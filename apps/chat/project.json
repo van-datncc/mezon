@@ -18,7 +18,8 @@
         "assets": ["apps/chat/src/favicon.ico", "apps/chat/src/assets"],
         "styles": ["apps/chat/src/styles.scss"],
         "scripts": [],
-        "webpackConfig": "apps/chat/webpack.config.js"
+        "webpackConfig": "apps/chat/webpack.config.js",
+        "postcssConfig": "apps/chat/postcss.config.js"
       },
       "configurations": {
         "development": {

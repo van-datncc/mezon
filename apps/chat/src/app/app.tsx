@@ -1,13 +1,23 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import ErrorPage from "./error-page";
+import Main from "./pages/main";
+
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
 
-import NxWelcome from './nx-welcome';
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Main />,
+    errorElement: <ErrorPage />,
+  },
+]);
 
 export function App() {
   return (
-    <div>
-      <NxWelcome title="chat" />
-    </div>
+    <RouterProvider router={router} />
   );
 }
 
