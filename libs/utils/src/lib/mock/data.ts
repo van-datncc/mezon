@@ -305,7 +305,7 @@ export const data = [
 
 export function getMessages() {
   return Array.from({ length: faker.datatype.number(10) }).map(
-    (_: any, i: number) => {
+    (_: unknown, i: number) => {
       const date = faker.date.past()
       return {
         id: i,

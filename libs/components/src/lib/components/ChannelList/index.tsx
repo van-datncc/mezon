@@ -1,52 +1,51 @@
 import { useState } from 'react'
 
-import { ServerData } from '@mezon/core'
+import { useChat } from '@mezon/core'
+
 import { Arrow } from '../Icons'
 import ChannelLink from '../ChannelLink'
+import { ICategory, IChannel } from '@mezon/utils'
 
-export type ChannelListProps = {
-  server: ServerData
-}
+export type ChannelListProps = { className?: string }
 
-function ChannelList({ server }: ChannelListProps) {
-  const [closedCategories, setClosedCategories] = useState<Array<number>>([])
+function ChannelList() {
+  const { categorizedChannels } = useChat()
+  const [categoriesState, setCategoriesState] = useState<Record<string, boolean>>({})
 
-  function toggleCategory(categoryId: number) {
-    setClosedCategories((closedCategories) =>
-      closedCategories.includes(categoryId)
-        ? closedCategories.filter((id) => id !== categoryId)
-        : [...closedCategories, categoryId]
-    )
+  function toggleCategory(categoryId: string) {
+    setCategoriesState((state) => ({
+      ...state,
+      [categoryId]: state[categoryId] ? !state[categoryId] : false
+    }))
   }
 
   return (
     <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide">
-      {server.categories.map((category) => (
+      {categorizedChannels.map((category: ICategory) => (
         <div key={category.id}>
-          {category.label && (
+          {category.name && (
             <button
               onClick={() => toggleCategory(category.id)}
               className="flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
             >
               <Arrow
                 className={`${
-                  closedCategories.includes(category.id) ? '-rotate-90' : ''
+                  categoriesState[category.id] ? '-rotate-90' : ''
                 } w-3 h-3 mr-0.5 transition duration-200`}
               />
-              {category.label}
+              {category.name}
             </button>
           )}
 
           <div className="mt-[5px] space-y-0.5">
-            {category.channels
-              .filter((channel) => {
-                let categoryIsOpen = !closedCategories.includes(category.id)
+            {category?.channels?.filter((channel: IChannel) => {
+                const categoryIsOpen = !categoriesState[category.id]
 
-                return categoryIsOpen || channel.unread
+                return categoryIsOpen || channel?.unread
               })
-              .map((channel) => (
+              .map((channel: IChannel) => (
                 <ChannelLink
-                  serverId={server.id}
+                  serverId={channel?.clanId}
                   channel={channel}
                   key={channel.id}
                 />

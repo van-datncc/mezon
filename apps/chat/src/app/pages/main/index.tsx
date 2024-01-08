@@ -1,12 +1,13 @@
 
 
 import { Image } from '@mezon/ui'
-
+import { useChat } from '@mezon/core'
 import { Discord, NavLink } from '@mezon/components'
-
-import { data } from '../../../../../../libs/core/src/lib/mock/data'
+import { IClan } from '@mezon/utils';
+import { MainContent } from './MainContent';
 
 function MyApp() {
+  const { clans } = useChat();
 
   return (
       <div className="flex h-screen text-gray-100">
@@ -17,23 +18,24 @@ function MyApp() {
 
           <hr className="mx-2 rounded border-t-2 border-t-white/[.06]" />
 
-          {data.map((server) => (
+          {clans.map((clan: IClan) => (
             <NavLink
-              href={`/servers/${server.id}/channels/${server.categories[0].channels[0].id}`}
+              href={`/servers/${clan.id}/channels/${clan.channelIds[0]}`}
               active={false}
-              key={server.id}
+              key={clan.id}
             >
               <Image
-                src={`/servers/${server.img}`}
-                alt={server.label}
+                src={clan.image}
+                alt={clan.name}
                 width={48}
                 height={48}
                 placeholder="blur"
-                blurDataURL={`/servers/${server.img}`}
+                blurDataURL={clan.image}
               />
             </NavLink>
           ))}
         </div>
+        <MainContent />
       </div>
   )
 }

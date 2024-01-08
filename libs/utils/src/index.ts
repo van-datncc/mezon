@@ -1,1 +1,2 @@
-export * from './lib/utils';
+export * from './lib/mock/data';
+export * from './lib/typings';

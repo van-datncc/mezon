@@ -1,12 +1,8 @@
 import {Image} from '@mezon/ui';
+import { IMessage } from '@mezon/utils';
 
 export type MessageWithUserProps = {
-  message: {
-    text: string
-    avatarUrl: string
-    user: string
-    date: string
-  }
+  message: IMessage;
 }
 
 function MessageWithUser({ message }: MessageWithUserProps) {
@@ -19,21 +15,21 @@ function MessageWithUser({ message }: MessageWithUserProps) {
           className="mt-0.5 mr-4 w-10 h-10 rounded-full"
           height={40}
           width={40}
-          src={message.avatarUrl}
-          alt={message.user}
-          blurDataURL={message.avatarUrl}
+          src={message.user?.avatarSm || ''}
+          alt={message.user?.username || ''}
+          blurDataURL={message?.user?.avatarSm || ''}
         />
       </div>
       <div>
         <p className="flex items-baseline">
           <span className="mr-2 font-medium text-green-400">
-            {message.user}
+            {message.user?.username}
           </span>
           <span className="text-xs font-medium text-gray-400">
             {message.date}
           </span>
         </p>
-        <p className="text-gray-100">{message.text}</p>
+        <p className="text-gray-100">{message.content}</p>
       </div>
     </div>
   )

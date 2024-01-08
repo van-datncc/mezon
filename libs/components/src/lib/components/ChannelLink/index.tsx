@@ -1,14 +1,11 @@
 import {Link} from 'react-router-dom'
-import * as Icons from '@mezon/components'
+import { IChannel } from '@mezon/utils'
+import { Hashtag, AddPerson } from '../Icons'
+
 
 export type ChannelLinkProps = {
-  serverId: number
-  channel: {
-    id: number
-    icon?: string
-    label: string
-    unread?: boolean
-  }
+  serverId: string
+  channel: IChannel
 }
 
 function ChannelLink({ serverId, channel }: ChannelLinkProps) {
@@ -31,9 +28,9 @@ function ChannelLink({ serverId, channel }: ChannelLinkProps) {
         {state === 'inactiveUnread' && (
           <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>
         )}
-        <Icons.Hashtag className="mr-1.5 w-5 h-5 text-gray-400" />
-        {channel.label}
-        <Icons.AddPerson className="ml-auto w-4 h-4 text-gray-200 hover:text-gray-100 opacity-0 group-hover:opacity-100" />
+        <Hashtag className="mr-1.5 w-5 h-5 text-gray-400" />
+        {channel.name}
+        <AddPerson className="ml-auto w-4 h-4 text-gray-200 hover:text-gray-100 opacity-0 group-hover:opacity-100" />
       </span>
     </Link>
   )
