@@ -21,7 +21,7 @@ function MyApp() {
           {clans.map((clan: IClan) => (
             <NavLink
               href={`/chat/servers/${clan.id}`}
-              active={false}
+              active={true}
               key={clan.id}
             >
               <Image

@@ -143,6 +143,7 @@ export function useChat() {
     categorizedChannels,
     currentClan,
     currentChanel,
+    currentChannelId,
     sendMessage,
     changeCurrentClan,
     changeCurrentChannel,

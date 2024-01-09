@@ -9,7 +9,7 @@ import { ICategory, IChannel } from '@mezon/utils'
 export type ChannelListProps = { className?: string }
 
 function ChannelList() {
-  const { categorizedChannels } = useChat()
+  const { categorizedChannels, currentChannelId } = useChat()
   const [categoriesState, setCategoriesState] = useState<Record<string, boolean>>({})
 
   function toggleCategory(categoryId: string) {
@@ -47,6 +47,7 @@ function ChannelList() {
                 <ChannelLink
                   serverId={channel?.clanId}
                   channel={channel}
+                  active={currentChannelId === channel.id}
                   key={channel.id}
                 />
               ))}

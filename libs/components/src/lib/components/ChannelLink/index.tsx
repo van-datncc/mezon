@@ -6,11 +6,12 @@ import { Hashtag, AddPerson } from '../Icons'
 export type ChannelLinkProps = {
   serverId: string
   channel: IChannel
+  active?: boolean
 }
 
-function ChannelLink({ serverId, channel }: ChannelLinkProps) {
+function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
 
-  const state = 'inactiveUnread'
+  const state = active ? 'active' : channel.unread ? 'inactiveUnread' : 'inactiveRead'
 
   const classes = {
     active: 'text-white bg-gray-550/[0.32]',
