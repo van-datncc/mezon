@@ -13,19 +13,19 @@ const preloadedState: PreloadedRootState = {
       entities: {
         'clan1': {
           id: 'clan1',
-          name: 'Clan 1',
+          name: 'Mezon',
           description: 'Clan 1 description',
           image: 'https://avatars.githubusercontent.com/u/57796807?s=280&v=4',
           channelIds: ['channel1'],
           memberIds: ['user1'],
           categories: [{
             id: 'category1',
-            name: 'Category 1',
+            name: 'General',
             channelIds: ['channel1'],
             clanId: 'clan1',
           }, {
             id: 'category2',
-            name: 'Category 2',
+            name: 'Development',
             channelIds: ['channel2', 'channel3'],
             clanId: 'clan1',
           }],
@@ -39,7 +39,7 @@ const preloadedState: PreloadedRootState = {
       entities: {
         'channel1': {
           id: 'channel1',
-          name: 'Channel 1',
+          name: 'Mezon',
           clanId: 'clan1',
           categoryId: 'category1',
           description: 'Channel 1 description',
@@ -49,7 +49,7 @@ const preloadedState: PreloadedRootState = {
         },
         'channel2': {
           id: 'channel2',
-          name: 'Channel 2',
+          name: 'Process',
           clanId: 'clan1',
           categoryId: 'category2',
           description: 'Channel 2 description',
@@ -59,7 +59,7 @@ const preloadedState: PreloadedRootState = {
         },
         'channel3': {
           id: 'channel3',
-          name: 'Channel 3',
+          name: 'Questions',
           clanId: 'clan1',
           categoryId: 'category2',
           description: 'Channel 3 description',
