@@ -36,6 +36,38 @@ export type IThread = {
     date: string;
 }
 
+export type IContextMenuItemAction = 'REST';
+
+export type IContextMenuItemMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+export type IContextMenuItemPayload = {
+    // any
+}
+
+export type IContextMenuItemCallback = {
+    // any
+}
+
+export type IContextMenuItem = {
+    label: string;
+    icon?: string;
+    action: IContextMenuItemAction;
+    method: IContextMenuItemMethod;
+    payload: IContextMenuItemPayload;
+}
+
+export type IMessageContextMenu = {
+
+}
+
+export type IMessageMeta = {
+    contextMenu: {
+        items: [{
+
+        }]
+    }
+}
+
 export type IMessage = {
     name: string;
     id: string;
