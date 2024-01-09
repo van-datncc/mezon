@@ -3,6 +3,7 @@ import { ChannelList, ChannelTopbar, ServerHeader } from '@mezon/components'
 
 import ChannelMessages from './ChanneMessages'
 import { useChat } from '@mezon/core'
+import { ChannelMessageBox } from './ChannelMessageBox'
 
 export default function Server() {
     const { currentChanel, currentClan } = useChat()
@@ -23,6 +24,10 @@ export default function Server() {
 
                 <div className="overflow-y-scroll flex-1">
                     <ChannelMessages />
+                </div>
+
+                <div className="flex-shrink-0">
+                    <ChannelMessageBox />
                 </div>
             </div>
         </>

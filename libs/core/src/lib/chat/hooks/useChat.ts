@@ -9,12 +9,14 @@ import {
   selectChannelsEntities,
   selectCurrentChannel,
   selectCurrentChannelId,
+  selectCurrentClanId,
   clansActions,
   channelsActions,
+  messagesActions,
   selectCurrentClan,
   selectClansEntities,
 } from '@mezon/store';
-import { IChannel } from '@mezon/utils';
+import { IChannel, IMessage } from '@mezon/utils';
 
 export function useChat() {
   const { client } = useNakama();
@@ -30,6 +32,7 @@ export function useChat() {
   const currentClan = useSelector(selectCurrentClan);
   const currentChanel = useSelector(selectCurrentChannel);
   const currentChannelId = useSelector(selectCurrentChannelId);
+  const currentClanId = useSelector(selectCurrentClanId);
   
   const { messages } = useMessages({ channelId: currentChannelId });
 
@@ -88,6 +91,33 @@ export function useChat() {
     dispatch(channelsActions.changeCurrentChanel(channelId));
   }, [channels, dispatch]);
 
+    const sendMessage = React.useCallback((message: IMessage) => {
+        // TODO: send message to server using nakama client
+        const payload = {
+            ...message,
+            id: Math.random().toString(),
+            date: new Date().toLocaleString(),
+            user: {
+                name: "My self",
+                username: 'myself',
+                id: 'myself',
+                avatarSm: 'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
+            }
+        }
+
+        if(!payload.channelId) {
+            payload.channelId = currentChannelId || ''
+        }
+
+        if(!payload.clanId) {
+            payload.clanId = currentClanId || ''
+        }
+
+        console.log('payload', payload)
+
+        dispatch(messagesActions.add(payload))
+    }, [currentChannelId, currentClanId, dispatch])
+
     React.useEffect(() => {
         if(!currentClan) {
             return
@@ -113,6 +143,7 @@ export function useChat() {
     categorizedChannels,
     currentClan,
     currentChanel,
+    sendMessage,
     changeCurrentClan,
     changeCurrentChannel,
   };
