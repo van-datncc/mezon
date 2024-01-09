@@ -15,7 +15,7 @@ const preloadedState: PreloadedRootState = {
           id: 'clan1',
           name: 'Mezon',
           description: 'Clan 1 description',
-          image: 'https://avatars.githubusercontent.com/u/57796807?s=280&v=4',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNkrnCQ0Q-FtMiBZGmCeQEJ5WTmxW50b4DgEXdM79-HyQvNPAvLJDnYhXSQHZXCdHRcgI&usqp=CAU',
           channelIds: ['channel1'],
           memberIds: ['user1'],
           categories: [{
@@ -88,7 +88,7 @@ const preloadedState: PreloadedRootState = {
           user: {
             id: 'user1',
             name: 'User 1',
-            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            avatarSm: 'https://avatar.iran.liara.run/public/17',
             username: 'user1',
           }
         },
@@ -102,7 +102,7 @@ const preloadedState: PreloadedRootState = {
           user: {
             id: 'user2',
             name: 'User 2',
-            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            avatarSm: 'https://avatar.iran.liara.run/public/47',
             username: 'user2',
           }
         },
@@ -117,7 +117,7 @@ const preloadedState: PreloadedRootState = {
           user: {
             id: 'user3',
             name: 'User 3',
-            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            avatarSm: 'https://avatar.iran.liara.run/public/48',
             username: 'user3',
           }
         },
@@ -131,7 +131,7 @@ const preloadedState: PreloadedRootState = {
           user: {
             id: 'user4',
             name: 'User 4',
-            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            avatarSm: 'https://avatar.iran.liara.run/public/43',
             username: 'user4',
           }
         },
@@ -145,7 +145,7 @@ const preloadedState: PreloadedRootState = {
           user: {
             id: 'user5',
             name: 'User 5',
-            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            avatarSm: 'https://avatar.iran.liara.run/public/11',
             username: 'user5',
           }
         },
