@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   selectChannelsEntities,
   selectCurrentChannel,
+  selectCurrentChannelId,
   clansActions,
   channelsActions,
   selectCurrentClan,
@@ -18,26 +19,27 @@ import { IChannel } from '@mezon/utils';
 export function useChat() {
   const { client } = useNakama();
   const { channels } = useChannels();
-  const { messages } = useMessages();
   const { clans } = useClans();
   const { threads } = useThreads();
-
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const ChannelsEntities = useSelector(selectChannelsEntities);
   const chanEntities = useSelector(selectClansEntities);
-
-
+  
+  
   const currentClan = useSelector(selectCurrentClan);
   const currentChanel = useSelector(selectCurrentChannel);
+  const currentChannelId = useSelector(selectCurrentChannelId);
+  
+  const { messages } = useMessages({ channelId: currentChannelId });
 
   const dispatch = useDispatch();
 
   const categorizedChannels = React.useMemo(() => {
     const categories = currentClan?.categories || [];
-    const channelIds = currentClan?.channelIds || [];
 
     const results = categories.map((category) => {
-      const categoryChannels = channelIds
-        .map((id) => ChannelsEntities[id])
+      const categoryChannels = channels
         .filter(
           (channel) => channel && channel?.categoryId === category.id
         ) as IChannel[];
@@ -49,7 +51,7 @@ export function useChat() {
     });
 
     return results;
-  }, [currentClan, ChannelsEntities]);
+  }, [currentClan, channels]);
 
   const changeCurrentClan = React.useCallback((optionalId?: string) => {
     let clanId = optionalId;
@@ -74,6 +76,33 @@ export function useChat() {
     dispatch(channelsActions.changeCurrentChanel(channelId));
   }, [clans, chanEntities, dispatch]);
 
+  const changeCurrentChannel = React.useCallback((optionalId?: string) => {
+    let channelId = optionalId;
+    if (!channelId) {
+      channelId = channels[0]?.id;
+    }
+    if (!channelId) {
+      return;
+    }
+
+    dispatch(channelsActions.changeCurrentChanel(channelId));
+  }, [channels, dispatch]);
+
+    React.useEffect(() => {
+        if(!currentClan) {
+            return
+        }
+        const channels = currentClan.channelIds || []
+        if(!channels.length) {
+            return
+        }
+        const channelId = channels[0]
+        if(!channelId) {
+            return
+        }
+        dispatch(channelsActions.changeCurrentChanel(channelId))
+    }, [currentClan, dispatch]);
+
 
   return {
     client,
@@ -85,5 +114,6 @@ export function useChat() {
     currentClan,
     currentChanel,
     changeCurrentClan,
+    changeCurrentChannel,
   };
 }

@@ -137,3 +137,12 @@ export const selectMessagesEntities = createSelector(
   getMessagesState,
   selectEntities
 );
+
+
+export const selectMessageByChannelId = (channelId?: string | null) => createSelector(
+  selectMessagesEntities,
+  (entities) => {
+    const messages = Object.values(entities);
+    return messages.filter((message) => message && message.channelId === channelId);
+  }
+);

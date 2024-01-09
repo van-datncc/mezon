@@ -21,7 +21,7 @@ function ChannelLink({ serverId, channel }: ChannelLinkProps) {
   }
 
   return (
-    <Link to={`/servers/${serverId}/channels/${channel.id}`}>
+    <Link to={`/chat/servers/${serverId}/channels/${channel.id}`}>
       <span
         className={`${classes[state]} flex items-center px-2 mx-2 py-1 rounded group relative`}
       >

@@ -1,5 +1,5 @@
 
-import { MessageWithUser } from '@mezon/components'
+import { ChannelMessage } from './ChannelMessage'
 import { useChat } from '@mezon/core'
 
 export default function ChannelMessages() {
@@ -8,9 +8,7 @@ export default function ChannelMessages() {
     return (
         <>
             {messages.map((message, i) => (
-                <div key={message.id}>
-                    <MessageWithUser message={message} />
-                </div>
+                <ChannelMessage key={i} message={message} />
             ))}
         </>
     )

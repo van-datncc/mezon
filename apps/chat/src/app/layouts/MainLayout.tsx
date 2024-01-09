@@ -4,13 +4,18 @@ import React, { useEffect } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 const MainLayout = () => {
-    const { serverId: serverIdParams } = useParams();
-    const { changeCurrentClan, currentClan, currentChanel } = useChat();
+    const { serverId: serverIdParams, channelId: channelIdParams } = useParams();
+    const { changeCurrentClan, changeCurrentChannel ,currentClan, currentChanel } = useChat();
     const navigate = useNavigate();
 
    useEffect(() => {
-    changeCurrentClan();
+    changeCurrentClan(serverIdParams);
    }, [changeCurrentClan, serverIdParams]);
+
+
+   useEffect(() => {
+    changeCurrentChannel(channelIdParams);
+   }, [changeCurrentChannel, channelIdParams]);
 
    useEffect(() => {
     if (!currentClan?.id) {

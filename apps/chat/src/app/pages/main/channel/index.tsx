@@ -1,22 +1,25 @@
 
 import { ChannelList, ChannelTopbar, ServerHeader } from '@mezon/components'
 
-import { data } from '@mezon/utils'
 import ChannelMessages from './ChanneMessages'
+import { useChat } from '@mezon/core'
 
 export default function Server() {
-    const server = data[0]
-    const channel = server.categories[0].channels[0]
+    const { currentChanel, currentClan } = useChat()
+
+    if (!currentClan || !currentChanel) {
+        return <div>Loading...</div>
+    }
 
     return (
         <>
             <div className="hidden flex-col w-60 bg-gray-800 md:flex">
-                <ServerHeader name={server.label} />
+                <ServerHeader name={currentClan?.name} />
                 <ChannelList />
             </div>
 
             <div className="flex flex-col flex-1 shrink min-w-0 bg-gray-700">
-                <ChannelTopbar channel={channel} />
+                <ChannelTopbar channel={currentChanel} />
 
                 <div className="overflow-y-scroll flex-1">
                     <ChannelMessages />

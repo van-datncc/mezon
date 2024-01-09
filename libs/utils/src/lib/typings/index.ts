@@ -23,6 +23,7 @@ export type IChannel = {
     clanId: string;
     categoryId: string;
     memberIds: string[];
+    description?: string;
     threadIds: string[];
     unread: boolean
 }
@@ -57,15 +58,11 @@ export type IContextMenuItem = {
 }
 
 export type IMessageContextMenu = {
-
+    items: IContextMenuItem[];
 }
 
 export type IMessageMeta = {
-    contextMenu: {
-        items: [{
-
-        }]
-    }
+    contextMenu: IMessageContextMenu
 }
 
 export type IMessage = {
@@ -76,6 +73,7 @@ export type IMessage = {
     content: string;
     date: string;
     user?: IUser;
+    isMe?: boolean;
 }
 
 export type IUser = {

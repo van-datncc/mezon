@@ -23,8 +23,13 @@ const preloadedState: PreloadedRootState = {
             name: 'Category 1',
             channelIds: ['channel1'],
             clanId: 'clan1',
+          }, {
+            id: 'category2',
+            name: 'Category 2',
+            channelIds: ['channel2', 'channel3'],
+            clanId: 'clan1',
           }],
-          categoryIds: [],
+          categoryIds: ['category1', 'category2'],
         }
       },
       ids: ['clan1'],
@@ -37,12 +42,33 @@ const preloadedState: PreloadedRootState = {
           name: 'Channel 1',
           clanId: 'clan1',
           categoryId: 'category1',
+          description: 'Channel 1 description',
           unread: false,
           memberIds: [],
           threadIds: [],
-        }
+        },
+        'channel2': {
+          id: 'channel2',
+          name: 'Channel 2',
+          clanId: 'clan1',
+          categoryId: 'category2',
+          description: 'Channel 2 description',
+          unread: false,
+          memberIds: [],
+          threadIds: [],
+        },
+        'channel3': {
+          id: 'channel3',
+          name: 'Channel 3',
+          clanId: 'clan1',
+          categoryId: 'category2',
+          description: 'Channel 3 description',
+          unread: false,
+          memberIds: [],
+          threadIds: [],
+        }   
       },
-      ids: ['channel1'],
+      ids: ['channel1', 'channel2', 'channel3'],
     },
     threads: {
       loadingStatus: 'loaded',
@@ -54,7 +80,7 @@ const preloadedState: PreloadedRootState = {
       entities: {
         '1': {
           id: '1',
-          content: 'Hello',
+          content: 'Welcome to Mezon',
           channelId: 'channel1',
           clanId: 'clan1',
           date: new Date().toLocaleString(),
@@ -68,7 +94,7 @@ const preloadedState: PreloadedRootState = {
         },
         '2': {
           id: '2',
-          content: 'Hello',
+          content: 'Hi guys, I am new here',
           channelId: 'channel1',
           clanId: 'clan1',
           date: new Date().toLocaleString(),
@@ -82,18 +108,47 @@ const preloadedState: PreloadedRootState = {
         },
         '3': {
           id: '3',
-          content: 'Hello',
+          content: 'Let\'s talk about Mezon',
           channelId: 'channel1',
           clanId: 'clan1',
           date: new Date().toLocaleString(),
           name: 'User 3',
+          isMe: true,
           user: {
             id: 'user3',
             name: 'User 3',
             avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
             username: 'user3',
           }
-        }
+        },
+        '4': {
+          id: '4',
+          content: 'Anybody here?',
+          channelId: 'channel2',
+          clanId: 'clan1',
+          date: new Date().toLocaleString(),
+          name: 'User 4',
+          user: {
+            id: 'user4',
+            name: 'User 4',
+            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            username: 'user4',
+          }
+        },
+        '5': {
+          id: '5',
+          content: 'Everybody is sleeping',
+          channelId: 'channel3',
+          clanId: 'clan1',
+          date: new Date().toLocaleString(),
+          name: 'User 5',
+          user: {
+            id: 'user5',
+            name: 'User 5',
+            avatarSm: 'https://static.vecteezy.com/system/resources/previews/013/042/571/original/default-avatar-profile-icon-social-media-user-photo-in-flat-style-vector.jpg',
+            username: 'user5',
+          }
+        },
       },
       ids: ['1', '2', '3'],
     },
