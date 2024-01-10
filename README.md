@@ -15,6 +15,7 @@ To start the development server run `nx run chat:serve`. Open your browser and n
 ## Directory Structure
 
 project-root/
+    
     │
     ├── apps/              
     │   ├── admin:                          ## Directory containing resources, libraries, and components related to the admin role;  
