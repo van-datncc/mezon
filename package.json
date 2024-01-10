@@ -2,7 +2,9 @@
   "name": "@mezon-fe/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev:chat": "nx run chat:serve"
+  },
   "private": true,
   "dependencies": {
     "@heroiclabs/nakama-js": "^2.7.1",
