@@ -1,22 +1,25 @@
 import React, { useCallback } from 'react';
 import { CreateNakamaClientOptions, createClient as createNakamaClient } from '../nakama';
 import { Client, Session } from '@heroiclabs/nakama-js';
+import { DeviceUUID } from "device-uuid";
 
-type NakamaContextProviderProps = {
+type MezonContextProviderProps = {
     children: React.ReactNode
     nakama: CreateNakamaClientOptions
+    connect?: boolean
 }
 
-export type NakamaContextValue = {
+export type MezonContextValue = {
     client?: Client | null
     session?: Session | null
     createClient: () => Promise<Client>
     authenticateEmail: (email: string, password: string) => Promise<Session>
+    authenticateDevice: (username: string) => Promise<Session>
 }
 
-const NakamaContext = React.createContext<NakamaContextValue>({} as NakamaContextValue);
+const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
-const NakamaContextProvider: React.FC<NakamaContextProviderProps> = ({ children, nakama }) => {
+const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, nakama, connect }) => {
     const [client, setClient] = React.useState<Client|null>(null);
     const [session, setSession] = React.useState<Session|null>(null);
 
@@ -37,23 +40,45 @@ const NakamaContextProvider: React.FC<NakamaContextProviderProps> = ({ children,
         return session;
     }, [client]);
 
-    const value = React.useMemo<NakamaContextValue>(() => ({
+    const authenticateDevice = useCallback(async (username: string) => {
+
+        if (!client) {
+            throw new Error('Nakama client not initialized');
+        }
+
+        const deviceId = new DeviceUUID().get();
+
+        const session = await client
+          .authenticateDevice(deviceId, true, username)
+          setSession(session);
+            return session;
+    }, [client]);
+
+    const value = React.useMemo<MezonContextValue>(() => ({
         client,
         session,
         createClient,
+        authenticateDevice,
         authenticateEmail,
     }), [
         client,
         session,
         createClient,
+        authenticateDevice,
         authenticateEmail,
     ]);
 
+    React.useEffect(() => {
+        if (connect) {
+            createClient();
+        }
+    }, [connect, createClient]);
+
     return (
-        <NakamaContext.Provider value={value}>
+        <MezonContext.Provider value={value}>
             {children}
-        </NakamaContext.Provider>
+        </MezonContext.Provider>
     );
 }
 
-export { NakamaContext, NakamaContextProvider };
+export { MezonContext, MezonContextProvider };

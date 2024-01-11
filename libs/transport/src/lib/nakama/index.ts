@@ -1,7 +1,7 @@
 import {Client} from "@heroiclabs/nakama-js";
 
 export type CreateNakamaClientOptions = {
-    useSSL: boolean;
+    ssl: boolean;
     host: string;
     port: string;
     key: string;
@@ -9,8 +9,8 @@ export type CreateNakamaClientOptions = {
 }
 
 export function createClient(options: CreateNakamaClientOptions) {
-    const {useSSL, host, port, key} = options;
-    const client = new Client(key, host, port, useSSL);
+    const {ssl, host, port, key} = options;
+    const client = new Client(key, host, port, ssl);
 
     return client;
     
