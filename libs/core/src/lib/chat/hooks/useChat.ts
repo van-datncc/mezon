@@ -2,8 +2,8 @@ import { useChannels } from './useChannels';
 import { useMessages } from './useMessages';
 import { useClans } from './useClans';
 import { useThreads } from './useThreads';
-import { useNakama } from '@mezon/transport';
-import React from 'react';
+import { useMezon } from '@mezon/transport';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectChannelsEntities,
@@ -15,11 +15,12 @@ import {
   messagesActions,
   selectCurrentClan,
   selectClansEntities,
+  authActions,
 } from '@mezon/store';
 import { IChannel, IMessage } from '@mezon/utils';
 
 export function useChat() {
-  const { client } = useNakama();
+  const { client, createClient, authenticateDevice } = useMezon();
   const { channels } = useChannels();
   const { clans } = useClans();
   const { threads } = useThreads();
@@ -113,10 +114,28 @@ export function useChat() {
             payload.clanId = currentClanId || ''
         }
 
-        console.log('payload', payload)
-
         dispatch(messagesActions.add(payload))
     }, [currentChannelId, currentClanId, dispatch])
+
+    const init = useCallback(() => {
+        createClient()
+    }, [createClient])
+
+    const loginEmail = useCallback(async (username: string, password: string) => {
+      if (!client) {
+        return;
+      }
+      const session = await client.authenticateEmail(username, password)
+      return session
+    }, [client])
+
+    const loginDevice = useCallback(async (username: string) => {
+      if (!client) {
+        return;
+      }
+      const session = await authenticateDevice(username)
+      return session
+    }, [authenticateDevice, client])
 
     React.useEffect(() => {
         if(!currentClan) {
@@ -144,8 +163,11 @@ export function useChat() {
     currentClan,
     currentChanel,
     currentChannelId,
+    init,
     sendMessage,
     changeCurrentClan,
     changeCurrentChannel,
+    loginEmail,
+    loginDevice
   };
 }

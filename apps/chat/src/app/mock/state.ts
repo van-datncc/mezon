@@ -8,6 +8,9 @@ const preloadedState: PreloadedRootState = {
     auth: {
       loadingStatus: 'loaded',
     },
+    account: {
+      loadingStatus: 'loaded',
+    },
     clans: {
       loadingStatus: 'loaded',
       entities: {

@@ -8,9 +8,9 @@ import AppLayout from '../layouts/AppLayout';
 import ServerLayout from '../layouts/ServerLayout';
 
 // Pages
-import Guess from '../pages/guess';
 import Main from '../pages/main';
-import Chanel from '../pages/main/channel';
+import Chanel from '../pages/channel';
+import Login from '../pages/login';
 
 // Components
 export const routes = createBrowserRouter([
@@ -22,8 +22,8 @@ export const routes = createBrowserRouter([
         path: "/guess",
         element: <GuessLayout />,
         children: [{
-          path: "",
-          element: <Guess />
+          path: "login",
+          element: <Login />,
         }]
       },
       {

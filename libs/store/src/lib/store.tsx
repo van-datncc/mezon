@@ -2,6 +2,7 @@ import { PreloadedState, StateFromReducersMapObject, configureStore } from '@red
 
 
 import { appReducer } from './app/app.slice'
+import { accountReducer } from './account/account.slice'
 import { authReducer  } from './auth/auth.slice'
 import { clansReducer } from './clans/clans.slice'
 import { channelsReducer } from './channels/channels.slice'
@@ -11,6 +12,7 @@ import { usersReducer } from './users/users.slice'
 
 const reducer = {
   app: appReducer,
+  account: accountReducer,
   auth: authReducer,
   clans: clansReducer,
   channels: channelsReducer,
