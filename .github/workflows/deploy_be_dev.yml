@@ -1,0 +1,34 @@
+name: Deploy Mezon FE Dev
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: mezon-server-dev
+    name: Build Mezon FE
+    environment: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Build
+        run: |
+          echo "Build"
+
+  deploy:
+    runs-on: mezon-server-dev
+    name: Deploy Mezon FE
+    environment: dev
+    needs:
+      - build
+    steps:
+      - name: Clear www folder
+        run: |
+          echo "Clearing www"
+   
+      - name: Copy files to www
+        run: |
+          echo "Copying files to www"
