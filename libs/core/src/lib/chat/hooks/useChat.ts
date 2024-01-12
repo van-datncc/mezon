@@ -15,7 +15,6 @@ import {
   messagesActions,
   selectCurrentClan,
   selectClansEntities,
-  authActions,
 } from '@mezon/store';
 import { IChannel, IMessage } from '@mezon/utils';
 

@@ -7,7 +7,7 @@
   },
   "private": true,
   "dependencies": {
-    "@heroiclabs/nakama-js": "^2.7.1",
+    "@heroiclabs/nakama-js": "file:vendors/mezon-js/packages/nakama-js",
     "@reduxjs/toolkit": "1.9.3",
     "@swc/helpers": "~0.5.2",
     "date-fns": "^3.1.0",
