@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: mezon-server-dev
+    runs-on: mezone-fe-dev
     name: Build Mezon FE
     environment: dev
     steps:
@@ -20,7 +20,7 @@ jobs:
           npm run build:chat
 
   deploy:
-    runs-on: mezon-server-dev
+    runs-on: mezone-fe-dev
     name: Deploy Mezon FE
     environment: dev
     needs:
