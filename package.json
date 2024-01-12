@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "dev:chat": "nx run chat:serve",
-    "preinstall": "sh ./scripts/preinstall.sh"
+    "preinstall": "sh ./scripts/preinstall.sh",
+    "build:chat": "nx run chat:build"
   },
   "private": true,
   "dependencies": {

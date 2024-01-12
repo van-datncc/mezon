@@ -17,6 +17,7 @@ jobs:
       - name: Build
         run: |
           echo "Build"
+          npm run build:chat
 
   deploy:
     runs-on: mezon-server-dev
@@ -27,8 +28,10 @@ jobs:
     steps:
       - name: Clear www folder
         run: |
-          echo "Clearing www"
+          echo "Clearing /var/www/mezon/"
+          rm -rf /var/www/mezon/*
    
       - name: Copy files to www
         run: |
-          echo "Copying files to www"
+          echo "Copying files to /var/www/mezon/"
+          cp -r ./dist/apps/chat/* /var/www/mezon/
