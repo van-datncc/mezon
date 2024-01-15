@@ -17,7 +17,7 @@ jobs:
           echo "NODE_ENV: ${{ env.NODE_ENV }}"
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
-          npm install
+          npm install | true
       - name: Build
         run: |
           echo "Build"
