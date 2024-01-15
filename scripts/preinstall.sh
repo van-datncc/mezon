@@ -1,4 +1,6 @@
 # add ssh keys
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+
 echo "Adding ssh keys"
 eval `ssh-agent -s`
 chmod 600 ./ssh/id_gh_ncc
