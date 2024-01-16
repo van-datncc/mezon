@@ -1,7 +1,6 @@
 import { BaseSyntheticEvent, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AlertTitleTextWarning } from '../../../../../ui/src/lib/Alert/index';
-import GoogleButtonLogin from './GoogleButton/index';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import line from '../../../../../../src/assets/Vector 1.svg';
@@ -72,7 +71,6 @@ function LoginForm(props: LoginFormProps) {
 
   return (
     <div className="flex-col justify-start items-center flex w-[496px] h-fit gap-y-8 ">
-      <GoogleButtonLogin />
       <div className="flex-row justify-start items-center flex w-full h-fit gap-x-4 ">
         <div>
           <img src={line} alt="line" />
@@ -96,7 +94,11 @@ function LoginForm(props: LoginFormProps) {
                 ✱
               </p>
             </div>
-            <div className="flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e]">
+            <div
+              className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${
+                errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
+              }`}
+            >
               <input
                 className="w-full h-6  bg-transparent outline-none relative text-white"
                 {...register('userEmail')}
@@ -105,12 +107,6 @@ function LoginForm(props: LoginFormProps) {
                 placeholder="Enter your email/phone number"
                 autoComplete="none"
               />
-
-              {errors.userEmail && (
-                <p className="absolute mt-[4.5rem] ml-[-1rem] text-xs text-red-400">
-                  {errors.userEmail.message}
-                </p>
-              )}
             </div>
           </div>
 
@@ -125,7 +121,11 @@ function LoginForm(props: LoginFormProps) {
             </div>
 
             <div className="flex-col justify-start items-start flex w-full h-fit ">
-              <div className="flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] border-[#1e1e1e]">
+              <div
+                className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] ${
+                  errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
+                } `}
+              >
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="w-full h-6 bg-transparent outline-none text-white"
@@ -144,11 +144,6 @@ function LoginForm(props: LoginFormProps) {
                     alt="eye"
                   />
                 </button>
-                {errors.password && (
-                  <p className="absolute mt-[4.5rem] ml-[-1rem] text-xs text-red-400">
-                    {errors.password.message}{' '}
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -185,6 +180,15 @@ function LoginForm(props: LoginFormProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div>
+        {errors.password && (
+          <AlertTitleTextWarning description={errors?.password?.message} />
+        )}
+        {errors.userEmail && (
+          <AlertTitleTextWarning description={errors?.userEmail?.message} />
+        )}
       </div>
     </div>
   );

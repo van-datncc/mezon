@@ -4,6 +4,7 @@ import React from 'react';
 import { getMezonSession } from 'libs/utils/src/lib/storage/storage';
 import { QRSection } from 'libs/components/src/lib/components/LoginForm/QR/index';
 import { TitleSection } from 'libs/components/src/lib/components/LoginForm/Title/index';
+import GoogleButtonLogin from 'libs/components/src/lib/components/LoginForm/GoogleButton';
 
 function Login() {
   const { loginDevice, loginEmail } = useChat();
@@ -33,7 +34,8 @@ function Login() {
         <div className="flex-row justify-center items-center flex w-[850px] h-fit p-12 gap-x-12 rounded-2xl bg-[#0b0b0b]">
           <div className="flex-col justify-start items-center flex w-full h-fit p-0 gap-y-8">
             <TitleSection />
-            <LoginForm onSubmit={handleSubmit} />
+            <GoogleButtonLogin />
+            <LoginForm onSubmit={handleSubmit}/>
           </div>
           <QRSection />
         </div>
@@ -43,3 +45,5 @@ function Login() {
 }
 
 export default Login;
+
+
