@@ -129,32 +129,33 @@ export function useChat() {
     createClient();
   }, [createClient]);
 
-  const ssFake = {
-    created: true,
-    token: 'FAKE-TOKEN',
-    refreshToken: 'FAKE-RTOKEN',
-    createdAt: 5,
-    refreshExpiresAt: 5,
-    expiresAt: 5,
-    username: 'FAKE-USERNAME',
-    userId: 'FAKE-USERID',
-    vars: 'FAKE-VARS',
-  };
+  // const ssFake = {
+  //   created: true,
+  //   token: 'FAKE-TOKEN',
+  //   refreshToken: 'FAKE-RTOKEN',
+  //   createdAt: 5,
+  //   refreshExpiresAt: 5,
+  //   expiresAt: 5,
+  //   username: 'FAKE-USERNAME',
+  //   userId: 'FAKE-USERID',
+  //   vars: 'FAKE-VARS',
+  // };
 
   const loginEmail = useCallback(
     async (username: string, password: string) => {
       if (!client) {
         return;
       }
-      // const session = await client.authenticateEmail(username, password);
-      dispatch(authActions.setSession(ssFake));
+      const session = await client.authenticateEmail(username, password);
+      const sessionJson = JSON.stringify(session);
+      dispatch(authActions.setSession(sessionJson));
       dispatch(
         accountActions.setAccount({
           email: username,
           password: password,
         })
       );
-      return ssFake;
+      return session;
     },
     [client]
   );
@@ -164,9 +165,10 @@ export function useChat() {
       if (!client) {
         return;
       }
-      // const session = await client.authenticateGoogle(token);
-      dispatch(authActions.setSession(ssFake));
-      return ssFake;
+      const session = await client.authenticateGoogle(token);
+      const sessionJson = JSON.stringify(session);
+      dispatch(authActions.setSession(sessionJson));
+      return session;
     },
     [client]
   );

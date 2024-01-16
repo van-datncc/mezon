@@ -1,9 +1,12 @@
-import { BaseSyntheticEvent, useCallback } from 'react';
+import { BaseSyntheticEvent, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AlertTitleTextWarning } from '../../../../../ui/src/lib/Alert/index';
-import GoogleButtonLogin from '../../../../../ui/src/lib/GoogleButton/index';
+import GoogleButtonLogin from './GoogleButton/index';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import line from '../../../../../../src/assets/Vector 1.svg';
+import eyeOpen from '../../../../../../src/assets/Live area open.svg';
+import eyeClose from '../../../../../../src/assets/Live area close.svg';
 
 export type LoginFormPayload = {
   userEmail: string;
@@ -15,7 +18,7 @@ type LoginFormProps = {
   onSubmit: (data: LoginFormPayload) => void;
 };
 
-const validationSchema = Yup.object().shape({
+export const validationSchema = Yup.object().shape({
   userEmail: Yup.string()
     .email('Invalid email address')
     .required('Email is required'),
@@ -45,8 +48,6 @@ function LoginForm(props: LoginFormProps) {
 
   const submitForm = useCallback(
     (data: LoginFormPayload) => {
-      // console.log('dataLogin', data);
-
       if (typeof onSubmit === 'function') {
         onSubmit(data);
       }
@@ -63,90 +64,129 @@ function LoginForm(props: LoginFormProps) {
     [handleSubmit, submitForm]
   );
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <>
-      <form className="space-y-4 md:space-y-6" onSubmit={handleFormSubmit}>
+    <div className="flex-col justify-start items-center flex w-[496px] h-fit gap-y-8 ">
+      <GoogleButtonLogin />
+      <div className="flex-row justify-start items-center flex w-full h-fit gap-x-4 ">
         <div>
-          <label
-            htmlFor="userEmail"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Your email:
-          </label>
-          <input
-            {...register('userEmail')}
-            type="text"
-            name="userEmail"
-            id="userEmail"
-            className="bg-gray-50 border border-gray-300 text-gray-900 
-            sm:text-sm rounded-lg focus:ring-primary-600 
-            focus:border-primary-600 block w-full p-2.5
-            dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
-            dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="name@company.com"
-          />
-          {errors.userEmail && (
-            <p className="mt-1 absolute text-xs  text-red-400">
-              {errors.userEmail.message}
-            </p>
-          )}
+          <img src={line} alt="line" />
         </div>
+        <p className="w-fit h-fit font-manrope text-sm text-[#aeaeae] leading-[130%]">
+          or
+        </p>
         <div>
-          <label
-            htmlFor="password"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Password:
-          </label>
-          <input
-            {...register('password')}
-            type="password"
-            name="password"
-            id="password"
-            placeholder="••••••••"
-            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          />
-          {errors.password && (
-            <p className=" mt-1 absolute text-xs  text-red-400">
-              {errors.password.message}
-            </p>
-          )}
+          <img src={line} alt="line" />
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-start">
-            <div className="flex items-center h-5">
-              <input
-                {...register('remember')}
-                id="remember"
-                aria-describedby="remember"
-                type="checkbox"
-                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-              />
+      </div>
+
+      <div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
+        <div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
+          <div className="flex-col justify-start items-start flex w-full h-fit gap-y-3 relative">
+            <div className="flex-row justify-start items-center flex w-full h-fit gap-x-1 ">
+              <p className="w-fit h-fit font-manrope text-left text-sm font-medium text-[#cccccc] leading-[150%]">
+                Email or Phone number
+              </p>
+              <p className="w-fit font-manrope h-fit text-left text-xs font-medium text-[#dc2626] leading-[150%]">
+                ✱
+              </p>
             </div>
-            <div className="ml-3 text-sm">
-              <label
-                htmlFor="remember"
-                className="text-gray-500 dark:text-gray-300"
-              >
-                Remember me
-              </label>
+            <div className="flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e]">
+              <input
+                className="w-full h-6  bg-transparent outline-none relative text-white"
+                {...register('userEmail')}
+                name="userEmail"
+                id="userEmail"
+                placeholder="Enter your email/phone number"
+                autoComplete="none"
+              />
+
+              {errors.userEmail && (
+                <p className="absolute mt-[4.5rem] ml-[-1rem] text-xs text-red-400">
+                  {errors.userEmail.message}
+                </p>
+              )}
             </div>
           </div>
-          <a
-            href="#"
-            className="text-sm font-medium text-primary-600 hover:underline dark:text-white"
+
+          <div className="flex-col justify-start items-start flex w-full h-fit gap-y-3 ">
+            <div className="flex-row justify-start items-center flex w-full h-fit gap-x-1 ">
+              <p className="w-fit h-fit font-manrope text-left text-sm font-medium text-[#cccccc] leading-[150%]">
+                Password
+              </p>
+              <p className="w-fit h-fit font-manrope text-left text-xs font-medium text-[#dc2626] leading-[150%]">
+                ✱
+              </p>
+            </div>
+
+            <div className="flex-col justify-start items-start flex w-full h-fit ">
+              <div className="flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] border-[#1e1e1e]">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="w-full h-6 bg-transparent outline-none text-white"
+                  {...register('password')}
+                  name="password"
+                  id="password"
+                  placeholder="Enter your password"
+                />
+                <button
+                  onClick={togglePasswordVisibility}
+                  className="outline-none z-50 fill-current left-0"
+                >
+                  <img
+                    className="w-6 h-6"
+                    src={showPassword ? eyeOpen : eyeClose}
+                    alt="eye"
+                  />
+                </button>
+                {errors.password && (
+                  <p className="absolute mt-[4.5rem] ml-[-1rem] text-xs text-red-400">
+                    {errors.password.message}{' '}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p className="w-full h-fit font-manrope text-left text-sm font-medium text-[#528bff] leading-[150%]">
+          <span>
+            <a className="hover:underline cursor-pointer">
+              Forgot your password?
+            </a>
+          </span>
+        </p>
+
+        <div className="flex-col justify-start items-start flex w-full h-fit">
+          <button
+            onClick={handleFormSubmit}
+            className="flex-col justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 rounded-[4px] bg-[#155eef] "
           >
-            Forgot password?
-          </a>
-        </div>
-        <div className="flex flex-col-reverse space-y-4 md:space-y-0 md:flex-row md:justify-between md:items-center">
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-            Sign in
+            <p className="w-fit h-fit font-manrope text-left text-base font-medium text-[#ffffff] leading-[150%]">
+              Sign in
+            </p>
           </button>
+
+          <div className="flex-row justify-start items-center flex w-full h-fit gap-y-2 ">
+            <p className="w-fit h-fit font-manrope text-left text-sm font-normal text-[#cccccc] leading-[130%]">
+              Need an account?
+            </p>
+            <div className="flex-col justify-start items-center flex w-fit h-fit pt-2 pr-4 pb-2 pl-4 rounded-[4px] ">
+              <p className="w-fit h-fit font-manrope text-left text-sm font-medium hover:underline text-[#528bff] leading-[130%]">
+                <span>
+                  <a className="hover:underline cursor-pointer">Sign up</a>
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
-      </form>
-      <GoogleButtonLogin />
-    </>
+      </div>
+    </div>
   );
 }
 

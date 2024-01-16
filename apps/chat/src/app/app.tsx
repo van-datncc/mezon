@@ -11,13 +11,14 @@ import { MezonUiProvider } from '@mezon/ui';
 import { routes } from './routes/index';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
+import { useEffect } from 'react';
+import WebFont from 'webfontloader';
 
 const store = initStore(preloadedState);
-const GOOGLE_CLIENT_ID =
-  '848059125942-6sujlck9t2joksnnmjamn2o0klohmqoi.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID ='1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
 const nakama: CreateNakamaClientOptions = {
-  host: '172.16.100.126',
+  host: 'dev-mezon.nccsoft.vn',
   port: '7350',
   key: 'defaultkey',
   ssl: false,
@@ -26,6 +27,13 @@ const nakama: CreateNakamaClientOptions = {
 const theme = 'light';
 
 export function App() {
+  useEffect(() => {
+    WebFont.load({
+      google: {
+        families: ['Manrope'],
+      },
+    });
+  }, []);
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <MezonStoreProvider store={store}>
