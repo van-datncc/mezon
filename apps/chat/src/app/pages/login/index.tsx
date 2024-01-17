@@ -1,7 +1,6 @@
 import { LoginForm, LoginFormPayload } from '@mezon/components';
 import { useChat } from '@mezon/core';
 import React from 'react';
-import { getMezonSession } from 'libs/utils/src/lib/storage/storage';
 import { QRSection } from 'libs/components/src/lib/components/LoginForm/QR/index';
 import { TitleSection } from 'libs/components/src/lib/components/LoginForm/Title/index';
 import GoogleButtonLogin from 'libs/components/src/lib/components/LoginForm/GoogleButton';

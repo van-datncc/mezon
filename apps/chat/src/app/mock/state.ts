@@ -5,9 +5,13 @@ const preloadedState: PreloadedRootState = {
       theme: 'light',
       loadingStatus: 'loaded', 
     },
-    auth: {
-      loadingStatus: 'loaded',
-    },
+    // auth: {
+    //   loadingStatus: 'loaded',
+    //   _persist: {
+    //     version: 1,
+    //     rehydrated: true
+    //   }
+    // },
     account: {
       loadingStatus: 'loaded',
     },

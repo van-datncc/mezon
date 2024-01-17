@@ -14,8 +14,11 @@ import { preloadedState } from './mock/state';
 import { useEffect } from 'react';
 import WebFont from 'webfontloader';
 
-const store = initStore(preloadedState);
-const GOOGLE_CLIENT_ID ='1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
+
+const { store, persistor } = initStore(preloadedState);
+
+const GOOGLE_CLIENT_ID =
+  '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
 const nakama: CreateNakamaClientOptions = {
   host: 'dev-mezon.nccsoft.vn',
@@ -36,12 +39,12 @@ export function App() {
   }, []);
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <MezonStoreProvider store={store}>
-        <MezonUiProvider themeName={theme}>
-          <MezonContextProvider nakama={nakama} connect={true}>
-            <RouterProvider router={routes} />
-          </MezonContextProvider>
-        </MezonUiProvider>
+      <MezonStoreProvider store={store} loading={null} persistor={persistor} >
+          <MezonUiProvider themeName={theme}>
+            <MezonContextProvider nakama={nakama} connect={true}>
+              <RouterProvider router={routes} />
+            </MezonContextProvider>
+          </MezonUiProvider>
       </MezonStoreProvider>
     </GoogleOAuthProvider>
   );

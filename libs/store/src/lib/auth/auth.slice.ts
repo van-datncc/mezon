@@ -1,11 +1,4 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { string } from 'yup';
-import {
-  getMezonSession,
-  saveMezonSession,
-  removeMezonSession,
-} from '../../../../utils/src/lib/storage/storage';
-
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
@@ -38,12 +31,10 @@ export const authSlice = createSlice({
   initialState: initialAuthState,
   reducers: {
     setSession(state, action) {
-      saveMezonSession(action.payload);
       state.session = action.payload;
       state.isLogin = true;
     },
     logOut(state) {
-      removeMezonSession();
       state.session = null;
       state.isLogin = false;
     },

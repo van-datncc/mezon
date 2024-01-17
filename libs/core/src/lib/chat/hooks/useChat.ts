@@ -129,17 +129,6 @@ export function useChat() {
     createClient();
   }, [createClient]);
 
-  // const ssFake = {
-  //   created: true,
-  //   token: 'FAKE-TOKEN',
-  //   refreshToken: 'FAKE-RTOKEN',
-  //   createdAt: 5,
-  //   refreshExpiresAt: 5,
-  //   expiresAt: 5,
-  //   username: 'FAKE-USERNAME',
-  //   userId: 'FAKE-USERID',
-  //   vars: 'FAKE-VARS',
-  // };
 
   const loginEmail = useCallback(
     async (username: string, password: string) => {
