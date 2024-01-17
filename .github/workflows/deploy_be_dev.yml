@@ -17,6 +17,7 @@ jobs:
           echo "NODE_ENV: ${{ env.NODE_ENV }}"
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
+          npm install @nrwl/nx-linux-x64-gnu
           npm install | true
       - name: Build
         run: |
