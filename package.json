@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "ssh:fix": "dos2unix ./ssh/id_gh_ncc",
+    "sync": "npm run sync:mezon-js",
+    "sync:mezon-js": "npm run preinstall && npm install file:vendors/mezon-js/packages/nakama-js",
     "dev:chat": "nx run chat:serve",
     "preinstall": "sh ./scripts/preinstall.sh",
     "build:chat": "nx run chat:build"
