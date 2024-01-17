@@ -3,13 +3,18 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:chat": "nx run chat:serve"
+    "ssh:fix": "dos2unix ./ssh/id_gh_ncc",
+    "sync": "npm run sync:mezon-js",
+    "sync:mezon-js": "npm run preinstall && npm install file:vendors/mezon-js/packages/nakama-js",
+    "dev:chat": "nx run chat:serve",
+    "preinstall": "sh ./scripts/preinstall.sh",
+    "build:chat": "nx run chat:build"
   },
   "private": true,
   "dependencies": {
-    "@heroiclabs/nakama-js": "^2.7.1",
     "@hookform/resolvers": "^3.3.4",
     "@react-oauth/google": "^0.12.1",
+    "@heroiclabs/nakama-js": "file:vendors/mezon-js/packages/nakama-js",
     "@reduxjs/toolkit": "1.9.3",
     "@swc/helpers": "~0.5.2",
     "date-fns": "^3.1.0",
@@ -73,5 +78,8 @@
     "ts-node": "10.9.1",
     "typescript": "~5.2.2",
     "url-loader": "^4.1.1"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }

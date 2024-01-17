@@ -1,0 +1,3 @@
+[submodule "vendors/mezon-js"]
+	path = vendors/mezon-js
+	url = git@github.com:nccasia/mezon-js.git
