@@ -9,6 +9,8 @@ export type IClan = {
     categories?: ICategory[];
 }
 
+
+
 export type ICategory = {
     name: string;
     id: string;

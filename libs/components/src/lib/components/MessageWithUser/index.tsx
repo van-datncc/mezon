@@ -17,7 +17,7 @@ function MessageWithUser({ message }: MessageWithUserProps) {
           width={40}
           src={message.user?.avatarSm || ''}
           alt={message.user?.username || ''}
-          blurDataURL={message?.user?.avatarSm || ''}
+          blurdataurl={message?.user?.avatarSm || ''}
         />
       </div>
       <div>

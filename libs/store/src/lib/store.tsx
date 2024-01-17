@@ -1,24 +1,35 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import {
+  configureStore,
+} from '@reduxjs/toolkit';
 
-import { appReducer } from './app/app.slice'
-import { accountReducer } from './account/account.slice'
-import { authReducer  } from './auth/auth.slice'
-import { clansReducer } from './clans/clans.slice'
-import { channelsReducer } from './channels/channels.slice'
-import { threadsReducer } from './threads/threads.slice'
-import { messagesReducer } from './messages/messages.slice'
-import { usersReducer } from './users/users.slice'
+import { appReducer } from './app/app.slice';
+import { accountReducer } from './account/account.slice';
+import { authReducer } from './auth/auth.slice';
+import { clansReducer } from './clans/clans.slice';
+import { channelsReducer } from './channels/channels.slice';
+import { threadsReducer } from './threads/threads.slice';
+import { messagesReducer } from './messages/messages.slice';
+import { usersReducer } from './users/users.slice';
+import storage from 'redux-persist/lib/storage';
+import { persistReducer, persistStore } from 'redux-persist';
 
-const reducer = combineReducers({
+const persistConfig = {
+  key: 'root',
+  storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, authReducer);
+
+const reducer = {
   app: appReducer,
   account: accountReducer,
-  auth: authReducer,
+  auth: persistedReducer,
   clans: clansReducer,
   channels: channelsReducer,
   threads: threadsReducer,
   messages: messagesReducer,
   users: usersReducer,
-});
+};
 
 const fakeStore = configureStore({
   reducer,
@@ -26,15 +37,18 @@ const fakeStore = configureStore({
 
 export type RootState = ReturnType<typeof fakeStore.getState>
 
-export type PreloadedRootState = Partial<RootState>
+export type PreloadedRootState = RootState | undefined;
 
-export const initStore = (preloadedState: PreloadedRootState) => {
-  return configureStore({
+export const initStore = (preloadedState?: PreloadedRootState) => {
+  const store = configureStore({
     reducer,
-    preloadedState
-  })
-}
+    preloadedState,
+  });
 
-type Store = ReturnType<typeof initStore>
+  const persistor = persistStore(store);
+  return { store, persistor };
+};
 
-export type AppDispatch = Store['dispatch']
+type Store = ReturnType<typeof initStore>['store'];
+
+export type AppDispatch = Store['dispatch'];

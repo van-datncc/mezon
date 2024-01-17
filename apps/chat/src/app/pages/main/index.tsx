@@ -30,7 +30,7 @@ function MyApp() {
                 width={48}
                 height={48}
                 placeholder="blur"
-                blurDataURL={clan.image}
+                blurdataurl={clan.image}
               />
             </NavLink>
           ))}

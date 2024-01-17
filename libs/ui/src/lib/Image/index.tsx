@@ -7,7 +7,7 @@ export type ImageProps = ImgProps & {
     width: number
     height: number
     placeholder: string
-    blurDataURL: string
+    blurdataurl: string
 };
 
 function Image(params: ImageProps) {

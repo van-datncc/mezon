@@ -13,12 +13,18 @@ module.exports = {
   ],
   theme: {
     extend: {
+      spacing: {
+        px: '1px',
+        0: '0',
+        96:"96px",
+        210:"210px"
+      },
+      fontFamily: {
+        manrope: ['Manrope', 'sans-serif'],
+      },
       screens: {
         'mobile-s': '320px',
         'mobile-l': '375px',
-      },
-      fontFamily: {
-        Roboto: ['Roboto', 'sans-serif'],
       },
       fontSize: {
         header: ['5rem', '5rem'],
@@ -50,3 +56,5 @@ module.exports = {
   },
   plugins: [],
 };
+
+
