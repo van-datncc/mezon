@@ -1,4 +1,4 @@
-import { StateFromReducersMapObject, combineReducers, configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
 import { appReducer } from './app/app.slice'
 import { accountReducer } from './account/account.slice'
@@ -20,7 +20,11 @@ const reducer = combineReducers({
   users: usersReducer,
 });
 
-export type RootState = StateFromReducersMapObject<typeof reducer>
+const fakeStore = configureStore({
+  reducer,
+});
+
+export type RootState = ReturnType<typeof fakeStore.getState>
 
 export type PreloadedRootState = Partial<RootState>
 
