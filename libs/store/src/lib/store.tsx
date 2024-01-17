@@ -1,7 +1,4 @@
 import {
-  DeepPartial,
-  PreloadedState,
-  StateFromReducersMapObject,
   configureStore,
 } from '@reduxjs/toolkit';
 
@@ -34,9 +31,13 @@ const reducer = {
   users: usersReducer,
 };
 
-export type RootState = StateFromReducersMapObject<typeof reducer>;
+const fakeStore = configureStore({
+  reducer,
+});
 
-export type PreloadedRootState = Partial<PreloadedState<RootState>>;
+export type RootState = ReturnType<typeof fakeStore.getState>
+
+export type PreloadedRootState = RootState | undefined;
 
 export const initStore = (preloadedState?: PreloadedRootState) => {
   const store = configureStore({
@@ -48,6 +49,6 @@ export const initStore = (preloadedState?: PreloadedRootState) => {
   return { store, persistor };
 };
 
-type Store = ReturnType<typeof initStore>;
+type Store = ReturnType<typeof initStore>['store'];
 
-export type AppDispatch = Store['store']['dispatch'];
+export type AppDispatch = Store['dispatch'];

@@ -1,17 +1,10 @@
 import { PreloadedRootState } from "@mezon/store";
 
-const preloadedState: PreloadedRootState = {
+const preloadedState = {
     app: {
       theme: 'light',
       loadingStatus: 'loaded', 
     },
-    // auth: {
-    //   loadingStatus: 'loaded',
-    //   _persist: {
-    //     version: 1,
-    //     rehydrated: true
-    //   }
-    // },
     account: {
       loadingStatus: 'loaded',
     },
@@ -164,6 +157,6 @@ const preloadedState: PreloadedRootState = {
       entities: {},
       ids: [],
     },
-  }
+  } as unknown as PreloadedRootState;
 
   export { preloadedState }
