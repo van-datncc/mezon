@@ -1,5 +1,4 @@
-import { PreloadedState, StateFromReducersMapObject, configureStore } from '@reduxjs/toolkit'
-
+import { StateFromReducersMapObject, combineReducers, configureStore } from '@reduxjs/toolkit'
 
 import { appReducer } from './app/app.slice'
 import { accountReducer } from './account/account.slice'
@@ -10,7 +9,7 @@ import { threadsReducer } from './threads/threads.slice'
 import { messagesReducer } from './messages/messages.slice'
 import { usersReducer } from './users/users.slice'
 
-const reducer = {
+const reducer = combineReducers({
   app: appReducer,
   account: accountReducer,
   auth: authReducer,
@@ -19,11 +18,11 @@ const reducer = {
   threads: threadsReducer,
   messages: messagesReducer,
   users: usersReducer,
-};
+});
 
 export type RootState = StateFromReducersMapObject<typeof reducer>
 
-export type PreloadedRootState = PreloadedState<RootState>
+export type PreloadedRootState = Partial<RootState>
 
 export const initStore = (preloadedState: PreloadedRootState) => {
   return configureStore({

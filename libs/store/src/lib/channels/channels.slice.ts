@@ -17,7 +17,7 @@ export interface ChannelsEntity extends IChannel {
   id: string; // Primary ID
 }
 
-export interface ChannelsState extends EntityState<ChannelsEntity> {
+export interface ChannelsState extends EntityState<ChannelsEntity, string> {
   loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
   error?: string | null;
   currentChannelId?: string | null;

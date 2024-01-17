@@ -17,7 +17,7 @@ export interface MessagesEntity extends IMessage {
   id: string; // Primary ID
 }
 
-export interface MessagesState extends EntityState<MessagesEntity> {
+export interface MessagesState extends EntityState<MessagesEntity, string> {
   loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
   error?: string | null;
 }

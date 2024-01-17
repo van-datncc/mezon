@@ -17,7 +17,7 @@ export interface ClansEntity extends IClan {
   id: string; // Primary ID
 }
 
-export interface ClansState extends EntityState<ClansEntity> {
+export interface ClansState extends EntityState<ClansEntity, string> {
   loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
   error?: string | null;
   currentClanId?: string | null;
