@@ -3,12 +3,13 @@ import React from 'react';
 import { useChat } from '@mezon/core';
 import googleIcon from '../../../../../../../src/assets/gg-icon.png';
 
+
 const GoogleButtonLogin: React.FC = () => {
   const { loginByGoogle } = useChat();
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
-    onSuccess: async (codeResponse: any) => {
-      await loginByGoogle(codeResponse.code);
+    onSuccess: async ({ code }) => {
+      await loginByGoogle(code);
     },
     onError: (errorResponse) => console.log(errorResponse),
   });
