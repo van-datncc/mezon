@@ -1,4 +1,6 @@
 import {
+  Action,
+  ThunkDispatch,
   configureStore,
 } from '@reduxjs/toolkit';
 
@@ -12,9 +14,11 @@ import { messagesReducer } from './messages/messages.slice';
 import { usersReducer } from './users/users.slice';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
+import { MezonContextValue } from '@mezon/transport'
+import { useDispatch } from 'react-redux';
 
 const persistConfig = {
-  key: 'root',
+  key: 'auth',
   storage,
 };
 
@@ -39,10 +43,18 @@ export type RootState = ReturnType<typeof fakeStore.getState>
 
 export type PreloadedRootState = RootState | undefined;
 
-export const initStore = (preloadedState?: PreloadedRootState) => {
+export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
   const store = configureStore({
     reducer,
     preloadedState,
+    middleware: (getDefaultMiddleware, ) => getDefaultMiddleware({
+      thunk: {
+        extraArgument: {
+          mezon
+        }
+      },
+      serializableCheck: false,
+    }),
   });
 
   const persistor = persistStore(store);
@@ -51,4 +63,8 @@ export const initStore = (preloadedState?: PreloadedRootState) => {
 
 type Store = ReturnType<typeof initStore>['store'];
 
-export type AppDispatch = Store['dispatch'];
+export type AppThunkDispatch = ThunkDispatch<RootState, unknown, Action>;
+
+export type AppDispatch = Store['dispatch'] & AppThunkDispatch;
+
+export const useAppDispatch: () => AppDispatch = useDispatch

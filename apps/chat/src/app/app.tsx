@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 import {
   MezonContextProvider,
   CreateNakamaClientOptions,
+  useMezon,
 } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -14,8 +15,6 @@ import { preloadedState } from './mock/state';
 import { useEffect } from 'react';
 import WebFont from 'webfontloader';
 
-
-const { store, persistor } = initStore(preloadedState);
 
 const GOOGLE_CLIENT_ID =
   '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
@@ -30,6 +29,25 @@ const nakama: CreateNakamaClientOptions = {
 const theme = 'light';
 
 export function App() {
+  const mezon = useMezon();
+
+  const { store, persistor } = initStore(mezon, preloadedState);
+
+  if(!mezon.client) {
+    return <>loading...</>
+  }
+
+  return (
+    <MezonStoreProvider store={store} loading={null} persistor={persistor} >
+      <MezonUiProvider themeName={theme}>
+        <RouterProvider router={routes} />
+      </MezonUiProvider>
+    </MezonStoreProvider>
+  );
+}
+
+function AppWrapper() {
+  
   useEffect(() => {
     WebFont.load({
       google: {
@@ -37,17 +55,14 @@ export function App() {
       },
     });
   }, []);
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <MezonStoreProvider store={store} loading={null} persistor={persistor} >
-          <MezonUiProvider themeName={theme}>
-            <MezonContextProvider nakama={nakama} connect={true}>
-              <RouterProvider router={routes} />
-            </MezonContextProvider>
-          </MezonUiProvider>
-      </MezonStoreProvider>
+      <MezonContextProvider nakama={nakama} connect={true}>
+        <App />
+      </MezonContextProvider>
     </GoogleOAuthProvider>
   );
 }
 
-export default App;
+export default AppWrapper;
