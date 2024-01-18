@@ -10,6 +10,7 @@ import ServerLayout from '../layouts/ServerLayout';
 // Pages
 import Main from '../pages/main';
 import Chanel from '../pages/channel';
+import Direct from '../pages/directMessage';
 import Login from '../pages/login';
 
 // Components
@@ -40,6 +41,14 @@ export const routes = createBrowserRouter([
               element: <Chanel />,
             }]
           }]
+        }]
+      },
+      {
+        path: "/mezon",
+        element: <Main />,
+        children: [{
+          path: "direct/:userId",
+          element: <Direct />,
         }]
       },
     ]

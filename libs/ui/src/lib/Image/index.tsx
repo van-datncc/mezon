@@ -1,13 +1,13 @@
-import {Img, ImgProps} from 'react-image'
+import { Img, ImgProps } from 'react-image'
 import VisibilitySensor from 'react-visibility-sensor'
 
 export type ImageProps = ImgProps & {
     src: string
     alt: string
-    width: number
-    height: number
-    placeholder: string
-    blurdataurl: string
+    width?: number
+    height?: number
+    placeholder?: string
+    blurDataURL?: string
 };
 
 function Image(params: ImageProps) {

@@ -52,7 +52,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
           <input
             type="text"
             placeholder="Search"
-            className="px-1.5 w-36 h-6 text-sm font-medium placeholder:text-gray-400 bg-gray-900 rounded border-none"
+            className="px-1.5 w-36 h-6 text-sm font-medium placeholder:text-gray-400 bg-bgSurface rounded border-none"
           />
           <div className="flex absolute inset-y-0 right-0 items-center">
             <Icons.Spyglass className="mr-1.5 w-4 h-4 text-gray-400" />

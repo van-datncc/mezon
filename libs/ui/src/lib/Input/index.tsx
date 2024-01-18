@@ -17,11 +17,10 @@ const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, r
         <div>
             <div className={'text-[14px] mb-2'}>{label}
                 {required && (
-                    <span className={'text-colorDanger'}> *
-                    </span>
+                    <span className={'text-colorDanger'}> *</span>
                 )}
             </div>
-            <input type={type} className={`bg-black font-[400] py-[12px] px-[14px] rounded w-full border border-gray-300 text-white outline-none ${className}`} {...rest} maxLength={maxLength} multiple />
+            <input type={type} className={`bg-black font-[400] py-[12px] px-[14px] rounded w-full border text-white outline-none ${className}`} {...rest} maxLength={maxLength} multiple />
         </div>
     )
 }

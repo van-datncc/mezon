@@ -1,4 +1,4 @@
-import {Image} from '@mezon/ui';
+import { Image } from '@mezon/ui';
 import { IMessage } from '@mezon/utils';
 
 export type MessageWithUserProps = {
@@ -17,7 +17,7 @@ function MessageWithUser({ message }: MessageWithUserProps) {
           width={40}
           src={message.user?.avatarSm || ''}
           alt={message.user?.username || ''}
-          blurdataurl={message?.user?.avatarSm || ''}
+          blurDataURL={message?.user?.avatarSm || ''}
         />
       </div>
       <div>
