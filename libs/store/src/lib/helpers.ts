@@ -16,7 +16,7 @@ type MezonValueContext = MezonContextValue & {
 }
 
 export function ensureClient(mezon: MezonContextValue):MezonValueContext  {
-    if(!mezon || !mezon.client || !mezon.session) {
+    if(!mezon || !mezon.client) {
         throw new Error('Error')
     }
     return mezon as MezonValueContext

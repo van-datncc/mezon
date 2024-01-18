@@ -46,16 +46,14 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
   'clans/fetchStatus',
   async (_, thunkAPI) => {
-
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
-    console.log('Mezon client', mezon.client)
-    const response = await mezon.client.listClanDescs(mezon.session)
+    const response = await mezon.client.listClanDescs(mezon.session, 100, 0, '')
     /**
      * Replace this with your custom fetch call.
      * For example, `return myApi.getClanss()`;
      * Right now we just return an empty array.
      */
-    console.log('Response: ',response)
+    console.log('Response: ', response)
     return Promise.resolve([]);
   }
 );
