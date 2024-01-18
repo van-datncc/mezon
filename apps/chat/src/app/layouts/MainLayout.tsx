@@ -11,17 +11,20 @@ const MainLayout = () => {
   const { changeCurrentClan, currentClan, fetchClans } = useChat();
   const navigate = useNavigate();
 
-  
   useEffect(() => {
+    if (!isLogin) {
+      return;
+    }
+
     fetchClans()
-  }, []);
+  }, [fetchClans, isLogin]);
 
   useEffect(() => {
-    if(!serverIdParams || serverIdParams == currentClan?.id) {
+    if(!isLogin || !serverIdParams || serverIdParams == currentClan?.id) {
       return
     }
     changeCurrentClan(serverIdParams);
-  }, [changeCurrentClan, currentClan, serverIdParams]);
+  }, [changeCurrentClan, currentClan, serverIdParams, isLogin]);
 
   useEffect(() => {
     if (!isLogin) {

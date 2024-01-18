@@ -19,14 +19,17 @@ import {
   authActions,
   accountActions,
   useAppDispatch,
+  ClansEntity,
 } from '@mezon/store';
 import { IChannel, IMessage } from '@mezon/utils';
 
 export function useChat() {
-  const { client, createClient } = useMezon();
+  const { clientRef, createClient } = useMezon();
   const { channels } = useChannels();
   const { clans } = useClans();
   const { threads } = useThreads();
+
+  const client = clientRef.current;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const ChannelsEntities = useSelector(selectChannelsEntities);
@@ -85,10 +88,17 @@ export function useChat() {
   );
 
   const fetchClans = React.useCallback(
-    () => {
-      dispatch(clansActions.fetchClans());
+    async () => {
+      const action = await dispatch(clansActions.fetchClans());
+      const payload = action.payload as ClansEntity[];
+      if (payload.length > 0) {
+        const defaultClanId = payload[0].id;
+        dispatch(clansActions.changeCurrentClan(defaultClanId));
+      }
+
+      return payload;
     },
-    [channels, dispatch]
+    [dispatch]
   );
 
   const changeCurrentChannel = React.useCallback(

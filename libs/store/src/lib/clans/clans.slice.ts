@@ -44,7 +44,7 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
  * ```
  */
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
-  'clans/fetchStatus',
+  'clans/fetchClans',
   async (_, thunkAPI) => {
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
     const response = await mezon.client.listClanDescs(mezon.session, 100, 0, '')
@@ -54,7 +54,26 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>(
      * Right now we just return an empty array.
      */
     console.log('Response: ', response)
-    return Promise.resolve([]);
+    return Promise.resolve([{
+      id: 'clan1',
+      name: 'Mezon',
+      description: 'Clan 1 description',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNkrnCQ0Q-FtMiBZGmCeQEJ5WTmxW50b4DgEXdM79-HyQvNPAvLJDnYhXSQHZXCdHRcgI&usqp=CAU',
+      channelIds: ['channel1'],
+      memberIds: ['user1'],
+      categories: [{
+        id: 'category1',
+        name: 'General',
+        channelIds: ['channel1'],
+        clanId: 'clan1',
+      }, {
+        id: 'category2',
+        name: 'Development',
+        channelIds: ['channel2', 'channel3'],
+        clanId: 'clan1',
+      }],
+      categoryIds: ['category1', 'category2'],
+    }]);
   }
 );
 

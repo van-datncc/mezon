@@ -12,7 +12,7 @@ import { MezonUiProvider } from '@mezon/ui';
 import { routes } from './routes/index';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import WebFont from 'webfontloader';
 
 
@@ -31,13 +31,13 @@ const theme = 'light';
 export function App() {
   const mezon = useMezon();
 
+  const { store, persistor } = useMemo(() => {
+    return initStore(mezon, preloadedState);
+  }, [mezon])
 
-
-  if (!mezon.client) {
+  if (!store) {
     return <>loading...</>
   }
-
-  const { store, persistor } = initStore(mezon, preloadedState);
 
   return (
     <MezonStoreProvider store={store} loading={null} persistor={persistor} >

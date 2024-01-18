@@ -29,17 +29,7 @@ export const initialAuthState: AuthState = {
 };
 
 function normalizeSession(session: Session): ISession {
-  return {
-    created: session.created,
-    token: session.token,
-    refreshToken: '',
-    createdAt: Date.now(),
-    refreshExpiresAt: Date.now(),
-    expiresAt: Date.now(),
-    username: session.username || '',
-    userId: session.user_id || '',
-    vars: session.vars,
-  };
+  return JSON.parse(JSON.stringify(session));
 }
 
 export const authenticateGoogle = createAsyncThunk(

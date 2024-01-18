@@ -10,7 +10,7 @@ const ServerLayout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchClans()
+    // TODO: Fetch channel
   }, [channelIdParam, currentChanel, fetchClans]);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const ServerLayout = () => {
     const url = `/chat/servers/${currentClan?.id}`;
     navigate(url);
   }, [currentClan, navigate]);
-  
+
     return (
       <div>
         <Outlet />

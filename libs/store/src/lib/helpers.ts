@@ -16,10 +16,15 @@ type MezonValueContext = MezonContextValue & {
 }
 
 export function ensureClient(mezon: MezonContextValue):MezonValueContext  {
-    if(!mezon || !mezon.client) {
+    if(!mezon || !mezon.clientRef.current) {
         throw new Error('Error')
     }
-    return mezon as MezonValueContext
+    
+    return {
+        ...mezon,
+        client: mezon.clientRef.current,
+        session: mezon.sessionRef.current
+    } as MezonValueContext
 }
 
 export function isMezonThunk(thunkAPI: GetThunkAPI<AsyncThunkConfig>): thunkAPI is GetThunkAPIWithMezon {
