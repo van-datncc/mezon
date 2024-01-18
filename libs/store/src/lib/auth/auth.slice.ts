@@ -146,3 +146,9 @@ export const selectAllAuth = createSelector(
   getAuthState,
   (state: AuthState) => state
 );
+
+
+export const selectIsLogin = createSelector(
+  getAuthState,
+  (state: AuthState) => state.isLogin
+);
