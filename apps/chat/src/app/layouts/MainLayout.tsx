@@ -4,33 +4,37 @@ import React, { useEffect } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 const MainLayout = () => {
-    const { serverId: serverIdParams, channelId: channelIdParams } = useParams();
-    const { changeCurrentClan, changeCurrentChannel ,currentClan, currentChanel } = useChat();
-    const navigate = useNavigate();
+  const { serverId: serverIdParams, channelId: channelIdParams } = useParams();
+  const { changeCurrentClan, changeCurrentChannel, currentClan, currentChanel, fetchClans } = useChat();
+  const navigate = useNavigate();
 
-   useEffect(() => {
+  useEffect(() => {
     changeCurrentClan(serverIdParams);
-   }, [changeCurrentClan, serverIdParams]);
+  }, [changeCurrentClan, serverIdParams]);
+
+  useEffect(() => {
+    fetchClans()
+  }, []);
 
 
-   useEffect(() => {
+  useEffect(() => {
     changeCurrentChannel(channelIdParams);
-   }, [changeCurrentChannel, channelIdParams]);
+  }, [changeCurrentChannel, channelIdParams]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (!currentClan?.id) {
       return;
     }
     const channelSlug = currentChanel ? `/channels/${currentChanel.id}` : '';
     const url = `/chat/servers/${currentClan?.id}${channelSlug}`;
     navigate(url);
-   }, [currentClan, currentChanel, navigate]);
+  }, [currentClan, currentChanel, navigate]);
 
-    return (
-      <div id="main-layout">
-        <Outlet />
-      </div>
-    )
-  }
-  
-  export default MainLayout;
+  return (
+    <div id="main-layout">
+      <Outlet />
+    </div>
+  )
+}
+
+export default MainLayout;

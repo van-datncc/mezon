@@ -7,6 +7,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { IClan } from '@mezon/utils';
+import { ensureClient, getMezonCtx } from '../helpers';
 
 export const CLANS_FEATURE_KEY = 'clans';
 
@@ -45,11 +46,16 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
   'clans/fetchStatus',
   async (_, thunkAPI) => {
+
+    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    console.log('Mezon client', mezon.client)
+    const response = await mezon.client.listClanDescs(mezon.session)
     /**
      * Replace this with your custom fetch call.
      * For example, `return myApi.getClanss()`;
      * Right now we just return an empty array.
      */
+    console.log('Response: ',response)
     return Promise.resolve([]);
   }
 );
@@ -111,7 +117,8 @@ export const clansReducer = clansSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const clansActions = clansSlice.actions;
+export const clansActions = 
+{...clansSlice.actions, fetchClans }
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

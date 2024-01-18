@@ -15,13 +15,15 @@ export type MezonContextValue = {
     createClient: () => Promise<Client>
     authenticateEmail: (email: string, password: string) => Promise<Session>
     authenticateDevice: (username: string) => Promise<Session>
+    authenticateGoogle: (token: string) => Promise<Session>
 }
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
 const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, nakama, connect }) => {
-    const [client, setClient] = React.useState<Client|null>(null);
-    const [session, setSession] = React.useState<Session|null>(null);
+
+    const [client, setClient] = React.useState<Client | null>(null);
+    const [session, setSession] = React.useState<Session | null>(null);
 
     const createClient = useCallback(async () => {
         const client = await createNakamaClient(nakama);
@@ -29,14 +31,23 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         return client;
     }, [nakama]);
 
+    console.log('Client: ', client)
+
     const authenticateEmail = useCallback(async (email: string, password: string) => {
         if (!client) {
             throw new Error('Nakama client not initialized');
         }
-
         const session = await client.authenticateEmail(email, password);
         setSession(session);
+        return session;
+    }, [client]);
 
+    const authenticateGoogle = useCallback(async (token: string) => {
+        if (!client) {
+            throw new Error('Nakama client not initialized');
+        }
+        const session = await client.authenticateGoogle(token);
+        setSession(session);
         return session;
     }, [client]);
 
@@ -49,9 +60,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         const deviceId = new DeviceUUID().get();
 
         const session = await client
-          .authenticateDevice(deviceId, true, username)
-          setSession(session);
-            return session;
+            .authenticateDevice(deviceId, true, username)
+        setSession(session);
+        return session;
     }, [client]);
 
     const value = React.useMemo<MezonContextValue>(() => ({
@@ -60,12 +71,14 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         createClient,
         authenticateDevice,
         authenticateEmail,
+        authenticateGoogle
     }), [
         client,
         session,
         createClient,
         authenticateDevice,
         authenticateEmail,
+        authenticateGoogle
     ]);
 
     React.useEffect(() => {

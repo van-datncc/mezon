@@ -84,6 +84,13 @@ export function useChat() {
     [clans, chanEntities, dispatch]
   );
 
+  const fetchClans = React.useCallback(
+    () => {
+      dispatch(clansActions.fetchClans());
+    },
+    [channels, dispatch]
+  );
+
   const changeCurrentChannel = React.useCallback(
     (optionalId?: string) => {
       let channelId = optionalId;
@@ -183,5 +190,6 @@ export function useChat() {
     changeCurrentChannel,
     loginEmail,
     loginByGoogle,
+    fetchClans
   };
 }

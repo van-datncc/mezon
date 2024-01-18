@@ -31,11 +31,13 @@ const theme = 'light';
 export function App() {
   const mezon = useMezon();
 
-  const { store, persistor } = initStore(mezon, preloadedState);
 
-  if(!mezon.client) {
+
+  if (!mezon.client) {
     return <>loading...</>
   }
+
+  const { store, persistor } = initStore(mezon, preloadedState);
 
   return (
     <MezonStoreProvider store={store} loading={null} persistor={persistor} >
@@ -47,7 +49,7 @@ export function App() {
 }
 
 function AppWrapper() {
-  
+
   useEffect(() => {
     WebFont.load({
       google: {

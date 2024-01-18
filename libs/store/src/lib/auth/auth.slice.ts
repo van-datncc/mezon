@@ -45,8 +45,8 @@ function normalizeSession(session: Session): ISession {
 export const authenticateGoogle = createAsyncThunk(
   'auth/authenticateGoogle',
   async (token: string, thunkAPI) => {
-    const { client } = getMezonCtx(thunkAPI);
-    const session = await client?.authenticateGoogle(token);
+    const  mezon  = getMezonCtx(thunkAPI);
+    const session = await mezon.authenticateGoogle(token);
     if (!session) {
       return thunkAPI.rejectWithValue('Invalid session');
     }
@@ -62,8 +62,8 @@ export type AuthenticateEmailPayload = {
 export const authenticateEmail = createAsyncThunk(
   'auth/authenticateEmail',
   async ({ username, password }: AuthenticateEmailPayload, thunkAPI) => {
-    const { client } = getMezonCtx(thunkAPI);
-    const session = await client?.authenticateEmail(username, password);
+    const mezon  = getMezonCtx(thunkAPI);
+    const session = await mezon?.authenticateEmail(username, password);
     if (!session) {
       return thunkAPI.rejectWithValue('Invalid session');
     }
