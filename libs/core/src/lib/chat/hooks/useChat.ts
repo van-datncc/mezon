@@ -5,7 +5,7 @@ import { useMessages } from './useMessages';
 import { useClans } from './useClans';
 import { useThreads } from './useThreads';
 import { useMezon } from '@mezon/transport';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   selectChannelsEntities,
   selectCurrentChannel,
@@ -18,11 +18,12 @@ import {
   selectClansEntities,
   authActions,
   accountActions,
+  useAppDispatch,
 } from '@mezon/store';
 import { IChannel, IMessage } from '@mezon/utils';
 
 export function useChat() {
-  const { client, createClient, authenticateDevice } = useMezon();
+  const { client, createClient } = useMezon();
   const { channels } = useChannels();
   const { clans } = useClans();
   const { threads } = useThreads();
@@ -38,7 +39,7 @@ export function useChat() {
 
   const { messages } = useMessages({ channelId: currentChannelId });
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const categorizedChannels = React.useMemo(() => {
     const categories = currentClan?.categories || [];
@@ -133,46 +134,22 @@ export function useChat() {
 
   const loginEmail = useCallback(
     async (username: string, password: string) => {
-      if (!client) {
-        return;
-      }
-      const session = await client.authenticateEmail(username, password);
-      const sessionJson = JSON.stringify(session);
-      dispatch(authActions.setSession(sessionJson));
-      dispatch(
-        accountActions.setAccount({
-          email: username,
-          password: password,
-        })
+      const action = await dispatch(
+        authActions.authenticateEmail({ username, password })
       );
-      return session;
+      const session = action.payload;
+      dispatch(accountActions.setAccount(session))
     },
-    [client]
+    [dispatch]
   );
 
   const loginByGoogle = useCallback(
     async (token: string) => {
-      if (!client) {
-        return;
-      }
-      const session = await client.authenticateGoogle(token);
-      const sessionJson = JSON.stringify(session);
-      dispatch(authActions.setSession(sessionJson));
-      return session;
+      const action = await dispatch(authActions.authenticateGoogle(token));
+      const session = action.payload;
+      dispatch(accountActions.setAccount(session))
     },
-    [client]
-  );
-
-  const loginDevice = useCallback(
-    async (username: string) => {
-      if (!client) {
-        return;
-      }
-      const session = await authenticateDevice(username);
-      dispatch(authActions.setSession(session));
-      return session;
-    },
-    [authenticateDevice, client]
+    [dispatch]
   );
 
   React.useEffect(() => {
@@ -205,7 +182,6 @@ export function useChat() {
     changeCurrentClan,
     changeCurrentChannel,
     loginEmail,
-    loginDevice,
     loginByGoogle,
   };
 }

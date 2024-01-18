@@ -81,4 +81,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
     );
 }
 
-export { MezonContext, MezonContextProvider };
+const MezonContextConsumer = MezonContext.Consumer;
+
+export { MezonContext, MezonContextProvider, MezonContextConsumer };
