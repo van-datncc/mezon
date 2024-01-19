@@ -20,6 +20,7 @@ import {
   accountActions,
   useAppDispatch,
   ClansEntity,
+  selectSession,
 } from '@mezon/store';
 import { IChannel, IMessage } from '@mezon/utils';
 
@@ -90,6 +91,7 @@ export function useChat() {
   const fetchClans = React.useCallback(
     async () => {
       const action = await dispatch(clansActions.fetchClans());
+
       const payload = action.payload as ClansEntity[];
       if (payload.length > 0) {
         const defaultClanId = payload[0].id;
@@ -147,7 +149,6 @@ export function useChat() {
   const init = useCallback(() => {
     createClient();
   }, [createClient]);
-
 
   const loginEmail = useCallback(
     async (username: string, password: string) => {

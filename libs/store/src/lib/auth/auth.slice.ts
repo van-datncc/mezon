@@ -11,15 +11,15 @@ export interface AuthState {
 }
 
 export interface ISession {
-  created: boolean;
+  readonly created: boolean;
   token: string;
-  refreshToken: string;
-  createdAt: number;
-  refreshExpiresAt: number;
-  expiresAt: number;
-  username: string;
-  userId: string;
-  vars: object | undefined;
+  readonly created_at: number;
+  expires_at?: number;
+  refresh_expires_at?: number;
+  refresh_token: string;
+  username?: string;
+  user_id?: string;
+  vars?: object;
 }
 
 export const initialAuthState: AuthState = {
@@ -57,6 +57,30 @@ export const authenticateEmail = createAsyncThunk(
     if (!session) {
       return thunkAPI.rejectWithValue('Invalid session');
     }
+    return normalizeSession(session);
+  }
+);
+
+export const refreshSession = createAsyncThunk(
+  'auth/refreshSession',
+  async (_, thunkAPI) => {
+    const mezon  = getMezonCtx(thunkAPI);
+    const sessionState = selectSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
+
+    if (!sessionState) {
+      return thunkAPI.rejectWithValue('Invalid session');
+    }
+
+    if(mezon.sessionRef.current?.token === sessionState?.token) {
+      return sessionState;
+    }
+
+    const session = await mezon?.refreshSession(sessionState);
+
+    if (!session) {
+      return thunkAPI.rejectWithValue('Invalid session');
+    }
+
     return normalizeSession(session);
   }
 );
@@ -114,6 +138,28 @@ export const authSlice = createSlice({
           state.error = action.error.message;
         }
       );
+
+    builder
+      .addCase(refreshSession.pending, (state: AuthState) => {
+        state.loadingStatus = 'loading';
+      })
+      .addCase(
+        refreshSession.fulfilled,
+        (state: AuthState, action) => {
+          state.loadingStatus = 'loaded';
+          state.session = action.payload;
+          state.isLogin = true;
+        }
+      )
+      .addCase(
+        refreshSession.rejected,
+        (state: AuthState, action) => {
+          state.loadingStatus = 'error';
+          state.error = action.error.message;
+          state.session = null;
+          state.isLogin = false;
+        }
+      );
   }
 });
 
@@ -126,6 +172,7 @@ export const authActions = {
   ...authSlice.actions,
   authenticateGoogle,
   authenticateEmail,
+  refreshSession
 }
 
 export const getAuthState = (rootState: {
@@ -141,4 +188,9 @@ export const selectAllAuth = createSelector(
 export const selectIsLogin = createSelector(
   getAuthState,
   (state: AuthState) => state.isLogin
+);
+
+export const selectSession = createSelector(
+  getAuthState,
+  (state: AuthState) => state.session
 );
