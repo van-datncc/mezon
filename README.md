@@ -8,9 +8,15 @@
 
 npm install --global nx@latest
 
+## Sync dependencies
+- Run `npm run sync` to sync dependencies
+
 ## Start the app
 
-To start the development server run `nx run chat:serve`. Open your browser and navigate to http://localhost:4200/. Happy coding!
+To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
+
+## Notes
+- using `Git Bash` to run the commands
 
 ## Directory Structure
 
