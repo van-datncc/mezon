@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { CreateNakamaClientOptions, createClient as createNakamaClient } from '../nakama';
-import { Client, Session } from '@heroiclabs/nakama-js';
+import { Client, Session, Socket } from '@heroiclabs/nakama-js';
 import { DeviceUUID } from "device-uuid";
 
 type MezonContextProviderProps = {
@@ -31,6 +31,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
 
     const clientRef = React.useRef<Client | null>(null);
     const sessionRef = React.useRef<Session | null>(null);
+    const socketRef = React.useRef<Socket | null>(null);
 
     const createClient = useCallback(async () => {
         const client = await createNakamaClient(nakama);
@@ -79,6 +80,15 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         return newSession;
     } , [clientRef]);
 
+    const createSocket = useCallback(async () => {
+        if (!clientRef.current) {
+            throw new Error('Nakama client not initialized');
+        }
+        const socket = clientRef.current.createSocket();
+        socketRef.current = socket;
+        return socket;
+    }, [clientRef, socketRef]);
+
     const value = React.useMemo<MezonContextValue>(() => ({
         clientRef,
         sessionRef,
@@ -86,7 +96,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         authenticateDevice,
         authenticateEmail,
         authenticateGoogle,
-        refreshSession
+        refreshSession,
+        createSocket
     }), [
         clientRef,
         sessionRef,
@@ -94,7 +105,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         authenticateDevice,
         authenticateEmail,
         authenticateGoogle,
-        refreshSession
+        refreshSession,
+        createSocket
     ]);
 
     React.useEffect(() => {
