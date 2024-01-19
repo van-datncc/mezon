@@ -1,16 +1,15 @@
 import { MessageWithUser } from '@mezon/components'
-import { IMessage } from '@mezon/utils'
+import { IMessage, IMessageWithUser } from '@mezon/utils'
 
 type MessageProps = {
-    message: IMessage
-
+    message: IMessageWithUser
 }
 
 export function ChannelMessage(props: MessageProps) {
     const { message } = props
     return (
         <div>
-           <MessageWithUser message={message} />
+            <MessageWithUser message={message} />
         </div>
     )
 }

@@ -20,12 +20,11 @@ function MessageBox(props: MessageBoxProps) {
                 return;
             }
             onSend({
-                content,
-                name: "",
+                content: {},
                 id: "",
-                clanId: "",
-                channelId: "",
-                date: "",
+                channel_id: "",
+                body: { text: '' },
+                channelId: ''
             });
             setContent("");
         },

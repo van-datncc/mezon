@@ -11,7 +11,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
       <div className="flex items-center">
         <Icons.Hashtag className="mx-2 w-6 h-6 font-semibold text-gray-400" />
         <span className="mr-2 font-title text-white whitespace-nowrap">
-          {channel?.name}
+          {channel?.channel_lable}
         </span>
       </div>
 

@@ -8,14 +8,19 @@ import {
 } from '@reduxjs/toolkit';
 import { IClan } from '@mezon/utils';
 import { ensureClient, getMezonCtx } from '../helpers';
-
+import { ApiClanDesc } from '@heroiclabs/nakama-js/dist/api.gen';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
  * Update these interfaces according to your requirements.
  */
+
 export interface ClansEntity extends IClan {
   id: string; // Primary ID
+}
+
+export const mapClanToEntity  = (clanRes: ApiClanDesc ) => {
+  return {...clanRes, id: clanRes.clan_id || ''}
 }
 
 export interface ClansState extends EntityState<ClansEntity, string> {
@@ -47,38 +52,23 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>(
   'clans/fetchClans',
   async (_, thunkAPI) => {
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listClanDescs(mezon.session, 100, 0, '')
+    const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '')
+    if(!response.clandesc) {
+      return thunkAPI.rejectWithValue([])
+    }
     /**
      * Replace this with your custom fetch call.
      * For example, `return myApi.getClanss()`;
      * Right now we just return an empty array.
      */
-    console.log('Response: ', response)
-    return Promise.resolve([{
-      id: 'clan1',
-      name: 'Mezon',
-      description: 'Clan 1 description',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNkrnCQ0Q-FtMiBZGmCeQEJ5WTmxW50b4DgEXdM79-HyQvNPAvLJDnYhXSQHZXCdHRcgI&usqp=CAU',
-      channelIds: ['channel1'],
-      memberIds: ['user1'],
-      categories: [{
-        id: 'category1',
-        name: 'General',
-        channelIds: ['channel1'],
-        clanId: 'clan1',
-      }, {
-        id: 'category2',
-        name: 'Development',
-        channelIds: ['channel2', 'channel3'],
-        clanId: 'clan1',
-      }],
-      categoryIds: ['category1', 'category2'],
-    }]);
+    
+    return response.clandesc.map(mapClanToEntity);
   }
 );
 
 export const initialClansState: ClansState = clansAdapter.getInitialState({
   loadingStatus: 'not loaded',
+  clans: [],
   error: null,
 });
 
@@ -99,8 +89,9 @@ export const clansSlice = createSlice({
       })
       .addCase(
         fetchClans.fulfilled,
-        (state: ClansState, action: PayloadAction<ClansEntity[]>) => {
-          clansAdapter.setAll(state, action.payload);
+        (state: ClansState, action: PayloadAction<IClan[]>) => {
+          console.log('Response: ', action.payload);
+          clansAdapter.setAll(state,action.payload)
           state.loadingStatus = 'loaded';
         }
       )
@@ -156,8 +147,11 @@ const { selectAll, selectEntities } = clansAdapter.getSelectors();
 export const getClansState = (rootState: {
   [CLANS_FEATURE_KEY]: ClansState;
 }): ClansState => rootState[CLANS_FEATURE_KEY];
-
 export const selectAllClans = createSelector(getClansState, selectAll);
+export const selectCurrentClanId = createSelector(
+  getClansState,
+  (state) => state.currentClanId
+);
 
 export const selectClansEntities = createSelector(
   getClansState,
@@ -167,11 +161,6 @@ export const selectClansEntities = createSelector(
 export const selectClanById = (id: string) => createSelector(
   selectClansEntities,
   (clansEntities) => clansEntities[id]
-);
-
-export const selectCurrentClanId = createSelector(
-  getClansState,
-  (state) => state.currentClanId
 );
 
 export const selectCurrentClan = createSelector(

@@ -9,15 +9,15 @@ type MezonContextProviderProps = {
     connect?: boolean
 }
 
-type Sessionlike =  {
+type Sessionlike = {
     token: string;
     refresh_token: string;
     created: boolean;
 }
 
 export type MezonContextValue = {
-    clientRef: React.MutableRefObject<Client | null> 
-    sessionRef: React.MutableRefObject<Session | null> 
+    clientRef: React.MutableRefObject<Client | null>
+    sessionRef: React.MutableRefObject<Session | null>
     createClient: () => Promise<Client>
     authenticateEmail: (email: string, password: string) => Promise<Session>
     authenticateDevice: (username: string) => Promise<Session>
@@ -43,7 +43,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         if (!clientRef.current) {
             throw new Error('Nakama client not initialized');
         }
-        const session = await clientRef.current.authenticateEmail(email, password);
+        const session = await clientRef.current.authenticateEmail(email, password, false);
         sessionRef.current = session;
         return session;
     }, [clientRef]);
@@ -78,7 +78,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         const newSession = await clientRef.current.sessionRefresh(new Session(session.token, session.refresh_token, session.created));
         sessionRef.current = newSession;
         return newSession;
-    } , [clientRef]);
+    }, [clientRef]);
 
     const createSocket = useCallback(async () => {
         if (!clientRef.current) {

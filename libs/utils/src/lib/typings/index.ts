@@ -1,33 +1,21 @@
-export type IClan = {
-    name: string;
+import {ApiCategoryDesc, ApiChannelDescription, ApiClanDesc } from '@heroiclabs/nakama-js/dist/api.gen'
+import {ChannelMessage} from '@heroiclabs/nakama-js'
+
+export type IClan = ApiClanDesc & {
+    id: string
+}
+export type ICategory = ApiCategoryDesc &{
     id: string;
-    image: string;
-    description: string;
-    memberIds: string[];
-    channelIds: string[];
-    categoryIds?: string[];
-    categories?: ICategory[];
 }
 
-
-
-export type ICategory = {
-    name: string;
-    id: string;
-    clanId: string;
-    channelIds: string[];
-    channels?: IChannel[];
+export type ICategoryChannel = ICategory & {
+    channels: IChannel[]
 }
 
-export type IChannel = {
-    name: string;
+export type IChannel = ApiChannelDescription & {
     id: string;
-    clanId: string;
-    categoryId: string;
-    memberIds: string[];
-    description?: string;
-    threadIds: string[];
-    unread: boolean
+    unread?: boolean;
+    description?: string
 }
 
 export type IThread = {
@@ -67,15 +55,15 @@ export type IMessageMeta = {
     contextMenu: IMessageContextMenu
 }
 
-export type IMessage = {
-    name: string;
+export type IMessage = ChannelMessage & {
     id: string;
-    clanId: string;
-    channelId: string;
-    content: string;
-    date: string;
-    user?: IUser;
-    isMe?: boolean;
+    body: {
+        text: string
+    }
+}
+
+export type IMessageWithUser = IMessage & {
+    user: IUser | null;
 }
 
 export type IUser = {

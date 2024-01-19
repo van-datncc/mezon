@@ -1,4 +1,4 @@
-import { IMessage } from '@mezon/utils';
+import { IMessage, IMessageWithUser } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -7,13 +7,21 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
+import { ensureClient, getMezonCtx } from '../helpers';
+import { el } from '@faker-js/faker';
+import { ChannelMessage } from 'vendors/mezon-js/packages/nakama-js/dist';
 
 export const MESSAGES_FEATURE_KEY = 'messages';
 
 /*
  * Update these interfaces according to your requirements.
  */
-export interface MessagesEntity extends IMessage {
+
+export const mapMessageChannelToEntity  = (channelMess: ChannelMessage  ) => {
+  return {...channelMess, id: channelMess.message_id || '', body: {text: 'Hello world'}, user: null}
+}
+
+export interface MessagesEntity extends IMessageWithUser {
   id: string; // Primary ID
 }
 
@@ -41,15 +49,20 @@ export const messagesAdapter = createEntityAdapter<MessagesEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchMessages = createAsyncThunk<MessagesEntity[]>(
+
+type fetchMessageChannelPayload = {
+  channelId: string
+}
+
+export const fetchMessages = createAsyncThunk(
   'messages/fetchStatus',
-  async (_, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getMessagess()`;
-     * Right now we just return an empty array.
-     */
-    return Promise.resolve([]);
+  async ({channelId} : fetchMessageChannelPayload, thunkAPI) => {
+    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listChannelMessages(mezon.session,channelId, 100,false)
+    if(!response.messages) {
+      return thunkAPI.rejectWithValue([])
+    }
+    return response.messages.map(mapMessageChannelToEntity);
   }
 );
 
@@ -109,7 +122,7 @@ export const messagesReducer = messagesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const messagesActions = messagesSlice.actions;
+export const messagesActions = {...messagesSlice.actions, fetchMessages};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -143,6 +156,6 @@ export const selectMessageByChannelId = (channelId?: string | null) => createSel
   selectMessagesEntities,
   (entities) => {
     const messages = Object.values(entities);
-    return messages.filter((message) => message && message.channelId === channelId);
+    return messages.filter((message) => message && message.channel_id === channelId);
   }
 );
