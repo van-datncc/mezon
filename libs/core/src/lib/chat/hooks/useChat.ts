@@ -21,13 +21,18 @@ import {
   useAppDispatch,
   ClansEntity,
   selectSession,
+  selectAllClans,
+  categoriesActions,
+  ChannelsEntity,
+  selectAllCategories,
+  MessagesEntity
 } from '@mezon/store';
-import { IChannel, IMessage } from '@mezon/utils';
+import { ICategoryChannel, ICategory, IChannel, IMessage } from '@mezon/utils';
 
 export function useChat() {
   const { clientRef, createClient } = useMezon();
   const { channels } = useChannels();
-  const { clans } = useClans();
+  // const { clans } = useClans();
   const { threads } = useThreads();
 
   const client = clientRef.current;
@@ -35,32 +40,44 @@ export function useChat() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const ChannelsEntities = useSelector(selectChannelsEntities);
   const chanEntities = useSelector(selectClansEntities);
-
+  const clans = useSelector(selectAllClans);
   const currentClan = useSelector(selectCurrentClan);
   const currentChanel = useSelector(selectCurrentChannel);
   const currentChannelId = useSelector(selectCurrentChannelId);
   const currentClanId = useSelector(selectCurrentClanId);
-
+  const categories = useSelector(selectAllCategories)
   const { messages } = useMessages({ channelId: currentChannelId });
-
+  
   const dispatch = useAppDispatch();
 
   const categorizedChannels = React.useMemo(() => {
-    const categories = currentClan?.categories || [];
-
+    console.log('Channel', channels)
     const results = categories.map((category) => {
       const categoryChannels = channels.filter(
-        (channel) => channel && channel?.categoryId === category.id
+        (channel) => channel && channel?.category_id === category.id
       ) as IChannel[];
-
       return {
         ...category,
         channels: categoryChannels,
       };
     });
 
-    return results;
-  }, [currentClan, channels]);
+    return results as ICategoryChannel[];
+  }, [currentClan, channels, categories]);
+
+  const fetchChannels = React.useCallback(
+    async (clanId:string) => {
+      const action = await  dispatch(channelsActions.fetchChannels({clanId}))
+      console.log('Action:', action)
+      const payload = action.payload as ChannelsEntity[];
+      if (payload.length > 0) {
+        const defaultChannelId = payload[0].id;
+       changeCurrentChannel(defaultChannelId);
+      }
+      return payload;
+    },
+    [dispatch]
+  );
 
   const changeCurrentClan = React.useCallback(
     (optionalId?: string) => {
@@ -68,26 +85,12 @@ export function useChat() {
       if (!clanId) {
         clanId = clans[0]?.id;
       }
-      if (!clanId) {
-        return;
-      }
-      const clan = chanEntities[clanId];
-      if (!clan) {
-        return;
-      }
-      const channelIds = clan.channelIds || [];
-
       dispatch(clansActions.changeCurrentClan(clanId));
-
-      const channelId = channelIds[0];
-      if (!channelId) {
-        return;
-      }
-      dispatch(channelsActions.changeCurrentChanel(channelId));
+      dispatch(categoriesActions.fetchCategories({clanId}))
+      fetchChannels(clanId)
     },
-    [clans, chanEntities, dispatch]
+    [clans, chanEntities,fetchChannels, dispatch]
   );
-
   const fetchClans = React.useCallback(
     async () => {
       const action = await dispatch(clansActions.fetchClans());
@@ -95,10 +98,17 @@ export function useChat() {
       const payload = action.payload as ClansEntity[];
       if (payload.length > 0) {
         const defaultClanId = payload[0].id;
-        dispatch(clansActions.changeCurrentClan(defaultClanId));
+       changeCurrentClan(defaultClanId);
       }
-
       return payload;
+    },
+    [dispatch]
+  );
+
+  const fetchMessageChannel = React.useCallback(
+    async (channelId:string) => {
+      const action = await dispatch(messagesActions.fetchMessages({channelId}));
+      return action;
     },
     [dispatch]
   );
@@ -113,8 +123,9 @@ export function useChat() {
         return;
       }
       dispatch(channelsActions.changeCurrentChanel(channelId));
+      fetchMessageChannel(channelId)
     },
-    [channels, dispatch]
+    [channels, dispatch, fetchMessageChannel]
   );
 
   const sendMessage = React.useCallback(
@@ -133,12 +144,8 @@ export function useChat() {
         },
       };
 
-      if (!payload.channelId) {
-        payload.channelId = currentChannelId || '';
-      }
-
-      if (!payload.clanId) {
-        payload.clanId = currentClanId || '';
+      if (!payload.channel_id) {
+        payload.channel_id = currentChannelId || '';
       }
 
       dispatch(messagesActions.add(payload));
@@ -174,7 +181,7 @@ export function useChat() {
     if (!currentClan) {
       return;
     }
-    const channels = currentClan.channelIds || [];
+    const channels = [] as string[];
     if (!channels.length) {
       return;
     }
@@ -195,6 +202,7 @@ export function useChat() {
     currentClan,
     currentChanel,
     currentChannelId,
+    currentClanId,
     init,
     sendMessage,
     changeCurrentClan,

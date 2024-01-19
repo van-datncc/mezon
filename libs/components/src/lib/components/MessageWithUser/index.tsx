@@ -1,8 +1,8 @@
 import { Image } from '@mezon/ui';
-import { IMessage } from '@mezon/utils';
+import { IMessage, IMessageWithUser } from '@mezon/utils';
 
 export type MessageWithUserProps = {
-  message: IMessage;
+  message: IMessageWithUser;
 }
 
 function MessageWithUser({ message }: MessageWithUserProps) {
@@ -26,10 +26,10 @@ function MessageWithUser({ message }: MessageWithUserProps) {
             {message.user?.username}
           </span>
           <span className="text-xs font-medium text-gray-400">
-            {message.date}
+            {message.create_time}
           </span>
         </p>
-        <p className="text-gray-100">{message.content}</p>
+        <p className="text-gray-100">{message.body.text}</p>
       </div>
     </div>
   )

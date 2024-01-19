@@ -22,13 +22,12 @@ const ServerLayout = () => {
   }, [changeCurrentClan, currentClan, serverIdParams]);
 
   useEffect(() => {
-    if (!currentClan) {
+    if (!currentClan || !currentChanel) {
       return;
     }
-
-    const url = `/chat/servers/${currentClan?.id}`;
+    const url = `/chat/servers/${currentClan?.id}/channels/${currentChanel?.channel_id}`;
     navigate(url);
-  }, [currentClan, navigate]);
+  }, [currentClan, currentChanel, navigate]);
 
   return (
     <div>

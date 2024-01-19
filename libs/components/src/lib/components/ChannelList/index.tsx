@@ -4,13 +4,15 @@ import { useChat } from '@mezon/core'
 
 import { Arrow } from '../Icons'
 import ChannelLink from '../ChannelLink'
-import { ICategory, IChannel } from '@mezon/utils'
+import { ICategory, IChannel, ICategoryChannel } from '@mezon/utils'
 
 export type ChannelListProps = { className?: string }
 
 function ChannelList() {
   const { categorizedChannels, currentChannelId } = useChat()
   const [categoriesState, setCategoriesState] = useState<Record<string, boolean>>({})
+
+  console.log('Channel, Cate: ', categorizedChannels)
 
   function toggleCategory(categoryId: string) {
     setCategoriesState((state) => ({
@@ -21,9 +23,9 @@ function ChannelList() {
 
   return (
     <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide">
-      {categorizedChannels.map((category: ICategory) => (
+      {categorizedChannels.map((category: ICategoryChannel) => (
         <div key={category.id}>
-          {category.name && (
+          {category.category_name && (
             <button
               onClick={() => toggleCategory(category.id)}
               className="flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
@@ -32,7 +34,7 @@ function ChannelList() {
                 className={`${categoriesState[category.id] ? '-rotate-90' : ''
                   } w-3 h-3 mr-0.5 transition duration-200`}
               />
-              {category.name}
+              {category.category_name}
             </button>
           )}
 
@@ -43,7 +45,7 @@ function ChannelList() {
             })
               .map((channel: IChannel) => (
                 <ChannelLink
-                  serverId={channel?.clanId}
+                  serverId={channel?.clan_id}
                   channel={channel}
                   active={currentChannelId === channel.id}
                   key={channel.id}

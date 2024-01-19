@@ -1,5 +1,6 @@
 import { IClan } from "@mezon/utils";
 import { Check, Tick } from "../Icons";
+import IconCreateClan from '../../../../../../apps/chat/src/assets/Images/IconCreateClan.svg'
 
 export type ModalListClansProps = {
     showModal: boolean;
@@ -18,16 +19,24 @@ const ModalListClans = (props: ModalListClansProps) => {
                      border-borderDefault bg-bgSecondary rounded-lg"
                 >
                     {options.map((option: IClan, index) => (
-                        <div className={`w-auto flex py-1 px-2 items-center justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B]' : ''}`} key={index} onClick={() => onChangeClan(option.id)}>
-                            <div className="flex items-center gap-2 w-10/12" >
-                                <img src={option.image} width={32} height={32} className="rounded-full" />
-                                <span className="text-[16px]">{option.name}</span>
+                        <div className={`w-auto flex py-1 px-2 items-center justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`} key={index} onClick={() => onChangeClan(option.id)}>
+                            <div className="flex items-center gap-4 w-10/12" >
+                                <img src={option.logo} width={40} height={40} className="rounded-full" />
+                                <span className="text-[16px]">{option.clan_name}</span>
                             </div>
-                            {idSelectedClan === option.id && (
+                            {idSelectedClan === option.clan_id && (
                                 <Tick />
                             )}
                         </div>
                     ))}
+
+                    <div className='w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md'>
+                        <div className="flex items-center gap-4 w-10/12" >
+                            <img src={IconCreateClan} alt={'logoMezon'} width={40} height={40} />
+                            <span className="text-[16px]">Add Clan</span>
+                        </div>
+
+                    </div>
                 </div>
             ) : null}
         </>

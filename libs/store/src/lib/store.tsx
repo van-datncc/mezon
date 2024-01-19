@@ -12,6 +12,7 @@ import { channelsReducer } from './channels/channels.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { usersReducer } from './users/users.slice';
+import { categoriesReducer } from './categories/categories.slice'
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { MezonContextValue } from '@mezon/transport'
@@ -35,6 +36,7 @@ const reducer = {
   threads: threadsReducer,
   messages: messagesReducer,
   users: usersReducer,
+  categories: categoriesReducer
 };
 
 const fakeStore = configureStore({
@@ -49,7 +51,7 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
   const store = configureStore({
     reducer,
     preloadedState,
-    middleware: (getDefaultMiddleware, ) => getDefaultMiddleware({
+    middleware: (getDefaultMiddleware,) => getDefaultMiddleware({
       thunk: {
         extraArgument: {
           mezon

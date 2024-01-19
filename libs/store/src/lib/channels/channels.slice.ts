@@ -7,6 +7,8 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
+import { ensureClient, getMezonCtx } from '../helpers';
+import { ApiChannelDescription } from '@heroiclabs/nakama-js/dist/api.gen';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -16,6 +18,11 @@ export const CHANNELS_FEATURE_KEY = 'channels';
 export interface ChannelsEntity extends IChannel {
   id: string; // Primary ID
 }
+
+export const mapChannelToEntity  = (channelRes: ApiChannelDescription ) => {
+  return {...channelRes, id: channelRes.channel_id || ''}
+}
+
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
   loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
@@ -42,15 +49,19 @@ export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchChannels = createAsyncThunk<ChannelsEntity[]>(
+type fetchChannelsPayload = {
+  clanId: string
+}
+
+export const fetchChannels = createAsyncThunk(
   'channels/fetchStatus',
-  async (_, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getChannelss()`;
-     * Right now we just return an empty array.
-     */
-    return Promise.resolve([]);
+  async ({clanId} : fetchChannelsPayload, thunkAPI) => {
+    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listChannelDescs(mezon.session, 100,1,'', clanId)
+    if(!response.channeldesc) {
+      return thunkAPI.rejectWithValue([])
+    }
+    return response.channeldesc.map(mapChannelToEntity);
   }
 );
 
@@ -112,7 +123,7 @@ export const channelsReducer = channelsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const channelsActions = channelsSlice.actions;
+export const channelsActions = {...channelsSlice.actions, fetchChannels};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
