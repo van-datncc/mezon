@@ -15,7 +15,7 @@ const ServerLayout = () => {
 
   useEffect(() => {
     // eslint-disable-next-line eqeqeq
-    if(!serverIdParams || serverIdParams == currentClan?.id) {
+    if (!serverIdParams || serverIdParams == currentClan?.id) {
       return
     }
     changeCurrentClan(serverIdParams);
@@ -30,11 +30,11 @@ const ServerLayout = () => {
     navigate(url);
   }, [currentClan, navigate]);
 
-    return (
-      <div>
-        <Outlet />
-      </div>
-    )
-  }
-  
-  export default ServerLayout;
+  return (
+    <div>
+      <Outlet />
+    </div>
+  )
+}
+
+export default ServerLayout;
