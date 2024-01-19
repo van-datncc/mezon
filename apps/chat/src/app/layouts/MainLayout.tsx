@@ -1,6 +1,7 @@
 
 import { useChat } from '@mezon/core';
-import { selectIsLogin } from '@mezon/store';
+import { authActions, selectIsLogin, selectSession, useAppDispatch } from '@mezon/store';
+import { MezonSuspense } from '@mezon/transport';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
@@ -42,9 +43,29 @@ const MainLayout = () => {
 
   return (
     <div id="main-layout">
-      <Outlet />
+      <MezonSuspense>
+        <Outlet />
+      </MezonSuspense>
     </div>
   )
 }
 
-export default MainLayout;
+const MainLayoutWrapper = () => {
+  const session = useSelector(selectSession);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!session) {
+      return;
+    }
+    dispatch(authActions.refreshSession())
+  }, [dispatch, session])
+
+  return (
+    <MezonSuspense>
+      <MainLayout />
+    </MezonSuspense>
+  )
+}
+
+export default MainLayoutWrapper;

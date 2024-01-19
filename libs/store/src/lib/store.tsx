@@ -16,6 +16,8 @@ import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { MezonContextValue } from '@mezon/transport'
 import { useDispatch } from 'react-redux';
+import React from 'react';
+import { trackActionError } from '@mezon/utils';
 
 const persistConfig = {
   key: 'auth',
@@ -67,4 +69,25 @@ export type AppThunkDispatch = ThunkDispatch<RootState, unknown, Action>;
 
 export type AppDispatch = Store['dispatch'] & AppThunkDispatch;
 
-export const useAppDispatch: () => AppDispatch = useDispatch
+export function useAppDispatch(): AppDispatch {
+  const dispatch = useDispatch<AppDispatch>();
+  const dispatchRef = React.useRef(dispatch);
+
+  const appDispatch: (typeof dispatch) = React.useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (action: any) => {
+      const result = dispatchRef.current(action);
+      if (result instanceof Promise) {
+        return result.then((res) => {
+          trackActionError(res);
+          return res;
+        });
+      }
+      trackActionError(result);
+      return result;
+    },
+    [],
+  );
+
+  return appDispatch;
+}

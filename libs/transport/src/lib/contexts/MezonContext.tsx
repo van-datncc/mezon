@@ -9,6 +9,12 @@ type MezonContextProviderProps = {
     connect?: boolean
 }
 
+type Sessionlike =  {
+    token: string;
+    refresh_token: string;
+    created: boolean;
+}
+
 export type MezonContextValue = {
     clientRef: React.MutableRefObject<Client | null> 
     sessionRef: React.MutableRefObject<Session | null> 
@@ -16,6 +22,7 @@ export type MezonContextValue = {
     authenticateEmail: (email: string, password: string) => Promise<Session>
     authenticateDevice: (username: string) => Promise<Session>
     authenticateGoogle: (token: string) => Promise<Session>
+    refreshSession: (session: Sessionlike) => Promise<Session>
 }
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -63,20 +70,31 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         return session;
     }, [clientRef]);
 
+    const refreshSession = useCallback(async (session: Sessionlike) => {
+        if (!clientRef.current) {
+            throw new Error('Nakama client not initialized');
+        }
+        const newSession = await clientRef.current.sessionRefresh(new Session(session.token, session.refresh_token, session.created));
+        sessionRef.current = newSession;
+        return newSession;
+    } , [clientRef]);
+
     const value = React.useMemo<MezonContextValue>(() => ({
         clientRef,
         sessionRef,
         createClient,
         authenticateDevice,
         authenticateEmail,
-        authenticateGoogle
+        authenticateGoogle,
+        refreshSession
     }), [
         clientRef,
         sessionRef,
         createClient,
         authenticateDevice,
         authenticateEmail,
-        authenticateGoogle
+        authenticateGoogle,
+        refreshSession
     ]);
 
     React.useEffect(() => {
@@ -94,4 +112,18 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
 
 const MezonContextConsumer = MezonContext.Consumer;
 
-export { MezonContext, MezonContextProvider, MezonContextConsumer };
+export type MezonSuspenseProps = {
+    children: React.ReactNode
+
+}
+
+const MezonSuspense: React.FC<MezonSuspenseProps> = ({ children }: MezonSuspenseProps) => {
+    const { clientRef, sessionRef } = React.useContext(MezonContext);
+    if (!clientRef.current || !sessionRef.current) {
+        return <>Loading...</>;
+    }
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    return <>{children}</>;
+}
+
+export { MezonContext, MezonContextProvider, MezonContextConsumer, MezonSuspense };
