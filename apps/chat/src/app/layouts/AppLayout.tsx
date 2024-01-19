@@ -11,6 +11,7 @@ const AppLayout = () => {
     if (!isLogin) {
       navigate('/guess/login');
     }
+    navigate('/chat');
   }, [isLogin, navigate]);
 
   return (
