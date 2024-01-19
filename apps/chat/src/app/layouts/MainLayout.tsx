@@ -33,9 +33,7 @@ const MainLayout = () => {
 
   return (
     <div id="main-layout">
-      <MezonSuspense>
-        <Outlet />
-      </MezonSuspense>
+      <Outlet />
     </div>
   )
 }
