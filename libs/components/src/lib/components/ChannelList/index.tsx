@@ -29,9 +29,8 @@ function ChannelList() {
               className="flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
             >
               <Arrow
-                className={`${
-                  categoriesState[category.id] ? '-rotate-90' : ''
-                } w-3 h-3 mr-0.5 transition duration-200`}
+                className={`${categoriesState[category.id] ? '-rotate-90' : ''
+                  } w-3 h-3 mr-0.5 transition duration-200`}
               />
               {category.name}
             </button>
@@ -39,10 +38,9 @@ function ChannelList() {
 
           <div className="mt-[5px] space-y-0.5">
             {category?.channels?.filter((channel: IChannel) => {
-                const categoryIsOpen = !categoriesState[category.id]
-
-                return categoryIsOpen || channel?.unread
-              })
+              const categoryIsOpen = !categoriesState[category.id]
+              return categoryIsOpen || channel?.unread
+            })
               .map((channel: IChannel) => (
                 <ChannelLink
                   serverId={channel?.clanId}

@@ -1,12 +1,11 @@
 import { PreloadedRootState } from "@mezon/store";
+import ClanImage1 from '../../assets/Images/ClanImage.png'
+import ClanImage2 from '../../assets/Images/Clan2Image.png'
 
-const preloadedState: PreloadedRootState = {
+const preloadedState = {
     app: {
       theme: 'light',
       loadingStatus: 'loaded', 
-    },
-    auth: {
-      loadingStatus: 'loaded',
     },
     account: {
       loadingStatus: 'loaded',
@@ -33,9 +32,50 @@ const preloadedState: PreloadedRootState = {
             clanId: 'clan1',
           }],
           categoryIds: ['category1', 'category2'],
+        },
+        'clan2': {
+          id: 'clan2',
+          name: 'Game',
+          description: 'Clan 2 description',
+          image: ClanImage1,
+          channelIds: ['channel1'],
+          memberIds: ['user1'],
+          categories: [{
+            id: 'category1',
+            name: 'General',
+            channelIds: ['channel1'],
+            clanId: 'clan2',
+          }, {
+            id: 'category2',
+            name: 'Development',
+            channelIds: ['channel2', 'channel3'],
+            clanId: 'clan2',
+          }],
+          categoryIds: ['category1', 'category2'],
+        },
+
+        'clan3': {
+          id: 'clan3',
+          name: 'Crypoto',
+          description: 'Clan 3 description',
+          image: ClanImage2,
+          channelIds: ['channel1'],
+          memberIds: ['user1'],
+          categories: [{
+            id: 'category1',
+            name: 'General',
+            channelIds: ['channel1'],
+            clanId: 'clan3',
+          }, {
+            id: 'category2',
+            name: 'Development',
+            channelIds: ['channel2', 'channel3'],
+            clanId: 'clan3',
+          }],
+          categoryIds: ['category1', 'category2'],
         }
       },
-      ids: ['clan1'],
+      ids: ['clan1','clan2', 'clan3'],
     },
     channels: {
       loadingStatus: 'loaded',
@@ -160,6 +200,6 @@ const preloadedState: PreloadedRootState = {
       entities: {},
       ids: [],
     },
-  }
+  } as unknown as PreloadedRootState;
 
   export { preloadedState }

@@ -1,22 +1,24 @@
-
-// import { useChat } from '@mezon/core';
-import React, { useEffect } from 'react';
+import { selectIsLogin } from '@mezon/store';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 const AppLayout = () => {
-    // const {  } = useChat();
-    const navigate = useNavigate();
+  const isLogin = useSelector(selectIsLogin);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-      // go to main page if user is not logged in
+  useEffect(() => {
+    if (!isLogin) {
       navigate('/guess/login');
-    }, [navigate]);
+    }
+    navigate('/chat');
+  }, [isLogin, navigate]);
 
-    return (
-      <div id="app-layout">
-        <Outlet />
-      </div>
-    )
-  }
-  
-  export default AppLayout;
+  return (
+    <div id="app-layout">
+      <Outlet />
+    </div>
+  );
+};
+
+export default AppLayout;

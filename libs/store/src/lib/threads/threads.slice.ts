@@ -17,7 +17,7 @@ export interface ThreadsEntity extends IThread {
   id: string; // Primary ID
 }
 
-export interface ThreadsState extends EntityState<ThreadsEntity> {
+export interface ThreadsState extends EntityState<ThreadsEntity, string> {
   loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
   error?: string | null;
 }

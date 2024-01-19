@@ -1,4 +1,4 @@
-import {Image} from '@mezon/ui';
+import { Image } from '@mezon/ui';
 import { IMessage } from '@mezon/utils';
 
 export type MessageWithUserProps = {
