@@ -6,7 +6,6 @@ export type MessageWithUserProps = {
 };
 
 function MessageWithUser({ message }: MessageWithUserProps) {
-  console.log('mssa', message);
   return (
     <div className="flex py-0.5 pr-16 pl-4 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer">
       <div className=" px-3 justify-start items-start gap-3 inline-flex ">
@@ -19,18 +18,15 @@ function MessageWithUser({ message }: MessageWithUserProps) {
         <div className="flex-col justify-center items-start inline-flex">
           <div className="justify-start items-center gap-2 inline-flex">
             <div className="font-thin font-['Manrope'] text-sm  text-green-400">
-              {/* {message.user?.username} */}
-              Phong.NguyễnNam
+              {message.user?.username}
             </div>
             <div className="w-full text-zinc-400 text-xs font-['Manrope']">
-              {/* {message.create_time} */}
-              01/12/2023 2:36PM - Test
+              {message?.date}
             </div>
           </div>
           <div className="w-[980px] justify-start items-center gap-2 inline-flex">
-            <div className=" text-xs text-stone-300  font-['Manrope']">
-              {/* <p className="text-gray-100">{message.content}</p> */}
-              Nội dung tin nhắn
+            <div className=" text-xs text-white font-['Manrope']">
+              {message.content?.content}
             </div>
           </div>
         </div>

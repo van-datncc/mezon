@@ -19,12 +19,12 @@ export type IChannel = ApiChannelDescription & {
 }
 
 export type IThread = {
-    name: string;
-    id: string;
-    clanId: string;
-    channelId: string;
-    content: string;
-    date: string;
+    name: string | undefined;
+    id: string | undefined;
+    clanId: string | undefined;
+    channelId: string | undefined;
+    content: string | undefined;
+    date: string |undefined;
 }
 
 export type IContextMenuItemAction = 'REST';
@@ -60,6 +60,10 @@ export type IMessage = ChannelMessage & {
     body: {
         text: string
     }
+    content?:{
+      content?:string | undefined
+    }
+    date?:string | undefined
 }
 
 export type IMessageWithUser = IMessage & {

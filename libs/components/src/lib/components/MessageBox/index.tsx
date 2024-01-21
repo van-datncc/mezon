@@ -23,8 +23,9 @@ function MessageBox(props: MessageBoxProps) {
     if (!content) {
       return;
     }
+    
     onSend({
-      content: {},
+      content: {content},
       id: '',
       channel_id: '',
       body: { text: '' },
@@ -45,8 +46,6 @@ function MessageBox(props: MessageBoxProps) {
     },
     [handleSend],
   );
-  console.log("handleSend", handleSend)
-
   return (
     <>
       <div className="self-stretch h-14 px-4 mb-[16px] mt-[16px] flex-col justify-end items-start gap-2 flex">
