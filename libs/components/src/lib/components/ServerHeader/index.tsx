@@ -23,7 +23,7 @@ function ServerHeader({ name, type, urlImage }: ServerHeaderProps) {
       ) : (
         <>
           <div className="h-[152px] relative">
-            <img src={imageDefault}></img>
+            <img src={urlImage ? urlImage : imageDefault} alt='imageCover'/>
             <div className="cursor-pointer w-[272px] px-4 pt-4 pb-5 left-0 top-0 absolute flex-row justify-center items-center gap-2 inline-flex">
               <p className="grow shrink basis-0 h-8 text-white text-lg  font-bold font-['Manrope']">
                 {name?.toLocaleUpperCase()}
