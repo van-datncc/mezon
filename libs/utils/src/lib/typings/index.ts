@@ -73,3 +73,51 @@ export type IUser = {
     avatarSm: string;
 }
 
+export interface CategoryNameProps {
+    ChannelType: string | undefined;
+    channelStatus: string | undefined;
+    name: string | undefined;
+  }
+  
+  export interface ThreadNameProps {
+    name: string | undefined;
+  }
+
+  
+  export interface IconProps {
+    url: string;
+  }
+  
+  export type ChannelListProps = { className?: string };
+  
+  export enum ChannelStatus {
+    OPEN = 'open',
+    CLOSE = 'close',
+  }
+  
+  export enum channelStatusEnum {
+    LOCK = 'lock',
+    UNLOCK = 'unlock',
+  }
+  
+  export enum ChannelTypeEnum {
+    CHAT = 'chat',
+    VOICE = 'voice',
+  }
+  
+  export interface ChannelProps {
+    name: string;
+    status?: string;
+    categories?: Record<string, CategoryProps>;
+  }
+  
+  export interface CategoryProps {
+    name: string | undefined;
+    status?: string | undefined;
+    type?: string | undefined;
+  }
+  
+  export interface ThreadProps {
+    name: string;
+  }
+  

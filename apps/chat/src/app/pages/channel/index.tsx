@@ -3,7 +3,6 @@ import { ChannelList, ChannelTopbar, FooterProfile, ServerHeader } from '@mezon/
 import ChannelMessages from './ChanneMessages'
 import { useChat } from '@mezon/core'
 import { ChannelMessageBox } from './ChannelMessageBox'
-// import { LogOutButton } from 'libs/ui/src/lib/LogOutButton/index';
 
 
 export default function Server() {
@@ -15,15 +14,15 @@ export default function Server() {
 
     return (
         <>
-            <div className="hidden flex-col w-60 bg-bgSurface md:flex">
+            <div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
                 <ServerHeader name={currentClan?.clan_name} type='channel' />
                 <ChannelList />
                 <FooterProfile name='nhan.nguyen' status='Online' />
-                {/* <LogOutButton /> */}
             </div>
             <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
                 <ChannelTopbar channel={currentChanel} />
-                <div className="overflow-y-scroll flex-1">
+                <div 
+                className="flex-1 overflow-y-auto ">
                     <ChannelMessages />
                 </div>
                 <div className="flex-shrink-0 bg-bgSecondary">
