@@ -10,7 +10,7 @@ const InitialRoutes = () => {
         return <Navigate to="/guess/login" replace />;
     }
 
-    return <Navigate to="/direct" replace />;
+    return <Navigate to="/chat/direct" replace />;
 };
 
 export default InitialRoutes;
