@@ -1,5 +1,6 @@
 export { default as ChannelLink } from './components/ChannelLink'
 export { default as ChannelList } from './components/ChannelList'
+export { default as MemberList } from './components/MemberList'
 export { default as DirectMessageList } from './components/DmList'
 export { default as ChannelTopbar } from './components/ChannelTopbar'
 export { default as Message } from './components/Message'

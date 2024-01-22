@@ -1,5 +1,5 @@
 
-import { ChannelList, ChannelTopbar, FooterProfile, ServerHeader } from '@mezon/components'
+import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from '@mezon/components'
 import ChannelMessages from './ChanneMessages'
 import { useChat } from '@mezon/core'
 import { ChannelMessageBox } from './ChannelMessageBox'
@@ -21,14 +21,22 @@ export default function Server() {
             </div>
             <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
                 <ChannelTopbar channel={currentChanel} />
-                <div 
-                className="flex-1 overflow-y-auto ">
-                    <ChannelMessages />
-                </div>
-                <div className="flex-shrink-0 bg-bgSecondary">
-                    <ChannelMessageBox />
+                <div className="flex h-screen">
+                    <div className="flex flex-col flex-1">
+                        <div 
+                        className="flex-1 overflow-y-auto">
+                            <ChannelMessages />
+                        </div>
+                        <div className="flex-shrink-0 bg-bgSecondary">
+                            <ChannelMessageBox />
+                        </div>
+                    </div>
+                    <div className="w-[268px] bg-bgSurface md:flex">
+                        <MemberList />
+                    </div>
                 </div>
             </div>
+
         </>
     )
 }
