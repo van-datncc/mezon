@@ -1,5 +1,5 @@
-import mezonQRCode from '../../../../../../../src/assets/QR-mezon.png';
-import mezonLogo from '../../../../../../../src/assets/mezon-logo.png';
+import mezonQRCode from 'apps/chat/src/assets/Images/QR-mezon.png';
+import mezonLogo from 'apps/chat/src/assets/Images/mezon-logo.png';
 
 export const QRSection: React.FC = () => {
   return (

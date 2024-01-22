@@ -3,10 +3,8 @@ import { Resolver, useForm } from 'react-hook-form';
 import { AlertTitleTextWarning } from '../../../../../../ui/src/lib/Alert/index';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import line from '../../../../../../../src/assets/Vector 1.svg';
-import eyeOpen from '../../../../../../../src/assets/Live area open.svg';
-import eyeClose from '../../../../../../../src/assets/Live area close.svg';
 
+import * as Icons from '../../Icons';
 
 export type LoginFormPayload = {
   userEmail: string;
@@ -26,7 +24,7 @@ export const validationSchema = Yup.object().shape({
     .required('Password is required')
     .matches(
       /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
-      'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number'
+      'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number',
     ),
 });
 
@@ -37,7 +35,9 @@ function LoginForm(props: LoginFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormPayload>({
-    resolver: yupResolver(validationSchema) as unknown as Resolver<LoginFormPayload>,
+    resolver: yupResolver(
+      validationSchema,
+    ) as unknown as Resolver<LoginFormPayload>,
 
     defaultValues: {
       password: '',
@@ -53,7 +53,7 @@ function LoginForm(props: LoginFormProps) {
       }
       return false;
     },
-    [onSubmit]
+    [onSubmit],
   );
 
   const handleFormSubmit = useCallback(
@@ -61,7 +61,7 @@ function LoginForm(props: LoginFormProps) {
       e.preventDefault();
       handleSubmit(submitForm)(e);
     },
-    [handleSubmit, submitForm]
+    [handleSubmit, submitForm],
   );
 
   const [showPassword, setShowPassword] = useState(false);
@@ -73,15 +73,12 @@ function LoginForm(props: LoginFormProps) {
   return (
     <div className="flex-col justify-start items-center flex w-[496px] h-fit gap-y-8 ">
       <div className="flex-row justify-start items-center flex w-full h-fit gap-x-4 ">
-        <div>
-          <img src={line} alt="line" />
-        </div>
+        <hr className="h-[0.08px] w-[272px] border-[#1E1E1E]" />
+
         <p className="w-fit h-fit font-manrope text-sm text-[#aeaeae] leading-[130%]">
           or
         </p>
-        <div>
-          <img src={line} alt="line" />
-        </div>
+        <hr className="h-[0.08px] w-[272px]  border-[#1E1E1E]" />
       </div>
 
       <div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
@@ -139,11 +136,7 @@ function LoginForm(props: LoginFormProps) {
                   onClick={togglePasswordVisibility}
                   className="outline-none z-50 fill-current left-0"
                 >
-                  <img
-                    className="w-6 h-6"
-                    src={showPassword ? eyeOpen : eyeClose}
-                    alt="eye"
-                  />
+                  {showPassword ? <Icons.EyeOpen /> : <Icons.EyeClose />}
                 </button>
               </div>
             </div>
