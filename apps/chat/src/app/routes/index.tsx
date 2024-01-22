@@ -12,6 +12,8 @@ import Main from '../pages/main';
 import Chanel from '../pages/channel';
 import Direct from '../pages/directMessage';
 import Login from '../pages/login';
+import ProtectedRoutes from './ProtectedRoutes';
+import InitialRoutes from './InititalRoutes';
 
 // Components
 export const routes = createBrowserRouter([
@@ -19,6 +21,11 @@ export const routes = createBrowserRouter([
     path: "/",
     element: <AppLayout />,
     children: [
+      // initial route to redirect to /chat
+      {
+        path: "",
+        element: <InitialRoutes />,
+      },
       {
         path: "/guess",
         element: <GuessLayout />,
@@ -29,27 +36,31 @@ export const routes = createBrowserRouter([
       },
       {
         path: "/chat",
-        element: <MainLayout />,
+        element: <ProtectedRoutes />,
         children: [{
-          path: "servers/:serverId",
-          element: <ServerLayout />,
+          path: "",
+          element: <MainLayout />,
           children: [{
             path: "",
             element: <Main />,
             children: [{
-              path: "channels/:channelId",
-              element: <Chanel />,
+              path: "servers/:serverId",
+              element: <ServerLayout />,
+              children: [{
+                path: "channels/:channelId",
+                element: <Chanel />,
+              }]
+            }, {
+              path: "direct",
+              element: <Direct />,
             }]
           }]
         }]
       },
+      // fallback route, renders when no other route is matched
       {
-        path: "/mezon",
-        element: <Main />,
-        children: [{
-          path: "direct/:userId",
-          element: <Direct />,
-        }]
+        path: "*",
+        element: <InitialRoutes />,
       },
     ]
   }

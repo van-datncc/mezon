@@ -13,7 +13,7 @@ function Login() {
   
   useEffect(() => {
     if (isLogin) {
-      navigate('/chat');
+      navigate('/direct');
     }
   }, [isLogin, navigate]);
 

@@ -30,7 +30,7 @@ const ServerLayout = () => {
   }, [currentClan, currentChanel, navigate]);
 
   return (
-    <div>
+    <div className='flex-row bg-bgSurface md:flex grow'>
       <Outlet />
     </div>
   )
