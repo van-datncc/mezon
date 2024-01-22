@@ -23,7 +23,7 @@ function MyApp() {
   return (
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
-        <NavLink href="/mezon/direct/12" active={pathName?.includes('direct')}>
+        <NavLink href="/chat/direct" active={pathName?.includes('direct')}>
           <Image src={IconLogoMezon} alt={'logoMezon'} />
         </NavLink>
         <div className="py-2 border-t-2 border-t-borderDefault"></div>
@@ -32,16 +32,14 @@ function MyApp() {
           active={!pathName?.includes('direct')}
           key={currentClanId}
         >
-          <>
-            <Image
-              src={currentClan?.logo || ''}
-              alt={currentClan?.clan_name || ''}
-              placeholder="blur"
-              width={48}
-              style={{ borderRadius: '50%' }}
-              blurDataURL={currentClan?.logo}
-            />
-          </>
+          <Image
+            src={currentClan?.logo || ''}
+            alt={currentClan?.clan_name || ''}
+            placeholder="blur"
+            width={48}
+            style={{ borderRadius: '50%' }}
+            blurDataURL={currentClan?.logo}
+          />
         </NavLink>
         )}
 
