@@ -74,13 +74,11 @@ function LoginForm(props: LoginFormProps) {
     <div className="flex-col justify-start items-center flex w-[496px] h-fit gap-y-8 ">
       <div className="flex-row justify-start items-center flex w-full h-fit gap-x-4 ">
         <hr className="h-[0.08px] w-[272px] border-[#1E1E1E]" />
-
         <p className="w-fit h-fit font-manrope text-sm text-[#aeaeae] leading-[130%]">
           or
         </p>
         <hr className="h-[0.08px] w-[272px]  border-[#1E1E1E]" />
       </div>
-
       <div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
         <div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
           <div className="flex-col justify-start items-start flex w-full h-fit gap-y-3 relative">
@@ -93,9 +91,8 @@ function LoginForm(props: LoginFormProps) {
               </p>
             </div>
             <div
-              className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${
-                errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
-              }`}
+              className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
+                }`}
             >
               <input
                 className="w-full h-6  bg-transparent outline-none relative text-white"
@@ -120,9 +117,8 @@ function LoginForm(props: LoginFormProps) {
 
             <div className="flex-col justify-start items-start flex w-full h-fit ">
               <div
-                className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] ${
-                  errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
-                } `}
+                className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] ${errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
+                  } `}
               >
                 <input
                   type={showPassword ? 'text' : 'password'}
