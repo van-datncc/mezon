@@ -5,8 +5,10 @@ import {
   useState,
   ChangeEvent,
   FormEvent,
+  useEffect,
 } from 'react';
 import * as Icons from '../Icons';
+import TypingIndicator from '../TypingIndicator';
 
 export type MessageBoxProps = {
   onSend: (mes: IMessagePayload) => void;
@@ -45,14 +47,18 @@ function MessageBox(props: MessageBoxProps) {
     },
     [handleSend],
   );
+
+
   return (
     <>
       <div className="self-stretch h-14 px-4 mb-[16px] mt-[16px] flex-col justify-end items-start gap-2 flex">
+        {/* <TypingIndicator /> */}
         <form
           onSubmit={handleSubmitted}
           className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
         >
           <Icons.AddCircle />
+
           <div
             className="grow  self-stretch justify-start items-center gap-2 flex"
             onSubmit={handleSubmitted}
@@ -65,7 +71,7 @@ function MessageBox(props: MessageBoxProps) {
               onBlur={handleInputChanged}
               onChange={handleInputChanged}
               value={content}
-              autoComplete='off'
+              autoComplete="off"
             />
           </div>
           <Icons.Gif />
