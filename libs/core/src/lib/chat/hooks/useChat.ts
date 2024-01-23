@@ -2,7 +2,7 @@
 import React, { useCallback } from 'react';
 import { useChannels } from './useChannels';
 import { useMessages } from './useMessages';
-import { useClans } from './useClans';
+import { useChannelMembers } from './useChannelMembers';
 import { useThreads } from './useThreads';
 import { useMezon } from '@mezon/transport';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import {
   selectCurrentClanId,
   clansActions,
   channelsActions,
+  channelMembersActions,
   messagesActions,
   selectCurrentClan,
   selectClansEntities,
@@ -20,14 +21,12 @@ import {
   accountActions,
   useAppDispatch,
   ClansEntity,
-  selectSession,
   selectAllClans,
   categoriesActions,
   ChannelsEntity,
   selectAllCategories,
-  MessagesEntity
 } from '@mezon/store';
-import { ICategoryChannel, ICategory, IChannel, IMessage } from '@mezon/utils';
+import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 
 export function useChat() {
   const { clientRef, createClient } = useMezon();
@@ -47,6 +46,7 @@ export function useChat() {
   const currentClanId = useSelector(selectCurrentClanId);
   const categories = useSelector(selectAllCategories)
   const { messages } = useMessages({ channelId: currentChannelId });
+  const { members } = useChannelMembers({ channelId: currentChannelId });
   
   const dispatch = useAppDispatch();
 
@@ -75,6 +75,14 @@ export function useChat() {
        changeCurrentChannel(defaultChannelId);
       }
       return payload;
+    },
+    [dispatch]
+  );
+
+  const fetchChannelMembers = React.useCallback(
+    async (channelId:string) => {
+      const action = await  dispatch(channelMembersActions.fetchChannelMembers({channelId}));
+      return action;
     },
     [dispatch]
   );
@@ -123,9 +131,10 @@ export function useChat() {
         return;
       }
       dispatch(channelsActions.changeCurrentChanel(channelId));
-      fetchMessageChannel(channelId)
+      fetchMessageChannel(channelId);
+      fetchChannelMembers(channelId);
     },
-    [channels, dispatch, fetchMessageChannel]
+    [channels, dispatch, fetchMessageChannel, fetchChannelMembers]
   );
 
   const sendMessage = React.useCallback(
@@ -199,6 +208,7 @@ export function useChat() {
     clans,
     threads,
     categorizedChannels,
+    members,
     currentClan,
     currentChanel,
     currentChannelId,

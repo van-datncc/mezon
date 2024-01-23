@@ -1,4 +1,4 @@
-import { IMessage, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -8,7 +8,6 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { el } from '@faker-js/faker';
 import { ChannelMessage } from 'vendors/mezon-js/packages/nakama-js/dist';
 
 export const MESSAGES_FEATURE_KEY = 'messages';

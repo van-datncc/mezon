@@ -10,7 +10,7 @@ import {
 import { ensureClient, getMezonCtx } from '../helpers';
 import { ChannelUserListChannelUser } from '@heroiclabs/nakama-js/dist/api.gen';
 
-export const CHANNEL_MEMBERS_FEATURE_KEY = 'channels';
+export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
 
 /*
  * Update these interfaces according to your requirements.
@@ -20,7 +20,7 @@ export interface ChannelMembersEntity extends IChannelMember {
 }
 
 export const mapChannelMemberToEntity  = (channelRes: ChannelUserListChannelUser) => {
-  return {...channelRes}
+  return {...channelRes, id: channelRes?.user?.id || ''}
 }
 
 
@@ -57,7 +57,7 @@ export const fetchChannelMembers = createAsyncThunk(
   'channelMembers/fetchStatus',
   async ({channelId} : fetchChannelMembersPayload, thunkAPI) => {
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listChannelUsers(mezon.session, channelId, 1, 20, "")
+    const response = await mezon.client.listChannelUsers(mezon.session, channelId, 1, 100, "")
     if(!response.channel_users) {
       return thunkAPI.rejectWithValue([])
     }
@@ -77,27 +77,24 @@ export const channelMembers = createSlice({
   reducers: {
     add: channelMembersAdapter.addOne,
     remove: channelMembersAdapter.removeOne,
-    changeCurrentChanel: (state, action: PayloadAction<string>) => {
-      state.currentChannelId = action.payload;
-    }
   },
-  // extraReducers: (builder) => {
-  //   builder
-  //     .addCase(fetchChannelMembers.pending, (state:ChannelMembersState) => {
-  //       state.loadingStatus = 'loading';
-  //     })
-  //     .addCase(
-  //       fetchChannelMembers.fulfilled,
-  //       (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-  //         channelMembersAdapter.setAll(state, action.payload);
-  //         state.loadingStatus = 'loaded';
-  //       }
-  //     )
-  //     .addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
-  //       state.loadingStatus = 'error';
-  //       state.error = action.error.message;
-  //     });
-  // },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchChannelMembers.pending, (state: ChannelMembersState) => {
+        state.loadingStatus = 'loading';
+      })
+      .addCase(
+        fetchChannelMembers.fulfilled,
+        (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
+          channelMembersAdapter.setAll(state, action.payload);
+          state.loadingStatus = 'loaded';
+        }
+      )
+      .addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
+        state.loadingStatus = 'error';
+        state.error = action.error.message;
+      });
+  },
 });
 
 /*
@@ -117,7 +114,7 @@ export const channelMembersReducer = channelMembers.reducer;
  *
  * const dispatch = useDispatch();
  * useEffect(() => {
- *   dispatch(channelsActions.add({ id: 1 }))
+ *   dispatch(channelMembersActions.add({ id: 1 }))
  * }, [dispatch]);
  * ```
  *
@@ -134,7 +131,7 @@ export const channelMembersActions = {...channelMembers.actions, fetchChannelMem
  *
  * // ...
  *
- * const entities = useSelector(selectAllChannels);
+ * const entities = useSelector(fetchChannelMembers);
  * ```
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
@@ -147,23 +144,16 @@ export const getChannelMembersState = (rootState: {
 
 export const selectAllChannelMembers = createSelector(getChannelMembersState, selectAll);
 
-export const selectChannelMembersEntities = createSelector(
+export const selectChannelMembesEntities = createSelector(
   getChannelMembersState,
   selectEntities
 );
 
-// export const selectChannelById = (id: string) => createSelector(
-//   selectChannelMembersEntities,
-//   (clansEntities) => clansEntities[id]
-// );
 
-// export const selectCurrentChannelId = createSelector(
-//   getChannelMembersState,
-//   (state) => state.currentChannelId
-// );
-
-// export const selectCurrentChannel = createSelector(
-//   selectChannelMembersEntities,
-//   selectCurrentChannelId,
-//   (clansEntities, clanId) => clanId ? clansEntities[clanId] : null
-// );
+export const selectMembersByChannelId = (channelId?: string | null) => createSelector(
+  selectChannelMembesEntities,
+  (entities) => {
+    const members = Object.values(entities);
+    return members.filter((member) => member && member.user !== null);
+  }
+);

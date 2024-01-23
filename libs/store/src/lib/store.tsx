@@ -9,6 +9,7 @@ import { accountReducer } from './account/account.slice';
 import { authReducer } from './auth/auth.slice';
 import { clansReducer } from './clans/clans.slice';
 import { channelsReducer } from './channels/channels.slice';
+import { channelMembersReducer } from './channelmembers/channel.members';
 import { threadsReducer } from './threads/threads.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { usersReducer } from './users/users.slice';
@@ -33,6 +34,7 @@ const reducer = {
   auth: persistedReducer,
   clans: clansReducer,
   channels: channelsReducer,
+  channelMembers: channelMembersReducer,
   threads: threadsReducer,
   messages: messagesReducer,
   users: usersReducer,
