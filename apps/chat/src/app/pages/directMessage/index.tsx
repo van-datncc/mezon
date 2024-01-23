@@ -24,7 +24,6 @@ export default function Direct() {
                         </div>
                     </>
                 ) : <>
-
                 </>
                 }
             </div>

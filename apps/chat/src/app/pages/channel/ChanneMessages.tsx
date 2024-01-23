@@ -1,4 +1,3 @@
-
 import { ChannelMessage } from './ChannelMessage'
 import { useChat } from '@mezon/core'
 

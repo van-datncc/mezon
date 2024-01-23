@@ -71,7 +71,7 @@ export const joinChanel = createAsyncThunk(
     const chanel = selectChannelById(channelId)(thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState })
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
     thunkAPI.dispatch(channelsActions.changeCurrentChanel(channelId))
-    const ch = await mezon.joinChatChannel(channelId, chanel.channel_lable || '')
+    const ch = await mezon.joinChatChannel(channelId, chanel?.channel_lable || '')
     console.log('chanel', ch)
   }
 );

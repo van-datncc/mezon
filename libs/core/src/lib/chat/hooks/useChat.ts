@@ -104,13 +104,23 @@ export function useChat() {
 
   const changeCurrentClan = React.useCallback(
     async (clanId: string) => {
-      console.log('changeCurrentClan', clanId)
+      dispatch(channelsActions.changeCurrentChanel(''))
       await dispatch(clansActions.changeCurrentClan(clanId));
       await fetchCategories(clanId)
       await fetchChannels(clanId)
     },
     [dispatch, fetchCategories, fetchChannels]
   );
+
+  const createClans = React.useCallback(
+    async (name:string, logoUrl: string) => {
+      const action = await dispatch(clansActions.createClan({clan_name : name, logo: logoUrl}));
+      const payload = action.payload as ClansEntity;
+      return payload;
+    },
+    [dispatch]
+  );
+
   const fetchClans = React.useCallback(
     async () => {
       console.log('fetchClans')
@@ -129,25 +139,11 @@ export function useChat() {
   const sendMessage = React.useCallback(
     async (message: IMessage) => {
       // TODO: send message to server using nakama client
-      const payload = {
-        ...message,
-        id: Math.random().toString(),
-        date: new Date().toLocaleString(),
-        user: {
-          name: 'My self',
-          username: 'myself',
-          id: 'myself',
-          avatarSm:
-            'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
-        },
-      };
-
-      if (!payload.channel_id) {
-        payload.channel_id = currentChannelId || '';
-      }
+      const session = sessionRef.current;
+   
 
       const client = clientRef.current;
-      const session = sessionRef.current;
+
       const socket = socketRef.current;
       const channel = channelRef.current;
 
@@ -155,9 +151,23 @@ export function useChat() {
         console.log(client, session, socket, channel, currentClanId)
         throw new Error('Client is not initialized');
       }
-
+   
+      const payload = {
+        ...message,
+        id: Math.random().toString(),
+        date: new Date().toLocaleString(),
+        user: {
+          name: session.username || '',
+          username: session.username || '',
+          id: 'myself',
+          avatarSm:
+            'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
+        },
+      };
+      if (!payload.channel_id) {
+        payload.channel_id = currentChannelId || '';
+      }
       dispatch(messagesActions.add(payload));
-
       const ack = await socket.writeChatMessage(currentClanId,  channel.id, payload);
       console.log('Ack:', ack)
     },
