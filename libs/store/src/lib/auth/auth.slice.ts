@@ -184,6 +184,10 @@ export const selectAllAuth = createSelector(
   (state: AuthState) => state
 );
 
+export const selectAuthIsLoaded = createSelector(
+  getAuthState,
+  (state: AuthState) => state.loadingStatus === 'loaded'
+);
 
 export const selectIsLogin = createSelector(
   getAuthState,

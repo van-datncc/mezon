@@ -13,8 +13,6 @@ function ChannelList() {
     Record<string, boolean>
   >({});
 
-  console.log('Channel, Cate: ', categorizedChannels);
-
   function toggleCategory(categoryId: string) {
     setCategoriesState((state) => ({
       ...state,

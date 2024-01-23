@@ -1,4 +1,4 @@
-import { IMessage, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -8,7 +8,6 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { el } from '@faker-js/faker';
 import { ChannelMessage } from 'vendors/mezon-js/packages/nakama-js/dist';
 
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -122,7 +121,7 @@ export const messagesReducer = messagesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const messagesActions = {...messagesSlice.actions, fetchMessages};
+export const messagesActions = {...messagesSlice.actions, fetchMessages };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
