@@ -51,6 +51,7 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
   'clans/fetchClans',
   async (_, thunkAPI) => {
+ 
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
     const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '')
     if(!response.clandesc) {
@@ -90,7 +91,6 @@ export const clansSlice = createSlice({
       .addCase(
         fetchClans.fulfilled,
         (state: ClansState, action: PayloadAction<IClan[]>) => {
-          console.log('Response: ', action.payload);
           clansAdapter.setAll(state,action.payload)
           state.loadingStatus = 'loaded';
         }
@@ -161,6 +161,11 @@ export const selectClansEntities = createSelector(
 export const selectClanById = (id: string) => createSelector(
   selectClansEntities,
   (clansEntities) => clansEntities[id]
+);
+
+export const selectLoadingStatus = createSelector(
+  getClansState,
+  (state) => state.loadingStatus
 );
 
 export const selectCurrentClan = createSelector(

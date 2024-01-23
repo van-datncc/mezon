@@ -65,6 +65,17 @@ export const fetchChannels = createAsyncThunk(
   }
 );
 
+export const joinChanel = createAsyncThunk(
+  'channels/joinChanel',
+  async (channelId : string, thunkAPI) => {
+    const chanel = selectChannelById(channelId)(thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState })
+    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    thunkAPI.dispatch(channelsActions.changeCurrentChanel(channelId))
+    const ch = await mezon.joinChatChannel(channelId, chanel.channel_lable || '')
+    console.log('chanel', ch)
+  }
+);
+
 export const initialChannelsState: ChannelsState =
   channelsAdapter.getInitialState({
     loadingStatus: 'not loaded',
@@ -123,7 +134,7 @@ export const channelsReducer = channelsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const channelsActions = {...channelsSlice.actions, fetchChannels};
+export const channelsActions = {...channelsSlice.actions, fetchChannels, joinChanel };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

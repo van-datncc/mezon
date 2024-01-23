@@ -1,10 +1,8 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useChannels } from './useChannels';
 import { useMessages } from './useMessages';
-import { useClans } from './useClans';
 import { useThreads } from './useThreads';
-import { useMezon } from '@mezon/transport';
 import { useSelector } from 'react-redux';
 import {
   selectChannelsEntities,
@@ -20,25 +18,23 @@ import {
   accountActions,
   useAppDispatch,
   ClansEntity,
-  selectSession,
   selectAllClans,
   categoriesActions,
   ChannelsEntity,
   selectAllCategories,
-  MessagesEntity
 } from '@mezon/store';
-import { ICategoryChannel, ICategory, IChannel, IMessage } from '@mezon/utils';
+import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
+import { useMezon } from '@mezon/transport';
 
 export function useChat() {
-  const { clientRef, createClient } = useMezon();
+  const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
   const { channels } = useChannels();
   // const { clans } = useClans();
   const { threads } = useThreads();
 
-  const client = clientRef.current;
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const ChannelsEntities = useSelector(selectChannelsEntities);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const chanEntities = useSelector(selectClansEntities);
   const clans = useSelector(selectAllClans);
   const currentClan = useSelector(selectCurrentClan);
@@ -47,11 +43,12 @@ export function useChat() {
   const currentClanId = useSelector(selectCurrentClanId);
   const categories = useSelector(selectAllCategories)
   const { messages } = useMessages({ channelId: currentChannelId });
+
+  const client = clientRef.current;
   
   const dispatch = useAppDispatch();
 
   const categorizedChannels = React.useMemo(() => {
-    console.log('Channel', channels)
     const results = categories.map((category) => {
       const categoryChannels = channels.filter(
         (channel) => channel && channel?.category_id === category.id
@@ -63,47 +60,7 @@ export function useChat() {
     });
 
     return results as ICategoryChannel[];
-  }, [currentClan, channels, categories]);
-
-  const fetchChannels = React.useCallback(
-    async (clanId:string) => {
-      const action = await  dispatch(channelsActions.fetchChannels({clanId}))
-      console.log('Action:', action)
-      const payload = action.payload as ChannelsEntity[];
-      if (payload.length > 0) {
-        const defaultChannelId = payload[0].id;
-       changeCurrentChannel(defaultChannelId);
-      }
-      return payload;
-    },
-    [dispatch]
-  );
-
-  const changeCurrentClan = React.useCallback(
-    (optionalId?: string) => {
-      let clanId = optionalId;
-      if (!clanId) {
-        clanId = clans[0]?.id;
-      }
-      dispatch(clansActions.changeCurrentClan(clanId));
-      dispatch(categoriesActions.fetchCategories({clanId}))
-      fetchChannels(clanId)
-    },
-    [clans, chanEntities,fetchChannels, dispatch]
-  );
-  const fetchClans = React.useCallback(
-    async () => {
-      const action = await dispatch(clansActions.fetchClans());
-
-      const payload = action.payload as ClansEntity[];
-      if (payload.length > 0) {
-        const defaultClanId = payload[0].id;
-       changeCurrentClan(defaultClanId);
-      }
-      return payload;
-    },
-    [dispatch]
-  );
+  }, [channels, categories]);
 
   const fetchMessageChannel = React.useCallback(
     async (channelId:string) => {
@@ -113,23 +70,64 @@ export function useChat() {
     [dispatch]
   );
 
+
   const changeCurrentChannel = React.useCallback(
-    (optionalId?: string) => {
-      let channelId = optionalId;
-      if (!channelId) {
-        channelId = channels[0]?.id;
-      }
-      if (!channelId) {
-        return;
-      }
-      dispatch(channelsActions.changeCurrentChanel(channelId));
-      fetchMessageChannel(channelId)
+    async (channelId: string) => {
+      await dispatch(channelsActions.joinChanel(channelId));
+      await fetchMessageChannel(channelId)
     },
-    [channels, dispatch, fetchMessageChannel]
+    [dispatch, fetchMessageChannel]
+  );
+
+  const fetchChannels = React.useCallback(
+    async (clanId:string) => {
+      console.log('fetchChannels', clanId)
+      const action = await  dispatch(channelsActions.fetchChannels({clanId}))
+      const payload = action.payload as ChannelsEntity[];
+      if (payload.length > 0) {
+        const defaultChannelId = payload[0].id;
+       changeCurrentChannel(defaultChannelId);
+      }
+      return payload;
+    },
+    [changeCurrentChannel, dispatch]
+  );
+
+  const fetchCategories = React.useCallback(
+    async (clanId:string) => {
+      console.log('fetchCategories', clanId)
+      const action = await  dispatch(categoriesActions.fetchCategories({clanId}))
+      return action.payload;
+    },
+    [dispatch]
+  );
+
+  const changeCurrentClan = React.useCallback(
+    async (clanId: string) => {
+      console.log('changeCurrentClan', clanId)
+      await dispatch(clansActions.changeCurrentClan(clanId));
+      await fetchCategories(clanId)
+      await fetchChannels(clanId)
+    },
+    [dispatch, fetchCategories, fetchChannels]
+  );
+  const fetchClans = React.useCallback(
+    async () => {
+      console.log('fetchClans')
+      const action = await dispatch(clansActions.fetchClans());
+
+      const payload = action.payload as ClansEntity[];
+      if (payload.length > 0) {
+        const defaultClanId = payload[0].id;
+        changeCurrentClan(defaultClanId);
+      }
+      return payload;
+    },
+    [changeCurrentClan, dispatch]
   );
 
   const sendMessage = React.useCallback(
-    (message: IMessage) => {
+    async (message: IMessage) => {
       // TODO: send message to server using nakama client
       const payload = {
         ...message,
@@ -148,14 +146,23 @@ export function useChat() {
         payload.channel_id = currentChannelId || '';
       }
 
-      dispatch(messagesActions.add(payload));
-    },
-    [currentChannelId, currentClanId, dispatch]
-  );
+      const client = clientRef.current;
+      const session = sessionRef.current;
+      const socket = socketRef.current;
+      const channel = channelRef.current;
 
-  const init = useCallback(() => {
-    createClient();
-  }, [createClient]);
+      if (!client || !session || !socket || !channel || !currentClanId) {
+        console.log(client, session, socket, channel, currentClanId)
+        throw new Error('Client is not initialized');
+      }
+
+      dispatch(messagesActions.add(payload));
+
+      const ack = await socket.writeChatMessage(currentClanId,  channel.id, payload);
+      console.log('Ack:', ack)
+    },
+    [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef]
+  );
 
   const loginEmail = useCallback(
     async (username: string, password: string) => {
@@ -177,22 +184,7 @@ export function useChat() {
     [dispatch]
   );
 
-  React.useEffect(() => {
-    if (!currentClan) {
-      return;
-    }
-    const channels = [] as string[];
-    if (!channels.length) {
-      return;
-    }
-    const channelId = channels[0];
-    if (!channelId) {
-      return;
-    }
-    dispatch(channelsActions.changeCurrentChanel(channelId));
-  }, [currentClan, dispatch]);
-
-  return {
+  return useMemo(() => ({
     client,
     channels,
     messages,
@@ -203,12 +195,28 @@ export function useChat() {
     currentChanel,
     currentChannelId,
     currentClanId,
-    init,
     sendMessage,
     changeCurrentClan,
     changeCurrentChannel,
     loginEmail,
     loginByGoogle,
     fetchClans
-  };
+  }), [
+    client,
+    channels,
+    messages,
+    clans,
+    threads,
+    categorizedChannels,
+    currentClan,
+    currentChanel,
+    currentChannelId,
+    currentClanId,
+    sendMessage,
+    changeCurrentClan,
+    changeCurrentChannel,
+    loginEmail,
+    loginByGoogle,
+    fetchClans
+  ]);
 }
