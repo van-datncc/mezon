@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useChannels } from './useChannels';
+import { useChannelMembers } from './useChannelMembers';
 import { useMessages } from './useMessages';
 import { useThreads } from './useThreads';
 import { useSelector } from 'react-redux';
@@ -10,6 +11,7 @@ import {
   selectCurrentClanId,
   clansActions,
   channelsActions,
+  channelMembersActions,
   messagesActions,
   selectCurrentClan,
   selectClansEntities,
@@ -24,7 +26,7 @@ import {
 } from '@mezon/store';
 import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
-import {checkMessageSendingAction} from "@mezon/store"
+import { checkMessageSendingAction } from "@mezon/store";
 
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
@@ -43,6 +45,7 @@ export function useChat() {
   const currentClanId = useSelector(selectCurrentClanId);
   const categories = useSelector(selectAllCategories);
   const { messages } = useMessages({ channelId: currentChannelId });
+  const { members } = useChannelMembers({ channelId: currentChannelId });
 
   const client = clientRef.current;
 
@@ -72,12 +75,21 @@ export function useChat() {
     [dispatch],
   );
 
+  const fetchChannelMembers = React.useCallback(
+    async (channelId:string) => {
+      const action = await  dispatch(channelMembersActions.fetchChannelMembers({channelId}));
+      return action;
+    },
+    [dispatch],
+  );
+
   const changeCurrentChannel = React.useCallback(
     async (channelId: string) => {
       await dispatch(channelsActions.joinChanel(channelId));
       await fetchMessageChannel(channelId);
+      await fetchChannelMembers(channelId);
     },
-    [dispatch, fetchMessageChannel],
+    [dispatch, fetchMessageChannel, fetchChannelMembers],
   );
 
   const fetchChannels = React.useCallback(
@@ -216,6 +228,7 @@ export function useChat() {
       clans,
       threads,
       categorizedChannels,
+      members,
       currentClan,
       currentChanel,
       currentChannelId,
@@ -234,6 +247,7 @@ export function useChat() {
       clans,
       threads,
       categorizedChannels,
+      members,
       currentClan,
       currentChanel,
       currentChannelId,

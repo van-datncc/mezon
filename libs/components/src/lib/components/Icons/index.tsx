@@ -487,6 +487,7 @@ export const MemberList: React.FC<FillProps> = ({
   const [isWhite, setFill] = useState<boolean>(false);
 
   const handleClick = () => {
+    console.log('member list');
     setFill(!isWhite);
   };
   return (

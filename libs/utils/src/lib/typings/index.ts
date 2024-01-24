@@ -1,4 +1,4 @@
-import {ApiCategoryDesc, ApiChannelDescription, ApiClanDesc } from '@heroiclabs/nakama-js/dist/api.gen'
+import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser } from '@heroiclabs/nakama-js/dist/api.gen'
 import {ChannelMessage} from '@heroiclabs/nakama-js'
 
 export type IClan = ApiClanDesc & {
@@ -12,10 +12,22 @@ export type ICategoryChannel = ICategory & {
     channels: IChannel[]
 }
 
+export type IRole = {
+    role_id: string
+}
+
+export type IRoleUsers = IRole & {
+    users: ApiUser[]
+}
+
 export type IChannel = ApiChannelDescription & {
     id: string;
     unread?: boolean;
     description?: string
+}
+
+export type IChannelMember = ChannelUserListChannelUser & {
+  id: string;
 }
 
 export type IThread = {
