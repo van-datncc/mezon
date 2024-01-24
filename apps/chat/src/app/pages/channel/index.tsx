@@ -1,11 +1,16 @@
-
-import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from '@mezon/components'
-import ChannelMessages from './ChanneMessages'
-import { useChat } from '@mezon/core'
-import { ChannelMessageBox } from './ChannelMessageBox'
+import {
+  ChannelList,
+  ChannelTopbar,
+  FooterProfile,
+  ServerHeader,
+  MemberList,
+} from '@mezon/components';
+import ChannelMessages from './ChanneMessages';
+import { useChat } from '@mezon/core';
+import { ChannelMessageBox } from './ChannelMessageBox';
 
 export default function Server() {
-    const { currentChanel, currentClan } = useChat()
+  const { currentChanel, currentClan } = useChat();
 
     if (!currentClan || !currentChanel) {
         return <div>Loading...</div>

@@ -80,7 +80,7 @@ export function useChat() {
       const action = await  dispatch(channelMembersActions.fetchChannelMembers({channelId}));
       return action;
     },
-    [dispatch]
+    [dispatch],
   );
 
   const changeCurrentChannel = React.useCallback(
