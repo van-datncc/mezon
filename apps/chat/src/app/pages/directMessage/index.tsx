@@ -1,8 +1,10 @@
 import { ChannelTopbar, DirectMessageList, FooterProfile, ServerHeader } from '@mezon/components'
 import ChannelMessages from '../channel/ChanneMessages'
 import { ChannelMessageBox } from '../channel/ChannelMessageBox'
+import { useChat } from '@mezon/core';
 
 export default function Direct() {
+    const { userProfile } = useChat();
 
     const currentDirectMess = null //get form store
     return (
@@ -10,7 +12,7 @@ export default function Direct() {
             <div className="hidden flex-col w-60 bg-bgSurface md:flex">
                 <ServerHeader type={'direct'} />
                 <DirectMessageList />
-                <FooterProfile name='nhan.nguyen' status='Online' />
+                <FooterProfile name={userProfile?.user?.username || ''} status={userProfile?.user?.online} avatar={userProfile?.user?.avatar_url || ''} />
             </div>
             <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
                 <ChannelTopbar channel={undefined} />

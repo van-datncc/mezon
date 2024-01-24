@@ -1,14 +1,15 @@
 export type ModalProps = {
     children: React.ReactNode
     showModal: boolean;
-    title: string;
+    title?: string;
     onClose: () => void;
-    confirmButton: () => void;
-    titleConfirm: string
+    confirmButton?: () => void;
+    titleConfirm?: string;
+    disableButtonConfirm?: boolean;
 };
 
 const Modal = (props: ModalProps) => {
-    const { showModal, onClose, confirmButton, title, children, titleConfirm } = props
+    const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm } = props
     return (
         <>
             {showModal ? (
@@ -36,20 +37,24 @@ const Modal = (props: ModalProps) => {
                                     {children}
                                 </div>
                                 {/*footer*/}
-                                <div className="flex items-center justify-end p-3 border-t border-solid border-borderDefault rounded-b">
-                                    <button
-                                        className="text-black-500 background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                        onClick={onClose}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        className="bg-primary text-white active:bg-emerald-600 font-semibold text-sm px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                        onClick={() => { confirmButton(), onClose() }}
-                                    >
-                                        {titleConfirm}
-                                    </button>
-                                </div>
+                                {confirmButton && (
+                                    <div className="flex items-center justify-end p-3 border-t border-solid border-borderDefault rounded-b">
+                                        <button
+                                            className="text-black-500 background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                            onClick={onClose}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            className={`text-white font-semibold text-sm px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${disableButtonConfirm ? 'bg-bgDisable' : 'bg-primary'}`}
+                                            onClick={() => { confirmButton(), onClose() }}
+                                            disabled={disableButtonConfirm}
+                                        >
+                                            {titleConfirm}
+                                        </button>
+                                    </div>
+                                )}
+
                             </div>
                         </div>
                     </div>

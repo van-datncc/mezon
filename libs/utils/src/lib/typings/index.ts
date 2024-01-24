@@ -1,4 +1,4 @@
-import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser } from '@heroiclabs/nakama-js/dist/api.gen'
+import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser, ApiAccount } from '@heroiclabs/nakama-js/dist/api.gen'
 import {ChannelMessage} from '@heroiclabs/nakama-js'
 
 export type IClan = ApiClanDesc & {
@@ -135,5 +135,8 @@ export interface CategoryNameProps {
   
   export interface ThreadProps {
     name: string;
+  }
+  
+  export type IUserAccount = ApiAccount & {
   }
   

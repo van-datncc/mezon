@@ -9,7 +9,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 let authLoaded = false
 
 const MainLayout = () => {
-  const { currentClanId } = useChat();
+  const { currentClanId, fetchUserProfile } = useChat();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +20,10 @@ const MainLayout = () => {
     const url = `/chat/servers/${currentClanId}`;
     navigate(url);
   }, [currentClanId, navigate]);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   return (
     <div id="main-layout">

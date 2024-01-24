@@ -2,7 +2,7 @@ import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { ChannelMessage } from 'vendors/mezon-js/packages/nakama-js/dist';
 import { useChat } from '../hooks/useChat';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 
@@ -17,7 +17,7 @@ export type ChatContextValue = {
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-  const { fetchClans } = useChat();
+  const { fetchClans, fetchUserProfile } = useChat();
   const { socketRef } = useMezon();
   const dispatch = useAppDispatch();
 
@@ -39,6 +39,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
   const { serverId: serverIdParams } = useParams();
   const { changeCurrentClan, changeCurrentChannel, currentClanId, currentChannelId } = useChat();
   const navigate = useNavigate();
+  const pathName = useLocation().pathname;
 
   const value = React.useMemo<ChatContextValue>(() => ({
 
@@ -87,6 +88,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
   }, [changeCurrentChannel, currentChannelId, channelIdParam]);
 
   useEffect(() => {
+    if (pathName.includes('direct')) {
+      return
+    }
     if (!currentClanId || !currentChannelId) {
       return;
     }
@@ -95,6 +99,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     }
     if (!channelIdParam) {
       const url = `/chat/servers/${currentClanId}/channels/${currentChannelId}`;
+      navigate(url);
+    }
+    if (!currentChannelId) {
+      const url = `/chat/servers/${currentClanId}/channels/${channelIdParam}`;
       navigate(url);
     }
   }, [currentClanId, currentChannelId, channelIdParam, serverIdParams, navigate]);

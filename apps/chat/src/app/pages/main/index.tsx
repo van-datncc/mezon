@@ -25,7 +25,6 @@ function MyApp() {
   const handleOpenCreate = () => {
     setOpenCreateClans(true)
   }
-
   return (
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
@@ -38,14 +37,25 @@ function MyApp() {
           active={!pathName?.includes('direct')}
           key={currentClanId}
         >
-          <Image
-            src={currentClan?.logo || ''}
-            alt={currentClan?.clan_name || ''}
-            placeholder="blur"
-            width={48}
-            style={{ borderRadius: '50%' }}
-            blurDataURL={currentClan?.logo}
-          />
+          {currentClan?.logo ? (
+            <Image
+              src={currentClan?.logo || ''}
+              alt={currentClan?.clan_name || ''}
+              placeholder="blur"
+              width={48}
+              style={{ borderRadius: '50%' }}
+              blurDataURL={currentClan?.logo}
+            />
+          ) : (
+            <>
+              {currentClan?.clan_name && (
+                <div className='w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px]'>
+                  {currentClan.clan_name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </>
+          )}
+
         </NavLink>
         )}
 
