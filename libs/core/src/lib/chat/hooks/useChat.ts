@@ -23,6 +23,7 @@ import {
   categoriesActions,
   ChannelsEntity,
   selectAllCategories,
+  selectAllAccount,
 } from '@mezon/store';
 import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
@@ -46,6 +47,7 @@ export function useChat() {
   const categories = useSelector(selectAllCategories);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
+  const {userProfile} = useSelector(selectAllAccount)
 
   const client = clientRef.current;
 
@@ -117,6 +119,18 @@ export function useChat() {
     [dispatch],
   );
 
+  
+  const fetchUserProfile = React.useCallback(
+    async () => {
+      const action = await dispatch(
+        accountActions.getUserProfile(),
+      );
+      return action.payload;
+    },
+    [dispatch],
+  );
+
+
   const changeCurrentClan = React.useCallback(
     async (clanId: string) => {
       dispatch(channelsActions.changeCurrentChanel(''));
@@ -133,13 +147,15 @@ export function useChat() {
         clansActions.createClan({ clan_name: name, logo: logoUrl }),
       );
       const payload = action.payload as ClansEntity;
+      if(payload && payload.clan_id) {
+        changeCurrentClan(payload.clan_id);
+      } 
       return payload;
     },
     [dispatch],
   );
 
   const fetchClans = React.useCallback(async () => {
-    console.log('fetchClans');
     const action = await dispatch(clansActions.fetchClans());
 
     const payload = action.payload as ClansEntity[];
@@ -155,9 +171,7 @@ export function useChat() {
     async (message: IMessage) => {
       // TODO: send message to server using nakama client
       const session = sessionRef.current;
-
       const client = clientRef.current;
-
       const socket = socketRef.current;
       const channel = channelRef.current;
 
@@ -171,10 +185,10 @@ export function useChat() {
         id: Math.random().toString(),
         date: new Date().toLocaleString(),
         user: {
-          name: session.username || '',
+          name: userProfile?.user?.username || '',
           username: session.username || '',
           id: 'myself',
-          avatarSm:
+          avatarSm: userProfile?.user?.avatar_url ||
             'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
         },
       };
@@ -233,12 +247,15 @@ export function useChat() {
       currentChanel,
       currentChannelId,
       currentClanId,
+      userProfile,
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
       loginEmail,
       loginByGoogle,
       fetchClans,
+      createClans,
+      fetchUserProfile
     }),
     [
       client,
@@ -252,12 +269,15 @@ export function useChat() {
       currentChanel,
       currentChannelId,
       currentClanId,
+      userProfile,
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
       loginEmail,
       loginByGoogle,
       fetchClans,
+      createClans,
+      fetchUserProfile
     ],
   );
 }

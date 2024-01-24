@@ -20,7 +20,7 @@ const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, r
                     <span className={'text-colorDanger'}> *</span>
                 )}
             </div>
-            <input type={type} className={`bg-black font-[400] py-[12px] px-[14px] rounded w-full border text-white outline-none ${className}`} {...rest} maxLength={maxLength} multiple />
+            <input type={type} className={`bg-bgPrimary font-[400] py-[12px] px-[14px] rounded w-full text-white outline-none ${className}`} {...rest} maxLength={maxLength} multiple />
         </div>
     )
 }
