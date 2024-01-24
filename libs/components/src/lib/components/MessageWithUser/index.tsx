@@ -1,11 +1,11 @@
-import { Image } from '@mezon/ui';
-import { IMessage, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 
 export type MessageWithUserProps = {
   message: IMessageWithUser;
 };
 
 function MessageWithUser({ message }: MessageWithUserProps) {
+
   return (
     <div className="flex py-0.5 pr-16 pl-4 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer">
       <div className=" px-3 justify-start items-start gap-3 inline-flex ">

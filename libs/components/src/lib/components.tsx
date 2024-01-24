@@ -12,6 +12,7 @@ export { default as MemberProfile } from './components/MemberProfile'
 export { default as MessageBox } from './components/MessageBox'
 export { default as LoginForm } from './components/LoginForm'
 export { default as ModalListClans } from './components/ModalListClans'
+export { default as ModalCreateClan } from './components/CreateClanModal'
 
 export * from './components/MessageBox'
 export * from './components/LoginForm'

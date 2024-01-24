@@ -1,35 +1,25 @@
 
-import { useChat } from '@mezon/core';
-import { authActions, selectIsLogin, selectSession, useAppDispatch } from '@mezon/store';
+import { ChatContextProvider, useChat } from '@mezon/core';
+import { authActions, selectIsLogin, selectLoadingStatus, selectSession, useAppDispatch } from '@mezon/store';
 import { MezonSuspense } from '@mezon/transport';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+
+let authLoaded = false
 
 const MainLayout = () => {
-  const { serverId: serverIdParams } = useParams();
-  const { changeCurrentClan, currentClan, fetchClans } = useChat();
+  const { currentClanId } = useChat();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchClans()
-  }, [fetchClans]);
-
-  useEffect(() => {
-    if (!serverIdParams || serverIdParams == currentClan?.id) {
-      return
-    }
-    changeCurrentClan(serverIdParams);
-  }, [changeCurrentClan, currentClan, serverIdParams]);
-
-  useEffect(() => {
-    if (!currentClan) {
+    if (!currentClanId) {
       return;
     }
 
-    const url = `/chat/servers/${currentClan?.id}`;
+    const url = `/chat/servers/${currentClanId}`;
     navigate(url);
-  }, [currentClan, navigate]);
+  }, [currentClanId, navigate]);
 
   return (
     <div id="main-layout">
@@ -39,16 +29,22 @@ const MainLayout = () => {
 }
 
 const MainLayoutWrapper = () => {
-  const isLogin = useSelector(selectIsLogin)
+  const isLogin = useSelector(selectIsLogin);
   const session = useSelector(selectSession);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoaded) {
+      return;
+    }
+
     if (!session) {
       return;
     }
+
     dispatch(authActions.refreshSession())
+    authLoaded = true
   }, [dispatch, session])
 
   useEffect(() => {
@@ -60,7 +56,9 @@ const MainLayoutWrapper = () => {
 
   return (
     <MezonSuspense>
-      <MainLayout />
+      <ChatContextProvider>
+        <MainLayout />
+      </ChatContextProvider>
     </MezonSuspense>
   )
 }

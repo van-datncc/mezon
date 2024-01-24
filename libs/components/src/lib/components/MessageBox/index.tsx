@@ -23,9 +23,8 @@ function MessageBox(props: MessageBoxProps) {
     if (!content) {
       return;
     }
-    
     onSend({
-      content: {content},
+      content: { content },
       id: '',
       channel_id: '',
       body: { text: '' },

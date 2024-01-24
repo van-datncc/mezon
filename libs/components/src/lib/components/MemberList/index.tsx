@@ -26,7 +26,7 @@ function MemberList() {
                     <MemberProfile
                       avatar={user?.user?.avatar_url ?? ''}
                       name={user?.user?.display_name ?? ''}
-                      status={user?.user?.display_name ?? ''}
+                      status={'hihi'}
                       key={user.id}
                     />
                   ))}

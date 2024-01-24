@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { CreateNakamaClientOptions, createClient as createNakamaClient } from '../nakama';
-import { Client, Session, Socket } from '@heroiclabs/nakama-js';
+import { Client, Session, Socket, Channel } from '@heroiclabs/nakama-js';
 import { DeviceUUID } from "device-uuid";
 
 type MezonContextProviderProps = {
@@ -18,20 +18,33 @@ type Sessionlike = {
 export type MezonContextValue = {
     clientRef: React.MutableRefObject<Client | null>
     sessionRef: React.MutableRefObject<Session | null>
+    socketRef: React.MutableRefObject<Socket | null>
+    channelRef: React.MutableRefObject<Channel | null>
     createClient: () => Promise<Client>
     authenticateEmail: (email: string, password: string) => Promise<Session>
     authenticateDevice: (username: string) => Promise<Session>
     authenticateGoogle: (token: string) => Promise<Session>
     refreshSession: (session: Sessionlike) => Promise<Session>
+    joinChatChannel: (channelId: string, type: string) => Promise<Channel>
 }
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
 const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, nakama, connect }) => {
-
     const clientRef = React.useRef<Client | null>(null);
     const sessionRef = React.useRef<Session | null>(null);
     const socketRef = React.useRef<Socket | null>(null);
+    const channelRef = React.useRef<Channel | null>(null);
+
+    const createSocket = useCallback(async () => {
+        if (!clientRef.current) {
+            throw new Error('Nakama client not initialized');
+        }
+        const socket = clientRef.current.createSocket();
+        socketRef.current = socket;
+        return socket;
+    }, [clientRef, socketRef]);
+
 
     const createClient = useCallback(async () => {
         const client = await createNakamaClient(nakama);
@@ -45,8 +58,17 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         }
         const session = await clientRef.current.authenticateEmail(email, password, false);
         sessionRef.current = session;
+
+        if (!socketRef.current) {
+            return session;
+        }
+
+        const session2 = await socketRef.current.connect(session, false);
+        sessionRef.current = session2;
+
+
         return session;
-    }, [clientRef]);
+    }, [clientRef, socketRef]);
 
     const authenticateGoogle = useCallback(async (token: string) => {
         if (!clientRef.current) {
@@ -54,8 +76,16 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         }
         const session = await clientRef.current.authenticateGoogle(token);
         sessionRef.current = session;
+
+        if (!socketRef.current) {
+            return session;
+        }
+
+        const session2 = await socketRef.current.connect(session, false);
+        sessionRef.current = session2;
+
         return session;
-    }, [clientRef]);
+    }, [clientRef, socketRef]);
 
     const authenticateDevice = useCallback(async (username: string) => {
 
@@ -77,43 +107,72 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         }
         const newSession = await clientRef.current.sessionRefresh(new Session(session.token, session.refresh_token, session.created));
         sessionRef.current = newSession;
-        return newSession;
-    }, [clientRef]);
 
-    const createSocket = useCallback(async () => {
-        if (!clientRef.current) {
-            throw new Error('Nakama client not initialized');
+        if (!socketRef.current) {
+            return newSession;
         }
-        const socket = clientRef.current.createSocket();
-        socketRef.current = socket;
-        return socket;
+
+        const session2 = await socketRef.current.connect(newSession, false);
+        sessionRef.current = session2;
+
+        return newSession;
     }, [clientRef, socketRef]);
+
+    const joinChatChannel = React.useCallback(async (channelId: string, channelName: string) => {
+        const socket = socketRef.current;
+        if (!socket) {
+          throw new Error('Socket is not initialized');
+        }
+    
+        const join = await socket
+          .joinChat(
+            channelId,
+            channelName,
+            1,
+            true,
+            false,
+          )
+    
+          console.log('Join:', join)
+    
+        channelRef.current = join;
+        return join;
+      }, [socketRef])
+
 
     const value = React.useMemo<MezonContextValue>(() => ({
         clientRef,
         sessionRef,
+        socketRef,
+        channelRef,
         createClient,
         authenticateDevice,
         authenticateEmail,
         authenticateGoogle,
         refreshSession,
+        joinChatChannel,
         createSocket
     }), [
         clientRef,
         sessionRef,
+        socketRef,
+        channelRef,
         createClient,
         authenticateDevice,
         authenticateEmail,
         authenticateGoogle,
         refreshSession,
+        joinChatChannel,
         createSocket
     ]);
 
     React.useEffect(() => {
         if (connect) {
-            createClient();
+            createClient().then(() => {
+                return createSocket();
+            });
         }
-    }, [connect, createClient]);
+    }, [connect, createClient, createSocket]);
 
     return (
         <MezonContext.Provider value={value}>
@@ -130,8 +189,8 @@ export type MezonSuspenseProps = {
 }
 
 const MezonSuspense: React.FC<MezonSuspenseProps> = ({ children }: MezonSuspenseProps) => {
-    const { clientRef, sessionRef } = React.useContext(MezonContext);
-    if (!clientRef.current || !sessionRef.current) {
+    const { clientRef, sessionRef, socketRef } = React.useContext(MezonContext);
+    if (!clientRef.current || !sessionRef.current || !socketRef.current) {
         return <>Loading...</>;
     }
     // eslint-disable-next-line react/jsx-no-useless-fragment

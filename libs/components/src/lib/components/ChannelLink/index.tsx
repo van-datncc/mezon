@@ -33,7 +33,7 @@ function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
         )}
         <Speaker className="mr-1.5 w-5 h-[28px] text-gray-400" />
         <p className="ml-2 text-[#AEAEAE] w-full h-[28px] hover:text-white">
-          {channel.channel_lable}
+          {channel?.channel_lable}
         </p>
         <AddPerson className="ml-auto w-4 h-4 text-gray-200 hover:text-gray-100 opacity-0 group-hover:opacity-100" />
       </span>

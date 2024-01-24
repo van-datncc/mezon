@@ -95,7 +95,6 @@ export const categoriesSlice = createSlice({
       .addCase(
         fetchCategories.fulfilled,
         (state: CategoriesState, action: PayloadAction<ICategory[]>) => {
-          console.log('Response: ', action.payload);
           categoriesAdapter.setAll(state,action.payload)
           state.loadingStatus = 'loaded';
         }
