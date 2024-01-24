@@ -65,12 +65,28 @@ export const fetchChannels = createAsyncThunk(
   }
 );
 
+function waitUntil<T>(condition: () => T | undefined, ms: number = 1000): Promise<T> {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      const result = condition();
+      if (result !== undefined) {
+        clearInterval(interval);
+        resolve(result);
+      }
+    }, ms);
+  });
+}
+
 export const joinChanel = createAsyncThunk(
   'channels/joinChanel',
   async (channelId : string, thunkAPI) => {
-    const chanel = selectChannelById(channelId)(thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState })
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
     thunkAPI.dispatch(channelsActions.changeCurrentChanel(channelId))
+
+    const chanel = await waitUntil(() => selectChannelById(channelId)(thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState }));
+    if(!chanel || !chanel.channel_lable) {
+      return thunkAPI.rejectWithValue([])
+    }
     const ch = await mezon.joinChatChannel(channelId, chanel?.channel_lable || '')
     console.log('chanel', ch)
   }
