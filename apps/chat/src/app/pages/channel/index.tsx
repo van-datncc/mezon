@@ -8,7 +8,7 @@ import {
 import ChannelMessages from './ChanneMessages';
 import { useChat } from '@mezon/core';
 import { ChannelMessageBox } from './ChannelMessageBox';
-
+import { LogOutButton } from 'libs/ui/src/lib/LogOutButton/index';
 export default function Server() {
   const { currentChanel, currentClan } = useChat();
 
@@ -20,6 +20,7 @@ export default function Server() {
             <div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
                 <ServerHeader name={currentClan?.clan_name} type='channel' bannerImage={currentClan.banner} />
                 <ChannelList />
+                <LogOutButton/>
                 <FooterProfile name='nhan.nguyen' status='Online' />
             </div>
             <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
