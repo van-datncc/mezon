@@ -1,5 +1,6 @@
 import { IMessageWithUser } from '@mezon/utils';
 import {
+  createAction,
   createAsyncThunk,
   createEntityAdapter,
   createSelector,
@@ -16,9 +17,14 @@ export const MESSAGES_FEATURE_KEY = 'messages';
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity  = (channelMess: ChannelMessage  ) => {
-  return {...channelMess, id: channelMess.message_id || '', body: {text: 'Hello world'}, user: null}
-}
+export const mapMessageChannelToEntity = (channelMess: ChannelMessage) => {
+  return {
+    ...channelMess,
+    id: channelMess.message_id || '',
+    body: { text: 'Hello world' },
+    user: null,
+  };
+};
 
 export interface MessagesEntity extends IMessageWithUser {
   id: string; // Primary ID
@@ -27,6 +33,7 @@ export interface MessagesEntity extends IMessageWithUser {
 export interface MessagesState extends EntityState<MessagesEntity, string> {
   loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
   error?: string | null;
+  isSending?: boolean;
 }
 
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
@@ -50,25 +57,32 @@ export const messagesAdapter = createEntityAdapter<MessagesEntity>();
  */
 
 type fetchMessageChannelPayload = {
-  channelId: string
-}
+  channelId: string;
+};
 
 export const fetchMessages = createAsyncThunk(
   'messages/fetchStatus',
-  async ({channelId} : fetchMessageChannelPayload, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listChannelMessages(mezon.session,channelId, 100,false)
-    if(!response.messages) {
-      return thunkAPI.rejectWithValue([])
+  async ({ channelId }: fetchMessageChannelPayload, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listChannelMessages(
+      mezon.session,
+      channelId,
+      100,
+      false,
+    );
+    if (!response.messages) {
+      return thunkAPI.rejectWithValue([]);
     }
     return response.messages.map(mapMessageChannelToEntity);
-  }
+  },
 );
+
 
 export const initialMessagesState: MessagesState =
   messagesAdapter.getInitialState({
     loadingStatus: 'not loaded',
     error: null,
+    isSending: false,
   });
 
 export const messagesSlice = createSlice({
@@ -77,7 +91,9 @@ export const messagesSlice = createSlice({
   reducers: {
     add: messagesAdapter.addOne,
     remove: messagesAdapter.removeOne,
-    // ...
+    checkMessageSendingAction: (state) => {
+      state.isSending = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -89,12 +105,12 @@ export const messagesSlice = createSlice({
         (state: MessagesState, action: PayloadAction<MessagesEntity[]>) => {
           messagesAdapter.setAll(state, action.payload);
           state.loadingStatus = 'loaded';
-        }
+        },
       )
       .addCase(fetchMessages.rejected, (state: MessagesState, action) => {
         state.loadingStatus = 'error';
         state.error = action.error.message;
-      });
+      })
   },
 });
 
@@ -121,7 +137,9 @@ export const messagesReducer = messagesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const messagesActions = {...messagesSlice.actions, fetchMessages };
+export const { checkMessageSendingAction } = messagesSlice.actions;
+
+export const messagesActions = { ...messagesSlice.actions, fetchMessages, checkMessageSendingAction };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -147,14 +165,16 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export const selectMessagesEntities = createSelector(
   getMessagesState,
-  selectEntities
+  selectEntities,
 );
 
-
-export const selectMessageByChannelId = (channelId?: string | null) => createSelector(
-  selectMessagesEntities,
-  (entities) => {
+export const selectMessageByChannelId = (channelId?: string | null) =>
+  createSelector(selectMessagesEntities, (entities) => {
     const messages = Object.values(entities);
-    return messages.filter((message) => message && message.channel_id === channelId);
-  }
-);
+    return messages.filter(
+      (message) => message && message.channel_id === channelId,
+    );
+  });
+
+
+
