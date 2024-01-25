@@ -19,7 +19,7 @@ function ChannelList() {
       [categoryId]: state[categoryId] ? !state[categoryId] : false,
     }));
   }
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
 
   return (
     <>

@@ -1,7 +1,7 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
-import { messagesActions, useAppDispatch } from '@mezon/store';
+import { mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 
 type ChatContextProviderProps = {
@@ -15,14 +15,12 @@ export type ChatContextValue = {
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-  
+
   const { socketRef } = useMezon();
   const dispatch = useAppDispatch();
 
   const onchannelmessage = useCallback((message: ChannelMessage) => {
-    console.log('onchannelmessage', message);
-    const payload = { ...message.content as IMessageWithUser };
-    dispatch(messagesActions.add(payload));
+    dispatch(messagesActions.add(mapMessageChannelToEntity(message)));
   }, []);
 
   const onchannelpresence = useCallback((message: ChannelMessage) => {

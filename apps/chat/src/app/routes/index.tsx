@@ -20,6 +20,8 @@ import InvitePage from '../pages/invite';
 // Loaders
 import { authLoader } from '../loaders/authLoader';
 import { mainLoader } from '../loaders/mainLoader';
+import { serverLoader } from '../loaders/serverLoader';
+import { channelLoader } from '../loaders/channelLoader';
 
 // Components
 export const routes = createBrowserRouter([
@@ -54,9 +56,11 @@ export const routes = createBrowserRouter([
             element: <Main />,
             children: [{
               path: "servers/:serverId",
+              loader: serverLoader,
               element: <ServerLayout />,
               children: [{
                 path: "channels/:channelId",
+                loader: channelLoader,
                 element: <Chanel />,
               }]
             }, {
@@ -67,7 +71,7 @@ export const routes = createBrowserRouter([
               path: "invite/:inviteId",
               element: <InvitePage />,
             }
-          ]
+            ]
           }]
         }]
       },
