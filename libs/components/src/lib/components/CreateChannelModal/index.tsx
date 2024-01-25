@@ -30,12 +30,11 @@ export const CreateNewChannelModal = () => {
   const dispatch = useAppDispatch();
 
   const handleSubmit = () => {
-    console.log('currentClanId', currentClanId);
-    const body = {
+    const body: ApiCreateChannelDescRequest = {
       clan_id: currentClanId?.toString(),
-      type: 1,
+      type: channelType,
       channel_lable: channelName,
-      channel_private: 1,
+      channel_private: isPrivate,
       category_id: currentCategoryId,
     };
     dispatch(createNewChannel(body));
@@ -45,22 +44,26 @@ export const CreateNewChannelModal = () => {
   const handleCloseModal = () => {
     dispatch(channelsActions.openCreateNewModalChannel());
   };
-  const handleCreate = () => {
-    console.log('clicked Create');
-  };
 
   const [channelName, setChannelName] = useState('');
-
   const handleChannelNameChange = (value: string) => {
     setChannelName(value);
-    console.log(channelName);
+  };
+
+  const [channelType, setChannelType] = useState<number>(-1);
+  const onChangeChannelType = (value: number) => {
+    setChannelType(value);
+  };
+  const [isPrivate, setIsPrivate] = useState<number>(0);
+  const onChangeToggle = (value: number) => {
+    setIsPrivate(value);
   };
 
   return (
     <>
       {isOpenModal && (
-        <div className="w-[100%] h-[100%] duration-500 absolute top-0 z-50 ml-[-72px] overflow-x-hidden opacity-80 bg-black flex flex-row justify-center items-center">
-          <div className="z-10 Frame397 w-[684px] h-[780px] bg-neutral-900 rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
+        <div className="w-screen h-screen overflow-hidden duration-500 absolute top-0 left-0 z-50 opacity-95 bg-black flex flex-row justify-center items-center">
+          <div className="z-60 Frame397 w-[684px] h-[780px] bg-[#151515] rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
             <div className="Frame398 self-stretch h-96 flex-col justify-start items-start flex ">
               <div className="Frame395 self-stretch h-96 px-5 pt-8 pb-5 flex-col justify-start items-start gap-6 flex">
                 <div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
@@ -85,10 +88,22 @@ export const CreateNewChannelModal = () => {
                 <div className="Frame407 self-stretch h-80 flex-col justify-start items-start gap-4 flex">
                   <ChannelLableModal labelProp="CHANNEL TYPE" />
                   <div className="Frame405 self-stretch h-72 flex-col justify-start items-start gap-2 flex">
-                    <ChannelTypeComponent type={0} />
-                    <ChannelTypeComponent type={1} />
-                    <ChannelTypeComponent type={2} />
-                    <ChannelTypeComponent type={3} />
+                    <ChannelTypeComponent
+                      type={0}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={1}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={2}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={3}
+                      onChange={onChangeChannelType}
+                    />
                   </div>
                 </div>
                 <ChannelNameTextField
@@ -96,13 +111,19 @@ export const CreateNewChannelModal = () => {
                   type={1}
                   channelNameProps="WHAT IS CHANNEL'S NAME?"
                 />
-                <ChannelStatusModal channelNameProps="IS PRIVATE CHANNEL?" />
-                <div className=" relative border-black self-stretch px-5 pt-5 pb-8 bg-neutral-900 border-t justify-end items-center gap-3 inline-flex">
+                <ChannelStatusModal
+                  onChangeValue={onChangeToggle}
+                  channelNameProps="IS PRIVATE CHANNEL?"
+                />
+                <div className=" relative border-black self-stretch px-5 pt-5 pb-8 bg-[#151515] border-t justify-end items-center gap-3 inline-flex">
                   <div className=" flex-col justify-center items-center inline-flex">
                     <div className=" w-[85px] flex-col justify-center items-center gap-2 flex">
                       <div className=" self-stretch grow shrink basis-0 px-4 py-3 rounded flex-col justify-center items-center flex">
                         <div className=" justify-start items-center gap-2 inline-flex">
-                          <button className=" text-blue-300 text-base font-medium font-['Manrope'] leading-normal">
+                          <button
+                            onClick={handleCloseModal}
+                            className=" text-blue-300 text-base font-medium font-['Manrope'] leading-normal"
+                          >
                             Cancel
                           </button>
                         </div>
