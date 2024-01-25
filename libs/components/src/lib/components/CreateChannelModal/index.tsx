@@ -30,12 +30,11 @@ export const CreateNewChannelModal = () => {
   const dispatch = useAppDispatch();
 
   const handleSubmit = () => {
-    console.log('currentClanId', currentClanId);
-    const body = {
+    const body: ApiCreateChannelDescRequest = {
       clan_id: currentClanId?.toString(),
-      type: 1,
+      type: channelType,
       channel_lable: channelName,
-      channel_private: 1,
+      channel_private: isPrivate,
       category_id: currentCategoryId,
     };
     dispatch(createNewChannel(body));
@@ -45,15 +44,19 @@ export const CreateNewChannelModal = () => {
   const handleCloseModal = () => {
     dispatch(channelsActions.openCreateNewModalChannel());
   };
-  const handleCreate = () => {
-    console.log('clicked Create');
-  };
 
   const [channelName, setChannelName] = useState('');
-
   const handleChannelNameChange = (value: string) => {
     setChannelName(value);
-    console.log(channelName);
+  };
+
+  const [channelType, setChannelType] = useState<number>(-1);
+  const onChangeChannelType = (value: number) => {
+    setChannelType(value);
+  };
+  const [isPrivate, setIsPrivate] = useState<number>(0);
+  const onChangeToggle = (value: number) => {
+    setIsPrivate(value);
   };
 
   return (
@@ -85,10 +88,22 @@ export const CreateNewChannelModal = () => {
                 <div className="Frame407 self-stretch h-80 flex-col justify-start items-start gap-4 flex">
                   <ChannelLableModal labelProp="CHANNEL TYPE" />
                   <div className="Frame405 self-stretch h-72 flex-col justify-start items-start gap-2 flex">
-                    <ChannelTypeComponent type={0} />
-                    <ChannelTypeComponent type={1} />
-                    <ChannelTypeComponent type={2} />
-                    <ChannelTypeComponent type={3} />
+                    <ChannelTypeComponent
+                      type={0}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={1}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={2}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={3}
+                      onChange={onChangeChannelType}
+                    />
                   </div>
                 </div>
                 <ChannelNameTextField
@@ -96,7 +111,10 @@ export const CreateNewChannelModal = () => {
                   type={1}
                   channelNameProps="WHAT IS CHANNEL'S NAME?"
                 />
-                <ChannelStatusModal channelNameProps="IS PRIVATE CHANNEL?" />
+                <ChannelStatusModal
+                  onChangeValue={onChangeToggle}
+                  channelNameProps="IS PRIVATE CHANNEL?"
+                />
                 <div className=" relative border-black self-stretch px-5 pt-5 pb-8 bg-neutral-900 border-t justify-end items-center gap-3 inline-flex">
                   <div className=" flex-col justify-center items-center inline-flex">
                     <div className=" w-[85px] flex-col justify-center items-center gap-2 flex">

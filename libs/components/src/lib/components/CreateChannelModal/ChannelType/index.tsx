@@ -4,61 +4,66 @@ import React, { useState } from 'react';
 
 interface ChannelTypeProps {
   type: number;
+  onChange: (value: number) => void;
 }
 
+const iconMap = {
+  [ChannelTypeEnum.TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+  [ChannelTypeEnum.VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
+  [ChannelTypeEnum.FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
+  [ChannelTypeEnum.ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
+};
 
-export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type }) => {
+const labelMap = {
+  [ChannelTypeEnum.TEXT]: 'Text',
+  [ChannelTypeEnum.VOICE]: 'Voice',
+  [ChannelTypeEnum.FORUM]: 'Forum',
+  [ChannelTypeEnum.ANNOUNCEMENT]: 'Announcement',
+};
+
+const descriptionMap = {
+  [ChannelTypeEnum.TEXT]:
+    'Send messages, images, GIFs, emoji, opinions, and puns',
+  [ChannelTypeEnum.VOICE]:
+    'Hang out together with voice, video, and screen share',
+  [ChannelTypeEnum.FORUM]: 'Create a space for organized discussions',
+  [ChannelTypeEnum.ANNOUNCEMENT]:
+    'Important updates for people in and out of the server',
+};
+
+export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({
+  type,
+  onChange,
+}) => {
+  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(Number(e.target.value));
+  };
+
   return (
-    <button className="Frame403 self-stretch px-2 py-3 bg-stone-900 rounded-lg justify-center items-center gap-4 inline-flex hover:bg-stone-800">
-        <div className="ChannelChat w-6 h-6 relative">
-          {type === ChannelTypeEnum.TEXT ? (
-            <Icons.Hashtag defaultSize="w-6 h-6" />
-          ) : type === ChannelTypeEnum.VOICE ? (
-            <Icons.Speaker defaultSize="w-6 h-6" />
-          ) : type === ChannelTypeEnum.FORUM ? (
-            <Icons.Forum defaultSize="w-6 h-6" />
-          ) : type === ChannelTypeEnum.ANNOUNCEMENT ? (
-            <Icons.Announcement defaultSize="w-6 h-6" />
-          ) : (
-            []
-          )}
+    <div className="Frame403 self-stretch px-2 py-3 bg-stone-900 rounded-lg justify-center items-center gap-4 inline-flex hover:bg-stone-800">
+      <div className="ChannelChat w-6 h-6 relative">
+        {iconMap[type as ChannelTypeEnum]}
+      </div>
+      <div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
+        <div className="Text self-stretch text-stone-300 text-base font-bold font-['Manrope'] leading-normal">
+          <p>{labelMap[type as ChannelTypeEnum]}</p>
         </div>
-        <div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
-          <div className="Text self-stretch text-stone-300 text-base font-bold font-['Manrope'] leading-normal">
-            {type === ChannelTypeEnum.TEXT ? (
-              <p>Text</p>
-            ) : type === ChannelTypeEnum.VOICE ? (
-              <p>Voice</p>
-            ) : type === ChannelTypeEnum.FORUM ? (
-              <p>Forum</p>
-            ) : type === ChannelTypeEnum.ANNOUNCEMENT ? (
-              <p>Announcement</p>
-            ) : (
-              ''
-            )}
-          </div>
-          <div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal font-['Manrope'] leading-[18.20px]">
-            {type === ChannelTypeEnum.TEXT ? (
-              <p> Send messages, images, GIFs, emoji, opinions, and puns</p>
-            ) : type === ChannelTypeEnum.VOICE ? (
-              <p> Hang out together with voice, video, and screen share</p>
-            ) : type === ChannelTypeEnum.FORUM ? (
-              <p>Create a space for organized discussions</p>
-            ) : type === ChannelTypeEnum.ANNOUNCEMENT ? (
-              <p>Important updates for people in and out of the server</p>
-            ) : (
-              ''
-            )}
-          </div>
+        <div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal font-['Manrope'] leading-[18.20px]">
+          <p>{descriptionMap[type as ChannelTypeEnum]}</p>
         </div>
-        <div className="RadioButton p-0.5 justify-start items-start flex">
-          <div className="Wrapper w-5 h-5 relative">
-            <div className="Plate w-5 h-5 left-0 top-0 absolute justify-start items-start inline-flex">
-              <div className="Circle grow shrink basis-0 self-stretch bg-stone-900 rounded-full border border-blue-600" />
-            </div>
-            <div className="Ellipse w-3 h-3 left-[4px] top-[4px] absolute bg-blue-600 rounded-full" />
-          </div>
+      </div>
+      <div className="RadioButton p-0.5 justify-start items-start flex">
+        <div className="relative flex items-center">
+          <input
+            className="w-4 h-4 transition-colors bg-white border-2 rounded-full appearance-none cursor-pointer peer border-white checked:border-[#0A68FF] checked:bg-[#0A68FF] checked:hover:border-[#0A68FF] checked:hover:bg-[#0A68FF] focus:outline-none checked:focus:border-[#0A68FF] checked:focus:white focus-visible:outline-none disabled:cursor-not-allowed disabled:border-slate-100 disabled:bg-slate-50"
+            type="radio"
+            value={type}
+            id={type.toString()}
+            name="drone"
+            onChange={onValueChange}
+          />
         </div>
-    </button>
+      </div>
+    </div>
   );
 };
