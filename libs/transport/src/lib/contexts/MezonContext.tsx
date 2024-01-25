@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { CreateNakamaClientOptions, createClient as createNakamaClient } from '../nakama';
-import { Client, Session, Socket, Channel } from '@heroiclabs/nakama-js';
+import { Client, Session, Socket, Channel } from '@mezon/mezon-js';
 import { DeviceUUID } from "device-uuid";
 
 type MezonContextProviderProps = {

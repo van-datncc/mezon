@@ -1,3 +1,5 @@
+
+import React, { useState } from 'react';
 import { ChannelTypeEnum } from '@mezon/utils';
 import { ChannelLableModal } from '../ChannelLabel';
 import * as Icons from '../../Icons';
@@ -5,12 +7,23 @@ import * as Icons from '../../Icons';
 interface ChannelNameModalProps {
   type: number;
   channelNameProps: string;
+  onChange: (value: string) => void;
 }
 
-export const ChannelNameTextFieldModal: React.FC<ChannelNameModalProps> = ({
+export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({
   channelNameProps,
   type,
+  onChange,
 }) => {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    onChange(value);
+  };
+
+  
   return (
     <div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-4 flex mt-4">
       <ChannelLableModal labelProp={channelNameProps} />
@@ -29,7 +42,11 @@ export const ChannelNameTextFieldModal: React.FC<ChannelNameModalProps> = ({
             []
           )}
           <div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">
-            <input className="Input grow shrink basis-0 h-10 outline-none bg-neutral-950 text-neutral-200 text-sm font-normal font-['Manrope']"></input>
+            <input
+              className="Input grow shrink basis-0 h-10 outline-none bg-neutral-950 text-neutral-200 text-sm font-normal font-['Manrope']"
+              value={inputValue}
+              onChange={handleInputChange}
+            />
           </div>
         </div>
       </div>

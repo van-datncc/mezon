@@ -1,4 +1,4 @@
-import {Client} from "@heroiclabs/nakama-js";
+import {Client} from "@mezon/mezon-js";
 
 export type CreateNakamaClientOptions = {
     ssl: boolean;

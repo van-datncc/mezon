@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { getMezonCtx } from '../helpers';
-import { Session } from '@heroiclabs/nakama-js'
+import { Session } from '@mezon/mezon-js'
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {

@@ -1240,7 +1240,7 @@ export const Forum: React.FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={defaultSize}
     >
-      <g id="live area" clip-path="url(#clip0_2541_3331)">
+      <g id="live area" clipPath="url(#clip0_2541_3331)">
         <g id="Vector">
           <path
             d="M13.0153 5.32968C11.8863 3.02422 9.52441 1.5 6.87514 1.5C3.08433 1.5 0.000301025 4.56653 0.000301025 8.33578C0.000301025 9.36013 0.220218 10.3419 0.65427 11.2573L0.0116679 14.4707C-0.070127 14.8798 0.290724 15.2414 0.699855 15.1604L3.95286 14.5173C4.39086 14.725 4.84398 14.883 5.30955 14.9919C4.26594 10.049 8.01257 5.40928 13.0153 5.32968Z"
@@ -1277,7 +1277,7 @@ export const Announcement: React.FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={defaultSize}
     >
-      <g id="Live area" clip-path="url(#clip0_2541_1180)">
+      <g id="Live area" clipPath="url(#clip0_2541_1180)">
         <g id="Vector">
           <path
             d="M8 12.5H3.5C1.567 12.5 0 10.933 0 8.99998C0 7.06698 1.567 5.49998 3.5 5.49998H8L12.3243 1.53606C12.9657 0.948107 14 1.40311 14 2.27321V15.7267C14 16.5968 12.9657 17.0518 12.3243 16.4639L8 12.5Z"
@@ -1321,11 +1321,11 @@ export const Private: React.FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={defaultSize}
     >
-      <g id="Live area" clip-path="url(#clip0_2604_2865)">
+      <g id="Live area" clipPath="url(#clip0_2604_2865)">
         <path
           id="Vector"
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M5 6V5C5 2.23858 7.23858 0 10 0C12.7614 0 15 2.23858 15 5V6H16C17.1046 6 18 6.89543 18 8V18C18 19.1046 17.1046 20 16 20H4C2.89543 20 2 19.1046 2 18V8C2 6.89543 2.89543 6 4 6H5ZM7 5C7 3.34315 8.34315 2 10 2C11.6569 2 13 3.34315 13 5V6H7V5ZM10 10.75C10.6904 10.75 11.25 11.3096 11.25 12V14C11.25 14.6904 10.6904 15.25 10 15.25C9.30964 15.25 8.75 14.6904 8.75 14V12C8.75 11.3096 9.30964 10.75 10 10.75Z"
           fill="#AEAEAE"
         />

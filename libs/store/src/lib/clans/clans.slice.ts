@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit';
 import { IClan } from '@mezon/utils';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ApiClanDesc } from '@heroiclabs/nakama-js/dist/api.gen';
+import { ApiClanDesc } from '@mezon/mezon-js/dist/api.gen';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*

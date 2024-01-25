@@ -8,10 +8,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import {
-  ApiChannelDescription,
-  ApiCreateChannelDescRequest,
-} from '@heroiclabs/nakama-js/dist/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -115,7 +112,6 @@ export const joinChanel = createAsyncThunk(
 export const createNewChannel = createAsyncThunk(
   'channels/createNewChannel',
   async (body: ApiCreateChannelDescRequest, thunkAPI) => {
-    console.log('body-1', body);
     try {
       const mezon = ensureClient(getMezonCtx(thunkAPI));
       const response = await mezon.client.createChannelDesc(
