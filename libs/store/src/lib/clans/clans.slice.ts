@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit';
 import { IClan } from '@mezon/utils';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ApiClanDesc } from '@mezon/mezon-js/dist/api.gen';
+import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -19,8 +19,8 @@ export interface ClansEntity extends IClan {
   id: string; // Primary ID
 }
 
-export const mapClanToEntity  = (clanRes: ApiClanDesc ) => {
-  return {...clanRes, id: clanRes.clan_id || ''}
+export const mapClanToEntity = (clanRes: ApiClanDesc) => {
+  return { ...clanRes, id: clanRes.clan_id || '' }
 }
 
 export interface ClansState extends EntityState<ClansEntity, string> {
@@ -51,10 +51,10 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
   'clans/fetchClans',
   async (_, thunkAPI) => {
- 
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
     const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '')
-    if(!response.clandesc) {
+    if (!response.clandesc) {
       return thunkAPI.rejectWithValue([])
     }
     /**
@@ -62,7 +62,7 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>(
      * For example, `return myApi.getClanss()`;
      * Right now we just return an empty array.
      */
-    
+
     return response.clandesc.map(mapClanToEntity);
   }
 );
@@ -74,21 +74,71 @@ type CreatePayload = {
 
 export const createClan = createAsyncThunk(
   'clans/createClans',
-  async ({clan_name, logo}: CreatePayload, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+  async ({ clan_name, logo }: CreatePayload, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
     const body = {
       banner: '',
       clan_name: clan_name,
       creator_id: '',
       logo: logo || '',
     }
-    const response = await mezon.client.createClanDesc(mezon.session,body)
-    if(!response) {
+    const response = await mezon.client.createClanDesc(mezon.session, body)
+    if (!response) {
       return thunkAPI.rejectWithValue([])
     }
     return mapClanToEntity(response);
   }
 );
+
+type CreateLinkInviteUser = {
+  channel_id: string;
+  clan_id: string;
+  expiry_time: number;
+}
+
+
+export const createLinkInviteUser = createAsyncThunk(
+  'clans/invite',
+  async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const body = {
+      channel_id: channel_id,
+      clan_id: clan_id,
+      expiry_time: expiry_time,
+    }
+    const response = await mezon.client.createLinkInviteUser(mezon.session, body)
+    if (!response) {
+      return thunkAPI.rejectWithValue([])
+    }
+    return response as ApiLinkInviteUser;
+  }
+);
+
+type InviteUser = {
+  inviteId: string
+}
+
+export const inviteUser = createAsyncThunk(
+  'clans/joinChannel',
+  async ({inviteId}: InviteUser, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const response = await mezon.client.inviteUser(mezon.session, inviteId)
+    if (!response) {
+      return thunkAPI.rejectWithValue([])
+    }
+    return response as ApiInviteUserRes;
+  }
+);
+
+// export interface ApiLinkInviteUser {
+//   channel_id?: string;
+//   clan_id?: string;
+//   create_time?: string;
+//   creator_id?: string;
+//   expiry_time?: string;
+//   id?: string;
+//   invite_link?: string;
+// }
 
 export const initialClansState: ClansState = clansAdapter.getInitialState({
   loadingStatus: 'not loaded',
@@ -114,7 +164,7 @@ export const clansSlice = createSlice({
       .addCase(
         fetchClans.fulfilled,
         (state: ClansState, action: PayloadAction<IClan[]>) => {
-          clansAdapter.setAll(state,action.payload)
+          clansAdapter.setAll(state, action.payload)
           state.loadingStatus = 'loaded';
         }
       )
@@ -123,7 +173,7 @@ export const clansSlice = createSlice({
         state.error = action.error.message;
       });
 
-      builder
+    builder
       .addCase(createClan.pending, (state: ClansState) => {
         state.loadingStatus = 'loading';
       })
@@ -131,7 +181,7 @@ export const clansSlice = createSlice({
         createClan.fulfilled,
         (state: ClansState, action: PayloadAction<IClan>) => {
           console.log('Response: ', action.payload);
-          clansAdapter.addOne(state,action.payload)
+          clansAdapter.addOne(state, action.payload)
           state.loadingStatus = 'loaded';
         }
       )
@@ -165,8 +215,8 @@ export const clansReducer = clansSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const clansActions = 
-{...clansSlice.actions, fetchClans, createClan}
+export const clansActions =
+  { ...clansSlice.actions, fetchClans, createClan, createLinkInviteUser, inviteUser }
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
