@@ -11,7 +11,6 @@ import {
   selectCurrentClanId,
   clansActions,
   channelsActions,
-  channelMembersActions,
   messagesActions,
   selectCurrentClan,
   selectClansEntities,
@@ -67,33 +66,11 @@ export function useChat() {
     return results as ICategoryChannel[];
   }, [channels, categories]);
 
-  const fetchMessageChannel = React.useCallback(
-    async (channelId: string) => {
-      const action = await dispatch(
-        messagesActions.fetchMessages({ channelId }),
-      );
-      return action;
-    },
-    [dispatch],
-  );
-
-  const fetchChannelMembers = React.useCallback(
-    async (channelId: string) => {
-      const action = await dispatch(
-        channelMembersActions.fetchChannelMembers({ channelId }),
-      );
-      return action;
-    },
-    [dispatch],
-  );
-
   const changeCurrentChannel = React.useCallback(
     async (channelId: string) => {
       await dispatch(channelsActions.joinChanel(channelId));
-      await fetchMessageChannel(channelId);
-      await fetchChannelMembers(channelId);
     },
-    [dispatch, fetchMessageChannel, fetchChannelMembers],
+    [dispatch],
   );
 
   const changeCurrentClan = React.useCallback(
@@ -114,7 +91,7 @@ export function useChat() {
       }
       return payload;
     },
-    [dispatch],
+    [changeCurrentClan, dispatch],
   );
 
   const createLinkInviteUser = React.useCallback(
@@ -140,7 +117,7 @@ export function useChat() {
       const payload = action.payload as ApiInviteUserRes;
       return payload;
     },
-    [changeCurrentClan, dispatch],
+    [dispatch],
   );
 
   const sendMessage = React.useCallback(

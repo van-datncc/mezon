@@ -10,6 +10,7 @@ import {
 import { ensureClient, getMezonCtx } from '../helpers';
 import { ApiChannelDescription } from '@mezon/mezon-js/dist/api.gen';
 import { messagesActions } from '../messages/messages.slice';
+import { channelMembersActions } from '../channelmembers/channel.members';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -73,6 +74,7 @@ export const joinChanel = createAsyncThunk(
     thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId))
 
     thunkAPI.dispatch(messagesActions.fetchMessages({channelId}));
+    thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({channelId}));
 
     const chanel = await waitUntil(() => selectChannelById(channelId)(thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState }));
     if(!chanel || !chanel.channel_lable) {
