@@ -7,8 +7,10 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { IClan } from '@mezon/utils';
-import { ensureClient, getMezonCtx } from '../helpers';
 import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
+import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
+import { categoriesActions } from '../categories/categories.slice';
+import { channelsActions } from '../channels/channels.slice';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -31,39 +33,37 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
 
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchClans())
- * }, [dispatch]);
- * ```
- */
+
+export const changeCurrentClan = createAsyncThunk(
+  'clans/changeCurrentClan',
+  async (clanId: string, thunkAPI) => {
+    thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+    thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
+    thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
+    thunkAPI.dispatch(channelsActions.fetchChannels({clanId}));
+  }
+);
+
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
   'clans/fetchClans',
   async (_, thunkAPI) => {
+ 
+    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '');
 
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '')
-    if (!response.clandesc) {
+    if(!response.clandesc) {
       return thunkAPI.rejectWithValue([])
     }
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getClanss()`;
-     * Right now we just return an empty array.
-     */
+    
+    const clans = response.clandesc.map(mapClanToEntity);
 
-    return response.clandesc.map(mapClanToEntity);
+    const currentClanId = clans[0]?.id;
+
+    if (currentClanId) {
+      thunkAPI.dispatch(changeCurrentClan(currentClanId));
+    }
+
+    return clans;
   }
 );
 
@@ -152,7 +152,7 @@ export const clansSlice = createSlice({
   reducers: {
     add: clansAdapter.addOne,
     remove: clansAdapter.removeOne,
-    changeCurrentClan: (state, action: PayloadAction<string>) => {
+    setCurrentClanId: (state, action: PayloadAction<string>) => {
       state.currentClanId = action.payload;
     }
   },
@@ -215,8 +215,8 @@ export const clansReducer = clansSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const clansActions =
-  { ...clansSlice.actions, fetchClans, createClan, createLinkInviteUser, inviteUser }
+export const clansActions = 
+{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, createLinkInviteUser, inviteUser  }
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

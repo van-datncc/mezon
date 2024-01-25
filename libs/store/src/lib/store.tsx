@@ -1,6 +1,6 @@
 import {
-  Action,
   ThunkDispatch,
+  UnknownAction,
   configureStore,
 } from '@reduxjs/toolkit';
 
@@ -41,11 +41,13 @@ const reducer = {
   categories: categoriesReducer
 };
 
-const fakeStore = configureStore({
+let storeInstance = configureStore({
   reducer,
 });
 
-export type RootState = ReturnType<typeof fakeStore.getState>
+let storeCreated = false;
+
+export type RootState = ReturnType<typeof storeInstance.getState>
 
 export type PreloadedRootState = RootState | undefined;
 
@@ -62,16 +64,31 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
       serializableCheck: false,
     }),
   });
-
+  storeInstance = store;
+  storeCreated = true;
   const persistor = persistStore(store);
   return { store, persistor };
 };
 
-type Store = ReturnType<typeof initStore>['store'];
+export type Store = typeof storeInstance
 
-export type AppThunkDispatch = ThunkDispatch<RootState, unknown, Action>;
+export type AppThunkDispatch = ThunkDispatch<RootState, unknown, UnknownAction>;
 
-export type AppDispatch = Store['dispatch'] & AppThunkDispatch;
+export type AppDispatch = typeof storeInstance.dispatch & AppThunkDispatch;
+
+export const getStoreAsync = async () => {
+  if (!storeCreated) {
+    return new Promise<Store>((resolve) => {
+      const interval = setInterval(() => {
+        if (storeCreated) {
+          clearInterval(interval);
+          resolve(storeInstance);
+        }
+      }, 100);
+    });
+  }
+  return storeInstance;
+};
 
 export function useAppDispatch(): AppDispatch {
   const dispatch = useDispatch<AppDispatch>();

@@ -8,10 +8,18 @@ export type CreateNakamaClientOptions = {
 
 }
 
+let clientInstance: Client;
+
+export function getClient() {
+    return clientInstance;
+}
+
 export function createClient(options: CreateNakamaClientOptions) {
     const {ssl, host, port, key} = options;
     const client = new Client(key, host, port, ssl);
 
+    clientInstance = client;
+    
     return client;
     
 }

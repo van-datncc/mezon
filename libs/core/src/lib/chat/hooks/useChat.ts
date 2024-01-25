@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useChannels } from './useChannels';
 import { useChannelMembers } from './useChannelMembers';
 import { useMessages } from './useMessages';
@@ -11,24 +11,22 @@ import {
   selectCurrentClanId,
   clansActions,
   channelsActions,
-  channelMembersActions,
   messagesActions,
   selectCurrentClan,
   selectClansEntities,
-  authActions,
-  accountActions,
   useAppDispatch,
   ClansEntity,
   selectAllClans,
-  categoriesActions,
-  ChannelsEntity,
   selectAllCategories,
   selectAllAccount,
 } from '@mezon/store';
 import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
-import { checkMessageSendingAction } from "@mezon/store";
-import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { checkMessageSendingAction } from '@mezon/store';
+import {
+  ApiInviteUserRes,
+  ApiLinkInviteUser,
+} from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
@@ -48,7 +46,7 @@ export function useChat() {
   const categories = useSelector(selectAllCategories);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
-  const { userProfile } = useSelector(selectAllAccount)
+  const { userProfile } = useSelector(selectAllAccount);
 
   const client = clientRef.current;
 
@@ -68,78 +66,18 @@ export function useChat() {
     return results as ICategoryChannel[];
   }, [channels, categories]);
 
-  const fetchMessageChannel = React.useCallback(
-    async (channelId: string) => {
-      const action = await dispatch(
-        messagesActions.fetchMessages({ channelId }),
-      );
-      return action;
-    },
-    [dispatch],
-  );
-
-  const fetchChannelMembers = React.useCallback(
-    async (channelId: string) => {
-      const action = await dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
-      return action;
-    },
-    [dispatch],
-  );
-
   const changeCurrentChannel = React.useCallback(
     async (channelId: string) => {
       await dispatch(channelsActions.joinChanel(channelId));
-      await fetchMessageChannel(channelId);
-      await fetchChannelMembers(channelId);
-    },
-    [dispatch, fetchMessageChannel, fetchChannelMembers],
-  );
-
-  const fetchChannels = React.useCallback(
-    async (clanId: string) => {
-      console.log('fetchChannels', clanId);
-      const action = await dispatch(channelsActions.fetchChannels({ clanId }));
-      const payload = action.payload as ChannelsEntity[];
-      if (payload.length > 0) {
-        const defaultChannelId = payload[0].id;
-        changeCurrentChannel(defaultChannelId);
-      }
-      return payload;
-    },
-    [changeCurrentChannel, dispatch],
-  );
-
-  const fetchCategories = React.useCallback(
-    async (clanId: string) => {
-      console.log('fetchCategories', clanId);
-      const action = await dispatch(
-        categoriesActions.fetchCategories({ clanId }),
-      );
-      return action.payload;
     },
     [dispatch],
   );
-
-
-  const fetchUserProfile = React.useCallback(
-    async () => {
-      const action = await dispatch(
-        accountActions.getUserProfile(),
-      );
-      return action.payload;
-    },
-    [dispatch],
-  );
-
 
   const changeCurrentClan = React.useCallback(
     async (clanId: string) => {
-      dispatch(channelsActions.changeCurrentChanel(''));
       await dispatch(clansActions.changeCurrentClan(clanId));
-      await fetchCategories(clanId);
-      await fetchChannels(clanId);
     },
-    [dispatch, fetchCategories, fetchChannels],
+    [dispatch],
   );
 
   const createClans = React.useCallback(
@@ -153,13 +91,17 @@ export function useChat() {
       }
       return payload;
     },
-    [dispatch],
+    [changeCurrentClan, dispatch],
   );
 
   const createLinkInviteUser = React.useCallback(
     async (clan_id: string, channel_id: string, expiry_time: number) => {
       const action = await dispatch(
-        clansActions.createLinkInviteUser({ clan_id: clan_id, channel_id: channel_id, expiry_time: expiry_time }),
+        clansActions.createLinkInviteUser({
+          clan_id: clan_id,
+          channel_id: channel_id,
+          expiry_time: expiry_time,
+        }),
       );
       const payload = action.payload as ApiLinkInviteUser;
       return payload;
@@ -170,25 +112,13 @@ export function useChat() {
   const inviteUser = React.useCallback(
     async (invite_id: string) => {
       const action = await dispatch(
-        clansActions.inviteUser({ inviteId: invite_id}),
+        clansActions.inviteUser({ inviteId: invite_id }),
       );
       const payload = action.payload as ApiInviteUserRes;
       return payload;
     },
     [dispatch],
   );
-
-  const fetchClans = React.useCallback(async () => {
-    const action = await dispatch(clansActions.fetchClans());
-
-    const payload = action.payload as ClansEntity[];
-    if (payload.length > 0) {
-      const defaultClanId = payload[0].id;
-      changeCurrentClan(defaultClanId);
-    }
-    return payload;
-  }, [changeCurrentClan, dispatch]);
-  const [isSent, setIsSent] = useState<boolean>(false);
 
   const sendMessage = React.useCallback(
     async (message: IMessage) => {
@@ -211,7 +141,8 @@ export function useChat() {
           name: userProfile?.user?.username || '',
           username: session.username || '',
           id: 'myself',
-          avatarSm: userProfile?.user?.avatar_url ||
+          avatarSm:
+            userProfile?.user?.avatar_url ||
             'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
         },
       };
@@ -224,7 +155,7 @@ export function useChat() {
         channel.id,
         payload,
       );
-      ack && dispatch(checkMessageSendingAction())
+      ack && dispatch(checkMessageSendingAction());
     },
     [
       channelRef,
@@ -234,27 +165,9 @@ export function useChat() {
       dispatch,
       sessionRef,
       socketRef,
+      userProfile?.user?.avatar_url,
+      userProfile?.user?.username,
     ],
-  );
-
-  const loginEmail = useCallback(
-    async (username: string, password: string) => {
-      const action = await dispatch(
-        authActions.authenticateEmail({ username, password }),
-      );
-      const session = action.payload;
-      dispatch(accountActions.setAccount(session));
-    },
-    [dispatch],
-  );
-
-  const loginByGoogle = useCallback(
-    async (token: string) => {
-      const action = await dispatch(authActions.authenticateGoogle(token));
-      const session = action.payload;
-      dispatch(accountActions.setAccount(session));
-    },
-    [dispatch],
   );
 
   return useMemo(
@@ -268,19 +181,13 @@ export function useChat() {
       members,
       currentClan,
       currentChanel,
-      currentChannelId,
-      currentClanId,
       userProfile,
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
-      loginEmail,
-      loginByGoogle,
-      fetchClans,
       createClans,
-      fetchUserProfile,
       createLinkInviteUser,
-      inviteUser
+      inviteUser,
     }),
     [
       client,
@@ -292,19 +199,13 @@ export function useChat() {
       members,
       currentClan,
       currentChanel,
-      currentChannelId,
-      currentClanId,
       userProfile,
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
-      loginEmail,
-      loginByGoogle,
-      fetchClans,
       createClans,
-      fetchUserProfile,
       createLinkInviteUser,
-      inviteUser
+      inviteUser,
     ],
   );
 }

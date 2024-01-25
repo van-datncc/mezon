@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useChat } from '@mezon/core';
 import * as Icons from '../Icons';
 import ChannelLink from '../ChannelLink';
-import { ICategory, IChannel, ICategoryChannel } from '@mezon/utils';
+import { IChannel, ICategoryChannel } from '@mezon/utils';
 import { Events, BrowseChannel } from './ChannelListComponents';
 
 export type ChannelListProps = { className?: string };
 
 function ChannelList() {
-  const { categorizedChannels, currentChannelId } = useChat();
+  const { categorizedChannels, currentChanel } = useChat();
   const [categoriesState, setCategoriesState] = useState<
     Record<string, boolean>
   >({});
@@ -56,7 +56,7 @@ function ChannelList() {
                     <ChannelLink
                       serverId={channel?.clan_id}
                       channel={channel}
-                      active={currentChannelId === channel.id}
+                      active={currentChanel?.id === channel.id}
                       key={channel.id}
                     />
                   ))}

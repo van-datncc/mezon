@@ -15,7 +15,6 @@ import { preloadedState } from './mock/state';
 import { useEffect, useMemo } from 'react';
 import WebFont from 'webfontloader';
 
-
 const GOOGLE_CLIENT_ID =
   '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 

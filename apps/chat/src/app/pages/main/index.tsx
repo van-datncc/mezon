@@ -1,21 +1,18 @@
-import { Image, InputField, Modal } from '@mezon/ui';
+import { Image } from '@mezon/ui';
 import { useChat } from '@mezon/core';
-import { ModalCreateClan, ModalListClans, NavLink } from '@mezon/components';
 import { MainContent } from './MainContent';
 import IconLogoMezon from '../../../assets/Images/IconLogoMezon.svg';
 import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { ModalCreateClan, ModalListClans } from '@mezon/components';
 
 function MyApp() {
-  const { clans, changeCurrentClan, currentChanel, currentClanId, currentClan } = useChat();
+  const { clans, currentClan } = useChat();
   const [openListClans, setOpenListClans] = useState(false);
   const [openCreateClan, setOpenCreateClans] = useState(false)
   const navigate = useNavigate();
-  const pathName = useLocation().pathname;
-  const channelSlug = currentClanId ? `/channels/${currentChanel?.id}` : '';
-  const url = `/chat/servers/${currentClanId}${channelSlug}`;
-
+  
   const handleChangeClan = (clanId: string) => {
     console.log('CLAN ID: ', clanId)
     // changeCurrentClan(clanId)
@@ -28,15 +25,11 @@ function MyApp() {
   return (
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
-        <NavLink href="/chat/direct" active={pathName?.includes('direct')}>
+        <NavLink to="/chat/direct">
           <Image src={IconLogoMezon} alt={'logoMezon'} />
         </NavLink>
         <div className="py-2 border-t-2 border-t-borderDefault"></div>
-        {currentClanId && (<NavLink
-          href={`${url}`}
-          active={!pathName?.includes('direct')}
-          key={currentClanId}
-        >
+        {currentClan?.id && (<NavLink to={`/chat/servers/${currentClan.id}`}>
           {currentClan?.logo ? (
             <Image
               src={currentClan?.logo || ''}
@@ -47,6 +40,7 @@ function MyApp() {
               blurDataURL={currentClan?.logo}
             />
           ) : (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
             <>
               {currentClan?.clan_name && (
                 <div className='w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px]'>

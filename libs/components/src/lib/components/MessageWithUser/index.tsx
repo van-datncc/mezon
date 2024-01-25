@@ -1,6 +1,6 @@
 import { RootState } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { UseSelector, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import { useMemo } from 'react';
 
