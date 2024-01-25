@@ -5,4 +5,7 @@ export * from './lib/chat/hooks/useMessages';
 export * from './lib/chat/hooks/useChannelMembers';
 export * from './lib/chat/hooks/useThreads';
 export * from './lib/chat/hooks/useChat';
+export * from './lib/auth/hooks/useAuth';
+export * from './lib/app/hooks/useAppParams';
+export * from './lib/chat/hooks/useChatParams';
 export * from './lib/chat/contexts/ChatContext';

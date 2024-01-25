@@ -8,6 +8,7 @@ import {
   createNewChannel,
 } from '@mezon/store';
 import { useChat } from '@mezon/core';
+
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import { ChannelLableModal } from './ChannelLabel';
@@ -17,19 +18,16 @@ import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
 
 export const CreateNewChannelModal = () => {
-  const currentCategoryId = useSelector((state:RootState)=>state.channels.currentCategoryId)
-  console.log("category-2", currentCategoryId)
-  const isOpenModal = useSelector((state: RootState) => state.channels.isOpenCreateNewChannel);
-
   const { currentClanId } = useChat();
 
-  const dispatch = useAppDispatch();
+  const currentCategoryId = useSelector(
+    (state: RootState) => state.channels.currentCategoryId,
+  );
+  const isOpenModal = useSelector(
+    (state: RootState) => state.channels.isOpenCreateNewChannel,
+  );
 
-  const [formData, setFormData] = useState({
-    channelType: null,
-    channelName: '',
-    isPrivate: null,
-  });
+  const dispatch = useAppDispatch();
 
   const handleSubmit = () => {
     console.log('currentClanId', currentClanId);
@@ -41,6 +39,7 @@ export const CreateNewChannelModal = () => {
       category_id: currentCategoryId,
     };
     dispatch(createNewChannel(body));
+    dispatch(channelsActions.openCreateNewModalChannel());
   };
 
   const handleCloseModal = () => {

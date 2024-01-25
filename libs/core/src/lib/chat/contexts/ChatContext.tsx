@@ -1,8 +1,6 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
-import { useChat } from '../hooks/useChat';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 
@@ -17,7 +15,7 @@ export type ChatContextValue = {
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-  const { fetchClans, fetchUserProfile } = useChat();
+  
   const { socketRef } = useMezon();
   const dispatch = useAppDispatch();
 
@@ -35,11 +33,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     console.log('disconnect');
   }, []);
 
-  const { channelId: channelIdParam } = useParams();
-  const { serverId: serverIdParams } = useParams();
-  const { changeCurrentClan, changeCurrentChannel, currentClanId, currentChannelId } = useChat();
-  const navigate = useNavigate();
-  const pathName = useLocation().pathname;
 
   const value = React.useMemo<ChatContextValue>(() => ({
 
@@ -65,48 +58,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     }
   }, [onchannelmessage, onchannelpresence, ondisconnect, socketRef])
 
-  useEffect(() => {
-    console.log('fetchClans222');
-    fetchClans();
-  }, [fetchClans]);
-
-  useEffect(() => {
-    // eslint-disable-next-line eqeqeq
-    if (!serverIdParams || serverIdParams == currentClanId) {
-      return
-    }
-
-    changeCurrentClan(serverIdParams);
-  }, [changeCurrentClan, currentClanId, serverIdParams]);
-
-  useEffect(() => {
-    // eslint-disable-next-line eqeqeq
-    if (!channelIdParam || channelIdParam == currentChannelId) {
-      return
-    }
-    changeCurrentChannel(channelIdParam);
-  }, [changeCurrentChannel, currentChannelId, channelIdParam]);
-
-  useEffect(() => {
-    if (pathName.includes('direct')) {
-      return
-    }
-    if (!currentClanId || !currentChannelId) {
-      return;
-    }
-    if (serverIdParams === currentClanId && channelIdParam === currentChannelId) {
-      return;
-    }
-    if (!channelIdParam) {
-      const url = `/chat/servers/${currentClanId}/channels/${currentChannelId}`;
-      navigate(url);
-    }
-    if (!currentChannelId) {
-      const url = `/chat/servers/${currentClanId}/channels/${channelIdParam}`;
-      navigate(url);
-    }
-  }, [currentClanId, currentChannelId, channelIdParam, serverIdParams, navigate]);
-
   return (
     <ChatContext.Provider value={value}>
       {children}
@@ -115,6 +66,5 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 }
 
 const ChatContextConsumer = ChatContext.Consumer;
-
 
 export { ChatContext, ChatContextProvider, ChatContextConsumer };

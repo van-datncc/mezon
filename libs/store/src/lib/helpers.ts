@@ -15,7 +15,18 @@ type MezonValueContext = MezonContextValue & {
     session: Session
 }
 
-export function ensureClient(mezon: MezonContextValue):MezonValueContext  {
+export async function ensureSession(mezon: MezonContextValue): Promise<MezonValueContext> {
+    return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+            if(mezon.sessionRef.current) {
+                clearInterval(interval);
+                resolve(ensureClient(mezon));
+            }
+        }, 100);
+    })
+}
+
+export function ensureClient(mezon: MezonContextValue): MezonValueContext  {
     if(!mezon || !mezon.clientRef.current) {
         throw new Error('Error')
     }

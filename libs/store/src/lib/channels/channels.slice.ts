@@ -9,6 +9,8 @@ import {
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
+import { messagesActions } from '../messages/messages.slice';
+import { channelMembersActions } from '../channelmembers/channel.members';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -33,49 +35,12 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchChannels())
- * }, [dispatch]);
- * ```
- */
+
 type fetchChannelsPayload = {
   clanId: string;
 };
 
-export const fetchChannels = createAsyncThunk(
-  'channels/fetchStatus',
-  async ({ clanId }: fetchChannelsPayload, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listChannelDescs(
-      mezon.session,
-      100,
-      1,
-      '',
-      clanId,
-    );
-    if (!response.channeldesc) {
-      return thunkAPI.rejectWithValue([]);
-    }
-    return response.channeldesc.map(mapChannelToEntity);
-  },
-);
-
-function waitUntil<T>(
-  condition: () => T | undefined,
-  ms: number = 1000,
-): Promise<T> {
+function waitUntil<T>(condition: () => T | undefined, ms: number = 1000): Promise<T> {
   return new Promise((resolve) => {
     const interval = setInterval(() => {
       const result = condition();
@@ -89,9 +54,12 @@ function waitUntil<T>(
 
 export const joinChanel = createAsyncThunk(
   'channels/joinChanel',
-  async (channelId: string, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
-    thunkAPI.dispatch(channelsActions.changeCurrentChanel(channelId));
+  async (channelId : string, thunkAPI) => {
+    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId))
+
+    thunkAPI.dispatch(messagesActions.fetchMessages({channelId}));
+    thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({channelId}));
 
     const chanel = await waitUntil(() =>
       selectChannelById(channelId)(
@@ -101,12 +69,10 @@ export const joinChanel = createAsyncThunk(
     if (!chanel || !chanel.channel_lable) {
       return thunkAPI.rejectWithValue([]);
     }
-    const ch = await mezon.joinChatChannel(
-      channelId,
-      chanel?.channel_lable || '',
-    );
-    console.log('chanel', ch);
-  },
+    await mezon.joinChatChannel(channelId, chanel?.channel_lable || '')
+    
+    return chanel;
+  }
 );
 
 export const createNewChannel = createAsyncThunk(
@@ -118,18 +84,36 @@ export const createNewChannel = createAsyncThunk(
         mezon.session,
         body,
       );
-      console.log('response', response);
       if (!response) {
         return thunkAPI.rejectWithValue([]);
       }
 
-      // Handle the success case and return the created channels
-      // return response..map(mapChannelToEntity);
     } catch (error) {
-      // Handle the error case
       return thunkAPI.rejectWithValue([]);
     }
   },
+)
+
+
+export const fetchChannels = createAsyncThunk(
+  'channels/fetchStatus',
+  async ({clanId} : fetchChannelsPayload, thunkAPI) => {
+    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listChannelDescs(mezon.session, 100,1,'', clanId)
+
+    
+    if(!response.channeldesc) {
+      return thunkAPI.rejectWithValue([])
+    }
+
+    const channels = response.channeldesc.map(mapChannelToEntity);
+
+    if (channels.length > 0) {
+      thunkAPI.dispatch(channelsActions.joinChanel(channels[0].id));
+    }
+
+    return channels;
+  }
 );
 
 export const initialChannelsState: ChannelsState =
@@ -146,7 +130,7 @@ export const channelsSlice = createSlice({
   reducers: {
     add: channelsAdapter.addOne,
     remove: channelsAdapter.removeOne,
-    changeCurrentChanel: (state, action: PayloadAction<string>) => {
+    setCurrentChannelId: (state, action: PayloadAction<string>) => {
       state.currentChannelId = action.payload;
     },
     openCreateNewModalChannel: (state) => {
