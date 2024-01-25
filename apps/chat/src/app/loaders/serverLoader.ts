@@ -1,10 +1,14 @@
-import { json } from 'react-router-dom';
-import { authActions, getStoreAsync } from '@mezon/store';
+import { LoaderFunction, json } from 'react-router-dom';
+import { authActions, clansActions, getStoreAsync } from '@mezon/store';
 
-export const authLoader = async () => {
+export const serverLoader: LoaderFunction = async ({params}) => {
   try {
+    const {serverId} = params
     const store = await getStoreAsync();
-    const response = await store.dispatch(authActions.refreshSession());
+    if(!serverId) {
+     throw new Error('Server ID null')
+    }
+    const response = await store.dispatch(clansActions.changeCurrentClan(serverId));
     return response;
   } catch (e: unknown) {
     console.error(e);

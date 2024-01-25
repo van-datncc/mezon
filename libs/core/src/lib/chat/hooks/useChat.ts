@@ -49,7 +49,6 @@ export function useChat() {
   const { userProfile } = useSelector(selectAllAccount);
 
   const client = clientRef.current;
-
   const dispatch = useAppDispatch();
 
   const categorizedChannels = React.useMemo(() => {
@@ -138,18 +137,16 @@ export function useChat() {
         id: Math.random().toString(),
         date: new Date().toLocaleString(),
         user: {
-          name: userProfile?.user?.username || '',
-          username: session.username || '',
-          id: 'myself',
-          avatarSm:
-            userProfile?.user?.avatar_url ||
-            'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
+          name: userProfile?.user?.display_name || '',
+          username: userProfile?.user?.username || '',
+          id: userProfile?.user?.id || 'idUser',
+          avatarSm: userProfile?.user?.avatar_url || '',
         },
       };
       if (!payload.channel_id) {
         payload.channel_id = currentChannelId || '';
       }
-      dispatch(messagesActions.add(payload));
+      // dispatch(messagesActions.add(payload));
       const ack = await socket.writeChatMessage(
         currentClanId,
         channel.id,

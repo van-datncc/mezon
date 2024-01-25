@@ -11,34 +11,38 @@ export type MessageWithUserProps = {
 function MessageWithUser({ message }: MessageWithUserProps) {
   const isSending = useSelector((state: RootState) => state.messages.isSending);
   const content = useMemo(() => {
-    if(typeof message.content === 'string') {
+    if (typeof message.content === 'string') {
       return message.content
     }
-    
-    if(typeof message.content === 'object') {
-      if(typeof message.content.content === 'string') {
+
+    if (typeof message.content === 'object') {
+      if (typeof message.content.content === 'string') {
         return message.content.content
       }
 
-      if(typeof message.content.content === 'object') {
+      if (typeof message.content.content === 'object') {
         return (message.content.content as unknown as any).content;
       }
     }
-    
     return '';
   }, [message]);
-  return (
 
+  return (
     <div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer  flex-shrink-1">
       <div className="justify-start gap-3 inline-flex items-center  w-full relative">
-        <img
-          className="w-11 h-11 rounded-full"
-          src={message.user?.avatarSm || ''}
-          alt={message.user?.username || ''}
-        />
-
+        {message.user?.avatarSm ? (
+          <img
+            className="w-[38px] h-[38px] rounded-full"
+            src={message.user?.avatarSm || ''}
+            alt={message.user?.username || ''}
+          />
+        ) : (
+          <div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
+            {message.user?.username.charAt(0).toUpperCase()}
+          </div>
+        )}
         <div className="flex-col w-full flex justify-center items-start relative">
-          <div className="flex-row items-center w-full gap-2 justify-between flex">
+          <div className="flex-row items-center w-full gap-4 flex">
             <div className="font-thin font-['Manrope'] text-sm  text-green-400">
               {message.user?.username}
             </div>
@@ -51,14 +55,6 @@ function MessageWithUser({ message }: MessageWithUserProps) {
               {content}
             </div>
           </div>
-          {isSending && (
-            <div className='flex absolute bottom-0 right-3 gap-1 items-center '>
-              <p className="text-xs text-gray-400">
-                sent
-              </p>
-              <Icons.Sent />
-            </div>
-          )}
         </div>
       </div>
     </div>
