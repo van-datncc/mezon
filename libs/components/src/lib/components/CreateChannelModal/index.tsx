@@ -62,8 +62,8 @@ export const CreateNewChannelModal = () => {
   return (
     <>
       {isOpenModal && (
-        <div className="w-[100%] h-[100%] duration-500 absolute top-0 z-50 ml-[-72px] overflow-x-hidden opacity-80 bg-black flex flex-row justify-center items-center">
-          <div className="z-10 Frame397 w-[684px] h-[780px] bg-neutral-900 rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
+        <div className="w-screen h-screen overflow-hidden duration-500 absolute top-0 left-0 z-50 opacity-95 bg-black flex flex-row justify-center items-center">
+          <div className="z-60 Frame397 w-[684px] h-[780px] bg-[#151515] rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
             <div className="Frame398 self-stretch h-96 flex-col justify-start items-start flex ">
               <div className="Frame395 self-stretch h-96 px-5 pt-8 pb-5 flex-col justify-start items-start gap-6 flex">
                 <div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
@@ -115,12 +115,15 @@ export const CreateNewChannelModal = () => {
                   onChangeValue={onChangeToggle}
                   channelNameProps="IS PRIVATE CHANNEL?"
                 />
-                <div className=" relative border-black self-stretch px-5 pt-5 pb-8 bg-neutral-900 border-t justify-end items-center gap-3 inline-flex">
+                <div className=" relative border-black self-stretch px-5 pt-5 pb-8 bg-[#151515] border-t justify-end items-center gap-3 inline-flex">
                   <div className=" flex-col justify-center items-center inline-flex">
                     <div className=" w-[85px] flex-col justify-center items-center gap-2 flex">
                       <div className=" self-stretch grow shrink basis-0 px-4 py-3 rounded flex-col justify-center items-center flex">
                         <div className=" justify-start items-center gap-2 inline-flex">
-                          <button className=" text-blue-300 text-base font-medium font-['Manrope'] leading-normal">
+                          <button
+                            onClick={handleCloseModal}
+                            className=" text-blue-300 text-base font-medium font-['Manrope'] leading-normal"
+                          >
                             Cancel
                           </button>
                         </div>

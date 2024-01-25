@@ -40,7 +40,7 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({
   };
 
   return (
-    <div className="Frame403 self-stretch px-2 py-3 bg-stone-900 rounded-lg justify-center items-center gap-4 inline-flex hover:bg-stone-800">
+    <div className="Frame403 self-stretch px-2 py-3 bg-[#1E1E1E] rounded-lg justify-center items-center gap-4 inline-flex hover:bg-[#2E2E2E]">
       <div className="ChannelChat w-6 h-6 relative">
         {iconMap[type as ChannelTypeEnum]}
       </div>
