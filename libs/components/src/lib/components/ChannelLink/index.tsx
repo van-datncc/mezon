@@ -27,16 +27,16 @@ function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
       'text-gray-300 hover:text-gray-100 hover:bg-gray-550/[0.16] active:bg-gray-550/[0.24]',
   };
 
-  const { currentClanId, createLinkInviteUser } = useChat();
+  const { currentClan, createLinkInviteUser } = useChat();
   const[openInvite, setOpenInvite] = useState(false);
   const [urlInvite, setUrlInvite] = useState('');
 
   const handleOpenInvite = () => {
     //call api
-    console.log("clan_id: ", currentClanId,"channel_id: " ,channel?.channel_id, "category_id: ",channel?.category_id)
+    console.log("clan_id: ", currentClan?.id, "channel_id: " ,channel?.channel_id, "category_id: ",channel?.category_id)
     console.log('dddd: ', window.location.origin)
     setOpenInvite(true)
-    createLinkInviteUser(currentClanId ?? '', channel?.channel_id ?? '', 10).then(res => {
+    createLinkInviteUser(currentClan?.id ?? '', channel?.channel_id ?? '', 10).then(res => {
       if(res && res.invite_link){
         setUrlInvite(window.location.origin +'/chat/invite/'+ res.invite_link)
       }

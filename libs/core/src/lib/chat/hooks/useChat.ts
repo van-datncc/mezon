@@ -23,8 +23,11 @@ import {
 } from '@mezon/store';
 import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
-import { checkMessageSendingAction } from "@mezon/store";
-import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { checkMessageSendingAction } from '@mezon/store';
+import {
+  ApiInviteUserRes,
+  ApiLinkInviteUser,
+} from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
@@ -44,7 +47,7 @@ export function useChat() {
   const categories = useSelector(selectAllCategories);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
-  const { userProfile } = useSelector(selectAllAccount)
+  const { userProfile } = useSelector(selectAllAccount);
 
   const client = clientRef.current;
 
@@ -76,7 +79,9 @@ export function useChat() {
 
   const fetchChannelMembers = React.useCallback(
     async (channelId: string) => {
-      const action = await dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
+      const action = await dispatch(
+        channelMembersActions.fetchChannelMembers({ channelId }),
+      );
       return action;
     },
     [dispatch],
@@ -112,11 +117,14 @@ export function useChat() {
     [dispatch],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const createLinkInviteUser = React.useCallback(
     async (clan_id: string, channel_id: string, expiry_time: number) => {
       const action = await dispatch(
-        clansActions.createLinkInviteUser({ clan_id: clan_id, channel_id: channel_id, expiry_time: expiry_time }),
+        clansActions.createLinkInviteUser({
+          clan_id: clan_id,
+          channel_id: channel_id,
+          expiry_time: expiry_time,
+        }),
       );
       const payload = action.payload as ApiLinkInviteUser;
       return payload;
@@ -124,11 +132,10 @@ export function useChat() {
     [dispatch],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const inviteUser = React.useCallback(
     async (invite_id: string) => {
       const action = await dispatch(
-        clansActions.inviteUser({ inviteId: invite_id}),
+        clansActions.inviteUser({ inviteId: invite_id }),
       );
       const payload = action.payload as ApiInviteUserRes;
       return payload;
@@ -157,7 +164,8 @@ export function useChat() {
           name: userProfile?.user?.username || '',
           username: session.username || '',
           id: 'myself',
-          avatarSm: userProfile?.user?.avatar_url ||
+          avatarSm:
+            userProfile?.user?.avatar_url ||
             'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
         },
       };
@@ -170,11 +178,20 @@ export function useChat() {
         channel.id,
         payload,
       );
-      ack && dispatch(checkMessageSendingAction())
+      ack && dispatch(checkMessageSendingAction());
     },
-    [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.username],
+    [
+      channelRef,
+      clientRef,
+      currentChannelId,
+      currentClanId,
+      dispatch,
+      sessionRef,
+      socketRef,
+      userProfile?.user?.avatar_url,
+      userProfile?.user?.username,
+    ],
   );
-
 
   return useMemo(
     () => ({
@@ -192,7 +209,26 @@ export function useChat() {
       changeCurrentClan,
       changeCurrentChannel,
       createClans,
+      createLinkInviteUser,
+      inviteUser,
     }),
-    [client, channels, messages, clans, threads, categorizedChannels, members, currentClan, currentChanel, userProfile, sendMessage, changeCurrentClan, changeCurrentChannel, createClans],
+    [
+      client,
+      channels,
+      messages,
+      clans,
+      threads,
+      categorizedChannels,
+      members,
+      currentClan,
+      currentChanel,
+      userProfile,
+      sendMessage,
+      changeCurrentClan,
+      changeCurrentChannel,
+      createClans,
+      createLinkInviteUser,
+      inviteUser,
+    ],
   );
 }
