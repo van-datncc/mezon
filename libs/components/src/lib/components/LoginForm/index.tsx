@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useChat } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import FormLogin from './FormLogin';
 
 export type LoginFormPayload = {
@@ -14,7 +14,7 @@ type LoginFormProps = {
 };
 
 function LoginForm(props: LoginFormProps) {
-  const { loginEmail } = useChat();
+  const { loginEmail } = useAuth();
 
   const handleSubmit = React.useCallback(
     async (values: LoginFormPayload) => {

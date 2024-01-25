@@ -1,6 +1,5 @@
 import { IMessageWithUser } from '@mezon/utils';
 import {
-  createAction,
   createAsyncThunk,
   createEntityAdapter,
   createSelector,
@@ -61,7 +60,7 @@ type fetchMessageChannelPayload = {
 };
 
 export const fetchMessages = createAsyncThunk(
-  'messages/fetchStatus',
+  'messages/fetchMessages',
   async ({ channelId }: fetchMessageChannelPayload, thunkAPI) => {
     const mezon = ensureClient(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelMessages(

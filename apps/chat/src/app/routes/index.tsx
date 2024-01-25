@@ -17,6 +17,10 @@ import InitialRoutes from './InititalRoutes';
 import ErrorRoutes from './ErrorRoutes';
 import InvitePage from '../pages/invite';
 
+// Loaders
+import { authLoader } from '../loaders/authLoader';
+import { mainLoader } from '../loaders/mainLoader';
+
 // Components
 export const routes = createBrowserRouter([
   {
@@ -39,9 +43,11 @@ export const routes = createBrowserRouter([
       },
       {
         path: "/chat",
+        loader: authLoader,
         element: <ProtectedRoutes />,
         children: [{
           path: "",
+          loader: mainLoader,
           element: <MainLayout />,
           children: [{
             path: "",
