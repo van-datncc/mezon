@@ -1,5 +1,5 @@
-import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser, ApiAccount } from '@heroiclabs/nakama-js/dist/api.gen'
-import {ChannelMessage} from '@heroiclabs/nakama-js'
+import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser, ApiAccount } from '@mezon/mezon-js/dist/api.gen'
+import {ChannelMessage} from '@mezon/mezon-js'
 
 export type IClan = ApiClanDesc & {
     id: string

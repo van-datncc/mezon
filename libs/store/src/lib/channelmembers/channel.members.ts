@@ -8,7 +8,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ChannelUserListChannelUser } from '@heroiclabs/nakama-js/dist/api.gen';
+import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
 
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
 

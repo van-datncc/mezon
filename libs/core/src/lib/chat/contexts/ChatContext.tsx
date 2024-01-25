@@ -1,6 +1,6 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
-import { ChannelMessage } from 'vendors/mezon-js/packages/nakama-js/dist';
+import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { useChat } from '../hooks/useChat';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { messagesActions, useAppDispatch } from '@mezon/store';
