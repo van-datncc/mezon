@@ -9,7 +9,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ChannelMessage } from 'vendors/mezon-js/packages/nakama-js/dist';
+import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 
 export const MESSAGES_FEATURE_KEY = 'messages';
 

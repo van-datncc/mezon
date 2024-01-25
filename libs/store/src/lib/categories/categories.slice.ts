@@ -7,7 +7,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ApiCategoryDesc } from '@heroiclabs/nakama-js/dist/api.gen';
+import { ApiCategoryDesc } from '@mezon/mezon-js/dist/api.gen';
 import { ICategory } from '@mezon/utils';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 

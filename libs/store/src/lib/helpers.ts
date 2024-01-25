@@ -1,7 +1,7 @@
 import { AsyncThunkConfig, GetThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
 import { GetThunkAPIWithMezon } from "./typings";
 import { MezonContextValue } from "@mezon/transport";
-import { Client, Session } from '@heroiclabs/nakama-js';
+import { Client, Session } from '@mezon/mezon-js';
 
 export const getMezonCtx = (thunkAPI: GetThunkAPI<AsyncThunkConfig>) => {
     if(!isMezonThunk(thunkAPI)) {
