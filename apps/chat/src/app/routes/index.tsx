@@ -15,6 +15,7 @@ import Login from '../pages/login';
 import ProtectedRoutes from './ProtectedRoutes';
 import InitialRoutes from './InititalRoutes';
 import ErrorRoutes from './ErrorRoutes';
+import InvitePage from '../pages/invite';
 
 // Components
 export const routes = createBrowserRouter([
@@ -55,7 +56,12 @@ export const routes = createBrowserRouter([
             }, {
               path: "direct",
               element: <Direct />,
-            }]
+            },
+            {
+              path: "invite/:inviteId",
+              element: <InvitePage />,
+            }
+          ]
           }]
         }]
       },

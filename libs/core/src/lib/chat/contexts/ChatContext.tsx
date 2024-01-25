@@ -91,6 +91,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     if (pathName.includes('direct')) {
       return
     }
+    if (pathName.includes('invite')) {
+      return
+    }
     if (!currentClanId || !currentChannelId) {
       return;
     }
@@ -105,7 +108,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
       const url = `/chat/servers/${currentClanId}/channels/${channelIdParam}`;
       navigate(url);
     }
-  }, [currentClanId, currentChannelId, channelIdParam, serverIdParams, navigate]);
+  }, [currentClanId, currentChannelId, channelIdParam, serverIdParams, navigate, pathName]);
 
   return (
     <ChatContext.Provider value={value}>

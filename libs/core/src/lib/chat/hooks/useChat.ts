@@ -28,6 +28,7 @@ import {
 import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
 import { checkMessageSendingAction } from "@mezon/store";
+import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
@@ -47,7 +48,7 @@ export function useChat() {
   const categories = useSelector(selectAllCategories);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
-  const {userProfile} = useSelector(selectAllAccount)
+  const { userProfile } = useSelector(selectAllAccount)
 
   const client = clientRef.current;
 
@@ -78,8 +79,8 @@ export function useChat() {
   );
 
   const fetchChannelMembers = React.useCallback(
-    async (channelId:string) => {
-      const action = await  dispatch(channelMembersActions.fetchChannelMembers({channelId}));
+    async (channelId: string) => {
+      const action = await dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
       return action;
     },
     [dispatch],
@@ -119,7 +120,7 @@ export function useChat() {
     [dispatch],
   );
 
-  
+
   const fetchUserProfile = React.useCallback(
     async () => {
       const action = await dispatch(
@@ -147,9 +148,31 @@ export function useChat() {
         clansActions.createClan({ clan_name: name, logo: logoUrl }),
       );
       const payload = action.payload as ClansEntity;
-      if(payload && payload.clan_id) {
+      if (payload && payload.clan_id) {
         changeCurrentClan(payload.clan_id);
-      } 
+      }
+      return payload;
+    },
+    [dispatch],
+  );
+
+  const createLinkInviteUser = React.useCallback(
+    async (clan_id: string, channel_id: string, expiry_time: number) => {
+      const action = await dispatch(
+        clansActions.createLinkInviteUser({ clan_id: clan_id, channel_id: channel_id, expiry_time: expiry_time }),
+      );
+      const payload = action.payload as ApiLinkInviteUser;
+      return payload;
+    },
+    [dispatch],
+  );
+
+  const inviteUser = React.useCallback(
+    async (invite_id: string) => {
+      const action = await dispatch(
+        clansActions.inviteUser({ inviteId: invite_id}),
+      );
+      const payload = action.payload as ApiInviteUserRes;
       return payload;
     },
     [dispatch],
@@ -255,7 +278,9 @@ export function useChat() {
       loginByGoogle,
       fetchClans,
       createClans,
-      fetchUserProfile
+      fetchUserProfile,
+      createLinkInviteUser,
+      inviteUser
     }),
     [
       client,
@@ -277,7 +302,9 @@ export function useChat() {
       loginByGoogle,
       fetchClans,
       createClans,
-      fetchUserProfile
+      fetchUserProfile,
+      createLinkInviteUser,
+      inviteUser
     ],
   );
 }

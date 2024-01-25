@@ -4,17 +4,22 @@ import { authActions, selectIsLogin, selectLoadingStatus, selectSession, useAppD
 import { MezonSuspense } from '@mezon/transport';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 let authLoaded = false
 
 const MainLayout = () => {
   const { currentClanId, fetchUserProfile } = useChat();
   const navigate = useNavigate();
+  const pathName = useLocation().pathname;
 
   useEffect(() => {
     if (!currentClanId) {
       return;
+    }
+
+    if (pathName.includes('invite')) {
+      return
     }
 
     const url = `/chat/servers/${currentClanId}`;
