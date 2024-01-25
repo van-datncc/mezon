@@ -185,6 +185,7 @@ export function useChat() {
       createClans,
       createLinkInviteUser,
       inviteUser,
+      currentClanId
     }),
     [
       client,
@@ -203,6 +204,7 @@ export function useChat() {
       createClans,
       createLinkInviteUser,
       inviteUser,
+      currentClanId
     ],
   );
 }
