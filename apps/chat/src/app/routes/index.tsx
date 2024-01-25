@@ -14,12 +14,14 @@ import Direct from '../pages/directMessage';
 import Login from '../pages/login';
 import ProtectedRoutes from './ProtectedRoutes';
 import InitialRoutes from './InititalRoutes';
+import ErrorRoutes from './ErrorRoutes';
 
 // Components
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
+    errorElement: <ErrorRoutes />,
     children: [
       // initial route to redirect to /chat
       {

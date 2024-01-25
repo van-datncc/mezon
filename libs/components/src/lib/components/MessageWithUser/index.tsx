@@ -2,6 +2,7 @@ import { RootState } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { UseSelector, useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
+import { useMemo } from 'react';
 
 export type MessageWithUserProps = {
   message: IMessageWithUser;
@@ -9,7 +10,23 @@ export type MessageWithUserProps = {
 
 function MessageWithUser({ message }: MessageWithUserProps) {
   const isSending = useSelector((state: RootState) => state.messages.isSending);
-  console.log('sen', isSending);
+  const content = useMemo(() => {
+    if(typeof message.content === 'string') {
+      return message.content
+    }
+    
+    if(typeof message.content === 'object') {
+      if(typeof message.content.content === 'string') {
+        return message.content.content
+      }
+
+      if(typeof message.content.content === 'object') {
+        return (message.content.content as unknown as any).content;
+      }
+    }
+    
+    return '';
+  }, [message]);
   return (
 
     <div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer  flex-shrink-1">
@@ -31,7 +48,7 @@ function MessageWithUser({ message }: MessageWithUserProps) {
           </div>
           <div className="w-full justify-start items-center gap-2 inline-flex">
             <div className=" text-xs text-white font-['Manrope']">
-              {message.content?.content}
+              {content}
             </div>
           </div>
           {isSending && (
