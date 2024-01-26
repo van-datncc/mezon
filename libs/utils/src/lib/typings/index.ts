@@ -159,3 +159,7 @@ export interface CategoryProps {
 export interface ThreadProps {
   name: string;
 }
+
+export enum Type {
+  CHANNEL = 1
+}

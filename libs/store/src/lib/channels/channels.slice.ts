@@ -7,7 +7,12 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureChannel, ensureClient, ensureSession, getMezonCtx } from '../helpers';
+import {
+  ensureChannel,
+  ensureClient,
+  ensureSession,
+  getMezonCtx,
+} from '../helpers';
 import {
   ApiChannelDescription,
   ApiCreateChannelDescRequest,
@@ -192,6 +197,18 @@ export const channelsSlice = createSlice({
       .addCase(joinChanel.fulfilled, (state: ChannelsState) => {
         state.socketStatus = 'loaded';
       });
+    builder
+      .addCase(createNewChannel.pending, (state: ChannelsState) => {
+        state.loadingStatus = 'loading';
+      })
+      .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
+        state.loadingStatus = 'loaded';
+        state.isOpenCreateNewChannel = false;
+      })
+      .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
+        state.loadingStatus = 'error';
+        state.error = action.error.message;
+      });
   },
 });
 
@@ -224,6 +241,7 @@ export const channelsActions = {
   ...channelsSlice.actions,
   fetchChannels,
   joinChanel,
+  createNewChannel
 };
 
 /*
