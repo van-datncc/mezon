@@ -128,7 +128,6 @@ export function useChat() {
       const channel = channelRef.current;
 
       if (!client || !session || !socket || !channel || !currentClanId) {
-        console.log(client, session, socket, channel, currentClanId);
         throw new Error('Client is not initialized');
       }
 
