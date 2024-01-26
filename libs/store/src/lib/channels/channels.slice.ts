@@ -69,8 +69,9 @@ export const joinChanel = createAsyncThunk(
     if (!chanel || !chanel.channel_lable) {
       return thunkAPI.rejectWithValue([]);
     }
-    await mezon.joinChatChannel(channelId, chanel?.channel_lable || '')
-    
+    if(mezon.socketRef.current) {
+          mezon.joinChatChannel(channelId, chanel?.channel_lable || '')
+    } 
     return chanel;
   }
 );
@@ -109,9 +110,11 @@ export const fetchChannels = createAsyncThunk(
     const channels = response.channeldesc.map(mapChannelToEntity);
 
     if (channels.length > 0) {
-      thunkAPI.dispatch(channelsActions.joinChanel(channels[0].id));
+      const currentChannelId = selectCurrentChannelId(thunkAPI.getState() as unknown as { [CHANNELS_FEATURE_KEY]: ChannelsState })
+      if(!currentChannelId) {
+        thunkAPI.dispatch(channelsActions.joinChanel(channels[0].id));
+      }
     }
-
     return channels;
   }
 );

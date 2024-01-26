@@ -26,7 +26,7 @@ import { channelLoader } from '../loaders/channelLoader';
 // Components
 export const routes = createBrowserRouter([
   {
-    path: "/",
+    path: "",
     element: <AppLayout />,
     errorElement: <ErrorRoutes />,
     children: [
@@ -44,7 +44,7 @@ export const routes = createBrowserRouter([
         }]
       },
       {
-        path: "/chat",
+        path: "chat",
         loader: authLoader,
         element: <ProtectedRoutes />,
         children: [{
@@ -70,7 +70,7 @@ export const routes = createBrowserRouter([
             {
               path: "invite/:inviteId",
               element: <InvitePage />,
-            }
+            },
             ]
           }]
         }]
