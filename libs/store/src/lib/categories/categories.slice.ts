@@ -6,7 +6,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureClient, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { ApiCategoryDesc } from '@mezon/mezon-js/dist/api.gen';
 import { ICategory, LoadingStatus } from '@mezon/utils';
 export const CATEGORIES_FEATURE_KEY = 'categories';
@@ -55,7 +55,7 @@ type fetchCategoriesPayload = {
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async ({clanId} : fetchCategoriesPayload, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listCategoryDescs(mezon.session, clanId)
     if(!response.categorydesc) {
       return thunkAPI.rejectWithValue([])

@@ -3,6 +3,7 @@ import { channelsActions, getStoreAsync } from '@mezon/store';
 
 export const channelLoader: LoaderFunction = async ({params}) => {
   const {channelId} = params
+
   const store = await getStoreAsync();
   if(!channelId) {
    throw new Error('Channel ID null')

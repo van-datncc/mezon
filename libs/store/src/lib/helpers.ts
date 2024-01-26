@@ -26,6 +26,17 @@ export async function ensureSession(mezon: MezonContextValue): Promise<MezonValu
     })
 }
 
+export async function ensureChannel(mezon: MezonContextValue, id: string): Promise<MezonValueContext> {
+    return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+            if(mezon.channelRef.current && mezon.channelRef.current.id === id) {
+                clearInterval(interval);
+                resolve(ensureClient(mezon));
+            }
+        }, 100);
+    })
+}
+
 export function ensureClient(mezon: MezonContextValue): MezonValueContext  {
     if(!mezon || !mezon.clientRef.current) {
         throw new Error('Error')

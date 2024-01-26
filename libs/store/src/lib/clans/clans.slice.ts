@@ -34,10 +34,18 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 export const clansAdapter = createEntityAdapter<ClansEntity>();
 
 
+export type ChangeCurrentClanArgs = {
+  clanId: string;
+  wipeChannels?: boolean;
+}
+
+
 export const changeCurrentClan = createAsyncThunk(
   'clans/changeCurrentClan',
-  async (clanId: string, thunkAPI) => {
-    // thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+  async ({ clanId, wipeChannels }: ChangeCurrentClanArgs, thunkAPI) => {
+    if(wipeChannels) {
+      thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+    }
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
     thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
     thunkAPI.dispatch(channelsActions.fetchChannels({clanId}));
@@ -60,7 +68,7 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>(
     const currentClanId = clans[0]?.id;
 
     if (currentClanId) {
-      thunkAPI.dispatch(changeCurrentClan(currentClanId));
+      thunkAPI.dispatch(changeCurrentClan({ clanId: currentClanId, wipeChannels: true }));
     }
     return clans;
   }
@@ -74,7 +82,7 @@ type CreatePayload = {
 export const createClan = createAsyncThunk(
   'clans/createClans',
   async ({ clan_name, logo }: CreatePayload, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const body = {
       banner: '',
       clan_name: clan_name,
@@ -99,7 +107,7 @@ export type CreateLinkInviteUser = {
 export const createLinkInviteUser = createAsyncThunk(
   'clans/invite',
   async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const body = {
       channel_id: channel_id,
       clan_id: clan_id,
@@ -120,7 +128,7 @@ type InviteUser = {
 export const inviteUser = createAsyncThunk(
   'clans/joinChannel',
   async ({inviteId}: InviteUser, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.inviteUser(mezon.session, inviteId)
     if (!response) {
       return thunkAPI.rejectWithValue([])

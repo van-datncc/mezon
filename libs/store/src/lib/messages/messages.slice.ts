@@ -7,7 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureClient, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { ChannelMessage } from '@mezon/mezon-js/dist';
 
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -57,7 +57,7 @@ type fetchMessageChannelPayload = {
 export const fetchMessages = createAsyncThunk(
   'messages/fetchMessages',
   async ({ channelId }: fetchMessageChannelPayload, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelMessages(
       mezon.session,
       channelId,

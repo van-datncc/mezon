@@ -7,7 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
+import { ensureChannel, ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import {
   ApiChannelDescription,
   ApiCreateChannelDescRequest,
@@ -77,7 +77,7 @@ export const joinChanel = createAsyncThunk(
         return thunkAPI.rejectWithValue([]);
       }
 
-      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      const mezon = await ensureChannel(getMezonCtx(thunkAPI), channelId);
       if (mezon.socketRef.current) {
         mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
       }
@@ -93,7 +93,7 @@ export const createNewChannel = createAsyncThunk(
   'channels/createNewChannel',
   async (body: ApiCreateChannelDescRequest, thunkAPI) => {
     try {
-      const mezon = ensureClient(getMezonCtx(thunkAPI));
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
       const response = await mezon.client.createChannelDesc(
         mezon.session,
         body,

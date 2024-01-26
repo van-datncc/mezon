@@ -1,5 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureClient, getMezonCtx } from '../helpers';
+import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import { IUserAccount, LoadingStatus } from '@mezon/utils';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
@@ -23,7 +23,7 @@ export const initialAccountState: AccountState = {
 export const getUserProfile = createAsyncThunk<IUserAccount>(
   'account/user',
   async (_, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon?.client.getAccount(mezon.session);
     if (!response) {
       return thunkAPI.rejectWithValue('Invalid session');

@@ -7,7 +7,7 @@ export const serverLoader: LoaderFunction = async ({params, request}) => {
   if(!serverId) {
    throw new Error('Server ID null')
   }
-  store.dispatch(clansActions.changeCurrentClan(serverId));
+  store.dispatch(clansActions.changeCurrentClan({ clanId: serverId }));
   return null;
 }
 

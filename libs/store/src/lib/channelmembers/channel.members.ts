@@ -7,7 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureClient, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
 
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -56,7 +56,7 @@ type fetchChannelMembersPayload = {
 export const fetchChannelMembers = createAsyncThunk(
   'channelMembers/fetchStatus',
   async ({channelId} : fetchChannelMembersPayload, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
+    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelUsers(mezon.session, channelId, 1, 100, "")
     if(!response.channel_users) {
       return thunkAPI.rejectWithValue([])
