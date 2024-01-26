@@ -55,7 +55,6 @@ type fetchCategoriesPayload = {
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async ({clanId} : fetchCategoriesPayload, thunkAPI) => {
-    console.log('fetch Cate:' , clanId)
     const mezon  = ensureClient(getMezonCtx(thunkAPI));
     const response = await mezon.client.listCategoryDescs(mezon.session, clanId)
     if(!response.categorydesc) {

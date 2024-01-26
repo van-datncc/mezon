@@ -9,8 +9,10 @@ module.exports = {
       __dirname,
       '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
     ),
+    'node_modules/flowbite-react/lib/esm/**/*.js',
     ...createGlobPatternsForDependencies(__dirname),
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       spacing: {
@@ -54,7 +56,9 @@ module.exports = {
       rotation: 'rotation 6s linear infinite',
     },
   },
-  plugins: [],
+  plugins: [
+    require('flowbite/plugin')
+]
 };
 
 

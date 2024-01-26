@@ -15,8 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@mezon/assets": ["libs/assets/src/index.ts"],
       "@mezon/components": ["libs/components/src/index.ts"],
       "@mezon/core": ["libs/core/src/index.ts"],
+      "@mezon/logger": ["libs/logger/src/index.ts"],
       "@mezon/store": ["libs/store/src/index.ts"],
       "@mezon/transport": ["libs/transport/src/index.ts"],
       "@mezon/ui": ["libs/ui/src/index.ts"],

@@ -24,11 +24,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
   }, []);
 
   const onchannelpresence = useCallback((message: ChannelMessage) => {
-    console.log('onchannelpresence', message);
+    // TODO: handle presence
   }, []);
 
   const ondisconnect = useCallback(() => {
-    console.log('disconnect');
+    // TODO: handle disconnect
   }, []);
 
 

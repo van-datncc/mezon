@@ -132,9 +132,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
             true,
             false,
           )
-    
-          console.log('Join:', join)
-    
+          
         channelRef.current = join;
         return join;
       }, [socketRef])
