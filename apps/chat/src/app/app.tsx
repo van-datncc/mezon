@@ -37,7 +37,7 @@ export function App() {
   if (!store) {
     return <>loading...</>
   }
-
+  
   return (
     <MezonStoreProvider store={store} loading={null} persistor={persistor} >
       <MezonUiProvider themeName={theme}>
@@ -48,7 +48,7 @@ export function App() {
 }
 
 function AppWrapper() {
-
+  
   useEffect(() => {
     WebFont.load({
       google: {

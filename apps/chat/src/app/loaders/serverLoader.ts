@@ -1,19 +1,19 @@
-import { LoaderFunction, json } from 'react-router-dom';
-import { authActions, clansActions, getStoreAsync } from '@mezon/store';
+import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
+import { clansActions, getStoreAsync } from '@mezon/store';
 
-export const serverLoader: LoaderFunction = async ({params}) => {
-  try {
-    const {serverId} = params
-    const store = await getStoreAsync();
-    if(!serverId) {
-     throw new Error('Server ID null')
-    }
-    const response = await store.dispatch(clansActions.changeCurrentClan(serverId));
-    return response;
-  } catch (e: unknown) {
-    console.error(e);
-    throw json(
-      { message: "Error occured while fetching data" },
-    );
+export const serverLoader: LoaderFunction = async ({params, request}) => {
+  const {serverId} = params
+  const store = await getStoreAsync();
+  if(!serverId) {
+   throw new Error('Server ID null')
   }
+  store.dispatch(clansActions.changeCurrentClan(serverId));
+  return null;
+}
+
+export const shouldRevalidateServer: ShouldRevalidateFunction = (ctx) => {
+  const {currentParams, nextParams} = ctx;
+  const { serverId: currentServerId } = currentParams;
+  const { serverId: nextServerId } = nextParams;
+  return currentServerId !== nextServerId;
 }

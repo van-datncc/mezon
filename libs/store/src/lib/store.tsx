@@ -76,6 +76,10 @@ export type AppThunkDispatch = ThunkDispatch<RootState, unknown, UnknownAction>;
 
 export type AppDispatch = typeof storeInstance.dispatch & AppThunkDispatch;
 
+export const getStore = () => {
+  return storeInstance;
+}
+
 export const getStoreAsync = async () => {
   if (!storeCreated) {
     return new Promise<Store>((resolve) => {

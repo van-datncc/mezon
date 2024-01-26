@@ -1,4 +1,4 @@
-import { IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -30,7 +30,7 @@ export interface MessagesEntity extends IMessageWithUser {
 }
 
 export interface MessagesState extends EntityState<MessagesEntity, string> {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
   isSending?: boolean;
 }

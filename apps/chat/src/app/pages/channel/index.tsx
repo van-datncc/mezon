@@ -11,22 +11,22 @@ import { ChannelMessageBox } from './ChannelMessageBox';
 import { LogOutButton } from 'libs/ui/src/lib/LogOutButton/index';
 import Setting from "../setting"
 import { useState } from 'react';
+
 export default function Server() {
   const { currentChanel, currentClan, userProfile } = useChat();
   const [openSetting, setOpenSetting] = useState(false)
-  if (!currentClan || !currentChanel) {
-    return <div>Loading...</div>;
-  }
+
   const handleOpenCreate = () => {
     setOpenSetting(true)
   }
+
   return (
     <>
       <div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
         <ServerHeader
           name={currentClan?.clan_name}
           type="channel"
-          bannerImage={currentClan.banner}
+          bannerImage={currentClan?.banner}
         />
         <ChannelList />
         <FooterProfile

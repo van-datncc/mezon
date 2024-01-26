@@ -2,7 +2,7 @@ import { IChannel } from '@mezon/utils';
 import * as Icons from '../Icons';
 import { ChannelLable, ThreadLable, SearchMessage } from './TopBarComponents';
 export type ChannelTopbarProps = {
-  channel?: IChannel;
+  channel?: IChannel | null;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {

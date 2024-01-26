@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IChannel } from '@mezon/utils';
 import { Hashtag, AddPerson, Speaker } from '../Icons';
-import { useState } from 'react';
+import { MouseEvent, useCallback, useState } from 'react';
 import { bool } from 'yup';
 import { Modal } from '@mezon/ui';
 import { useChat } from '@mezon/core';
@@ -30,6 +30,7 @@ function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
   const { currentClan, createLinkInviteUser } = useChat();
   const[openInvite, setOpenInvite] = useState(false);
   const [urlInvite, setUrlInvite] = useState('');
+  const navigate = useNavigate();
 
   const handleOpenInvite = () => {
     //call api
@@ -45,11 +46,16 @@ function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(urlInvite)
   }
+
+  const handleClickChannel = useCallback((e: MouseEvent) => {
+    e.preventDefault();
+    return navigate(`../${channel?.channel_id}`, { replace: true, relative: 'route' })
+  }, [channel, navigate]);
   
   return (
-    <Link to={`/chat/servers/${serverId}/channels/${channel.id}`}>
+    <Link to={`/chat/servers/${serverId}/channels/${channel?.channel_id}`} onClick={handleClickChannel}>
       <span
-        className={`${classes[state]} hover:bg-[#36373D] flex flex-row items-center px-2 mx-2  rounded group relative`}
+        className={`${classes[state]} ${state} hover:bg-[#36373D] flex flex-row items-center px-2 mx-2  rounded group relative`}
       >
         {state === 'inactiveUnread' && (
           <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>

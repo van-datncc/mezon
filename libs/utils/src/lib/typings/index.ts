@@ -1,6 +1,8 @@
 import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser, ApiAccount } from '@mezon/mezon-js/dist/api.gen'
 import {ChannelMessage} from '@mezon/mezon-js'
 
+export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
+
 export type IClan = ApiClanDesc & {
   id: string;
 };
@@ -126,7 +128,7 @@ export interface ThreadProps {
   name: string;
 }
 
-export type IUserAccount = ApiAccount & {};
+export type IUserAccount = ApiAccount;
 
 export enum ChannelStatusEnum {
   LOCK = 'lock',
