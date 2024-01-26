@@ -8,7 +8,7 @@ export const channelLoader: LoaderFunction = async ({params}) => {
     if(!channelId) {
      throw new Error('Channel ID null')
     }
-    const response = await store.dispatch(channelsActions.joinChanel(channelId));
+    const response = store.dispatch(channelsActions.joinChanel(channelId));
     return response;
   } catch (e: unknown) {
     console.error(e);

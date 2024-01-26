@@ -8,7 +8,7 @@ export const serverLoader: LoaderFunction = async ({params}) => {
     if(!serverId) {
      throw new Error('Server ID null')
     }
-    const response = await store.dispatch(clansActions.changeCurrentClan(serverId));
+    const response = store.dispatch(clansActions.changeCurrentClan(serverId));
     return response;
   } catch (e: unknown) {
     console.error(e);
