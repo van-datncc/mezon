@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { IUserAccount } from '@mezon/utils';
+import { IUserAccount, LoadingStatus } from '@mezon/utils';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
 export interface IAccount {
@@ -8,7 +8,7 @@ export interface IAccount {
   password: string;
 }
 export interface AccountState {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
   account?: IAccount | null;
   userProfile?: IUserAccount | null

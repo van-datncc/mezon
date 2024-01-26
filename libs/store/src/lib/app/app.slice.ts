@@ -1,3 +1,4 @@
+import { LoadingStatus } from '@mezon/utils';
 import {
   createSelector,
   createSlice,
@@ -7,7 +8,7 @@ export const APP_FEATURE_KEY = 'app';
 
 export interface AppState {
   theme: 'light' | 'dark';
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
 }
 

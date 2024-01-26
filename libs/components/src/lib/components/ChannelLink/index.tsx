@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { IChannel } from '@mezon/utils';
-import { Hashtag, AddPerson, Speaker } from '../Icons';
+import { AddPerson, Speaker } from '../Icons';
 
 export type ChannelLinkProps = {
   serverId?: string;

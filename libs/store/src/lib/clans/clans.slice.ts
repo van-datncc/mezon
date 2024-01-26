@@ -6,7 +6,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { IClan } from '@mezon/utils';
+import { IClan, LoadingStatus } from '@mezon/utils';
 import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import { categoriesActions } from '../categories/categories.slice';
@@ -26,7 +26,7 @@ export const mapClanToEntity = (clanRes: ApiClanDesc) => {
 }
 
 export interface ClansState extends EntityState<ClansEntity, string> {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
   currentClanId?: string | null;
 }

@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
 import { ApiCategoryDesc } from '@mezon/mezon-js/dist/api.gen';
-import { ICategory } from '@mezon/utils';
+import { ICategory, LoadingStatus } from '@mezon/utils';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
 /*
@@ -25,7 +25,7 @@ export const mapCategoryToEntity  = (categoriesRes: ApiCategoryDesc ) => {
 }
 
 export interface CategoriesState extends EntityState<CategoriesEntity, string> {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
   currentCategoryId?: string | null;
 }
