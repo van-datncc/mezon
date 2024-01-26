@@ -14,6 +14,7 @@ const SettingRightProfile = () => {
     setIsUserSettings(true);
   };
   
+    console.log('Name:', userProfile?.user?.username || '');
   
     return (
         <>

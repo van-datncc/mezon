@@ -23,7 +23,7 @@ export const AlertTitleTextWarning: React.FC<AlertProps> = ({
       {isOpen && (
         <div
           id="toast-danger"
-          className="flex items-center justify-between  z-50 w-full max-w-[684px] p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 absolute bottom-0 left-1/2 transform -translate-x-1/2"
+          className="flex items-center justify-between w-full max-w-xl p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 absolute bottom-0 left-1/2 transform -translate-x-1/2"
           role="alert"
         >
           <div className="flex items-center">

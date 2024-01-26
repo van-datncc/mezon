@@ -16,6 +16,7 @@ function MyApp() {
   const dispatch = useAppDispatch()
 
   const handleChangeClan = (clanId: string) => {
+    console.log('CLAN ID: ', clanId)
     // changeCurrentClan(clanId)
     dispatch(channelsActions.setCurrentChannelId(''));
     navigate(`/chat/servers/${clanId}`);
