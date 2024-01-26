@@ -68,15 +68,16 @@ export type IMessageMeta = {
 };
 
 export type IMessage = ChannelMessage & {
-  id: string;
-  body: {
-    text: string;
-  };
-  content?: {
-    content?: string | undefined;
-  };
-  date?: string | undefined;
-};
+    id: string;
+    lastSeen: boolean;
+    body: {
+        text: string
+    }
+    content?:{
+      content?:string | undefined
+    }
+    date?:string | undefined
+}
 
 export type IMessageWithUser = IMessage & {
   user: IUser | null;
