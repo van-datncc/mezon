@@ -123,6 +123,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         if (!socket) {
           throw new Error('Socket is not initialized');
         }
+
+        if(channelRef.current) {
+            await socket.leaveChat(channelRef.current.id);
+            channelRef.current = null;
+        }
     
         const join = await socket
           .joinChat(
