@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { getMezonCtx } from '../helpers';
 import { Session } from '@mezon/mezon-js'
+import { LoadingStatus } from '@mezon/utils';
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
   session?: ISession | null;
   isLogin?: boolean;

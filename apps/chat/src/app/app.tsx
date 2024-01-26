@@ -20,6 +20,7 @@ const GOOGLE_CLIENT_ID =
 
 const nakama: CreateNakamaClientOptions = {
   host: 'dev-mezon.nccsoft.vn',
+  // host: '127.0.0.1',
   port: '7350',
   key: 'defaultkey',
   ssl: false,
@@ -29,7 +30,6 @@ const theme = 'light';
 
 export function App() {
   const mezon = useMezon();
-
   const { store, persistor } = useMemo(() => {
     return initStore(mezon, preloadedState);
   }, [mezon])
@@ -37,7 +37,7 @@ export function App() {
   if (!store) {
     return <>loading...</>
   }
-
+  
   return (
     <MezonStoreProvider store={store} loading={null} persistor={persistor} >
       <MezonUiProvider themeName={theme}>
@@ -48,7 +48,7 @@ export function App() {
 }
 
 function AppWrapper() {
-
+  
   useEffect(() => {
     WebFont.load({
       google: {

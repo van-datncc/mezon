@@ -18,15 +18,15 @@ import ErrorRoutes from './ErrorRoutes';
 import InvitePage from '../pages/invite';
 
 // Loaders
-import { authLoader } from '../loaders/authLoader';
-import { mainLoader } from '../loaders/mainLoader';
-import { serverLoader } from '../loaders/serverLoader';
-import { channelLoader } from '../loaders/channelLoader';
+import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
+import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
+import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
+import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
 
 // Components
 export const routes = createBrowserRouter([
   {
-    path: "/",
+    path: "",
     element: <AppLayout />,
     errorElement: <ErrorRoutes />,
     children: [
@@ -36,7 +36,7 @@ export const routes = createBrowserRouter([
         element: <InitialRoutes />,
       },
       {
-        path: "/guess",
+        path: "guess",
         element: <GuessLayout />,
         children: [{
           path: "login",
@@ -44,12 +44,14 @@ export const routes = createBrowserRouter([
         }]
       },
       {
-        path: "/chat",
+        path: "chat",
         loader: authLoader,
+        shouldRevalidate: shouldRevalidateAuth,
         element: <ProtectedRoutes />,
         children: [{
           path: "",
           loader: mainLoader,
+          shouldRevalidate: shouldRevalidateMain,
           element: <MainLayout />,
           children: [{
             path: "",
@@ -57,11 +59,16 @@ export const routes = createBrowserRouter([
             children: [{
               path: "servers/:serverId",
               loader: serverLoader,
+              shouldRevalidate: shouldRevalidateServer,
               element: <ServerLayout />,
               children: [{
-                path: "channels/:channelId",
-                loader: channelLoader,
-                element: <Chanel />,
+                path: "channels",
+                children: [{
+                  path: ":channelId",
+                  loader: channelLoader,
+                  shouldRevalidate: shouldRevalidateChannel,
+                  element: <Chanel />,
+                }]
               }]
             }, {
               path: "direct",
@@ -70,7 +77,7 @@ export const routes = createBrowserRouter([
             {
               path: "invite/:inviteId",
               element: <InvitePage />,
-            }
+            },
             ]
           }]
         }]

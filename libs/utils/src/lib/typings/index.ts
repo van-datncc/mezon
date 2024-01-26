@@ -8,6 +8,8 @@ import {
 } from '@mezon/mezon-js/dist/api.gen';
 import { ChannelMessage } from '@mezon/mezon-js';
 
+export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
+
 export type IClan = ApiClanDesc & {
   id: string;
 };
@@ -75,15 +77,16 @@ export type IMessageMeta = {
 };
 
 export type IMessage = ChannelMessage & {
-  id: string;
-  body: {
-    text: string;
-  };
-  content?: {
-    content?: string | undefined;
-  };
-  date?: string | undefined;
-};
+    id: string;
+    lastSeen: boolean;
+    body: {
+        text: string
+    }
+    content?:{
+      content?:string | undefined
+    }
+    date?:string | undefined
+}
 
 export type IMessageWithUser = IMessage & {
   user: IUser | null;
@@ -132,7 +135,7 @@ export interface ThreadProps {
   name: string;
 }
 
-export type IUserAccount = ApiAccount & {};
+export type IUserAccount = ApiAccount;
 
 export enum ChannelStatusEnum {
   LOCK = 'lock',

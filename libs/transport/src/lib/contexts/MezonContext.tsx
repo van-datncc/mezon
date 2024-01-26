@@ -137,8 +137,29 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
         return newSession;
       }
 
-      const session2 = await socketRef.current.connect(newSession, false);
-      sessionRef.current = session2;
+    const joinChatChannel = React.useCallback(async (channelId: string, channelName: string) => {
+        const socket = socketRef.current;
+        if (!socket) {
+          throw new Error('Socket is not initialized');
+        }
+
+        if(channelRef.current) {
+            await socket.leaveChat(channelRef.current.id);
+            channelRef.current = null;
+        }
+    
+        const join = await socket
+          .joinChat(
+            channelId,
+            channelName,
+            1,
+            true,
+            false,
+          )
+          
+        channelRef.current = join;
+        return join;
+      }, [socketRef])
 
       return newSession;
     },

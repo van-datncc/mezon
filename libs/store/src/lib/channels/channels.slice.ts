@@ -1,4 +1,4 @@
-import { IChannel } from '@mezon/utils';
+import { IChannel, LoadingStatus } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -7,7 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureClient, getMezonCtx } from '../helpers';
+import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import {
   ApiChannelDescription,
   ApiCreateChannelDescRequest,
@@ -30,7 +30,8 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 };
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
+  socketStatus: LoadingStatus;
   error?: string | null;
   currentChannelId?: string | null;
   isOpenCreateNewChannel?: boolean;
@@ -61,23 +62,31 @@ function waitUntil<T>(
 export const joinChanel = createAsyncThunk(
   'channels/joinChanel',
   async (channelId: string, thunkAPI) => {
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
-    thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+    try {
+      thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+      thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+      thunkAPI.dispatch(
+        channelMembersActions.fetchChannelMembers({ channelId }),
+      );
 
-    thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-    thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
+      const chanel = await waitUntil(() =>
+        selectChannelById(channelId)(
+          thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState },
+        ),
+      );
+      if (!chanel || !chanel.channel_lable) {
+        return thunkAPI.rejectWithValue([]);
+      }
 
-    const chanel = await waitUntil(() =>
-      selectChannelById(channelId)(
-        thunkAPI.getState() as { [CHANNELS_FEATURE_KEY]: ChannelsState },
-      ),
-    );
-    if (!chanel || !chanel.channel_lable) {
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      if (mezon.socketRef.current) {
+        mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
+      }
+      return chanel;
+    } catch (error) {
+      console.log(error);
       return thunkAPI.rejectWithValue([]);
     }
-    await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
-
-    return chanel;
   },
 );
 
@@ -118,9 +127,15 @@ export const fetchChannels = createAsyncThunk(
     const channels = response.channeldesc.map(mapChannelToEntity);
 
     if (channels.length > 0) {
-      thunkAPI.dispatch(channelsActions.joinChanel(channels[0].id));
+      const currentChannelId = selectCurrentChannelId(
+        thunkAPI.getState() as unknown as {
+          [CHANNELS_FEATURE_KEY]: ChannelsState;
+        },
+      );
+      if (!currentChannelId) {
+        thunkAPI.dispatch(channelsActions.joinChanel(channels[0].id));
+      }
     }
-
     return channels;
   },
 );
@@ -128,6 +143,7 @@ export const fetchChannels = createAsyncThunk(
 export const initialChannelsState: ChannelsState =
   channelsAdapter.getInitialState({
     loadingStatus: 'not loaded',
+    socketStatus: 'not loaded',
     error: null,
     isOpenCreateNewChannel: false,
     currentCategoryId: undefined,
@@ -176,6 +192,17 @@ export const channelsSlice = createSlice({
       .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
         state.loadingStatus = 'error';
         state.error = action.error.message;
+
+    builder
+      .addCase(joinChanel.rejected, (state: ChannelsState, action) => {
+        state.socketStatus = 'error';
+        state.error = action.error.message;
+      })
+      .addCase(joinChanel.pending, (state: ChannelsState) => {
+        state.socketStatus = 'loading';
+      })
+      .addCase(joinChanel.fulfilled, (state: ChannelsState) => {
+        state.socketStatus = 'loaded';
       });
   },
 });

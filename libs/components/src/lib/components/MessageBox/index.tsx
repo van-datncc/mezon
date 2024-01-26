@@ -28,6 +28,7 @@ function MessageBox(props: MessageBoxProps) {
     onSend({
       content: { content },
       id: '',
+      lastSeen: true,
       channel_id: '',
       body: { text: '' },
       channelId: '',

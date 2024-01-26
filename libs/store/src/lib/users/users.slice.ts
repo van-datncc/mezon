@@ -1,4 +1,4 @@
-import { IThread } from '@mezon/utils';
+import { IThread, LoadingStatus } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -18,7 +18,7 @@ export interface UsersEntity extends IThread {
 }
 
 export interface UsersState extends EntityState<UsersEntity, string> {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
 }
 

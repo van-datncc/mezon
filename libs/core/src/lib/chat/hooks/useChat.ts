@@ -11,7 +11,6 @@ import {
   selectCurrentClanId,
   clansActions,
   channelsActions,
-  messagesActions,
   selectCurrentClan,
   selectClansEntities,
   useAppDispatch,
@@ -74,6 +73,7 @@ export function useChat() {
 
   const changeCurrentClan = React.useCallback(
     async (clanId: string) => {
+      await dispatch(channelsActions.setCurrentChannelId(''));
       await dispatch(clansActions.changeCurrentClan(clanId));
     },
     [dispatch],

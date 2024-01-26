@@ -1,4 +1,4 @@
-import { IChannelMember } from '@mezon/utils';
+import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -25,7 +25,7 @@ export const mapChannelMemberToEntity  = (channelRes: ChannelUserListChannelUser
 
 
 export interface ChannelMembersState extends EntityState<ChannelMembersEntity, string> {
-  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  loadingStatus: LoadingStatus;
   error?: string | null;
   currentChannelId?: string | null;
 }

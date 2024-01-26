@@ -2,7 +2,6 @@ import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
 
 type ChatContextProviderProps = {
   children: React.ReactNode

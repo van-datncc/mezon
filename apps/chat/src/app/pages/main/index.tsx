@@ -6,15 +6,18 @@ import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { ModalCreateClan, ModalListClans } from '@mezon/components';
+import { channelsActions, useAppDispatch } from '@mezon/store';
 
 function MyApp() {
   const { clans, currentClan } = useChat();
   const [openListClans, setOpenListClans] = useState(false);
   const [openCreateClan, setOpenCreateClans] = useState(false)
   const navigate = useNavigate();
-  
+  const dispatch = useAppDispatch()
+
   const handleChangeClan = (clanId: string) => {
     // changeCurrentClan(clanId)
+    dispatch(channelsActions.setCurrentChannelId(''));
     navigate(`/chat/servers/${clanId}`);
   }
 
@@ -25,7 +28,7 @@ function MyApp() {
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
         <NavLink to="/chat/direct">
-          <Image src={IconLogoMezon} alt={'logoMezon'} />
+          <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
         </NavLink>
         <div className="py-2 border-t-2 border-t-borderDefault"></div>
         {currentClan?.id && (<NavLink to={`/chat/servers/${currentClan.id}`}>

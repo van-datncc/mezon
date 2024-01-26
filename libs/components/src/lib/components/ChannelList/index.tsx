@@ -6,10 +6,10 @@ import { Events, BrowseChannel } from './ChannelListComponents';
 import {
   channelsActions,
   useAppDispatch,
-  openCreateNewModalChannel,
 } from '@mezon/store';
 import * as Icons from '../Icons';
 import { CreateNewChannelModal } from 'libs/components/src/lib/components/CreateChannelModal/index';
+import { Modal } from '@mezon/ui';
 
 export type ChannelListProps = { className?: string };
 
@@ -18,7 +18,7 @@ function ChannelList() {
   const [categoriesState, setCategoriesState] = useState<
     Record<string, boolean>
   >({});
-
+  const { currentClan, createLinkInviteUser } = useChat();
   function toggleCategory(categoryId: string) {
     setCategoriesState((state) => ({
       ...state,
@@ -34,6 +34,26 @@ function ChannelList() {
     dispatch(channelsActions.openCreateNewModalChannel());
     dispatch(channelsActions.getCurrentCategoryId(paramCategory));
   };
+
+  const [openInvite, setOpenInvite] = useState(false);
+
+  const [urlInvite, setUrlInvite] = useState('');
+
+
+  const handleOpenInvite = (currentServerId: string, currentChannelId: string) => {
+    //call api
+    // console.log("clan_id: ", currentServerId, "channel_id: ", currentChannelId?., "category_id: ", channel?.category_id)
+    setOpenInvite(true)
+    createLinkInviteUser(currentServerId ?? '', currentChannelId ?? '', 10).then(res => {
+      if (res && res.invite_link) {
+        setUrlInvite(window.location.origin + '/chat/invite/' + res.invite_link)
+      }
+    })
+  }
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(urlInvite)
+  }
 
   return (
     <>
@@ -79,6 +99,7 @@ function ChannelList() {
                       channel={channel}
                       active={currentChanel?.id === channel.id}
                       key={channel.id}
+                      createInviteLink={handleOpenInvite}
                     />
                   ))}
               </div>
@@ -86,6 +107,9 @@ function ChannelList() {
           </div>
         ))}
       </div>
+      <Modal title='Invite' onClose={() => { setOpenInvite(false) }} showModal={openInvite} confirmButton={handleCopyToClipboard} titleConfirm='Copy'>
+        <p><span>{urlInvite}</span></p>
+      </Modal>
     </>
   );
 }
