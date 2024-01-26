@@ -9,11 +9,16 @@ import ChannelMessages from './ChanneMessages';
 import { useChat } from '@mezon/core';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { LogOutButton } from 'libs/ui/src/lib/LogOutButton/index';
+import Setting from "../setting"
+import { useState } from 'react';
 export default function Server() {
   const { currentChanel, currentClan, userProfile } = useChat();
-
+  const [openSetting, setOpenSetting] = useState(false)
   if (!currentClan || !currentChanel) {
     return <div>Loading...</div>;
+  }
+  const handleOpenCreate = () => {
+    setOpenSetting(true)
   }
   return (
     <>
@@ -28,6 +33,7 @@ export default function Server() {
           name={userProfile?.user?.username || ''}
           status={userProfile?.user?.online}
           avatar={userProfile?.user?.avatar_url || ''}
+          openSetting={handleOpenCreate}
         />
       </div>
       <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
@@ -46,6 +52,7 @@ export default function Server() {
           </div>
         </div>
       </div>
+      <Setting open={openSetting} onClose={() => {setOpenSetting(false)}}/>
     </>
   );
 }
