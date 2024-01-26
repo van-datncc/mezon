@@ -1,5 +1,12 @@
-import {ApiCategoryDesc, ApiChannelDescription, ChannelUserListChannelUser, ApiClanDesc, ApiUser, ApiAccount } from '@mezon/mezon-js/dist/api.gen'
-import {ChannelMessage} from '@mezon/mezon-js'
+import {
+  ApiCategoryDesc,
+  ApiChannelDescription,
+  ChannelUserListChannelUser,
+  ApiClanDesc,
+  ApiUser,
+  ApiAccount,
+} from '@mezon/mezon-js/dist/api.gen';
+import { ChannelMessage } from '@mezon/mezon-js';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
@@ -118,7 +125,6 @@ export enum channelStatusEnum {
   UNLOCK = 'unlock',
 }
 
-
 export interface CategoryProps {
   name: string | undefined;
   status?: string | undefined;
@@ -143,6 +149,10 @@ export enum ChannelTypeEnum {
   ANNOUNCEMENT = 3,
 }
 
+export enum Type {
+  CHANNEL = 1,
+}
+
 export interface ChannelProps {
   name?: string;
   status?: ChannelStatusEnum;
@@ -158,4 +168,11 @@ export interface CategoryProps {
 
 export interface ThreadProps {
   name: string;
+}
+
+export interface LoadingStatus {
+  LOADING: "loading",
+  LOADED: "loaded",
+  ERROR: "error",
+  NOT_LOADED: "not loaded"
 }
