@@ -644,7 +644,11 @@ export function Hashtag({
   defaultFill = '#AEAEAE',
   defaultSize = 'w-5 h-5',
 }: IconProps) {
+  const [isWhite, setFill] = useState<boolean>(false);
 
+  const handleClick = () => {
+    setFill(!isWhite);
+  };
   return (
     <svg
       width="18"
@@ -653,12 +657,13 @@ export function Hashtag({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={defaultSize}
+      onClick={handleClick}
     >
       <g id="Live area">
         <path
           id="Vector"
           d="M3.38824 16.424L4.5491 12.0811H0.486084L0.952502 10.3191H5.02589L5.82398 7.29253H1.76096L2.23774 5.54087H6.30076L7.3787 1.50895H9.20292L8.11461 5.54087H11.2759L12.3538 1.50895H14.178L13.0897 5.54087H17.1528L16.6863 7.29253H12.6233L11.8045 10.3191H15.8675L15.4011 12.0811H11.3381L10.1772 16.424H8.36336L9.51386 12.0811H6.36295L5.20209 16.424H3.38824ZM6.83973 10.3191H9.99065L10.7991 7.29253H7.64819L6.83973 10.3191Z"
-          fill={defaultFill}
+          fill={isWhite ? '#FFFFFF' : defaultFill}
         />
       </g>
     </svg>
@@ -669,7 +674,11 @@ export function Speaker({
   defaultFill = '#AEAEAE',
   defaultSize = 'w-5 h-5',
 }: IconProps) {
+  const [isWhite, setFill] = useState<boolean>(false);
 
+  const handleClick = () => {
+    setFill(!isWhite);
+  };
   return (
     <svg
       width="18"
@@ -678,21 +687,22 @@ export function Speaker({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={defaultSize}
+      onClick={handleClick}
     >
       <g id="Live area" clipPath="url(#clip0_2155_1604)">
         <g id="Vector">
           <path
             d="M10.1977 0.750516C10.4846 0.889971 10.6667 1.18099 10.6667 1.50001V16.5C10.6667 16.819 10.4846 17.1101 10.1977 17.2495C9.91077 17.389 9.56941 17.3524 9.31856 17.1553L4.24217 13.1667H1.50008C1.03984 13.1667 0.666748 12.7936 0.666748 12.3333V5.66668C0.666748 5.20644 1.03984 4.83334 1.50008 4.83334H4.24217L9.31856 0.844747C9.56941 0.64765 9.91077 0.611061 10.1977 0.750516Z"
-            fill={defaultFill}
-            />
+            fill={isWhite ? '#FFFFFF' : defaultFill}
+          />
           <path
             d="M14.5893 3.41075C14.2639 3.08531 13.7363 3.08531 13.4108 3.41075C13.0854 3.73619 13.0854 4.26382 13.4108 4.58926L13.6968 4.87521C15.9748 7.15327 15.9748 10.8467 13.6968 13.1248L13.4108 13.4107C13.0854 13.7362 13.0854 14.2638 13.4108 14.5893C13.7363 14.9147 14.2639 14.9147 14.5893 14.5893L14.8753 14.3033C17.8042 11.3744 17.8042 6.62563 14.8753 3.6967L14.5893 3.41075Z"
-            fill={defaultFill}
-            />
+            fill={isWhite ? '#FFFFFF' : defaultFill}
+          />
           <path
             d="M12.9227 5.91075C12.5972 5.58531 12.0696 5.58531 11.7442 5.91075C11.4187 6.23619 11.4187 6.76382 11.7442 7.08926L11.8871 7.23224C12.8634 8.20855 12.8634 9.79146 11.8871 10.7678L11.7442 10.9107C11.4187 11.2362 11.4187 11.7638 11.7442 12.0893C12.0696 12.4147 12.5972 12.4147 12.9227 12.0893L13.0656 11.9463C14.6928 10.3191 14.6928 7.68091 13.0656 6.05373L12.9227 5.91075Z"
-            fill={defaultFill}
-            />
+            fill={isWhite ? '#FFFFFF' : defaultFill}
+          />
         </g>
       </g>
       <defs>

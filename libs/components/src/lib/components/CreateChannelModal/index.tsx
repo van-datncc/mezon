@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { ThunkDispatch } from '@reduxjs/toolkit';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
   RootState,
@@ -7,6 +8,7 @@ import {
   createNewChannel,
 } from '@mezon/store';
 import { useChat } from '@mezon/core';
+
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import { ChannelLableModal } from './ChannelLabel';
@@ -14,11 +16,10 @@ import { ChannelNameTextField } from './ChannelNameTextField';
 import { ChannelTypeComponent } from './ChannelType';
 import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
-import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { Type } from 'libs/utils/src/lib/typings/index';
 
 export const CreateNewChannelModal = () => {
   const { currentClanId } = useChat();
+
   const currentCategoryId = useSelector(
     (state: RootState) => state.channels.currentCategoryId,
   );
@@ -26,54 +27,31 @@ export const CreateNewChannelModal = () => {
     (state: RootState) => state.channels.isOpenCreateNewChannel,
   );
 
-  const isLoading = useSelector(
-    (state: RootState) => state.channels.loadingStatus,
-  );
-
-  console.log("loadding", isLoading)
-
   const dispatch = useAppDispatch();
-  const [isErrorType, setIsErrorType] = useState<string>('');
-  const [isErrorName, setIsErrorName] = useState<string>('');
 
-  const handleSubmit = async () => {
-    if (channelType === -1) {
-      setIsErrorType("Channel's type is required");
-      return;
-    }
-    if (channelName === '') {
-      setIsErrorName("Channel's name is required");
-      return;
-    }
-
+  const handleSubmit = () => {
     const body: ApiCreateChannelDescRequest = {
       clan_id: currentClanId?.toString(),
-      type: Type.CHANNEL,
+      type: channelType,
       channel_lable: channelName,
       channel_private: isPrivate,
       category_id: currentCategoryId,
     };
-    await dispatch(createNewChannel(body));
-    clearDataAfterCreateNew();
+    dispatch(createNewChannel(body));
     dispatch(channelsActions.openCreateNewModalChannel());
   };
 
   const handleCloseModal = () => {
-    setIsErrorType('');
-    setIsErrorName('');
-    clearDataAfterCreateNew();
     dispatch(channelsActions.openCreateNewModalChannel());
   };
 
   const [channelName, setChannelName] = useState('');
   const handleChannelNameChange = (value: string) => {
-    setIsErrorName('');
     setChannelName(value);
   };
 
   const [channelType, setChannelType] = useState<number>(-1);
   const onChangeChannelType = (value: number) => {
-    setIsErrorType('');
     setChannelType(value);
   };
   const [isPrivate, setIsPrivate] = useState<number>(0);
@@ -81,89 +59,96 @@ export const CreateNewChannelModal = () => {
     setIsPrivate(value);
   };
 
-  const clearDataAfterCreateNew = () => {
-    setChannelName('');
-    setChannelType(-1);
-    setIsPrivate(0);
-  };
   return (
     <>
       {isOpenModal && (
-        <>
-          <div className="w-screen h-screen overflow-hidden absolute top-0 left-0 z-50 opacity-95 bg-black flex flex-row justify-center items-start pt-9">
-            {}
-            <div className="z-60 w-[684px] h-[780px] bg-[#151515] rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
-              <div className=" self-stretch h-96 flex-col justify-start items-start flex ">
-                <div className="self-stretch h-96 px-5 pt-8 pb-5 flex-col justify-start items-start gap-6 flex">
-                  <div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
-                    <div className="flex items-center justify-between w-full relative">
-                      <div className="text-white text-xl flex-nowrap font-bold font-['Manrope']">
-                        Create Channel
-                      </div>
-                      <div className="absolute right-1 top-[-10px]">
-                        <button
-                          onClick={handleCloseModal}
-                          className="hover:text-[#ffffff]"
-                        >
-                          <Icons.Close />
-                        </button>
-                      </div>
+        <div className="w-screen h-screen overflow-hidden duration-500 absolute top-0 left-0 z-50 opacity-95 bg-black flex flex-row justify-center items-center">
+          <div className="z-60 Frame397 w-[684px] h-[780px] bg-[#151515] rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
+            <div className="Frame398 self-stretch h-96 flex-col justify-start items-start flex ">
+              <div className="Frame395 self-stretch h-96 px-5 pt-8 pb-5 flex-col justify-start items-start gap-6 flex">
+                <div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
+                  <div className="flex items-center justify-between w-full relative">
+                    <div className="text-white text-xl flex-nowrap font-bold font-['Manrope']">
+                      Create Channel
                     </div>
+                    <div className="absolute right-1 top-[-10px]">
+                      <button
+                        onClick={handleCloseModal}
+                        className="hover:text-[#ffffff]"
+                      >
+                        <Icons.Close />
+                      </button>
+                    </div>
+                  </div>
 
-                    <div className=" text-zinc-400 text-sm font-normal font-['Manrope']">
-                      Kindly set up a channel of your choice.
+                  <div className=" text-zinc-400 text-sm font-normal font-['Manrope']">
+                    Kindly set up a channel of your choice.
+                  </div>
+                </div>
+                <div className="Frame407 self-stretch h-80 flex-col justify-start items-start gap-4 flex">
+                  <ChannelLableModal labelProp="CHANNEL TYPE" />
+                  <div className="Frame405 self-stretch h-72 flex-col justify-start items-start gap-2 flex">
+                    <ChannelTypeComponent
+                      type={0}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={1}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={2}
+                      onChange={onChangeChannelType}
+                    />
+                    <ChannelTypeComponent
+                      type={3}
+                      onChange={onChangeChannelType}
+                    />
+                  </div>
+                </div>
+                <ChannelNameTextField
+                  onChange={handleChannelNameChange}
+                  type={1}
+                  channelNameProps="WHAT IS CHANNEL'S NAME?"
+                />
+                <ChannelStatusModal
+                  onChangeValue={onChangeToggle}
+                  channelNameProps="IS PRIVATE CHANNEL?"
+                />
+                <div className=" relative border-black self-stretch px-5 pt-5 pb-8 bg-[#151515] border-t justify-end items-center gap-3 inline-flex">
+                  <div className=" flex-col justify-center items-center inline-flex">
+                    <div className=" w-[85px] flex-col justify-center items-center gap-2 flex">
+                      <div className=" self-stretch grow shrink basis-0 px-4 py-3 rounded flex-col justify-center items-center flex">
+                        <div className=" justify-start items-center gap-2 inline-flex">
+                          <button
+                            onClick={handleCloseModal}
+                            className=" text-blue-300 text-base font-medium font-['Manrope'] leading-normal"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="Frame407 self-stretch h-80 flex-col justify-start items-start gap-4 flex">
-                    <ChannelLableModal labelProp="CHANNEL TYPE" />
-                    <div className="Frame405 self-stretch h-72 flex-col justify-start items-start gap-2 flex">
-                      <ChannelTypeComponent
-                        type={0}
-                        onChange={onChangeChannelType}
-                        error={isErrorType}
-                      />
-                      <ChannelTypeComponent
-                        type={1}
-                        onChange={onChangeChannelType}
-                        error={isErrorType}
-                      />
-                      <ChannelTypeComponent
-                        type={2}
-                        onChange={onChangeChannelType}
-                        error={isErrorType}
-                      />
-                      <ChannelTypeComponent
-                        type={3}
-                        onChange={onChangeChannelType}
-                        error={isErrorType}
-                      />
+                  <div className=" flex-col justify-center items-center inline-flex">
+                    <div className=" w-[150px] flex-col justify-center items-center gap-2 flex">
+                      <div className=" self-stretch grow shrink basis-0 px-4 py-3  bg-blue-600 rounded flex-col justify-center items-center flex">
+                        <div className=" justify-start items-center gap-2 inline-flex">
+                          <button
+                            onClick={handleSubmit}
+                            className="Text text-white text-base font-medium font-['Manrope'] leading-normal"
+                          >
+                            Create Channel
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <ChannelNameTextField
-                    onChange={handleChannelNameChange}
-                    type={channelType}
-                    channelNameProps="WHAT IS CHANNEL'S NAME?"
-                    error={isErrorName}
-                  />
-                  <ChannelStatusModal
-                    onChangeValue={onChangeToggle}
-                    channelNameProps="IS PRIVATE CHANNEL?"
-                  />
-                  <CreateChannelButton
-                    onClickCancel={handleCloseModal}
-                    onClickCreate={handleSubmit}
-                  />
                 </div>
               </div>
             </div>
           </div>
-          {isErrorType !== '' && (
-            <AlertTitleTextWarning description={isErrorType} />
-          )}
-          {isErrorName !== '' && (
-            <AlertTitleTextWarning description={isErrorName} />
-          )}
-        </>
+        </div>
       )}
     </>
   );

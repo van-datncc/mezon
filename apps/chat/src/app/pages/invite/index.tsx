@@ -27,6 +27,7 @@ export default function InvitePage() {
       })
     }
   }
+  // console.log('DDDD: ', inviteIdParam);
   return (
     <>
       <div className="hidden flex-col w-60 bg-bgSurface md:flex">

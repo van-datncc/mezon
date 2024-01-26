@@ -15,7 +15,6 @@ import {
 import { messagesActions } from '../messages/messages.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 
-
 export const CHANNELS_FEATURE_KEY = 'channels';
 
 /*
@@ -181,17 +180,6 @@ export const channelsSlice = createSlice({
         state.loadingStatus = 'error';
         state.error = action.error.message;
       });
-    builder
-      .addCase(createNewChannel.pending, (state: ChannelsState) => {
-        state.loadingStatus = 'loading';
-      })
-      .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
-        state.loadingStatus = 'loaded';
-        state.isOpenCreateNewChannel = false;
-      })
-      .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
 
     builder
       .addCase(joinChanel.rejected, (state: ChannelsState, action) => {
@@ -236,7 +224,6 @@ export const channelsActions = {
   ...channelsSlice.actions,
   fetchChannels,
   joinChanel,
-  createNewChannel,
 };
 
 /*
