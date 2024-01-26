@@ -2,17 +2,21 @@ import { ChannelTopbar, DirectMessageList, FooterProfile, ServerHeader } from '@
 import ChannelMessages from '../channel/ChanneMessages'
 import { ChannelMessageBox } from '../channel/ChannelMessageBox'
 import { useChat } from '@mezon/core';
+import { useState } from 'react';
 
 export default function Direct() {
     const { userProfile } = useChat();
-
+    const [openSetting, setOpenSetting] = useState(false)
     const currentDirectMess = null //get form store
+    const handleOpenCreate = () => {
+        setOpenSetting(true)
+      }
     return (
         <>
             <div className="hidden flex-col w-60 bg-bgSurface md:flex">
                 <ServerHeader type={'direct'} />
                 <DirectMessageList />
-                <FooterProfile name={userProfile?.user?.username || ''} status={userProfile?.user?.online} avatar={userProfile?.user?.avatar_url || ''} />
+                <FooterProfile name={userProfile?.user?.username || ''} status={userProfile?.user?.online} avatar={userProfile?.user?.avatar_url || ''} openSetting={handleOpenCreate} />
             </div>
             <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
                 <ChannelTopbar channel={undefined} />
