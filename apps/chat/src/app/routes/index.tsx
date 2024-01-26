@@ -77,7 +77,7 @@ export const routes = createBrowserRouter([
             {
               path: "invite/:inviteId",
               element: <InvitePage />,
-            }
+            },
             ]
           }]
         }]

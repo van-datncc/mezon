@@ -8,7 +8,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelMessage } from '@mezon/mezon-js/dist';
 
 export const MESSAGES_FEATURE_KEY = 'messages';
 
@@ -16,14 +16,9 @@ export const MESSAGES_FEATURE_KEY = 'messages';
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity = (channelMess: ChannelMessage) => {
-  return {
-    ...channelMess,
-    id: channelMess.message_id || '',
-    body: { text: 'Hello world' },
-    user: null,
-  };
-};
+export const mapMessageChannelToEntity  = (channelMess: ChannelMessage, lastSeenMsg: undefined | string = undefined) => {
+  return {...channelMess, id: channelMess.message_id || '', body: {text: 'Hello world'}, user: null, lastSeen: lastSeenMsg === channelMess.message_id}
+}
 
 export interface MessagesEntity extends IMessageWithUser {
   id: string; // Primary ID
@@ -72,10 +67,27 @@ export const fetchMessages = createAsyncThunk(
     if (!response.messages) {
       return thunkAPI.rejectWithValue([]);
     }
-    return response.messages.map(mapMessageChannelToEntity);
-  },
+    return response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
+  }
 );
 
+
+// export const updateLastSeenMessage = createAsyncThunk(
+//   'messages/fetchStatus',
+//   async ({ channelId }: fetchMessageChannelPayload, thunkAPI) => {
+//     const mezon = ensureClient(getMezonCtx(thunkAPI));
+//     const response = await mezon.client.PostLastSeenMessage(
+//       mezon.session,
+//       channelId,
+//       100,
+//       false,
+//     );
+//     if (!response.messages) {
+//       return thunkAPI.rejectWithValue([]);
+//     }
+//     return response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
+//   }
+// );
 
 export const initialMessagesState: MessagesState =
   messagesAdapter.getInitialState({

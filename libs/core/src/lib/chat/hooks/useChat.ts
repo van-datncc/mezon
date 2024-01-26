@@ -73,6 +73,7 @@ export function useChat() {
 
   const changeCurrentClan = React.useCallback(
     async (clanId: string) => {
+      await dispatch(channelsActions.setCurrentChannelId(''));
       await dispatch(clansActions.changeCurrentClan(clanId));
     },
     [dispatch],
