@@ -14,7 +14,6 @@ function MyApp() {
   const navigate = useNavigate();
   
   const handleChangeClan = (clanId: string) => {
-    console.log('CLAN ID: ', clanId)
     // changeCurrentClan(clanId)
     navigate(`/chat/servers/${clanId}`);
   }

@@ -2,7 +2,7 @@ import { BaseSyntheticEvent, useCallback, useState } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { AlertTitleTextWarning } from '../../../../../../ui/src/lib/Alert/index';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { validationSchema } from 'libs/utils/src/lib/validate/index';
 
 import * as Icons from '../../Icons';
 
@@ -15,18 +15,6 @@ export type LoginFormPayload = {
 type LoginFormProps = {
   onSubmit: (data: LoginFormPayload) => void;
 };
-
-export const validationSchema = Yup.object().shape({
-  userEmail: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  password: Yup.string()
-    .required('Password is required')
-    .matches(
-      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
-      'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number',
-    ),
-});
 
 function LoginForm(props: LoginFormProps) {
   const { onSubmit } = props;
@@ -91,8 +79,9 @@ function LoginForm(props: LoginFormProps) {
               </p>
             </div>
             <div
-              className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
-                }`}
+              className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${
+                errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
+              }`}
             >
               <input
                 className="w-full h-6  bg-transparent outline-none relative text-white"
@@ -117,8 +106,9 @@ function LoginForm(props: LoginFormProps) {
 
             <div className="flex-col justify-start items-start flex w-full h-fit ">
               <div
-                className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] ${errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
-                  } `}
+                className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] ${
+                  errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
+                } `}
               >
                 <input
                   type={showPassword ? 'text' : 'password'}

@@ -8,9 +8,13 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { ensureClient, getMezonCtx } from '../helpers';
-import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
+import {
+  ApiChannelDescription,
+  ApiCreateChannelDescRequest,
+} from '@mezon/mezon-js/dist/api.gen';
 import { messagesActions } from '../messages/messages.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
+
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -35,12 +39,14 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
-
 type fetchChannelsPayload = {
   clanId: string;
 };
 
-function waitUntil<T>(condition: () => T | undefined, ms: number = 1000): Promise<T> {
+function waitUntil<T>(
+  condition: () => T | undefined,
+  ms: number = 1000,
+): Promise<T> {
   return new Promise((resolve) => {
     const interval = setInterval(() => {
       const result = condition();
@@ -54,12 +60,12 @@ function waitUntil<T>(condition: () => T | undefined, ms: number = 1000): Promis
 
 export const joinChanel = createAsyncThunk(
   'channels/joinChanel',
-  async (channelId : string, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
-    thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId))
+  async (channelId: string, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 
-    thunkAPI.dispatch(messagesActions.fetchMessages({channelId}));
-    thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({channelId}));
+    thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+    thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
 
     const chanel = await waitUntil(() =>
       selectChannelById(channelId)(
@@ -69,10 +75,10 @@ export const joinChanel = createAsyncThunk(
     if (!chanel || !chanel.channel_lable) {
       return thunkAPI.rejectWithValue([]);
     }
-    await mezon.joinChatChannel(channelId, chanel?.channel_lable || '')
-    
+    await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
+
     return chanel;
-  }
+  },
 );
 
 export const createNewChannel = createAsyncThunk(
@@ -87,23 +93,26 @@ export const createNewChannel = createAsyncThunk(
       if (!response) {
         return thunkAPI.rejectWithValue([]);
       }
-
     } catch (error) {
       return thunkAPI.rejectWithValue([]);
     }
   },
-)
-
+);
 
 export const fetchChannels = createAsyncThunk(
   'channels/fetchStatus',
-  async ({clanId} : fetchChannelsPayload, thunkAPI) => {
-    const mezon  = ensureClient(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listChannelDescs(mezon.session, 100,1,'', clanId)
+  async ({ clanId }: fetchChannelsPayload, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listChannelDescs(
+      mezon.session,
+      100,
+      1,
+      '',
+      clanId,
+    );
 
-    
-    if(!response.channeldesc) {
-      return thunkAPI.rejectWithValue([])
+    if (!response.channeldesc) {
+      return thunkAPI.rejectWithValue([]);
     }
 
     const channels = response.channeldesc.map(mapChannelToEntity);
@@ -113,7 +122,7 @@ export const fetchChannels = createAsyncThunk(
     }
 
     return channels;
-  }
+  },
 );
 
 export const initialChannelsState: ChannelsState =
@@ -156,6 +165,18 @@ export const channelsSlice = createSlice({
         state.loadingStatus = 'error';
         state.error = action.error.message;
       });
+    builder
+      .addCase(createNewChannel.pending, (state: ChannelsState) => {
+        state.loadingStatus = 'loading';
+      })
+      .addCase(createNewChannel.fulfilled, (state: ChannelsState) => {
+        state.loadingStatus = 'loaded';
+        state.isOpenCreateNewChannel = false;
+      })
+      .addCase(createNewChannel.rejected, (state: ChannelsState, action) => {
+        state.loadingStatus = 'error';
+        state.error = action.error.message;
+      });
   },
 });
 
@@ -188,6 +209,7 @@ export const channelsActions = {
   ...channelsSlice.actions,
   fetchChannels,
   joinChanel,
+  createNewChannel,
 };
 
 /*

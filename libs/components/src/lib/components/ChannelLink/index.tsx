@@ -33,8 +33,7 @@ function ChannelLink({ serverId, channel, active }: ChannelLinkProps) {
 
   const handleOpenInvite = () => {
     //call api
-    console.log("clan_id: ", currentClan?.id, "channel_id: " ,channel?.channel_id, "category_id: ",channel?.category_id)
-    console.log('dddd: ', window.location.origin)
+
     setOpenInvite(true)
     createLinkInviteUser(currentClan?.id ?? '', channel?.channel_id ?? '', 10).then(res => {
       if(res && res.invite_link){
