@@ -45,7 +45,7 @@ type fetchChannelsPayload = {
 
 function waitUntil<T>(
   condition: () => T | undefined,
-  ms: number = 1000,
+  ms: number = 100,
 ): Promise<T> {
   return new Promise((resolve) => {
     const interval = setInterval(() => {
@@ -77,10 +77,8 @@ export const joinChanel = createAsyncThunk(
         return thunkAPI.rejectWithValue([]);
       }
 
-      const mezon = await ensureChannel(getMezonCtx(thunkAPI), channelId);
-      if (mezon.socketRef.current) {
-        mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
-      }
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
       return chanel;
     } catch (error) {
       console.log(error);
