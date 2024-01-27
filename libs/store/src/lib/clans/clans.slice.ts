@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit';
 import { IClan, LoadingStatus } from '@mezon/utils';
 import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
-import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 export const CLANS_FEATURE_KEY = 'clans';
@@ -36,19 +36,14 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 
 export type ChangeCurrentClanArgs = {
   clanId: string;
-  wipeChannels?: boolean;
 }
-
 
 export const changeCurrentClan = createAsyncThunk(
   'clans/changeCurrentClan',
-  async ({ clanId, wipeChannels }: ChangeCurrentClanArgs, thunkAPI) => {
-    if(wipeChannels) {
-      thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
-    }
+  async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
     thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
-    thunkAPI.dispatch(channelsActions.fetchChannels({clanId}));
+    thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
   }
 );
 
@@ -64,12 +59,6 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>(
     }
     
     const clans = response.clandesc.map(mapClanToEntity);
-
-    const currentClanId = clans[0]?.id;
-
-    if (currentClanId) {
-      thunkAPI.dispatch(changeCurrentClan({ clanId: currentClanId, wipeChannels: true }));
-    }
     return clans;
   }
 );
@@ -270,3 +259,8 @@ export const selectCurrentClan = createSelector(
   selectCurrentClanId,
   (clansEntities, clanId) => clanId ? clansEntities[clanId] : null
 );
+
+export const selectDefaultClanId = createSelector(
+  selectAllClans,
+  (clans) => clans.length > 0 ? clans[0].id : null
+)
