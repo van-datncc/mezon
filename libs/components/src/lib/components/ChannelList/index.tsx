@@ -20,11 +20,21 @@ function ChannelList() {
     }, {} as CategoriesState),
   );
 
-  const handleToggleCategory = (category: ICategoryChannel) => {
-    setCategoriesState((prevState) => ({
-      ...prevState,
-      [category.id]: !prevState[category.id],
-    }));
+  const handleToggleCategory = (
+    category: ICategoryChannel,
+    setToTrue?: boolean,
+  ) => {
+    if (setToTrue) {
+      setCategoriesState((prevState) => ({
+        ...prevState,
+        [category.id]: prevState[category.id],
+      }));
+    } else {
+      setCategoriesState((prevState) => ({
+        ...prevState,
+        [category.id]: !prevState[category.id],
+      }));
+    }
   };
 
   const { currentClan, createLinkInviteUser } = useChat();
@@ -80,10 +90,6 @@ function ChannelList() {
                 <button
                   onClick={() => {
                     handleToggleCategory(category);
-                    console.log(
-                      '!categoriesState[category.id] ',
-                      categoriesState[category.id],
-                    );
                   }}
                   className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
                 >
@@ -97,7 +103,7 @@ function ChannelList() {
                 </button>
                 <button
                   onClick={() => {
-                    handleToggleCategory(category);
+                    handleToggleCategory(category, true);
                     openModalCreateNewChannel(category);
                   }}
                 >

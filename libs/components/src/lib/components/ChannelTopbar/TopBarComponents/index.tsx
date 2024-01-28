@@ -20,7 +20,7 @@ export const ChannelLable: React.FC<ChannelProps> = ({
     <>
       <div className="flex flex-row items-center">
         <div className="w-6 h-6 relative flex text-zinc-400 text-lg font-['Manrope']">
-          {type === ChannelTypeEnum.VOICE ? (
+          {type === ChannelTypeEnum.CHANNEL_VOICE ? (
             <Icons.Speaker defaultSize='w-6 h-6'/>
           ) : (
             <div>

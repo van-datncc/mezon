@@ -15,7 +15,7 @@ import { ChannelTypeComponent } from './ChannelType';
 import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { Type, LoadingStatus } from 'libs/utils/src/lib/typings/index';
+import { ChannelTypeEnum, LoadingStatus } from 'libs/utils/src/lib/typings/index';
 
 export const CreateNewChannelModal = () => {
   const dispatch = useAppDispatch();
@@ -27,12 +27,10 @@ export const CreateNewChannelModal = () => {
   const isOpenModal = useSelector(
     (state: RootState) => state.channels.isOpenCreateNewChannel,
   );
-  console.log("isOpenModal", isOpenModal)
   const isLoading = useSelector(
     (state: RootState) => state.channels.loadingStatus,
   );
 
-  const [reloadClan, setReloadClan] = useState<boolean>(false);
 
   useEffect(() => {
     if (isLoading === 'loaded') {
@@ -55,13 +53,12 @@ export const CreateNewChannelModal = () => {
 
     const body: ApiCreateChannelDescRequest = {
       clan_id: currentClanId?.toString(),
-      type: Type.CHANNEL,
+      type: channelType,
       channel_lable: channelName,
       channel_private: isPrivate,
       category_id: currentCategory?.category_id,
     };
     await dispatch(createNewChannel(body));
-    setReloadClan(!reloadClan);
     clearDataAfterCreateNew();
   };
 
@@ -128,21 +125,23 @@ export const CreateNewChannelModal = () => {
                     <ChannelLableModal labelProp="Choose channel's type:" />
                     <div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex">
                       <ChannelTypeComponent
-                        type={0}
+                        type={ChannelTypeEnum.CHANNEL_TEXT}
                         onChange={onChangeChannelType}
                         error={isErrorType}
                       />
                       <ChannelTypeComponent
-                        type={1}
+                        type={ChannelTypeEnum.CHANNEL_VOICE}
                         onChange={onChangeChannelType}
                         error={isErrorType}
                       />
                       <ChannelTypeComponent
+                        disable={true}
                         type={2}
                         onChange={onChangeChannelType}
                         error={isErrorType}
                       />
                       <ChannelTypeComponent
+                        disable={true}
                         type={3}
                         onChange={onChangeChannelType}
                         error={isErrorType}

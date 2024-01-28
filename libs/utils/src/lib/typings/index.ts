@@ -5,8 +5,11 @@ import {
   ApiClanDesc,
   ApiUser,
   ApiAccount,
+  
 } from '@mezon/mezon-js/dist/api.gen';
 import { ChannelMessage } from '@mezon/mezon-js';
+
+ 
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
@@ -143,8 +146,8 @@ export enum ChannelStatusEnum {
 }
 
 export enum ChannelTypeEnum {
-  TEXT = 0,
-  VOICE = 1,
+  CHANNEL_TEXT = 1,
+  CHANNEL_VOICE = 4,
   FORUM = 2,
   ANNOUNCEMENT = 3,
 }
@@ -164,9 +167,5 @@ export interface CategoryProps {
 
 export interface ThreadProps {
   name: string;
-}
-
-export enum Type {
-  CHANNEL = 1,
 }
 

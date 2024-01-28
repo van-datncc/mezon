@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { IChannel } from '@mezon/utils';
-import { AddPerson, Speaker } from '../Icons';
+import { ChannelTypeEnum, IChannel } from '@mezon/utils';
+import { AddPerson, Hashtag, Speaker } from '../Icons';
 
 export type ChannelLinkProps = {
   serverId?: string;
@@ -32,7 +32,6 @@ function ChannelLink({
   const handleCreateLinkInvite = () => {
     createInviteLink(serverId || '', channel.channel_id || '');
   };
-  console.log("state", state)
   return (
     <div className="relative group ">
       <Link to={`/chat/servers/${serverId}/channels/${channel.id}`}>
@@ -42,7 +41,11 @@ function ChannelLink({
           {state === 'inactiveUnread' && (
             <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>
           )}
-          <Speaker />
+          {channel.type === ChannelTypeEnum.CHANNEL_TEXT ? (
+            <Hashtag />
+          ) : (
+            <Speaker />
+          )}
           <p className="ml-2 text-[#AEAEAE] w-full hover:text-white text-sm focus:bg-[#36373D]">
             {channel?.channel_lable}
           </p>
