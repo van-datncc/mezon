@@ -92,6 +92,17 @@ export function useChat() {
     },
     [changeCurrentClan, dispatch],
   );
+  
+  const updateUser = React.useCallback(
+    async (name: string, logoUrl: string, displayName:string) => {
+      const action = await dispatch(
+        clansActions.updateUser({ user_name: name, avatar_url: logoUrl, display_name: displayName}),
+      );
+      const payload = action.payload as ClansEntity;
+      return payload;
+    },
+    [dispatch],
+  );
 
   const createLinkInviteUser = React.useCallback(
     async (clan_id: string, channel_id: string, expiry_time: number) => {
@@ -183,6 +194,7 @@ export function useChat() {
       changeCurrentClan,
       changeCurrentChannel,
       createClans,
+      updateUser,
       createLinkInviteUser,
       inviteUser,
       currentClanId
@@ -202,6 +214,7 @@ export function useChat() {
       changeCurrentClan,
       changeCurrentChannel,
       createClans,
+      updateUser,
       createLinkInviteUser,
       inviteUser,
       currentClanId
