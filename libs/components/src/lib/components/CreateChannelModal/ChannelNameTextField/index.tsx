@@ -32,7 +32,7 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({
 
   return (
     <>
-      <div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-4 flex mt-6">
+      <div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">
         <ChannelLableModal labelProp={channelNameProps} />
         <div className="ContentContainer self-stretch h-11 flex-col items-start flex">
           <div

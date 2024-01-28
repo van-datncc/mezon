@@ -16,9 +16,18 @@ export const MESSAGES_FEATURE_KEY = 'messages';
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity  = (channelMess: ChannelMessage, lastSeenMsg: undefined | string = undefined) => {
-  return {...channelMess, id: channelMess.message_id || '', body: {text: 'Hello world'}, user: null, lastSeen: lastSeenMsg === channelMess.message_id}
-}
+export const mapMessageChannelToEntity = (
+  channelMess: ChannelMessage,
+  lastSeenMsg: undefined | string = undefined,
+) => {
+  return {
+    ...channelMess,
+    id: channelMess.message_id || '',
+    body: { text: 'Hello world' },
+    user: null,
+    lastSeen: lastSeenMsg === channelMess.message_id,
+  };
+};
 
 export interface MessagesEntity extends IMessageWithUser {
   id: string; // Primary ID
@@ -67,10 +76,11 @@ export const fetchMessages = createAsyncThunk(
     if (!response.messages) {
       return thunkAPI.rejectWithValue([]);
     }
-    return response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
-  }
+    return response.messages.map((item) =>
+      mapMessageChannelToEntity(item, response.last_seen_message_id),
+    );
+  },
 );
-
 
 // export const updateLastSeenMessage = createAsyncThunk(
 //   'messages/fetchStatus',
@@ -103,7 +113,7 @@ export const messagesSlice = createSlice({
     add: messagesAdapter.addOne,
     remove: messagesAdapter.removeOne,
     checkMessageSendingAction: (state) => {
-      state.isSending = true;
+      state.isSending = !state.isSending;
     },
   },
   extraReducers: (builder) => {
@@ -121,7 +131,7 @@ export const messagesSlice = createSlice({
       .addCase(fetchMessages.rejected, (state: MessagesState, action) => {
         state.loadingStatus = 'error';
         state.error = action.error.message;
-      })
+      });
   },
 });
 
@@ -150,7 +160,11 @@ export const messagesReducer = messagesSlice.reducer;
  */
 export const { checkMessageSendingAction } = messagesSlice.actions;
 
-export const messagesActions = { ...messagesSlice.actions, fetchMessages, checkMessageSendingAction };
+export const messagesActions = {
+  ...messagesSlice.actions,
+  fetchMessages,
+  checkMessageSendingAction,
+};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -186,6 +200,3 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
       (message) => message && message.channel_id === channelId,
     );
   });
-
-
-

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSelector, useStore } from 'react-redux';
 import {
   RootState,
   channelsActions,
@@ -15,24 +15,31 @@ import { ChannelTypeComponent } from './ChannelType';
 import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { Type } from 'libs/utils/src/lib/typings/index';
+import { Type, LoadingStatus } from 'libs/utils/src/lib/typings/index';
 
 export const CreateNewChannelModal = () => {
+  const dispatch = useAppDispatch();
+
   const { currentClanId } = useChat();
-  const currentCategoryId = useSelector(
-    (state: RootState) => state.channels.currentCategoryId,
+  const currentCategory = useSelector(
+    (state: RootState) => state.channels.currentCategory,
   );
   const isOpenModal = useSelector(
     (state: RootState) => state.channels.isOpenCreateNewChannel,
   );
-
+  console.log("isOpenModal", isOpenModal)
   const isLoading = useSelector(
     (state: RootState) => state.channels.loadingStatus,
   );
 
-  console.log('isOpenCreateNewChannel', isOpenModal);
+  const [reloadClan, setReloadClan] = useState<boolean>(false);
 
-  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (isLoading === 'loaded') {
+      dispatch(channelsActions.openCreateNewModalChannel(false));
+    }
+  }, [isLoading]);
+
   const [isErrorType, setIsErrorType] = useState<string>('');
   const [isErrorName, setIsErrorName] = useState<string>('');
 
@@ -51,18 +58,18 @@ export const CreateNewChannelModal = () => {
       type: Type.CHANNEL,
       channel_lable: channelName,
       channel_private: isPrivate,
-      category_id: currentCategoryId,
+      category_id: currentCategory?.category_id,
     };
     await dispatch(createNewChannel(body));
+    setReloadClan(!reloadClan);
     clearDataAfterCreateNew();
-    dispatch(channelsActions.openCreateNewModalChannel());
   };
 
   const handleCloseModal = () => {
     setIsErrorType('');
     setIsErrorName('');
     clearDataAfterCreateNew();
-    dispatch(channelsActions.openCreateNewModalChannel());
+    dispatch(channelsActions.openCreateNewModalChannel(false));
   };
 
   const [channelName, setChannelName] = useState('');
@@ -90,16 +97,19 @@ export const CreateNewChannelModal = () => {
     <>
       {isOpenModal && (
         <>
-          <div className="w-screen h-screen overflow-hidden absolute top-0 left-0 z-50 opacity-95 bg-black flex flex-row justify-center items-start pt-9">
+          <div className="w-[100vw] h-[100vh] overflow-hidden absolute top-0 left-0 z-50 bg-black flex flex-row justify-center items-center">
             {}
-            <div className="z-60 w-[684px] h-[780px] bg-[#151515] rounded-2xl flex-col justify-start items-start gap-3 inline-flex">
-              <div className=" self-stretch h-96 flex-col justify-start items-start flex ">
-                <div className="self-stretch h-96 px-5 pt-8 pb-5 flex-col justify-start items-start gap-6 flex">
+            <div className="z-60 w-full md:w-[684px] h-full md:h-[630px] bg-[#151515] rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
+              <div className="self-stretch md:h-96 flex-col justify-start items-start flex">
+                <div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
                   <div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
-                    <div className="flex items-center justify-between w-full relative">
-                      <div className="text-white text-xl flex-nowrap font-bold font-['Manrope']">
-                        Create Channel
-                      </div>
+                    <div className="flex items-center w-full relative">
+                      <ChannelLableModal labelProp="CREATE A NEW CHANNEL IN" />
+                      <span>
+                        <p className=" ml-1 self-stretch  text-sm font-bold font-['Manrope'] leading-normal uppercase text-cyan-500">
+                          {currentCategory?.category_name}
+                        </p>
+                      </span>
                       <div className="absolute right-1 top-[-10px]">
                         <button
                           onClick={handleCloseModal}
@@ -114,9 +124,9 @@ export const CreateNewChannelModal = () => {
                       Kindly set up a channel of your choice.
                     </div>
                   </div>
-                  <div className="Frame407 self-stretch h-80 flex-col justify-start items-start gap-4 flex">
-                    <ChannelLableModal labelProp="CHANNEL TYPE" />
-                    <div className="Frame405 self-stretch h-72 flex-col justify-start items-start gap-2 flex">
+                  <div className="Frame407 self-stretch flex-col items-center gap-2 flex">
+                    <ChannelLableModal labelProp="Choose channel's type:" />
+                    <div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex">
                       <ChannelTypeComponent
                         type={0}
                         onChange={onChangeChannelType}
@@ -142,12 +152,12 @@ export const CreateNewChannelModal = () => {
                   <ChannelNameTextField
                     onChange={handleChannelNameChange}
                     type={channelType}
-                    channelNameProps="WHAT IS CHANNEL'S NAME?"
+                    channelNameProps="What is channel's name?"
                     error={isErrorName}
                   />
                   <ChannelStatusModal
                     onChangeValue={onChangeToggle}
-                    channelNameProps="IS PRIVATE CHANNEL?"
+                    channelNameProps="Is private channel?"
                   />
                   <CreateChannelButton
                     onClickCancel={handleCloseModal}

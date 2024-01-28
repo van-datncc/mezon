@@ -761,7 +761,7 @@ export function ArrowToThread(props: React.HTMLAttributes<SVGElement>) {
 export function ThreadNotClick(props: React.HTMLAttributes<SVGElement>) {
   return (
     <svg
-      className="w-5 h-5 mt-0.5"
+      className="w-6 h-6 mt-0.5"
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -1326,3 +1326,4 @@ export const Private: React.FC<IconProps> = ({
     </svg>
   );
 };
+

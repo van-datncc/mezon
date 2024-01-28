@@ -19,13 +19,13 @@ export const ChannelLable: React.FC<ChannelProps> = ({
   return (
     <>
       <div className="flex flex-row items-center">
-        <div className="w-5 h-5 relative flex text-zinc-400 text-lg font-['Manrope']">
+        <div className="w-6 h-6 relative flex text-zinc-400 text-lg font-['Manrope']">
           {type === ChannelTypeEnum.VOICE ? (
-            <Icons.Speaker />
+            <Icons.Speaker defaultSize='w-6 h-6'/>
           ) : (
             <div>
               {' '}
-              <Icons.Hashtag />
+              <Icons.Hashtag defaultSize='w-6 h-6'/>
             </div>
           )}
         </div>

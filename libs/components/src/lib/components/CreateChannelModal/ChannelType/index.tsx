@@ -43,13 +43,13 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({
 
   return (
     <div
-      className={`Frame403 self-stretch px-2 py-3 bg-[#1E1E1E] rounded-lg justify-center items-center gap-4 inline-flex hover:bg-[#2E2E2E]  ${error ? 'border border-red-500' : ' border border-[#1E1E1E]'}`}
+      className={`Frame403 self-stretch px-2 py-2 bg-[#1E1E1E] rounded-lg justify-center items-center gap-4 inline-flex hover:bg-[#2E2E2E]  ${error ? 'border border-red-500' : ' border border-[#1E1E1E]'}`}
     >
       <div className="ChannelChat w-6 h-6 relative">
         {iconMap[type as ChannelTypeEnum]}
       </div>
       <div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
-        <div className="Text self-stretch text-stone-300 text-base font-bold font-['Manrope'] leading-normal">
+        <div className="Text self-stretch text-stone-300 text-sm font-bold font-['Manrope'] leading-normal">
           <p>{labelMap[type as ChannelTypeEnum]}</p>
         </div>
         <div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal font-['Manrope'] leading-[18.20px]">
