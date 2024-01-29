@@ -12,11 +12,11 @@ function MemberList() {
         {members.map((role: any) => (
           <div key={role.id}>
             {role.title && (
-              <text
+              <p
                 className="font-['Manrope'] mb-3 text-[#AEAEAE] text-[14px] font-bold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase"
               >
                 {role.title}
-              </text>
+              </p>
             )}
             {(
               <div className="flex flex-col gap-4 font-['Manrope'] text-[#AEAEAE]">

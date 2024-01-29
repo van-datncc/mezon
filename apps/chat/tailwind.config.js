@@ -7,7 +7,7 @@ module.exports = {
   content: [
     join(
       __dirname,
-      '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
+      '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}',
     ),
     'node_modules/flowbite-react/lib/esm/**/*.js',
     ...createGlobPatternsForDependencies(__dirname),
@@ -18,9 +18,18 @@ module.exports = {
       spacing: {
         px: '1px',
         0: '0',
-        96:"96px",
-        210:"210px"
+        96: '96px',
+        210: '210px',
       },
+      width: {
+        widthWithoutServerWidth: 'calc(100vw - 72px)',
+      },
+      height: {
+        heightMessageViewChat: 'calc(100vh - 137px)',
+        heightWithoutTopBar: 'calc(100vh - 72px)',
+        heightTopBar: '72px',
+      },
+
       fontFamily: {
         manrope: ['Manrope', 'sans-serif'],
       },
@@ -56,9 +65,5 @@ module.exports = {
       rotation: 'rotation 6s linear infinite',
     },
   },
-  plugins: [
-    require('flowbite/plugin')
-]
+  plugins: [require('flowbite/plugin')],
 };
-
-

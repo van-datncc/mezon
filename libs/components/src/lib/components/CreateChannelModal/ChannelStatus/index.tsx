@@ -16,7 +16,7 @@ export const ChannelStatusModal: React.FC<ChannelStatusModalProps> = ({
   };
 
   return (
-    <div className="Frame348 self-stretch h-[62px] flex-col justify-start items-start gap-3 flex">
+    <div className="Frame348 self-stretch h-[62px] flex-col justify-start items-start gap-2 mt-2 flex">
       <div className="Frame347 self-stretch justify-start items-center gap-3 inline-flex">
         <div className="Frame409 grow shrink basis-0 h-6 justify-start items-center gap-1 flex">
           <div className="Lock w-6 h-6 relative">
@@ -40,7 +40,7 @@ export const ChannelStatusModal: React.FC<ChannelStatusModalProps> = ({
           />
         </div>
       </div>
-      <div className="OnlySelectedMembersAndRolesWillBeAbleToViewThisChannel self-stretch text-zinc-400 text-sm font-normal font-['Manrope'] leading-[18.20px]">
+      <div className="OnlySelectedMembersAndRolesWillBeAbleToViewThisChannel self-stretch text-zinc-400 text-xs font-normal font-['Manrope'] leading-[18.20px]">
         Only selected members and roles will be able to view this channel.
       </div>
     </div>

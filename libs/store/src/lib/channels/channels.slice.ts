@@ -1,4 +1,4 @@
-import { IChannel, LoadingStatus } from '@mezon/utils';
+import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -39,7 +39,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
   error?: string | null;
   currentChannelId?: string | null;
   isOpenCreateNewChannel?: boolean;
-  currentCategoryId: string | undefined;
+  currentCategory: ICategory | null;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -101,7 +101,9 @@ export const createNewChannel = createAsyncThunk(
         mezon.session,
         body,
       );
-      if (!response) {
+      if (response) {
+        thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
+      } else {
         return thunkAPI.rejectWithValue([]);
       }
     } catch (error) {
@@ -148,7 +150,7 @@ export const initialChannelsState: ChannelsState =
     socketStatus: 'not loaded',
     error: null,
     isOpenCreateNewChannel: false,
-    currentCategoryId: undefined,
+    currentCategory: null,
   });
 
 export const channelsSlice = createSlice({
@@ -160,11 +162,11 @@ export const channelsSlice = createSlice({
     setCurrentChannelId: (state, action: PayloadAction<string>) => {
       state.currentChannelId = action.payload;
     },
-    openCreateNewModalChannel: (state) => {
-      state.isOpenCreateNewChannel = !state.isOpenCreateNewChannel;
+    openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
+      state.isOpenCreateNewChannel = action.payload;
     },
-    getCurrentCategoryId: (state, action: PayloadAction<string>) => {
-      state.currentCategoryId = action.payload;
+    getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
+      state.currentCategory = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -239,7 +241,7 @@ export const channelsActions = {
   ...channelsSlice.actions,
   fetchChannels,
   joinChanel,
-  createNewChannel
+  createNewChannel,
 };
 
 /*

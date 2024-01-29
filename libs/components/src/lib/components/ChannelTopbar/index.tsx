@@ -7,18 +7,18 @@ export type ChannelTopbarProps = {
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
   return (
-    <div className="flex h-[72px] min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink ">
+    <div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink ">
       <div className="justify-start items-center gap-1 flex">
         <ChannelLable
           type={1}
           // channelStatus=""
-          name={channel?.channel_lable}
+          name={channel?.category_name}
         />
         <ThreadLable name={channel?.channel_lable} />
       </div>
 
       {/* Desktop buttons */}
-      <div className="hidden items-center h-[72px] ml-auto lg:flex">
+      <div className="hidden items-center h-full ml-auto lg:flex">
         <div className="justify-end items-center gap-2 flex">
           <div className="justify-start items-center gap-[15px] flex">
             <button>
