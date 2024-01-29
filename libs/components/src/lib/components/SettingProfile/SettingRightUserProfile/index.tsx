@@ -1,18 +1,10 @@
 // import ColorPicker from '../ColorPicker'
-import { useChat } from '@mezon/core';
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 const SettingRightUser = ({ onClanProfileClick, name, avatar }: { onClanProfileClick?: () => void,name: string; avatar: string; }) => {
-    const [minutes, setMinutes] = useState(0);
-    const [seconds, setSeconds] = useState(0);
-    const { currentChanel, currentClan, userProfile } = useChat();
-    console.log('Name:', userProfile?.user?.username || '');
-//   useEffect(() => {
-//     const timerInterval = setInterval(() => {
-//       setSeconds((prevSeconds) => (prevSeconds + 1) % 60);
-//       setMinutes((prevMinutes) => (prevMinutes + 1) % 60 === 0 ? prevMinutes + 1 : prevMinutes);
-//     }, 1000);
-//     return () => clearInterval(timerInterval);
-// }, []);
+    const [minutes] = useState(0);
+    const [seconds] = useState(0);
+
+    
 const handleClanProfileButtonClick = () => {
     if (onClanProfileClick) {
       onClanProfileClick();

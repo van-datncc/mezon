@@ -8,7 +8,6 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import {
-  ensureClient,
   ensureSession,
   getMezonCtx,
 } from '../helpers';
@@ -83,9 +82,8 @@ export const joinChanel = createAsyncThunk(
       if (!chanel || !chanel.channel_lable) {
         return thunkAPI.rejectWithValue([]);
       }
-
       const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
+      await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
       return chanel;
     } catch (error) {
       console.log(error);
@@ -120,10 +118,9 @@ type fetchChannelsArgs = {
 };
 
 export const fetchChannels = createAsyncThunk(
-  'channels/fetchStatus',
+  'channels/fetchChannels',
   async ({ clanId }: fetchChannelsArgs, thunkAPI) => {
-    thunkAPI.dispatch(channelsActions.setCurrentChannelId(''))
-    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelDescs(
       mezon.session,
       100,

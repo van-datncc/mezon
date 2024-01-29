@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { IChannel } from '@mezon/utils';
 import { AddPerson, Speaker } from '../Icons';
+import { useAppNavigation } from '@mezon/core';
 
 export type ChannelLinkProps = {
   serverId?: string;
@@ -24,13 +25,17 @@ function ChannelLink({ serverId, channel, active, createInviteLink }: ChannelLin
       'text-gray-300 hover:text-gray-100 hover:bg-gray-550/[0.16] active:bg-gray-550/[0.24]',
   };
 
+  const { toChannelPage } = useAppNavigation()
+
   const handleCreateLinkInvite = () => {
     createInviteLink(serverId || '', channel.channel_id || '')
   }
 
+  const channelPath = toChannelPage(channel.id, channel?.clan_id || '')
+
   return (
     <div className='relative group'>
-      <Link to={`/chat/servers/${serverId}/channels/${channel.id}`}>
+      <Link to={channelPath}>
         <span
           className={`${classes[state]} hover:bg-[#36373D] flex flex-row items-center px-2 mx-2 rounded relative`}
         >

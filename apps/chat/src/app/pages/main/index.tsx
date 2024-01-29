@@ -1,30 +1,26 @@
 import { Image } from '@mezon/ui';
-import { useChat } from '@mezon/core';
+import { useChat, useAppNavigation } from '@mezon/core';
 import { MainContent } from './MainContent';
 import IconLogoMezon from '../../../assets/Images/IconLogoMezon.svg';
 import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { ModalCreateClan, ModalListClans } from '@mezon/components';
-import { channelsActions, useAppDispatch } from '@mezon/store';
 
 function MyApp() {
   const { clans, currentClan } = useChat();
   const [openListClans, setOpenListClans] = useState(false);
   const [openCreateClan, setOpenCreateClans] = useState(false)
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch()
+  const { navigate, toClanPage } = useAppNavigation();
 
   const handleChangeClan = (clanId: string) => {
-    console.log('CLAN ID: ', clanId)
-    // changeCurrentClan(clanId)
-    dispatch(channelsActions.setCurrentChannelId(''));
-    navigate(`/chat/servers/${clanId}`);
+    navigate(toClanPage(clanId));
   }
 
   const handleOpenCreate = () => {
     setOpenCreateClans(true)
   }
+
   return (
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
@@ -32,7 +28,7 @@ function MyApp() {
           <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
         </NavLink>
         <div className="py-2 border-t-2 border-t-borderDefault"></div>
-        {currentClan?.id && (<NavLink to={`/chat/servers/${currentClan.id}`}>
+        {currentClan?.id && (<NavLink to={toClanPage(currentClan.id)}>
           {currentClan?.logo ? (
             <Image
               src={currentClan?.logo || ''}

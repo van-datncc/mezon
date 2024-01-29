@@ -120,6 +120,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
 
     const joinChatChannel = React.useCallback(async (channelId: string, channelName: string) => {
         const socket = socketRef.current;
+        
         if (!socket) {
           throw new Error('Socket is not initialized');
         }

@@ -21,18 +21,22 @@ import { useDispatch } from 'react-redux';
 import React from 'react';
 import { trackActionError } from '@mezon/utils';
 
-const persistConfig = {
+
+const persistedReducer = persistReducer({
   key: 'auth',
   storage,
-};
+}, authReducer);
 
-const persistedReducer = persistReducer(persistConfig, authReducer);
+const persistedClansReducer = persistReducer({
+  key: 'clans',
+  storage,
+}, clansReducer);
 
 const reducer = {
   app: appReducer,
   account: accountReducer,
   auth: persistedReducer,
-  clans: clansReducer,
+  clans: persistedClansReducer,
   channels: channelsReducer,
   channelMembers: channelMembersReducer,
   threads: threadsReducer,

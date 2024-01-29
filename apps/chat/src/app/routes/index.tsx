@@ -27,6 +27,8 @@ import {
 } from '../loaders/channelLoader';
 import ClansRoutes from './ClanRoutes';
 import ChannelsRoutes from './ChannelsRoutes';
+import { ClanIndex } from '../pages/clan/ClanIndex';
+import { ChannelIndex } from '../pages/channel/ChannelIndex';
 
 // Components
 export const routes = createBrowserRouter([
@@ -77,9 +79,17 @@ export const routes = createBrowserRouter([
                         element: <ServerLayout />,
                         children: [
                           {
+                            path: '',
+                            element: <ClanIndex />,
+                          },
+                          {
                             path: 'channels',
                             element: <ChannelsRoutes />,
                             children: [
+                              {
+                                path: '',
+                                element: <ChannelIndex />,
+                              },
                               {
                                 path: ':channelId',
                                 loader: channelLoader,
@@ -90,21 +100,26 @@ export const routes = createBrowserRouter([
                           },
                         ],
                       },
-                      {
-                        path: 'direct',
-                        element: <Direct />,
-                      },
-                      {
-                        path: 'invite/:inviteId',
-                        element: <InvitePage />,
-                      },
                     ],
+                  },
+                  {
+                    path: 'direct',
+                    element: <Direct />,
                   },
                 ],
               },
             ],
           },
         ],
+      },
+      {
+        path: 'invite',
+        loader: authLoader,
+        children: [{
+          path: ':inviteId',
+          // TODO: add loader
+          element: <InvitePage />,
+        }]
       },
       // fallback route, renders when no other route is matched
       {

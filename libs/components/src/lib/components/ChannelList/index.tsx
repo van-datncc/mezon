@@ -42,11 +42,10 @@ function ChannelList() {
 
   const handleOpenInvite = (currentServerId: string, currentChannelId: string) => {
     //call api
-    // console.log("clan_id: ", currentServerId, "channel_id: ", currentChannelId?., "category_id: ", channel?.category_id)
     setOpenInvite(true)
     createLinkInviteUser(currentServerId ?? '', currentChannelId ?? '', 10).then(res => {
       if (res && res.invite_link) {
-        setUrlInvite(window.location.origin + '/chat/invite/' + res.invite_link)
+        setUrlInvite(window.location.origin + '/invite/' + res.invite_link)
       }
     })
   }

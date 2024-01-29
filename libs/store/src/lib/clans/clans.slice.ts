@@ -41,6 +41,7 @@ export type ChangeCurrentClanArgs = {
 export const changeCurrentClan = createAsyncThunk(
   'clans/changeCurrentClan',
   async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
+    thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
     thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
     thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
@@ -115,7 +116,7 @@ type InviteUser = {
 }
 
 export const inviteUser = createAsyncThunk(
-  'clans/joinChannel',
+  'clans/inviteUser',
   async ({inviteId}: InviteUser, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.inviteUser(mezon.session, inviteId)

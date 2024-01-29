@@ -30,8 +30,6 @@ export const CreateNewChannelModal = () => {
     (state: RootState) => state.channels.loadingStatus,
   );
 
-  console.log('isOpenCreateNewChannel', isOpenModal);
-
   const dispatch = useAppDispatch();
   const [isErrorType, setIsErrorType] = useState<string>('');
   const [isErrorName, setIsErrorName] = useState<string>('');
