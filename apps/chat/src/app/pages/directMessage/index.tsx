@@ -3,7 +3,7 @@ import ChannelMessages from '../channel/ChanneMessages'
 import { ChannelMessageBox } from '../channel/ChannelMessageBox'
 import { useChat } from '@mezon/core';
 import { useState } from 'react';
-
+import Setting from "../setting"
 export default function Direct() {
     const { userProfile } = useChat();
     const [openSetting, setOpenSetting] = useState(false)
@@ -33,6 +33,7 @@ export default function Direct() {
                 </>
                 }
             </div>
+            <Setting open={openSetting} onClose={() => {setOpenSetting(false)}}/>
         </>
     )
 }

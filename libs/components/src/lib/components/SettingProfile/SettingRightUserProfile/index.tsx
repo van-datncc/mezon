@@ -1,37 +1,57 @@
-// import ColorPicker from '../ColorPicker'
-import { useChat } from '@mezon/core';
-import React, { useState, useEffect } from 'react';
-const SettingRightUser = ({ onClanProfileClick, name, avatar }: { onClanProfileClick?: () => void,name: string; avatar: string; }) => {
+// import { useChat } from '@mezon/core';
+import { useChat } from "@mezon/core";
+import { InputField, Modal } from "@mezon/ui";
+import * as Icons from '../../Icons';
+import { useEffect, useState } from "react";
+// import * as Icons from '../../Icons';
+
+// import React, { useState, useEffect } from 'react';
+const SettingRightUser = ({ onClanProfileClick, name, avatar, nameDisplay }: { onClanProfileClick?: () => void,name: string; avatar: string; nameDisplay: string;}) => {
     const [minutes, setMinutes] = useState(0);
     const [seconds, setSeconds] = useState(0);
-    const { currentChanel, currentClan, userProfile } = useChat();
-    console.log('Name:', userProfile?.user?.username || '');
-//   useEffect(() => {
-//     const timerInterval = setInterval(() => {
-//       setSeconds((prevSeconds) => (prevSeconds + 1) % 60);
-//       setMinutes((prevMinutes) => (prevMinutes + 1) % 60 === 0 ? prevMinutes + 1 : prevMinutes);
-//     }, 1000);
-//     return () => clearInterval(timerInterval);
-// }, []);
+    const [userName, setUserName] = useState(name);
+    const [displayName, setDisplayName] = useState(nameDisplay);
+    const [urlImage, setUrlImage] = useState(avatar);
+    const {updateUser} = useChat();
+    const [flags, setFlags] = useState(true);
+    // const { currentChanel, currentClan, userProfile } = useChat();
+    const handleUpdateUser = async () => {
+        if (userName||urlImage||displayName) {
+            await updateUser(userName, urlImage,displayName)
+        }
+        console.log("jgdlfg",avatar)
+    }
+    const handleFile = (e: any) => {
+        const fileToStore: File = e.target.files[0];
+        setUrlImage(URL.createObjectURL(fileToStore))
+        setFlags(true)
+    }
+    const handleClose = () => {
+            setFlags(false)
+    }
+    const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDisplayName(e.target.value);
+        setFlags(true); // Thêm dòng này để gọi setFlags(true) khi có sự thay đổi
+      };
+
 const handleClanProfileButtonClick = () => {
     if (onClanProfileClick) {
       onClanProfileClick();
     }
   };
     return (
-        
         <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
             <div className="mt-[16px] pl-[90px] text-white">
                         <h1 className="text-2xl font-medium">Profiles</h1>
                         <button className="pt-1 text-white mt-[20px] font-medium text-xl border-b-2 border-blue-500">User Profile</button>
                         <button className="pt-1 text-white mt-[20px] font-medium text-xl ml-[16px]" onClick={handleClanProfileButtonClick}>Clan Profile</button>
                     </div>
-            <div className="flex-1 flex mt-[20px] pl-[90px] ">
+            <div className="flex-1 flex mt-[20px] pl-[90px] z-0">
                 <div className="w-1/2 text-white">
                     <div className="mt-[20px]">
                         <label className="font-normal">DISPLAY NAME</label>
                         <br />
-                        <input type="text"className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black"placeholder={name}/>
+                        <InputField onChange={handleDisplayName} type="text"className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black"placeholder={displayName} value={displayName} defaultValue={displayName}/>
                     </div>
                     <div className="mt-[20px]">
                         <label className="font-normal">PRONOUNS</label>
@@ -40,8 +60,15 @@ const handleClanProfileButtonClick = () => {
                     </div>
                     <div className="mt-[20px]">
                         <p>AVATAR</p>
-                        <button className="bg-blue-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px]">Change avatar</button>
-                        <button className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px]">Remove avatar</button>
+                        <div className="flex">
+                            <label>
+                                <div className="w-[130px] bg-blue-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px]" onChange={(e) => handleFile(e)}>
+                                    Change avatar
+                                </div>
+                                <input  type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
+                            </label>
+                            <button className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px]">Remove avatar</button>
+                        </div>
                     </div>
                     <div className="mt-[20px]">
                         <p>BANNER COLOR</p>
@@ -64,12 +91,12 @@ const handleClanProfileButtonClick = () => {
                     <div className="bg-black h-[542px] ml-[30px] mt-[10px] rounded-[10px] flex flex-col relative">
                         <div className="h-1/6 bg-green-500 rounded-tr-[10px] rounded-tl-[10px]"></div>
                         <div className="text-black ml-[50px]">
-                            <img src={avatar} alt="" className="w-[100px] h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px]"/>
+                            <img src={urlImage} alt="" className="w-[100px] h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px]"/>
                         </div>
                         <div className="bg-bgSecondary w-[380px] h-2/3 mt-[20px] ml-[15px] rounded-[20px]">
                         <div className="w-[300px] mt-[16px] ml-[16px]">
                         <p className="text-xl font-medium">{name}</p>
-                        <p>{name}</p>
+                        <p>{displayName}</p>
                         </div>
                         <div className="w-[300px] mt-[50px] ml-[16px]">
                             <p>CUSTOMIZING MY PROFILE</p>
@@ -89,12 +116,21 @@ const handleClanProfileButtonClick = () => {
                     </div>
                     </div>
                 </div>
-            </div>
-                {/* <div className="w-1/3 text-black ml-[50px]">
-                    <button className="bg-white w-[30px] h-[30px] rounded-[50px] font-bold">X</button>
-                    <p className="text-white mt-[10px]">ESC</p>
-                </div> */}
+            </div> 
+            {(urlImage!==avatar && flags)||(displayName!==nameDisplay && flags)?(<div className="flex items-center w-1/2 h-[50px] mt-[-90px] bg-gray-500 rounded-[8px] z-10 fixed top-[890px] pl-[20px] pr-[20px]">
+                <p>
+                    Carefull - you have unsaved changes! 
+                </p>
+                <button className="ml-[450px] bg-gray-600 rounded-[8px] p-[8px]" onClick={() => {handleClose()}}>
+                    Reset
+                </button>
+                <button className="ml-auto bg-blue-600 rounded-[8px] p-[8px]" onClick={() => { handleUpdateUser(),handleClose()}}> 
+                    Save Changes
+                </button>
+            </div>):(null)}
+            
         </div>
+
     )
 
 }

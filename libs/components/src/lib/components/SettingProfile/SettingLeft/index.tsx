@@ -62,6 +62,8 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
                 <button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Streamer Mode</button>
                 <br />
                 <button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Advanced</button>
+                <br />
+                <button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Log Out</button>
             </div>
         </div>
     )

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => void }) => {
+import { IClan } from "@mezon/utils";
+const SettingRightClan = ({ onUserProfileClick, clans, name, avatar, nameDisplay}: { onUserProfileClick?: () => void, clans:IClan[], name: string; avatar: string; nameDisplay: string }) => {
     const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
@@ -31,18 +32,15 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
                             name="clan"
                             className="block w-full mt-1 bg-black border border-black text-white rounded p-2"
                         >
-                            <option value="option1">Option 1</option>
-                            <option value="option2">Option 2</option>
-                            <option value="option3">Option 3</option>
+                            {clans.map((clan) => (
+                                <option key={clan.id} value={clan.id}>
+                                    {clan.clan_name}
+                                </option>
+                            ))}
                         </select>
                     </div>
             <div className="flex-1 flex mt-[10px] pl-[90px] ">
                 <div className="w-1/2 text-white">
-                    <div className="mt-[20px]">
-                        <label className="font-normal">CLAN NICKNAME</label>
-                        <br />
-                        <input type="text"className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black"placeholder="Enter display name"/>
-                    </div>
                     <div className="mt-[20px]">
                         <label className="font-normal">CLAN NICKNAME</label>
                         <br />
@@ -60,12 +58,12 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
                     <div className="bg-black h-[542px] ml-[30px] mt-[10px] rounded-[10px] flex flex-col relative">
                         <div className="h-1/6 bg-green-500 rounded-tr-[10px] rounded-tl-[10px]"></div>
                         <div className="text-black ml-[50px]">
-                            <img src="https://i.postimg.cc/3RSsTnbD/3d63f5caeb33449b32d885e5aa94bbbf.jpg" alt="" className="w-[100px] h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px]"/>
+                            <img src={avatar} alt="" className="w-[100px] h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px]"/>
                         </div>
-                        <div className="bg-bgSecondary w-5/6 h-2/3 mt-[20px] ml-[35px]  rounded-[20px]">
+                        <div className="bg-bgSecondary w-[380px] h-2/3 mt-[20px] ml-[15px] rounded-[20px]">
                         <div className="w-[300px] mt-[16px] ml-[16px]">
-                        <p className="text-xl font-medium">anh.nguyendiep</p>
-                        <p>anh.nguyendiep</p>
+                        <p className="text-xl font-medium">{name}</p>
+                        <p>{name}</p>
                         </div>
                         <div className="w-[300px] mt-[50px] ml-[16px]">
                             <p>CUSTOMIZING MY PROFILE</p>
@@ -78,7 +76,7 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
                             </div>
                         </div>
                         <div className="w-[300px] mt-[40px] ml-[16px]">
-                        <button className='w-5/6 h-[50px] ml-[30px] bg-black rounded-[8px]'> 
+                            <button className='w-5/6 h-[50px] ml-[30px] bg-black rounded-[8px]'> 
                                 Example button
                             </button>
                         </div>
@@ -86,6 +84,17 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
                     </div>
                 </div>
             </div>
+            {/* <div className="flex items-center w-1/2 h-[50px] mt-[-90px] bg-gray-500 rounded-[8px] z-10 fixed top-[890px] pl-[20px] pr-[20px]">
+                <p>
+                    Carefull - you have unsaved changes! 
+                </p>
+                <button className="ml-[450px] bg-gray-600 rounded-[8px] p-[8px]">
+                    Reset
+                </button>
+                <button className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"> 
+                    Save Changes
+                </button>
+            </div> */}
                 {/* <div className="w-1/3 text-black ml-[50px]">
                     <button className="bg-white w-[30px] h-[30px] rounded-[50px] font-bold">X</button>
                     <p className="text-white mt-[10px]">ESC</p>
