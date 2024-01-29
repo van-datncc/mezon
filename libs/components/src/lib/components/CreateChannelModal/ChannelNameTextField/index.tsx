@@ -22,8 +22,8 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({
   };
 
   const iconMap = {
-    [ChannelTypeEnum.TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-    [ChannelTypeEnum.VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
+    [ChannelTypeEnum.CHANNEL_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+    [ChannelTypeEnum.CHANNEL_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
     [ChannelTypeEnum.FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
     [ChannelTypeEnum.ANNOUNCEMENT]: (
       <Icons.Announcement defaultSize="w-6 h-6" />
@@ -32,7 +32,7 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({
 
   return (
     <>
-      <div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-4 flex mt-6">
+      <div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">
         <ChannelLableModal labelProp={channelNameProps} />
         <div className="ContentContainer self-stretch h-11 flex-col items-start flex">
           <div

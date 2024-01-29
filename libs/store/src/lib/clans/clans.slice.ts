@@ -7,8 +7,8 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { IClan, LoadingStatus } from '@mezon/utils';
-import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser, ApiUpdateAccountRequest } from '@mezon/mezon-js/dist/api.gen';
+import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 export const CLANS_FEATURE_KEY = 'clans';
@@ -84,6 +84,32 @@ export const createClan = createAsyncThunk(
       return thunkAPI.rejectWithValue([])
     }
     return mapClanToEntity(response);
+  }
+);
+
+type UpdateLinkUser = {
+  user_name: string;
+  avatar_url: string;
+  display_name: string;
+}
+
+export const updateUser = createAsyncThunk(
+  'clans/updateUser',
+  async ({ user_name, avatar_url, display_name}: UpdateLinkUser, thunkAPI) => {
+    const mezon = ensureClient(getMezonCtx(thunkAPI));
+    const body = {
+      avatar_url: avatar_url||'',
+      display_name: display_name||'',
+      lang_tag: 'en',
+      location: '',
+      timezone: '',
+      username: user_name,
+    }
+    const response = await mezon.client.updateAccount(mezon.session, body)
+    if (!response) {
+      return thunkAPI.rejectWithValue([])
+    }
+    return response as true;
   }
 );
 
@@ -213,7 +239,7 @@ export const clansReducer = clansSlice.reducer;
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
 export const clansActions = 
-{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, createLinkInviteUser, inviteUser  }
+{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, updateUser, createLinkInviteUser, inviteUser  }
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { IChannel } from '@mezon/utils';
-import { AddPerson, Speaker } from '../Icons';
+import { ChannelTypeEnum, IChannel } from '@mezon/utils';
+import { AddPerson, Hashtag, Speaker } from '../Icons';
 import { useAppNavigation } from '@mezon/core';
 
 export type ChannelLinkProps = {
@@ -10,7 +10,12 @@ export type ChannelLinkProps = {
   createInviteLink: (serverId: string, channelId: string) => void;
 };
 
-function ChannelLink({ serverId, channel, active, createInviteLink }: ChannelLinkProps) {
+function ChannelLink({
+  serverId,
+  channel,
+  active,
+  createInviteLink,
+}: ChannelLinkProps) {
   const state = active
     ? 'active'
     : channel?.unread
@@ -37,20 +42,25 @@ function ChannelLink({ serverId, channel, active, createInviteLink }: ChannelLin
     <div className='relative group'>
       <Link to={channelPath}>
         <span
-          className={`${classes[state]} hover:bg-[#36373D] flex flex-row items-center px-2 mx-2 rounded relative`}
+          className={`${classes[state]} hover:bg-[#36373D] flex flex-row items-center px-2 mx-2 rounded relative p-1 focus:bg-[#36373D]`}
         >
           {state === 'inactiveUnread' && (
             <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>
           )}
-          <Speaker />
-          <p className="ml-2 text-[#AEAEAE] w-full h-[28px] hover:text-white">
+          {channel.type === ChannelTypeEnum.CHANNEL_TEXT ? (
+            <Hashtag />
+          ) : (
+            <Speaker />
+          )}
+          <p className="ml-2 text-[#AEAEAE] w-full hover:text-white text-sm focus:bg-[#36373D]">
             {channel?.channel_lable}
           </p>
-          <div>
-          </div>
         </span>
       </Link>
-      <AddPerson className="absolute ml-auto w-4 h-4 text-gray-200 top-[6px] right-3 hover:text-gray-100 opacity-0 group-hover:opacity-100" onClick={handleCreateLinkInvite} />
+      <AddPerson
+        className="absolute ml-auto w-4 h-4 text-gray-200 top-[6px] right-3 hover:text-gray-100 opacity-0 group-hover:opacity-100"
+        onClick={handleCreateLinkInvite}
+      />
     </div>
   );
 }
