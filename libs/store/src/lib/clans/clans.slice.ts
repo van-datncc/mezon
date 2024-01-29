@@ -36,19 +36,15 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 
 export type ChangeCurrentClanArgs = {
   clanId: string;
-  wipeChannels?: boolean;
 }
-
 
 export const changeCurrentClan = createAsyncThunk(
   'clans/changeCurrentClan',
-  async ({ clanId, wipeChannels }: ChangeCurrentClanArgs, thunkAPI) => {
-    if(wipeChannels) {
-      thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
-    }
+  async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
+    thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
     thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
-    thunkAPI.dispatch(channelsActions.fetchChannels({clanId}));
+    thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
   }
 );
 
@@ -64,12 +60,6 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>(
     }
     
     const clans = response.clandesc.map(mapClanToEntity);
-
-    const currentClanId = clans[0]?.id;
-
-    if (currentClanId) {
-      thunkAPI.dispatch(changeCurrentClan({ clanId: currentClanId, wipeChannels: true }));
-    }
     return clans;
   }
 );
@@ -152,7 +142,7 @@ type InviteUser = {
 }
 
 export const inviteUser = createAsyncThunk(
-  'clans/joinChannel',
+  'clans/inviteUser',
   async ({inviteId}: InviteUser, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.inviteUser(mezon.session, inviteId)
@@ -296,3 +286,8 @@ export const selectCurrentClan = createSelector(
   selectCurrentClanId,
   (clansEntities, clanId) => clanId ? clansEntities[clanId] : null
 );
+
+export const selectDefaultClanId = createSelector(
+  selectAllClans,
+  (clans) => clans.length > 0 ? clans[0].id : null
+)

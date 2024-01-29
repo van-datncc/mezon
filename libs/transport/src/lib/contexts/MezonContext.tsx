@@ -56,7 +56,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
         if (!clientRef.current) {
             throw new Error('Nakama client not initialized');
         }
-        const session = await clientRef.current.authenticateEmail(email, password, false);
+        const session = await clientRef.current.authenticateEmail(email, password, true);
         sessionRef.current = session;
 
         if (!socketRef.current) {
@@ -120,6 +120,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
 
     const joinChatChannel = React.useCallback(async (channelId: string, channelName: string) => {
         const socket = socketRef.current;
+        
         if (!socket) {
           throw new Error('Socket is not initialized');
         }

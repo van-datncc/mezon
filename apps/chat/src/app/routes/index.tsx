@@ -21,72 +21,111 @@ import InvitePage from '../pages/invite';
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
-import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
+import {
+  channelLoader,
+  shouldRevalidateChannel,
+} from '../loaders/channelLoader';
+import ClansRoutes from './ClanRoutes';
+import ChannelsRoutes from './ChannelsRoutes';
+import { ClanIndex } from '../pages/clan/ClanIndex';
+import { ChannelIndex } from '../pages/channel/ChannelIndex';
 
 // Components
 export const routes = createBrowserRouter([
   {
-    path: "",
+    path: '',
     element: <AppLayout />,
     errorElement: <ErrorRoutes />,
     children: [
       // initial route to redirect to /chat
       {
-        path: "",
+        path: '',
         element: <InitialRoutes />,
       },
       {
-        path: "guess",
+        path: 'guess',
         element: <GuessLayout />,
-        children: [{
-          path: "login",
-          element: <Login />,
-        }]
+        children: [
+          {
+            path: 'login',
+            element: <Login />,
+          },
+        ],
       },
       {
-        path: "chat",
+        path: 'chat',
         loader: authLoader,
         shouldRevalidate: shouldRevalidateAuth,
         element: <ProtectedRoutes />,
+        children: [
+          {
+            path: '',
+            loader: mainLoader,
+            shouldRevalidate: shouldRevalidateMain,
+            element: <MainLayout />,
+            children: [
+              {
+                path: '',
+                element: <Main />,
+                children: [
+                  {
+                    path: 'servers',
+                    element: <ClansRoutes />,
+                    children: [
+                      {
+                        path: ':serverId',
+                        loader: serverLoader,
+                        shouldRevalidate: shouldRevalidateServer,
+                        element: <ServerLayout />,
+                        children: [
+                          {
+                            path: '',
+                            element: <ClanIndex />,
+                          },
+                          {
+                            path: 'channels',
+                            element: <ChannelsRoutes />,
+                            children: [
+                              {
+                                path: '',
+                                element: <ChannelIndex />,
+                              },
+                              {
+                                path: ':channelId',
+                                loader: channelLoader,
+                                shouldRevalidate: shouldRevalidateChannel,
+                                element: <Chanel />,
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  {
+                    path: 'direct',
+                    element: <Direct />,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: 'invite',
+        loader: authLoader,
         children: [{
-          path: "",
-          loader: mainLoader,
-          shouldRevalidate: shouldRevalidateMain,
-          element: <MainLayout />,
-          children: [{
-            path: "",
-            element: <Main />,
-            children: [{
-              path: "servers/:serverId",
-              loader: serverLoader,
-              shouldRevalidate: shouldRevalidateServer,
-              element: <ServerLayout />,
-              children: [{
-                path: "channels",
-                children: [{
-                  path: ":channelId",
-                  loader: channelLoader,
-                  shouldRevalidate: shouldRevalidateChannel,
-                  element: <Chanel />,
-                }]
-              }]
-            }, {
-              path: "direct",
-              element: <Direct />,
-            },
-            {
-              path: "invite/:inviteId",
-              element: <InvitePage />,
-            },
-            ]
-          }]
+          path: ':inviteId',
+          // TODO: add loader
+          element: <InvitePage />,
         }]
       },
       // fallback route, renders when no other route is matched
       {
-        path: "*",
+        path: '*',
         element: <InitialRoutes />,
       },
-    ]
-  }
-])
+    ],
+  },
+]);

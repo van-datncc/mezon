@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useSelector, useStore } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   RootState,
   channelsActions,
@@ -15,7 +15,7 @@ import { ChannelTypeComponent } from './ChannelType';
 import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { ChannelTypeEnum, LoadingStatus } from 'libs/utils/src/lib/typings/index';
+import { ChannelTypeEnum } from 'libs/utils/src/lib/typings/index';
 
 export const CreateNewChannelModal = () => {
   const dispatch = useAppDispatch();
@@ -31,12 +31,11 @@ export const CreateNewChannelModal = () => {
     (state: RootState) => state.channels.loadingStatus,
   );
 
-
   useEffect(() => {
     if (isLoading === 'loaded') {
       dispatch(channelsActions.openCreateNewModalChannel(false));
     }
-  }, [isLoading]);
+  }, [dispatch, isLoading]);
 
   const [isErrorType, setIsErrorType] = useState<string>('');
   const [isErrorName, setIsErrorName] = useState<string>('');

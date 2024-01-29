@@ -1,8 +1,7 @@
 // import { useChat } from '@mezon/core';
 import { useChat } from "@mezon/core";
-import { InputField, Modal } from "@mezon/ui";
-import * as Icons from '../../Icons';
-import { useEffect, useState } from "react";
+import { InputField } from "@mezon/ui";
+import { useState } from "react";
 // import * as Icons from '../../Icons';
 
 // import React, { useState, useEffect } from 'react';

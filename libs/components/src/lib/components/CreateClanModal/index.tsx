@@ -1,7 +1,7 @@
 import { InputField, Modal } from "@mezon/ui";
 import { useState } from "react";
 import * as Icons from '../Icons';
-import { useChat } from "@mezon/core";
+import { useAppNavigation, useChat } from "@mezon/core";
 import { useNavigate } from "react-router-dom";
 
 export type ModalCreateClansProps = {
@@ -13,25 +13,26 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
     const { open, onClose } = props
     const [urlImage, setUrlImage] = useState('');
     const [nameClan, setNameClan] = useState('');
-    const navigate = useNavigate();
+    const { navigate, toClanPage } = useAppNavigation();
     const { createClans, userProfile } = useChat();
     const handleFile = (e: any) => {
         const fileToStore: File = e.target.files[0];
         setUrlImage(URL.createObjectURL(fileToStore))
     }
     const handleCreateClan = () => {
+        // TODO: validate
         if (nameClan) {
             createClans(nameClan, '').then(res => {
                 if (res && res.clan_id) {
-                    navigate(`/chat/servers/${res.clan_id}`);
+                    navigate(toClanPage(res.clan_id || ''));
                 }
             })
         }
     }
     const handleClose = () => {
-        onClose(),
-            setUrlImage(''),
-            setNameClan('')
+        onClose();
+        setUrlImage('');
+        setNameClan('');
     }
 
     return (

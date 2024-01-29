@@ -60,7 +60,7 @@ function ChannelList() {
     ).then((res) => {
       if (res && res.invite_link) {
         setUrlInvite(
-          window.location.origin + '/chat/invite/' + res.invite_link,
+          window.location.origin + '/invite/' + res.invite_link,
         );
       }
     });
