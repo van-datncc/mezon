@@ -6,7 +6,7 @@ import {
   createNewChannel,
   useAppDispatch,
 } from '@mezon/store';
-import { useChat } from '@mezon/core';
+import { useAppNavigation, useChat } from '@mezon/core';
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import { ChannelLableModal } from './ChannelLabel';
@@ -16,6 +16,7 @@ import { ChannelStatusModal } from './ChannelStatus';
 import { CreateChannelButton } from './CreateChannelButton';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { ChannelTypeEnum } from 'libs/utils/src/lib/typings/index';
+import { useNavigate } from 'react-router-dom';
 
 export const CreateNewChannelModal = () => {
   const dispatch = useAppDispatch();
@@ -40,6 +41,9 @@ export const CreateNewChannelModal = () => {
   const [isErrorType, setIsErrorType] = useState<string>('');
   const [isErrorName, setIsErrorName] = useState<string>('');
 
+  const navigate = useNavigate();
+  const { toChannelPage } = useAppNavigation();
+
   const handleSubmit = async () => {
     if (channelType === -1) {
       setIsErrorType("Channel's type is required");
@@ -57,7 +61,14 @@ export const CreateNewChannelModal = () => {
       channel_private: isPrivate,
       category_id: currentCategory?.category_id,
     };
-    await dispatch(createNewChannel(body));
+    const newChannelCreatedId = await dispatch(createNewChannel(body));
+    const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
+    const channelID = payload.channel_id;
+
+    if (newChannelCreatedId) {
+      const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
+      navigate(channelPath);
+    }
     clearDataAfterCreateNew();
   };
 
