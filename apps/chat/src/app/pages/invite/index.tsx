@@ -28,6 +28,7 @@ export default function InvitePage() {
   };
 
   const handleJoinChannel = () => {
+    console.log("Join Channel");
     joinChannel();
     setOpenModal(false);
   };
@@ -55,7 +56,7 @@ export default function InvitePage() {
   return (
     <>
       <div></div>
-      <Modal show={openModal} onClose={() => setOpenModal(false)} size={"md"} onBlur={() => setOpenModal(false)}>
+      <Modal show={openModal} onClose={() => setOpenModal(false)} size={"md"} >
         {/* <Modal.Header></Modal.Header> */}
         <Modal.Body className="bg-gray-700">
           <div className="flex flex-col justify-center items-center pb-24">
