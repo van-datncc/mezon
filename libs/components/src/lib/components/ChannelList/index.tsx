@@ -8,15 +8,12 @@ import * as Icons from "../Icons";
 import { CreateNewChannelModal } from "libs/components/src/lib/components/CreateChannelModal/index";
 import { Modal } from "@mezon/ui";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
-  const newChannelCreatedId = useSelector(
-    (state: RootState) => state.channels.newChannelCreatedId,
-  );
 
   const { categorizedChannels, currentChanel } = useChat();
   const [categoriesState, setCategoriesState] = useState<CategoriesState>(
@@ -74,18 +71,6 @@ function ChannelList() {
     navigator.clipboard.writeText(urlInvite);
   };
 
-  const navigate = useNavigate();
-  const { toChannelPage } = useAppNavigation();
-
-  useEffect(() => {
-    if (newChannelCreatedId) {
-      const channelPath = toChannelPage(
-        newChannelCreatedId,
-        currentClan?.clan_id ?? "",
-      );
-      navigate(channelPath);
-    }
-  }, [newChannelCreatedId]);
   return (
     <>
       {<CreateNewChannelModal />}
