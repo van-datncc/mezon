@@ -2,6 +2,7 @@ import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
+import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
 type ChatContextProviderProps = {
   children: React.ReactNode
@@ -16,11 +17,12 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
 
   const { socketRef } = useMezon();
+  const { initWorker, unInitWorker } = useSeenMessagePool();
   const dispatch = useAppDispatch();
 
   const onchannelmessage = useCallback((message: ChannelMessage) => {
-    dispatch(messagesActions.add(mapMessageChannelToEntity(message)));
-  }, []);
+    dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
+  }, [dispatch]);
 
   const onchannelpresence = useCallback((message: ChannelMessage) => {
     // TODO: handle presence
@@ -54,6 +56,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
       socket.ondisconnect = () => { };
     }
   }, [onchannelmessage, onchannelpresence, ondisconnect, socketRef])
+
+  useEffect(() => {
+    initWorker();
+    return () => {
+      unInitWorker();
+    }
+  }, [initWorker, unInitWorker])
+
 
   return (
     <ChatContext.Provider value={value}>

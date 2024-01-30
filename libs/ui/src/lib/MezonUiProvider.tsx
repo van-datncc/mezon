@@ -1,8 +1,10 @@
 import React from 'react'
+import { SkeletonTheme } from 'react-loading-skeleton';
+
 
 type Props = {
-    children: React.ReactNode
-    themeName?: string
+  children: React.ReactNode
+  themeName?: string
 }
 
 type MezonUiContextValue = {
@@ -14,9 +16,15 @@ export const MezonUiContext = React.createContext<MezonUiContextValue>({
 })
 
 export function MezonUiProvider({ children, themeName }: Props) {
-  const [selectedTheme] = React.useState(themeName ||'light')
+  const [selectedTheme] = React.useState(themeName || 'light')
 
   const value = React.useMemo(() => ({ selectedTheme }), [selectedTheme])
 
-  return <MezonUiContext.Provider value={value}>{children}</MezonUiContext.Provider>
+  return (
+    <MezonUiContext.Provider value={value}>
+      <SkeletonTheme baseColor="#202020" highlightColor="#444">
+        {children}
+      </SkeletonTheme>
+    </MezonUiContext.Provider>
+  )
 }

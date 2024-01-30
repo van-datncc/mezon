@@ -27,6 +27,8 @@ import {
   ApiLinkInviteUser,
 } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
+// @deprecated
+// TODO: refactor this hook into useChatChannel
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
   const { channels } = useChannels();
@@ -175,17 +177,7 @@ export function useChat() {
       );
       ack && dispatch(checkMessageSendingAction());
     },
-    [
-      channelRef,
-      clientRef,
-      currentChannelId,
-      currentClanId,
-      dispatch,
-      sessionRef,
-      socketRef,
-      userProfile?.user?.avatar_url,
-      userProfile?.user?.username,
-    ],
+    [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.display_name, userProfile?.user?.id, userProfile?.user?.username],
   );
 
   return useMemo(
