@@ -90,6 +90,7 @@ export type IMessage = ChannelMessage & {
   date?: string | undefined;
   creationTime?: Date;
   creationTimeMs?: number;
+  lastSeen?: boolean;
 };
 
 export type IMessageWithUser = IMessage & {

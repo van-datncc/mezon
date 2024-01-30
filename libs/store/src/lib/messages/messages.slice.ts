@@ -17,7 +17,7 @@ export const MESSAGES_FEATURE_KEY = "messages";
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity = (channelMess: ChannelMessage): IMessageWithUser => {
+export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
   const creationTime = new Date(channelMess.create_time || "");
   const creationTimeMs = creationTime.getTime();
   return {
@@ -27,6 +27,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage): IMessage
     id: channelMess.message_id || "",
     body: { text: "Hello world" },
     user: null,
+    lastSeen: lastSeenId === channelMess.message_id,
   };
 };
 
@@ -62,7 +63,7 @@ export const fetchMessages = createAsyncThunk(
     }
 
     const messages = response.messages.map((item) =>
-      mapMessageChannelToEntity(item),
+      mapMessageChannelToEntity(item, response.last_seen_message_id),
     );
 
     if (response.last_seen_message_id) {
@@ -100,9 +101,9 @@ export const updateLastSeenMessage = createAsyncThunk(
   async ({ channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
     try {
       const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-      thunkAPI.dispatch(
-        messagesActions.setChannelLastMessage({ channelId, messageId }),
-      );
+      // thunkAPI.dispatch(
+      //   messagesActions.setChannelLastMessage({ channelId, messageId }),
+      // );
       await mezon.socketRef.current?.writeLastSeenMessage(channelId, messageId);
     } catch (e) {
       console.log(e);
@@ -136,6 +137,14 @@ export const messagesSlice = createSlice({
           [action.payload.channel_id]: action.payload.id,
         };
       }
+    },
+    markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
+      messagesAdapter.updateOne(state, { 
+        id: action.payload,
+        changes: {
+          lastSeen: true
+        }
+      });
     },
     remove: messagesAdapter.removeOne,
     checkMessageSendingAction: (state) => {
