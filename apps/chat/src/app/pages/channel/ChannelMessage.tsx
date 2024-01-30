@@ -19,7 +19,6 @@ export function ChannelMessage(props: MessageProps) {
     // TODO: recheck this
     const mess = useMemo(() => {
         if(typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
-            console.log('message.content', message.content)
             return message.content
         }
         return message
