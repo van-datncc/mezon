@@ -1,28 +1,85 @@
-import { useChat } from '@mezon/core';
-import { Button } from '@mezon/ui';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useChat } from "@mezon/core";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { Button, Modal } from "flowbite-react";
+import { useEffect, useState } from "react";
 
 export default function InvitePage() {
+  const [openModal, setOpenModal] = useState(false);
+  const [clanName, setClanName] = useState("Mezon");
+  const [channelName, setChannelName] = useState("general");
+
   const { inviteId: inviteIdParam } = useParams();
   const navigate = useNavigate();
-  const { inviteUser } = useChat();
+  const { inviteUser, getLinkInvite } = useChat();
 
   const joinChannel = async () => {
     if (inviteIdParam) {
-      inviteUser(inviteIdParam).then(res => {
+      inviteUser(inviteIdParam).then((res) => {
         if (res.channel_id && res.clan_id) {
-          navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`)
+          console.log(
+            "LInk : ",
+            `/chat/servers/${res.clan_id}/channels/${res.channel_id}`,
+          );
+          navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
         }
-      })
+      });
     }
-  }
-  // console.log('DDDD: ', inviteIdParam);
+  };
+
+  const handleJoinChannel = () => {
+    joinChannel();
+    setOpenModal(false);
+  };
+
+  const handleCancelJoin = () => {
+    navigate(`/guess/login`);
+    setOpenModal(false);
+  };
+
+  useEffect(() => {
+    if (inviteIdParam) {
+      getLinkInvite(inviteIdParam).then((res) => {
+        if (res.channel_id && res.clan_id) {
+          navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
+        } else {
+          setClanName(res.clan_name ?? "Mezon");
+          setChannelName(res.channel_name ?? "general");
+          setOpenModal(true);
+        }
+      });
+    }
+  }, []);
+
+  console.log("clanName: ", clanName, "channelName: ", clanName);
   return (
     <>
-      <div className="hidden flex-col w-60 bg-bgSurface md:flex">
-        <h1>Invite Page</h1>
-        <Button label="JOIN" onClick={joinChannel} />
-      </div>
+      <div></div>
+      <Modal show={openModal} onClose={() => setOpenModal(false)} size={"md"} onBlur={() => setOpenModal(false)}>
+        {/* <Modal.Header></Modal.Header> */}
+        <Modal.Body className="bg-gray-700">
+          <div className="flex flex-col justify-center items-center pb-24">
+            <div className="w-[70px] h-[70px] bg-bgDisable rounded-lg flex justify-center items-center text-contentSecondary text-[25px] bg-zinc-900 ">
+              {clanName.charAt(0).toUpperCase()}
+            </div>
+            <p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">
+              You've been invite to join
+            </p>
+            <p className="text-4xl text-white font-semibold mt-4">{clanName}</p>
+            <p className="text-4xl text-white text-[18px]">#{channelName}</p>
+          </div>
+        </Modal.Body>
+        {/* <Modal.Footer> */}
+        <div className="flex justify-center flex-row items-center gap-4 pb-8 bg-gray-700">
+          <Button color="gray" onClick={handleCancelJoin}>
+            No, Thanks
+          </Button>
+          <Button color="blue" onClick={handleJoinChannel}>
+            Join Mezon
+          </Button>
+        </div>
+        {/* </Modal.Footer> */}
+      </Modal>
     </>
   );
 }
