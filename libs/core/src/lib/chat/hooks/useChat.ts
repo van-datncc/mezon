@@ -27,6 +27,8 @@ import {
   ApiLinkInviteUser,
 } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
+// @deprecated
+// TODO: refactor this hook into useChatChannel
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
   const { channels } = useChannels();
@@ -129,6 +131,17 @@ export function useChat() {
     [dispatch],
   );
 
+  const getLinkInvite = React.useCallback(
+    async (invite_id: string) => {
+      const action = await dispatch(
+        clansActions.getLinkInvite({ inviteId: invite_id }),
+      );
+      const payload = action.payload as ApiInviteUserRes;
+      return payload;
+    },
+    [dispatch],
+  );
+
   const sendMessage = React.useCallback(
     async (message: IMessage) => {
       // TODO: send message to server using nakama client
@@ -164,17 +177,7 @@ export function useChat() {
       );
       ack && dispatch(checkMessageSendingAction());
     },
-    [
-      channelRef,
-      clientRef,
-      currentChannelId,
-      currentClanId,
-      dispatch,
-      sessionRef,
-      socketRef,
-      userProfile?.user?.avatar_url,
-      userProfile?.user?.username,
-    ],
+    [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.display_name, userProfile?.user?.id, userProfile?.user?.username],
   );
 
   return useMemo(
@@ -196,7 +199,8 @@ export function useChat() {
       updateUser,
       createLinkInviteUser,
       inviteUser,
-      currentClanId
+      currentClanId,
+      getLinkInvite
     }),
     [
       client,
@@ -216,7 +220,8 @@ export function useChat() {
       updateUser,
       createLinkInviteUser,
       inviteUser,
-      currentClanId
+      currentClanId,
+      getLinkInvite
     ],
   );
 }

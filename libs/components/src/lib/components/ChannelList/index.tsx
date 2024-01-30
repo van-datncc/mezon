@@ -67,8 +67,26 @@ function ChannelList() {
     });
   };
 
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(urlInvite);
+  const unsecuredCopyToClipboard = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('Unable to copy to clipboard', err);
+    }
+    document.body.removeChild(textArea);
+  };
+
+  const handleCopyToClipboard = (content: string) => {
+    if (window.isSecureContext && navigator.clipboard) {
+      navigator.clipboard.writeText(content);
+    } else {
+      unsecuredCopyToClipboard(content);
+    }
   };
 
   return (
@@ -136,7 +154,7 @@ function ChannelList() {
           setOpenInvite(false);
         }}
         showModal={openInvite}
-        confirmButton={handleCopyToClipboard}
+        confirmButton={() => handleCopyToClipboard(urlInvite)}
         titleConfirm="Copy"
       >
         <p>

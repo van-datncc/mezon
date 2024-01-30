@@ -1,4 +1,4 @@
-import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
+import { IMessageWithUser, LoadingStatus } from "@mezon/utils";
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -6,26 +6,27 @@ import {
   createSlice,
   EntityState,
   PayloadAction,
-} from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
-import { ChannelMessage } from '@mezon/mezon-js/dist';
+} from "@reduxjs/toolkit";
+import { ensureSession, ensureSocket, getMezonCtx } from "../helpers";
+import { ChannelMessage } from "@mezon/mezon-js/dist";
+import { seenMessagePool } from "./SeenMessagePool";
 
-export const MESSAGES_FEATURE_KEY = 'messages';
+export const MESSAGES_FEATURE_KEY = "messages";
 
 /*
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity = (
-  channelMess: ChannelMessage,
-  lastSeenMsg: undefined | string = undefined,
-) => {
+export const mapMessageChannelToEntity = (channelMess: ChannelMessage): IMessageWithUser => {
+  const creationTime = new Date(channelMess.create_time || "");
+  const creationTimeMs = creationTime.getTime();
   return {
     ...channelMess,
-    id: channelMess.message_id || '',
-    body: { text: 'Hello world' },
+    creationTime,
+    creationTimeMs,
+    id: channelMess.message_id || "",
+    body: { text: "Hello world" },
     user: null,
-    lastSeen: lastSeenMsg === channelMess.message_id,
   };
 };
 
@@ -37,34 +38,17 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
   loadingStatus: LoadingStatus;
   error?: string | null;
   isSending?: boolean;
+  unreadMessagesEntries?: Record<string, string>;
 }
 
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
-
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchMessages())
- * }, [dispatch]);
- * ```
- */
 
 type fetchMessageChannelPayload = {
   channelId: string;
 };
 
 export const fetchMessages = createAsyncThunk(
-  'messages/fetchMessages',
+  "messages/fetchMessages",
   async ({ channelId }: fetchMessageChannelPayload, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelMessages(
@@ -76,32 +60,65 @@ export const fetchMessages = createAsyncThunk(
     if (!response.messages) {
       return thunkAPI.rejectWithValue([]);
     }
-    return response.messages.map((item) =>
-      mapMessageChannelToEntity(item, response.last_seen_message_id),
+
+    const messages = response.messages.map((item) =>
+      mapMessageChannelToEntity(item),
     );
+
+    if (response.last_seen_message_id) {
+      thunkAPI.dispatch(
+        messagesActions.setChannelLastMessage({
+          channelId,
+          messageId: response.last_seen_message_id,
+        }),
+      );
+      const lastMessage = messages.find(
+        (message) => message.id === response.last_seen_message_id,
+      );
+
+      if (lastMessage) {
+        seenMessagePool.updateKnownSeenMessage({
+          channelId: lastMessage.channel_id || "",
+          messageId: lastMessage.id,
+          messageCreatedAt: lastMessage.creationTimeMs ? +lastMessage.creationTimeMs : 0,
+          messageSeenAt: 0,
+        })
+      }
+    }
+
+    return messages;
   },
 );
 
-// export const updateLastSeenMessage = createAsyncThunk(
-//   'messages/fetchStatus',
-//   async ({ channelId }: fetchMessageChannelPayload, thunkAPI) => {
-//     const mezon = ensureClient(getMezonCtx(thunkAPI));
-//     const response = await mezon.client.PostLastSeenMessage(
-//       mezon.session,
-//       channelId,
-//       100,
-//       false,
-//     );
-//     if (!response.messages) {
-//       return thunkAPI.rejectWithValue([]);
-//     }
-//     return response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
-//   }
-// );
+type UpdateMessageArgs = {
+  channelId: string;
+  messageId: string;
+};
+
+export const updateLastSeenMessage = createAsyncThunk(
+  "messages/updateLastSeenMessage",
+  async ({ channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
+    try {
+      const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+      thunkAPI.dispatch(
+        messagesActions.setChannelLastMessage({ channelId, messageId }),
+      );
+      await mezon.socketRef.current?.writeLastSeenMessage(channelId, messageId);
+    } catch (e) {
+      console.log(e);
+      return thunkAPI.rejectWithValue([]);
+    }
+  },
+);
+
+export type SetChannelLastMessageArgs = {
+  channelId: string;
+  messageId: string;
+};
 
 export const initialMessagesState: MessagesState =
   messagesAdapter.getInitialState({
-    loadingStatus: 'not loaded',
+    loadingStatus: "not loaded",
     error: null,
     isSending: false,
   });
@@ -110,28 +127,50 @@ export const messagesSlice = createSlice({
   name: MESSAGES_FEATURE_KEY,
   initialState: initialMessagesState,
   reducers: {
-    add: messagesAdapter.addOne,
+    newMessage: (state, action: PayloadAction<MessagesEntity>) => {
+      messagesAdapter.addOne(state, action.payload);
+      if (action.payload.channel_id) {
+        // TODO: check duplicates with setChannelLastMessage
+        state.unreadMessagesEntries = {
+          ...state.unreadMessagesEntries,
+          [action.payload.channel_id]: action.payload.id,
+        };
+      }
+    },
     remove: messagesAdapter.removeOne,
     checkMessageSendingAction: (state) => {
       state.isSending = !state.isSending;
+    },
+    setChannelLastMessage: (
+      state,
+      action: PayloadAction<SetChannelLastMessageArgs>,
+    ) => {
+      state.unreadMessagesEntries = {
+        ...state.unreadMessagesEntries,
+        [action.payload.channelId]: action.payload.messageId,
+      };
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMessages.pending, (state: MessagesState) => {
-        state.loadingStatus = 'loading';
+        state.loadingStatus = "loading";
       })
       .addCase(
         fetchMessages.fulfilled,
         (state: MessagesState, action: PayloadAction<MessagesEntity[]>) => {
           messagesAdapter.setAll(state, action.payload);
-          state.loadingStatus = 'loaded';
+          state.loadingStatus = "loaded";
         },
       )
       .addCase(fetchMessages.rejected, (state: MessagesState, action) => {
-        state.loadingStatus = 'error';
+        state.loadingStatus = "error";
         state.error = action.error.message;
       });
+
+    builder.addCase(updateLastSeenMessage.fulfilled, (state: MessagesState) => {
+      // state.loadingStatus = 'loaded';
+    });
   },
 });
 
@@ -164,6 +203,7 @@ export const messagesActions = {
   ...messagesSlice.actions,
   fetchMessages,
   checkMessageSendingAction,
+  updateLastSeenMessage,
 };
 
 /*
@@ -188,6 +228,13 @@ export const getMessagesState = (rootState: {
 
 export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
+export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
+  if (a.creationTimeMs && b.creationTimeMs) {
+    return +a.creationTimeMs - +b.creationTimeMs;
+  }
+  return 0;
+}
+
 export const selectMessagesEntities = createSelector(
   getMessagesState,
   selectEntities,
@@ -196,7 +243,31 @@ export const selectMessagesEntities = createSelector(
 export const selectMessageByChannelId = (channelId?: string | null) =>
   createSelector(selectMessagesEntities, (entities) => {
     const messages = Object.values(entities);
-    return messages.filter(
-      (message) => message && message.channel_id === channelId,
-    );
+    return messages
+      .sort(orderMessageByDate)
+      .filter((message) => message && message.channel_id === channelId);
   });
+
+export const selectLastMessageByChannelId = (channelId?: string | null) =>
+  createSelector(selectMessageByChannelId(channelId), (messages) => {
+    return messages.pop();
+  });
+
+export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
+  createSelector(selectLastMessageByChannelId(channelId), (message) => {
+    return message && message.id;
+  });
+
+export const selectUnreadMessageEntries = createSelector(
+  getMessagesState,
+  (state) => state.unreadMessagesEntries,
+);
+
+export const selectUnreadMessageIdByChannelId = (channelId?: string | null) =>
+  createSelector(
+    getMessagesState,
+    selectUnreadMessageEntries,
+    (state, lastMessagesEntries) => {
+      return lastMessagesEntries && lastMessagesEntries[channelId || ""];
+    },
+  );

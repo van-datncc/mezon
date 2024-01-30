@@ -3,6 +3,7 @@ import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import { useMemo } from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 export type MessageWithUserProps = {
   message: IMessageWithUser;
@@ -57,6 +58,14 @@ function MessageWithUser({ message }: MessageWithUserProps) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+MessageWithUser.Skeleton = () => {
+  return (
+    <div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer  flex-shrink-1">
+      <Skeleton circle={true} width={38} height={38} />
     </div>
   );
 }

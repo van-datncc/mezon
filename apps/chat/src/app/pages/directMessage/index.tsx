@@ -23,7 +23,7 @@ export default function Direct() {
                 {currentDirectMess ? (
                     <>
                         <div className="overflow-y-scroll flex-1">
-                            <ChannelMessages />
+                            <ChannelMessages.Skeleton />
                         </div>
                         <div className="flex-shrink-0 bg-bgSecondary">
                             <ChannelMessageBox />

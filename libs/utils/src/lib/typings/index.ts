@@ -81,7 +81,6 @@ export type IMessageMeta = {
 
 export type IMessage = ChannelMessage & {
   id: string;
-  lastSeen: boolean;
   body: {
     text: string;
   };
@@ -89,6 +88,8 @@ export type IMessage = ChannelMessage & {
     content?: string | undefined;
   };
   date?: string | undefined;
+  creationTime?: Date;
+  creationTimeMs?: number;
 };
 
 export type IMessageWithUser = IMessage & {

@@ -10,3 +10,4 @@ export * from './lib/app/app.slice';
 export * from './lib/categories/categories.slice';
 export * from './lib/store';
 export * from './lib/MezonStoreProvider';
+export * from './lib/messages/SeenMessagePool';
