@@ -1,7 +1,7 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
-import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
-import { mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
+import { ChannelMessage, ChannelPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { channelMembersActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
 type ChatContextProviderProps = {
@@ -24,10 +24,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
   }, [dispatch]);
 
-  const onchannelpresence = useCallback((message: ChannelMessage) => {
-    // TODO: handle presence
+  const onchannelpresence = useCallback((channelPresence: ChannelPresenceEvent) => {
+    dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
   }, []);
-
   const ondisconnect = useCallback(() => {
     // TODO: handle disconnect
   }, []);
