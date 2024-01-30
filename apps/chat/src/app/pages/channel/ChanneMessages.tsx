@@ -15,7 +15,7 @@ export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
                 <ChannelMessage
                     key={message.id}
                     lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-                    message={message.content as IMessageWithUser}
+                    message={message}
                 />
             ))}
         </>

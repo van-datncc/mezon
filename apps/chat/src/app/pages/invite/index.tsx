@@ -41,13 +41,13 @@ export default function InvitePage() {
   useEffect(() => {
     if (inviteIdParam) {
       getLinkInvite(inviteIdParam).then((res) => {
-        if (res.channel_id && res.clan_id) {
-          navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
-        } else {
-          setClanName(res.clan_name ?? "Mezon");
-          setChannelName(res.channel_name ?? "general");
-          setOpenModal(true);
-        }
+        console.log("res: ", res);
+        // if (res.channel_id && res.clan_id) {
+        // }
+        // navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
+        setClanName(res.clan_name ?? "Mezon");
+        setChannelName(res.channel_name ?? "general");
+        setOpenModal(true);
       });
     }
   }, []);

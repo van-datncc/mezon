@@ -98,11 +98,16 @@ type UpdateMessageArgs = {
 export const updateLastSeenMessage = createAsyncThunk(
   "messages/updateLastSeenMessage",
   async ({ channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
-    const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-    thunkAPI.dispatch(
-      messagesActions.setChannelLastMessage({ channelId, messageId }),
-    );
-    await mezon.socketRef.current?.writeLastSeenMessage(channelId, messageId);
+    try {
+      const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+      thunkAPI.dispatch(
+        messagesActions.setChannelLastMessage({ channelId, messageId }),
+      );
+      await mezon.socketRef.current?.writeLastSeenMessage(channelId, messageId);
+    } catch (e) {
+      console.log(e);
+      return thunkAPI.rejectWithValue([]);
+    }
   },
 );
 
