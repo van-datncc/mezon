@@ -13,6 +13,7 @@ export { default as MessageBox } from './components/MessageBox'
 export { default as LoginForm } from './components/LoginForm'
 export { default as ModalListClans } from './components/ModalListClans'
 export { default as ModalCreateClan } from './components/CreateClanModal'
+export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak'
 
 export * from './components/MessageBox'
 export * from './components/LoginForm'

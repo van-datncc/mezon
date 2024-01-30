@@ -37,6 +37,18 @@ export async function ensureChannel(mezon: MezonContextValue, id: string): Promi
     })
 }
 
+export async function ensureSocket(mezon: MezonContextValue): Promise<MezonValueContext> {
+    return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+            if(mezon.socketRef.current && (mezon.socketRef.current as any).adapter && (mezon.socketRef.current as any).adapter.isOpen())  {
+                clearInterval(interval);
+                resolve(ensureClient(mezon));
+            }
+        }, 100);
+    })
+}
+
+
 export function ensureClient(mezon: MezonContextValue): MezonValueContext  {
     if(!mezon || !mezon.clientRef.current) {
         throw new Error('Error')

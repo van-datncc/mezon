@@ -1,14 +1,33 @@
 import { IMessageWithUser } from '@mezon/utils'
 import { ChannelMessage } from './ChannelMessage'
-import { useChat } from '@mezon/core'
+import { useChatChannel } from '@mezon/core'
 
-export default function ChannelMessages() {
-    const { messages } = useChat()
+type ChannelMessagesProps = {
+    channelId: string
+}
+
+export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
+    const { messages, unreadMessageId, lastMessageId } = useChatChannel(channelId)
+
     return (
         <>
             {messages.map((message, i) => (
-                <ChannelMessage key={i} message={message.content as IMessageWithUser} />
+                <ChannelMessage
+                    key={message.id}
+                    lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+                    message={message.content as IMessageWithUser}
+                />
             ))}
+        </>
+    )
+}
+
+ChannelMessages.Skeleton = () => {
+    return (
+        <>
+            <ChannelMessage.Skeleton />
+            <ChannelMessage.Skeleton />
+            <ChannelMessage.Skeleton />
         </>
     )
 }

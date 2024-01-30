@@ -20,7 +20,7 @@ export type IMessagePayload = IMessage & {
 };
 
 function MessageBox(props: MessageBoxProps) {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [content, setContent] = useState('');
   const { onSend } = props;
 
@@ -31,7 +31,6 @@ function MessageBox(props: MessageBoxProps) {
     onSend({
       content: { content },
       id: '',
-      lastSeen: true,
       channel_id: '',
       body: { text: '' },
       channelId: '',

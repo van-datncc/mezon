@@ -36,7 +36,7 @@ export function ChannelIndex() {
                 <div className="flex h-screen">
                     <div className="flex flex-col flex-1">
                         <div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
-                            <ChannelMessages />
+                            <ChannelMessages.Skeleton />
                         </div>
                         <div className="flex-shrink-0 bg-bgSecondary">
                             <ChannelMessageBox />
