@@ -18,7 +18,6 @@ const SettingRightUser = ({ onClanProfileClick, name, avatar, nameDisplay }: { o
         if (userName||urlImage||displayName) {
             await updateUser(userName, urlImage,displayName)
         }
-        console.log("jgdlfg",avatar)
     }
     const handleFile = (e: any) => {
         const fileToStore: File = e.target.files[0];

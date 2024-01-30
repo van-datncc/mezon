@@ -1,17 +1,23 @@
-import { useState } from 'react';
-import { useChat } from '@mezon/core';
-import ChannelLink from '../ChannelLink';
-import { IChannel, ICategoryChannel, ICategory } from '@mezon/utils';
-import { Events, BrowseChannel } from './ChannelListComponents';
-import { channelsActions, useAppDispatch } from '@mezon/store';
-import * as Icons from '../Icons';
-import { CreateNewChannelModal } from 'libs/components/src/lib/components/CreateChannelModal/index';
-import { Modal } from '@mezon/ui';
+import { useEffect, useState } from "react";
+import { useAppNavigation, useChat } from "@mezon/core";
+import ChannelLink from "../ChannelLink";
+import { IChannel, ICategoryChannel, ICategory } from "@mezon/utils";
+import { Events, BrowseChannel } from "./ChannelListComponents";
+import { RootState, channelsActions, useAppDispatch } from "@mezon/store";
+import * as Icons from "../Icons";
+import { CreateNewChannelModal } from "libs/components/src/lib/components/CreateChannelModal/index";
+import { Modal } from "@mezon/ui";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
+  const newChannelCreatedId = useSelector(
+    (state: RootState) => state.channels.newChannelCreatedId,
+  );
+
   const { categorizedChannels, currentChanel } = useChat();
   const [categoriesState, setCategoriesState] = useState<CategoriesState>(
     categorizedChannels.reduce((acc, category) => {
@@ -46,7 +52,7 @@ function ChannelList() {
 
   const [openInvite, setOpenInvite] = useState(false);
 
-  const [urlInvite, setUrlInvite] = useState('');
+  const [urlInvite, setUrlInvite] = useState("");
 
   const handleOpenInvite = (
     currentServerId: string,
@@ -54,14 +60,12 @@ function ChannelList() {
   ) => {
     setOpenInvite(true);
     createLinkInviteUser(
-      currentServerId ?? '',
-      currentChannelId ?? '',
+      currentServerId ?? "",
+      currentChannelId ?? "",
       10,
     ).then((res) => {
       if (res && res.invite_link) {
-        setUrlInvite(
-          window.location.origin + '/invite/' + res.invite_link,
-        );
+        setUrlInvite(window.location.origin + "/invite/" + res.invite_link);
       }
     });
   };
@@ -70,6 +74,18 @@ function ChannelList() {
     navigator.clipboard.writeText(urlInvite);
   };
 
+  const navigate = useNavigate();
+  const { toChannelPage } = useAppNavigation();
+
+  useEffect(() => {
+    if (newChannelCreatedId) {
+      const channelPath = toChannelPage(
+        newChannelCreatedId,
+        currentClan?.clan_id ?? "",
+      );
+      navigate(channelPath);
+    }
+  }, [newChannelCreatedId]);
   return (
     <>
       {<CreateNewChannelModal />}
@@ -79,9 +95,7 @@ function ChannelList() {
       </div>
       <hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
 
-      <div
-        className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide "
-      >
+      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide ">
         {categorizedChannels.map((category: ICategoryChannel) => (
           <div key={category.id}>
             {category.category_name && (

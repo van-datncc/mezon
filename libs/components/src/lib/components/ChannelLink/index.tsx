@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ChannelTypeEnum, IChannel } from "@mezon/utils";
 import { AddPerson, Hashtag, Speaker } from "../Icons";
 import { useAppNavigation } from "@mezon/core";
-import * as Icons from '../Icons';
+import * as Icons from "../Icons";
 export type ChannelLinkProps = {
   serverId?: string;
   channel: IChannel;
@@ -41,9 +41,7 @@ function ChannelLink({
   return (
     <div className="relative group">
       <Link to={channelPath}>
-        <span
-          className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}
-        >
+        <span className={`${classes[state]} ${active ? "bg-[#36373D]" : ""}`}>
           {state === "inactiveUnread" && (
             <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>
           )}
@@ -61,13 +59,20 @@ function ChannelLink({
           </div>
           <p
             className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-sm focus:bg-[#36373D] ${active ? "text-white" : ""}`}
+            title={
+              channel.channel_lable && channel?.channel_lable.length > 20
+                ? channel?.channel_lable
+                : undefined
+            }
           >
-            {channel?.channel_lable}
+            {channel.channel_lable && channel?.channel_lable.length > 20
+              ? `${channel?.channel_lable.substring(0, 20)}...`
+              : channel?.channel_lable}
           </p>
         </span>
       </Link>
       <AddPerson
-        className={`absolute ml-auto w-4 h-4  top-[6px] right-3 group-hover:text-white  ${active ? "text-white" : "text-[#0B0B0B]"}`}
+        className={`absolute ml-auto w-4 h-4  top-[6px] right-3 group-hover:text-white  ${active ? "text-white" : "text-[#0B0B0B]"} cursor-pointer`}
         onClick={handleCreateLinkInvite}
       />
     </div>
