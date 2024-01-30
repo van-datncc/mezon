@@ -1,0 +1,19 @@
+
+ .UnreadMessage {
+    display: flex;
+    flex-direction: row;
+    
+    .LinePart {
+        width: 100%; 
+        text-align: center; 
+        border-bottom: 1px solid #bd0202; 
+        line-height: 0.1em;
+        margin: 10px 0 20px; 
+     } 
+     
+     .LineText {
+        padding:0 6px;
+        font-weight: 600;
+        color: #bd0202;
+    }
+ }
