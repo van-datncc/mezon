@@ -153,6 +153,18 @@ export const inviteUser = createAsyncThunk(
   }
 );
 
+export const getLinkInvite = createAsyncThunk(
+  'clans/getLinkInvite',
+  async ({inviteId}: InviteUser, thunkAPI) => {
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const response = await mezon.client.getLinkInvite(mezon.session, inviteId)
+    if (!response) {
+      return thunkAPI.rejectWithValue([])
+    }
+    return response as ApiInviteUserRes;
+  }
+);
+
 // export interface ApiLinkInviteUser {
 //   channel_id?: string;
 //   clan_id?: string;
@@ -239,7 +251,7 @@ export const clansReducer = clansSlice.reducer;
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
 export const clansActions = 
-{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, updateUser, createLinkInviteUser, inviteUser  }
+{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, updateUser, createLinkInviteUser, inviteUser, getLinkInvite  }
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
