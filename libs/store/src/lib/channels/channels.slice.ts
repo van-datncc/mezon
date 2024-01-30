@@ -7,10 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import {
-  ensureSession,
-  getMezonCtx,
-} from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import {
   ApiChannelDescription,
   ApiCreateChannelDescRequest,
@@ -18,6 +15,7 @@ import {
 import { messagesActions } from '../messages/messages.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
+import { fetchCategories } from '../categories/categories.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -39,6 +37,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
   currentChannelId?: string | null;
   isOpenCreateNewChannel?: boolean;
   currentCategory: ICategory | null;
+  // newChannelCreatedId: string | undefined;
 }
 
 export interface ChannelsRootState {
@@ -62,7 +61,9 @@ function waitUntil<T>(
   });
 }
 
-function getChannelsRootState(thunkAPI: GetThunkAPI<unknown>): ChannelsRootState {
+function getChannelsRootState(
+  thunkAPI: GetThunkAPI<unknown>,
+): ChannelsRootState {
   return thunkAPI.getState() as ChannelsRootState;
 }
 
@@ -103,6 +104,8 @@ export const createNewChannel = createAsyncThunk(
       );
       if (response) {
         thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
+        thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+        return response;
       } else {
         return thunkAPI.rejectWithValue([]);
       }
@@ -282,12 +285,12 @@ export const selectCurrentChannel = createSelector(
   (clansEntities, clanId) => (clanId ? clansEntities[clanId] : null),
 );
 
-export const selectChannelsByClanId = (clainId: string) => createSelector(
-  selectAllChannels,
-  (channels) => channels.filter(ch => ch.clan_id == clainId)
-)
+export const selectChannelsByClanId = (clainId: string) =>
+  createSelector(selectAllChannels, (channels) =>
+    channels.filter((ch) => ch.clan_id == clainId),
+  );
 
-export const selectDefaultChannelIdByClanId = (clainId: string) => createSelector(
-  selectChannelsByClanId(clainId),
-  (channels) => channels.length > 0 ? channels[0].id : null
-)
+export const selectDefaultChannelIdByClanId = (clainId: string) =>
+  createSelector(selectChannelsByClanId(clainId), (channels) =>
+    channels.length > 0 ? channels[0].id : null,
+  );
