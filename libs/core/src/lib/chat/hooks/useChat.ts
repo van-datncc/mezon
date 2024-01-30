@@ -131,6 +131,17 @@ export function useChat() {
     [dispatch],
   );
 
+  const getLinkInvite = React.useCallback(
+    async (invite_id: string) => {
+      const action = await dispatch(
+        clansActions.getLinkInvite({ inviteId: invite_id }),
+      );
+      const payload = action.payload as ApiInviteUserRes;
+      return payload;
+    },
+    [dispatch],
+  );
+
   const sendMessage = React.useCallback(
     async (message: IMessage) => {
       // TODO: send message to server using nakama client
@@ -188,7 +199,8 @@ export function useChat() {
       updateUser,
       createLinkInviteUser,
       inviteUser,
-      currentClanId
+      currentClanId,
+      getLinkInvite
     }),
     [
       client,
@@ -208,7 +220,8 @@ export function useChat() {
       updateUser,
       createLinkInviteUser,
       inviteUser,
-      currentClanId
+      currentClanId,
+      getLinkInvite
     ],
   );
 }
