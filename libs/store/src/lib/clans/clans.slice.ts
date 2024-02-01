@@ -11,6 +11,7 @@ import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser, ApiUpdateAccountReque
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
+import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -45,6 +46,7 @@ export const changeCurrentClan = createAsyncThunk(
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
     thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
     thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
+    thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({clanId}));
   }
 );
 
@@ -111,6 +113,29 @@ export const updateUser = createAsyncThunk(
     }
     return response as true;
   }
+);
+
+type updateLinkUserClanProfile = {
+  user_name: string;
+  avatar_url: string;
+  clan_id: string;
+}
+export const updateUserClanProfile = createAsyncThunk(
+'clans/updateUserClanProfile',
+async ({clan_id, user_name, avatar_url}: updateLinkUserClanProfile, thunkAPI) => {
+  console.log("avatar_url ", avatar_url)
+  const mezon = ensureClient(getMezonCtx(thunkAPI));
+  const body = {
+    clan_id: clan_id,
+    nick_name: user_name ||'',
+    avartar: avatar_url,
+  }
+  const response = await mezon.client.updateUserProfileByClan(mezon.session, clan_id, body)
+  if (!response) {
+    return thunkAPI.rejectWithValue([])
+  }
+  return response as true;
+}
 );
 
 export type CreateLinkInviteUser = {
@@ -251,7 +276,7 @@ export const clansReducer = clansSlice.reducer;
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
 export const clansActions = 
-{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, updateUser, createLinkInviteUser, inviteUser, getLinkInvite  }
+{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, updateUser, updateUserClanProfile, createLinkInviteUser, inviteUser, getLinkInvite  }
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

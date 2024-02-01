@@ -1,4 +1,5 @@
 export * from './lib/clans/clans.slice';
+export * from './lib/clanProfile/clanProfile.slice';
 export * from './lib/messages/messages.slice';
 export * from './lib/threads/threads.slice';
 export * from './lib/channels/channels.slice';

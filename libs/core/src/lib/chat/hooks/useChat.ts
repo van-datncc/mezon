@@ -10,6 +10,8 @@ import {
   selectCurrentChannelId,
   selectCurrentClanId,
   clansActions,
+  userClanProfileActions,
+  selectUserClanProfile,
   channelsActions,
   selectCurrentClan,
   selectClansEntities,
@@ -45,6 +47,7 @@ export function useChat() {
   const currentChannelId = useSelector(selectCurrentChannelId);
   const currentClanId = useSelector(selectCurrentClanId);
   const categories = useSelector(selectAllCategories);
+  const userClansProfile = useSelector(selectUserClanProfile);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
   const { userProfile } = useSelector(selectAllAccount);
@@ -79,7 +82,25 @@ export function useChat() {
     },
     [dispatch],
   );
-
+  
+  const getUserClanProfile = React.useCallback(
+    async (clanId: string) => {
+      await dispatch(userClanProfileActions.fetchUserClanProfile({clanId}));
+    },
+    [dispatch],
+  );
+  
+  const updateUserClanProfile = React.useCallback(
+    async (clan_id: string, name: string, logoUrl: string) => {
+      const action = await dispatch(
+        clansActions.updateUserClanProfile({clan_id, user_name: name, avatar_url: logoUrl}),
+      );
+      const payload = action.payload;
+      return payload;
+    },
+    [dispatch],
+  );
+  
   const createClans = React.useCallback(
     async (name: string, logoUrl: string) => {
       const action = await dispatch(
@@ -192,6 +213,9 @@ export function useChat() {
       currentClan,
       currentChanel,
       userProfile,
+      userClansProfile,
+      getUserClanProfile,
+      updateUserClanProfile,
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
@@ -216,6 +240,9 @@ export function useChat() {
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
+      userClansProfile,
+      getUserClanProfile,
+      updateUserClanProfile,
       createClans,
       updateUser,
       createLinkInviteUser,

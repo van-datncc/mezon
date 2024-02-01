@@ -20,6 +20,7 @@ import { MezonContextValue } from '@mezon/transport'
 import { useDispatch } from 'react-redux';
 import React from 'react';
 import { trackActionError } from '@mezon/utils';
+import { userClanProfileReducer } from './clanProfile/clanProfile.slice'
 
 
 const persistedReducer = persistReducer({
@@ -42,7 +43,8 @@ const reducer = {
   threads: threadsReducer,
   messages: messagesReducer,
   users: usersReducer,
-  categories: categoriesReducer
+  categories: categoriesReducer,
+  userClanProfile: userClanProfileReducer
 };
 
 let storeInstance = configureStore({
