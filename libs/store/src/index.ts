@@ -1,4 +1,5 @@
 export * from './lib/clans/clans.slice';
+export * from './lib/friends/friend.slice';
 export * from './lib/messages/messages.slice';
 export * from './lib/threads/threads.slice';
 export * from './lib/channels/channels.slice';
@@ -11,3 +12,4 @@ export * from './lib/categories/categories.slice';
 export * from './lib/store';
 export * from './lib/MezonStoreProvider';
 export * from './lib/messages/SeenMessagePool';
+export * from './lib/direct/direct.slice';

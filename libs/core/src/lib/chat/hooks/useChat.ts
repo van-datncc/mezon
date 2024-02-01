@@ -5,14 +5,12 @@ import { useMessages } from './useMessages';
 import { useThreads } from './useThreads';
 import { useSelector } from 'react-redux';
 import {
-  selectChannelsEntities,
   selectCurrentChannel,
   selectCurrentChannelId,
   selectCurrentClanId,
   clansActions,
   channelsActions,
   selectCurrentClan,
-  selectClansEntities,
   useAppDispatch,
   ClansEntity,
   selectAllClans,
@@ -32,13 +30,7 @@ import {
 export function useChat() {
   const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
   const { channels } = useChannels();
-  // const { clans } = useClans();
   const { threads } = useThreads();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const ChannelsEntities = useSelector(selectChannelsEntities);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const chanEntities = useSelector(selectClansEntities);
   const clans = useSelector(selectAllClans);
   const currentClan = useSelector(selectCurrentClan);
   const currentChanel = useSelector(selectCurrentChannel);
@@ -72,7 +64,6 @@ export function useChat() {
     },
     [dispatch],
   );
-
   const changeCurrentClan = React.useCallback(
     async (clanId: string) => {
       await dispatch(clansActions.changeCurrentClan({ clanId }));

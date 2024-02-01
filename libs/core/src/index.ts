@@ -12,3 +12,4 @@ export * from './lib/chat/contexts/ChatContext';
 export * from './lib/app/hooks/useAppNavigation';
 export * from './lib/chat/hooks/useChatChannel';
 export * from './lib/chat/hooks/useChatMessage';
+export * from './lib/chat/hooks/useChatDirect';
