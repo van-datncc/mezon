@@ -71,7 +71,7 @@ const SettingRightClanEdit = ({
     console.log("draftProfile: ", draftProfile)
     const {displayName, urlImage} = editProfile; 
 
-  const { updateUserClanProfile } =     ({ clanId });
+  const { updateUserClanProfile } = useClanProfileSetting({ clanId });
 
   const handleFile = (e: any) => {
     const fileToStore: File = e.target.files[0];
