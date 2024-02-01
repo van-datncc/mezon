@@ -3,7 +3,7 @@ import SettingRightUser from '../SettingRightUserProfile';
 import SettingRightClan from '../SettingRightClanProfile';
 import { useChat } from '@mezon/core';
 const SettingRightProfile = () => {
-  const { clans, currentClan, userClansProfile, userProfile } = useChat();
+  const { userProfile } = useChat();
   const [isUserSettings, setIsUserSettings] = useState(true);
 
   const handleClanProfileClick = () => {
@@ -28,12 +28,6 @@ const SettingRightProfile = () => {
       ) : (
         <SettingRightClan
           onUserProfileClick={handleUserSettingsClick}
-          currentClan={currentClan?.clan_id || ''}
-          userClansProfile={userClansProfile[0] || {}}
-          clans={clans}
-          name={userProfile?.user?.username || ''}
-          avatar={userProfile?.user?.avatar_url || ''}
-          nameDisplay={userProfile?.user?.display_name || ''}
         />
       )}
     </>

@@ -11,7 +11,8 @@ import {
   selectCurrentClanId,
   clansActions,
   userClanProfileActions,
-  selectUserClanProfile,
+  selectAllUserClanProfile,
+  selectUserClanProfileByClanID,
   channelsActions,
   selectCurrentClan,
   selectClansEntities,
@@ -47,7 +48,7 @@ export function useChat() {
   const currentChannelId = useSelector(selectCurrentChannelId);
   const currentClanId = useSelector(selectCurrentClanId);
   const categories = useSelector(selectAllCategories);
-  const userClansProfile = useSelector(selectUserClanProfile);
+  const userClansProfile = useSelector(selectAllUserClanProfile);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
   const { userProfile } = useSelector(selectAllAccount);
@@ -91,9 +92,9 @@ export function useChat() {
   );
   
   const updateUserClanProfile = React.useCallback(
-    async (clan_id: string, name: string, logoUrl: string) => {
+    async (clanId: string, name: string, logoUrl: string) => {
       const action = await dispatch(
-        clansActions.updateUserClanProfile({clan_id, user_name: name, avatar_url: logoUrl}),
+        userClanProfileActions.updateUserClanProfile({clanId, username: name, avatarUrl: logoUrl}),
       );
       const payload = action.payload;
       return payload;

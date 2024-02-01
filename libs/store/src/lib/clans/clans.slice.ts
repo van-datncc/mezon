@@ -5,14 +5,19 @@ import {
   createSlice,
   EntityState,
   PayloadAction,
-} from '@reduxjs/toolkit';
-import { IClan, LoadingStatus } from '@mezon/utils';
-import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser, ApiUpdateAccountRequest } from '@mezon/mezon-js/dist/api.gen';
-import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
-import { categoriesActions } from '../categories/categories.slice';
-import { channelsActions } from '../channels/channels.slice';
-import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
-export const CLANS_FEATURE_KEY = 'clans';
+} from "@reduxjs/toolkit";
+import { IClan, LoadingStatus } from "@mezon/utils";
+import {
+  ApiClanDesc,
+  ApiInviteUserRes,
+  ApiLinkInviteUser,
+  ApiUpdateAccountRequest,
+} from "@mezon/mezon-js/dist/api.gen";
+import { ensureClient, ensureSession, getMezonCtx } from "../helpers";
+import { categoriesActions } from "../categories/categories.slice";
+import { channelsActions } from "../channels/channels.slice";
+import { userClanProfileActions } from "../clanProfile/clanProfile.slice";
+export const CLANS_FEATURE_KEY = "clans";
 
 /*
  * Update these interfaces according to your requirements.
@@ -23,8 +28,8 @@ export interface ClansEntity extends IClan {
 }
 
 export const mapClanToEntity = (clanRes: ApiClanDesc) => {
-  return { ...clanRes, id: clanRes.clan_id || '' }
-}
+  return { ...clanRes, id: clanRes.clan_id || "" };
+};
 
 export interface ClansState extends EntityState<ClansEntity, string> {
   loadingStatus: LoadingStatus;
@@ -34,160 +39,145 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
 
-
 export type ChangeCurrentClanArgs = {
   clanId: string;
-}
+};
 
 export const changeCurrentClan = createAsyncThunk(
-  'clans/changeCurrentClan',
+  "clans/changeCurrentClan",
   async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
-    thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+    thunkAPI.dispatch(channelsActions.setCurrentChannelId(""));
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
-    thunkAPI.dispatch(categoriesActions.fetchCategories({clanId}));
+    thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
     thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
-    thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({clanId}));
-  }
+    thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
+  },
 );
 
 export const fetchClans = createAsyncThunk<ClansEntity[]>(
-  'clans/fetchClans',
+  "clans/fetchClans",
   async (_, thunkAPI) => {
- 
-    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '');
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listClanDescs(
+      mezon.session,
+      100,
+      1,
+      "",
+    );
 
-    if(!response.clandesc) {
-      return thunkAPI.rejectWithValue([])
+    if (!response.clandesc) {
+      return thunkAPI.rejectWithValue([]);
     }
-    
+
     const clans = response.clandesc.map(mapClanToEntity);
     return clans;
-  }
+  },
 );
 
 type CreatePayload = {
-  clan_name: string,
-  logo?: string
-}
+  clan_name: string;
+  logo?: string;
+};
 
 export const createClan = createAsyncThunk(
-  'clans/createClans',
+  "clans/createClans",
   async ({ clan_name, logo }: CreatePayload, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const body = {
-      banner: '',
+      banner: "",
       clan_name: clan_name,
-      creator_id: '',
-      logo: logo || '',
-    }
-    const response = await mezon.client.createClanDesc(mezon.session, body)
+      creator_id: "",
+      logo: logo || "",
+    };
+    const response = await mezon.client.createClanDesc(mezon.session, body);
     if (!response) {
-      return thunkAPI.rejectWithValue([])
+      return thunkAPI.rejectWithValue([]);
     }
     return mapClanToEntity(response);
-  }
+  },
 );
 
 type UpdateLinkUser = {
   user_name: string;
   avatar_url: string;
   display_name: string;
-}
+};
 
 export const updateUser = createAsyncThunk(
-  'clans/updateUser',
-  async ({ user_name, avatar_url, display_name}: UpdateLinkUser, thunkAPI) => {
+  "clans/updateUser",
+  async ({ user_name, avatar_url, display_name }: UpdateLinkUser, thunkAPI) => {
     const mezon = ensureClient(getMezonCtx(thunkAPI));
     const body = {
-      avatar_url: avatar_url||'',
-      display_name: display_name||'',
-      lang_tag: 'en',
-      location: '',
-      timezone: '',
+      avatar_url: avatar_url || "",
+      display_name: display_name || "",
+      lang_tag: "en",
+      location: "",
+      timezone: "",
       username: user_name,
-    }
-    const response = await mezon.client.updateAccount(mezon.session, body)
+    };
+    const response = await mezon.client.updateAccount(mezon.session, body);
     if (!response) {
-      return thunkAPI.rejectWithValue([])
+      return thunkAPI.rejectWithValue([]);
     }
     return response as true;
-  }
-);
-
-type updateLinkUserClanProfile = {
-  user_name: string;
-  avatar_url: string;
-  clan_id: string;
-}
-export const updateUserClanProfile = createAsyncThunk(
-'clans/updateUserClanProfile',
-async ({clan_id, user_name, avatar_url}: updateLinkUserClanProfile, thunkAPI) => {
-  console.log("avatar_url ", avatar_url)
-  const mezon = ensureClient(getMezonCtx(thunkAPI));
-  const body = {
-    clan_id: clan_id,
-    nick_name: user_name ||'',
-    avartar: avatar_url,
-  }
-  const response = await mezon.client.updateUserProfileByClan(mezon.session, clan_id, body)
-  if (!response) {
-    return thunkAPI.rejectWithValue([])
-  }
-  return response as true;
-}
+  },
 );
 
 export type CreateLinkInviteUser = {
   channel_id: string;
   clan_id: string;
   expiry_time: number;
-}
-
+};
 
 export const createLinkInviteUser = createAsyncThunk(
-  'clans/invite',
-  async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
+  "clans/invite",
+  async (
+    { channel_id, clan_id, expiry_time }: CreateLinkInviteUser,
+    thunkAPI,
+  ) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const body = {
       channel_id: channel_id,
       clan_id: clan_id,
       expiry_time: expiry_time,
-    }
-    const response = await mezon.client.createLinkInviteUser(mezon.session, body)
+    };
+    const response = await mezon.client.createLinkInviteUser(
+      mezon.session,
+      body,
+    );
     if (!response) {
-      return thunkAPI.rejectWithValue([])
+      return thunkAPI.rejectWithValue([]);
     }
     return response as ApiLinkInviteUser;
-  }
+  },
 );
 
 type InviteUser = {
-  inviteId: string
-}
+  inviteId: string;
+};
 
 export const inviteUser = createAsyncThunk(
-  'clans/inviteUser',
-  async ({inviteId}: InviteUser, thunkAPI) => {
+  "clans/inviteUser",
+  async ({ inviteId }: InviteUser, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.inviteUser(mezon.session, inviteId)
+    const response = await mezon.client.inviteUser(mezon.session, inviteId);
     if (!response) {
-      return thunkAPI.rejectWithValue([])
+      return thunkAPI.rejectWithValue([]);
     }
     return response as ApiInviteUserRes;
-  }
+  },
 );
 
 export const getLinkInvite = createAsyncThunk(
-  'clans/getLinkInvite',
-  async ({inviteId}: InviteUser, thunkAPI) => {
+  "clans/getLinkInvite",
+  async ({ inviteId }: InviteUser, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.getLinkInvite(mezon.session, inviteId)
+    const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
     if (!response) {
-      return thunkAPI.rejectWithValue([])
+      return thunkAPI.rejectWithValue([]);
     }
     return response as ApiInviteUserRes;
-  }
+  },
 );
 
 // export interface ApiLinkInviteUser {
@@ -201,7 +191,7 @@ export const getLinkInvite = createAsyncThunk(
 // }
 
 export const initialClansState: ClansState = clansAdapter.getInitialState({
-  loadingStatus: 'not loaded',
+  loadingStatus: "not loaded",
   clans: [],
   error: null,
 });
@@ -214,39 +204,39 @@ export const clansSlice = createSlice({
     remove: clansAdapter.removeOne,
     setCurrentClanId: (state, action: PayloadAction<string>) => {
       state.currentClanId = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchClans.pending, (state: ClansState) => {
-        state.loadingStatus = 'loading';
+        state.loadingStatus = "loading";
       })
       .addCase(
         fetchClans.fulfilled,
         (state: ClansState, action: PayloadAction<IClan[]>) => {
-          clansAdapter.setAll(state, action.payload)
-          state.loadingStatus = 'loaded';
-        }
+          clansAdapter.setAll(state, action.payload);
+          state.loadingStatus = "loaded";
+        },
       )
       .addCase(fetchClans.rejected, (state: ClansState, action) => {
-        state.loadingStatus = 'error';
+        state.loadingStatus = "error";
         state.error = action.error.message;
       });
 
     builder
       .addCase(createClan.pending, (state: ClansState) => {
-        state.loadingStatus = 'loading';
+        state.loadingStatus = "loading";
       })
       .addCase(
         createClan.fulfilled,
         (state: ClansState, action: PayloadAction<IClan>) => {
-          console.log('Response: ', action.payload);
-          clansAdapter.addOne(state, action.payload)
-          state.loadingStatus = 'loaded';
-        }
+          console.log("Response: ", action.payload);
+          clansAdapter.addOne(state, action.payload);
+          state.loadingStatus = "loaded";
+        },
       )
       .addCase(createClan.rejected, (state: ClansState, action) => {
-        state.loadingStatus = 'error';
+        state.loadingStatus = "error";
         state.error = action.error.message;
       });
   },
@@ -275,8 +265,16 @@ export const clansReducer = clansSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const clansActions = 
-{...clansSlice.actions, fetchClans, createClan, changeCurrentClan, updateUser, updateUserClanProfile, createLinkInviteUser, inviteUser, getLinkInvite  }
+export const clansActions = {
+  ...clansSlice.actions,
+  fetchClans,
+  createClan,
+  changeCurrentClan,
+  updateUser,
+  createLinkInviteUser,
+  inviteUser,
+  getLinkInvite,
+};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -300,31 +298,28 @@ export const getClansState = (rootState: {
 export const selectAllClans = createSelector(getClansState, selectAll);
 export const selectCurrentClanId = createSelector(
   getClansState,
-  (state) => state.currentClanId
+  (state) => state.currentClanId,
 );
 
 export const selectClansEntities = createSelector(
   getClansState,
-  selectEntities
+  selectEntities,
 );
 
-export const selectClanById = (id: string) => createSelector(
-  selectClansEntities,
-  (clansEntities) => clansEntities[id]
-);
+export const selectClanById = (id: string) =>
+  createSelector(selectClansEntities, (clansEntities) => clansEntities[id]);
 
 export const selectLoadingStatus = createSelector(
   getClansState,
-  (state) => state.loadingStatus
+  (state) => state.loadingStatus,
 );
 
 export const selectCurrentClan = createSelector(
   selectClansEntities,
   selectCurrentClanId,
-  (clansEntities, clanId) => clanId ? clansEntities[clanId] : null
+  (clansEntities, clanId) => (clanId ? clansEntities[clanId] : null),
 );
 
-export const selectDefaultClanId = createSelector(
-  selectAllClans,
-  (clans) => clans.length > 0 ? clans[0].id : null
-)
+export const selectDefaultClanId = createSelector(selectAllClans, (clans) =>
+  clans.length > 0 ? clans[0].id : null,
+);
