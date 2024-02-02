@@ -4,19 +4,19 @@ import { MainContent } from './MainContent';
 import IconLogoMezon from '../../../assets/Images/IconLogoMezon.svg';
 import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { ModalCreateClan, ModalListClans } from '@mezon/components';
+import { NavLink, useLocation } from 'react-router-dom';
+import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
 
 function MyApp() {
   const { clans, currentClan } = useChat();
   const [openListClans, setOpenListClans] = useState(false);
   const [openCreateClan, setOpenCreateClans] = useState(false)
   const { navigate, toClanPage } = useAppNavigation();
+  const pathName = useLocation().pathname;
 
   const handleChangeClan = (clanId: string) => {
     navigate(toClanPage(clanId));
   }
-
   const handleOpenCreate = () => {
     setOpenCreateClans(true)
   }
@@ -25,30 +25,33 @@ function MyApp() {
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
         <NavLink to="/chat/direct">
-          <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
+          <NavLinkComponent active={pathName.includes('direct')}>
+            <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
+          </NavLinkComponent>
         </NavLink>
         <div className="py-2 border-t-2 border-t-borderDefault"></div>
-        {currentClan?.id && (<NavLink to={toClanPage(currentClan.id)}>
-          {currentClan?.logo ? (
-            <Image
-              src={currentClan?.logo || ''}
-              alt={currentClan?.clan_name || ''}
-              placeholder="blur"
-              width={48}
-              style={{ borderRadius: '50%' }}
-              blurDataURL={currentClan?.logo}
-            />
-          ) : (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <>
-              {currentClan?.clan_name && (
-                <div className='w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px]'>
-                  {currentClan.clan_name.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </>
-          )}
-
+        {currentClan?.id && (<NavLink to={`/chat/servers/${currentClan.id}`}>
+          <NavLinkComponent active={!pathName.includes('direct')}>
+            {currentClan?.logo ? (
+              <Image
+                src={currentClan?.logo || ''}
+                alt={currentClan?.clan_name || ''}
+                placeholder="blur"
+                width={48}
+                style={{ borderRadius: '50%' }}
+                blurDataURL={currentClan?.logo}
+              />
+            ) : (
+              // eslint-disable-next-line react/jsx-no-useless-fragment
+              <>
+                {currentClan?.clan_name && (
+                  <div className='w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px]'>
+                    {currentClan.clan_name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </>
+            )}
+          </NavLinkComponent>
         </NavLink>
         )}
 

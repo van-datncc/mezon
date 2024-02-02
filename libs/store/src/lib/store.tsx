@@ -3,7 +3,6 @@ import {
   UnknownAction,
   configureStore,
 } from '@reduxjs/toolkit';
-
 import { appReducer } from './app/app.slice';
 import { accountReducer } from './account/account.slice';
 import { authReducer } from './auth/auth.slice';
@@ -22,6 +21,8 @@ import React from 'react';
 import { trackActionError } from '@mezon/utils';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice'
 
+import { friendsReducer } from './friends/friend.slice';
+import { directReducer } from './direct/direct.slice';
 
 const persistedReducer = persistReducer({
   key: 'auth',
@@ -44,7 +45,9 @@ const reducer = {
   messages: messagesReducer,
   users: usersReducer,
   categories: categoriesReducer,
-  userClanProfile: userClanProfileReducer
+  userClanProfile: userClanProfileReducer,
+  friends: friendsReducer,
+  direct: directReducer
 };
 
 let storeInstance = configureStore({
