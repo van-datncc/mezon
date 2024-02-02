@@ -16,11 +16,15 @@ import ProtectedRoutes from './ProtectedRoutes';
 import InitialRoutes from './InititalRoutes';
 import ErrorRoutes from './ErrorRoutes';
 import InvitePage from '../pages/invite';
+import DirectMain from '../pages/directMessage';
 
 // Loaders
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
+import { directLoader } from '../loaders/directLoader';
+import { friendsLoader } from '../loaders/friendsLoader';
+import { directMessageLoader } from '../loaders/directMessageLoader';
 import {
   channelLoader,
   shouldRevalidateChannel,
@@ -29,6 +33,10 @@ import ClansRoutes from './ClanRoutes';
 import ChannelsRoutes from './ChannelsRoutes';
 import { ClanIndex } from '../pages/clan/ClanIndex';
 import { ChannelIndex } from '../pages/channel/ChannelIndex';
+import FriendsPage from '../pages/directMessage/FriendsPage';
+import DMRoutes from './DMRoutes';
+import { DirectMessageIndex } from '../pages/directMessage/DMPage/DirectMessageIndex';
+import { DirectMessage } from '../pages/directMessage/DMPage';
 
 // Components
 export const routes = createBrowserRouter([
@@ -104,7 +112,31 @@ export const routes = createBrowserRouter([
                   },
                   {
                     path: 'direct',
-                    element: <Direct />,
+                    element: <DirectMain />,
+                    loader: directLoader,
+                    children: [
+                      {
+                        path: 'friends',
+                        loader: friendsLoader,
+                        element: <FriendsPage />,
+                      },
+                      {
+                        path: 'message',
+                        element: <DMRoutes />,
+                        children: [
+                          {
+                            path: '',
+                            element: <DirectMessageIndex />,
+                          },
+                          {
+                            path: ':directId',
+                            loader: directMessageLoader,
+                            shouldRevalidate: shouldRevalidateChannel,
+                            element: <DirectMessage />,
+                          },
+                        ],
+                      },
+                    ],
                   },
                 ],
               },
