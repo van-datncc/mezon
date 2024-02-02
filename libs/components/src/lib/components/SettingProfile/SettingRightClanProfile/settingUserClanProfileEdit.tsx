@@ -31,6 +31,7 @@ const SettingRightClanEdit = ({
     selectUserClanProfileByClanID(clanId || "", userProfile?.user?.id || ""),
   );
   const [draftProfile, setDraftProfile] = useState(userClansProfile);
+
   const setUrlImage = (url_image: string) => {
     setDraftProfile((prevState) => {
       if (!prevState) {
@@ -53,23 +54,22 @@ const SettingRightClanEdit = ({
       };
     });
   };
+
+  const editProfile = useMemo<Profilesform>(() => {
+    const profileVaile = {
+      displayName: userProfile?.user?.username || "",
+      urlImage: userProfile?.user?.avatar_url || ''
+    }
+    if (draftProfile?.nick_name) {
+      profileVaile.displayName = draftProfile?.nick_name
+    }
+    if (draftProfile?.avartar) {
+      profileVaile.urlImage = draftProfile.avartar
+    }
+    return profileVaile
+  }, [draftProfile, userProfile]);
   
-  const editProfile = useMemo<Profilesform> (() => {
-      const profileVaile = {
-          displayName: userProfile?.user?.username || "",
-          urlImage: userProfile?.user?.avatar_url || ''
-        }
-        if (draftProfile?.nick_name ) {
-            profileVaile.displayName = draftProfile?.nick_name
-        }
-        if (draftProfile?.avartar ) {
-            profileVaile.urlImage = draftProfile.avartar
-        }
-        return profileVaile
-    },[draftProfile, userProfile]);
-    console.log("editProfile: ", editProfile)
-    console.log("draftProfile: ", draftProfile)
-    const {displayName, urlImage} = editProfile; 
+  const { displayName, urlImage } = editProfile;
 
   const { updateUserClanProfile } = useClanProfileSetting({ clanId });
 
@@ -83,39 +83,8 @@ const SettingRightClanEdit = ({
 
   const handleRemoveButtonClick = () => {
     setFlagOptionsTrue?.();
-    setUrlImage(userProfile?.user?.avatar_url||'');
+    setUrlImage(userProfile?.user?.avatar_url || '');
   };
-
-//   useEffect(() => {
-//     if (userClansProfile?.nick_name !== undefined) {
-//       if (displayName !== userClansProfile.nick_name) {
-//         setFlagOptionsTrue?.();
-//       } else {
-//         setFlagOptionsfalse?.();
-//       }
-//     } else {
-//       if (displayName !== userProfile?.user?.username) {
-//         setFlagOptionsTrue?.();
-//       } else {
-//         setFlagOptionsfalse?.();
-//       }
-//     }
-//   }, [displayName, userClansProfile]);
-//   useEffect(() => {
-//     if (userClansProfile?.avartar !== undefined) {
-//       if (urlImage !== userClansProfile.avartar) {
-//         setFlagOptionsTrue?.();
-//       } else {
-//         setFlagOptionsfalse?.();
-//       }
-//     } else {
-//       if (urlImage !== userProfile?.user?.avatar_url) {
-//         setFlagOptionsTrue?.();
-//       } else {
-//         setFlagOptionsfalse?.();
-//       }
-//     }
-//   }, [urlImage, userClansProfile]);
 
   const handleClose = () => {
     if (
@@ -125,8 +94,8 @@ const SettingRightClanEdit = ({
       setDisplayName(userClansProfile.nick_name || "");
       setUrlImage(userClansProfile.avartar || "");
     } else {
-      setDisplayName(userProfile?.user?.username||'');
-      setUrlImage(userProfile?.user?.avatar_url||'');
+      setDisplayName(userProfile?.user?.username || '');
+      setUrlImage(userProfile?.user?.avatar_url || '');
     }
     setFlagOptionsTrue?.();
   };

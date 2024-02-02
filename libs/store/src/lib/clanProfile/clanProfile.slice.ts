@@ -9,7 +9,7 @@ import {
 import { ensureClient, ensureSession, getMezonCtx } from "../helpers";
 import { ApiClanProfile } from "@mezon/mezon-js/dist/api.gen";
 import { IClanProfile, LoadingStatus } from "@mezon/utils";
-import { useSelector } from "react-redux";
+import { ApiUpdateClanProfileRequest } from "vendors/mezon-js/packages/mezon-js/dist";
 export const USER_CLAN_PROFILE_FEATURE_KEY = "userClanProfile";
 
 export interface UserClanProfileEntity extends IClanProfile {
@@ -65,10 +65,10 @@ export const updateUserClanProfile = createAsyncThunk(
   ) => {
     console.log("avatar_url ", avatarUrl);
     const mezon = ensureClient(getMezonCtx(thunkAPI));
-    const body = {
+    const body: ApiUpdateClanProfileRequest = {
       clan_id: clanId,
       nick_name: username || "",
-      avartar: avatarUrl,
+      avatar_url: avatarUrl || "",
     };
     const response = await mezon.client.updateUserProfileByClan(
       mezon.session,
