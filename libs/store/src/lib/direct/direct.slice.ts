@@ -3,7 +3,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import { channelsActions } from "../channels/channels.slice";
 import { messagesActions } from "../messages/messages.slice";
 import { channelMembersActions } from "../channelmembers/channel.members";
-import { ensureSession, getMezonCtx } from "../helpers";
+import { ensureSession, ensureSocket, getMezonCtx } from "../helpers";
 import { ApiCreateChannelDescRequest } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 import { GetThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
 import { string } from "yup";
@@ -53,7 +53,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
         thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
         // thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ directMessageId }));
 
-        const mezon = await ensureSession(getMezonCtx(thunkAPI));
+        const mezon = await ensureSocket(getMezonCtx(thunkAPI));
         await mezon.joinChatDirectMessage(directMessageId, channelName, type);
         return;
     } catch (error) {
