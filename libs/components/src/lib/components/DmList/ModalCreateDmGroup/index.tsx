@@ -4,7 +4,7 @@ import { Modal } from "@mezon/ui";
 import { channelsActions, directActions, getStoreAsync, joinChanel } from "@mezon/store";
 import { useAppDispatch } from "@mezon/store";
 import { useNavigate } from "react-router-dom";
-import { useAppNavigation, useChannelMembers, useChat } from "@mezon/core";
+import { useAppNavigation, useAppParams, useChannelMembers, useChat } from "@mezon/core";
 import { ApiCreateChannelDescRequest } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 
 interface ModalCreateDMProps {
@@ -37,12 +37,10 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
             channel_private: 1,
             user_ids: selectedFriends,
         };
-        console.log("bodycreate", bodyCreateDmGroup);
         setIsCheck(true);
         const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
         const resPayload = response.payload as ApiCreateChannelDescRequest;
 
-        console.log("response-channel", resPayload);
         if (resPayload.channel_id) {
             await dispatch(directActions.joinDirectMessage({ directMessageId: resPayload.channel_id, channelName: resPayload.channel_lable, type: Number(resPayload.type) }));
             const directChat = toDmGroupPage(resPayload.channel_id, Number(resPayload.type));
@@ -55,6 +53,8 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 
     const [searchTerm, setSearchTerm] = useState<string>("");
 
+    const { directId } = useAppParams();
+    const { members } = useChannelMembers({ channelId: "69df9c32-57aa-4c16-a90b-ecd33d4ef353" });
     interface FriendProps {
         name: string;
         id: string;
@@ -63,8 +63,12 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
     const [friends, setFriends] = useState<FriendProps[]>([
         { name: "USER10", id: "26e7e1ff-7b83-4f46-bb87-58991d0cbdb1" },
         { name: "USER11", id: "4f0ab1da-d153-4965-841d-b8d0123b645d" },
-        { name: "Trường LX", id: "842b743e-7dc5-479c-aba8-1f174dd4e621" },
-        { name: "Phong NN", id: "e7766349-0e0b-40c2-ad02-603a74d23735" },
+        { name: "Truong Le Xuan", id: "842b743e-7dc5-479c-aba8-1f174dd4e621" },
+        { name: "Phong Nguyen Nam", id: "e7766349-0e0b-40c2-ad02-603a74d23735" },
+        { name: "Minh Luc Van", id: "83c79681-0320-432a-8fe4-b2c7a18c27d7" },
+        { name: "Nhan Nguyen Tran", id: "8c464912-9e60-4b84-a5ef-318c03989980" },
+        { name: "Vy Pham Thi Mai", id: "327ea2df-cf03-4768-b41e-66fe84fecd75" },
+        { name: "Anh Nguyen Diep", id: "2a062f8b-5cb7-4cc7-b1a9-40293d2c9ea9" },
     ]);
 
     const filteredFriends = friends.filter((friend: FriendProps) => friend.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -83,7 +87,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <ul className="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+                        <ul className="h-[400px] px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
                             {filteredFriends.map((friend, index) => (
                                 <li key={index}>
                                     <div className="flex items-center p-2 mt-2 rounded ">

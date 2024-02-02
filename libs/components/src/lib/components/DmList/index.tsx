@@ -24,31 +24,6 @@ function DirectMessageList() {
             dmId: "60f777dc-2422-48bc-af3f-2fbaefedeb1d",
             type: 3,
         },
-        {
-            user: {
-                user_name: "Chat With User11",
-                avatar: "",
-                description: "Mezon member1",
-            },
-            dmId: "b2bbd97c-84ab-405e-8b29-ea10457d6462",
-            type: 2,
-        },
-        // {
-        //   user: {
-        //     user_name: "Trường LX",
-        //     avatar: "",
-        //     description: "Mezon member1",
-        //   },
-        //   dmId: "842b743e-7dc5-479c-aba8-1f174dd4e621",
-        // },
-        //     {
-        //   user: {
-        //     user_name: "Phong NN",
-        //     avatar: "",
-        //     description: "Mezon member1",
-        //   },
-        //   dmId: "e7766349-0e0b-40c2-ad02-603a74d23735",
-        // },
     ];
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const onClickOpenModal = () => {

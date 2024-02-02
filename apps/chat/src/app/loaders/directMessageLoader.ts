@@ -8,7 +8,6 @@ export const directMessageLoader: LoaderFunction = async ({ params }) => {
     if (!directId) {
         throw new Error("DirectMessage ID null");
     }
-    console.log("get-loaded");
 
     store.dispatch(directActions.joinDirectMessage({ directMessageId: directId, channelName: "", type: Number(type) }));
 

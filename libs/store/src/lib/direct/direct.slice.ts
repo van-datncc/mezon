@@ -6,6 +6,7 @@ import { channelMembersActions } from "../channelmembers/channel.members";
 import { ensureSession, getMezonCtx } from "../helpers";
 import { ApiCreateChannelDescRequest } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 import { GetThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
+import { string } from "yup";
 
 export const DIRECT_FEATURE_KEY = "direct";
 
@@ -48,12 +49,9 @@ interface JoinDirectMessagePayload {
 
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>("directMessage/joinDirectMessage", async ({ directMessageId, channelName, type }, thunkAPI) => {
     try {
-        console.log("channelID-joined", directMessageId);
         // thunkAPI.dispatch(directActions.setCurrentChannelId(directMessageId));
-        // thunkAPI.dispatch(messagesActions.fetchMessages({ directMessageId }));
-        // thunkAPI.dispatch(
-        //   channelMembersActions.fetchChannelMembers({ directMessageId }),
-        // );
+        thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
+        // thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ directMessageId }));
 
         const mezon = await ensureSession(getMezonCtx(thunkAPI));
         await mezon.joinChatDirectMessage(directMessageId, channelName, type);

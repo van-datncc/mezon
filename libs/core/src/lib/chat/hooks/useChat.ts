@@ -116,11 +116,7 @@ export function useChat() {
             const socket = socketRef.current;
             const channel = channelRef.current;
 
-            console.log("client", client);
-            console.log("session", session);
-            console.log("socker", socket);
-            console.log("channel", channel);
-            console.log("currentClan", currentClanId);
+
 
             if (!client || !session || !socket || !channel || !currentClanId) {
                 console.log(client, session, socket, channel, currentClanId);
