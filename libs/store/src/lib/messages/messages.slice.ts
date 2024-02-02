@@ -7,9 +7,10 @@ import {
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { ensureSession, ensureSocket, getMezonCtx } from "../helpers";
+import { ensureSession, ensureSocket, getMezonCtx, sleep } from "../helpers";
 import { ChannelMessage } from "@mezon/mezon-js/dist";
 import { seenMessagePool } from "./SeenMessagePool";
+import { GetThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
 
 export const MESSAGES_FEATURE_KEY = "messages";
 
@@ -17,7 +18,10 @@ export const MESSAGES_FEATURE_KEY = "messages";
  * Update these interfaces according to your requirements.
  */
 
-export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
+export const mapMessageChannelToEntity = (
+  channelMess: ChannelMessage,
+  lastSeenId?: string,
+): IMessageWithUser => {
   const creationTime = new Date(channelMess.create_time || "");
   const creationTimeMs = creationTime.getTime();
   return {
@@ -35,12 +39,33 @@ export interface MessagesEntity extends IMessageWithUser {
   id: string; // Primary ID
 }
 
+export type UserTypingState = {
+  userId: string;
+  channelId: string;
+  isTyping: boolean;
+  timeAt: number;
+};
+
 export interface MessagesState extends EntityState<MessagesEntity, string> {
   loadingStatus: LoadingStatus;
   error?: string | null;
   isSending?: boolean;
   unreadMessagesEntries?: Record<string, string>;
+  typingUsers?: Record<string, UserTypingState>;
 }
+
+export interface MessagesRootState {
+  [MESSAGES_FEATURE_KEY]: MessagesState;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getMessagesRootState(
+  thunkAPI: GetThunkAPI<unknown>,
+): MessagesRootState {
+  return thunkAPI.getState() as MessagesRootState;
+}
+
+const TYPING_TIMEOUT = 10000;
 
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
@@ -81,9 +106,11 @@ export const fetchMessages = createAsyncThunk(
         seenMessagePool.updateKnownSeenMessage({
           channelId: lastMessage.channel_id || "",
           messageId: lastMessage.id,
-          messageCreatedAt: lastMessage.creationTimeMs ? +lastMessage.creationTimeMs : 0,
+          messageCreatedAt: lastMessage.creationTimeMs
+            ? +lastMessage.creationTimeMs
+            : 0,
           messageSeenAt: 0,
-        })
+        });
       }
     }
 
@@ -112,9 +139,45 @@ export const updateLastSeenMessage = createAsyncThunk(
   },
 );
 
+type UpdateTypingArgs = {
+  channelId: string;
+  userId: string;
+  isTyping: boolean;
+}
+
+export const updateTypingUsers = createAsyncThunk(
+  "messages/updateTypingUsers",
+  async ({ channelId, userId, isTyping }: UpdateTypingArgs, thunkAPI) => {
+    // set user typing to true
+    thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
+    // after 30 seconds recalculate typing users
+    await sleep(30500);
+    thunkAPI.dispatch(messagesActions.recheckTypingUsers());
+  },
+);
+
+export type SendMessageArgs = {
+  channelId: string;
+}
+
+export const sendTypingUser = createAsyncThunk(
+  "messages/sendTypingUser",
+  async ({ channelId }: SendMessageArgs, thunkAPI) => {
+    const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+    const ack = mezon.socketRef.current?.writeMessageTyping(channelId);
+    return ack;
+  },
+);
+
 export type SetChannelLastMessageArgs = {
   channelId: string;
   messageId: string;
+};
+
+export type SetUserTypingArgs = {
+  userId: string;
+  channelId: string;
+  isTyping: boolean;
 };
 
 export const initialMessagesState: MessagesState =
@@ -122,7 +185,11 @@ export const initialMessagesState: MessagesState =
     loadingStatus: "not loaded",
     error: null,
     isSending: false,
+    unreadMessagesEntries: {},
+    typingUsers: {},
   });
+
+export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
 export const messagesSlice = createSlice({
   name: MESSAGES_FEATURE_KEY,
@@ -139,11 +206,11 @@ export const messagesSlice = createSlice({
       }
     },
     markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
-      messagesAdapter.updateOne(state, { 
+      messagesAdapter.updateOne(state, {
         id: action.payload,
         changes: {
-          lastSeen: true
-        }
+          lastSeen: true,
+        },
       });
     },
     remove: messagesAdapter.removeOne,
@@ -159,6 +226,27 @@ export const messagesSlice = createSlice({
         [action.payload.channelId]: action.payload.messageId,
       };
     },
+    setUserTyping: (state, action: PayloadAction<SetUserTypingArgs>) => {
+      state.typingUsers = {
+        ...state.typingUsers,
+        [buildTypingUserKey(action.payload.channelId, action.payload.userId)]: {
+          channelId: action.payload.channelId,
+          isTyping: action.payload.isTyping,
+          timeAt: Date.now(),
+          userId: action.payload.userId,
+        }
+      };
+    },
+    recheckTypingUsers: (state) => {
+      const now = Date.now();
+      const typingUsers = { ...state.typingUsers };
+      for (const key in typingUsers) {
+        if (now - typingUsers[key].timeAt > TYPING_TIMEOUT) {
+          delete typingUsers[key];
+        }
+      }
+      state.typingUsers = typingUsers;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -213,6 +301,8 @@ export const messagesActions = {
   fetchMessages,
   checkMessageSendingAction,
   updateLastSeenMessage,
+  updateTypingUsers,
+  sendTypingUser,
 };
 
 /*
@@ -280,3 +370,29 @@ export const selectUnreadMessageIdByChannelId = (channelId?: string | null) =>
       return lastMessagesEntries && lastMessagesEntries[channelId || ""];
     },
   );
+
+export const selectTypingUsers = createSelector(
+  getMessagesState,
+  (state) => state.typingUsers,
+);
+
+export const selectTypingUsersList = createSelector(
+  selectTypingUsers,
+  (typingUsers) => {
+    return typingUsers && Object.values(typingUsers);
+  },
+);
+
+export const selectTypingUserIds = createSelector(selectTypingUsersList, (typingUsers) => {
+  return typingUsers && typingUsers.map((u) => u.userId);
+});
+
+export const selectTypingUsersListByChannelId = (channelId: string) =>
+  createSelector(selectTypingUsersList, (typingUsers) => {
+    return typingUsers && typingUsers.filter((user) => user.channelId === channelId);
+  });
+
+export const selectTypingUserById = (userId: string) =>
+  createSelector(selectTypingUsers, (typingUsers) => {
+    return typingUsers && typingUsers[userId];
+  });

@@ -1,30 +1,46 @@
 import { MessageBox, IMessagePayload } from '@mezon/components';
-import { useChat } from '@mezon/core';
-import { RootState } from '@mezon/store';
+import { useChatChannel } from '@mezon/core';
 import { IMessage } from '@mezon/utils';
 import { useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce'
 
-export function ChannelMessageBox() {
-    const { sendMessage } = useChat();
-    const sessionUser = useSelector((state: RootState) => state.auth.session);
+type ChannelMessageBoxProps = {
+    channelId: string;
+}
+
+export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
+    const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
+    
     const handleSend = useCallback(
         (mess: IMessagePayload) => {
-            if (sessionUser) {
-                const messageToSend: IMessage = {
-                    ...mess,
-                };
-                sendMessage(messageToSend);
-            } else {
-                console.error('Session is not available');
-            }
+            const messageToSend: IMessage = {
+                ...mess,
+            };
+            sendMessage(messageToSend);
         },
-        [sendMessage, sessionUser],
+        [sendMessage],
     );
+
+    const handleTyping = useCallback(
+        () => {
+            sendMessageTyping();
+        },
+        [sendMessageTyping],
+    );
+
+    const handleTypingDebounced = useDebouncedCallback(handleTyping, 1000);
 
     return (
         <div>
-            <MessageBox onSend={handleSend} />
+            <MessageBox onSend={handleSend} onTyping={handleTypingDebounced} />
+        </div>
+    );
+}
+
+ChannelMessageBox.Skeleton = () => {
+    return (
+        <div>
+            <MessageBox.Skeleton />
         </div>
     );
 }
