@@ -43,9 +43,6 @@ export function DirectMessage() {
                     <MemberList />
                 </div>
             </div>
-            <div className="w-[268px] bg-bgSurface md:flex">
-                <MemberList />
-            </div>
         </div>
     );
 }
