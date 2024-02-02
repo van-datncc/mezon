@@ -9,6 +9,9 @@ import {
   selectCurrentChannelId,
   selectCurrentClanId,
   clansActions,
+  userClanProfileActions,
+  selectAllUserClanProfile,
+  selectUserClanProfileByClanID,
   channelsActions,
   selectCurrentClan,
   useAppDispatch,
@@ -37,6 +40,7 @@ export function useChat() {
   const currentChannelId = useSelector(selectCurrentChannelId);
   const currentClanId = useSelector(selectCurrentClanId);
   const categories = useSelector(selectAllCategories);
+  const userClansProfile = useSelector(selectAllUserClanProfile);
   const { messages } = useMessages({ channelId: currentChannelId });
   const { members } = useChannelMembers({ channelId: currentChannelId });
   const { userProfile } = useSelector(selectAllAccount);
@@ -70,7 +74,25 @@ export function useChat() {
     },
     [dispatch],
   );
-
+  
+  const getUserClanProfile = React.useCallback(
+    async (clanId: string) => {
+      await dispatch(userClanProfileActions.fetchUserClanProfile({clanId}));
+    },
+    [dispatch],
+  );
+  
+  const updateUserClanProfile = React.useCallback(
+    async (clanId: string, name: string, logoUrl: string) => {
+      const action = await dispatch(
+        userClanProfileActions.updateUserClanProfile({clanId, username: name, avatarUrl: logoUrl}),
+      );
+      const payload = action.payload;
+      return payload;
+    },
+    [dispatch],
+  );
+  
   const createClans = React.useCallback(
     async (name: string, logoUrl: string) => {
       const action = await dispatch(
@@ -183,6 +205,9 @@ export function useChat() {
       currentClan,
       currentChanel,
       userProfile,
+      userClansProfile,
+      getUserClanProfile,
+      updateUserClanProfile,
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
@@ -207,6 +232,9 @@ export function useChat() {
       sendMessage,
       changeCurrentClan,
       changeCurrentChannel,
+      userClansProfile,
+      getUserClanProfile,
+      updateUserClanProfile,
       createClans,
       updateUser,
       createLinkInviteUser,

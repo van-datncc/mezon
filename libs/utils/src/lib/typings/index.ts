@@ -5,6 +5,7 @@ import {
   ApiClanDesc,
   ApiUser,
   ApiAccount,
+  ApiClanProfile,
   
 } from '@mezon/mezon-js/dist/api.gen';
 import { ChannelMessage } from '@mezon/mezon-js';
@@ -14,6 +15,9 @@ import { ChannelMessage } from '@mezon/mezon-js';
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
 export type IClan = ApiClanDesc & {
+  id: string;
+};
+export type IClanProfile = ApiClanProfile & {
   id: string;
 };
 export type ICategory = ApiCategoryDesc & {
