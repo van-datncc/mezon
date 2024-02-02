@@ -19,6 +19,8 @@ import { MezonContextValue } from '@mezon/transport'
 import { useDispatch } from 'react-redux';
 import React from 'react';
 import { trackActionError } from '@mezon/utils';
+import { userClanProfileReducer } from './clanProfile/clanProfile.slice'
+
 import { friendsReducer } from './friends/friend.slice';
 import { directReducer } from './direct/direct.slice';
 
@@ -43,6 +45,7 @@ const reducer = {
   messages: messagesReducer,
   users: usersReducer,
   categories: categoriesReducer,
+  userClanProfile: userClanProfileReducer,
   friends: friendsReducer,
   direct: directReducer
 };
