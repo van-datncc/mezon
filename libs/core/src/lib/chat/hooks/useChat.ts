@@ -4,7 +4,19 @@ import { useChannelMembers } from "./useChannelMembers";
 import { useMessages } from "./useMessages";
 import { useThreads } from "./useThreads";
 import { useSelector } from "react-redux";
-import { selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, clansActions, channelsActions, selectCurrentClan, useAppDispatch, ClansEntity, selectAllClans, selectAllCategories, selectAllAccount } from "@mezon/store";
+import {
+    selectCurrentChannel,
+    selectCurrentChannelId,
+    selectCurrentClanId,
+    clansActions,
+    channelsActions,
+    selectCurrentClan,
+    useAppDispatch,
+    ClansEntity,
+    selectAllClans,
+    selectAllCategories,
+    selectAllAccount,
+} from "@mezon/store";
 import { ICategoryChannel, IChannel, IMessage } from "@mezon/utils";
 import { useMezon } from "@mezon/transport";
 import { checkMessageSendingAction } from "@mezon/store";
@@ -116,8 +128,6 @@ export function useChat() {
             const socket = socketRef.current;
             const channel = channelRef.current;
 
-
-
             if (!client || !session || !socket || !channel || !currentClanId) {
                 console.log(client, session, socket, channel, currentClanId);
                 throw new Error("Client is not initialized");
@@ -141,7 +151,19 @@ export function useChat() {
             const ack = await socket.writeChatMessage(currentClanId, channel.id, payload);
             ack && dispatch(checkMessageSendingAction());
         },
-        [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.display_name, userProfile?.user?.id, userProfile?.user?.username],
+        [
+            channelRef,
+            clientRef,
+            currentChannelId,
+            currentClanId,
+            dispatch,
+            sessionRef,
+            socketRef,
+            userProfile?.user?.avatar_url,
+            userProfile?.user?.display_name,
+            userProfile?.user?.id,
+            userProfile?.user?.username,
+        ],
     );
 
     return useMemo(
@@ -166,6 +188,26 @@ export function useChat() {
             currentClanId,
             getLinkInvite,
         }),
-        [client, channels, messages, clans, threads, categorizedChannels, members, currentClan, currentChanel, userProfile, sendMessage, changeCurrentClan, changeCurrentChannel, createClans, updateUser, createLinkInviteUser, inviteUser, currentClanId, getLinkInvite],
+        [
+            client,
+            channels,
+            messages,
+            clans,
+            threads,
+            categorizedChannels,
+            members,
+            currentClan,
+            currentChanel,
+            userProfile,
+            sendMessage,
+            changeCurrentClan,
+            changeCurrentChannel,
+            createClans,
+            updateUser,
+            createLinkInviteUser,
+            inviteUser,
+            currentClanId,
+            getLinkInvite,
+        ],
     );
 }

@@ -16,9 +16,10 @@ export function useChatDirect(directMessageID: string | undefined) {
     const listDM = useSelector(selectAllDirectMessages);
     const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
     const { userProfile } = useSelector(selectAllAccount);
-
-    //sendMessage Direct Actions
+    const { messages } = useMessages({ channelId: directMessageID });
+    const client = clientRef.current;
     const dispatch = useAppDispatch();
+
     const sendDirectMessage = React.useCallback(
         async (message: IMessage) => {
             // TODO: send message to server using nakama client
@@ -27,12 +28,6 @@ export function useChatDirect(directMessageID: string | undefined) {
             const socket = socketRef.current;
             const channel = channelRef.current;
             const currentClanId = "093b8667-1ce3-4982-9140-790dfebcf3c9";
-
-            console.log("client", client);
-            console.log("session", session);
-            console.log("socker", socket);
-            console.log("channel", channel);
-            console.log("currentClan", currentClanId);
 
             if (!client || !session || !socket || !channel || !currentClanId) {
                 console.log(client, session, socket, channel, currentClanId);
@@ -56,15 +51,29 @@ export function useChatDirect(directMessageID: string | undefined) {
             const ack = await socket.writeChatMessage("", channel.id, payload);
             ack && dispatch(checkMessageSendingAction());
         },
-        [sessionRef, clientRef, socketRef, channelRef, userProfile?.user?.display_name, userProfile?.user?.username, userProfile?.user?.id, userProfile?.user?.avatar_url, dispatch, directMessageID],
-    );
+        [
+        messages,
+        sessionRef,
+        clientRef,
+        socketRef,
+        channelRef, 
+        userProfile?.user?.display_name, 
+        userProfile?.user?.username,
+        userProfile?.user?.id, 
+        userProfile?.user?.avatar_url,
+        dispatch, directMessageID],
+);
 
     return useMemo(
         () => ({
             friends,
             listDM,
+            client,
+            messages,
             sendDirectMessage,
+            dispatch,
+            directMessageID,
         }),
-        [friends, listDM, sendDirectMessage],
+        [friends, listDM, client, messages, sendDirectMessage, messages],
     );
 }

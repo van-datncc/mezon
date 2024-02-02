@@ -1,5 +1,5 @@
 import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from "@mezon/components";
-import { useAppNavigation, useAppParams } from "@mezon/core";
+import { useAppNavigation, useAppParams, useChatChannel } from "@mezon/core";
 import { RootState, selectDefaultChannelIdByClanId } from "@mezon/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
@@ -18,13 +18,14 @@ export function DirectMessage() {
             navigate(`./${defaultChannelId}`);
         }
     }, [defaultChannelId, navigate]);
+    const { messages } = useChatChannel(directId ?? "");
 
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
-    }, [isSending, [], messagesContainerRef.current?.scrollHeight]);
+    }, [isSending, [], messages]);
 
     return (
         <>
