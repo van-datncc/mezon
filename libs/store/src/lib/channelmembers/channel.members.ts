@@ -195,7 +195,6 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
   selectChannelMembesEntities,
   (entities) => {
     const members = Object.values(entities);
-    console.log('members', members, userIds, channelId)
     return members.filter((member) => member?.user?.id && userIds.includes(member?.user?.id))
   }
 )
