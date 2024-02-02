@@ -115,7 +115,6 @@ export function useChat() {
             const client = clientRef.current;
             const socket = socketRef.current;
             const channel = channelRef.current;
-            const currentClanId = "093b8667-1ce3-4982-9140-790dfebcf3c9";
 
             console.log("client", client);
             console.log("session", session);

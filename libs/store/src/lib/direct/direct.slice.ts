@@ -42,7 +42,7 @@ export const createNewDirectMessage = createAsyncThunk("channels/createNewChanne
 
 interface JoinDirectMessagePayload {
     directMessageId: string;
-    channelName?: string ;
+    channelName?: string;
     type?: number;
 }
 
@@ -52,11 +52,11 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
         // thunkAPI.dispatch(directActions.setCurrentChannelId(directMessageId));
         // thunkAPI.dispatch(messagesActions.fetchMessages({ directMessageId }));
         // thunkAPI.dispatch(
-        //   channelMembersActions.fetchChannelMembers({ directMessageId }),    
+        //   channelMembersActions.fetchChannelMembers({ directMessageId }),
         // );
 
         const mezon = await ensureSession(getMezonCtx(thunkAPI));
-        await mezon.joinChatChannel(directMessageId, channelName, type);
+        await mezon.joinChatDirectMessage(directMessageId, channelName, type);
         return;
     } catch (error) {
         console.log(error);

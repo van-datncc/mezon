@@ -59,7 +59,7 @@ function DirectMessageList() {
             <hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
             <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide ">
                 {
-                    <div className="flex flex-col gap-4 font-['Manrope'] text-[#AEAEAE] p-4">
+                    <div className="flex flex-col gap-4 font-['Manrope'] text-[#AEAEAE] py-4 px-2">
                         <button
                             className={` rounded-[4px] flex items-center gap-3`}
                             onClick={() => {
@@ -77,7 +77,7 @@ function DirectMessageList() {
                             <ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
                         </div>
                         {listDm.map((directMessage: any) => (
-                            <NavLink to={`/chat/direct/message/${directMessage.dmId}/${directMessage.type}`}>
+                            <NavLink className={"hover:bg-gray-800 w-full px-2 py-1"} to={`/chat/direct/message/${directMessage.dmId}/${directMessage.type}`}>
                                 <MemberProfile avatar={directMessage?.user?.avatar ?? ""} name={directMessage?.user?.user_name ?? ""} status={false} isHideStatus={false} key={directMessage.dmId} />
                             </NavLink>
                         ))}
