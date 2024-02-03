@@ -122,7 +122,7 @@ function LoginForm(props: LoginFormProps) {
               >
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className="w-full h-6 bg-transparent outline-none text-white"
+                  className="w-full h-6 bg-transparent outline-none text-white pl-0 border-none"
                   {...register('password')}
                   name="password"
                   id="password"

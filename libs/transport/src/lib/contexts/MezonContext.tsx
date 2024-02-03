@@ -57,7 +57,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, n
             if (!clientRef.current) {
                 throw new Error("Nakama client not initialized");
             }
-            const session = await clientRef.current.authenticateEmail(email, password, true);
+            const session = await clientRef.current.authenticateEmail(email, password, false);
             sessionRef.current = session;
 
             if (!socketRef.current) {
