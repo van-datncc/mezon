@@ -1,10 +1,13 @@
-import { BaseSyntheticEvent, useCallback, useState } from "react";
-import { Resolver, useForm } from "react-hook-form";
-import { AlertTitleTextWarning } from "../../../../../../ui/src/lib/Alert/index";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-
-import * as Icons from "../../Icons";
+import { BaseSyntheticEvent, useCallback, useEffect, useState } from 'react';
+import { Resolver, useForm } from 'react-hook-form';
+import { AlertTitleTextWarning } from '../../../../../../ui/src/lib/Alert/index';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { Loading } from 'libs/ui/src/lib/Loading/index';
+import * as Icons from '../../Icons';
+import { useSelector } from 'react-redux';
+import { RootState, authActions } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store';
 
 export type LoginFormPayload = {
     userEmail: string;
@@ -18,17 +21,22 @@ type LoginFormProps = {
 
 export const validationSchema = Yup.object().shape({
     userEmail: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
+        .email('Invalid email address')
+        .required('Email is required'),
     password: Yup.string()
-        .required("Password is required")
+        .required('Password is required')
         .matches(
             /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
-            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number",
+            'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number',
         ),
 });
 
 function LoginForm(props: LoginFormProps) {
+    const isLoading = useSelector(
+        (state: RootState) => state.auth.loadingStatus,
+    );
+    const dispatch = useAppDispatch();
+
     const { onSubmit } = props;
     const {
         register,
@@ -40,15 +48,15 @@ function LoginForm(props: LoginFormProps) {
         ) as unknown as Resolver<LoginFormPayload>,
 
         defaultValues: {
-            password: "",
+            password: '',
             remember: false,
-            userEmail: "",
+            userEmail: '',
         },
     });
 
     const submitForm = useCallback(
         (data: LoginFormPayload) => {
-            if (typeof onSubmit === "function") {
+            if (typeof onSubmit === 'function') {
                 onSubmit(data);
             }
             return false;
@@ -69,6 +77,12 @@ function LoginForm(props: LoginFormProps) {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
+
+    const handleRefreshStatusLogin = () => {
+        dispatch(authActions.refreshStatus());
+    };
+
+    console.log('isLoading', isLoading);
 
     return (
         <div className="flex-col justify-start items-center flex lg:w-[496px] h-fit px-36 lg:px-0 w-full">
@@ -93,13 +107,13 @@ function LoginForm(props: LoginFormProps) {
                         <div
                             className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${
                                 errors.userEmail
-                                    ? "border-red-500"
-                                    : "border-[#1e1e1e]"
+                                    ? 'border-red-500'
+                                    : 'border-[#1e1e1e]'
                             }`}
                         >
                             <input
                                 className="w-full h-6  bg-transparent outline-none relative text-white"
-                                {...register("userEmail")}
+                                {...register('userEmail')}
                                 name="userEmail"
                                 id="userEmail"
                                 placeholder="Enter your email/phone number"
@@ -122,14 +136,14 @@ function LoginForm(props: LoginFormProps) {
                             <div
                                 className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] border-[1px] ${
                                     errors.password
-                                        ? "border-red-500"
-                                        : "border-[#1e1e1e]"
+                                        ? 'border-red-500'
+                                        : 'border-[#1e1e1e]'
                                 } `}
                             >
                                 <input
-                                    type={showPassword ? "text" : "password"}
+                                    type={showPassword ? 'text' : 'password'}
                                     className="w-full h-6 bg-transparent outline-none text-white pl-0 border-none"
-                                    {...register("password")}
+                                    {...register('password')}
                                     name="password"
                                     id="password"
                                     placeholder="Enter your password"
@@ -160,10 +174,16 @@ function LoginForm(props: LoginFormProps) {
                 <div className="flex-col justify-start items-start flex w-full h-fit">
                     <button
                         onClick={handleFormSubmit}
-                        className="flex-col justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 rounded-[4px] bg-[#155eef] "
+                        className="flex-col justify-start items-center flex w-full h-[48px] pt-3 pr-4 pb-3 pl-4 rounded-[4px] bg-[#155eef] "
                     >
                         <p className="w-fit h-fit font-manrope text-left text-base font-medium text-[#ffffff] leading-[150%]">
-                            Sign in
+                            {isLoading === 'loading' ? (
+                                <Loading classProps="w-5 h-5 ml-2" />
+                            ) : isLoading === 'loaded' ? (
+                                'Login successful'
+                            ) : (
+                                'Sign in'
+                            )}
                         </p>
                     </button>
 
@@ -194,6 +214,14 @@ function LoginForm(props: LoginFormProps) {
                     <AlertTitleTextWarning
                         description={errors?.userEmail?.message}
                     />
+                )}
+                {isLoading === 'error' ? (
+                    <AlertTitleTextWarning
+                        description={'Your account does not exist'}
+                        onClick={handleRefreshStatusLogin}
+                    />
+                ) : (
+                    []
                 )}
             </div>
         </div>

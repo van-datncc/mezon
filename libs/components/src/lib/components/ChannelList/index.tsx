@@ -141,6 +141,7 @@ function ChannelList() {
                       active={currentChanel?.id === channel.id}
                       key={channel.id}
                       createInviteLink={handleOpenInvite}
+                      isPrivate={channel.channel_private}
                     />
                   ))}
               </div>

@@ -37,7 +37,7 @@ const Modal = (props: ModalProps) => {
                                 </div>
                                 {/*body*/}
                                 <div className="relative px-6 py-4 flex-auto">
-                                    <div className="bg-black p-[10px] rounded-[5px]">
+                                    <div className="bg-[#323232] p-[10px] rounded-[5px]">
                                         {children}
                                     </div>
                                 </div>

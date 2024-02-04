@@ -2,58 +2,57 @@ import { IChannel } from '@mezon/utils';
 import * as Icons from '../Icons';
 import { ChannelLable, ThreadLable, SearchMessage } from './TopBarComponents';
 export type ChannelTopbarProps = {
-  channel?: IChannel | null;
+    channel?: IChannel | null;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
-  return (
-    <div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink ">
-      <div className="justify-start items-center gap-1 flex">
-        <ChannelLable
-          type={1}
-          // channelStatus=""
-          name={channel?.category_name}
-        />
-        <ThreadLable name={channel?.channel_lable} />
-      </div>
+    return (
+        <div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink ">
+            <div className="justify-start items-center gap-1 flex">
+                <ChannelLable
+                    type={1}
+                    name={channel?.channel_lable}
+                    isPrivate={channel?.channel_private}
+                />
+            </div>
 
-      {/* Desktop buttons */}
-      <div className="hidden items-center h-full ml-auto lg:flex">
-        <div className="justify-end items-center gap-2 flex">
-          <div className="justify-start items-center gap-[15px] flex">
-            <button>
-              <Icons.ThreadIcon />
-            </button>
+            {/* Desktop buttons */}
+            <div className="hidden items-center h-full ml-auto lg:flex">
+                <div className="justify-end items-center gap-2 flex">
+                    <div className="justify-start items-center gap-[15px] flex">
+                        <button>
+                            <Icons.ThreadIcon />
+                        </button>
 
-            <button>
-              <Icons.MuteBell />
-            </button>
+                        <button>
+                            <Icons.MuteBell />
+                        </button>
 
-            <button>
-              <Icons.PinRight />
-            </button>
+                        <button>
+                            <Icons.PinRight />
+                        </button>
 
-            <button>
-              <Icons.MemberList />
-            </button>
+                        <button>
+                            <Icons.MemberList />
+                        </button>
 
-            <button>
-              <Icons.ThreeDot />
-            </button>
-          </div>
-          <SearchMessage />
-          <div className="justify-start items-start gap-4 flex">
-            <button>
-              <Icons.Inbox />
-            </button>
-            <button>
-              <Icons.Help />
-            </button>
-          </div>
+                        <button>
+                            <Icons.ThreeDot />
+                        </button>
+                    </div>
+                    <SearchMessage />
+                    <div className="justify-start items-start gap-4 flex">
+                        <button>
+                            <Icons.Inbox />
+                        </button>
+                        <button>
+                            <Icons.Help />
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default ChannelTopbar;
