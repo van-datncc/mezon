@@ -1,12 +1,15 @@
 import { LoaderFunction } from 'react-router-dom';
-import { channelsActions, getStoreAsync } from '@mezon/store';
+import { channelsActions, directActions, getStoreAsync } from '@mezon/store';
+import { ChannelTypeEnum } from '@mezon/utils';
 
-export const directLoader: LoaderFunction = async ({params}) => {
-  const {channelId} = params
-//   const store = await getStoreAsync();
-//   if(!channelId) {
-//    throw new Error('DirectMessage ID null')
-//   }
-//   store.dispatch(channelsActions.joinChanel(channelId));
-  return null;
-}
+export const directLoader: LoaderFunction = async () => {
+    const store = await getStoreAsync();
+    store.dispatch(
+        directActions.fetchDirectMessage({
+            clanId: '',
+            channelType: ChannelTypeEnum.DM_CHAT | ChannelTypeEnum.GROUP_CHAT,
+        }),
+    );
+
+    return null;
+};

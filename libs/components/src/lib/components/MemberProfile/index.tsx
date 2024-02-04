@@ -3,6 +3,7 @@ export type MemberProfileProps = {
     name: string;
     status?: boolean;
     isHideStatus: boolean;
+    numberCharacterCollapse?: number;
 };
 
 function MemberProfile({
@@ -10,6 +11,7 @@ function MemberProfile({
     name,
     status,
     isHideStatus,
+    numberCharacterCollapse = 6,
 }: MemberProfileProps) {
     return (
         <div className="relative gap-[5px] flex items-center ">
@@ -41,10 +43,10 @@ function MemberProfile({
             <div className="flex flex-col items-start">
                 <p
                     className="text-[13px]"
-                    title={name && name.length > 6 ? name : undefined}
+                    title={name && name.length > numberCharacterCollapse ? name : undefined}
                 >
-                    {name && name.length > 6
-                        ? `${name.substring(0, 10)}...`
+                    {name && name.length > numberCharacterCollapse
+                        ? `${name.substring(0, numberCharacterCollapse)}...`
                         : name}
                 </p>
 

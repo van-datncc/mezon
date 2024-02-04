@@ -149,9 +149,11 @@ export enum ChannelStatusEnum {
 
 export enum ChannelTypeEnum {
     CHANNEL_TEXT = 1,
+    DM_CHAT = 2,
+    GROUP_CHAT = 3,
     CHANNEL_VOICE = 4,
-    FORUM = 2,
-    ANNOUNCEMENT = 3,
+    FORUM = 5,
+    ANNOUNCEMENT = 6,
 }
 
 export interface ChannelProps {

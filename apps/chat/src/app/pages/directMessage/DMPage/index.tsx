@@ -5,6 +5,7 @@ import {
     MemberList,
     ServerHeader,
     DirectMessageBox,
+    DmTopbar,
 } from '@mezon/components';
 import { useAppNavigation, useAppParams, useChatChannel } from '@mezon/core';
 import { RootState, selectDefaultChannelIdByClanId } from '@mezon/store';
@@ -40,7 +41,7 @@ export function DirectMessage() {
 
     return (
         <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-            <ChannelTopbar channel={null} />
+            <DmTopbar channel={null} />
             <div className="flex h-heightWithoutTopBar flex-row ">
                 <div className="flex flex-col flex-1 w-full h-full">
                     <div
@@ -52,9 +53,6 @@ export function DirectMessage() {
                     <div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
                         <DirectMessageBox directParamId={directId ?? ''} />
                     </div>
-                </div>
-                <div className="w-[268px] bg-bgSurface  lg:flex hidden">
-                    <MemberList />
                 </div>
             </div>
         </div>

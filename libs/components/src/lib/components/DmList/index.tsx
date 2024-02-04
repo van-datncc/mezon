@@ -1,30 +1,20 @@
-import { NavLink } from "react-router-dom";
-import MemberProfile from "../MemberProfile";
-import { IconFriends } from "../Icons";
-import { useAppNavigation } from "@mezon/core";
-import * as Icons from "../Icons";
-import { ModalCreateDM } from "./ModalCreateDmGroup/index";
-import { useState } from "react";
+import { NavLink } from 'react-router-dom';
+import MemberProfile from '../MemberProfile';
+import { IconFriends } from '../Icons';
+import { useAppNavigation, useAppParams, useChatDirect } from '@mezon/core';
+import * as Icons from '../Icons';
+import { ModalCreateDM } from './ModalCreateDmGroup/index';
+import { useState } from 'react';
+import { ChannelTypeEnum } from '@mezon/utils';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function DirectMessageList() {
+    const { directId } = useAppParams();
+    const dmGroupList = useChatDirect(directId);
+    console.log('dmGroupList', dmGroupList.listDM);
     const { navigate } = useAppNavigation();
-
-    // const { listDm } = useChatDirect();
-    //Dummy data for list DirectMessages
-    const listDm = [
-        {
-            user: {
-                user_name: "User10; User 11; PNN; TLX",
-                avatar: "",
-                description: "Mezon member1",
-            },
-            dmId: "60f777dc-2422-48bc-af3f-2fbaefedeb1d",
-            type: 3,
-        },
-    ];
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const onClickOpenModal = () => {
         setIsOpen(!isOpen);
@@ -38,7 +28,7 @@ function DirectMessageList() {
                         <button
                             className={` rounded-[4px] flex items-center gap-3`}
                             onClick={() => {
-                                navigate("/chat/direct/friends");
+                                navigate('/chat/direct/friends');
                             }}
                         >
                             <IconFriends />
@@ -46,14 +36,30 @@ function DirectMessageList() {
                         </button>
                         <div className="text-[14px] font-bold text-[#fff] mt-3 flex flex-row items-center justify-center gap-3  h-5">
                             DIRECT MESSAGE
-                            <button onClick={onClickOpenModal} className="cursor-pointer flex flex-row justify-end ml-0">
+                            <button
+                                onClick={onClickOpenModal}
+                                className="cursor-pointer flex flex-row justify-end ml-0"
+                            >
                                 <Icons.Plus />
                             </button>
-                            <ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
+                            <ModalCreateDM
+                                onClose={onClickOpenModal}
+                                isOpen={isOpen}
+                            />
                         </div>
-                        {listDm.map((directMessage: any) => (
-                            <NavLink className={"hover:bg-gray-800 w-full px-2 py-1"} to={`/chat/direct/message/${directMessage.dmId}/${directMessage.type}`}>
-                                <MemberProfile avatar={directMessage?.user?.avatar ?? ""} name={directMessage?.user?.user_name ?? ""} status={false} isHideStatus={false} key={directMessage.dmId} />
+                        {dmGroupList.listDM.map((directMessage: any) => (
+                            <NavLink
+                                className={'hover:bg-gray-800 w-full px-2 py-1'}
+                                to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`}
+                            >
+                                <MemberProfile
+                                    numberCharacterCollapse={20}
+                                    avatar={directMessage?.user?.avatar ?? ''}
+                                    name={directMessage?.channel_lable ?? ''}
+                                    status={false}
+                                    isHideStatus={false}
+                                    key={directMessage.channel_id}
+                                />
                             </NavLink>
                         ))}
                     </div>
