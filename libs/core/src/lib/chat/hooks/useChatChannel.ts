@@ -16,7 +16,6 @@ import {
 } from "@mezon/store";
 import { IMessage } from "@mezon/utils";
 import { useMezon } from "@mezon/transport";
-import { checkMessageSendingAction } from "@mezon/store";
 import {
   ApiInviteUserRes,
   ApiLinkInviteUser,
@@ -107,7 +106,6 @@ export function useChatChannel(channelId: string) {
         channel.id,
         payload,
       );
-      ack && dispatch(checkMessageSendingAction());
     },
     [
       sessionRef,

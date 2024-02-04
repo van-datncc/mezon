@@ -81,6 +81,7 @@ export const fetchMessages = createAsyncThunk("messages/fetchMessages", async ({
   }
 
   const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
+  console.log("messsget",messages)
 
   if (response.last_seen_message_id) {
     thunkAPI.dispatch(
@@ -206,9 +207,6 @@ export const messagesSlice = createSlice({
       });
     },
     remove: messagesAdapter.removeOne,
-    checkMessageSendingAction: (state) => {
-      state.isSending = !state.isSending;
-    },
     setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
       state.unreadMessagesEntries = {
         ...state.unreadMessagesEntries,
@@ -283,12 +281,10 @@ export const messagesReducer = messagesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const { checkMessageSendingAction } = messagesSlice.actions;
 
 export const messagesActions = {
   ...messagesSlice.actions,
   fetchMessages,
-  checkMessageSendingAction,
   updateLastSeenMessage,
   updateTypingUsers,
   sendTypingUser,

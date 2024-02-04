@@ -7,7 +7,6 @@ import { useThreads } from "./useThreads";
 import { selectCurrentClanId, clansActions, useAppDispatch, selectAllAccount, selectUnreadMessageIdByChannelId, selectLastMessageIdByChannelId } from "@mezon/store";
 import { IMessage } from "@mezon/utils";
 import { useMezon } from "@mezon/transport";
-import { checkMessageSendingAction } from "@mezon/store";
 import { ApiInviteUserRes, ApiLinkInviteUser } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 // @deprecated
 
@@ -49,7 +48,6 @@ export function useChatDirect(directMessageID: string | undefined) {
                 payload.channel_id = directMessageID || "";
             }
             const ack = await socket.writeChatMessage("", channel.id, payload);
-            ack && dispatch(checkMessageSendingAction());
         },
         [
         messages,

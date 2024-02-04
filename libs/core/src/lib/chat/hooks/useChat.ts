@@ -22,7 +22,6 @@ import {
 } from '@mezon/store';
 import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
-import { checkMessageSendingAction } from '@mezon/store';
 import {
   ApiInviteUserRes,
   ApiLinkInviteUser,
@@ -188,7 +187,6 @@ export function useChat() {
         channel.id,
         payload,
       );
-      ack && dispatch(checkMessageSendingAction());
     },
     [channelRef, clientRef, currentChannelId, currentClanId, dispatch, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.display_name, userProfile?.user?.id, userProfile?.user?.username],
   );
