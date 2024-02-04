@@ -42,7 +42,6 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
         });
     };
 
-    console.log('length', length);
     const handleCreateDM = async () => {
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
             type: length > 1 ? 3 : 2,

@@ -17,7 +17,6 @@ export const ChannelLable: React.FC<ChannelProps> = ({
     type,
     name,
 }) => {
-    console.log('ispriva', isPrivate);
     return (
         <>
             <div className="flex flex-row items-center relative">
