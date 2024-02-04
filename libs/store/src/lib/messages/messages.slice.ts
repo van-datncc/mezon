@@ -81,7 +81,6 @@ export const fetchMessages = createAsyncThunk("messages/fetchMessages", async ({
   }
 
   const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
-  console.log("messsget",messages)
 
   if (response.last_seen_message_id) {
     thunkAPI.dispatch(

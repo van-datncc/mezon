@@ -82,7 +82,6 @@ function LoginForm(props: LoginFormProps) {
         dispatch(authActions.refreshStatus());
     };
 
-    console.log('isLoading', isLoading);
 
     return (
         <div className="flex-col justify-start items-center flex lg:w-[496px] h-fit px-36 lg:px-0 w-full">
