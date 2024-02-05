@@ -63,7 +63,7 @@ export const fetchDirectMessage = createAsyncThunk("channels/fetchChannels", asy
     console.log("clandidGet", clanId);
     console.log("channelType", channelType);
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, "", clanId, 2);
+    const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, "", clanId, 1);
     console.log("responsedmgr", response);
     if (!response.channeldesc) {
         return thunkAPI.rejectWithValue([]);
