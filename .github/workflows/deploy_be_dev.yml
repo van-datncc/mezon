@@ -18,6 +18,7 @@ jobs:
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
           npm install --no-package-lock | true
+          npm run sync
       - name: Build
         run: |
           echo "Build"
