@@ -2,15 +2,11 @@ import { selectAllDirectMessages, selectAllFriends, selectDmGroupCurrentId } fro
 import { useSelector } from 'react-redux';
 import React, { useMemo } from 'react';
 import { useMessages } from './useMessages';
-import {
-
-	useAppDispatch,
-	selectAllAccount,
-
-} from '@mezon/store';
+import { useAppDispatch, selectAllAccount } from '@mezon/store';
 import { IMessage } from '@mezon/utils';
 import { useMezon } from '@mezon/transport';
 import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { useChannelMembers } from './useChannelMembers';
 // @deprecated
 
 export function useChatDirect(directMessageID: string | undefined) {
@@ -21,6 +17,7 @@ export function useChatDirect(directMessageID: string | undefined) {
 	const { messages } = useMessages({ channelId: directMessageID });
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
+	const { members } = useChannelMembers({ channelId: directMessageID });
 
 	const sendDirectMessage = React.useCallback(
 		async (message: IMessage) => {
@@ -65,6 +62,7 @@ export function useChatDirect(directMessageID: string | undefined) {
 			dispatch,
 			directMessageID,
 			listDM,
+			members,
 		],
 	);
 
@@ -77,7 +75,8 @@ export function useChatDirect(directMessageID: string | undefined) {
 			dispatch,
 			directMessageID,
 			listDM,
+			members,
 		}),
-		[friends, listDM, client, messages, sendDirectMessage, messages, listDM],
+		[friends, listDM, client, messages, sendDirectMessage, messages, listDM, members],
 	);
 }

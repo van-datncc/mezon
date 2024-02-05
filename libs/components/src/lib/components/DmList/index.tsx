@@ -1,12 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import MemberProfile from '../MemberProfile';
 import { IconFriends } from '../Icons';
-import { useAppNavigation, useAppParams, useChatDirect } from '@mezon/core';
+import { useAppNavigation, useAppParams, useChannelMembers, useChatDirect } from '@mezon/core';
 import * as Icons from '../Icons';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
 import { useEffect, useState } from 'react';
 import { ChannelTypeEnum, IChannel } from '@mezon/utils';
-import { RootState, directActions } from '@mezon/store';
+import { ChannelMembersEntity, RootState, directActions } from '@mezon/store';
 import { joinDirectMessage } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';

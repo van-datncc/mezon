@@ -1,11 +1,11 @@
-import { useChat } from '@mezon/core';
+import { useChat, useChatDirect } from '@mezon/core';
 import { MemberProfile } from '@mezon/components';
 import { ChannelMembersEntity } from '@mezon/store';
 
-export type MemberListProps = { className?: string };
+export type MemberListProps = { className?: string; directMessageId: string | undefined };
 
-function MemberList() {
-	const { members } = useChat();
+function MemberListGroupChat({ directMessageId }: MemberListProps) {
+	const { members } = useChatDirect(directMessageId);
 	return (
 		<>
 			<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">
@@ -37,4 +37,4 @@ function MemberList() {
 	);
 }
 
-export default MemberList;
+export default MemberListGroupChat;
