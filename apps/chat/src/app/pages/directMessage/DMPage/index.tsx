@@ -18,7 +18,7 @@ import { ChannelTypeEnum } from '@mezon/utils';
 export function DirectMessage() {
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
 
-	const { serverId, directId } = useAppParams();
+	const { serverId, directId,type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(serverId || ''));
 	const { navigate } = useAppNavigation();
 
@@ -35,7 +35,6 @@ export function DirectMessage() {
 			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
 		}
 	}, [isSending, [], messages]);
-	const { type } = useAppParams();
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
