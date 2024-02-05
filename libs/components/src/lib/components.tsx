@@ -15,6 +15,7 @@ export { default as ModalListClans } from './components/ModalListClans';
 export { default as ModalCreateClan } from './components/CreateClanModal';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
 export { default as DirectMessageBox } from './components/DmList/MessageBoxDM/index';
+export { default as DmTopbar } from './components/DmList//DMtopbar/index';
 
 export * from './components/MessageBox';
 export * from './components/LoginForm';

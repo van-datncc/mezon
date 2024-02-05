@@ -52,7 +52,6 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
             directActions.createNewDirectMessage(bodyCreateDmGroup),
         );
         const resPayload = response.payload as ApiCreateChannelDescRequest;
-
         if (resPayload.channel_id) {
             await dispatch(
                 directActions.joinDirectMessage({

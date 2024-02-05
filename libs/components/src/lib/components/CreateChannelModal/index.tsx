@@ -158,13 +158,15 @@ export const CreateNewChannelModal = () => {
                                             />
                                             <ChannelTypeComponent
                                                 disable={true}
-                                                type={2}
+                                                type={ChannelTypeEnum.FORUM}
                                                 onChange={onChangeChannelType}
                                                 error={isErrorType}
                                             />
                                             <ChannelTypeComponent
                                                 disable={true}
-                                                type={3}
+                                                type={
+                                                    ChannelTypeEnum.ANNOUNCEMENT
+                                                }
                                                 onChange={onChangeChannelType}
                                                 error={isErrorType}
                                             />
