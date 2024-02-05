@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from "@mezon/components";
+import { ChannelList, ChannelTopbar, DmTopbar, FooterProfile, MemberList, ServerHeader } from "@mezon/components";
 import { useAppNavigation, useAppParams } from "@mezon/core";
 import { selectDefaultChannelIdByClanId } from "@mezon/store";
 import { useSelector } from "react-redux";
@@ -19,7 +19,7 @@ export function DirectMessageIndex() {
 
     return (
         <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-            <ChannelTopbar channel={null} />
+            <DmTopbar channel={null} />
             <div className="flex h-screen">
                 <div className="flex flex-col flex-1">
                     <div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
