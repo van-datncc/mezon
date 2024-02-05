@@ -2,7 +2,6 @@ import { IMessageWithUser } from "@mezon/utils";
 import { ChannelMessage } from "./ChannelMessage";
 import { useChatChannel } from "@mezon/core";
 import { useEffect, useRef } from "react";
-import { checkMessageSendingAction } from "@mezon/store";
 import { useDispatch } from "react-redux";
 
 type ChannelMessagesProps = {

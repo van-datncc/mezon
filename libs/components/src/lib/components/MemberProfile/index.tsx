@@ -17,7 +17,11 @@ function MemberProfile({
                 {avatar ? (
                     <img
                         src={avatar}
-                        style={{ width: '38px', height: '38px', borderRadius: '50%' }}
+                        style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '50%',
+                        }}
                     />
                 ) : (
                     <div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
@@ -35,7 +39,15 @@ function MemberProfile({
                 )}
             </a>
             <div className="flex flex-col items-start">
-                <span className="text-[13px]">{name}</span>
+                <p
+                    className="text-[13px]"
+                    title={name && name.length > 6 ? name : undefined}
+                >
+                    {name && name.length > 6
+                        ? `${name.substring(0, 10)}...`
+                        : name}
+                </p>
+
                 <span className="text-[11px] text-contentSecondary">
                     {status ? 'Offline' : 'Online'}
                 </span>

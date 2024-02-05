@@ -206,9 +206,6 @@ export const messagesSlice = createSlice({
       });
     },
     remove: messagesAdapter.removeOne,
-    checkMessageSendingAction: (state) => {
-      state.isSending = !state.isSending;
-    },
     setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
       state.unreadMessagesEntries = {
         ...state.unreadMessagesEntries,
@@ -283,12 +280,10 @@ export const messagesReducer = messagesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const { checkMessageSendingAction } = messagesSlice.actions;
 
 export const messagesActions = {
   ...messagesSlice.actions,
   fetchMessages,
-  checkMessageSendingAction,
   updateLastSeenMessage,
   updateTypingUsers,
   sendTypingUser,
