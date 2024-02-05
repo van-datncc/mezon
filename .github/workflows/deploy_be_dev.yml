@@ -17,8 +17,8 @@ jobs:
           echo "NODE_ENV: ${{ env.NODE_ENV }}"
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
+          chmod 777 ./scripts/preinstall.sh
           npm install --no-package-lock | true
-          npm run sync
       - name: Build
         run: |
           echo "Build"
