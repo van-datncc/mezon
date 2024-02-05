@@ -32,6 +32,10 @@ const SettingRightClanEdit = ({
   );
   const [draftProfile, setDraftProfile] = useState(userClansProfile);
 
+  useEffect(() => {
+    setDraftProfile(userClansProfile);
+  }, [userClansProfile]);
+
   const setUrlImage = (url_image: string) => {
     setDraftProfile((prevState) => {
       if (!prevState) {
@@ -39,7 +43,7 @@ const SettingRightClanEdit = ({
       }
       return {
         ...prevState,
-        url_image,
+        avartar: url_image,
       };
     });
   };
@@ -75,10 +79,21 @@ const SettingRightClanEdit = ({
 
   const handleFile = (e: any) => {
     const fileToStore: File = e.target.files[0];
-    setUrlImage(URL.createObjectURL(fileToStore));
+    const newUrl = URL.createObjectURL(fileToStore);
+    setUrlImage(newUrl);
+    if(newUrl !== userProfile?.user?.avatar_url){
+      setFlagOptionsTrue?.();
+    }else{
+      setFlagOptionsfalse?.();
+    }
   };
   const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayName(e.target.value);
+    if(e.target.value !== userProfile?.user?.username){
+      setFlagOptionsTrue?.();
+    }else{
+      setFlagOptionsfalse?.();
+    }
   };
 
   const handleRemoveButtonClick = () => {
@@ -90,26 +105,26 @@ const SettingRightClanEdit = ({
     if (
       userClansProfile?.nick_name !== undefined ||
       userClansProfile?.avartar !== undefined
-    ) {
-      setDisplayName(userClansProfile.nick_name || "");
-      setUrlImage(userClansProfile.avartar || "");
-    } else {
-      setDisplayName(userProfile?.user?.username || '');
-      setUrlImage(userProfile?.user?.avatar_url || '');
-    }
-    setFlagOptionsTrue?.();
-  };
-  const handlSaveClose = () => {
-    setFlagOptionsfalse?.();
-  };
-  const handleUpdateUser = async () => {
-    if (urlImage || displayName) {
-      await updateUserClanProfile(
-        userClansProfile?.clan_id || "",
-        displayName || "",
-        urlImage || "",
-      );
-    }
+      ) {
+        setDisplayName(userClansProfile.nick_name || "");
+        setUrlImage(userClansProfile.avartar || "");
+      } else {
+        setDisplayName(userProfile?.user?.username || '');
+        setUrlImage(userProfile?.user?.avatar_url || '');
+      }
+      setFlagOptionsfalse?.();
+    };
+    const handlSaveClose = () => {
+      setFlagOptionsfalse?.();
+    };
+    const handleUpdateUser = async () => {
+      if (urlImage || displayName) {
+        await updateUserClanProfile(
+          userClansProfile?.clan_id || "",
+          displayName || "",
+          urlImage || "",
+          );
+        }
   };
   const saveProfile: ModalSettingSave = {
     flagOption: flagOption,
