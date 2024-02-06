@@ -1,13 +1,6 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
-import { ApiCategoryDesc } from '@mezon/mezon-js/dist/api.gen';
+import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from '@mezon/mezon-js/dist/api.gen';
 import { ICategory, LoadingStatus } from '@mezon/utils';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
@@ -16,93 +9,93 @@ export const CATEGORIES_FEATURE_KEY = 'categories';
  */
 
 export interface CategoriesEntity extends ICategory {
-  id: string; // Primary ID
+	id: string; // Primary ID
 }
 
-export const mapCategoryToEntity  = (categoriesRes: ApiCategoryDesc ) => {
-  const id = (categoriesRes as unknown as any).category_id
-  return {...categoriesRes, id}
-}
+export const mapCategoryToEntity = (categoriesRes: ApiCategoryDesc) => {
+	const id = (categoriesRes as unknown as any).category_id;
+	return { ...categoriesRes, id };
+};
 
 export interface CategoriesState extends EntityState<CategoriesEntity, string> {
-  loadingStatus: LoadingStatus;
-  error?: string | null;
-  currentCategoryId?: string | null;
+	loadingStatus: LoadingStatus;
+	error?: string | null;
+	currentCategoryId?: string | null;
 }
 
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
 
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchCategories())
- * }, [dispatch]);
- * ```
- */
 type fetchCategoriesPayload = {
-  clanId: string
-}
-export const fetchCategories = createAsyncThunk(
-  'categories/fetchCategories',
-  async ({clanId} : fetchCategoriesPayload, thunkAPI) => {
-    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listCategoryDescs(mezon.session, clanId)
-    if(!response.categorydesc) {
-      return thunkAPI.rejectWithValue([])
-    }
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getCategoriess()`;
-     * Right now we just return an empty array.
-     */
-    
-    return response.categorydesc.map(mapCategoryToEntity);
-  }
-);
+	clanId: string;
+};
+export const fetchCategories = createAsyncThunk('categories/fetchCategories', async ({ clanId }: fetchCategoriesPayload, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	const response = await mezon.client.listCategoryDescs(mezon.session, clanId);
+	if (!response.categorydesc) {
+		return thunkAPI.rejectWithValue([]);
+	}
+	return response.categorydesc.map(mapCategoryToEntity);
+});
+
+export const createNewCategory = createAsyncThunk('categories/createCategories', async (body: ApiCreateCategoryDescRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.createCategoryDesc(mezon.session, body);
+		if (response) {
+      thunkAPI.dispatch(
+        fetchCategories({ clanId: body.clan_id as string }),
+    );
+			return response;
+		} else {
+			return thunkAPI.rejectWithValue([]);
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export const initialCategoriesState: CategoriesState = categoriesAdapter.getInitialState({
-  loadingStatus: 'not loaded',
-  categories: [],
-  error: null,
+	loadingStatus: 'not loaded',
+	categories: [],
+	error: null,
 });
 
 export const categoriesSlice = createSlice({
-  name: CATEGORIES_FEATURE_KEY,
-  initialState: initialCategoriesState,
-  reducers: {
-    add: categoriesAdapter.addOne,
-    remove: categoriesAdapter.removeOne,
-    changeCurrentCategory: (state, action: PayloadAction<string>) => {
-      state.currentCategoryId = action.payload;
-    }
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchCategories.pending, (state: CategoriesState) => {
-        state.loadingStatus = 'loading';
-      })
-      .addCase(
-        fetchCategories.fulfilled,
-        (state: CategoriesState, action: PayloadAction<ICategory[]>) => {
-          categoriesAdapter.setAll(state,action.payload)
-          state.loadingStatus = 'loaded';
-        }
-      )
-      .addCase(fetchCategories.rejected, (state: CategoriesState, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      });
-  },
+	name: CATEGORIES_FEATURE_KEY,
+	initialState: initialCategoriesState,
+	reducers: {
+		add: categoriesAdapter.addOne,
+		remove: categoriesAdapter.removeOne,
+		changeCurrentCategory: (state, action: PayloadAction<string>) => {
+			state.currentCategoryId = action.payload;
+		},
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchCategories.pending, (state: CategoriesState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(fetchCategories.fulfilled, (state: CategoriesState, action: PayloadAction<ICategory[]>) => {
+				categoriesAdapter.setAll(state, action.payload);
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(fetchCategories.rejected, (state: CategoriesState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+
+		builder
+			.addCase(createNewCategory.pending, (state: CategoriesState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(createNewCategory.fulfilled, (state: CategoriesState) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(createNewCategory.rejected, (state: CategoriesState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+	},
 });
 
 /*
@@ -128,8 +121,7 @@ export const categoriesReducer = categoriesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const categoriesActions = 
-{...categoriesSlice.actions, fetchCategories }
+export const categoriesActions = { ...categoriesSlice.actions, fetchCategories,createNewCategory};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -147,27 +139,14 @@ export const categoriesActions =
  */
 const { selectAll, selectEntities } = categoriesAdapter.getSelectors();
 
-export const getCategoriesState = (rootState: {
-  [CATEGORIES_FEATURE_KEY]: CategoriesState;
-}): CategoriesState => rootState[CATEGORIES_FEATURE_KEY];
+export const getCategoriesState = (rootState: { [CATEGORIES_FEATURE_KEY]: CategoriesState }): CategoriesState => rootState[CATEGORIES_FEATURE_KEY];
 export const selectAllCategories = createSelector(getCategoriesState, selectAll);
-export const selectCurrentCategoryId = createSelector(
-  getCategoriesState,
-  (state) => state.currentCategoryId
-);
+export const selectCurrentCategoryId = createSelector(getCategoriesState, (state) => state.currentCategoryId);
 
-export const selectCategoriesEntities = createSelector(
-  getCategoriesState,
-  selectEntities
-);
+export const selectCategoriesEntities = createSelector(getCategoriesState, selectEntities);
 
-export const selectCategoryById = (id: string) => createSelector(
-  selectCategoriesEntities,
-  (categoriesEntities) => categoriesEntities[id]
-);
+export const selectCategoryById = (id: string) => createSelector(selectCategoriesEntities, (categoriesEntities) => categoriesEntities[id]);
 
-export const selectCurrentCategory = createSelector(
-  selectCategoriesEntities,
-  selectCurrentCategoryId,
-  (categoriesEntities, clanId) => clanId ? categoriesEntities[clanId] : null
+export const selectCurrentCategory = createSelector(selectCategoriesEntities, selectCurrentCategoryId, (categoriesEntities, clanId) =>
+	clanId ? categoriesEntities[clanId] : null,
 );

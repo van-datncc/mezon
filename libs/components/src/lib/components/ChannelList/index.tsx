@@ -97,8 +97,7 @@ function ChannelList() {
         <BrowseChannel />
       </div>
       <hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
-
-      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide ">
+      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide">
         {categorizedChannels.map((category: ICategoryChannel) => (
           <div key={category.id}>
             {category.category_name && (
@@ -114,7 +113,6 @@ function ChannelList() {
                   ) : (
                     <Icons.ArrowRight />
                   )}
-
                   {category.category_name}
                 </button>
                 <button

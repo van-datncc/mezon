@@ -179,16 +179,6 @@ export const getLinkInvite = createAsyncThunk(
   },
 );
 
-// export interface ApiLinkInviteUser {
-//   channel_id?: string;
-//   clan_id?: string;
-//   create_time?: string;
-//   creator_id?: string;
-//   expiry_time?: string;
-//   id?: string;
-//   invite_link?: string;
-// }
-
 export const initialClansState: ClansState = clansAdapter.getInitialState({
   loadingStatus: "not loaded",
   clans: [],
