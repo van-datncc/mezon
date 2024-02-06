@@ -4,7 +4,7 @@ import { RootState } from '@mezon/store';
 import { IMessage } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { useDebouncedCallback } from 'use-debounce'
+import { useThrottledCallback } from 'use-debounce'
 
 type ChannelMessageBoxProps = {
     channelId: string;
@@ -12,7 +12,7 @@ type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
     const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
-    
+
     const handleSend = useCallback(
         (mess: IMessagePayload) => {
             const messageToSend: IMessage = {
@@ -30,7 +30,7 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
         [sendMessageTyping],
     );
 
-    const handleTypingDebounced = useDebouncedCallback(handleTyping, 1000);
+    const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
     return (
         <div>

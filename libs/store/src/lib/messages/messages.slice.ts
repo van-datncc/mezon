@@ -65,7 +65,7 @@ function getMessagesRootState(
   return thunkAPI.getState() as MessagesRootState;
 }
 
-const TYPING_TIMEOUT = 3000;
+export const TYPING_TIMEOUT = 3000;
 
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
