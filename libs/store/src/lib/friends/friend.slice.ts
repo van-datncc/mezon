@@ -5,71 +5,121 @@ import {
   createSlice,
   EntityState,
   PayloadAction,
-} from '@reduxjs/toolkit';
-import { LoadingStatus } from '@mezon/utils';
-import {ensureSession, getMezonCtx } from '../helpers';
-import { Friend } from 'vendors/mezon-js/packages/mezon-js/dist';
-export const FRIEND_FEATURE_KEY = 'friends';
+} from "@reduxjs/toolkit";
+import { LoadingStatus } from "@mezon/utils";
+import { ensureSession, getMezonCtx } from "../helpers";
+import { Friend } from "vendors/mezon-js/packages/mezon-js/dist";
+import { toast } from "react-toastify";
+export const FRIEND_FEATURE_KEY = "friends";
 
 export interface FriendsEntity extends Friend {
-  id:string
+  id: string;
 }
 
 export interface IFriend extends Friend {
-  id:string
+  id: string;
 }
-
 
 export const mapFriendToEntity = (FriendRes: Friend) => {
-  return { ...FriendRes, id: FriendRes.user?.id || '' }
-}
+  return { ...FriendRes, id: FriendRes.user?.id || "" };
+};
 
 export interface FriendsState extends EntityState<FriendsEntity, string> {
   loadingStatus: LoadingStatus;
   error?: string | null;
+  currentTabStatus: string;
 }
 
 export const friendsAdapter = createEntityAdapter<FriendsEntity>();
 
 export const fetchListFriends = createAsyncThunk(
-  'friends/fetchListFriends',
+  "friends/fetchListFriends",
   async (_, thunkAPI) => {
- 
-    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.listFriends(mezon.session, 1, 100, '');
-
-    if(!response.friends) {
-      return thunkAPI.rejectWithValue([])
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const response = await mezon.client.listFriends(
+      mezon.session,
+      undefined,
+      100,
+      "",
+    );
+    if (!response.friends) {
+      return thunkAPI.rejectWithValue([]);
     }
     return response.friends.map(mapFriendToEntity);
-  }
+  },
 );
 
 export type requestAddFriendParam = {
   ids?: string[];
-  usernames?: string[]
-}
-
+  usernames?: string[];
+};
 
 export const sendRequestAddFriend = createAsyncThunk(
-  'friends/requestFriends',
-  async ({ids, usernames} : requestAddFriendParam, thunkAPI) => {
- 
-    const mezon  = await ensureSession(getMezonCtx(thunkAPI));
-    const response = await mezon.client.addFriends(mezon.session,ids,usernames);
-
-    if(!response) {
-      return thunkAPI.rejectWithValue([])
-    }
-    return response;
-  }
+  "friends/requestFriends",
+  async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    await mezon.client
+      .addFriends(mezon.session, ids, usernames)
+      .catch(function (err) {
+        err.json().then((data: any) => {
+          toast.error(data.message);
+        });
+      })
+      .then((data) => {
+        if (data) {
+          thunkAPI.dispatch(friendsActions.fetchListFriends());
+        }
+      })
+      .catch((e) => {
+        console.log("error");
+      });
+  },
 );
 
-export const initialFriendsState: FriendsState = friendsAdapter.getInitialState({
-  loadingStatus: 'not loaded',
-  friends: [],
-  error: null,
-});
+export const sendRequestDeleteFriend = createAsyncThunk(
+  "friends/requestDeleteFriends",
+  async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const response = await mezon.client.deleteFriends(
+      mezon.session,
+      ids,
+      usernames,
+    );
+    console.log(response);
+    if (!response) {
+      return thunkAPI.rejectWithValue([]);
+    }
+    thunkAPI.dispatch(friendsActions.fetchListFriends());
+    return response;
+  },
+);
+
+export const sendRequestBlockFriend = createAsyncThunk(
+  "friends/requestBlockFriends",
+  async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const response = await mezon.client.blockFriends(
+      mezon.session,
+      ids,
+      usernames,
+    );
+    console.log(response);
+    if (!response) {
+      return thunkAPI.rejectWithValue([]);
+    }
+    thunkAPI.dispatch(friendsActions.fetchListFriends());
+    return response;
+  },
+);
+
+export const initialFriendsState: FriendsState = friendsAdapter.getInitialState(
+  {
+    loadingStatus: "not loaded",
+    friends: [],
+    error: null,
+    currentTabStatus: "all",
+  },
+);
 
 export const friendsSlice = createSlice({
   name: FRIEND_FEATURE_KEY,
@@ -77,33 +127,48 @@ export const friendsSlice = createSlice({
   reducers: {
     add: friendsAdapter.addOne,
     remove: friendsAdapter.removeOne,
+    changeCurrentStatusTab: (state, action: PayloadAction<string>) => {
+      state.currentTabStatus = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchListFriends.pending, (state: FriendsState) => {
-        state.loadingStatus = 'loading';
+        state.loadingStatus = "loading";
       })
       .addCase(
         fetchListFriends.fulfilled,
         (state: FriendsState, action: PayloadAction<IFriend[]>) => {
-          friendsAdapter.setAll(state, action.payload)
-          state.loadingStatus = 'loaded';
-        }
+          friendsAdapter.setAll(state, action.payload);
+          state.loadingStatus = "loaded";
+        },
       )
       .addCase(fetchListFriends.rejected, (state: FriendsState, action) => {
-        state.loadingStatus = 'error';
+        state.loadingStatus = "error";
         state.error = action.error.message;
       });
+    builder.addCase(
+      sendRequestAddFriend.rejected,
+      (state: FriendsState, action) => {
+        state.loadingStatus = "error";
+        state.error =
+          action.error.message ?? "No valid ID or username was provided.";
+      },
+    );
   },
 });
 
 export const friendsReducer = friendsSlice.reducer;
 
+export const friendsActions = {
+  ...friendsSlice.actions,
+  fetchListFriends,
+  sendRequestAddFriend,
+  sendRequestDeleteFriend,
+  sendRequestBlockFriend,
+};
 
-export const friendsActions = 
-{...friendsSlice.actions, fetchListFriends, sendRequestAddFriend}
-
-const { selectAll, selectEntities } = friendsAdapter.getSelectors();
+const { selectAll } = friendsAdapter.getSelectors();
 
 export const getFriendsState = (rootState: {
   [FRIEND_FEATURE_KEY]: FriendsState;

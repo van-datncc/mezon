@@ -1,13 +1,12 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import MemberProfile from '../MemberProfile';
 import { IconFriends } from '../Icons';
 import { useAppNavigation, useAppParams, useChannelMembers, useChatDirect } from '@mezon/core';
 import * as Icons from '../Icons';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
-import { useEffect, useState } from 'react';
-import { ChannelTypeEnum, IChannel } from '@mezon/utils';
-import { ChannelMembersEntity, RootState, directActions } from '@mezon/store';
-import { joinDirectMessage } from '@mezon/store';
+import { useState } from 'react';
+import { IChannel } from '@mezon/utils';
+import { RootState, directActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
@@ -17,6 +16,7 @@ export type CategoriesState = Record<string, boolean>;
 function DirectMessageList() {
 	const currentDmGroupId = useSelector((state: RootState) => state.direct.currentDirectMessageId);
 	const { directId } = useAppParams();
+	const pathname = useLocation().pathname
 	const data = useChatDirect(directId);
 	const dmGroupChatList = data.listDM;
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
@@ -47,7 +47,6 @@ function DirectMessageList() {
 			}),
 		);
 		await dispatch(directActions.selectDmGroupCurrentId(DMid));
-
 		if (result) {
 			navigate(toDmGroupPage(DMid, type));
 		}
@@ -60,45 +59,43 @@ function DirectMessageList() {
 				<ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
 			</div>
 
-			<div className="mt-5">
-				<div className="w-full flex flex-row justify-center">
+			<div className="mt-5 px-2 py-1">
+				<div className="w-full flex flex-row items-center">
 					<button
-						className={` rounded-[4px] flex items-center gap-3`}
+						className={`py-2 px-3 rounded-[4px] w-full flex gap-4 items-center ${pathname.includes('friends') ? "bg-bgTertiary" : ""}`}
 						onClick={() => {
 							navigate('/chat/direct/friends');
 						}}
 					>
 						<IconFriends />
-						Add Friend
+						Friends
 					</button>
 				</div>
 
-				<div className="text-[14px] font-bold text-[#fff] mt-6 flex flex-row items-center w-full justify-between px-1 pb-5 h-5">
+				<div className="text-[14px] px-3 font-bold text-[#fff] mt-6 flex flex-row items-center w-full justify-between px-1 pb-5 h-5">
 					<p>DIRECT MESSAGE</p>
 					<button onClick={onClickOpenModal} className="cursor-pointer flex flex-row justify-end  ml-0">
 						<Icons.Plus />
 					</button>
 				</div>
 			</div>
-			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 scrollbar-hide">
-				<div className="flex flex-col gap-4 font-['Manrope'] text-[#AEAEAE] py-1 text-center relative">
-					<div className=" ">
-						{filteredDataDM.map((directMessage: any) => (
-							<button
-								className={`h-fit pl-2 hover:bg-[#1E1E1E] py-2 w-full focus:bg-[#1E1E1E] ${directMessage.channel_id === currentDmGroupId ? 'bg-[#1E1E1E] text-cyan-500' : ''}`}
-								onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
-							>
-								<MemberProfile
-									numberCharacterCollapse={25}
-									avatar={directMessage?.user?.avatar ?? ''}
-									name={directMessage?.channel_lable ?? ''}
-									status={false}
-									isHideStatus={false}
-									key={directMessage.channel_id}
-								/>
-							</button>
-						))}
-					</div>
+			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 scrollbar-hide px-2">
+				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
+					{filteredDataDM.map((directMessage: any) => (
+						<button
+							className={`h-fit pl-2 rounded-[6px] hover:bg-bgSecondary py-2 w-full focus:bg-bgTertiary ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'bg-[#1E1E1E] text-cyan-500' : ''}`}
+							onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
+						>
+							<MemberProfile
+								numberCharacterCollapse={22}
+								avatar={directMessage?.user?.avatar ?? ''}
+								name={directMessage?.channel_lable ?? ''}
+								status={false}
+								isHideStatus={false}
+								key={directMessage.channel_id}
+							/>
+						</button>
+					))}
 				</div>
 			</div>
 		</>

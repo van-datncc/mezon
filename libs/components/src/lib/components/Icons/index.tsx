@@ -112,6 +112,26 @@ export function IconFriends(props: React.HTMLAttributes<SVGElement>) {
     );
 }
 
+export function IconChat(props: React.HTMLAttributes<SVGElement>) {
+    return (
+        <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+            <path d="M15.946 11.8118C16.8226 10.6243 17.3333 9.19918 17.3333 7.66667C17.3333 3.52453 13.6024 0.166668 9 0.166668C4.39763 0.166668 0.666672 3.52453 0.666672 7.66667C0.666672 11.8088 4.39763 15.1667 9 15.1667C10.2213 15.1667 11.3812 14.9302 12.4263 14.5054L16.164 15.9547C16.8505 16.2209 17.5196 15.5312 17.2327 14.8531L15.946 11.8118Z" fill="#AEAEAE" />
+        </svg>
+    );
+}
+
+
+export function IconEditThreeDot(props: React.HTMLAttributes<SVGElement>) {
+    return (
+        <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+            <path d="M9.00003 4.33337C8.30968 4.33337 7.75003 3.77373 7.75003 3.08337C7.75003 2.39302 8.30968 1.83337 9.00003 1.83337C9.69039 1.83337 10.25 2.39302 10.25 3.08337C10.25 3.77373 9.69039 4.33337 9.00003 4.33337Z" fill="#AEAEAE" />
+            <path d="M9.00003 15.1667C8.30967 15.1667 7.75003 14.6071 7.75003 13.9167C7.75003 13.2264 8.30967 12.6667 9.00003 12.6667C9.69039 12.6667 10.25 13.2264 10.25 13.9167C10.25 14.6071 9.69039 15.1667 9.00003 15.1667Z" fill="#AEAEAE" />
+            <path d="M9.00003 9.75004C8.30968 9.75004 7.75003 9.1904 7.75003 8.50004C7.75003 7.80968 8.30968 7.25004 9.00003 7.25004C9.69039 7.25004 10.25 7.80968 10.25 8.50004C10.25 9.1904 9.69039 9.75004 9.00003 9.75004Z" fill="#AEAEAE" />
+        </svg>
+
+    );
+}
+
 export function UploadImage(props: React.HTMLAttributes<SVGElement>) {
     return (
         <svg
