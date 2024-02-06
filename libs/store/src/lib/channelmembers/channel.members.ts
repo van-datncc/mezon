@@ -21,8 +21,9 @@ export interface ChannelMembersEntity extends IChannelMember {
   id: string; // Primary ID
 }
 
-export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser) => {
-  return { ...channelRes, id: channelRes?.user?.id || '' }
+// TODO: remove channelId from the parameter
+export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
+  return { ...channelRes, id: channelRes?.user?.id || '', channelId }
 }
 
 export const mapUserIdToEntity = (userId: string, username :string ) => {
@@ -75,7 +76,8 @@ export const fetchChannelMembers = createAsyncThunk(
     if (!response.channel_users) {
       return thunkAPI.rejectWithValue([])
     }
-    return response.channel_users.map(mapChannelMemberToEntity);
+    // TODO: add channelId to the response
+    return response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
   }
 );
 
@@ -187,7 +189,7 @@ export const selectMembersByChannelId = (channelId?: string | null) => createSel
   selectChannelMembesEntities,
   (entities) => {
     const members = Object.values(entities);
-    return members.filter((member) => member && member.user !== null);
+    return members.filter((member) => member && member.user !== null && member.channelId === channelId);
   }
 );
 
