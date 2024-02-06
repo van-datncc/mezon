@@ -11,6 +11,7 @@ import { Button, InputField } from "@mezon/ui";
 import {
     FriendsEntity,
     RootState,
+    directActions,
     friendsActions,
     requestAddFriendParam,
     sendRequestAddFriend,
@@ -20,7 +21,10 @@ import {
 } from "@mezon/store";
 import { useSelector } from "react-redux";
 import { Dropdown } from "flowbite-react";
-import { useChatDirect } from "@mezon/core";
+import { useAppNavigation, useChatDirect } from "@mezon/core";
+import { Navigate, useNavigate } from "react-router";
+import { ApiCreateChannelDescRequest } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
+import { ChannelTypeEnum } from "@mezon/utils";
 
 const tabData = [
     { title: "All", value: "all" },
@@ -132,6 +136,31 @@ export default function FriendsPage() {
     const listFriendFilter = filterStatus(friends).filter((obj) =>
         obj.user?.username?.includes(textSearch),
     );
+
+	const { toDmGroupPageFromFriendPage } = useAppNavigation();
+	const navigate = useNavigate();
+
+    const directMessageWithUser = async (userId:string) => {
+		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
+			type: ChannelTypeEnum.DM_CHAT,
+			channel_private: 1,
+			user_ids: [userId],
+		};
+        const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
+		const resPayload = response.payload as ApiCreateChannelDescRequest;
+
+		if (resPayload.channel_id) {
+			await dispatch(
+				directActions.joinDirectMessage({
+					directMessageId: resPayload.channel_id,
+					channelName: resPayload.channel_lable,
+					type: Number(resPayload.type),
+				}),
+			);
+			const directChat = toDmGroupPageFromFriendPage(resPayload.channel_id, Number(resPayload.type));
+			navigate(directChat);
+		}
+	};
     const quantityPendingRequest = friends.filter((obj) =>
         obj.state === 2
     ).length || 0
@@ -202,7 +231,7 @@ export default function FriendsPage() {
                                         <div>
                                             {friend.state === 0 && (
                                                 <div className="flex gap-3 items-center">
-                                                    <button className="bg-bgTertiary rounded-full p-2">
+                                                    <button onClick={() => directMessageWithUser(friend.user?.id ?? "")} className="bg-bgTertiary rounded-full p-2">
                                                         <IconChat />
                                                     </button>
                                                     <Dropdown

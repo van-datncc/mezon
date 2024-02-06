@@ -7,6 +7,7 @@ import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { string } from 'yup';
+import { friendsActions } from '../friends/friend.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -56,12 +57,12 @@ type fetchDmGroupArgs = {
 };
 
 export const fetchDirectMessage = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType }: fetchDmGroupArgs, thunkAPI) => {
+	thunkAPI.dispatch(friendsActions.fetchListFriends());
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', clanId, channelType);
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
-
 	const channels = response.channeldesc.map(mapDmGroupToEntity);
 	return channels;
 });
