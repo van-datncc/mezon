@@ -133,6 +133,9 @@ export const directActions = {
 const { selectAll, selectEntities } = directAdapter.getSelectors();
 
 export const getDirectState = (rootState: { [DIRECT_FEATURE_KEY]: DirectState }): DirectState => rootState[DIRECT_FEATURE_KEY];
+export const selectDirectMessageEntities = createSelector(getDirectState, selectEntities);
 
 export const selectAllDirectMessages = createSelector(getDirectState, selectAll);
 export const selectDmGroupCurrentId = createSelector(getDirectState, (state) => state.currentDirectMessageId);
+
+export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirectMessageEntities, (channelEntities) => channelEntities[dmId]);

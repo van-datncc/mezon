@@ -9,16 +9,16 @@ import {
 	MemberListGroupChat,
 } from '@mezon/components';
 import { useAppNavigation, useAppParams, useChatChannel } from '@mezon/core';
-import { RootState, selectDefaultChannelIdByClanId } from '@mezon/store';
+import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent } from '@mezon/store';
 import { useSelector } from 'react-redux';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChannelMessages from '../../channel/ChanneMessages';
-import { ChannelTypeEnum } from '@mezon/utils';
+import { ChannelTypeEnum, IChannel } from '@mezon/utils';
 
 export function DirectMessage() {
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
 
-	const { serverId, directId,type } = useAppParams();
+	const { serverId, directId, type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(serverId || ''));
 	const { navigate } = useAppNavigation();
 
@@ -36,9 +36,10 @@ export function DirectMessage() {
 		}
 	}, [isSending, [], messages]);
 
+
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<DmTopbar channel={null} />
+			<DmTopbar dmGroupId={directId} />
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full">
 					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>

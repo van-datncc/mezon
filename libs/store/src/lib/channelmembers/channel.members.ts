@@ -119,7 +119,7 @@ export const channelMembers = createSlice({
       .addCase(
         fetchChannelMembers.fulfilled,
         (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-          channelMembersAdapter.setAll(state, action.payload);
+          channelMembersAdapter.setMany(state, action.payload);
           state.loadingStatus = 'loaded';
         }
       )
