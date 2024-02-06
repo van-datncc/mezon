@@ -205,7 +205,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
                 true,
                 false,
             );
-            console.log('joinedOK', join);
 
             if (join) {
                 channelRef.current = join;
