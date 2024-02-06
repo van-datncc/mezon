@@ -51,7 +51,7 @@ const Modal = (props: ModalProps) => {
                                             Cancel
                                         </button>
                                         <button
-                                            className={`text-white font-semibold text-sm px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${disableButtonConfirm ? 'bg-bgDisable' : 'bg-primary'}`}
+                                            className={`text-white font-semibold text-sm px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${disableButtonConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             onClick={() => { confirmButton(), onClose() }}
                                             disabled={disableButtonConfirm}
                                         >

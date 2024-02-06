@@ -14,6 +14,8 @@ import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { useEffect, useMemo } from 'react';
 import WebFont from 'webfontloader';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const GOOGLE_CLIENT_ID =
   '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
@@ -33,11 +35,9 @@ export function App() {
   const { store, persistor } = useMemo(() => {
     return initStore(mezon, preloadedState);
   }, [mezon])
-
   if (!store) {
     return <>loading...</>
   }
-  
   return (
     <MezonStoreProvider store={store} loading={null} persistor={persistor} >
       <MezonUiProvider themeName={theme}>
@@ -48,7 +48,6 @@ export function App() {
 }
 
 function AppWrapper() {
-  
   useEffect(() => {
     WebFont.load({
       google: {
@@ -61,6 +60,18 @@ function AppWrapper() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <MezonContextProvider nakama={nakama} connect={true}>
         <App />
+        <ToastContainer
+          position='top-right'
+          autoClose={2200}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme='light'
+        />
       </MezonContextProvider>
     </GoogleOAuthProvider>
   );

@@ -24,7 +24,7 @@ function MyApp() {
   return (
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
-        <NavLink to="/chat/direct">
+        <NavLink to="/chat/direct/friends">
           <NavLinkComponent active={pathName.includes('direct')}>
             <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
           </NavLinkComponent>
@@ -55,7 +55,7 @@ function MyApp() {
         </NavLink>
         )}
 
-        <div className="relative py-2" onClick={() => setOpenListClans(!openListClans)}>
+        <div className="relative py-2" onClick={() => { setOpenListClans(!openListClans) }}>
           <Image src={IconCreateClan} alt={'logoMezon'} width={48} height={48} />
           <div className='absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary'>
             <ModalListClans
@@ -64,6 +64,7 @@ function MyApp() {
               idSelectedClan={currentClan?.clan_id}
               onChangeClan={handleChangeClan}
               createClan={handleOpenCreate}
+              onClose={() => setOpenListClans(false)}
             />
           </div>
         </div>
