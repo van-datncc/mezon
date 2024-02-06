@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppNavigation, useAppParams, useChannelMembers, useChat, useChatDirect } from '@mezon/core';
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useSelector } from 'react-redux';
-import { IChannel } from '@mezon/utils';
+import { ChannelTypeEnum, IChannel } from '@mezon/utils';
 
 interface ModalCreateDMProps {
 	onClose: () => void;
@@ -21,18 +21,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const navigate = useNavigate();
 	const { friends } = useChatDirect(undefined);
 	const [length, setLength] = useState<number>(selectedFriends.length);
-	const { listDM } = useChatDirect(undefined);
-
-	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
-		const uniqueLabels = new Set();
-		return data.filter((obj: IChannel) => {
-			const isUnique = !uniqueLabels.has(obj.channel_lable);
-			uniqueLabels.add(obj.channel_lable);
-			return isUnique;
-		});
-	};
-
-	const filteredDataDM = filterDmGroupsByChannelLabel(listDM);
+	// const { listDM } = useChatDirect(undefined);
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
@@ -46,44 +35,9 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 		});
 	};
 
-	function getUsernamesByIds(idsInput: string[], dataFriens: IFriend[]) {
-		return dataFriens.filter((item) => idsInput.includes(item.id)).map((item) => item?.user?.username);
-	}
-
-	function findChannelsByLabel(data: DirectEntity[], names: any) {
-		data.filter((item: DirectEntity) => {
-			const label = item.channel_lable?.split(',');
-			const sortLabel = label?.sort();
-
-			const areArraysEqual = sortLabel?.length === names.length && sortLabel?.every((value, index) => value === names[index]);
-            console.log("-----------")
-            console.log('sortLabel', sortLabel);
-			console.log('name', names);
-			console.log('areArraysEqual', areArraysEqual);
-			if (areArraysEqual) {
-				return item;
-			}
-
-			// if (sortLabel) {
-			// 	if (sortLabel === names) return item;
-			// }
-		});
-	}
-
-	const [isExist, setIsExist] = useState<boolean>(false);
-	useEffect(() => {
-		const usernamesArray = getUsernamesByIds(selectedFriends, friends).sort();
-
-		if (usernamesArray.length > 0) {
-			console.log('usernamesArray', usernamesArray);
-			const itemMatching = findChannelsByLabel(filteredDataDM, usernamesArray);
-			console.log('itemmatching', itemMatching);
-		}
-	}, [selectedFriends]);
-
 	const handleCreateDM = async () => {
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-			type: length > 1 ? 3 : 2,
+			type: length > 1 ? ChannelTypeEnum.GROUP_CHAT : ChannelTypeEnum.DM_CHAT,
 			channel_private: 1,
 			user_ids: selectedFriends,
 		};

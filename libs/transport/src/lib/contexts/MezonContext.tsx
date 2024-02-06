@@ -200,8 +200,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
 
             const join = await socket.joinChat(
                 channelId,
-                '',
-                channelType ?? 1,
+                channelName ?? "",
+                channelType ?? 0,
                 true,
                 false,
             );
