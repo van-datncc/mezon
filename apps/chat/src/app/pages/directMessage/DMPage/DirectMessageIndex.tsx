@@ -19,7 +19,7 @@ export function DirectMessageIndex() {
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<DmTopbar channel={null} />
+			<DmTopbar dmGroupId={""} />
 			<div className="flex h-screen">
 				<div className="flex flex-col flex-1">
 					<div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
