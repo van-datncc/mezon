@@ -1,22 +1,53 @@
+import React, { useRef, useEffect } from 'react';
 import { IClan } from "@mezon/utils";
 import { Check, Tick } from "../Icons";
-import IconCreateClan from '../../../../../../apps/chat/src/assets/Images/IconCreateClan.svg'
+import IconCreateClan from '../../../../../../apps/chat/src/assets/Images/IconCreateClan.svg';
 
 export type ModalListClansProps = {
     showModal: boolean;
     options: IClan[];
     idSelectedClan?: string | null;
     onChangeClan: (clanId: string) => void;
-    createClan: () => void
+    createClan: () => void;
+    onClose: () => void;
 };
 
 const ModalListClans = (props: ModalListClansProps) => {
-    const { showModal, options, idSelectedClan, onChangeClan, createClan } = props;
+    const { showModal, options, idSelectedClan, onChangeClan, createClan, onClose } = props;
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+            onClose();
+        }
+    };
+
+    useEffect(() => {
+        if (showModal) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showModal]);
+
+    useEffect(() => {
+        const activeClanIndex = options.findIndex(option => option.id === idSelectedClan);
+        if (activeClanIndex !== -1) {
+            const activeClan = options[activeClanIndex];
+            options.splice(activeClanIndex, 1);
+            options.unshift(activeClan);
+        }
+    }, [idSelectedClan]);
 
     return (
         <>
             {showModal ? (
                 <div
+                    ref={modalRef}
                     className="flex w-64 flex-col text-[16px] px-3 py-2 gap-2 z-50 border-[1px] border-bg-bgSecondary
                      border-borderDefault bg-bgSecondary rounded-lg"
                 >
@@ -49,10 +80,10 @@ const ModalListClans = (props: ModalListClansProps) => {
                             <span className="text-[16px]">Add Clan</span>
                         </div>
                     </div>
-                </div >
+                </div>
             ) : null}
         </>
     );
-}
+};
 
-export default ModalListClans
+export default ModalListClans;

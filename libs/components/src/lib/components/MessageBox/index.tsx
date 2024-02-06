@@ -108,7 +108,7 @@ function MessageBox(props: MessageBoxProps) {
     <div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
       <form
         onSubmit={handleSubmitted}
-        className="self-stretch p-2 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
+        className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-3 inline-flex items-center"
       >
         <div
           className={`flex flex-row h-full  ${rowNumber > 1 ? 'items-end' : 'items-center'}`}
@@ -152,7 +152,7 @@ MessageBox.Skeleton = () => {
   return (
     <div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
       <form
-        className="self-stretch p-2 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
+        className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center"
       >
         <div className="flex flex-row h-full items-center">
           <div className="flex flex-row  justify-end h-fit">
@@ -167,7 +167,7 @@ MessageBox.Skeleton = () => {
             placeholder="Write your thoughts here..."
             className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-hidden w-full resize-none"
             id="message"
-            rows={1}
+            rows={4}
           />
         </div>
         <div className="flex flex-row h-full items-center gap-1">

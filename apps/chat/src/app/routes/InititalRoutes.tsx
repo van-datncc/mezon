@@ -4,13 +4,13 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const InitialRoutes = () => {
-	const isLogin = useSelector(selectIsLogin);
+    const isLogin = useSelector(selectIsLogin);
 
-	if(!isLogin) {
+    if (!isLogin) {
         return <Navigate to="/guess/login" replace />;
     }
 
-    return <Navigate to="/chat/direct" replace />;
+    return <Navigate to="/chat/direct/friends" replace />;
 };
 
 export default InitialRoutes;
