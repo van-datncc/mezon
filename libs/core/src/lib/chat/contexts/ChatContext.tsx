@@ -1,9 +1,10 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
-import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
-import { channelMembersActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
+import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent, Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { toast } from 'react-toastify';
 
 type ChatContextProviderProps = {
   children: React.ReactNode
@@ -30,6 +31,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
     dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
   }, [dispatch]);
 
+  const onnotification = useCallback((notification: Notification) => {
+    // console.log('SSSSSSSS: ', notification)
+    if (notification.code === -2 || notification.code === -3) {
+      dispatch(friendsActions.fetchListFriends());
+      toast.info(notification.subject)
+    }
+  }, [dispatch]);
   const ondisconnect = useCallback(() => {
     // TODO: handle disconnect
   }, []);
@@ -37,10 +45,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
   const onmessagetyping = useCallback((e: MessageTypingEvent) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const event = (e as any).message_typing_event;
-    if(event.sender_id === userId) {
+    if (event.sender_id === userId) {
       return;
     }
-    
+
     dispatch(messagesActions.updateTypingUsers({
       channelId: event.channel_id,
       userId: event.sender_id,
@@ -53,7 +61,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
   const value = React.useMemo<ChatContextValue>(() => ({
 
   }), []);
-  
+
 
 
   useEffect(() => {
@@ -70,12 +78,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
     socket.onmessagetyping = onmessagetyping;
 
+    socket.onnotification = onnotification;
+
     return () => {
       socket.onchannelmessage = () => { };
       socket.onchannelpresence = () => { };
+      socket.onnotification = () => { };
       socket.ondisconnect = () => { };
+
     }
-  }, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, socketRef])
+  }, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onnotification, socketRef])
 
   useEffect(() => {
     initWorker();

@@ -7,7 +7,7 @@ export type ChannelTopbarProps = {
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
     return (
-        <div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink ">
+        <div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
             <div className="justify-start items-center gap-1 flex">
                 <ChannelLable
                     type={Number(channel?.type)}
