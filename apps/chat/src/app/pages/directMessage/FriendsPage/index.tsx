@@ -78,7 +78,6 @@ export default function FriendsPage() {
     const handleAddFriend = async () => {
         await dispatch(sendRequestAddFriend(requestAddFriend));
         resetField();
-
     };
 
     const filterStatus = (listFriends: FriendsEntity[]) => {
@@ -133,23 +132,34 @@ export default function FriendsPage() {
     const listFriendFilter = filterStatus(friends).filter((obj) =>
         obj.user?.username?.includes(textSearch),
     );
+    const quantityPendingRequest = friends.filter((obj) =>
+        obj.state === 2
+    ).length || 0
+
     return (
         <>
             <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-                <div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-4 justify-start">
+                <div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start">
                     <div className="flex flex-row gap-2">
                         <IconFriends />
                         Friend
                     </div>
                     <div className="flex flex-row gap-4 border-l-[1px] pl-6 border-borderDefault">
                         {tabData.map((tab, index) => (
-                            <button
-                                className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? "bg-[#151C2B]" : ""}`}
-                                tabIndex={index}
-                                onClick={() => handleChangeTab(tab.value)}
-                            >
-                                {tab.title}
-                            </button>
+                            <div className="relative">
+                                <button
+                                    className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? "bg-[#151C2B]" : ""}`}
+                                    tabIndex={index}
+                                    onClick={() => handleChangeTab(tab.value)}
+                                >
+                                    {tab.title}
+                                </button>
+                                {tab.value === 'pending' && quantityPendingRequest !== 0 && (
+                                    <div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold text-[9px] flex items-center justify-center top-6 right-[-2px]">
+                                        {quantityPendingRequest}
+                                    </div>
+                                )}
+                            </div>
                         ))}
                     </div>
                     <button
@@ -168,7 +178,7 @@ export default function FriendsPage() {
                                         type="text"
                                         onChange={(e) => setTextSearch(e.target.value)}
                                         placeholder="Search"
-                                        className="mb-6 py-[7px]"
+                                        className="mb-6 py-[10px] text-[14px]"
                                     />
                                     <div className="absolute top-5 right-5" >
                                         <Search />
@@ -189,14 +199,12 @@ export default function FriendsPage() {
                                                 numberCharacterCollapse={100}
                                             />
                                         </div>
-
                                         <div>
                                             {friend.state === 0 && (
                                                 <div className="flex gap-3 items-center">
                                                     <button className="bg-bgTertiary rounded-full p-2">
                                                         <IconChat />
                                                     </button>
-
                                                     <Dropdown
                                                         label=""
                                                         className="bg-bgPrimary border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"

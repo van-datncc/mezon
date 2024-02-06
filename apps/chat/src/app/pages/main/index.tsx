@@ -1,5 +1,5 @@
 import { Image } from '@mezon/ui';
-import { useChat, useAppNavigation } from '@mezon/core';
+import { useChat, useAppNavigation, useChatDirect } from '@mezon/core';
 import { MainContent } from './MainContent';
 import IconLogoMezon from '../../../assets/Images/IconLogoMezon.svg';
 import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
@@ -21,12 +21,24 @@ function MyApp() {
     setOpenCreateClans(true)
   }
 
+  const { friends } = useChatDirect(undefined);
+  const quantityPendingRequest = friends.filter((obj) =>
+    obj.state === 2
+  ).length || 0
+
   return (
     <div className="flex h-screen text-gray-100">
       <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
         <NavLink to="/chat/direct/friends">
           <NavLinkComponent active={pathName.includes('direct')}>
-            <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
+            <div >
+              <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
+              {quantityPendingRequest !== 0 && (
+                <div className="absolute w-[20px] h-[20px] rounded-full bg-colorDanger text-[#fff] font-bold text-[10px] flex items-center justify-center top-7 right-[0]">
+                  {quantityPendingRequest}
+                </div>
+              )}
+            </div>
           </NavLinkComponent>
         </NavLink>
         <div className="py-2 border-t-2 border-t-borderDefault"></div>
