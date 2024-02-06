@@ -1,36 +1,26 @@
-import { ChannelList, ChannelTopbar, DmTopbar, FooterProfile, MemberList, ServerHeader } from '@mezon/components';
+import { DmTopbar } from '@mezon/components';
 import { useAppNavigation, useAppParams } from '@mezon/core';
-import { selectDefaultChannelIdByClanId } from '@mezon/store';
-import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import ChannelMessages from '../../channel/ChanneMessages';
-import { ChannelMessageBox } from '../../channel/ChannelMessageBox';
 
 export function DirectMessageIndex() {
-	const { serverId } = useAppParams();
-	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(serverId || ''));
+	const { directId } = useAppParams();
 	const { navigate } = useAppNavigation();
 
 	useEffect(() => {
-		if (defaultChannelId) {
-			navigate(`./${defaultChannelId}`);
+		if (!directId) {
+			navigate(`../friends`);
 		}
-	}, [defaultChannelId, navigate]);
+	}, [directId, navigate]);
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<DmTopbar dmGroupId={""} />
-			<div className="flex h-screen">
+			<DmTopbar.Skeleton />
+			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1">
-					<div className="overflow-y-auto bg-[#1E1E1E] h-[751px]">
+					<div className="overflow-y-auto bg-bgSecondary  max-h-heightMessageViewChat h-heightMessageViewChat">
 						<ChannelMessages.Skeleton />
 					</div>
-					<div className="flex-shrink-0 bg-bgSecondary">
-						<ChannelMessageBox.Skeleton />
-					</div>
-				</div>
-				<div className="w-[268px] bg-bgSurface md:flex">
-					<MemberList />
 				</div>
 			</div>
 		</div>
