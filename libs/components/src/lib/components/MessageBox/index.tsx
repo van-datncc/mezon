@@ -127,6 +127,7 @@ function MessageBox(props: MessageBoxProps) {
             className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-hidden w-full resize-none"
             id="message"
             onInput={handleTyping}
+            onFocus={handleTyping}
             onBlur={handleInputChanged}
             onChange={handleInputChanged}
             onKeyDown={handleKeyDown}
