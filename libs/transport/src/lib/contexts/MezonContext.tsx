@@ -3,7 +3,7 @@ import {
     CreateNakamaClientOptions,
     createClient as createNakamaClient,
 } from '../nakama';
-import { Client, Session, Socket, Channel } from '@mezon/mezon-js';
+import { Client, Session, Socket, Channel, Status } from '@mezon/mezon-js';
 import { DeviceUUID } from 'device-uuid';
 
 type MezonContextProviderProps = {
@@ -34,6 +34,7 @@ export type MezonContextValue = {
         channelName?: string,
         channelType?: number,
     ) => Promise<Channel>;
+    addStatusFollow: (ids: string[]) => Promise<Status>
 };
 
 const MezonContext = React.createContext<MezonContextValue>(
@@ -181,6 +182,21 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
         [socketRef],
     );
 
+
+    const addStatusFollow = React.useCallback(
+        async (userIds: string[]) => {
+            const socket = socketRef.current;
+
+            if (!socket) {
+                throw new Error('Socket is not initialized');
+            }
+
+            const statusFollow = await socket.followUsers(userIds)
+            return statusFollow;
+        },
+        [socketRef],
+    );
+
     const joinChatDirectMessage = React.useCallback(
         async (
             channelId: string,
@@ -228,6 +244,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
             joinChatChannel,
             joinChatDirectMessage,
             createSocket,
+            addStatusFollow
         }),
         [
             clientRef,
@@ -242,6 +259,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
             joinChatChannel,
             joinChatDirectMessage,
             createSocket,
+            addStatusFollow
         ],
     );
 

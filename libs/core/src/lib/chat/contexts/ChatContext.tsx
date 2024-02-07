@@ -1,6 +1,6 @@
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
-import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent, Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent, Notification, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -29,6 +29,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
   const onchannelpresence = useCallback((channelPresence: ChannelPresenceEvent) => {
     dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
+  }, [dispatch]);
+
+  const onstatuspresence = useCallback((statusPresence: StatusPresenceEvent) => {
+    console.log('AAAAAAAAA: ', statusPresence)
   }, [dispatch]);
 
   const onnotification = useCallback((notification: Notification) => {
@@ -80,14 +84,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
     socket.onnotification = onnotification;
 
+    socket.onstatuspresence = onstatuspresence;
+
     return () => {
       socket.onchannelmessage = () => { };
       socket.onchannelpresence = () => { };
       socket.onnotification = () => { };
+      socket.onstatuspresence = () => { }
       socket.ondisconnect = () => { };
-
     }
-  }, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onnotification, socketRef])
+  }, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onnotification, onstatuspresence, socketRef])
 
   useEffect(() => {
     initWorker();

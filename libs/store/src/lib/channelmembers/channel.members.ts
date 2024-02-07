@@ -7,7 +7,7 @@ import {
   EntityState,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
 import { ChannelPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -68,6 +68,8 @@ type fetchChannelMembersPayload = {
   channelId: string
 }
 
+
+
 export const fetchChannelMembers = createAsyncThunk(
   'channelMembers/fetchStatus',
   async ({ channelId }: fetchChannelMembersPayload, thunkAPI) => {
@@ -76,8 +78,24 @@ export const fetchChannelMembers = createAsyncThunk(
     if (!response.channel_users) {
       return thunkAPI.rejectWithValue([])
     }
-    // TODO: add channelId to the response
-    return response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
+    const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
+    thunkAPI.dispatch(channelMembersActions.addMany(members))
+    thunkAPI.dispatch(channelMembersActions.followUserStatus())
+    return members
+  }
+);
+
+export const followUserStatus = createAsyncThunk(
+  'channelMembers/followUserStatus',
+  async (_, thunkAPI) => {
+    const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+    const listUserIds = selectAllUserIds(getChannelMemberRootState(thunkAPI))
+    const response = mezon.addStatusFollow(listUserIds)
+    if (!response) {
+      return thunkAPI.rejectWithValue([])
+    }
+    console.log('REs: ', response)
+    return response;
   }
 );
 
@@ -111,7 +129,8 @@ export const channelMembers = createSlice({
     remove: channelMembersAdapter.removeOne,
     onChannelPresence: (state: ChannelMembersState, action: PayloadAction<IChannelMember>) => {
       channelMembersAdapter.addOne(state, action.payload)
-    }
+    },
+    addMany: channelMembersAdapter.addMany
   },
   extraReducers: (builder) => {
     builder
@@ -121,7 +140,7 @@ export const channelMembers = createSlice({
       .addCase(
         fetchChannelMembers.fulfilled,
         (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-          channelMembersAdapter.setAll(state, action.payload);
+          // channelMembersAdapter.setAll(state, action.payload);
           state.loadingStatus = 'loaded';
         }
       )
@@ -155,7 +174,7 @@ export const channelMembersReducer = channelMembers.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const channelMembersActions = { ...channelMembers.actions, fetchChannelMembers, fetchChannelMembersPresence };
+export const channelMembersActions = { ...channelMembers.actions, fetchChannelMembers, fetchChannelMembersPresence, followUserStatus};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -184,6 +203,14 @@ export const selectChannelMembesEntities = createSelector(
   selectEntities
 );
 
+export const selectAllUserIds = createSelector(
+  selectChannelMembesEntities,
+  (entities) => {
+    const members = Object.values(entities);
+    return members.filter(item => item.user?.id).map((member) => member.user?.id as string)
+  }
+);
+
 
 export const selectMembersByChannelId = (channelId?: string | null) => createSelector(
   selectChannelMembesEntities,
@@ -197,7 +224,7 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
   selectChannelMembesEntities,
   (entities) => {
     const members = Object.values(entities);
-    return members.filter((member) => member?.user?.id && userIds.includes(member?.user?.id))
+    return members.filter((member) =>userIds && member?.user?.id && member.channelId === channelId && userIds.includes(member?.user?.id))
   }
 )
 
