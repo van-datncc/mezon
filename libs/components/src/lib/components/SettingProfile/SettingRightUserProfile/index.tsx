@@ -65,7 +65,7 @@ const SettingRightUser = ({
     setUrlImage('');
   };
   return (
-    <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
+    <div className="overflow-y-auto flex flex-col flex-1 shrink min-w-0 bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
       <div className="mt-[16px] pl-[90px] text-white">
         <h1 className="text-2xl font-medium">Profiles</h1>
         <button className="pt-1 text-white mt-[20px] font-medium text-xl border-b-2 border-blue-500">
@@ -109,7 +109,7 @@ const SettingRightUser = ({
                 />
               </label>
               <button
-                className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px]"
+                className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
                 onClick={handleRemoveButtonClick}
               >
                 Remove avatar
@@ -129,29 +129,36 @@ const SettingRightUser = ({
           <SettingUserClanProfileCard profiles ={editProfile}/>
         </div>
       </div>
-      {(urlImage !== avatar && flags) ||
-      (displayName !== nameDisplay && flags) ||
-      (flagsRemoveAvartar !== false && flags) ? (
-        <div className="flex items-center w-1/2 h-[50px] mt-[-90px] bg-gray-500 rounded-[8px] z-10 fixed top-[890px] pl-[20px] pr-[20px]">
-          <p>Carefull - you have unsaved changes!</p>
-          <button
-            className="ml-[450px] bg-gray-600 rounded-[8px] p-[8px]"
-            onClick={() => {
-              handleClose();
-            }}
-          >
-            Reset
-          </button>
-          <button
-            className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
-            onClick={() => {
-              handleUpdateUser(), handlSaveClose();
-            }}
-          >
-            Save Changes
-          </button>
-        </div>
-      ) : null}
+      {(urlImage !== avatar && flags) || (displayName !== nameDisplay && flags) || (flagsRemoveAvartar !== false && flags) ? (
+				// <div className="flex items-center w-1/2 h-[50px] mt-[-90px] bg-gray-500 rounded-[8px] z-10 fixed top-[890px] pl-[20px] pr-[20px]">
+				<div className="flex flex-row gap-2  bg-gray-500 absolute w-[96] bottom-4 min-w-96 h-fit p-3 rounded transform ">
+					<div className="flex-1 flex items-center text-nowrap">
+						<p>Carefull - you have unsaved changes!</p>
+					</div>
+
+					<div className="flex flex-row justify-end px-2 gap-3">
+						<button
+							// className="ml-[450px] bg-gray-600 rounded-[8px] p-[8px]"
+							className="bg-gray-600 ml-[300px] rounded-[8px] p-[8px]"
+							onClick={() => {
+								handleClose();
+							}}
+						>
+							Reset
+						</button>
+
+						<button
+							// className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
+							className="bg-blue-600 rounded-[8px] p-[8px] text-nowrap"
+							onClick={() => {
+								handleUpdateUser(), handlSaveClose();
+							}}
+						>
+							Save Changes
+						</button>
+					</div>
+				</div>
+			) : null}
     </div>
   );
 };

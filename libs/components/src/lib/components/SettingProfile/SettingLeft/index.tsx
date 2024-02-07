@@ -27,7 +27,7 @@ const SettingItem = ({
   };
   return (
     <div className="hidden overflow-y-auto w-1/4 bg-black md:block pt-96 pl-[142px] pr-[16px] pb-[96px] scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200">
-      <div className="w-170px font-semibold">
+      <div className="w-170px ">
         <p className="text-blue-500 ">USER SETTINGS</p>
         <button
           className={`pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px] ${selectedButton === "Account" ? "bg-blue-400" : ""}`}

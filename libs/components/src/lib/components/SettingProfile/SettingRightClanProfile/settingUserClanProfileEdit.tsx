@@ -165,7 +165,7 @@ const SettingRightClanEdit = ({
                 />
               </label>
               <button
-                className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px]"
+                className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
                 onClick={handleRemoveButtonClick}
               >
                 Remove avatar

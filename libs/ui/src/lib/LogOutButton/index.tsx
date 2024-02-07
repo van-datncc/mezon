@@ -76,16 +76,16 @@ export const LogoutModal: React.FC<ModalProps> = ({
             </p>
             <div className="flex justify-center">
               <button
-                onClick={handleLogOut}
-                className="px-4 py-2 mr-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
-              >
-                Log Out
-              </button>
-              <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
+                className="px-4 py-2 mr-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
               >
                 Cancel
+              </button>
+              <button
+                onClick={handleLogOut}
+                className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
+              >
+                Log Out
               </button>
             </div>
           </div>
