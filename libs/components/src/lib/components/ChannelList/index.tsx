@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAppNavigation, useChat } from "@mezon/core";
+import { useAppNavigation, useAuth, useChat } from "@mezon/core";
 import ChannelLink from "../ChannelLink";
 import { IChannel, ICategoryChannel, ICategory } from "@mezon/utils";
 import { Events, BrowseChannel } from "./ChannelListComponents";
@@ -14,7 +14,7 @@ export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
-
+  const { userProfile } = useAuth();
   const { categorizedChannels, currentChanel } = useChat();
   const [categoriesState, setCategoriesState] = useState<CategoriesState>(
     categorizedChannels.reduce((acc, category) => {
@@ -115,14 +115,16 @@ function ChannelList() {
                   )}
                   {category.category_name}
                 </button>
-                <button
-                  onClick={() => {
-                    handleToggleCategory(category, true);
-                    openModalCreateNewChannel(category);
-                  }}
-                >
-                  <Icons.Plus />
-                </button>
+                {currentClan?.creator_id===userProfile?.user?.id &&(
+                  <button
+                    onClick={() => {
+                      handleToggleCategory(category, true);
+                      openModalCreateNewChannel(category);
+                    }}
+                  >
+                    <Icons.Plus />
+                  </button>
+                )}
               </div>
             )}
             {!categoriesState[category.id] && (
