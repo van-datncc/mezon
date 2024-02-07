@@ -102,7 +102,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
           </div>
         </Modal.Body>
         <div className=" text-white font-semibold text-sm flex bg-bgTertiary justify-end flex-row items-center gap-4 py-4 px-6 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
-          <span>Cancel</span>
+          <button onClick={onClose}>Cancel</button>
           <button
             className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${!nameCate.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={handleCreateCate}
