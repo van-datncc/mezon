@@ -50,7 +50,7 @@ function MemberProfile({
                         : name}
                 </p>
 
-                <span className="text-[11px] text-contentSecondary">
+                <span className="text-[11px] ">
                     {status ? 'Offline' : 'Online'}
                 </span>
             </div>

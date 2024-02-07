@@ -51,7 +51,7 @@ function MessageWithUser({ message }: MessageWithUserProps) {
                     )}
                     <div className="flex-col w-full flex justify-center items-start relative gap-1">
                         <div className="flex-row items-center w-full gap-4 flex">
-                            <div className="font-thin font-['Manrope'] text-green-400 text-[15px]">
+                            <div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">
                                 {message.user?.username}
                             </div>
                             <div className=" text-zinc-400 font-['Manrope'] text-[10px]">
@@ -59,7 +59,7 @@ function MessageWithUser({ message }: MessageWithUserProps) {
                             </div>
                         </div>
                         <div className="w-full justify-start items-center inline-flex">
-                            <div className="flex flex-col gap-1  text-white font-['Manrope'] whitespace-pre-wrap text-[15px]">
+                            <div className="flex flex-col gap-1  text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px]">
                                 {renderMultilineContent()}
                             </div>
                         </div>
