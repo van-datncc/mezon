@@ -41,7 +41,7 @@ export function DirectMessage() {
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
 			<DmTopbar dmGroupId={directId} />
 			<div className="flex h-heightWithoutTopBar flex-row ">
-				<div className="flex flex-col flex-1 w-full h-full">
+				<div className="flex flex-col flex-1 w-full h-full ">
 					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
 						{<ChannelMessages channelId={directId ?? ''} />}
 					</div>

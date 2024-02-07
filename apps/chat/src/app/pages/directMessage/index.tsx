@@ -17,7 +17,7 @@ export default function Direct() {
 
     return (
         <>
-            <div className="hidden flex-col w-60 bg-bgSurface md:flex">
+            <div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
                 <ServerHeader type={"direct"} />
                 <DirectMessageList />
                 <FooterProfile

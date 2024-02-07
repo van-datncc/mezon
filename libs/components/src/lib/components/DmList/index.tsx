@@ -54,7 +54,7 @@ function DirectMessageList() {
 
 	return (
 		<>
-			<hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
+			<hr className="h-[0.08px] w-[272px] mt-[36px] border-[#1E1E1E]" />
 			<div className="absolute">
 				<ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
 			</div>
@@ -79,7 +79,7 @@ function DirectMessageList() {
 					</button>
 				</div>
 			</div>
-			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 scrollbar-hide px-2">
+			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any) => (
 						<button
@@ -87,7 +87,7 @@ function DirectMessageList() {
 							onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
 						>
 							<MemberProfile
-								numberCharacterCollapse={20}
+								numberCharacterCollapse={22}
 								avatar={directMessage?.user?.avatar ?? ''}
 								name={directMessage?.channel_lable ?? ''}
 								status={false}
