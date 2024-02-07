@@ -87,7 +87,7 @@ function DirectMessageList() {
 							onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
 						>
 							<MemberProfile
-								numberCharacterCollapse={22}
+								numberCharacterCollapse={20}
 								avatar={directMessage?.user?.avatar ?? ''}
 								name={directMessage?.channel_lable ?? ''}
 								status={false}

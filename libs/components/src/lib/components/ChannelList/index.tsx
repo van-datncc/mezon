@@ -97,7 +97,7 @@ function ChannelList() {
         <BrowseChannel />
       </div>
       <hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
-      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px] font-medium text-gray-300 scrollbar-hide">
+      <div className="overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ">
         {categorizedChannels.map((category: ICategoryChannel) => (
           <div key={category.id}>
             {category.category_name && (
@@ -106,12 +106,12 @@ function ChannelList() {
                   onClick={() => {
                     handleToggleCategory(category);
                   }}
-                  className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title text-xs tracking-wide hover:text-gray-100 uppercase"
+                  className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
                 >
                   {!categoriesState[category.id] ? (
-                    <Icons.ArrowDown />
+                    <Icons.ArrowDown defaultSize="text-[16px]" />
                   ) : (
-                    <Icons.ArrowRight />
+                    <Icons.ArrowRight defaultSize="text-[16px]" />
                   )}
                   {category.category_name}
                 </button>

@@ -68,7 +68,7 @@ function ChannelLink({
                             )}
                     </div>
                     <p
-                        className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-sm focus:bg-[#36373D] ${active ? 'text-white' : ''}`}
+                        className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white' : ''}`}
                         title={
                             channel.channel_lable &&
                             channel?.channel_lable.length > 20

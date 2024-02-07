@@ -42,7 +42,7 @@ function MemberProfile({
             </a>
             <div className="flex flex-col items-start">
                 <p
-                    className="text-[13px]"
+                    className="text-[15px]"
                     title={name && name.length > numberCharacterCollapse ? name : undefined}
                 >
                     {name && name.length > numberCharacterCollapse
