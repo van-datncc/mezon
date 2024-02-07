@@ -41,6 +41,7 @@ export type IChannel = ApiChannelDescription & {
 
 export type IChannelMember = ChannelUserListChannelUser & {
     id: string;
+    channelId?: string;
 };
 
 export type IThread = {

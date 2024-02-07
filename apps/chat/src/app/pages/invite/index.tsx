@@ -72,7 +72,7 @@ export default function InvitePage() {
         </Modal.Body>
         {/* <Modal.Footer> */}
         <div className="flex justify-center flex-row items-center gap-4 pb-8 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
-          <Button color="gray" onClick={handleCancelJoin}>
+          <Button color="gray" className="outline-none" onClick={handleCancelJoin}>
             No, Thanks
           </Button>
           <Button color="blue" onClick={handleJoinChannel}>

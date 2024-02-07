@@ -4,6 +4,7 @@ export type MemberProfileProps = {
     status?: boolean;
     isHideStatus: boolean;
     numberCharacterCollapse?: number;
+    textColor?: string
 };
 
 function MemberProfile({
@@ -12,6 +13,7 @@ function MemberProfile({
     status,
     isHideStatus,
     numberCharacterCollapse = 6,
+    textColor ="contentSecondary"
 }: MemberProfileProps) {
     return (
         <div className="relative gap-[5px] flex items-center ">
@@ -50,7 +52,7 @@ function MemberProfile({
                         : name}
                 </p>
 
-                <span className="text-[11px] ">
+                <span className={`text-[11px] text-${textColor}`}>  
                     {status ? 'Offline' : 'Online'}
                 </span>
             </div>
