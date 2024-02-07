@@ -16,6 +16,7 @@ import { ensureClient, ensureSession, getMezonCtx } from "../helpers";
 import { categoriesActions } from "../categories/categories.slice";
 import { channelsActions } from "../channels/channels.slice";
 import { userClanProfileActions } from "../clanProfile/clanProfile.slice";
+import { accountSlice, getUserProfile } from "../account/account.slice";
 export const CLANS_FEATURE_KEY = "clans";
 
 /*
@@ -117,6 +118,9 @@ export const updateUser = createAsyncThunk(
     const response = await mezon.client.updateAccount(mezon.session, body);
     if (!response) {
       return thunkAPI.rejectWithValue([]);
+    }
+    if (response) {
+      thunkAPI.dispatch(getUserProfile())
     }
     return response as true;
   },
