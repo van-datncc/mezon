@@ -53,7 +53,7 @@ export default function Server() {
                         {currentChanel ? <ChannelMessageBox channelId={currentChanel?.id} /> : <ChannelMessageBox.Skeleton />}
                         </div>
                     </div>
-                    <div className="w-[268px] bg-bgSurface  lg:flex hidden">
+                    <div className="w-[268px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
                         <MemberList />
                     </div>
                 </div>

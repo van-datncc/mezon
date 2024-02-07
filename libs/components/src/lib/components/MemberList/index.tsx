@@ -17,7 +17,7 @@ function MemberList() {
 							</p>
 						)}
 						{
-							<div className="flex flex-col gap-4 font-['Manrope'] text-[#AEAEAE]">
+							<div className="flex flex-col gap-4 font-['Manrope']">
 								{role?.users.map((user: ChannelMembersEntity) => (
 									<MemberProfile
 										numberCharacterCollapse={30}
@@ -26,6 +26,7 @@ function MemberList() {
 										status={user.user?.online}
 										isHideStatus={false}
 										key={user.id}
+										textColor="[#AEAEAE]"
 									/>
 								))}
 							</div>
