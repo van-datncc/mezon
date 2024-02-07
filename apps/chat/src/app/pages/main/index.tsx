@@ -34,7 +34,7 @@ function MyApp() {
             <div >
               <Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
               {quantityPendingRequest !== 0 && (
-                <div className="absolute w-[20px] h-[20px] rounded-full bg-colorDanger text-[#fff] font-bold text-[10px] flex items-center justify-center top-7 right-[0]">
+                <div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
                   {quantityPendingRequest}
                 </div>
               )}
