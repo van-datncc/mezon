@@ -83,7 +83,7 @@ function DirectMessageList() {
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any) => (
 						<button
-							className={`h-fit pl-2 rounded-[6px] hover:bg-bgSecondary py-2 w-full focus:bg-bgTertiary ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'bg-[#1E1E1E] text-cyan-500' : ''}`}
+							className={`group text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] hover:bg-bgSecondary py-2 w-full focus:bg-bgTertiary ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'bg-[#1E1E1E] text-white' : ''}`}
 							onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
 						>
 							<MemberProfile
