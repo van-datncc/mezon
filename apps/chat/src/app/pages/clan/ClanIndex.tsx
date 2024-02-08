@@ -17,18 +17,18 @@ export function ClanIndex() {
     }, [defaultChannelId, navigate])
 
     return (
-        <div className="flex h-screen text-gray-100">
-            <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
+        <div className="flex h-screen text-gray-100 ">
+            <div className="hidden overflow-visible py-4 px-3 space-y-2 w-[272px] bg-bgPrimary md:block scrollbar-hide 0">
                 {/* Placeholder for IconLogoMezon */}
                 <div className="w-48 h-48"></div>
-                <div className="py-2 border-t-2 border-t-borderDefault"></div>
+                {/* <div className="py-2 border-t-2 border-t-borderDefault"></div> */}
 
                 {/* Placeholder for currentClan */}
                 <div>
                     <div className="w-48 h-48"></div>
                 </div>
 
-                <div className="relative py-2">
+                <div className="relative py-2 ">
                     {/* Placeholder for IconCreateClan */}
                     <div className="w-48 h-48"></div>
                     <div className='absolute bottom-0 right-0 top-0 left-[60px] z-10'>

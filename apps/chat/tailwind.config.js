@@ -1,7 +1,8 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
-
+const topBarHeight = '58px';
+const chatBoxHeight = '52px';
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: [
@@ -19,13 +20,14 @@ module.exports = {
 				210: '210px',
 			},
 			width: {
-				widthWithoutServerWidth: 'calc(100vw - 72px)',
-			},
-			height: {
-				heightMessageViewChat: 'calc(100vh - 137px)',
-				heightWithoutTopBar: 'calc(100vh - 72px)',
-				heightTopBar: '72px',
-			},
+				widthWithoutServerWidth: `calc(100vw - ${topBarHeight})`,
+			  },
+			  height: {
+				heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+				heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
+				heightTopBar: topBarHeight,
+				heightChatBox: chatBoxHeight,
+			  },
 
 			fontFamily: {
 				manrope: ['Manrope', 'sans-serif'],
