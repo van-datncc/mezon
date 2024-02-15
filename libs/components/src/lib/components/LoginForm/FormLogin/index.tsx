@@ -100,8 +100,8 @@ function LoginForm(props: LoginFormProps) {
 								{...register('userEmail')}
 								name="userEmail"
 								id="userEmail"
-								placeholder="Enter your email/phone number"
-								autoComplete="none"
+								placeholder="Enter your email"
+								autoComplete='userEmail'
 							/>
 						</div>
 					</div>
@@ -120,11 +120,12 @@ function LoginForm(props: LoginFormProps) {
 							>
 								<input
 									type={showPassword ? 'text' : 'password'}
-									className="w-full h-6 bg-transparent outline-none text-white pl-0 border-none"
+									className="w-full h-6 bg-transparent outline-none text-white pl-0 border-none placeholder:font-manrope"
 									{...register('password')}
 									name="password"
 									id="password"
 									placeholder="Enter your password"
+									autoComplete='password'
 								/>
 								<button onClick={togglePasswordVisibility} className="outline-none z-50 fill-current left-0">
 									{showPassword ? <Icons.EyeOpen /> : <Icons.EyeClose />}

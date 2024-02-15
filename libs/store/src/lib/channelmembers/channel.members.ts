@@ -75,7 +75,6 @@ export const fetchChannelMembers = createAsyncThunk(
   async ({ channelId }: fetchChannelMembersPayload, thunkAPI) => {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const response = await mezon.client.listChannelUsers(mezon.session, channelId, 1, 100, "")
-    console.log("res-user-stt",  response)
     if (!response.channel_users) {
       return thunkAPI.rejectWithValue([])
     }
@@ -91,11 +90,10 @@ export const followUserStatus = createAsyncThunk(
   async (_, thunkAPI) => {
     const mezon = await ensureSocket(getMezonCtx(thunkAPI));
     const listUserIds = selectAllUserIds(getChannelMemberRootState(thunkAPI))
-    const response = mezon.addStatusFollow(listUserIds)
+    const response =  mezon.addStatusFollow(listUserIds)
     if (!response) {
       return thunkAPI.rejectWithValue([])
     }
-    console.log('REs: ', response)
     return response;
   }
 );
@@ -141,7 +139,7 @@ export const channelMembers = createSlice({
       .addCase(
         fetchChannelMembers.fulfilled,
         (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-          // channelMembersAdapter.setAll(state, action.payload);
+          channelMembersAdapter.setAll(state, action.payload);
           state.loadingStatus = 'loaded';
         }
       )
