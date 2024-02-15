@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react';
 import {
-    CreateNakamaClientOptions,
+    CreateMezonClientOptions,
     createClient as createNakamaClient,
-} from '../nakama';
+} from '../mezon';
 import { Client, Session, Socket, Channel, Status } from '@mezon/mezon-js';
 import { DeviceUUID } from 'device-uuid';
 
 type MezonContextProviderProps = {
     children: React.ReactNode;
-    nakama: CreateNakamaClientOptions;
+    mezon: CreateMezonClientOptions;
     connect?: boolean;
 };
 
@@ -43,7 +43,7 @@ const MezonContext = React.createContext<MezonContextValue>(
 
 const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
     children,
-    nakama,
+    mezon,
     connect,
 }) => {
     const clientRef = React.useRef<Client | null>(null);
@@ -53,7 +53,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
 
     const createSocket = useCallback(async () => {
         if (!clientRef.current) {
-            throw new Error('Nakama client not initialized');
+            throw new Error('Mezon client not initialized');
         }
         const socket = clientRef.current.createSocket();
         socketRef.current = socket;
@@ -61,15 +61,15 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
     }, [clientRef, socketRef]);
 
     const createClient = useCallback(async () => {
-        const client = await createNakamaClient(nakama);
+        const client = await createNakamaClient(mezon);
         clientRef.current = client;
         return client;
-    }, [nakama]);
+    }, [mezon]);
 
     const authenticateEmail = useCallback(
         async (email: string, password: string) => {
             if (!clientRef.current) {
-                throw new Error('Nakama client not initialized');
+                throw new Error('Mezon client not initialized');
             }
             const session = await clientRef.current.authenticateEmail(
                 email,
@@ -93,7 +93,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
     const authenticateGoogle = useCallback(
         async (token: string) => {
             if (!clientRef.current) {
-                throw new Error('Nakama client not initialized');
+                throw new Error('Mezon client not initialized');
             }
             const session = await clientRef.current.authenticateGoogle(token);
             sessionRef.current = session;
@@ -113,7 +113,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
     const authenticateDevice = useCallback(
         async (username: string) => {
             if (!clientRef.current) {
-                throw new Error('Nakama client not initialized');
+                throw new Error('Mezon client not initialized');
             }
 
             const deviceId = new DeviceUUID().get();
@@ -132,7 +132,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
     const refreshSession = useCallback(
         async (session: Sessionlike) => {
             if (!clientRef.current) {
-                throw new Error('Nakama client not initialized');
+                throw new Error('Mezon client not initialized');
             }
             const newSession = await clientRef.current.sessionRefresh(
                 new Session(

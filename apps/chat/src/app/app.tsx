@@ -2,7 +2,7 @@ import { MezonStoreProvider, initStore } from '@mezon/store';
 import { RouterProvider } from 'react-router-dom';
 import {
   MezonContextProvider,
-  CreateNakamaClientOptions,
+  CreateMezonClientOptions,
   useMezon,
 } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -20,7 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const GOOGLE_CLIENT_ID =
   '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
-const nakama: CreateNakamaClientOptions = {
+const mezon: CreateMezonClientOptions = {
   host: 'dev-mezon.nccsoft.vn',
   // host: '127.0.0.1',
   port: '7350',
@@ -58,7 +58,7 @@ function AppWrapper() {
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <MezonContextProvider nakama={nakama} connect={true}>
+      <MezonContextProvider mezon={mezon} connect={true}>
         <App />
         <ToastContainer
           position='top-right'
