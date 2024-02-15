@@ -21,7 +21,7 @@ export function useChatDirect(directMessageID: string | undefined) {
 
 	const sendDirectMessage = React.useCallback(
 		async (message: IMessage) => {
-			// TODO: send message to server using nakama client
+			// TODO: send message to server using mezon client
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;

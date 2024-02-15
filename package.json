@@ -12,7 +12,7 @@
   },
   "private": true,
   "dependencies": {
-    "@heroiclabs/nakama-js": "file:vendors/mezon-js/packages/mezon-js",
+    "@heroiclabs/mezon-js": "file:vendors/mezon-js/packages/mezon-js",
     "@hookform/resolvers": "^3.3.4",
     "@mezon/mezon-js": "file:vendors/mezon-js/packages/mezon-js",
     "@react-oauth/google": "^0.12.1",

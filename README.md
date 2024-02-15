@@ -40,7 +40,7 @@ project-root/
         ├── components/:                    ## The directory containing complex components with multiple functionalities;
         ├── core/                           ## The directory focusing on handling logic;
         ├── store/                          ## The directory for storing data locally;
-        ├── transport/                      ## The directory for communicating with the server through Nakama Client;
+        ├── transport/                      ## The directory for communicating with the server through Mezon Client;
         ├── ui/                             ## The directory containing common simple components;
         └── utils                           ## The directory containing utility/helper functions;
 
