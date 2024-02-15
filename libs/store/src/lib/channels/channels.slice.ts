@@ -73,7 +73,7 @@ export const joinChanel = createAsyncThunk(
         try {
             thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
             thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-            thunkAPI.dispatch(
+             thunkAPI.dispatch(
                 channelMembersActions.fetchChannelMembers({ channelId }),
             );
 
