@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import {
     CreateMezonClientOptions,
-    createClient as createNakamaClient,
+    createClient as createMezonClient,
 } from '../mezon';
 import { Client, Session, Socket, Channel, Status } from '@mezon/mezon-js';
 import { DeviceUUID } from 'device-uuid';
@@ -61,7 +61,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
     }, [clientRef, socketRef]);
 
     const createClient = useCallback(async () => {
-        const client = await createNakamaClient(mezon);
+        const client = await createMezonClient(mezon);
         clientRef.current = client;
         return client;
     }, [mezon]);
