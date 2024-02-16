@@ -10,7 +10,7 @@ export const getMezonCtx = (thunkAPI: GetThunkAPI<AsyncThunkConfig>) => {
     return thunkAPI.extra.mezon;
 }
 
-type MezonValueContext = MezonContextValue & {
+export type MezonValueContext = MezonContextValue & {
     client: Client 
     session: Session
 }

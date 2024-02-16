@@ -17,6 +17,7 @@ import { channelMembersActions } from '../channelmembers/channel.members';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { fetchCategories } from '../categories/categories.slice';
 
+
 export const CHANNELS_FEATURE_KEY = 'channels';
 
 /*
