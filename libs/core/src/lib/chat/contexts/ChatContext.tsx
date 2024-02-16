@@ -33,7 +33,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
   const onstatuspresence = useCallback((statusPresence: StatusPresenceEvent) => {
     console.log('AAAAAAAAA: ', statusPresence)
-  }, [dispatch]);
+  }, []);
 
   const onnotification = useCallback((notification: Notification) => {
     // console.log('SSSSSSSS: ', notification)

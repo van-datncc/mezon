@@ -163,10 +163,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
                 throw new Error('Socket is not initialized');
             }
 
-            if (channelRef.current) {
-                await socket.leaveChat(channelRef.current.id);
-                channelRef.current = null;
-            }
+            // if (channelRef.current) {
+            //     await socket.leaveChat(channelRef.current.id);
+            //     channelRef.current = null;
+            // }
 
             const join = await socket.joinChat(
                 channelId,
@@ -197,6 +197,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
         [socketRef],
     );
 
+    // TODO: use same function for joinChatChannel and joinChatDirectMessage
     const joinChatDirectMessage = React.useCallback(
         async (
             channelId: string,
@@ -209,10 +210,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({
                 throw new Error('Socket is not initialized');
             }
 
-            if (channelRef.current) {
-                await socket.leaveChat(channelRef.current.id);
-                channelRef.current = null;
-            }
+            // if (channelRef.current) {
+            //     await socket.leaveChat(channelRef.current.id);
+            //     channelRef.current = null;
+            // }
 
             const join = await socket.joinChat(
                 channelId,
