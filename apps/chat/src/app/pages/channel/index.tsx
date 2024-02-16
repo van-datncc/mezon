@@ -41,11 +41,11 @@ export default function Server() {
                 <ChannelList />
                 <FooterProfile name={userProfile?.user?.username || ""} status={userProfile?.user?.online} avatar={userProfile?.user?.avatar_url || ""} openSetting={handleOpenCreate} />
             </div>
-            <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
+            <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
                 <ChannelTopbar channel={currentChanel} />
                 <div className="flex h-heightWithoutTopBar flex-row ">
                     <div className="flex flex-col flex-1 w-full h-full">
-                        <div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
+                        <div className="overflow-y-auto bg-[#1E1E1E]  w-widthMessageViewChat max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
                             {currentChanel ? <ChannelMessages channelId={currentChanel?.id} /> : <ChannelMessages.Skeleton />}
                         </div>
                         <div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">

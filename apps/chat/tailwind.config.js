@@ -3,6 +3,12 @@ const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
 const topBarHeight = '58px';
 const chatBoxHeight = '52px';
+const clanWidth = "72px"
+const channelListWidth = "272px"
+const memberWidth= "268px"
+const avatarWidth= "68px"
+const iconWidth= "160px"
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: [
@@ -20,8 +26,11 @@ module.exports = {
 				210: '210px',
 			},
 			width: {
-				widthWithoutServerWidth: `calc(100vw - ${topBarHeight})`,
-			  },
+				// widthWithoutServerWidth: `calc(100vw - ${topBarHeight})`,
+				widthMessageViewChat:`calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth})`,
+				widthMessageWithUser:`calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${avatarWidth})`,
+				widChatBoxBreak: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${iconWidth})`,
+			},
 			  height: {
 				heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
 				heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
