@@ -2,7 +2,7 @@ import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
-import { ChannelPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelPresenceEvent, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 
@@ -100,6 +100,28 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 	},
 );
 
+export const updateStatusUser = createAsyncThunk(
+  'channelMembers/fetchUserStatus',
+  async (statusPresence: StatusPresenceEvent , thunkAPI) => {
+    //user exist
+    let userId = ''
+    if(statusPresence?.leaves?.length) {
+      userId = statusPresence.leaves[0].user_id
+    } else if(statusPresence?.joins?.length){
+      userId =  statusPresence.joins[0].user_id
+    }
+    const userChange = selectMemberById(userId)(getChannelMemberRootState(thunkAPI))
+    const updateUser = {
+      ...userChange,
+      user: {
+        ...userChange.user,
+        online: statusPresence?.joins?.length ? true : undefined
+      }
+    };
+    thunkAPI.dispatch(channelMembersActions.onUpdateStatusUserPresence(updateUser))
+  }
+);
+
 export const initialChannelMembersState: ChannelMembersState = channelMembersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
@@ -111,9 +133,12 @@ export const channelMembers = createSlice({
 	reducers: {
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
-		onChannelPresence: (state: ChannelMembersState, action: PayloadAction<IChannelMember>) => {
-			channelMembersAdapter.addOne(state, action.payload);
-		},
+    onUpdateStatusUserPresence: (state: ChannelMembersState, update: PayloadAction<IChannelMember>) => {
+      channelMembersAdapter.updateOne(state, {
+        id: update.payload.id,
+        changes: update.payload
+      });
+    },
 		addMany: channelMembersAdapter.addMany,
 	},
 	extraReducers: (builder) => {
@@ -132,9 +157,6 @@ export const channelMembers = createSlice({
 	},
 });
 
-/*
- * Export reducer for store configuration.
- */
 export const channelMembersReducer = channelMembers.reducer;
 
 /*
@@ -155,7 +177,7 @@ export const channelMembersReducer = channelMembers.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const channelMembersActions = { ...channelMembers.actions, fetchChannelMembers, fetchChannelMembersPresence, followUserStatus };
+export const channelMembersActions = { ...channelMembers.actions, fetchChannelMembers, fetchChannelMembersPresence, followUserStatus, updateStatusUser };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
