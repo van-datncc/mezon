@@ -29,6 +29,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentChannelId?: string | null;
+	followingUserIds?: string[];
 }
 
 export interface ChannelMemberRootState {
@@ -56,7 +57,7 @@ type fetchChannelMembersPayload = {
 };
 
 export const fetchChannelMembers = createAsyncThunk(
-	'channelMembers/fetchStatus',
+	'channelMembers/fetchChannelMembers',
 	async ({ channelId, noCache }: fetchChannelMembersPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
@@ -78,11 +79,15 @@ export const fetchChannelMembers = createAsyncThunk(
 export const followUserStatus = createAsyncThunk('channelMembers/followUserStatus', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 	const listUserIds = selectAllUserIds(getChannelMemberRootState(thunkAPI));
-	const response = mezon.addStatusFollow(listUserIds);
+	const listFollowingUserIds = selectFollowingUserIds(getChannelMemberRootState(thunkAPI))
+	if(listUserIds.length !== listFollowingUserIds?.length || (listUserIds.some(id => !listFollowingUserIds.includes(id)))) {
+		const response = await mezon.addStatusFollow(listUserIds);
+		thunkAPI.dispatch(channelMembersActions.setFollowingUserIds(listUserIds))
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
 	return response;
+	}
 });
 
 export const fetchChannelMembersPresence = createAsyncThunk(
@@ -100,27 +105,24 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 	},
 );
 
-export const updateStatusUser = createAsyncThunk(
-  'channelMembers/fetchUserStatus',
-  async (statusPresence: StatusPresenceEvent , thunkAPI) => {
-    //user exist
-    let userId = ''
-    if(statusPresence?.leaves?.length) {
-      userId = statusPresence.leaves[0].user_id
-    } else if(statusPresence?.joins?.length){
-      userId =  statusPresence.joins[0].user_id
-    }
-    const userChange = selectMemberById(userId)(getChannelMemberRootState(thunkAPI))
-    const updateUser = {
-      ...userChange,
-      user: {
-        ...userChange.user,
-        online: statusPresence?.joins?.length ? true : undefined
-      }
-    };
-    thunkAPI.dispatch(channelMembersActions.onUpdateStatusUserPresence(updateUser))
-  }
-);
+export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus', async (statusPresence: StatusPresenceEvent, thunkAPI) => {
+	//user exist
+	let userId = '';
+	if (statusPresence?.leaves?.length) {
+		userId = statusPresence.leaves[0].user_id;
+	} else if (statusPresence?.joins?.length) {
+		userId = statusPresence.joins[0].user_id;
+	}
+	const userChange = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
+	const updateUser = {
+		...userChange,
+		user: {
+			...userChange.user,
+			online: statusPresence?.joins?.length ? true : undefined,
+		},
+	};
+	thunkAPI.dispatch(channelMembersActions.onUpdateStatusUserPresence(updateUser));
+});
 
 export const initialChannelMembersState: ChannelMembersState = channelMembersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -133,13 +135,16 @@ export const channelMembers = createSlice({
 	reducers: {
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
-    onUpdateStatusUserPresence: (state: ChannelMembersState, update: PayloadAction<IChannelMember>) => {
-      channelMembersAdapter.updateOne(state, {
-        id: update.payload.id,
-        changes: update.payload
-      });
-    },
+		onUpdateStatusUserPresence: (state: ChannelMembersState, update: PayloadAction<IChannelMember>) => {
+			channelMembersAdapter.updateOne(state, {
+				id: update.payload.id,
+				changes: update.payload,
+			});
+		},
 		addMany: channelMembersAdapter.addMany,
+		setFollowingUserIds:(state: ChannelMembersState, action: PayloadAction<string[]>) => {
+			state.followingUserIds = action.payload
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -177,7 +182,13 @@ export const channelMembersReducer = channelMembers.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const channelMembersActions = { ...channelMembers.actions, fetchChannelMembers, fetchChannelMembersPresence, followUserStatus, updateStatusUser };
+export const channelMembersActions = {
+	...channelMembers.actions,
+	fetchChannelMembers,
+	fetchChannelMembersPresence,
+	followUserStatus,
+	updateStatusUser,
+};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -201,6 +212,8 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 export const selectAllChannelMembers = createSelector(getChannelMembersState, selectAll);
 
 export const selectChannelMembesEntities = createSelector(getChannelMembersState, selectEntities);
+
+export const selectFollowingUserIds = createSelector(getChannelMembersState, (state) => state.followingUserIds);
 
 export const selectAllUserIds = createSelector(selectChannelMembesEntities, (entities) => {
 	const members = Object.values(entities);
