@@ -15,6 +15,7 @@ import {
     channelsActions,
     selectCurrentClan,
     useAppDispatch,
+    selectAllPermissionsUser,
     ClansEntity,
     selectAllClans,
     selectAllCategories,
@@ -39,6 +40,7 @@ export function useChat() {
     const currentChannelId = useSelector(selectCurrentChannelId);
     const currentClanId = useSelector(selectCurrentClanId);
     const categories = useSelector(selectAllCategories);
+    const permissionsUser = useSelector(selectAllPermissionsUser)
     const userClansProfile = useSelector(selectAllUserClanProfile);
     const { messages } = useMessages({ channelId: currentChannelId });
     const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -230,6 +232,7 @@ export function useChat() {
             inviteUser,
             currentClanId,
             getLinkInvite,
+            permissionsUser,
         }),
         [
             client,
@@ -253,6 +256,7 @@ export function useChat() {
             inviteUser,
             currentClanId,
             getLinkInvite,
+            permissionsUser,
         ],
     );
 }
