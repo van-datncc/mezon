@@ -14,3 +14,4 @@ export * from './lib/store';
 export * from './lib/MezonStoreProvider';
 export * from './lib/messages/SeenMessagePool';
 export * from './lib/direct/direct.slice';
+export * from './lib/permissionuser/permissionuser.slice';

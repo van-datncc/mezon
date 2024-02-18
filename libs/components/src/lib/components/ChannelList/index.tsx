@@ -40,7 +40,9 @@ function ChannelList() {
     }
   };
 
-  const { currentClan, createLinkInviteUser } = useChat();
+  const { currentClan, createLinkInviteUser, permissionsUser } = useChat();
+  const containsViewChannelPermission = permissionsUser.some(permission => permission.slug === "view-channel");
+  
   const dispatch = useAppDispatch();
   const openModalCreateNewChannel = (paramCategory: ICategory) => {
     dispatch(channelsActions.openCreateNewModalChannel(true));
@@ -115,7 +117,7 @@ function ChannelList() {
                   )}
                   {category.category_name}
                 </button>
-                {currentClan?.creator_id===userProfile?.user?.id &&(
+                {currentClan?.creator_id===userProfile?.user?.id && containsViewChannelPermission &&(
                   <button
                     onClick={() => {
                       handleToggleCategory(category, true);

@@ -3,6 +3,7 @@ import {
     ApiChannelDescription,
     ChannelUserListChannelUser,
     ApiClanDesc,
+    ApiPermission,
     ApiUser,
     ApiAccount,
     ApiClanProfile,
@@ -18,6 +19,10 @@ export type IClanProfile = ApiClanProfile & {
     id: string;
 };
 export type ICategory = ApiCategoryDesc & {
+    id: string;
+};
+
+export type IPermissionUser = ApiPermission & {
     id: string;
 };
 

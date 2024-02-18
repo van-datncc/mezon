@@ -17,6 +17,7 @@ import { categoriesActions } from "../categories/categories.slice";
 import { channelsActions } from "../channels/channels.slice";
 import { userClanProfileActions } from "../clanProfile/clanProfile.slice";
 import { accountSlice, getUserProfile } from "../account/account.slice";
+import { PermissionsUserActions } from "../permissionuser/permissionuser.slice";
 export const CLANS_FEATURE_KEY = "clans";
 
 /*
@@ -49,6 +50,7 @@ export const changeCurrentClan = createAsyncThunk(
     thunkAPI.dispatch(channelsActions.setCurrentChannelId(""));
     thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
     thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
+    thunkAPI.dispatch(PermissionsUserActions.fetchPermissionsUser({ clanId }));
     thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
     thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
   },
