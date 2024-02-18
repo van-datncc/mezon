@@ -33,15 +33,10 @@ export const fetchPermissionsUser = createAsyncThunk(
 	async ({ clanId }: fetchPermissionsUserPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.GetPermissionOfUserInTheClan(mezon.session, clanId);
-	// console.log("response: ", response.permissions?.at(0));
-        // const resPayload = response.payload as ApiPermissionList;
 		if (!response.permissions) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		// console.log("chuyện gì sẽ xảy ra",response.permissions.map(mapPermissionUserToEntity));
-		
 		return response.permissions.map(mapPermissionUserToEntity);
-		// return response;
 	},
 );
 
