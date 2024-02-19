@@ -6,7 +6,7 @@
 
 ## Installing Nx Globally
 
-npm install --global nx@latest
+`npm install --global nx@latest`
 
 ## Sync dependencies
 - Run `npm run sync` to sync dependencies
@@ -18,29 +18,79 @@ To start the development server run `nx run dev:chat`. Open your browser and nav
 ## Notes
 - using `Git Bash` to run the commands
 
-## Directory Structure
+## Architecture Overview
 
-project-root/
-    
-    │
-    ├── apps/              
-    │   ├── admin:                          ## Directory containing resources, libraries, and components related to the admin role;  
-    │   └── chat:                           ## Directory containing resources, libraries, and components related to users; 
-    │        └── src/ 
-    │            ├── apps/:                 
-    │            │   ├── context/:          ## The directory containing related contexts;
-    │            │   ├── layout/:           ## The directory containing layouts based on user behavior;
-    │            │   ├── mock/:
-    │            │   ├── pages/:
-    │            │   └── routes/:
-    │            └── assets/:
-    │
-    │
-    └── libs/           
-        ├── components/:                    ## The directory containing complex components with multiple functionalities;
-        ├── core/                           ## The directory focusing on handling logic;
-        ├── store/                          ## The directory for storing data locally;
-        ├── transport/                      ## The directory for communicating with the server through Mezon Client;
-        ├── ui/                             ## The directory containing common simple components;
-        └── utils                           ## The directory containing utility/helper functions;
+<iframe src="https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview" width="640" height="480"></iframe>
+
+## Workspace Structure
+
+![Workspace Structure](./docs/workspace-structure.svg)
+
+We are using monorepo architecture to manage the codebase. The workspace is divided into multiple applications and libraries. Each application is a standalone application and each library is a reusable codebase.
+
+Workspace will be managed by [`Nx`](https://nx.dev/) which is a smart, fast and extensible build system.
+
+### Applications
+
+All applications are located in the `apps` directory. Each application is a standalone React application and has its own codebase.
+
+- `chat`: Chat application
+- `admin`: Admin application
+
+Currently, we only focus on the `chat` application.
+
+### Libraries
+
+All libraries are located in the `libs` directory. Each library is a reusable codebase and can be used by multiple applications.
+
+- `ui`: UI elements library, the components are `stateless` and `dumb`
+- `components`: Shared components library, the components are `stateful` and `smart` perform some logic through `context` and `hooks`
+- `core`: Core library, contains the core logic of the application, could be reused by multiple applications e.g. web, mobile, desktop
+- `transports`: Transport layer library, contains the logic to communicate with the server through `mezon-js` library
+- `store`: State management library, contains the logic to manage the state of the application using `redux` and `redux-toolkit`
+- `assets`: Assets library, contains the assets used by the applications and libraries
+- `logger`: Logger library, contains the logic to log the messages
+- `utils`: Utility functions library
+
+## Data Flow
+
+We are using `one-way` data flow architecture to manage the data flow of the application. The data flow is unidirectional follow the `Redux` pattern.
+
+![Data Flow](./docs/redux-data-flow.gif)
+
+See more about the `Redux` pattern [here](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow).
+
+The core concepts are `one-way` data flow and `single source of truth`.
+
+## Application data flow
+
+![Data Flow](./docs/data-flow.svg)
+
+The application data flow is managed by some packages:
+
+- `mez-js`: The core package to communicate with the server through `WebSocket` and `REST` API
+    - `WebSocket`: send and listen to the messages from the server
+    - `REST`: send and receive the messages from the server
+- `store`: The state management package to manage the state of the application. store is divided into multiple slices, each slice is a standalone slice and has its own reducer, action, and selector.
+    - `slice`: A standalone slice of the store, contains the reducer, action, and selector
+    - `reducer`: A function to manage the state of the application
+    - `action`: A function to dispatch the action to the reducer
+    - `selector`: A function to select the state from the store
+
+- `routing`: The routing package to manage the routing of the application. The routing is managed by `react-router-dom` package.
+    - loader: The loader to load the component dynamically
+    - route: The route to navigate to the component
+    - page: The page to render the component
+
+## Conventions and Guidelines
+
+## Code Style
+Using `Prettier` and `ESLint` to format the codebase. The codebase should be formatted before committing the code.
+
+## file naming
+
+- `PascalCase` for the components and pages
+- `camelCase` for the functions and variables
+
+See more about the naming convention [here](https://github.com/airbnb/javascript/tree/master/react#naming)
 
