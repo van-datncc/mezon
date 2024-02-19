@@ -13,7 +13,7 @@ export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
     return (
         <>
             {messages.map((message, i) => (
-                <ChannelMessage key={message.id} lastSeen={message.id === unreadMessageId && message.id !== lastMessageId} message={message} />
+                <ChannelMessage key={message.id} lastSeen={message.id === unreadMessageId && message.id !== lastMessageId} message={message} preMessage={i > 0 ? messages[i - 1] : undefined} />
             ))}
         </>
     );
