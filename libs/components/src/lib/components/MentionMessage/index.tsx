@@ -39,10 +39,6 @@ function Entry(props: EntryComponentProps): ReactElement {
 
 					<div className="flex justify-between gap-1">
 						<div className={theme?.mentionSuggestionsEntryText}>{mention.name}</div>
-
-						{/* <div className="">
-            {mention.name}
-          </div> */}
 					</div>
 				</div>
 			</div>
@@ -63,11 +59,11 @@ export default function CustomMentionEditor(): ReactElement {
 			}));
 			return setListUserMention(newUserMentionList);
 		}
-	}, [channelId,members[0].users.length]);
+	}, [channelId, members[0].users.length]);
 
 	useEffect(() => {
 		getListMentions();
-	}, [channelId,getListMentions]);
+	}, [channelId, getListMentions]);
 
 	const [listUserMention, setListUserMention] = useState<MentionData[]>([]);
 	const ref = useRef<Editor>(null);

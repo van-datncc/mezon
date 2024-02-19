@@ -1,81 +1,80 @@
 .mention {
-    color: #4a85bb;
-    text-decoration: none;
-  }
-  
-  .mentionSuggestions {
-    /* border-top: 1px solid #eee; */
-    /* background: #fff; */
-    border-radius: 2px;
-    cursor: pointer;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    transform-origin: 50% 0%;
-    transform: scaleY(0);
-    margin: -16px;
-    border: #033a6d;
-    position: relative;
-    color: black;
-    width: 300px;
-    border: 1px solid red
-  }
+	color: #4a85bb;
+	text-decoration: none;
+}
+
+.mentionSuggestions {
+	/* border-top: 1px solid #eee; */
+	/* background: #fff; */
+	border-radius: 2px;
+	cursor: pointer;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	transform-origin: 50% 0%;
+	transform: scaleY(0);
+	margin: -16px;
+	border: #033a6d;
+	position: relative;
+	color: black;
+	width: 300px;
+	border: 1px solid red;
+}
 /*   
   .mentionSuggestionsEntryContainer {
     display: table;
     width: 100%;
   } */
-  
-  /* .mentionSuggestionsEntryContainerLeft,
+
+/* .mentionSuggestionsEntryContainerLeft,
   .mentionSuggestionsEntryContainerRight {
     display: table-cell;
     vertical-align: middle;
   } */
-  
-  /* .mentionSuggestionsEntryContainerRight {
+
+/* .mentionSuggestionsEntryContainerRight {
     width: 100%;
     padding-left: 8px;
   } */
-  
-  /* .mentionSuggestionsEntry {
+
+/* .mentionSuggestionsEntry {
     padding: 7px 10px 3px 10px;
     transition: background-color 0.4s cubic-bezier(.27,1.27,.48,.56);
   } */
-  
-  /* .mentionSuggestionsEntry:active {
+
+/* .mentionSuggestionsEntry:active {
     background-color: #0181f0;
   } */
-  
-  .mentionSuggestionsEntryFocused {
-    /* composes: mentionSuggestionsEntry; */
-    background-color: #033a6d;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  /* .mentionSuggestionsEntryText,
+
+.mentionSuggestionsEntryFocused {
+	/* composes: mentionSuggestionsEntry; */
+	background-color: #033a6d;
+	color: white;
+	border-radius: 5px;
+}
+
+/* .mentionSuggestionsEntryText,
   .mentionSuggestionsEntryTitle {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   } */
-  
-  /* .mentionSuggestionsEntryText {
+
+/* .mentionSuggestionsEntryText {
   } */
-  
-  .mentionSuggestionsEntryTitle {
-    font-size: 0%;
-    color: #ff0000;
-  }
-  
-  .mentionSuggestionsEntryAvatar {
-    display: inline;
-    margin-left: auto;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    padding: 5px;
-  }
+
+.mentionSuggestionsEntryTitle {
+	font-size: 0%;
+	color: #ff0000;
+}
+
+.mentionSuggestionsEntryAvatar {
+	display: inline;
+	margin-left: auto;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	padding: 5px;
+}

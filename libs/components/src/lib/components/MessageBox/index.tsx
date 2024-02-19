@@ -12,7 +12,6 @@ import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { defaultSuggestionsFilter, MentionPluginTheme } from '@draft-js-plugins/mention';
 import editorStyles from '../MentionMessage/CustomMentionEditor.module.css';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-import { useChatDirect } from '@mezon/core';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -39,17 +38,13 @@ function Entry(props: EntryComponentProps): ReactElement {
 
 	return (
 		<div {...parentProps}>
-			<div className="flex items-center rounded-xl">
+			<div className="flex items-center rounded-xl py-2 px-2 gap-2">
 				<div className="">
-					<img src={mention.avatar} className="w-12 h-12" role="presentation" />
+					<img src={mention.avatar} className="w-8 h-8 rounded-full" role="presentation" />
 				</div>
 
 				<div className="flex justify-between gap-1">
-					<div className={theme?.mentionSuggestionsEntryText}>{mention.name}</div>
-
-					{/* <div className="">
-            {mention.name}
-          </div> */}
+					<div className="">{mention.name}</div>
 				</div>
 			</div>
 		</div>
@@ -65,10 +60,10 @@ export type IMessagePayload = IMessage & {
 	channelId: string;
 };
 
-function MessageBox(props: MessageBoxProps) {
+function MessageBox(props: MessageBoxProps): ReactElement {
 	const { channelId } = useAppParams();
 	const { members } = useChatChannel(channelId ?? '');
-	const getListMentions = useCallback(() => {
+	const getListMentions = () => {
 		if (members[0].users.length > 0) {
 			const userMentionRaw = members[0].users;
 			const newUserMentionList: MentionData[] = userMentionRaw.map((item) => ({
@@ -76,15 +71,24 @@ function MessageBox(props: MessageBoxProps) {
 				name: item?.user?.username ?? '',
 				id: item?.id ?? null,
 			}));
+			console.log('newUserMentionList', newUserMentionList);
 			return setListUserMention(newUserMentionList);
 		}
-	}, [channelId, members[0].users.length]);
-
-	useEffect(() => {
-		getListMentions();
-	}, [channelId, getListMentions]);
+	};
 
 	const [listUserMention, setListUserMention] = useState<MentionData[]>([]);
+	const onSearchChange = useCallback(
+		({ value }: { value: string }) => {
+			setSuggestions(defaultSuggestionsFilter(value, listUserMention));
+		},
+		[listUserMention],
+	);
+	useEffect(() => {
+		getListMentions();
+	}, []);
+	const memoizedListUserMention = useMemo(() => listUserMention, [listUserMention]);
+	console.log('memoizedListUserMention', memoizedListUserMention);
+
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 	const [open, setOpen] = useState(false);
@@ -105,11 +109,9 @@ function MessageBox(props: MessageBoxProps) {
 	const onChange = useCallback((_editorState: EditorState) => {
 		setEditorState(_editorState);
 	}, []);
+
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
-	}, []);
-	const onSearchChange = useCallback(({ value }: { value: string }) => {
-		setSuggestions(defaultSuggestionsFilter(value, listUserMention));
 	}, []);
 
 	const [content, setContent] = useState('');
@@ -187,25 +189,22 @@ function MessageBox(props: MessageBoxProps) {
 
 	return (
 		<div
-			className={editorStyles.editor}
+			className={`${editorStyles.editor} relative`}
 			// className="relative h-10 w-full"
 			onClick={() => {
 				ref.current!.focus();
 			}}
 		>
 			<Editor editorKey={'editor'} editorState={editorState} onChange={onChange} plugins={plugins} ref={ref} />
-
-			<div className='absolute w-1/2 top-0 border bg-blue-500'>
+			<div className="absolute w-full box-border bottom-20 max-w-[97%] bg-black rounded-md">
 				<MentionSuggestions
 					open={open}
 					onOpenChange={onOpenChange}
 					suggestions={listUserMention}
 					onSearchChange={onSearchChange}
-					onAddMention={() => {
-						// get the mention object selected
-					}}
+					onAddMention={() => {}}
 					entryComponent={Entry}
-					popoverContainer={({ children }) => <div>{children}</div>}
+					popoverContainer={({ children }: any) => <div>{children}</div>}
 				/>
 			</div>
 		</div>
