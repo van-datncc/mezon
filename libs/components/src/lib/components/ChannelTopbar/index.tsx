@@ -1,72 +1,58 @@
-import { IChannel } from '@mezon/utils'
-import * as Icons from '../Icons'
-
+import { IChannel } from '@mezon/utils';
+import * as Icons from '../Icons';
+import { ChannelLable, ThreadLable, SearchMessage } from './TopBarComponents';
 export type ChannelTopbarProps = {
-  channel?: IChannel
-}
+    channel?: IChannel | null;
+};
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
-  return (
-    <div className="flex items-center px-2 h-12 shadow-sm">
-      <div className="flex items-center">
-        <Icons.Hashtag className="mx-2 w-6 h-6 font-semibold text-gray-400" />
-        <span className="mr-2 font-title text-white whitespace-nowrap">
-          {channel?.name}
-        </span>
-      </div>
+    return (
+        <div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
+            <div className="justify-start items-center gap-1 flex">
+                <ChannelLable
+                    type={Number(channel?.type)}
+                    name={channel?.channel_lable}
+                    isPrivate={channel?.channel_private}
+                />
+            </div>
 
-      {channel?.description && (
-        <>
-          <div className="hidden mx-2 w-px h-6 bg-white/[.06] md:block"></div>
-          <div className="hidden mx-2 text-sm font-medium text-gray-200 truncate md:block">
-            {channel?.description}
-          </div>
-        </>
-      )}
+            {/* Desktop buttons */}
+            <div className="hidden items-center h-full ml-auto lg:flex">
+                <div className="justify-end items-center gap-2 flex">
+                    <div className="justify-start items-center gap-[15px] flex">
+                        <button>
+                            <Icons.ThreadIcon />
+                        </button>
 
-      {/* Mobile buttons */}
-      <div className="flex items-center ml-auto md:hidden">
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.HashtagWithSpeechBubble className="mx-2 w-6 h-6" />
-        </button>
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.People className="mx-2 w-6 h-6" />
-        </button>
-      </div>
+                        <button>
+                            <Icons.MuteBell />
+                        </button>
 
-      {/* Desktop buttons */}
-      <div className="hidden items-center ml-auto md:flex">
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.HashtagWithSpeechBubble className="mx-2 w-6 h-6" />
-        </button>
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.Bell className="mx-2 w-6 h-6" />
-        </button>
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.Pin className="mx-2 w-6 h-6" />
-        </button>
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.People className="mx-2 w-6 h-6" />
-        </button>
-        <div className="relative mx-2">
-          <input
-            type="text"
-            placeholder="Search"
-            className="px-1.5 w-36 h-6 text-sm font-medium placeholder:text-gray-400 bg-bgSurface rounded border-none"
-          />
-          <div className="flex absolute inset-y-0 right-0 items-center">
-            <Icons.Spyglass className="mr-1.5 w-4 h-4 text-gray-400" />
-          </div>
+                        <button>
+                            <Icons.PinRight />
+                        </button>
+
+                        <button>
+                            <Icons.MemberList />
+                        </button>
+
+                        <button>
+                            <Icons.ThreeDot />
+                        </button>
+                    </div>
+                    <SearchMessage />
+                    <div className="justify-start items-start gap-4 flex">
+                        <button>
+                            <Icons.Inbox />
+                        </button>
+                        <button>
+                            <Icons.Help />
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.Inbox className="mx-2 w-6 h-6" />
-        </button>
-        <button className="text-gray-200 hover:text-gray-100">
-          <Icons.QuestionCircle className="mx-2 w-6 h-6" />
-        </button>
-      </div>
-    </div>
-  )
+    );
 }
 
-export default ChannelTopbar
+export default ChannelTopbar;

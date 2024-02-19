@@ -1,15 +1,30 @@
+import { IMessageWithUser } from "@mezon/utils";
+import { ChannelMessage } from "./ChannelMessage";
+import { useChatChannel } from "@mezon/core";
+import { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 
-import { ChannelMessage } from './ChannelMessage'
-import { useChat } from '@mezon/core'
+type ChannelMessagesProps = {
+    channelId: string;
+};
 
-export default function ChannelMessages() {
-    const { messages } = useChat()
-
+export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
+    const { messages, unreadMessageId, lastMessageId } = useChatChannel(channelId);
     return (
         <>
             {messages.map((message, i) => (
-                <ChannelMessage key={i} message={message} />
+                <ChannelMessage key={message.id} lastSeen={message.id === unreadMessageId && message.id !== lastMessageId} message={message} />
             ))}
         </>
-    )
+    );
 }
+
+ChannelMessages.Skeleton = () => {
+    return (
+        <>
+            <ChannelMessage.Skeleton />
+            <ChannelMessage.Skeleton />
+            <ChannelMessage.Skeleton />
+        </>
+    );
+};

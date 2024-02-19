@@ -1,68 +1,156 @@
-import { IMessage } from "@mezon/utils";
-import { useCallback, FocusEvent, useState, ChangeEvent, FormEvent } from "react";
+import { IMessage } from '@mezon/utils';
+import { useCallback, useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
+import * as Icons from '../Icons';
 
 export type MessageBoxProps = {
-    onSend: (mes: IMessagePayload) => void;
+	onSend: (mes: IMessagePayload) => void;
+	onTyping?: () => void;
 };
 
 export type IMessagePayload = IMessage & {
-    channelId: string;
+	channelId: string;
 };
 
 function MessageBox(props: MessageBoxProps) {
-    const [content, setContent] = useState("");
+	const [content, setContent] = useState('');
+	const { onSend, onTyping } = props;
 
-    const { onSend } = props;
+	const handleSend = useCallback(() => {
+		if (!content.trim()) {
+			return;
+		}
+		onSend({
+			content: { content },
+			id: '',
+			channel_id: '',
+			body: { text: '' },
+			channelId: '',
+		});
+		setContent('');
+	}, [onSend, content]);
 
-    const handleSend = useCallback(
-        () => {
-            if (!content) {
-                return;
-            }
-            onSend({
-                content,
-                name: "",
-                id: "",
-                clanId: "",
-                channelId: "",
-                date: "",
-            });
-            setContent("");
-        },
-        [onSend, content]
-    );
+	const handleKeyDown = useCallback(
+		(event: React.KeyboardEvent<HTMLDivElement>) => {
+			if (event.key === 'Enter' && !event.shiftKey) {
+				event.preventDefault();
+				handleSend();
+			}
+		},
+		[handleSend, content, setContent],
+	);
 
-    const handleInputChanged = useCallback((event: ChangeEvent | FocusEvent) => {
-        const target = event.target as HTMLInputElement;
-        setContent(target.value);
-    }, []);
+	const sanitizeContent = (content: string): string => {
+		return content.replace(/ style="[^"]*"/g, '');
+	};
 
-    const handleSubmitted = useCallback((event: FormEvent) => {
-        event.preventDefault();
-        handleSend();
-    }, [handleSend]);
+	const handleInputChanged = useCallback(
+		(event: React.FormEvent<HTMLDivElement>) => {
+			const updatedContent = (event.currentTarget as HTMLDivElement).innerHTML;
+			const sanitizedContent = sanitizeContent(updatedContent);
+			setContent(sanitizedContent);
+		},
+		[handleKeyDown, content, setContent],
+	);
 
-    return (
-        <div className="flex items-center justify-between p-4 bg-bgSecondary dark:bg-gray-900">
-            <form className="flex items-center justify-between flex-grow" onSubmit={handleSubmitted}>
-                <textarea
-                    id="message"
-                    className="flex-grow p-2.5 text-sm text-white bg-bgPrimary rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Write your thoughts here..."
-                    onBlur={handleInputChanged}
-                    onChange={handleInputChanged}
-                    value={content}
-                >
-                </textarea>
-                <button
-                    className="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg focus:ring focus:ring-blue-300 dark:bg-blue-600"
-                    type="submit"
-                >
-                    Send
-                </button>
-            </form>
-        </div>
-    );
+	const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		const clipboardData = event.clipboardData.getData('text/plain');
+		setContent(clipboardData);
+	};
+
+	const handleTyping = useCallback(() => {
+		if (typeof onTyping === 'function') {
+			onTyping();
+		}
+	}, [onTyping]);
+
+	const contentEditableRef = useRef<HTMLDivElement | null>(null);
+	useEffect(() => {
+		const range = document.createRange();
+		const selection = window.getSelection();
+		range.selectNodeContents(contentEditableRef.current as any);
+		range.collapse(false);
+		selection?.removeAllRanges();
+		selection?.addRange(range);
+	}, [content]);
+
+	const [placeholderVisible, setPlaceholderVisible] = useState(true);
+	useEffect(() => {
+		const hasContent = contentEditableRef?.current;
+		const contentLength = hasContent?.textContent?.trim().length;
+		if (contentLength && contentLength > 0) {
+			setPlaceholderVisible(!hasContent);
+		} else {
+			setPlaceholderVisible(true);
+		}
+	}, [content]);
+	return (
+		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
+			<form className="self-stretch p-4 bg-neutral-950  rounded-lg justify-start gap-3 inline-flex items-center ">
+				<div>
+					<div className="flex flex-row justify-end h-fit">
+						<Icons.AddCircle />
+					</div>
+				</div>
+
+				<div className="grow self-stretch justify-start items-center gap-2 flex relative ml-1">
+					{placeholderVisible && (
+						<div
+							className="absolute pointer-events-none select-none text-[#ABABAB]"
+							style={{ top: '50%', transform: 'translateY(-50%)' }}
+						>
+							Write your thoughts here...
+						</div>
+					)}
+
+						<div
+							contentEditable
+							ref={contentEditableRef}
+							className="grow flex-wrap text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto w-widChatBoxBreak resize-none"
+							id="message"
+							onInput={handleInputChanged}
+							onFocus={handleTyping}
+							onBlur={handleInputChanged}
+							onChange={handleInputChanged}
+							dangerouslySetInnerHTML={{ __html: content }}
+							onKeyDown={handleKeyDown}
+							onPaste={handlePaste}
+						/>
+				</div>
+				<div>
+					<div className="flex flex-row gap-1">
+						<Icons.Gif />
+						<Icons.Help />
+					</div>
+				</div>
+			</form>
+		</div>
+	);
 }
+
+MessageBox.Skeleton = () => {
+	return (
+		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
+			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
+				<div className="flex flex-row h-full items-center">
+					<div className="flex flex-row  justify-end h-fit">
+						<Icons.AddCircle />
+					</div>
+				</div>
+
+				<div className="grow self-stretch justify-start items-center gap-2 flex">
+					<div
+						contentEditable
+						className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
+					/>
+				</div>
+				<div className="flex flex-row h-full items-center gap-1">
+					<Icons.Gif />
+					<Icons.Help />
+				</div>
+			</form>
+		</div>
+	);
+};
 
 export default MessageBox;

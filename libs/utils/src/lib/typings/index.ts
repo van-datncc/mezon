@@ -1,43 +1,62 @@
-export type IClan = {
-    name: string;
+import {
+    ApiCategoryDesc,
+    ApiChannelDescription,
+    ChannelUserListChannelUser,
+    ApiClanDesc,
+    ApiPermission,
+    ApiUser,
+    ApiAccount,
+    ApiClanProfile,
+} from '@mezon/mezon-js/dist/api.gen';
+import { ChannelMessage } from '@mezon/mezon-js';
+
+export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
+
+export type IClan = ApiClanDesc & {
     id: string;
-    image: string;
-    description: string;
-    memberIds: string[];
-    channelIds: string[];
-    categoryIds?: string[];
-    categories?: ICategory[];
-}
-
-
-
-export type ICategory = {
-    name: string;
+};
+export type IClanProfile = ApiClanProfile & {
     id: string;
-    clanId: string;
-    channelIds: string[];
-    channels?: IChannel[];
-}
-
-export type IChannel = {
-    name: string;
+};
+export type ICategory = ApiCategoryDesc & {
     id: string;
-    clanId: string;
-    categoryId: string;
-    memberIds: string[];
+};
+
+export type IPermissionUser = ApiPermission & {
+    id: string;
+};
+
+export type ICategoryChannel = ICategory & {
+    channels: IChannel[];
+};
+
+export type IRole = {
+    role_id: string;
+};
+
+export type IRoleUsers = IRole & {
+    users: ApiUser[];
+};
+
+export type IChannel = ApiChannelDescription & {
+    id: string;
+    unread?: boolean;
     description?: string;
-    threadIds: string[];
-    unread: boolean
-}
+};
+
+export type IChannelMember = ChannelUserListChannelUser & {
+    id: string;
+    channelId?: string;
+};
 
 export type IThread = {
-    name: string;
-    id: string;
-    clanId: string;
-    channelId: string;
-    content: string;
-    date: string;
-}
+    name: string | undefined;
+    id: string | undefined;
+    clanId: string | undefined;
+    channelId: string | undefined;
+    content: string | undefined;
+    date: string | undefined;
+};
 
 export type IContextMenuItemAction = 'REST';
 
@@ -45,11 +64,11 @@ export type IContextMenuItemMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export type IContextMenuItemPayload = {
     // any
-}
+};
 
 export type IContextMenuItemCallback = {
     // any
-}
+};
 
 export type IContextMenuItem = {
     label: string;
@@ -57,31 +76,105 @@ export type IContextMenuItem = {
     action: IContextMenuItemAction;
     method: IContextMenuItemMethod;
     payload: IContextMenuItemPayload;
-}
+};
 
 export type IMessageContextMenu = {
     items: IContextMenuItem[];
-}
+};
 
 export type IMessageMeta = {
-    contextMenu: IMessageContextMenu
-}
+    contextMenu: IMessageContextMenu;
+};
 
-export type IMessage = {
-    name: string;
+export type IMessage = ChannelMessage & {
     id: string;
-    clanId: string;
-    channelId: string;
-    content: string;
-    date: string;
-    user?: IUser;
-    isMe?: boolean;
-}
+    body: {
+        text: string;
+    };
+    content?: {
+        content?: string | undefined;
+    };
+    date?: string | undefined;
+    creationTime?: Date;
+    creationTimeMs?: number;
+    lastSeen?: boolean;
+};
+
+export type IMessageWithUser = IMessage & {
+    user: IUser | null;
+};
 
 export type IUser = {
     name: string;
     username: string;
     id: string;
     avatarSm: string;
+};
+
+export interface CategoryNameProps {
+    ChannelType: string | undefined;
+    channelStatus: string | undefined;
+    name: string | undefined;
 }
 
+export interface ThreadNameProps {
+    name: string | undefined;
+}
+
+export interface IconProps {
+    url: string;
+}
+
+export type ChannelListProps = { className?: string };
+
+export enum ChannelStatus {
+    OPEN = 'open',
+    CLOSE = 'close',
+}
+
+export enum channelStatusEnum {
+    LOCK = 'lock',
+    UNLOCK = 'unlock',
+}
+
+export interface CategoryProps {
+    name: string | undefined;
+    status?: string | undefined;
+    type?: string | undefined;
+}
+
+export interface ThreadProps {
+    name: string;
+}
+
+export type IUserAccount = ApiAccount;
+
+export enum ChannelStatusEnum {
+    isPrivate = 1,
+}
+
+export enum ChannelTypeEnum {
+    CHANNEL_TEXT = 1,
+    DM_CHAT = 2,
+    GROUP_CHAT = 3,
+    CHANNEL_VOICE = 4,
+    FORUM = 5,
+    ANNOUNCEMENT = 6,
+}
+
+export interface ChannelProps {
+    name?: string;
+    isPrivate?: ChannelStatusEnum;
+    categories?: Record<string, CategoryProps>;
+    type: ChannelTypeEnum;
+}
+
+export interface CategoryProps {
+    name: string | undefined;
+    status?: string | undefined;
+    type?: string | undefined;
+}
+
+export interface ThreadProps {
+    name: string;
+}

@@ -1,16 +1,43 @@
-import { MessageWithUser } from '@mezon/components'
-import { IMessage } from '@mezon/utils'
+import { MessageWithUser, UnreadMessageBreak } from '@mezon/components'
+import { useChatMessage } from '@mezon/core'
+import { IMessageWithUser } from '@mezon/utils'
+import { useEffect, useMemo } from 'react'
 
 type MessageProps = {
-    message: IMessage
-
+    message: IMessageWithUser,
+    lastSeen?: boolean
 }
 
 export function ChannelMessage(props: MessageProps) {
-    const { message } = props
+    const { message, lastSeen } = props
+    const { markMessageAsSeen } = useChatMessage(message.id);
+
+    useEffect(() => {
+        markMessageAsSeen(message)
+    }, [markMessageAsSeen, message]);
+
+    // TODO: recheck this
+    const mess = useMemo(() => {
+        if(typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
+            return message.content
+        }
+        return message
+    }, [message])
+
     return (
         <div>
-           <MessageWithUser message={message} />
+            <MessageWithUser message={mess as IMessageWithUser} />
+            {lastSeen && (
+                <UnreadMessageBreak />
+            )}
+        </div>
+    )
+}
+
+ChannelMessage.Skeleton = () => {
+    return (
+        <div>
+            <MessageWithUser.Skeleton />
         </div>
     )
 }

@@ -1,60 +1,77 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
+const topBarHeight = '58px';
+const chatBoxHeight = '52px';
+const clanWidth = "72px"
+const channelListWidth = "272px"
+const memberWidth= "268px"
+const avatarWidth= "68px"
+const iconWidth= "160px"
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    join(
-      __dirname,
-      '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
-    ),
-    ...createGlobPatternsForDependencies(__dirname),
-  ],
-  theme: {
-    extend: {
-      spacing: {
-        px: '1px',
-        0: '0',
-        96:"96px",
-        210:"210px"
-      },
-      fontFamily: {
-        manrope: ['Manrope', 'sans-serif'],
-      },
-      screens: {
-        'mobile-s': '320px',
-        'mobile-l': '375px',
-      },
-      fontSize: {
-        header: ['5rem', '5rem'],
-        headerMobile: ['3.125rem', '3.75rem'],
-        subHeaderMobile: '1.563rem',
-        contentMobile: '1.25rem',
-      },
-      colors: Colors,
-      transitionDuration: {
-        3000: '3000ms',
-      },
-      keyframes: {
-        rotation: {
-          '0%': {
-            transform: 'rotate3d(0, 1, 0, 0deg)',
-          },
-          '50%': {
-            transform: 'rotate3d(0, 1, 0, 180deg)',
-          },
-          '100%': {
-            transform: 'rotate3d(0, 1, 0, 360deg)',
-          },
-        },
-      },
-    },
-    animation: {
-      rotation: 'rotation 6s linear infinite',
-    },
-  },
-  plugins: [],
+	content: [
+		join(__dirname, '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'),
+		'node_modules/flowbite-react/lib/esm/**/*.js',
+		...createGlobPatternsForDependencies(__dirname),
+	],
+	darkMode: 'class',
+	theme: {
+		extend: {
+			spacing: {
+				px: '1px',
+				0: '0',
+				96: '96px',
+				210: '210px',
+			},
+			width: {
+				// widthWithoutServerWidth: `calc(100vw - ${topBarHeight})`,
+				widthMessageViewChat:`calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth})`,
+				widthMessageWithUser:`calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${avatarWidth})`,
+				widChatBoxBreak: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${iconWidth})`,
+			},
+			  height: {
+				heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+				heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
+				heightTopBar: topBarHeight,
+				heightChatBox: chatBoxHeight,
+			  },
+
+			fontFamily: {
+				manrope: ['Manrope', 'sans-serif'],
+			},
+			screens: {
+				'mobile-s': '320px',
+				'mobile-l': '375px',
+			},
+			fontSize: {
+				header: ['5rem', '5rem'],
+				headerMobile: ['3.125rem', '3.75rem'],
+				subHeaderMobile: '1.563rem',
+				contentMobile: '1.25rem',
+			},
+			colors: Colors,
+			transitionDuration: {
+				3000: '3000ms',
+			},
+			keyframes: {
+				rotation: {
+					'0%': {
+						transform: 'rotate3d(0, 1, 0, 0deg)',
+					},
+					'50%': {
+						transform: 'rotate3d(0, 1, 0, 180deg)',
+					},
+					'100%': {
+						transform: 'rotate3d(0, 1, 0, 360deg)',
+					},
+				},
+			},
+		},
+		animation: {
+			rotation: 'rotation 6s linear infinite',
+		},
+	},
+	//   plugins: [require('flowbite/plugin')],
 };
-
-

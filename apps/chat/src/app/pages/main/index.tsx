@@ -1,70 +1,99 @@
 import { Image } from '@mezon/ui';
-import { useChat } from '@mezon/core';
-import { ModalListClans, NavLink } from '@mezon/components';
+import { useChat, useAppNavigation, useChatDirect } from '@mezon/core';
 import { MainContent } from './MainContent';
-import IconLogoMezon from '../../../assets/Images/IconLogoMezon.svg';
-import IconListClans from '../../../assets/Images/IconListClans.svg';
+import IconLogoMezon from '../../../assets/Images/mezon-logo.png';
 import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
 
 function MyApp() {
-  const { clans, currentClan, changeCurrentClan, currentChanel } = useChat();
-  const [openListClans, setOpenListClans] = useState(false);
-  const navigate = useNavigate();
-  const pathName = useLocation().pathname;
-  const channelSlug = currentChanel ? `/channels/${currentChanel.id}` : '';
-  const url = `/chat/servers/${currentClan?.id}${channelSlug}`;
+	const { clans, currentClan } = useChat();
+	const [openListClans, setOpenListClans] = useState(false);
+	const [openCreateClan, setOpenCreateClans] = useState(false);
+	const { navigate, toClanPage } = useAppNavigation();
+	const pathName = useLocation().pathname;
 
-  const handleChangeClan = (clanId: string) => {
-    changeCurrentClan(clanId)
-    navigate(`/chat/servers/${clanId}${channelSlug}`);
-  }
+	const handleChangeClan = (clanId: string) => {
+		navigate(toClanPage(clanId));
+	};
+	const handleOpenCreate = () => {
+		setOpenCreateClans(true);
+	};
 
-  return (
-    <div className="flex h-screen text-gray-100">
-      <div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
-        <NavLink href="/mezon/direct/12" active={pathName?.includes('direct')}>
-          <Image src={IconLogoMezon} alt={'logoMezon'} />
-        </NavLink>
-        <div className="py-2 border-t-2 border-t-borderDefault"></div>
+	const { friends } = useChatDirect(undefined);
+	const quantityPendingRequest = friends.filter((obj) => obj.state === 2).length || 0;
 
-        <NavLink
-          href={`${url}`}
-          active={!pathName?.includes('direct')}
-          key={currentClan?.id}
-        >
-          <>
-            <Image
-              src={currentClan?.image || ''}
-              alt={currentClan?.name || ''}
-              placeholder="blur"
-              width={48}
-              style={{ borderRadius: '50%' }}
-              blurDataURL={currentClan?.image}
-            />
-          </>
-        </NavLink>
+	return (
+		<div className="flex h-screen text-gray-100">
+			<div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
+				<NavLink to="/chat/direct/friends">
+					<NavLinkComponent active={pathName.includes('direct')}>
+						<div>
+							<Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
+							{quantityPendingRequest !== 0 && (
+								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
+									{quantityPendingRequest}
+								</div>
+							)}
+						</div>
+					</NavLinkComponent>
+				</NavLink>
+				<div className="py-2 border-t-2 border-t-borderDefault"></div>
+				{currentClan?.id && (
+					<NavLink to={`/chat/servers/${currentClan.id}`}>
+						<NavLinkComponent active={!pathName.includes('direct')}>
+							{currentClan?.logo ? (
+								<Image
+									src={currentClan?.logo || ''}
+									alt={currentClan?.clan_name || ''}
+									placeholder="blur"
+									width={48}
+									style={{ borderRadius: '50%' }}
+									blurDataURL={currentClan?.logo}
+								/>
+							) : (
+								// eslint-disable-next-line react/jsx-no-useless-fragment
+								<>
+									{currentClan?.clan_name && (
+										<div className="w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px]">
+											{currentClan.clan_name.charAt(0).toUpperCase()}
+										</div>
+									)}
+								</>
+							)}
+						</NavLinkComponent>
+					</NavLink>
+				)}
 
-        <div className="relative py-2" onClick={() => setOpenListClans(!openListClans)}>
-          <Image src={IconListClans} alt={'logoMezon'} width={48} height={48} />
-          <div className='absolute bottom-0 right-0 top-0 left-[54px] z-10 bg-bgSecondary'>
-            <ModalListClans
-              options={clans}
-              showModal={openListClans}
-              idSelectedClan={currentClan?.id}
-              onChangeClan={handleChangeClan}
-            />
-          </div>
-        </div>
-
-        <div className="relative" onClick={() => { console.log('Create Clan') }}>
-          <Image src={IconCreateClan} alt={'logoMezon'} width={48} height={48} />
-        </div>
-      </div>
-      <MainContent />
-    </div>
-  );
+				<div
+					className="relative py-2"
+					onClick={() => {
+						setOpenListClans(!openListClans);
+					}}
+				>
+					<Image src={IconCreateClan} alt={'logoMezon'} width={48} height={48} />
+					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
+						<ModalListClans
+							options={clans}
+							showModal={openListClans}
+							idSelectedClan={currentClan?.clan_id}
+							onChangeClan={handleChangeClan}
+							createClan={handleOpenCreate}
+							onClose={() => setOpenListClans(false)}
+						/>
+					</div>
+				</div>
+			</div>
+			<MainContent />
+			<ModalCreateClan
+				open={openCreateClan}
+				onClose={() => {
+					setOpenCreateClans(false);
+				}}
+			/>
+		</div>
+	);
 }
 
 export default MyApp;

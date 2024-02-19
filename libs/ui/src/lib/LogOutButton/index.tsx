@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { authActions } from '@mezon/store';
+import { authActions, useAppDispatch } from '@mezon/store';
 
 export function LogOutButton() {
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch()
   const handleOpenModal = () => {
     setOpenModal(true);
   };
@@ -59,7 +58,7 @@ interface ModalProps {
   handleLogOut: () => void;
 }
 
-const LogoutModal: React.FC<ModalProps> = ({
+export const LogoutModal: React.FC<ModalProps> = ({
   isOpen,
   handleLogOut,
   onClose,
@@ -69,23 +68,25 @@ const LogoutModal: React.FC<ModalProps> = ({
       {isOpen && (
         <div className="fixed  inset-0 flex items-center justify-center z-50">
           <div className="fixed inset-0 bg-black opacity-50"></div>
-          <div className="relative z-10 dark:bg-gray-900  bg-white p-6 rounded-lg text-center">
-            <h2 className="text-xl font-semibold mb-4">Confirm Log Out</h2>
-            <p className="text-white-600 mb-6">
+          <div className="relative z-10 dark:bg-gray-900  bg-bgDisable p-6 rounded-[5px] text-center">
+            <h2 className="text-[30px] font-semibold mb-4">Log Out</h2>
+            <p className="text-white-600 mb-6 text-[16px]">
               Are you sure you want to log out?
             </p>
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-10 text-[14px]">
               <button
-                onClick={handleLogOut}
-                className="px-4 py-2 mr-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
-              >
-                Log Out
-              </button>
-              <button
+                color="gray"
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
+                className="px-4 py-2 mr-5 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
               >
                 Cancel
+              </button>
+              <button
+                color="blue"
+                onClick={handleLogOut}
+                className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
+              >
+                Log Out
               </button>
             </div>
           </div>

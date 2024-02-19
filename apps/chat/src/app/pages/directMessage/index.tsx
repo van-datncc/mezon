@@ -1,33 +1,39 @@
-import { ChannelTopbar, DirectMessageList, FooterProfile, ServerHeader } from '@mezon/components'
-import ChannelMessages from '../channel/ChanneMessages'
-import { ChannelMessageBox } from '../channel/ChannelMessageBox'
+import {
+    DirectMessageList,
+    FooterProfile,
+    ServerHeader,
+} from "@mezon/components";
+import { useChat } from "@mezon/core";
+import { useState } from "react";
+import Setting from "../setting";
+import { MainContentDirect } from "./MainContentDirect";
 
 export default function Direct() {
+    const { userProfile } = useChat();
+    const [openSetting, setOpenSetting] = useState(false);
+    const handleOpenCreate = () => {
+        setOpenSetting(true);
+    };
 
-    const currentDirectMess = null //get form store
     return (
         <>
-            <div className="hidden flex-col w-60 bg-bgSurface md:flex">
-                <ServerHeader type={'direct'} />
+            <div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
+                <ServerHeader type={"direct"} />
                 <DirectMessageList />
-                <FooterProfile name='nhan.nguyen' status='Online' />
+                <FooterProfile
+                    name={userProfile?.user?.username || ""}
+                    status={userProfile?.user?.online}
+                    avatar={userProfile?.user?.avatar_url || ""}
+                    openSetting={handleOpenCreate}
+                />
             </div>
-            <div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary">
-                <ChannelTopbar channel={undefined} />
-                {currentDirectMess ? (
-                    <>
-                        <div className="overflow-y-scroll flex-1">
-                            <ChannelMessages />
-                        </div>
-                        <div className="flex-shrink-0 bg-bgSecondary">
-                            <ChannelMessageBox />
-                        </div>
-                    </>
-                ) : <>
-
-                </>
-                }
-            </div>
+            <MainContentDirect />
+            <Setting
+                open={openSetting}
+                onClose={() => {
+                    setOpenSetting(false);
+                }}
+            />
         </>
-    )
+    );
 }

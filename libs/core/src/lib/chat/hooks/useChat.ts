@@ -1,206 +1,262 @@
-
-import React, { useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { useChannels } from './useChannels';
+import { useChannelMembers } from './useChannelMembers';
 import { useMessages } from './useMessages';
-import { useClans } from './useClans';
 import { useThreads } from './useThreads';
-import { useMezon } from '@mezon/transport';
 import { useSelector } from 'react-redux';
 import {
-  selectChannelsEntities,
-  selectCurrentChannel,
-  selectCurrentChannelId,
-  selectCurrentClanId,
-  clansActions,
-  channelsActions,
-  messagesActions,
-  selectCurrentClan,
-  selectClansEntities,
-  authActions,
-  accountActions,
-  useAppDispatch,
-  ClansEntity,
-  selectSession,
+    selectCurrentChannel,
+    selectCurrentChannelId,
+    selectCurrentClanId,
+    clansActions,
+    userClanProfileActions,
+    selectAllUserClanProfile,
+    selectUserClanProfileByClanID,
+    channelsActions,
+    selectCurrentClan,
+    useAppDispatch,
+    selectAllPermissionsUser,
+    ClansEntity,
+    selectAllClans,
+    selectAllCategories,
+    selectAllAccount,
 } from '@mezon/store';
-import { IChannel, IMessage } from '@mezon/utils';
+import { ICategoryChannel, IChannel, IMessage } from '@mezon/utils';
+import { useMezon } from '@mezon/transport';
+import {
+    ApiInviteUserRes,
+    ApiLinkInviteUser,
+} from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
+// @deprecated
+// TODO: refactor this hook into useChatChannel
 export function useChat() {
-  const { clientRef, createClient } = useMezon();
-  const { channels } = useChannels();
-  const { clans } = useClans();
-  const { threads } = useThreads();
+    const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
+    const { channels } = useChannels();
+    const { threads } = useThreads();
+    const clans = useSelector(selectAllClans);
+    const currentClan = useSelector(selectCurrentClan);
+    const currentChanel = useSelector(selectCurrentChannel);
+    const currentChannelId = useSelector(selectCurrentChannelId);
+    const currentClanId = useSelector(selectCurrentClanId);
+    const categories = useSelector(selectAllCategories);
+    const permissionsUser = useSelector(selectAllPermissionsUser)
+    const userClansProfile = useSelector(selectAllUserClanProfile);
+    const { messages } = useMessages({ channelId: currentChannelId });
+    const { members } = useChannelMembers({ channelId: currentChannelId });
+    const { userProfile } = useSelector(selectAllAccount);
 
-  const client = clientRef.current;
+    const client = clientRef.current;
+    const dispatch = useAppDispatch();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const ChannelsEntities = useSelector(selectChannelsEntities);
-  const chanEntities = useSelector(selectClansEntities);
+    const categorizedChannels = React.useMemo(() => {
+        const results = categories.map((category) => {
+            const categoryChannels = channels.filter(
+                (channel) => channel && channel?.category_id === category.id,
+            ) as IChannel[];
+            return {
+                ...category,
+                channels: categoryChannels,
+            };
+        });
 
-  const currentClan = useSelector(selectCurrentClan);
-  const currentChanel = useSelector(selectCurrentChannel);
-  const currentChannelId = useSelector(selectCurrentChannelId);
-  const currentClanId = useSelector(selectCurrentClanId);
+        return results as ICategoryChannel[];
+    }, [channels, categories]);
 
-  const { messages } = useMessages({ channelId: currentChannelId });
-
-  const dispatch = useAppDispatch();
-
-  const categorizedChannels = React.useMemo(() => {
-    const categories = currentClan?.categories || [];
-
-    const results = categories.map((category) => {
-      const categoryChannels = channels.filter(
-        (channel) => channel && channel?.categoryId === category.id
-      ) as IChannel[];
-
-      return {
-        ...category,
-        channels: categoryChannels,
-      };
-    });
-
-    return results;
-  }, [currentClan, channels]);
-
-  const changeCurrentClan = React.useCallback(
-    (optionalId?: string) => {
-      let clanId = optionalId;
-      if (!clanId) {
-        clanId = clans[0]?.id;
-      }
-      if (!clanId) {
-        return;
-      }
-      const clan = chanEntities[clanId];
-      if (!clan) {
-        return;
-      }
-      const channelIds = clan.channelIds || [];
-
-      dispatch(clansActions.changeCurrentClan(clanId));
-
-      const channelId = channelIds[0];
-      if (!channelId) {
-        return;
-      }
-      dispatch(channelsActions.changeCurrentChanel(channelId));
-    },
-    [clans, chanEntities, dispatch]
-  );
-
-  const fetchClans = React.useCallback(
-    async () => {
-      const action = await dispatch(clansActions.fetchClans());
-
-      const payload = action.payload as ClansEntity[];
-      if (payload.length > 0) {
-        const defaultClanId = payload[0].id;
-        dispatch(clansActions.changeCurrentClan(defaultClanId));
-      }
-
-      return payload;
-    },
-    [dispatch]
-  );
-
-  const changeCurrentChannel = React.useCallback(
-    (optionalId?: string) => {
-      let channelId = optionalId;
-      if (!channelId) {
-        channelId = channels[0]?.id;
-      }
-      if (!channelId) {
-        return;
-      }
-      dispatch(channelsActions.changeCurrentChanel(channelId));
-    },
-    [channels, dispatch]
-  );
-
-  const sendMessage = React.useCallback(
-    (message: IMessage) => {
-      // TODO: send message to server using nakama client
-      const payload = {
-        ...message,
-        id: Math.random().toString(),
-        date: new Date().toLocaleString(),
-        user: {
-          name: 'My self',
-          username: 'myself',
-          id: 'myself',
-          avatarSm:
-            'https://cdn.pixabay.com/photo/2016/11/18/23/38/child-1837375_640.png',
+    const changeCurrentClan = React.useCallback(
+        async (clanId: string) => {
+            await dispatch(clansActions.changeCurrentClan({ clanId }));
         },
-      };
+        [dispatch],
+    );
 
-      if (!payload.channelId) {
-        payload.channelId = currentChannelId || '';
-      }
+    const getUserClanProfile = React.useCallback(
+        async (clanId: string) => {
+            await dispatch(
+                userClanProfileActions.fetchUserClanProfile({ clanId }),
+            );
+        },
+        [dispatch],
+    );
 
-      if (!payload.clanId) {
-        payload.clanId = currentClanId || '';
-      }
+    const updateUserClanProfile = React.useCallback(
+        async (clanId: string, name: string, logoUrl: string) => {
+            const action = await dispatch(
+                userClanProfileActions.updateUserClanProfile({
+                    clanId,
+                    username: name,
+                    avatarUrl: logoUrl,
+                }),
+            );
+            const payload = action.payload;
+            return payload;
+        },
+        [dispatch],
+    );
 
-      dispatch(messagesActions.add(payload));
-    },
-    [currentChannelId, currentClanId, dispatch]
-  );
+    const createClans = React.useCallback(
+        async (name: string, logoUrl: string) => {
+            const action = await dispatch(
+                clansActions.createClan({ clan_name: name, logo: logoUrl }),
+            );
+            const payload = action.payload as ClansEntity;
+            if (payload && payload.clan_id) {
+                changeCurrentClan(payload.clan_id);
+            }
+            return payload;
+        },
+        [changeCurrentClan, dispatch],
+    );
 
-  const init = useCallback(() => {
-    createClient();
-  }, [createClient]);
+    const updateUser = React.useCallback(
+        async (name: string, logoUrl: string, displayName: string) => {
+            const action = await dispatch(
+                clansActions.updateUser({
+                    user_name: name,
+                    avatar_url: logoUrl,
+                    display_name: displayName,
+                }),
+            );
+            const payload = action.payload as ClansEntity;
+            return payload;
+        },
+        [dispatch],
+    );
 
-  const loginEmail = useCallback(
-    async (username: string, password: string) => {
-      const action = await dispatch(
-        authActions.authenticateEmail({ username, password })
-      );
-      const session = action.payload;
-      dispatch(accountActions.setAccount(session))
-    },
-    [dispatch]
-  );
+    const createLinkInviteUser = React.useCallback(
+        async (clan_id: string, channel_id: string, expiry_time: number) => {
+            const action = await dispatch(
+                clansActions.createLinkInviteUser({
+                    clan_id: clan_id,
+                    channel_id: channel_id,
+                    expiry_time: expiry_time,
+                }),
+            );
+            const payload = action.payload as ApiLinkInviteUser;
+            return payload;
+        },
+        [dispatch],
+    );
 
-  const loginByGoogle = useCallback(
-    async (token: string) => {
-      const action = await dispatch(authActions.authenticateGoogle(token));
-      const session = action.payload;
-      dispatch(accountActions.setAccount(session))
-    },
-    [dispatch]
-  );
+    const inviteUser = React.useCallback(
+        async (invite_id: string) => {
+            const action = await dispatch(
+                clansActions.inviteUser({ inviteId: invite_id }),
+            );
+            const payload = action.payload as ApiInviteUserRes;
+            return payload;
+        },
+        [dispatch],
+    );
 
-  React.useEffect(() => {
-    if (!currentClan) {
-      return;
-    }
-    const channels = currentClan.channelIds || [];
-    if (!channels.length) {
-      return;
-    }
-    const channelId = channels[0];
-    if (!channelId) {
-      return;
-    }
-    dispatch(channelsActions.changeCurrentChanel(channelId));
-  }, [currentClan, dispatch]);
+    const getLinkInvite = React.useCallback(
+        async (invite_id: string) => {
+            const action = await dispatch(
+                clansActions.getLinkInvite({ inviteId: invite_id }),
+            );
+            const payload = action.payload as ApiInviteUserRes;
+            return payload;
+        },
+        [dispatch],
+    );
 
-  return {
-    client,
-    channels,
-    messages,
-    clans,
-    threads,
-    categorizedChannels,
-    currentClan,
-    currentChanel,
-    currentChannelId,
-    init,
-    sendMessage,
-    changeCurrentClan,
-    changeCurrentChannel,
-    loginEmail,
-    loginByGoogle,
-    fetchClans
-  };
+    const sendMessage = React.useCallback(
+        async (message: IMessage) => {
+            // TODO: send message to server using mezon client
+            const session = sessionRef.current;
+            const client = clientRef.current;
+            const socket = socketRef.current;
+            const channel = channelRef.current;
+
+            if (!client || !session || !socket || !channel || !currentClanId) {
+                console.log(client, session, socket, channel, currentClanId);
+                throw new Error('Client is not initialized');
+            }
+
+            const payload = {
+                ...message,
+                id: Math.random().toString(),
+                date: new Date().toLocaleString(),
+                user: {
+                    name: userProfile?.user?.display_name || '',
+                    username: userProfile?.user?.username || '',
+                    id: userProfile?.user?.id || 'idUser',
+                    avatarSm: userProfile?.user?.avatar_url || '',
+                },
+            };
+            if (!payload.channel_id) {
+                payload.channel_id = currentChannelId || '';
+            }
+            // dispatch(messagesActions.add(payload));
+            const ack = await socket.writeChatMessage(
+                currentClanId,
+                channel.id,
+                payload,
+            );
+        },
+        [
+            channelRef,
+            clientRef,
+            currentChannelId,
+            currentClanId,
+            dispatch,
+            sessionRef,
+            socketRef,
+            userProfile?.user?.avatar_url,
+            userProfile?.user?.display_name,
+            userProfile?.user?.id,
+            userProfile?.user?.username,
+        ],
+    );
+
+    return useMemo(
+        () => ({
+            client,
+            channels,
+            messages,
+            clans,
+            threads,
+            categorizedChannels,
+            members,
+            currentClan,
+            currentChanel,
+            userProfile,
+            userClansProfile,
+            getUserClanProfile,
+            updateUserClanProfile,
+            sendMessage,
+            changeCurrentClan,
+            createClans,
+            updateUser,
+            createLinkInviteUser,
+            inviteUser,
+            currentClanId,
+            getLinkInvite,
+            permissionsUser,
+        }),
+        [
+            client,
+            channels,
+            messages,
+            clans,
+            threads,
+            categorizedChannels,
+            members,
+            currentClan,
+            currentChanel,
+            userProfile,
+            sendMessage,
+            changeCurrentClan,
+            userClansProfile,
+            getUserClanProfile,
+            updateUserClanProfile,
+            createClans,
+            updateUser,
+            createLinkInviteUser,
+            inviteUser,
+            currentClanId,
+            getLinkInvite,
+            permissionsUser,
+        ],
+    );
 }
