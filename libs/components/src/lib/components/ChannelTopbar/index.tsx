@@ -1,11 +1,17 @@
 import { IChannel } from '@mezon/utils';
 import * as Icons from '../Icons';
 import { ChannelLable, ThreadLable, SearchMessage } from './TopBarComponents';
+import { useDispatch } from 'react-redux';
+import { toggleIsShow } from '../../../../../store/src/lib/showlistmember/showlistmember.slice';
 export type ChannelTopbarProps = {
     channel?: IChannel | null;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
+    const dispatch = useDispatch();
+    const handleClick = () => {
+        dispatch(toggleIsShow());
+      };
     return (
         <div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
             <div className="justify-start items-center gap-1 flex">
@@ -32,7 +38,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
                             <Icons.PinRight />
                         </button>
 
-                        <button>
+                        <button onClick={handleClick}>
                             <Icons.MemberList />
                         </button>
 
