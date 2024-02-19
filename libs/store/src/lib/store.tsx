@@ -14,6 +14,7 @@ import { messagesReducer } from './messages/messages.slice';
 import { usersReducer } from './users/users.slice';
 import { categoriesReducer } from './categories/categories.slice'
 import { PermissionsUserReducer } from './permissionuser/permissionuser.slice'
+import { IsShowReducer } from './showlistmember/showlistmember.slice'
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { MezonContextValue } from '@mezon/transport'
@@ -48,6 +49,7 @@ const reducer = {
   categories: categoriesReducer,
   permissionuser: PermissionsUserReducer,
   userClanProfile: userClanProfileReducer,
+  isshow:IsShowReducer,
   friends: friendsReducer,
   direct: directReducer
 };

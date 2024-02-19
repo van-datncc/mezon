@@ -1,4 +1,6 @@
+import { getIsShow } from 'libs/store/src/lib/showlistmember/showlistmember.slice';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
     return (
         <svg
@@ -594,18 +596,13 @@ export const MemberList: React.FC<IconProps> = ({
     defaultSize = 'w-5 h-5',
     defaultFill = '#AEAEAE',
 }) => {
-    const [isWhite, setFill] = useState<boolean>(false);
-
-    const handleClick = () => {
-        setFill(!isWhite);
-    };
+    const isWhite = useSelector(getIsShow);
     return (
         <svg
             viewBox="0 0 20 20"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={defaultSize}
-            onClick={handleClick}
         >
             <g id="Live area">
                 <g id="Vector">
