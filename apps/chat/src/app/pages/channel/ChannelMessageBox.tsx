@@ -9,29 +9,33 @@ type ChannelMessageBoxProps = {
 };
 
 export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
-	const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
+    const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
 
-	const handleSend = useCallback(
-		(mess: IMessagePayload) => {
-			const messageToSend: IMessage = {
-				...mess,
-			};
-			sendMessage(messageToSend);
-		},
-		[sendMessage],
-	);
+    const handleSend = useCallback(
+        (mess: IMessagePayload) => {
+            const messageToSend: IMessage = {
+                ...mess,
+            };
+            console.log("mess", mess)
+            sendMessage(messageToSend);
+        },
+        [sendMessage],
+    );
 
-	const handleTyping = useCallback(() => {
-		sendMessageTyping();
-	}, [sendMessageTyping]);
+    const handleTyping = useCallback(
+        () => {
+            sendMessageTyping();
+        },
+        [sendMessageTyping],
+    );
 
-	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
+    const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
-	return (
-		<div>
-			<MessageBox onSend={handleSend} onTyping={handleTypingDebounced} />
-		</div>
-	);
+    return (
+        <div>
+            <MessageBox onSend={handleSend} onTyping={handleTypingDebounced} />
+        </div>
+    );
 }
 
 ChannelMessageBox.Skeleton = () => {
