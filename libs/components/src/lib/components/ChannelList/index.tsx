@@ -41,7 +41,7 @@ function ChannelList() {
   };
 
   const { currentClan, createLinkInviteUser, permissionsUser } = useChat();
-  const containsViewChannelPermission = permissionsUser.some(permission => permission.slug === "view-channel");
+  const containsViewChannelPermission = permissionsUser.some(permission => permission.slug === "administrator");
   const shouldDisplayButton = currentClan?.creator_id === userProfile?.user?.id || containsViewChannelPermission;
   const dispatch = useAppDispatch();
   const openModalCreateNewChannel = (paramCategory: ICategory) => {

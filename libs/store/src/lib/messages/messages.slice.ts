@@ -1,4 +1,4 @@
-import { IMessageWithUser, LoadingStatus } from '@mezon/utils';
+import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { ChannelMessage } from '@mezon/mezon-js/dist';
@@ -60,7 +60,7 @@ export const TYPING_TIMEOUT = 3000;
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
 export const fetchMessagesCached = memoize(
-  (mezon: MezonValueContext, channelId: string) => mezon.client.listChannelMessages(mezon.session, channelId, 100, false),
+  (mezon: MezonValueContext, channelId: string) => mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false),
   { 
     promise: true,
     maxAge: FETCH_MESSAGES_CACHED_TIME,
@@ -76,9 +76,9 @@ type fetchMessageChannelPayload = {
 export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({ channelId, noCache }: fetchMessageChannelPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-  if (noCache) {
-    fetchMessagesCached.clear(mezon, channelId);
-  }
+	if (noCache) {
+		fetchMessagesCached.clear(mezon, channelId);
+	}
 
 	const response = await fetchMessagesCached(mezon, channelId);
 	if (!response.messages) {

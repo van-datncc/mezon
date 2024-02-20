@@ -38,8 +38,8 @@ function MemberList() {
 									Offline
 								</p>
 								<div className="flex flex-col gap-4">
-									{role?.users.filter((obj: ChannelMembersEntity) => !obj.user?.online).map((user: ChannelMembersEntity) => (
-										<div className='opacity-60'>
+									<div className='opacity-60'>
+										{role?.users.filter((obj: ChannelMembersEntity) => !obj.user?.online).map((user: ChannelMembersEntity) => (										
 											<MemberProfile
 												numberCharacterCollapse={30}
 												avatar={user?.user?.avatar_url ?? ''}
@@ -49,9 +49,9 @@ function MemberList() {
 												isHideIconStatus={true}
 												key={user.id}
 												textColor="[#AEAEAE]"
-											/>
-										</div>
-									))}
+											/>										
+										))}
+									</div>	
 								</div>
 							</div>
 						}

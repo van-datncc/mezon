@@ -5,11 +5,12 @@ import { useEffect, useMemo } from 'react'
 
 type MessageProps = {
     message: IMessageWithUser,
+    preMessage?: IMessageWithUser,
     lastSeen?: boolean
 }
 
 export function ChannelMessage(props: MessageProps) {
-    const { message, lastSeen } = props
+    const { message, lastSeen, preMessage } = props
     const { markMessageAsSeen } = useChatMessage(message.id);
 
     useEffect(() => {
@@ -18,15 +19,22 @@ export function ChannelMessage(props: MessageProps) {
 
     // TODO: recheck this
     const mess = useMemo(() => {
-        if(typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
+        if (typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
             return message.content
         }
         return message
     }, [message])
 
+    const messPre = useMemo(() => {
+        if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
+            return preMessage.content
+        }
+        return preMessage
+    }, [preMessage])
+
     return (
         <div>
-            <MessageWithUser message={mess as IMessageWithUser} />
+            <MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} />
             {lastSeen && (
                 <UnreadMessageBreak />
             )}
