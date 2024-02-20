@@ -1,7 +1,7 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
 import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from '@mezon/mezon-js/dist/api.gen';
 import { ICategory, LoadingStatus } from '@mezon/utils';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { ensureSession, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
 /*
@@ -42,9 +42,7 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createCategoryDesc(mezon.session, body);
 		if (response) {
-      thunkAPI.dispatch(
-        fetchCategories({ clanId: body.clan_id as string }),
-    );
+			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -121,7 +119,7 @@ export const categoriesReducer = categoriesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const categoriesActions = { ...categoriesSlice.actions, fetchCategories,createNewCategory};
+export const categoriesActions = { ...categoriesSlice.actions, fetchCategories, createNewCategory };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

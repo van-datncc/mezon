@@ -1,20 +1,18 @@
-import { Story, Meta } from '@storybook/react'
-import ChannelLink, { ChannelLinkProps } from '.'
+import { Meta, Story } from '@storybook/react';
+import ChannelLink, { ChannelLinkProps } from '.';
 
 export default {
-  title: 'ChannelLink',
-  component: ChannelLink
-} as Meta
+	title: 'ChannelLink',
+	component: ChannelLink,
+} as Meta;
 
-export const Default: Story<ChannelLinkProps> = (args) => (
-  <ChannelLink {...args} />
-)
+export const Default: Story<ChannelLinkProps> = (args) => <ChannelLink {...args} />;
 
 Default.args = {
-  serverId: 1,
-  channel: {
-    id: 1,
-    label: 'welcome',
-    icon: 'Book'
-  }
-}
+	serverId: 1,
+	channel: {
+		id: 1,
+		label: 'welcome',
+		icon: 'Book',
+	},
+};

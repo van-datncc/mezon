@@ -1,10 +1,10 @@
-import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { ChannelMessage } from '@mezon/mezon-js/dist';
-import { seenMessagePool } from './SeenMessagePool';
+import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
+import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -60,25 +60,25 @@ export const TYPING_TIMEOUT = 3000;
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
 export const fetchMessagesCached = memoize(
-  (mezon: MezonValueContext, channelId: string) => mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false),
-  { 
-    promise: true,
-    maxAge: FETCH_MESSAGES_CACHED_TIME,
-    normalizer: (args) => args[1],
-  },
+	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false),
+	{
+		promise: true,
+		maxAge: FETCH_MESSAGES_CACHED_TIME,
+		normalizer: (args) => args[1],
+	},
 );
 
 type fetchMessageChannelPayload = {
 	channelId: string;
-  noCache?: boolean;
+	noCache?: boolean;
 };
 
 export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({ channelId, noCache }: fetchMessageChannelPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-  if (noCache) {
-    fetchMessagesCached.clear(mezon, channelId);
-  }
+	if (noCache) {
+		fetchMessagesCached.clear(mezon, channelId);
+	}
 
 	const response = await fetchMessagesCached(mezon, channelId);
 	if (!response.messages) {
@@ -240,7 +240,7 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[]>) => {
-				messagesAdapter.setAll(state, action.payload);
+				messagesAdapter.setMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
@@ -347,6 +347,11 @@ export const selectTypingUsersList = createSelector(selectTypingUsers, (typingUs
 export const selectTypingUserIds = createSelector(selectTypingUsersList, (typingUsers) => {
 	return typingUsers && typingUsers.map((u) => u.userId);
 });
+
+export const selectTypingUserIdsByChannelId = (channelId: string) =>
+	createSelector(selectTypingUsersList, (typingUsers) => {
+		return typingUsers && typingUsers.filter((user) => user.channelId === channelId).map((u) => u.userId);
+	});
 
 export const selectTypingUsersListByChannelId = (channelId: string) =>
 	createSelector(selectTypingUsersList, (typingUsers) => {

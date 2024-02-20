@@ -1,13 +1,10 @@
-import { ChannelStatusEnum, ChannelTypeEnum, IChannel, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { channelsActions } from '../channels/channels.slice';
-import { messagesActions } from '../messages/messages.slice';
-import { channelMembersActions } from '../channelmembers/channel.members';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ChannelTypeEnum, IChannel, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
-import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
-import { string } from 'yup';
+import { channelMembersActions } from '../channelmembers/channel.members';
 import { friendsActions } from '../friends/friend.slice';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { messagesActions } from '../messages/messages.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 

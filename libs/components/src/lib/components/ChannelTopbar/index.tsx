@@ -1,64 +1,100 @@
 import { IChannel } from '@mezon/utils';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
-import { ChannelLable, ThreadLable, SearchMessage } from './TopBarComponents';
-import { useDispatch } from 'react-redux';
-import { toggleIsShow } from '../../../../../store/src/lib/showlistmember/showlistmember.slice';
+import { ChannelLable, SearchMessage } from './TopBarComponents';
+import { appActions, selectIsShowMemberList } from '@mezon/store';
 export type ChannelTopbarProps = {
-    channel?: IChannel | null;
+	channel?: IChannel | null;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
-    const dispatch = useDispatch();
-    const handleClick = () => {
-        dispatch(toggleIsShow());
-      };
-    return (
-        <div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
-            <div className="justify-start items-center gap-1 flex">
-                <ChannelLable
-                    type={Number(channel?.type)}
-                    name={channel?.channel_lable}
-                    isPrivate={channel?.channel_private}
-                />
-            </div>
+	return (
+		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
+			<div className="justify-start items-center gap-1 flex">
+				<ChannelLable type={Number(channel?.type)} name={channel?.channel_lable} isPrivate={channel?.channel_private} />
+			</div>
 
-            {/* Desktop buttons */}
-            <div className="hidden items-center h-full ml-auto lg:flex">
-                <div className="justify-end items-center gap-2 flex">
-                    <div className="justify-start items-center gap-[15px] flex">
-                        <button>
-                            <Icons.ThreadIcon />
-                        </button>
+			{/* Desktop buttons */}
+			<div className="hidden items-center h-full ml-auto lg:flex">
+				<div className="justify-end items-center gap-2 flex">
+					<div className="justify-start items-center gap-[15px] flex">
+						<ThreadButton />
+						<MuteButton />
+						<PinButton />
+						<ChannelListButton />
+						<ThreeDotButton />
+					</div>
+					<SearchMessage />
+					<div className="justify-start items-start gap-4 flex">
+						<InboxButton />
+						<HelpButton />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
 
-                        <button>
-                            <Icons.MuteBell />
-                        </button>
+function ThreadButton() {
+	return (
+		<button>
+			<Icons.ThreadIcon />
+		</button>
+	);
+}
 
-                        <button>
-                            <Icons.PinRight />
-                        </button>
+function MuteButton() {
+	return (
+		<button>
+			<Icons.MuteBell />
+		</button>
+	);
+}
 
-                        <button onClick={handleClick}>
-                            <Icons.MemberList />
-                        </button>
+function PinButton() {
+	return (
+		<button>
+			<Icons.PinRight />
+		</button>
+	);
+}
 
-                        <button>
-                            <Icons.ThreeDot />
-                        </button>
-                    </div>
-                    <SearchMessage />
-                    <div className="justify-start items-start gap-4 flex">
-                        <button>
-                            <Icons.Inbox />
-                        </button>
-                        <button>
-                            <Icons.Help />
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+function ThreeDotButton() {
+	return (
+		<button>
+			<Icons.ThreeDot />
+		</button>
+	);
+}
+
+function InboxButton() {
+	return (
+		<button>
+			<Icons.Inbox />
+		</button>
+	);
+}
+
+function HelpButton() {
+	return (
+		<button>
+			<Icons.Help />
+		</button>
+	);
+}
+
+
+function ChannelListButton() {
+	const dispatch = useDispatch();
+	const isActive = useSelector(selectIsShowMemberList)
+	const handleClick = () => {
+		dispatch(appActions.setIsShowMemberList(!isActive));
+	};
+	return (
+		<button onClick={handleClick}>
+			<Icons.MemberList isWhite={isActive} />
+		</button>
+	);
 }
 
 export default ChannelTopbar;

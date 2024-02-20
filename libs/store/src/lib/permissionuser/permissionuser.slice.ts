@@ -1,7 +1,7 @@
+import { ApiPermission } from '@mezon/mezon-js/dist/api.gen';
+import { IPermissionUser, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
-import { ApiCreateChannelDescRequest, ApiPermission } from '@mezon/mezon-js/dist/api.gen';
-import { LoadingStatus, IPermissionUser } from '@mezon/utils';
 export const PERMISSION_USER_FEATURE_KEY = 'permissionuser';
 
 /*
@@ -61,7 +61,7 @@ export const PermissionsUserSlice = createSlice({
 			.addCase(fetchPermissionsUser.fulfilled, (state: PermissionsUserState, action: PayloadAction<IPermissionUser[]>) => {
 				PermissionsUserAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
-				console.log("action.payload.permission: ", action.payload);
+				console.log('action.payload.permission: ', action.payload);
 			})
 
 			.addCase(fetchPermissionsUser.rejected, (state: PermissionsUserState, action) => {
@@ -80,8 +80,7 @@ export const PermissionsUserActions = { ...PermissionsUserSlice.actions, fetchPe
 
 const { selectAll, selectEntities } = PermissionsUserAdapter.getSelectors();
 
-export const getPermissionsUserState = (rootState: { 
-	[PERMISSION_USER_FEATURE_KEY]: PermissionsUserState 
-}): PermissionsUserState => rootState[PERMISSION_USER_FEATURE_KEY];
+export const getPermissionsUserState = (rootState: { [PERMISSION_USER_FEATURE_KEY]: PermissionsUserState }): PermissionsUserState =>
+	rootState[PERMISSION_USER_FEATURE_KEY];
 
 export const selectAllPermissionsUser = createSelector(getPermissionsUserState, selectAll);

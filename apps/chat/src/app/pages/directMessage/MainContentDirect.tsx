@@ -1,8 +1,5 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
 export function MainContentDirect() {
-
-    return (
-        <Outlet />
-    )
+	return <Outlet />;
 }

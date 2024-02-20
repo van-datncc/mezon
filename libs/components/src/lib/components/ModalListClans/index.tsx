@@ -1,7 +1,6 @@
-import React, { useRef, useEffect } from 'react';
-import { IClan } from "@mezon/utils";
-import { Check, Tick } from "../Icons";
-import IconCreateClan from '../../../../../../apps/chat/src/assets/Images/IconCreateClan.svg';
+import { IClan } from '@mezon/utils';
+import { useEffect, useRef } from 'react';
+import { Tick } from '../Icons';
 
 export type ModalListClansProps = {
     showModal: boolean;
@@ -35,7 +34,7 @@ const ModalListClans = (props: ModalListClansProps) => {
     }, [showModal]);
 
     useEffect(() => {
-        const activeClanIndex = options.findIndex(option => option.id === idSelectedClan);
+        const activeClanIndex = options.findIndex((option) => option.id === idSelectedClan);
         if (activeClanIndex !== -1) {
             const activeClan = options[activeClanIndex];
             options.splice(activeClanIndex, 1);
@@ -43,46 +42,47 @@ const ModalListClans = (props: ModalListClansProps) => {
         }
     }, [idSelectedClan]);
 
+    // TODO: using modal component
+    if (!showModal) return null;
+
     return (
-        <>
-            {showModal ? (
-                <div
-                    ref={modalRef}
-                    className="flex w-64 flex-col text-[16px] px-3 py-2 gap-2 z-50 border-[1px] border-bg-bgSecondary
-                     border-borderDefault bg-bgSecondary rounded-lg"
-                >
-                    <div className="overflow-y-auto max-h-36">
-                        {options.map((option: IClan, index) => (
-                            <div className={`w-auto flex py-1 px-2 items-center justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`} key={index} onClick={() => onChangeClan(option.id)}>
-                                <div className="flex items-center gap-4 w-10/12" >
-                                    {option.logo ? (
-                                        <img src={option.logo} width={40} height={40} className="rounded-full" />
-                                    ) : (
-                                        <>
-                                            {option?.clan_name && (
-                                                <div className='w-[40px] h-[40px] bg-bgSurface rounded-full flex justify-center items-center text-contentSecondary text-[20px]'>
-                                                    {option.clan_name.charAt(0).toUpperCase()}
-                                                </div>
-                                            )}
-                                        </>
+        <div
+            ref={modalRef}
+            className="flex w-64 flex-col text-[16px] px-3 py-2 gap-2 z-50 border-[1px] border-bg-bgSecondary
+         border-borderDefault bg-bgSecondary rounded-lg"
+        >
+            <div className="overflow-y-auto max-h-36">
+                {options.map((option: IClan, index) => (
+                    <div
+                        className={`w-auto flex py-1 px-2 items-center justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`}
+                        key={index}
+                        onClick={() => onChangeClan(option.id)}
+                    >
+                        <div className="flex items-center gap-4 w-10/12">
+                            {option.logo ? (
+                                <img src={option.logo} width={40} height={40} className="rounded-full" />
+                            ) : (
+                                <div>
+                                    {option?.clan_name && (
+                                        <div className="w-[40px] h-[40px] bg-bgSurface rounded-full flex justify-center items-center text-contentSecondary text-[20px]">
+                                            {option.clan_name.charAt(0).toUpperCase()}
+                                        </div>
                                     )}
-                                    <span className="text-[16px]">{option.clan_name}</span>
                                 </div>
-                                {idSelectedClan === option.clan_id && (
-                                    <Tick />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                    <div className='w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md'>
-                        <div className="flex items-center gap-4 w-10/12" onClick={createClan}>
-                            <img src={IconCreateClan} alt={'logoMezon'} width={40} height={40} />
-                            <span className="text-[16px]">Add Clan</span>
+                            )}
+                            <span className="text-[16px]">{option.clan_name}</span>
                         </div>
+                        {idSelectedClan === option.clan_id && <Tick />}
                     </div>
+                ))}
+            </div>
+            <div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md">
+                <div className="flex items-center gap-4 w-10/12" onClick={createClan}>
+                    <img src={'/assets/images/icon-create-clan.svg'} alt={'logoMezon'} width={40} height={40} />
+                    <span className="text-[16px]">Add Clan</span>
                 </div>
-            ) : null}
-        </>
+            </div>
+        </div>
     );
 };
 

@@ -1,15 +1,13 @@
-import { Story, Meta } from '@storybook/react'
-import ChannelList, { ChannelListProps } from '.'
+import { Meta, Story } from '@storybook/react';
+import ChannelList, { ChannelListProps } from '.';
 
 export default {
-  title: 'ChannelList',
-  component: ChannelList
-} as Meta
+	title: 'ChannelList',
+	component: ChannelList,
+} as Meta;
 
-export const Default: Story<ChannelListProps> = (args) => (
-  <ChannelList {...args} />
-)
+export const Default: Story<ChannelListProps> = (args) => <ChannelList {...args} />;
 
 Default.args = {
-  server: data[0]
-}
+	server: data[0],
+};

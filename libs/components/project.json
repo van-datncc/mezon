@@ -4,6 +4,7 @@
   "sourceRoot": "libs/components/src",
   "projectType": "library",
   "tags": [],
+  "files": ["*.ts"],
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",

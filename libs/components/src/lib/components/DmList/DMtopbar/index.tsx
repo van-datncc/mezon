@@ -1,9 +1,8 @@
-import { IChannel } from '@mezon/utils';
-import * as Icons from '../../Icons/index';
-import { ChannelLable, SearchMessage } from '../../ChannelTopbar/TopBarComponents';
-import { useSelector } from 'react-redux';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
+import { useSelector } from 'react-redux';
+import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
+import * as Icons from '../../Icons/index';
 
 export type ChannelTopbarProps = {
 	dmGroupId?: string;

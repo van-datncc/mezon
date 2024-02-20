@@ -1,15 +1,13 @@
-import { selectAllDirectMessages, selectAllFriends, selectDmGroupCurrent, selectDmGroupCurrentId } from '@mezon/store';
-import { useSelector } from 'react-redux';
-import React, { useMemo } from 'react';
-import { useMessages } from './useMessages';
-import { useAppDispatch, selectAllAccount } from '@mezon/store';
-import { IMessage } from '@mezon/utils';
+import { selectAllAccount, selectAllDirectMessages, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { IMessage } from '@mezon/utils';
+import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { useChannelMembers } from './useChannelMembers';
+import { useMessages } from './useMessages';
 // @deprecated
 
 export function useChatDirect(directMessageID: string | undefined) {
-	
 	const friends = useSelector(selectAllFriends);
 	const listDM = useSelector(selectAllDirectMessages);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();

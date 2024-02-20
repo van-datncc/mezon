@@ -1,5 +1,5 @@
-import { useChat } from '@mezon/core';
 import { MemberProfile } from '@mezon/components';
+import { useChat } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 
 export type MemberListProps = { className?: string };
@@ -18,18 +18,20 @@ function MemberList() {
 						)}
 						{
 							<div className="flex flex-col gap-4">
-								{role?.users.filter((obj: ChannelMembersEntity) => obj.user?.online).map((user: ChannelMembersEntity) => (
-									<MemberProfile
-										numberCharacterCollapse={30}
-										avatar={user?.user?.avatar_url ?? ''}
-										name={user?.user?.username ?? ''}
-										status={user.user?.online}
-										isHideStatus={true}
-										isHideIconStatus={false}
-										key={user.id}
-										textColor="[#AEAEAE]"
-									/>
-								))}
+								{role?.users
+									.filter((obj: ChannelMembersEntity) => obj.user?.online)
+									.map((user: ChannelMembersEntity) => (
+										<MemberProfile
+											numberCharacterCollapse={30}
+											avatar={user?.user?.avatar_url ?? ''}
+											name={user?.user?.username ?? ''}
+											status={user.user?.online}
+											isHideStatus={true}
+											isHideIconStatus={false}
+											key={user.id}
+											textColor="[#AEAEAE]"
+										/>
+									))}
 							</div>
 						}
 						{
@@ -38,20 +40,22 @@ function MemberList() {
 									Offline
 								</p>
 								<div className="flex flex-col gap-4">
-									{role?.users.filter((obj: ChannelMembersEntity) => !obj.user?.online).map((user: ChannelMembersEntity) => (
-										<div className='opacity-60'>
-											<MemberProfile
-												numberCharacterCollapse={30}
-												avatar={user?.user?.avatar_url ?? ''}
-												name={user?.user?.username ?? ''}
-												status={user.user?.online}
-												isHideStatus={true}
-												isHideIconStatus={true}
-												key={user.id}
-												textColor="[#AEAEAE]"
-											/>
-										</div>
-									))}
+									{role?.users
+										.filter((obj: ChannelMembersEntity) => !obj.user?.online)
+										.map((user: ChannelMembersEntity) => (
+											<div className="opacity-60">
+												<MemberProfile
+													numberCharacterCollapse={30}
+													avatar={user?.user?.avatar_url ?? ''}
+													name={user?.user?.username ?? ''}
+													status={user.user?.online}
+													isHideStatus={true}
+													isHideIconStatus={true}
+													key={user.id}
+													textColor="[#AEAEAE]"
+												/>
+											</div>
+										))}
 								</div>
 							</div>
 						}

@@ -1,5 +1,5 @@
 import { IMessage } from '@mezon/utils';
-import { useCallback, useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 
 export type MessageBoxProps = {
@@ -19,6 +19,7 @@ function MessageBox(props: MessageBoxProps) {
 		if (!content.trim()) {
 			return;
 		}
+		// TODO: change the interface of onSend, remove the id and channelId
 		onSend({
 			content: { content },
 			id: '',
@@ -29,14 +30,23 @@ function MessageBox(props: MessageBoxProps) {
 		setContent('');
 	}, [onSend, content]);
 
+	const handleTyping = useCallback(() => {
+		if (typeof onTyping === 'function') {
+			onTyping();
+		}
+	}, [onTyping]);
+
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent<HTMLDivElement>) => {
+			if(typeof handleTyping === 'function') {
+				handleTyping();
+			}
 			if (event.key === 'Enter' && !event.shiftKey) {
 				event.preventDefault();
 				handleSend();
 			}
 		},
-		[handleSend, content, setContent],
+		[handleSend, handleTyping],
 	);
 
 	const sanitizeContent = (content: string): string => {
@@ -49,7 +59,7 @@ function MessageBox(props: MessageBoxProps) {
 			const sanitizedContent = sanitizeContent(updatedContent);
 			setContent(sanitizedContent);
 		},
-		[handleKeyDown, content, setContent],
+		[setContent],
 	);
 
 	const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -58,13 +68,8 @@ function MessageBox(props: MessageBoxProps) {
 		setContent(clipboardData);
 	};
 
-	const handleTyping = useCallback(() => {
-		if (typeof onTyping === 'function') {
-			onTyping();
-		}
-	}, [onTyping]);
-
 	const contentEditableRef = useRef<HTMLDivElement | null>(null);
+
 	useEffect(() => {
 		const range = document.createRange();
 		const selection = window.getSelection();
@@ -84,6 +89,7 @@ function MessageBox(props: MessageBoxProps) {
 			setPlaceholderVisible(true);
 		}
 	}, [content]);
+
 	return (
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
 			<form className="self-stretch p-4 bg-neutral-950  rounded-lg justify-start gap-3 inline-flex items-center ">
@@ -103,19 +109,19 @@ function MessageBox(props: MessageBoxProps) {
 						</div>
 					)}
 
-						<div
-							contentEditable
-							ref={contentEditableRef}
-							className="grow flex-wrap text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto w-widChatBoxBreak resize-none"
-							id="message"
-							onInput={handleInputChanged}
-							onFocus={handleTyping}
-							onBlur={handleInputChanged}
-							onChange={handleInputChanged}
-							dangerouslySetInnerHTML={{ __html: content }}
-							onKeyDown={handleKeyDown}
-							onPaste={handlePaste}
-						/>
+					<div
+						contentEditable
+						ref={contentEditableRef}
+						className="grow flex-wrap text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto w-widChatBoxBreak resize-none"
+						id="message"
+						onInput={handleInputChanged}
+						onFocus={handleTyping}
+						onBlur={handleInputChanged}
+						onChange={handleInputChanged}
+						dangerouslySetInnerHTML={{ __html: content }}
+						onKeyDown={handleKeyDown}
+						onPaste={handlePaste}
+					/>
 				</div>
 				<div>
 					<div className="flex flex-row gap-1">
