@@ -1,16 +1,13 @@
 import { IMessage } from '@mezon/utils';
 import { useCallback, useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
 import * as Icons from '../Icons';
-import MentionMessage from '../MentionMessage';
 import { useAppParams, useChatChannel } from '@mezon/core';
 import { MentionData } from '@draft-js-plugins/mention';
-// import mentions from '../MentionMessage/mentions';
 
 import React, { MouseEvent, ReactElement, memo, useMemo } from 'react';
-import { EditorState, RichUtils, convertToRaw } from 'draft-js';
+import { EditorState, convertToRaw } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { defaultSuggestionsFilter, MentionPluginTheme } from '@draft-js-plugins/mention';
-import editorStyles from '../MentionMessage/CustomMentionEditor.module.css';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
 export interface EntryComponentProps {
@@ -94,7 +91,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const mentionPlugin = createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
 			theme: mentionsStyles,
-			mentionPrefix: '@',
+			// mentionPrefix: '@',
 			supportWhitespace: true,
 			mentionTrigger: ['@', '('],
 		});
@@ -104,23 +101,29 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 	const [suggestions, setSuggestions] = useState<MentionData[]>(listUserMention);
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const { onSend, onTyping } = props;
 
-	const onChange = useCallback((editorState: EditorState) => {
-		setEditorState(editorState);
-		const contentState = editorState.getCurrentContent();
-		const content = convertToRaw(contentState).blocks[0].text;
-		const mentionedRaw = convertToRaw(contentState).entityMap;
-		const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
-		setContent(content);
-		setUserMentioned(mentioned);
-	}, []);
+	const onChange = useCallback(
+		(editorState: EditorState) => {
+			if (typeof onTyping === 'function') {
+				onTyping();
+			}
+			setEditorState(editorState);
+			const contentState = editorState.getCurrentContent();
+			const content = convertToRaw(contentState).blocks[0].text;
+			const mentionedRaw = convertToRaw(contentState).entityMap;
+			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
+			setContent(content);
+			setUserMentioned(mentioned);
+		},
+		[onTyping],
+	);
 
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
 	}, []);
 
 	const [content, setContent] = useState('');
-	const { onSend, onTyping } = props;
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
@@ -138,8 +141,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [onSend, content]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
-		if (e.key === 'Enter') {
-			return 'onsend'; // name this whatever you want
+		if (e.key === 'Enter' && !e.shiftKey) {
+			return 'onsend';
 		}
 	}
 
@@ -152,30 +155,47 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}
 
 	return (
-		<div
-			className={`${editorStyles.editor} relative`}
-			onClick={() => {
-				ref.current!.focus();
-			}}
-		>
-			<Editor
-				editorKey={'editor'}
-				editorState={editorState}
-				onChange={onChange}
-				plugins={plugins}
-				ref={ref}
-				keyBindingFn={keyBindingFn}
-				handleKeyCommand={handleKeyCommand}
-			/>
-			<div className="absolute w-full box-border bottom-20 max-w-[97%] bg-black rounded-md">
-				<MentionSuggestions
-					open={open}
-					onOpenChange={onOpenChange}
-					suggestions={listUserMention}
-					onSearchChange={onSearchChange}
-					entryComponent={Entry}
-					popoverContainer={({ children }: any) => <div>{children}</div>}
-				/>
+		<div className="flex w-full items-center">
+			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-2 bg-black rounded-md pr-2">
+				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
+					<Icons.AddCircle />
+				</div>
+
+				<div
+					className={`w-[96%] relative bg-black gap-3`}
+					onClick={() => {
+						ref.current!.focus();
+					}}
+				>
+					<div className="p-[10px] flex items-center">
+						<Editor
+							editorKey={'editor'}
+							editorState={editorState}
+							onChange={onChange}
+							plugins={plugins}
+							ref={ref}
+							keyBindingFn={keyBindingFn}
+							handleKeyCommand={handleKeyCommand}
+							// placeholder='Write your thoughs here...'
+						/>
+					</div>
+
+					<div className="absolute w-full box-border bottom-20  bg-black rounded-md ">
+						<MentionSuggestions
+							open={open}
+							onOpenChange={onOpenChange}
+							suggestions={listUserMention}
+							onSearchChange={onSearchChange}
+							entryComponent={Entry}
+							popoverContainer={({ children }: any) => <div>{children}</div>}
+						/>
+					</div>
+				</div>
+
+				<div className="flex flex-row h-full items-center gap-1 w-12">
+					<Icons.Gif />
+					<Icons.Help />
+				</div>
 			</div>
 		</div>
 	);
@@ -186,7 +206,7 @@ MessageBox.Skeleton = () => {
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
 			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
-					<div className="flex flex-row  justify-end h-fit">{/* <Icons.AddCircle /> */}</div>
+					<div className="flex flex-row  justify-end h-fit"><Icons.AddCircle /></div>
 				</div>
 
 				<div className="grow self-stretch justify-start items-center gap-2 flex">
@@ -195,7 +215,7 @@ MessageBox.Skeleton = () => {
 						className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
 					/>
 				</div>
-				<div className="flex flex-row h-full items-center gap-1">
+				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12">
 					<Icons.Gif />
 					<Icons.Help />
 				</div>
