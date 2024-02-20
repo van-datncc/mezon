@@ -1,7 +1,7 @@
 import { IMessageWithUser, TIME_COMBINE } from '@mezon/utils';
 import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import * as Icons from '../Icons/index'
+import * as Icons from '../Icons/index';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -40,16 +40,31 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 
 	const renderMultilineContent = () => {
 		const lines = content.replace(/<br>/g, '\n').split('<br>');
-		return lines.map((line: string, index: number) => <div key={index}>{line}</div>);
+		return lines.map((line: string, index: number) => {
+			const match = line.match(/(@\S+)/);
+			if (match) {
+				const startIndex = match.index || 0;
+				const endIndex = startIndex + match[0].length;
+				return (
+					<div key={index}>
+						<span>{line.substring(0, startIndex)}</span>
+						<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
+						<span>{line.substring(endIndex)}</span>
+					</div>
+				);
+			}
+			return <div key={index}>{line}</div>;
+		});
 	};
 
 	return (
 		<>
-			<div className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}>
+			<div
+				className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+			>
 				<div className="justify-start gap-4 inline-flex w-full relative">
 					{isCombine ? (
-						<div className="w-[38px] h-[0]">
-						</div>
+						<div className="w-[38px] h-[0]"></div>
 					) : (
 						<div>
 							{message.user?.avatarSm ? (

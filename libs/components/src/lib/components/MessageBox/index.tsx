@@ -1,7 +1,6 @@
 import { IMessage } from '@mezon/utils';
-import { useCallback, useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import * as Icons from '../Icons';
-import { useAppParams, useChatChannel } from '@mezon/core';
 import { MentionData } from '@draft-js-plugins/mention';
 
 import React, { MouseEvent, ReactElement, memo, useMemo } from 'react';
@@ -51,6 +50,7 @@ function Entry(props: EntryComponentProps): ReactElement {
 export type MessageBoxProps = {
 	onSend: (mes: IMessagePayload) => void;
 	onTyping?: () => void;
+	memberList?: MentionData[];
 };
 
 export type IMessagePayload = IMessage & {
@@ -58,31 +58,13 @@ export type IMessagePayload = IMessage & {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { channelId } = useAppParams();
-	const { members } = useChatChannel(channelId ?? '');
-	const getListMentions = () => {
-		if (members[0].users.length > 0) {
-			const userMentionRaw = members[0].users;
-			const newUserMentionList: MentionData[] = userMentionRaw.map((item) => ({
-				avatar: item?.user?.avatar_url ?? '',
-				name: item?.user?.username ?? '',
-				id: item?.id ?? null,
-			}));
-			return setListUserMention(newUserMentionList);
-		}
-	};
-
-	const [listUserMention, setListUserMention] = useState<MentionData[]>([]);
+	const [listUserMention, setListUserMention] = useState<MentionData[]>(props.memberList ?? []);
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
-			setSuggestions(defaultSuggestionsFilter(value, listUserMention));
+			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
 		},
 		[listUserMention],
 	);
-	useEffect(() => {
-		getListMentions();
-	}, [members[0].users.length]);
-
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 	const [open, setOpen] = useState(false);
@@ -91,7 +73,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const mentionPlugin = createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
 			theme: mentionsStyles,
-			// mentionPrefix: '@',
+			mentionPrefix: '@',
 			supportWhitespace: true,
 			mentionTrigger: ['@', '('],
 		});
@@ -99,7 +81,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const plugins = [mentionPlugin];
 		return { plugins, MentionSuggestions };
 	}, []);
-	const [suggestions, setSuggestions] = useState<MentionData[]>(listUserMention);
+	const [suggestions, setSuggestions] = useState<MentionData[]>(props.memberList ?? []);
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const { onSend, onTyping } = props;
 
@@ -153,7 +135,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return 'not-handled';
 	}
-
 	return (
 		<div className="flex w-full items-center">
 			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-2 bg-black rounded-md pr-2">
@@ -180,11 +161,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						/>
 					</div>
 
-					<div className="absolute w-full box-border bottom-20  bg-black rounded-md ">
+					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">
 						<MentionSuggestions
 							open={open}
 							onOpenChange={onOpenChange}
-							suggestions={listUserMention}
+							suggestions={props.memberList ?? []}
 							onSearchChange={onSearchChange}
 							entryComponent={Entry}
 							popoverContainer={({ children }: any) => <div>{children}</div>}
@@ -206,7 +187,9 @@ MessageBox.Skeleton = () => {
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
 			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
-					<div className="flex flex-row  justify-end h-fit"><Icons.AddCircle /></div>
+					<div className="flex flex-row  justify-end h-fit">
+						<Icons.AddCircle />
+					</div>
 				</div>
 
 				<div className="grow self-stretch justify-start items-center gap-2 flex">

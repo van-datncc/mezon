@@ -18,7 +18,6 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const navigate = useNavigate();
 	const { friends } = useChatDirect(undefined);
 	const [length, setLength] = useState<number>(selectedFriends.length);
-	// const { listDM } = useChatDirect(undefined);
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
@@ -66,7 +65,6 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 		setSelectedFriends([]);
 		onClose();
 	};
-
 
 	return (
 		<div className="overflow-y-scroll  flex-1 pt-3 space-y-[21px] h-32 flex flex-row justify-center text-gray-300 scrollbar-hide font-bold font-['Manrope']">
