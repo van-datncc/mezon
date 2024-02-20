@@ -78,7 +78,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 			</div>
 			<div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md">
 				<div className="flex items-center gap-4 w-10/12" onClick={createClan}>
-					<img src={'/assets/images/icon-create-clan.svg'} alt={'logoMezon'} width={40} height={40} />
+					<img src={'/assets//icon-create-clan.svg'} alt={'logoMezon'} width={40} height={40} />
 					<span className="text-[16px]">Add Clan</span>
 				</div>
 			</div>
