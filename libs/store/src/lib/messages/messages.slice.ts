@@ -76,9 +76,9 @@ type fetchMessageChannelPayload = {
 export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({ channelId, noCache }: fetchMessageChannelPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-  if (noCache) {
-    fetchMessagesCached.clear(mezon, channelId);
-  }
+	if (noCache) {
+		fetchMessagesCached.clear(mezon, channelId);
+	}
 
 	const response = await fetchMessagesCached(mezon, channelId);
 	if (!response.messages) {
