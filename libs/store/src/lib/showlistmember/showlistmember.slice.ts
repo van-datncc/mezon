@@ -4,11 +4,11 @@ import { RootState } from '../store';
 export const uiSlice = createSlice({
   name: 'isshow',
   initialState: {
-    isWhite: false,
+    isShow: true,
   },
   reducers: {
     toggleIsShow: (state) => {
-      state.isWhite = !state.isWhite;
+      state.isShow = !state.isShow;
     },
   },
 });
@@ -17,9 +17,9 @@ export const IsShowReducer= uiSlice.reducer;
 
 export const { toggleIsShow } = uiSlice.actions;
 
-const selectIsWhite = (state: RootState) => state.isshow.isWhite;
+const selectIsShow = (state: RootState) => state.isshow.isShow;
 
 export const getIsShow = createSelector(
-  selectIsWhite,
+  selectIsShow,
   (isshow) => isshow
 );
