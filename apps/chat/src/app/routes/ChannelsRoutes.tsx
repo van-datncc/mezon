@@ -1,8 +1,7 @@
-
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
 const ChannelsRoutes = () => {
-    return <Outlet />
+	return <Outlet />;
 };
 
 export default ChannelsRoutes;

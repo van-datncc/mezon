@@ -1,10 +1,10 @@
-import { IChannelMember, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
-import { ChannelPresenceEvent, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { IChannelMember, LoadingStatus } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { ChannelPresenceEvent, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -14,7 +14,7 @@ export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
  */
 export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
-	name?: string
+	name?: string;
 }
 
 // TODO: remove channelId from the parameter
@@ -80,14 +80,14 @@ export const fetchChannelMembers = createAsyncThunk(
 export const followUserStatus = createAsyncThunk('channelMembers/followUserStatus', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 	const listUserIds = selectAllUserIds(getChannelMemberRootState(thunkAPI));
-	const listFollowingUserIds = selectFollowingUserIds(getChannelMemberRootState(thunkAPI))
-	if(listUserIds.length !== listFollowingUserIds?.length || (listUserIds.some(id => !listFollowingUserIds.includes(id)))) {
+	const listFollowingUserIds = selectFollowingUserIds(getChannelMemberRootState(thunkAPI));
+	if (listUserIds.length !== listFollowingUserIds?.length || listUserIds.some((id) => !listFollowingUserIds.includes(id))) {
 		const response = await mezon.addStatusFollow(listUserIds);
-		thunkAPI.dispatch(channelMembersActions.setFollowingUserIds(listUserIds))
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
-	}
-	return response;
+		thunkAPI.dispatch(channelMembersActions.setFollowingUserIds(listUserIds));
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		return response;
 	}
 });
 
@@ -145,8 +145,8 @@ export const channelMembers = createSlice({
 			});
 		},
 		addMany: channelMembersAdapter.addMany,
-		setFollowingUserIds:(state: ChannelMembersState, action: PayloadAction<string[]>) => {
-			state.followingUserIds = action.payload
+		setFollowingUserIds: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
+			state.followingUserIds = action.payload;
 		},
 	},
 	extraReducers: (builder) => {

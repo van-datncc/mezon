@@ -1,6 +1,4 @@
-import React from "react";
-import { MezonContext } from "../contexts/MezonContext";
-
+import React from 'react';
+import { MezonContext } from '../contexts/MezonContext';
 
 export const useMezon = () => React.useContext(MezonContext);
-

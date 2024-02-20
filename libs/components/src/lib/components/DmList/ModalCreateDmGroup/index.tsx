@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Modal } from '@mezon/ui';
-import { IFriend, directActions } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store';
-import { useNavigate } from 'react-router-dom';
 import { useAppNavigation, useChatDirect } from '@mezon/core';
-import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { IFriend, directActions, useAppDispatch } from '@mezon/store';
+import { Modal } from '@mezon/ui';
 import { ChannelTypeEnum } from '@mezon/utils';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 interface ModalCreateDMProps {
 	onClose: () => void;
 	isOpen: boolean;
@@ -66,7 +65,6 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 		setSelectedFriends([]);
 		onClose();
 	};
-
 
 	return (
 		<div className="overflow-y-scroll  flex-1 pt-3 space-y-[21px] h-32 flex flex-row justify-center text-gray-300 scrollbar-hide font-bold font-['Manrope']">

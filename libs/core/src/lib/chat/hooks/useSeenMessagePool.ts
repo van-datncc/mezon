@@ -1,6 +1,3 @@
-
-
-
 // Last seen message update mechanism
 // Every time message component is rendered
 // component triggers updateLastSeenMessage action
@@ -8,37 +5,39 @@
 // push action into cache, keep the payload with the latest create time
 // set timeout to 1 second, if no new action comes in, send the latest action to server
 
-import { messagesActions, seenMessagePool, useAppDispatch } from "@mezon/store";
-import { IMessage } from "@mezon/utils";
+import { messagesActions, seenMessagePool, useAppDispatch } from '@mezon/store';
+import { IMessage } from '@mezon/utils';
 
 export function useSeenMessagePool() {
-    const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-    const initWorker = () => {
-        seenMessagePool.registerSeenMessageWorker((action) => {
-            dispatch(messagesActions.updateLastSeenMessage({
-                channelId: action.channelId,
-                messageId: action.messageId
-            }));
-        });
-    }
+	const initWorker = () => {
+		seenMessagePool.registerSeenMessageWorker((action) => {
+			dispatch(
+				messagesActions.updateLastSeenMessage({
+					channelId: action.channelId,
+					messageId: action.messageId,
+				}),
+			);
+		});
+	};
 
-    const unInitWorker = () => {
-        seenMessagePool.unRegisterSeenMessageWorker();
-    }
+	const unInitWorker = () => {
+		seenMessagePool.unRegisterSeenMessageWorker();
+	};
 
-    const markMessageAsSeen = (message: IMessage) => {
-        seenMessagePool.addSeenMessage({
-            channelId: message.channel_id || '',
-            messageId: message.id || '',
-            messageCreatedAt: message.creationTimeMs ? +message.creationTimeMs : 0,
-            messageSeenAt: +Date.now(),
-        });
-    }
+	const markMessageAsSeen = (message: IMessage) => {
+		seenMessagePool.addSeenMessage({
+			channelId: message.channel_id || '',
+			messageId: message.id || '',
+			messageCreatedAt: message.creationTimeMs ? +message.creationTimeMs : 0,
+			messageSeenAt: +Date.now(),
+		});
+	};
 
-    return {
-        markMessageAsSeen,
-        initWorker,
-        unInitWorker
-    }
+	return {
+		markMessageAsSeen,
+		initWorker,
+		unInitWorker,
+	};
 }

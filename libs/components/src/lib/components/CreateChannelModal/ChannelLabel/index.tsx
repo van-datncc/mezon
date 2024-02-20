@@ -1,12 +1,6 @@
 interface ChannelLabelModalProps {
-    labelProp: string;
+	labelProp: string;
 }
-export const ChannelLableModal: React.FC<ChannelLabelModalProps> = ({
-  labelProp,
-}) => {
-  return (
-    <div className="self-stretch text-white text-sm font-bold font-['Manrope'] leading-normal">
-      {labelProp}
-    </div>
-  );
+export const ChannelLableModal: React.FC<ChannelLabelModalProps> = ({ labelProp }) => {
+	return <div className="self-stretch text-white text-sm font-bold font-['Manrope'] leading-normal">{labelProp}</div>;
 };

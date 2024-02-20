@@ -1,12 +1,5 @@
 import { IThread, LoadingStatus } from '@mezon/utils';
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const USERS_FEATURE_KEY = 'users';
 
@@ -14,12 +7,12 @@ export const USERS_FEATURE_KEY = 'users';
  * Update these interfaces according to your requirements.
  */
 export interface UsersEntity extends IThread {
-  id: string; // Primary ID
+	id: string; // Primary ID
 }
 
 export interface UsersState extends EntityState<UsersEntity, string> {
-  loadingStatus: LoadingStatus;
-  error?: string | null;
+	loadingStatus: LoadingStatus;
+	error?: string | null;
 }
 
 export const usersAdapter = createEntityAdapter<UsersEntity>();
@@ -41,48 +34,42 @@ export const usersAdapter = createEntityAdapter<UsersEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchUsers = createAsyncThunk<UsersEntity[]>(
-  'users/fetchStatus',
-  async (_, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getUserss()`;
-     * Right now we just return an empty array.
-     */
-    return Promise.resolve([]);
-  }
-);
+export const fetchUsers = createAsyncThunk<UsersEntity[]>('users/fetchStatus', async (_, thunkAPI) => {
+	/**
+	 * Replace this with your custom fetch call.
+	 * For example, `return myApi.getUserss()`;
+	 * Right now we just return an empty array.
+	 */
+	return Promise.resolve([]);
+});
 
 export const initialUsersState: UsersState = usersAdapter.getInitialState({
-  loadingStatus: 'not loaded',
-  error: null,
+	loadingStatus: 'not loaded',
+	error: null,
 });
 
 export const usersSlice = createSlice({
-  name: USERS_FEATURE_KEY,
-  initialState: initialUsersState,
-  reducers: {
-    add: usersAdapter.addOne,
-    remove: usersAdapter.removeOne,
-    // ...
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchUsers.pending, (state: UsersState) => {
-        state.loadingStatus = 'loading';
-      })
-      .addCase(
-        fetchUsers.fulfilled,
-        (state: UsersState, action: PayloadAction<UsersEntity[]>) => {
-          usersAdapter.setAll(state, action.payload);
-          state.loadingStatus = 'loaded';
-        }
-      )
-      .addCase(fetchUsers.rejected, (state: UsersState, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      });
-  },
+	name: USERS_FEATURE_KEY,
+	initialState: initialUsersState,
+	reducers: {
+		add: usersAdapter.addOne,
+		remove: usersAdapter.removeOne,
+		// ...
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchUsers.pending, (state: UsersState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(fetchUsers.fulfilled, (state: UsersState, action: PayloadAction<UsersEntity[]>) => {
+				usersAdapter.setAll(state, action.payload);
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(fetchUsers.rejected, (state: UsersState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+	},
 });
 
 /*
@@ -126,13 +113,8 @@ export const usersActions = usersSlice.actions;
  */
 const { selectAll, selectEntities } = usersAdapter.getSelectors();
 
-export const getUsersState = (rootState: {
-  [USERS_FEATURE_KEY]: UsersState;
-}): UsersState => rootState[USERS_FEATURE_KEY];
+export const getUsersState = (rootState: { [USERS_FEATURE_KEY]: UsersState }): UsersState => rootState[USERS_FEATURE_KEY];
 
 export const selectAllUsers = createSelector(getUsersState, selectAll);
 
-export const selectUsersEntities = createSelector(
-  getUsersState,
-  selectEntities
-);
+export const selectUsersEntities = createSelector(getUsersState, selectEntities);

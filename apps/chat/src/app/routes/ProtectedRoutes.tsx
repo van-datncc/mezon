@@ -1,16 +1,15 @@
-import { selectIsLogin } from "@mezon/store";
-import React from "react";
-import { useSelector } from "react-redux";
+import { selectIsLogin } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from 'react-router-dom';
 
 const ProtectedRoutes = () => {
 	const isLogin = useSelector(selectIsLogin);
-	if(!isLogin) {
+	if (!isLogin) {
 		return <Navigate to="/guess/login" replace />;
 	}
 
-	return (<Outlet />)
+	return <Outlet />;
 };
 
 export default ProtectedRoutes;

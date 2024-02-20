@@ -1,7 +1,7 @@
 import { IMessageWithUser, TIME_COMBINE } from '@mezon/utils';
 import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import * as Icons from '../Icons/index'
+import * as Icons from '../Icons/index';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -45,11 +45,12 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 
 	return (
 		<>
-			<div className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}>
+			<div
+				className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+			>
 				<div className="justify-start gap-4 inline-flex w-full relative">
 					{isCombine ? (
-						<div className="w-[38px] h-[0]">
-						</div>
+						<div className="w-[38px] h-[0]"></div>
 					) : (
 						<div>
 							{message.user?.avatarSm ? (

@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 export type NavLinkProps = {
 	active?: boolean;
 	children?: React.ReactElement | string;

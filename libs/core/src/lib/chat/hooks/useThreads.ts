@@ -1,10 +1,10 @@
-import { useSelector } from "react-redux";
-import { selectAllThreads } from "@mezon/store";
+import { selectAllThreads } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
 export function useThreads() {
-    const threads = useSelector(selectAllThreads);
-    
-    return {
-        threads
-    };
+	const threads = useSelector(selectAllThreads);
+
+	return {
+		threads,
+	};
 }
