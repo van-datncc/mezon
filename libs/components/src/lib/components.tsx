@@ -1,3 +1,5 @@
+import MentionMessage from './components/MentionMessage';
+
 export { default as ChannelLink } from './components/ChannelLink';
 export { default as ChannelList } from './components/ChannelList';
 export { default as MemberList } from './components/MemberList';
@@ -17,6 +19,7 @@ export { default as UnreadMessageBreak } from './components/Message/UnreadMessag
 export { default as DirectMessageBox } from './components/DmList/MessageBoxDM/index';
 export { default as DmTopbar } from './components/DmList/DMtopbar/index';
 export { default as MemberListGroupChat } from './components/DmList/MemberListGroupChat/index';
+export { default as MentionMessage } from './components/MentionMessage/index';
 
 export * from './components/MessageBox';
 export * from './components/LoginForm';

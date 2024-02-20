@@ -93,6 +93,7 @@ export type IMessage = ChannelMessage & {
     };
     content?: {
         content?: string | undefined;
+        mentioned?: string[] | undefined
     };
     date?: string | undefined;
     creationTime?: Date;
