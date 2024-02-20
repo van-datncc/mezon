@@ -39,7 +39,7 @@ function MemberList() {
 								</p>
 								<div className="flex flex-col gap-4">
 									{role?.users.filter((obj: ChannelMembersEntity) => !obj.user?.online).map((user: ChannelMembersEntity) => (
-										<div className='opacity-60'>
+										<div key={user.id} className='opacity-60'>
 											<MemberProfile
 												numberCharacterCollapse={30}
 												avatar={user?.user?.avatar_url ?? ''}
