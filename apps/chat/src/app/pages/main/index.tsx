@@ -29,7 +29,7 @@ function MyApp() {
 				<NavLink to="/chat/direct/friends">
 					<NavLinkComponent active={pathName.includes('direct')}>
 						<div>
-							<Image src={`/assets/Images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} />
+							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} />
 							{quantityPendingRequest !== 0 && (
 								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
 									{quantityPendingRequest}
@@ -71,7 +71,7 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					<Image src={`/assets/Images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} />
+					<Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} />
 					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
 						<ModalListClans
 							options={clans}
