@@ -1,6 +1,6 @@
 import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
 import { IClan, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';

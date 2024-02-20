@@ -1,5 +1,5 @@
-import { HeadPhoneICon, MicIcon, SettingProfile } from "../Icons";
-import MemberProfile from "../MemberProfile";
+import { HeadPhoneICon, MicIcon, SettingProfile } from '../Icons';
+import MemberProfile from '../MemberProfile';
 
 export type FooterProfileProps = {
 	name: string;

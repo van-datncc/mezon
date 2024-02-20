@@ -94,13 +94,15 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 	'channelMembers/fetchChannelMembersPresence',
 	async (channelPresence: ChannelPresenceEvent, thunkAPI) => {
 		//user exist
-		const userId = channelPresence.joins[0].user_id;
-		const channelId = channelPresence.channel_id;
+		if (channelPresence.joins.length > 0) {
+			const userId = channelPresence.joins[0].user_id;
+			const channelId = channelPresence.channel_id;
 
-		const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
+			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
 
-		if (!user) {
-			thunkAPI.dispatch(fetchChannelMembers({ channelId }));
+			if (!user) {
+				thunkAPI.dispatch(fetchChannelMembers({ channelId }));
+			}
 		}
 	},
 );

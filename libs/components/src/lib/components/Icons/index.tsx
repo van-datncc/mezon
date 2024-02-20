@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="false" aria-label="Discord" viewBox="0 0 28 20" {...props}>
@@ -14,7 +14,7 @@ export function Discord(props: React.HTMLAttributes<SVGElement>) {
 export function Verified(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-			<g clip-path="url(#clip0_2719_1783)">
+			<g clipPath="url(#clip0_2719_1783)">
 				<path
 					d="M10 2.34375C10.3238 2.34375 10.5859 2.0816 10.5859 1.75781V0.585938C10.5859 0.262146 10.3238 0 10 0C9.67621 0 9.41406 0.262146 9.41406 0.585938V1.75781C9.41406 2.0816 9.67621 2.34375 10 2.34375Z"
 					fill="white"
@@ -56,7 +56,7 @@ export function Verified(props: React.HTMLAttributes<SVGElement>) {
 export function IconFriends(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<g clip-path="url(#clip0_2719_1783)">
+			<g clipPath="url(#clip0_2719_1783)">
 				<path
 					d="M10 2.34375C10.3238 2.34375 10.5859 2.0816 10.5859 1.75781V0.585938C10.5859 0.262146 10.3238 0 10 0C9.67621 0 9.41406 0.262146 9.41406 0.585938V1.75781C9.41406 2.0816 9.67621 2.34375 10 2.34375Z"
 					fill="white"
@@ -471,7 +471,7 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 export const PinRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	// TODO: remove state and handle click, pass fill as prop
 	const [isWhite, setFill] = useState<boolean>(false);
-	
+
 	const handleClick = () => {
 		setFill(!isWhite);
 	};
@@ -530,7 +530,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defau
 
 export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);	
+	const [isWhite, setFill] = useState<boolean>(false);
 
 	const handleClick = () => {
 		setFill(!isWhite);
@@ -1093,8 +1093,8 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 				fill="#AEAEAE"
 			/>
 			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
+				fillRule="evenodd"
+				clipRule="evenodd"
 				d="M15.0682 2.036V1.66579C15.0682 0.740249 15.8086 -0.000183105 16.7342 -0.000183105C17.6597 -0.000183105 18.4001 0.740249 18.4001 1.66579V2.036H18.7704C19.1406 2.036 19.4182 2.31367 19.4182 2.68388V6.01582C19.4182 6.38604 19.1406 6.6637 18.7704 6.6637H14.698C14.3278 6.6637 14.0501 6.38604 14.0501 6.01582V2.68388C14.0501 2.31367 14.3278 2.036 14.698 2.036H15.0682ZM15.7161 1.66579C15.7161 1.11046 16.1789 0.647695 16.7342 0.647695C17.2895 0.647695 17.7523 1.11046 17.7523 1.66579V2.036H15.7161V1.66579ZM16.7342 3.60942C17.0118 3.60942 17.1969 3.79453 17.1969 4.07219V4.72007C17.1969 4.99773 17.0118 5.18284 16.7342 5.18284C16.4565 5.18284 16.2714 4.99773 16.2714 4.72007V4.07219C16.2714 3.79453 16.4565 3.60942 16.7342 3.60942Z"
 				fill="#AEAEAE"
 			/>
@@ -1111,8 +1111,8 @@ export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 					fill="#AEAEAE"
 				/>
 				<path
-					fill-rule="evenodd"
-					clip-rule="evenodd"
+					fillRule="evenodd"
+					clipRule="evenodd"
 					d="M13.2117 3.45524V3.13004C13.2117 2.31703 13.8621 1.66663 14.6751 1.66663C15.4881 1.66663 16.1385 2.31703 16.1385 3.13004V3.45524H16.4637C16.7889 3.45524 17.0328 3.69915 17.0328 4.02435V6.95118C17.0328 7.27638 16.7889 7.52028 16.4637 7.52028H12.8865C12.5613 7.52028 12.3174 7.27638 12.3174 6.95118V4.02435C12.3174 3.69915 12.5613 3.45524 12.8865 3.45524H13.2117ZM13.7808 3.13004C13.7808 2.64224 14.1873 2.23573 14.6751 2.23573C15.1629 2.23573 15.5694 2.64224 15.5694 3.13004V3.45524H13.7808V3.13004ZM14.6751 4.83736C14.919 4.83736 15.0816 4.99996 15.0816 5.24386V5.81297C15.0816 6.05687 14.919 6.21947 14.6751 6.21947C14.4312 6.21947 14.2686 6.05687 14.2686 5.81297V5.24386C14.3499 4.99996 14.5125 4.83736 14.6751 4.83736Z"
 					fill="#AEAEAE"
 				/>

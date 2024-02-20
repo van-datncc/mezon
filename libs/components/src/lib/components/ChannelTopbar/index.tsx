@@ -1,8 +1,8 @@
+import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import { ChannelLable, SearchMessage } from './TopBarComponents';
-import { appActions, selectIsShowMemberList } from '@mezon/store';
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
 };
@@ -83,10 +83,9 @@ function HelpButton() {
 	);
 }
 
-
 function ChannelListButton() {
 	const dispatch = useDispatch();
-	const isActive = useSelector(selectIsShowMemberList)
+	const isActive = useSelector(selectIsShowMemberList);
 	const handleClick = () => {
 		dispatch(appActions.setIsShowMemberList(!isActive));
 	};

@@ -1,6 +1,6 @@
 import { ApiClanProfile } from '@mezon/mezon-js/dist/api.gen';
 import { IClanProfile, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUpdateClanProfileRequest } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 export const USER_CLAN_PROFILE_FEATURE_KEY = 'userClanProfile';

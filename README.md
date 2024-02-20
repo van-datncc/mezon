@@ -14,13 +14,13 @@
 
 ## Linting
 
--  Run `npm run lint` to lint the codebase
-- Run `npm run lint:fix` to fix the linting issues
+-   Run `npm run lint` to lint the codebase
+-   Run `npm run lint:fix` to fix the linting issues
 
 ## Format
 
--  Run `npm run format` to format the codebase
-- Run `npm run format:fix` to fix the formatting issues
+-   Run `npm run format` to format the codebase
+-   Run `npm run format:fix` to fix the formatting issues
 
 ## Start the app
 

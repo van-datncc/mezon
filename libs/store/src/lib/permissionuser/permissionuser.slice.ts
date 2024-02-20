@@ -1,6 +1,6 @@
 import { ApiPermission } from '@mezon/mezon-js/dist/api.gen';
 import { IPermissionUser, LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const PERMISSION_USER_FEATURE_KEY = 'permissionuser';
 

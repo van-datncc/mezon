@@ -1,6 +1,5 @@
-import { LoginForm } from '@mezon/components';
+import { GoogleButtonLogin, LoginForm, QRSection, TitleSection } from '@mezon/components';
 import { selectIsLogin } from '@mezon/store';
-import { GoogleButtonLogin, TitleSection, QRSection } from '@mezon/components';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';

@@ -11,6 +11,8 @@ export type ModalProps = {
 const Modal = (props: ModalProps) => {
 	const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm } = props;
 	return (
+		// TODO: using modal component
+		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{showModal ? (
 				<>
@@ -24,7 +26,7 @@ const Modal = (props: ModalProps) => {
 									</button>
 								</div>
 								<div className="border-b border-solid border-borderDefault rounded-t pl-[20px] pb-[10px]">
-									Send a channel invite link to a friend
+									Send invite link to a friend
 								</div>
 								{/*body*/}
 								<div className="relative px-6 py-4 flex-auto">

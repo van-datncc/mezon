@@ -1,6 +1,6 @@
 import { useChat } from '@mezon/core';
 import { categoriesActions, useAppDispatch } from '@mezon/store';
-import { InputField } from '@mezon/ui';
+import { InputField, Modal as ModalInvite } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
 import { useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
@@ -17,8 +17,41 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	const dispatch = useAppDispatch();
 	const { currentClanId } = useChat();
 	const [openCreateCate, setOpenCreateCate] = useState(false);
+	const [openInvite, setOpenInvite] = useState(false);
+	const { currentClan, createLinkInviteUser } = useChat();
+	const [urlInvite, setUrlInvite] = useState('');
+
+	const handleOpenInvite = () => {
+		setOpenInvite(true);
+		createLinkInviteUser(currentClan?.clan_id ?? '', '', 10).then((res) => {
+			if (res && res.invite_link) {
+				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
+			}
+		});
+	};
+	const unsecuredCopyToClipboard = (text: string) => {
+		const textArea = document.createElement('textarea');
+		textArea.value = text;
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		try {
+			document.execCommand('copy');
+		} catch (err) {
+			console.error('Unable to copy to clipboard', err);
+		}
+		document.body.removeChild(textArea);
+	};
+	const handleCopyToClipboard = (content: string) => {
+		if (window.isSecureContext && navigator.clipboard) {
+			navigator.clipboard.writeText(content);
+		} else {
+			unsecuredCopyToClipboard(content);
+		}
+	};
 	const onClose = () => {
 		setOpenCreateCate(false);
+		setOpenInvite(false);
 	};
 	const [nameCate, setNameCate] = useState('');
 
@@ -67,11 +100,36 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 								>
 									Create category
 								</Dropdown.Item>
+								<Dropdown.Item
+									icon={MdOutlineCreateNewFolder}
+									theme={{
+										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
+									}}
+									onClick={() => {
+										setOpenInvite(true);
+										handleOpenInvite();
+									}}
+								>
+									Invite clan
+								</Dropdown.Item>
 							</Dropdown>
 						</div>
 					</div>
 				</>
 			)}
+			<ModalInvite
+				title="Invite friend"
+				onClose={() => {
+					setOpenInvite(false);
+				}}
+				showModal={openInvite}
+				confirmButton={() => handleCopyToClipboard(urlInvite)}
+				titleConfirm="Copy"
+			>
+				<p>
+					<span>{urlInvite}</span>
+				</p>
+			</ModalInvite>
 			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary" size="lg">
 				<div className="bg-[#313338] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-[500]">Create Category</div>

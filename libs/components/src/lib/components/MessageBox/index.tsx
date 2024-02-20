@@ -38,7 +38,7 @@ function MessageBox(props: MessageBoxProps) {
 
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent<HTMLDivElement>) => {
-			if(typeof handleTyping === 'function') {
+			if (typeof handleTyping === 'function') {
 				handleTyping();
 			}
 			if (event.key === 'Enter' && !event.shiftKey) {

@@ -2,7 +2,7 @@ import { useChatChannel } from '@mezon/core';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
-    channelId: string;
+	channelId: string;
 };
 
 export default function ChannelMessages({ channelId }: ChannelMessagesProps) {

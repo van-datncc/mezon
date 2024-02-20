@@ -26,6 +26,7 @@ import { useThreads } from './useThreads';
 // @deprecated
 // TODO: refactor this hook into useChatChannel
 export function useChat() {
+	console.warn('useChat is deprecated, use useChatChannel instead');
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { channels } = useChannels();
 	const { threads } = useThreads();
@@ -173,9 +174,20 @@ export function useChat() {
 				payload.channel_id = currentChannelId || '';
 			}
 			// dispatch(messagesActions.add(payload));
-			 await socket.writeChatMessage(currentClanId, channel.id, payload);
+			await socket.writeChatMessage(currentClanId, channel.id, payload);
 		},
-		[channelRef, clientRef, currentChannelId, currentClanId, sessionRef, socketRef, userProfile?.user?.avatar_url, userProfile?.user?.display_name, userProfile?.user?.id, userProfile?.user?.username],
+		[
+			channelRef,
+			clientRef,
+			currentChannelId,
+			currentClanId,
+			sessionRef,
+			socketRef,
+			userProfile?.user?.avatar_url,
+			userProfile?.user?.display_name,
+			userProfile?.user?.id,
+			userProfile?.user?.username,
+		],
 	);
 
 	return useMemo(

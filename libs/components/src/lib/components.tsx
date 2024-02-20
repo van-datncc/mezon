@@ -18,7 +18,6 @@ export { default as NavLinkComponent } from './components/NavLink';
 export { default as ServerHeader } from './components/ServerHeader';
 export { default as SettingAccount } from './components/SettingAccount';
 
-export * from './components/LoginForm';
 export * from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox';
