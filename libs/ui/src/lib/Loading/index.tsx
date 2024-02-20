@@ -1,4 +1,3 @@
-import loadingSvg from 'apps/chat/src/assets/Svg/loading.svg';
 import React from 'react';
 
 interface IconLoadingProps {
@@ -8,7 +7,7 @@ interface IconLoadingProps {
 export const Loading: React.FC<IconLoadingProps> = ({ classProps }) => {
 	return (
 		<div className={classProps}>
-			<img src={loadingSvg}></img>
+			<img src={'/assets/svg/loading.svg'} alt='loading'></img>
 		</div>
 	);
 };

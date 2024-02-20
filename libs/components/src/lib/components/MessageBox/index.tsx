@@ -135,9 +135,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 		setContent('');
 		setEditorState(() => EditorState.createEmpty());
-	}, [onSend, content]);
+	}, [content, onSend, userMentioned]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
+		onTyping && onTyping();
 		if (e.key === 'Enter') {
 			return 'onsend'; // name this whatever you want
 		}
