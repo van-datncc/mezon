@@ -1,14 +1,14 @@
+import { MentionData } from '@draft-js-plugins/mention';
+import { useAppParams, useChatChannel } from '@mezon/core';
 import { IMessage } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
-import { useAppParams, useChatChannel } from '@mezon/core';
-import { MentionData } from '@draft-js-plugins/mention';
 // import mentions from '../MentionMessage/mentions';
 
-import React, { MouseEvent, ReactElement, useMemo } from 'react';
-import { EditorState, convertToRaw } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, { defaultSuggestionsFilter, MentionPluginTheme } from '@draft-js-plugins/mention';
+import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import { EditorState, convertToRaw } from 'draft-js';
+import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import editorStyles from '../MentionMessage/CustomMentionEditor.module.css';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 

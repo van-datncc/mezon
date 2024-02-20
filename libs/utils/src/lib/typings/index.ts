@@ -87,18 +87,18 @@ export type IMessageMeta = {
 };
 
 export type IMessage = ChannelMessage & {
-    id: string;
-    body: {
-        text: string;
-    };
-    content?: {
-        content?: string | undefined;
-        mentioned?: string[] | undefined
-    };
-    date?: string | undefined;
-    creationTime?: Date;
-    creationTimeMs?: number;
-    lastSeen?: boolean;
+	id: string;
+	body: {
+		text: string;
+	};
+	content?: {
+		content?: string | undefined;
+		mentioned?: string[] | undefined;
+	};
+	date?: string | undefined;
+	creationTime?: Date;
+	creationTimeMs?: number;
+	lastSeen?: boolean;
 };
 
 export type IMessageWithUser = IMessage & {

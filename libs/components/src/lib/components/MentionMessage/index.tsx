@@ -1,10 +1,10 @@
-import React, { MouseEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, { defaultSuggestionsFilter, MentionData, MentionPluginTheme } from '@draft-js-plugins/mention';
+import createMentionPlugin, { MentionData, MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import { useAppParams, useChatChannel } from '@mezon/core';
+import { EditorState } from 'draft-js';
+import { MouseEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import editorStyles from './CustomMentionEditor.module.css';
 import mentionsStyles from './MentionsStyles.module.css';
-import { useAppParams, useChatChannel, useChatDirect } from '@mezon/core';
 
 export interface EntryComponentProps {
 	className?: string;

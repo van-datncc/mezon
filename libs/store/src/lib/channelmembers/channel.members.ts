@@ -14,7 +14,7 @@ export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
  */
 export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
-	name?: string
+	name?: string;
 }
 
 // TODO: remove channelId from the parameter
