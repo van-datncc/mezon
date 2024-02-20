@@ -4,10 +4,10 @@ import * as Icons from '../Icons';
 import MentionMessage from '../MentionMessage';
 import { useAppParams, useChatChannel } from '@mezon/core';
 import { MentionData } from '@draft-js-plugins/mention';
-import mentions from '../MentionMessage/mentions';
+// import mentions from '../MentionMessage/mentions';
 
 import React, { MouseEvent, ReactElement, memo, useMemo } from 'react';
-import { EditorState } from 'draft-js';
+import { EditorState, RichUtils, convertToRaw } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { defaultSuggestionsFilter, MentionPluginTheme } from '@draft-js-plugins/mention';
 import editorStyles from '../MentionMessage/CustomMentionEditor.module.css';
@@ -71,7 +71,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				name: item?.user?.username ?? '',
 				id: item?.id ?? null,
 			}));
-			console.log('newUserMentionList', newUserMentionList);
 			return setListUserMention(newUserMentionList);
 		}
 	};
@@ -85,14 +84,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	useEffect(() => {
 		getListMentions();
-	}, []);
-	const memoizedListUserMention = useMemo(() => listUserMention, [listUserMention]);
-	console.log('memoizedListUserMention', memoizedListUserMention);
+	}, [members[0].users.length]);
 
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 	const [open, setOpen] = useState(false);
-	const [suggestions, setSuggestions] = useState(listUserMention);
 
 	const { MentionSuggestions, plugins } = useMemo(() => {
 		const mentionPlugin = createMentionPlugin({
@@ -100,14 +96,23 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			theme: mentionsStyles,
 			mentionPrefix: '@',
 			supportWhitespace: true,
+			mentionTrigger: ['@', '('],
 		});
 		const { MentionSuggestions } = mentionPlugin;
 		const plugins = [mentionPlugin];
 		return { plugins, MentionSuggestions };
 	}, []);
+	const [suggestions, setSuggestions] = useState<MentionData[]>(listUserMention);
+	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 
-	const onChange = useCallback((_editorState: EditorState) => {
-		setEditorState(_editorState);
+	const onChange = useCallback((editorState: EditorState) => {
+		setEditorState(editorState);
+		const contentState = editorState.getCurrentContent();
+		const content = convertToRaw(contentState).blocks[0].text;
+		const mentionedRaw = convertToRaw(contentState).entityMap;
+		const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
+		setContent(content);
+		setUserMentioned(mentioned);
 	}, []);
 
 	const onOpenChange = useCallback((_open: boolean) => {
@@ -122,203 +127,57 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 		onSend({
-			content: { content },
+			content: { content: content, mentioned: userMentioned },
 			id: '',
 			channel_id: '',
 			body: { text: '' },
 			channelId: '',
 		});
 		setContent('');
+		setEditorState(() => EditorState.createEmpty());
 	}, [onSend, content]);
 
-	const handleKeyDown = useCallback(
-		(event: React.KeyboardEvent<HTMLDivElement>) => {
-			if (event.key === 'Enter' && !event.shiftKey) {
-				event.preventDefault();
-				handleSend();
-			}
-		},
-		[handleSend, content, setContent],
-	);
+	function keyBindingFn(e: React.KeyboardEvent<Element>) {
+		if (e.key === 'Enter') {
+			return 'onsend'; // name this whatever you want
+		}
+	}
 
-	const sanitizeContent = (content: string): string => {
-		return content.replace(/ style="[^"]*"/g, '');
-	};
-
-	// const handleInputChanged = useCallback(
-	// 	(event: React.FormEvent<HTMLDivElement>) => {
-	// 		const updatedContent = (event.currentTarget as HTMLDivElement).innerHTML;
-	// 		const sanitizedContent = sanitizeContent(updatedContent);
-	// 		setContent(sanitizedContent);
-	// 	},
-	// 	[handleKeyDown, content, setContent],
-	// );
-
-	// const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
-	// 	event.preventDefault();
-	// 	const clipboardData = event.clipboardData.getData('text/plain');
-	// 	setContent(clipboardData);
-	// };
-
-	// const handleTyping = useCallback(() => {
-	// 	if (typeof onTyping === 'function') {
-	// 		onTyping();
-	// 	}
-	// }, [onTyping]);
-
-	// const contentEditableRef = useRef<HTMLDivElement | null>(null);
-	// useEffect(() => {
-	// 	const range = document.createRange();
-	// 	const selection = window.getSelection();
-	// 	range.selectNodeContents(contentEditableRef.current as any);
-	// 	range.collapse(false);
-	// 	selection?.removeAllRanges();
-	// 	selection?.addRange(range);
-	// }, [content]);
-
-	// const [placeholderVisible, setPlaceholderVisible] = useState(true);
-	// useEffect(() => {
-	// 	const hasContent = contentEditableRef?.current;
-	// 	const contentLength = hasContent?.textContent?.trim().length;
-	// 	if (contentLength && contentLength > 0) {
-	// 		setPlaceholderVisible(!hasContent);
-	// 	} else {
-	// 		setPlaceholderVisible(true);
-	// 	}
-	// }, [content]);
+	function handleKeyCommand(command: string) {
+		if (command === 'onsend') {
+			handleSend();
+			return 'handled';
+		}
+		return 'not-handled';
+	}
 
 	return (
 		<div
 			className={`${editorStyles.editor} relative`}
-			// className="relative h-10 w-full"
 			onClick={() => {
 				ref.current!.focus();
 			}}
 		>
-			<Editor editorKey={'editor'} editorState={editorState} onChange={onChange} plugins={plugins} ref={ref} />
+			<Editor
+				editorKey={'editor'}
+				editorState={editorState}
+				onChange={onChange}
+				plugins={plugins}
+				ref={ref}
+				keyBindingFn={keyBindingFn}
+				handleKeyCommand={handleKeyCommand}
+			/>
 			<div className="absolute w-full box-border bottom-20 max-w-[97%] bg-black rounded-md">
 				<MentionSuggestions
 					open={open}
 					onOpenChange={onOpenChange}
 					suggestions={listUserMention}
 					onSearchChange={onSearchChange}
-					onAddMention={() => {}}
 					entryComponent={Entry}
 					popoverContainer={({ children }: any) => <div>{children}</div>}
 				/>
 			</div>
 		</div>
-
-		// <div className="self-stretch relative h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
-		// 	<form className="self-stretch p-4 bg-neutral-950  rounded-lg justify-start gap-3 inline-flex items-center ">
-		// 		<div>
-		// 			<div className="flex flex-row justify-end h-fit">
-		// 				<Icons.AddCircle />
-		// 			</div>
-		// 		</div>
-
-		// 		<div
-		// 			// className={editorStyles.editor}
-		// 			className="relative h-10 w-full"
-		// 			onClick={() => {
-		// 				ref.current!.focus();
-		// 			}}
-		// 		>
-		// 			<Editor editorKey={'editor'} editorState={editorState} onChange={onChange} plugins={plugins} ref={ref} />
-		// 			<div className="absolute z-50 w-full top-0 h-[500px]">
-		// 				<MentionSuggestions
-		// 					open={open}
-		// 					onOpenChange={onOpenChange}
-		// 					suggestions={listUserMention}
-		// 					onSearchChange={onSearchChange}
-		// 					onAddMention={() => {
-		// 						// get the mention object selected
-		// 					}}
-		// 					entryComponent={Entry}
-		// 					popoverContainer={({ children }) => <div>{children}</div>}
-		// 				/>
-		// 			</div>
-		// 		</div>
-
-		// 		<div className="grow self-stretch justify-start items-center gap-2 flex relative ml-1">
-		// 			{/* {placeholderVisible && (
-		// 				<div
-		// 					className="absolute pointer-events-none select-none text-[#ABABAB]"
-		// 					style={{ top: '50%', transform: 'translateY(-50%)' }}
-		// 				>
-		// 					Write your thoughts here...
-		// 				</div>
-		// 			)} */}
-		// 			{/* <MentionMessage /> */}
-		// 			{/* <div
-		// 				contentEditable
-		// 				ref={contentEditableRef}
-		// 				className="grow flex-wrap text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto w-widChatBoxBreak resize-none"
-		// 				id="message"
-		// 				onInput={handleInputChanged}
-		// 				onFocus={handleTyping}
-		// 				onBlur={handleInputChanged}
-		// 				onChange={handleInputChanged}
-		// 				dangerouslySetInnerHTML={{ __html: content }}
-		// 				onKeyDown={handleKeyDown}
-		// 				// onPaste={handlePaste}
-		// 			></div> */}
-
-		// 			{/* <div
-		// 				// className={editorStyles.editor}
-		// 				className='relative h-10 w-full'
-		// 				onClick={() => {
-		// 					ref.current!.focus();
-		// 				}}
-		// 			>
-		// 				<Editor editorKey={'editor'} editorState={editorState} onChange={onChange} plugins={plugins} ref={ref} />
-		// 				<div className='absolute z-50 w-full top-0 h-[500px]'>
-		// 					<MentionSuggestions
-		// 						open={open}
-		// 						onOpenChange={onOpenChange}
-		// 						suggestions={listUserMention}
-		// 						onSearchChange={onSearchChange}
-		// 						onAddMention={() => {
-		// 							// get the mention object selected
-		// 						}}
-		// 						entryComponent={Entry}
-		// 						popoverContainer={({ children }) => <div>{children}</div>}
-		// 					/>
-		// 				</div>
-		// 			</div> */}
-		// 		</div>
-
-		// 		<div>
-		// 			<div className="flex flex-row gap-1">
-		// 				<Icons.Gif />
-		// 				<Icons.Help />
-		// 			</div>
-		// 		</div>
-		// 	</form>
-
-		// 	<div
-		// 		// className={editorStyles.editor}
-		// 		className="relative h-10 w-full"
-		// 		onClick={() => {
-		// 			ref.current!.focus();
-		// 		}}
-		// 	>
-		// 		{/* <Editor editorKey={'editor'} editorState={editorState} onChange={onChange} plugins={plugins} ref={ref} /> */}
-		// 		{/* <div className="absolute z-50 w-full top-0 h-[500px]">
-		// 			<MentionSuggestions
-		// 				open={open}
-		// 				onOpenChange={onOpenChange}
-		// 				suggestions={listUserMention}
-		// 				onSearchChange={onSearchChange}
-		// 				onAddMention={() => {
-		// 					// get the mention object selected
-		// 				}}
-		// 				entryComponent={Entry}
-		// 				popoverContainer={({ children }) => <div>{children}</div>}
-		// 			/>
-		// 		</div> */}
-		// 	</div>
-		// </div>
 	);
 }
 
@@ -327,9 +186,7 @@ MessageBox.Skeleton = () => {
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
 			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
-					<div className="flex flex-row  justify-end h-fit">
-						<Icons.AddCircle />
-					</div>
+					<div className="flex flex-row  justify-end h-fit">{/* <Icons.AddCircle /> */}</div>
 				</div>
 
 				<div className="grow self-stretch justify-start items-center gap-2 flex">

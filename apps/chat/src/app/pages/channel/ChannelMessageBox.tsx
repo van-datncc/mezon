@@ -18,6 +18,7 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
             const messageToSend: IMessage = {
                 ...mess,
             };
+            console.log("mess", mess)
             sendMessage(messageToSend);
         },
         [sendMessage],
