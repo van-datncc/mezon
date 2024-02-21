@@ -1,14 +1,13 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import MemberProfile from '../MemberProfile';
-import { IconFriends } from '../Icons';
-import { useAppNavigation, useAppParams, useChannelMembers, useChatDirect } from '@mezon/core';
-import * as Icons from '../Icons';
-import { ModalCreateDM } from './ModalCreateDmGroup/index';
-import { useState } from 'react';
+import { useAppNavigation, useAppParams, useChatDirect } from '@mezon/core';
+import { RootState, directActions, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { RootState, directActions } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import * as Icons from '../Icons';
+import { IconFriends } from '../Icons';
+import MemberProfile from '../MemberProfile';
+import { ModalCreateDM } from './ModalCreateDmGroup/index';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -16,7 +15,7 @@ export type CategoriesState = Record<string, boolean>;
 function DirectMessageList() {
 	const currentDmGroupId = useSelector((state: RootState) => state.direct.currentDirectMessageId);
 	const { directId } = useAppParams();
-	const pathname = useLocation().pathname
+	const pathname = useLocation().pathname;
 	const data = useChatDirect(directId);
 	const dmGroupChatList = data.listDM;
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
@@ -54,7 +53,6 @@ function DirectMessageList() {
 
 	return (
 		<>
-			<hr className="h-[0.08px] w-[272px] mt-[36px] border-[#1E1E1E]" />
 			<div className="absolute">
 				<ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
 			</div>
@@ -62,7 +60,7 @@ function DirectMessageList() {
 			<div className="mt-5 px-2 py-1">
 				<div className="w-full flex flex-row items-center">
 					<button
-						className={`py-2 px-3 rounded-[4px] w-full flex gap-4 items-center ${pathname.includes('friends') ? "bg-bgTertiary" : ""}`}
+						className={`py-2 px-3 rounded-[4px] w-full flex gap-4 items-center ${pathname.includes('friends') ? 'bg-bgTertiary' : ''}`}
 						onClick={() => {
 							navigate('/chat/direct/friends');
 						}}

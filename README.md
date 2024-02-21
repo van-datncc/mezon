@@ -9,14 +9,26 @@
 `npm install --global nx@latest`
 
 ## Sync dependencies
-- Run `npm run sync` to sync dependencies
+
+-   Run `npm run sync` to sync dependencies
+
+## Linting
+
+-   Run `npm run lint` to lint the codebase
+-   Run `npm run lint:fix` to fix the linting issues
+
+## Format
+
+-   Run `npm run format` to format the codebase
+-   Run `npm run format:fix` to fix the formatting issues
 
 ## Start the app
 
 To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
 
 ## Notes
-- using `Git Bash` to run the commands
+
+-   using `Git Bash` to run the commands
 
 ## Architecture Overview
 
@@ -34,8 +46,8 @@ Workspace will be managed by [`Nx`](https://nx.dev/) which is a smart, fast and 
 
 All applications are located in the `apps` directory. Each application is a standalone React application and has its own codebase.
 
-- `chat`: Chat application
-- `admin`: Admin application
+-   `chat`: Chat application
+-   `admin`: Admin application
 
 Currently, we only focus on the `chat` application.
 
@@ -43,14 +55,14 @@ Currently, we only focus on the `chat` application.
 
 All libraries are located in the `libs` directory. Each library is a reusable codebase and can be used by multiple applications.
 
-- `ui`: UI elements library, the components are `stateless` and `dumb`
-- `components`: Shared components library, the components are `stateful` and `smart` perform some logic through `context` and `hooks`
-- `core`: Core library, contains the core logic of the application, could be reused by multiple applications e.g. web, mobile, desktop
-- `transports`: Transport layer library, contains the logic to communicate with the server through `mezon-js` library
-- `store`: State management library, contains the logic to manage the state of the application using `redux` and `redux-toolkit`
-- `assets`: Assets library, contains the assets used by the applications and libraries
-- `logger`: Logger library, contains the logic to log the messages
-- `utils`: Utility functions library
+-   `ui`: UI elements library, the components are `stateless` and `dumb`
+-   `components`: Shared components library, the components are `stateful` and `smart` perform some logic through `context` and `hooks`
+-   `core`: Core library, contains the core logic of the application, could be reused by multiple applications e.g. web, mobile, desktop
+-   `transports`: Transport layer library, contains the logic to communicate with the server through `mezon-js` library
+-   `store`: State management library, contains the logic to manage the state of the application using `redux` and `redux-toolkit`
+-   `assets`: Assets library, contains the assets used by the applications and libraries
+-   `logger`: Logger library, contains the logic to log the messages
+-   `utils`: Utility functions library
 
 ## Data Flow
 
@@ -68,29 +80,56 @@ The core concepts are `one-way` data flow and `single source of truth`.
 
 The application data flow is managed by some packages:
 
-- `mez-js`: The core package to communicate with the server through `WebSocket` and `REST` API
-    - `WebSocket`: send and listen to the messages from the server
-    - `REST`: send and receive the messages from the server
-- `store`: The state management package to manage the state of the application. store is divided into multiple slices, each slice is a standalone slice and has its own reducer, action, and selector.
-    - `slice`: A standalone slice of the store, contains the reducer, action, and selector
-    - `reducer`: A function to manage the state of the application
-    - `action`: A function to dispatch the action to the reducer
-    - `selector`: A function to select the state from the store
+-   `mez-js`: The core package to communicate with the server through `WebSocket` and `REST` API
+    -   `WebSocket`: send and listen to the messages from the server
+    -   `REST`: send and receive the messages from the server
+-   `store`: The state management package to manage the state of the application. store is divided into multiple slices, each slice is a standalone slice and has its own reducer, action, and selector.
 
-- `routing`: The routing package to manage the routing of the application. The routing is managed by `react-router-dom` package.
-    - loader: The loader to load the component dynamically
-    - route: The route to navigate to the component
-    - page: The page to render the component
+    -   `slice`: A standalone slice of the store, contains the reducer, action, and selector
+    -   `reducer`: A function to manage the state of the application
+    -   `action`: A function to dispatch the action to the reducer
+    -   `selector`: A function to select the state from the store
+
+-   `routing`: The routing package to manage the routing of the application. The routing is managed by `react-router-dom` package.
+    -   loader: The loader to load the component dynamically
+    -   route: The route to navigate to the component
+    -   page: The page to render the component
+
+### Access Control
+
+Access control is managed by the `policies` slice. each user has it own permissions to access the resources. The permission is managed by the `policies` slice.
+
+There are several ways to manage the access control:
+
+-   using `policies` slice and `selectAllPermissionsUser` to get the permissions of the user
+-   using `useSelector(selectAllPermissionsUser)` to get the permissions of the user
+-   using `useUserPermissions` to get the permissions of the user
+-   using `UserRestrictionZone` to control displaying the components based on the user permissions
+-   using `useUserRestriction` to get the user restrictions based on the user permissions
+
+## Layouting
+
+how to layout the components and pages
+
+![Layouting](./docs/layouting.svg)
+
+We have sevaral layout components to handle layout based on the route:
+
+-   `/` - `AppLayout`: The layout for the application
+-   `/chat` -[logged in]- `MainLayout`: The layout for the main page
+-   `Main`: The main page to render the global components
+-   `/chat/server/:id` - `ServerLayout`: The layout for the server page
+-   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
 
 ## Conventions and Guidelines
 
 ## Code Style
+
 Using `Prettier` and `ESLint` to format the codebase. The codebase should be formatted before committing the code.
 
 ## file naming
 
-- `PascalCase` for the components and pages
-- `camelCase` for the functions and variables
+-   `PascalCase` for the components and pages
+-   `camelCase` for the functions and variables
 
 See more about the naming convention [here](https://github.com/airbnb/javascript/tree/master/react#naming)
-

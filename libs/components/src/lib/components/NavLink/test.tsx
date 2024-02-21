@@ -1,40 +1,36 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
 
-import NavLink from '.'
+import NavLink from '.';
 
-const useRouter = jest.spyOn(require('next/router'), 'useRouter')
+const useRouter = jest.spyOn(require('next/router'), 'useRouter');
 
-let asPath = ''
+let asPath = '';
 useRouter.mockImplementation(() => ({
-  asPath
-}))
+	asPath,
+}));
 
 describe('<NavLink />', () => {
-  it('should render correctly with children and link', () => {
-    render(<NavLink href="/some-link">Discord</NavLink>)
+	it('should render correctly with children and link', () => {
+		render(<NavLink href="/some-link">Discord</NavLink>);
 
-    expect(screen.getByText(/discord/i)).toBeInTheDocument()
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/some-link')
-  })
+		expect(screen.getByText(/discord/i)).toBeInTheDocument();
+		expect(screen.getByRole('link')).toHaveAttribute('href', '/some-link');
+	});
 
-  it('should render with active styles if the prop is passed', () => {
-    render(
-      <NavLink href="/some-link" active>
-        Discord
-      </NavLink>
-    )
+	it('should render with active styles if the prop is passed', () => {
+		render(
+			<NavLink href="/some-link" active>
+				Discord
+			</NavLink>,
+		);
 
-    expect(screen.getByText(/discord/i)).toHaveClass(
-      'rounded-2xl bg-brand text-white'
-    )
-  })
+		expect(screen.getByText(/discord/i)).toHaveClass('rounded-2xl bg-brand text-white');
+	});
 
-  it('should render with active styles if the route is active', () => {
-    asPath = '/some-link'
-    render(<NavLink href="/some-link">Discord</NavLink>)
+	it('should render with active styles if the route is active', () => {
+		asPath = '/some-link';
+		render(<NavLink href="/some-link">Discord</NavLink>);
 
-    expect(screen.getByText(/discord/i)).toHaveClass(
-      'rounded-2xl bg-brand text-white'
-    )
-  })
-})
+		expect(screen.getByText(/discord/i)).toHaveClass('rounded-2xl bg-brand text-white');
+	});
+});

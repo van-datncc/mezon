@@ -3,11 +3,13 @@ const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
 const topBarHeight = '58px';
 const chatBoxHeight = '52px';
-const clanWidth = "72px"
-const channelListWidth = "272px"
-const memberWidth= "268px"
-const avatarWidth= "68px"
-const iconWidth= "160px"
+const clanWidth = '72px';
+const channelListWidth = '272px';
+const memberWidth = '268px';
+const avatarWidth = '68px';
+const iconWidth = '160px';
+
+const plugin = require('tailwindcss/plugin');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -17,6 +19,7 @@ module.exports = {
 		...createGlobPatternsForDependencies(__dirname),
 	],
 	darkMode: 'class',
+
 	theme: {
 		extend: {
 			spacing: {
@@ -24,19 +27,37 @@ module.exports = {
 				0: '0',
 				96: '96px',
 				210: '210px',
+				250:'250px',
 			},
 			width: {
 				// widthWithoutServerWidth: `calc(100vw - ${topBarHeight})`,
-				widthMessageViewChat:`calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth})`,
-				widthMessageWithUser:`calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${avatarWidth})`,
+				widthMessageViewChat: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth})`,
+				widthMessageWithUser: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${avatarWidth})`,
 				widChatBoxBreak: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${iconWidth})`,
+				widthMessageTextChat:`calc(100% - 40px)`,
+				450: '450px',
+				"4/5":"80%",
+				"9/10":"90%",
 			},
-			  height: {
+			height: {
 				heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
 				heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
 				heightTopBar: topBarHeight,
 				heightChatBox: chatBoxHeight,
-			  },
+			},
+
+			maxWidth: {
+				'9/10': '90%',
+				'2/5':"40%",
+			},
+
+			maxHeight: {
+				'4/5': '80%',
+			},
+
+			minHeight: {
+				600: '600px',
+			},
 
 			fontFamily: {
 				manrope: ['Manrope', 'sans-serif'],
@@ -73,5 +94,15 @@ module.exports = {
 			rotation: 'rotation 6s linear infinite',
 		},
 	},
+	plugins: [
+		plugin(function ({ addUtilities }) {
+			const newUtilities = {
+				'.hide-scrollbar::-webkit-scrollbar': {
+					display: 'none',
+				},
+			};
+			addUtilities(newUtilities, ['responsive', 'hover']);
+		}),
+	],
 	//   plugins: [require('flowbite/plugin')],
 };

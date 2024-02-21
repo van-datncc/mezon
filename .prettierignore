@@ -2,3 +2,14 @@
 /dist
 /coverage
 /.nx/cache
+/vendors
+/.vscode
+/.idea
+/.DS_Store
+/.nx
+/.github
+*.json
+*.config.js
+*.config.ts
+.babelrc
+*.yml

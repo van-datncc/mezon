@@ -1,0 +1,43 @@
+.mention {
+	color: #3b82f6;
+	text-decoration: none;
+}
+
+.mentionSuggestions {
+	border-radius: 2px;
+	cursor: pointer;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	transform-origin: 50% 0%;
+	transform: scaleY(0);
+	margin: -16px;
+	border: #033a6d;
+	position: relative;
+	color: black;
+	width: 300px;
+	border: 1px solid red;
+}
+
+.mentionSuggestionsEntryFocused {
+	/* composes: mentionSuggestionsEntry; */
+	background-color: #033a6d;
+	color: white;
+	border-radius: 5px;
+}
+
+.mentionSuggestionsEntryTitle {
+	font-size: 0%;
+	color: #ff0000;
+}
+
+.mentionSuggestionsEntryAvatar {
+	display: inline;
+	margin-left: auto;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	padding: 5px;
+}

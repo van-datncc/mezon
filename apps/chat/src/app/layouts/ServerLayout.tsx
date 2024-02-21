@@ -1,12 +1,17 @@
-
-import { Outlet } from 'react-router-dom';
+import { MezonPolicyProvider } from '@mezon/core';
+import { Outlet, useLoaderData } from 'react-router-dom';
+import { ServerLoaderData } from '../loaders/serverLoader';
 
 const ServerLayout = () => {
-  return (
-    <div className='flex-row bg-bgSurface md:flex grow'>
-      <Outlet />
-    </div>
-  )
-}
+	const { serverId } = useLoaderData() as ServerLoaderData;
+
+	return (
+		<div className="flex-row bg-bgSurface flex grow">
+			<MezonPolicyProvider clanId={serverId}>
+				<Outlet />
+			</MezonPolicyProvider>
+		</div>
+	);
+};
 
 export default ServerLayout;

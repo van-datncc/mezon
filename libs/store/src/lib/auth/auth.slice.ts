@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { getMezonCtx } from '../helpers';
 import { Session } from '@mezon/mezon-js';
 import { LoadingStatus } from '@mezon/utils';
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
+import { getMezonCtx } from '../helpers';
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
@@ -85,10 +85,9 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 
 export const logOut = createAsyncThunk('auth/logOut', async (_, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	 await mezon?.logOutMezon()
-	 thunkAPI.dispatch(authActions.setLogout())
+	await mezon?.logOutMezon();
+	thunkAPI.dispatch(authActions.setLogout());
 });
-
 
 export const authSlice = createSlice({
 	name: AUTH_FEATURE_KEY,
@@ -165,7 +164,7 @@ export const authActions = {
 	authenticateGoogle,
 	authenticateEmail,
 	refreshSession,
-	logOut
+	logOut,
 };
 
 export const getAuthState = (rootState: { [AUTH_FEATURE_KEY]: AuthState }): AuthState => rootState[AUTH_FEATURE_KEY];

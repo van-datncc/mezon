@@ -1,8 +1,7 @@
-
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
 const DMRoutes = () => {
-    return <Outlet />
+	return <Outlet />;
 };
 
 export default DMRoutes;

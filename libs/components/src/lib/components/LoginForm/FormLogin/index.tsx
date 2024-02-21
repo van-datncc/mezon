@@ -1,14 +1,12 @@
-import { BaseSyntheticEvent, useCallback, useEffect, useState } from 'react';
-import { Resolver, useForm } from 'react-hook-form';
-import { AlertTitleTextWarning } from '../../../../../../ui/src/lib/Alert/index';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { RootState, authActions, useAppDispatch } from '@mezon/store';
 import { Loading } from 'libs/ui/src/lib/Loading/index';
-import * as Icons from '../../Icons';
+import { BaseSyntheticEvent, useCallback, useState } from 'react';
+import { Resolver, useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { RootState, authActions } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store';
 import { toast } from 'react-toastify';
+import * as Yup from 'yup';
+import * as Icons from '../../Icons';
 
 export type LoginFormPayload = {
 	userEmail: string;
@@ -75,8 +73,8 @@ function LoginForm(props: LoginFormProps) {
 	};
 
 	return (
-		<div className="flex-col justify-start items-center flex lg:w-[496px] h-fit px-36 lg:px-0 w-full">
-			<div className="flex-row justify-start items-center flex w-full h-fit gap-x-4 pb-6">
+		<div className="flex-col justify-start items-center flex lg:w-[496px] h-fit lg:px-0 w-450 max-w-full">
+			<div className="hidden flex-row justify-start items-center lg:flex w-full h-fit gap-x-4 pb-6">
 				<hr className="h-[0.08px] w-[272px] border-[#1E1E1E]" />
 				<p className="w-fit h-fit font-manrope text-sm text-[#aeaeae] leading-[130%]">or</p>
 				<hr className="h-[0.08px] w-[272px]  border-[#1E1E1E]" />
@@ -101,7 +99,7 @@ function LoginForm(props: LoginFormProps) {
 								name="userEmail"
 								id="userEmail"
 								placeholder="Enter your email"
-								autoComplete='userEmail'
+								autoComplete="userEmail"
 							/>
 						</div>
 					</div>
@@ -125,7 +123,7 @@ function LoginForm(props: LoginFormProps) {
 									name="password"
 									id="password"
 									placeholder="Enter your password"
-									autoComplete='password'
+									autoComplete="password"
 								/>
 								<button onClick={togglePasswordVisibility} className="outline-none z-50 fill-current left-0">
 									{showPassword ? <Icons.EyeOpen /> : <Icons.EyeClose />}

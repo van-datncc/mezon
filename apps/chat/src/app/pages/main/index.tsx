@@ -1,14 +1,15 @@
-import { Image } from '@mezon/ui';
-import { useChat, useAppNavigation, useChatDirect } from '@mezon/core';
-import { MainContent } from './MainContent';
-import IconLogoMezon from '../../../assets/Images/mezon-logo.png';
-import IconCreateClan from '../../../assets/Images/IconCreateClan.svg';
-import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
 import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
+import { useAppNavigation, useChatDirect } from '@mezon/core';
+import { selectAllClans, selectCurrentClan } from '@mezon/store';
+import { Image } from '@mezon/ui';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { NavLink, useLocation } from 'react-router-dom';
+import { MainContent } from './MainContent';
 
 function MyApp() {
-	const { clans, currentClan } = useChat();
+	const clans = useSelector(selectAllClans);
+	const currentClan = useSelector(selectCurrentClan);
 	const [openListClans, setOpenListClans] = useState(false);
 	const [openCreateClan, setOpenCreateClans] = useState(false);
 	const { navigate, toClanPage } = useAppNavigation();
@@ -21,16 +22,17 @@ function MyApp() {
 		setOpenCreateClans(true);
 	};
 
+	// TODO: move to useFriendRequest hook
 	const { friends } = useChatDirect(undefined);
 	const quantityPendingRequest = friends.filter((obj) => obj.state === 2).length || 0;
 
 	return (
-		<div className="flex h-screen text-gray-100">
-			<div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
+		<div className="flex h-screen text-gray-100 overflow-hidden">
+			<div className="overflow-visible py-4 px-3 space-y-2 bg-bgPrimary scrollbar-hide">
 				<NavLink to="/chat/direct/friends">
 					<NavLinkComponent active={pathName.includes('direct')}>
 						<div>
-							<Image src={IconLogoMezon} alt={'logoMezon'} width={48} height={48} />
+							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} />
 							{quantityPendingRequest !== 0 && (
 								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
 									{quantityPendingRequest}
@@ -39,7 +41,7 @@ function MyApp() {
 						</div>
 					</NavLinkComponent>
 				</NavLink>
-				<div className="py-2 border-t-2 border-t-borderDefault"></div>
+				<div className="py-2 border-t-2 border-t-borderDefault" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (
 					<NavLink to={`/chat/servers/${currentClan.id}`}>
 						<NavLinkComponent active={!pathName.includes('direct')}>
@@ -72,7 +74,7 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					<Image src={IconCreateClan} alt={'logoMezon'} width={48} height={48} />
+					<Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} />
 					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
 						<ModalListClans
 							options={clans}
