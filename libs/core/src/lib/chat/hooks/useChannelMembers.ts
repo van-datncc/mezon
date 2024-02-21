@@ -13,11 +13,10 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 		if (!rawMembers) {
 			return [];
 		}
-
 		const roles = [
 			{
-				id: 'db7be5e6-2a04-4c7a-9040-1ea1f7002f14',
-				title: 'MEMBER',
+				id: '',
+				title: '',
 			},
 		];
 
