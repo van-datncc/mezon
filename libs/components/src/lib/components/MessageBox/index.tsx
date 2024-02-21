@@ -1,5 +1,4 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { useAppParams, useChatChannel } from '@mezon/core';
 import { IMessage } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
@@ -7,7 +6,7 @@ import * as Icons from '../Icons';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, SelectionState, convertToRaw } from 'draft-js';
+import { EditorState, RichUtils, SelectionState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
@@ -128,13 +127,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
-
 	}, [content, onSend, userMentioned]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			return 'onsend';
-		}
+		} return;
 	}
 
 	function handleKeyCommand(command: string) {
@@ -144,23 +142,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return 'not-handled';
 	}
-
-
-	const handleMoveCursorToEnd = () => {
-		const content = editorState.getCurrentContent();
-		const lastBlock = content.getLastBlock();
-		const lastBlockKey = lastBlock.getKey();
-		const lastBlockLength = lastBlock.getLength();
-	
-		const selection = new SelectionState({
-		  anchorKey: lastBlockKey,
-		  anchorOffset: lastBlockLength,
-		  focusKey: lastBlockKey,
-		  focusOffset: lastBlockLength,
-		});
-		const updatedEditorState = EditorState.forceSelection(editorState, selection);
-		setEditorState(updatedEditorState);
-	  };
 
 	return (
 		<div className="flex w-full items-center">
@@ -173,7 +154,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					className={`w-[96%] relative bg-black gap-3`}
 					onClick={() => {
 						ref.current!.focus();
-						handleMoveCursorToEnd();
 					}}
 				>
 					<div className="p-[10px] flex items-center text-[15px]">
