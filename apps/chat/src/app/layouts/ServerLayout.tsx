@@ -6,7 +6,7 @@ const ServerLayout = () => {
 	const { serverId } = useLoaderData() as ServerLoaderData;
 
 	return (
-		<div className="flex-row bg-bgSurface md:flex grow">
+		<div className="flex-row bg-bgSurface flex grow">
 			<MezonPolicyProvider clanId={serverId}>
 				<Outlet />
 			</MezonPolicyProvider>
