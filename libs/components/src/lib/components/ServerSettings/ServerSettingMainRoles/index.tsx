@@ -6,7 +6,7 @@ import { InputField } from "@mezon/ui";
 
 // import SettingRightUser from '../SettingRightUserProfile';
 const ServerSettingMainRoles = () => {
-    const { RolesClan, MembersRole } = useRoles();
+    const { RolesClan } = useRoles();
     
     
 	return (
@@ -44,7 +44,7 @@ const ServerSettingMainRoles = () => {
                                 RolesClan.map((role) => (
                                     <tr key={role.id}>
                                         <td className="px-6 py-4 whitespace-nowrap"><p>{role.title}</p></td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><p></p>{MembersRole.length}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap"><p></p></td>
                                         <td className="px-6 py-4 whitespace-nowrap"><p></p></td>
                                     </tr>
                                 ))

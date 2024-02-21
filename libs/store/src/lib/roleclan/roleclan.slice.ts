@@ -1,8 +1,8 @@
-import { ApiRole } from '@mezon/mezon-js/dist/api.gen';
+import { ApiRole, ApiRoleUserList, RoleUserListRoleUser } from '@mezon/mezon-js/dist/api.gen';
 import { IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
-import { MembersRoleActions } from '../getlistmemberinrole/getListMembersInRole.slice';
+// import { MembersRoleActions } from '../getlistmemberinrole/getListMembersInRole.slice';
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
 
 /*
@@ -22,35 +22,51 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentRoleId?: string | null;
+	roleMembers:Record<string,RoleUserListRoleUser[]> 
 }
 
 export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
 
-type fetchRolesClanPayload = {
+type FetchRolesClanPayload = {
 	clanId: string;
 };
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
-	async ({ clanId }: fetchRolesClanPayload, thunkAPI) => {
+	async ({ clanId }: FetchRolesClanPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listRoles(mezon.session, 100,1,'',clanId);
 		if (!response.roles) {
 			return thunkAPI.rejectWithValue([]);
-		}else{
-			const fetchMembersByRoleId = (roleId: string) => {
-				thunkAPI.dispatch(MembersRoleActions.fetchMembersRole({ roleId }));
-			};
-			response.roles.forEach((role) => {
-				fetchMembersByRoleId(role.id||'');
-			});
 		}
 		return response.roles.map(mapRolesClanToEntity);
 	},
 );
 
+type FetchReturnMembersRole ={
+	roleID:string
+	members:RoleUserListRoleUser[]
+}
+
+type FetchMembersRolePayload = {
+	roleId: string;
+};
+export const fetchMembersRole = createAsyncThunk(
+	'MembersRole/fetchMembersRole',
+	async ({ roleId }: FetchMembersRolePayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listRoleUsers(mezon.session,roleId, 100,'');
+		if (!response.role_users) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		return ({
+			roleID: roleId,members:response.role_users
+		}) as FetchReturnMembersRole;
+	},
+);
 export const initialRolesClanState: RolesClanState = RolesClanAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	RolesClan: [],
+	roleMembers: {},
 	error: null,
 });
 
@@ -78,6 +94,10 @@ export const RolesClanSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+		builder
+			.addCase(fetchMembersRole.fulfilled, (state: RolesClanState, action: PayloadAction<FetchReturnMembersRole>) => {
+				state.roleMembers[action.payload.roleID]=(action.payload.members);
+			})
 	},
 });
 
@@ -86,7 +106,8 @@ export const RolesClanSlice = createSlice({
  */
 export const RolesClanReducer = RolesClanSlice.reducer;
 
-export const RolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan };
+export const RolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole };
+
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
 
@@ -102,3 +123,5 @@ export const selectRolesClanEntities = createSelector(getRolesClanState, selectE
 export const selectCurrentRole = createSelector(selectRolesClanEntities, selectCurrentRoleId, (RolesClanEntities, RoleId) =>
 RoleId ? RolesClanEntities[RoleId] : null,
 );
+export const selectAllRoleMember = createSelector(getRolesClanState, (state)=>state.roleMembers);
+export const selectMembersByRoleID = (roleID:string)=>{createSelector(selectAllRoleMember, (roleMembers)=>{return roleMembers[roleID]});}
