@@ -1,13 +1,11 @@
-import {
-	selectAllCategories,
-} from '@mezon/store';
+import { selectAllCategories } from '@mezon/store';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChannels } from './useChannels';
 
 export function useCategory() {
-	const { channels } = useChannels();	
+	const { channels } = useChannels();
 	const categories = useSelector(selectAllCategories);
 
 	const categorizedChannels = React.useMemo(() => {
@@ -24,10 +22,8 @@ export function useCategory() {
 
 	return useMemo(
 		() => ({
-			categorizedChannels,			
+			categorizedChannels,
 		}),
-		[
-			categorizedChannels,			
-		],
+		[categorizedChannels],
 	);
 }

@@ -95,6 +95,32 @@ The application data flow is managed by some packages:
     -   route: The route to navigate to the component
     -   page: The page to render the component
 
+### Access Control
+
+Access control is managed by the `policies` slice. each user has it own permissions to access the resources. The permission is managed by the `policies` slice.
+
+There are several ways to manage the access control:
+
+-   using `policies` slice and `selectAllPermissionsUser` to get the permissions of the user
+-   using `useSelector(selectAllPermissionsUser)` to get the permissions of the user
+-   using `useUserPermissions` to get the permissions of the user
+-   using `UserRestrictionZone` to control displaying the components based on the user permissions
+-   using `useUserRestriction` to get the user restrictions based on the user permissions
+
+## Layouting
+
+how to layout the components and pages
+
+![Layouting](./docs/layouting.svg)
+
+We have sevaral layout components to handle layout based on the route:
+
+-   `/` - `AppLayout`: The layout for the application
+-   `/chat` -[logged in]- `MainLayout`: The layout for the main page
+-   `Main`: The main page to render the global components
+-   `/chat/server/:id` - `ServerLayout`: The layout for the server page
+-   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
+
 ## Conventions and Guidelines
 
 ## Code Style

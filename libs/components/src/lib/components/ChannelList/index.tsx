@@ -1,13 +1,13 @@
-import { useAuth, useCategory, useClans, useInvite } from '@mezon/core';
-import { channelsActions, selectAllPermissionsUser, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { UserRestrictionZone, useAuth, useCategory, useClans, useInvite } from '@mezon/core';
+import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
-import { ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
+import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import ChannelLink from '../ChannelLink';
+import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
-import { CreateNewChannelModal } from '../CreateChannelModal';
-import { useSelector } from 'react-redux';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -39,10 +39,7 @@ function ChannelList() {
 
 	const { currentClan } = useClans();
 	const { createLinkInviteUser } = useInvite();
-	
-	const permissionsUser = useSelector(selectAllPermissionsUser);
-	const containsViewChannelPermission = permissionsUser.some((permission) => permission.slug === 'administrator');
-	const shouldDisplayButton = currentClan?.creator_id === userProfile?.user?.id || containsViewChannelPermission;
+
 	const dispatch = useAppDispatch();
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
@@ -110,7 +107,10 @@ function ChannelList() {
 									)}
 									{category.category_name}
 								</button>
-								{shouldDisplayButton && (
+								<UserRestrictionZone
+									permissions={[EPermission.administrator]}
+									policy={currentClan?.creator_id === userProfile?.user?.id}
+								>
 									<button
 										onClick={() => {
 											handleToggleCategory(category, true);
@@ -119,7 +119,7 @@ function ChannelList() {
 									>
 										<Icons.Plus />
 									</button>
-								)}
+								</UserRestrictionZone>
 							</div>
 						)}
 						{!categoriesState[category.id] && (
