@@ -24,7 +24,7 @@ export function LogOutButton() {
       bg-blue-700 px-5 text-sm font-medium tracking-wide text-white transition duration-300
       hover:bg-blue-500 focus:bg-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
 			>
-				<span>LogOut</span>
+				<span>Log Out</span>
 				<span className="relative only:-mx-5">
 					<svg
 						className="h-4 w-4 text-white"

@@ -91,8 +91,7 @@ export function useChatChannel(channelId: string) {
 			if (!payload.channel_id) {
 				payload.channel_id = channelId || '';
 			}
-			// dispatch(messagesActions.add(payload));
-			const ack = await socket.writeChatMessage(currentClanId, channel.id, payload);
+			await socket.writeChatMessage(currentClanId, channel.id, payload);
 		},
 		[
 			sessionRef,
@@ -104,7 +103,6 @@ export function useChatChannel(channelId: string) {
 			userProfile?.user?.username,
 			userProfile?.user?.id,
 			userProfile?.user?.avatar_url,
-			dispatch,
 			channelId,
 		],
 	);

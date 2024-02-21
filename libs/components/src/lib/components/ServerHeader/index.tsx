@@ -1,11 +1,12 @@
-import { useChat } from '@mezon/core';
-import { categoriesActions, useAppDispatch } from '@mezon/store';
+import { useClans, useInvite } from '@mezon/core';
+import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField, Modal as ModalInvite } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
 import { useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
+import { useSelector } from 'react-redux';
 
 export type ServerHeaderProps = {
 	name?: string;
@@ -15,10 +16,11 @@ export type ServerHeaderProps = {
 
 function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	const dispatch = useAppDispatch();
-	const { currentClanId } = useChat();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openInvite, setOpenInvite] = useState(false);
-	const { currentClan, createLinkInviteUser } = useChat();
+	const { currentClan } = useClans();
+	const { createLinkInviteUser } = useInvite();
 	const [urlInvite, setUrlInvite] = useState('');
 
 	const handleOpenInvite = () => {

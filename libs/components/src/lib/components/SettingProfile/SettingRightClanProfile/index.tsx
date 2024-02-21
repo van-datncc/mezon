@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import SettingRightClanEdit from './settingUserClanProfileEdit';
 const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => void }) => {
 	const { clans, currentClan } = useClans();
-	// const { currentClan } = useChat()
 	const [flagOption, setFlagOption] = useState(false);
 	const [selectedClanId, setSelectedClanId] = useState<string | undefined>(currentClan ? currentClan.id : undefined);
 	const handleUserProfileButtonClick = () => {

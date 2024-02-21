@@ -1,6 +1,6 @@
 import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from '@mezon/components';
-import { useChat, useChatChannel } from '@mezon/core';
-import { RootState, selectIsShowMemberList } from '@mezon/store';
+import { useAuth, useChatChannel, useClans } from '@mezon/core';
+import { RootState, selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Setting from '../setting';
@@ -13,7 +13,9 @@ export default function Server() {
 
 	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
-	const { currentChanel, currentClan, userProfile } = useChat();
+	const currentChanel = useSelector(selectCurrentChannel);
+	const { currentClan } = useClans();
+	const { userProfile } = useAuth();
 	const [openSetting, setOpenSetting] = useState(false);
 
 	const handleOpenCreate = () => {

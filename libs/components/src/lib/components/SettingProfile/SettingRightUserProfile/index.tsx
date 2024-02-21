@@ -1,5 +1,4 @@
-// import { useChat } from '@mezon/core';
-import { useChat } from '@mezon/core';
+import { useAccount } from '@mezon/core';
 import { InputField } from '@mezon/ui';
 import { useState } from 'react';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
@@ -22,7 +21,7 @@ const SettingRightUser = ({
 	const [userName, setUserName] = useState(name);
 	const [displayName, setDisplayName] = useState(nameDisplay);
 	const [urlImage, setUrlImage] = useState(avatar);
-	const { updateUser } = useChat();
+	const { updateUser } = useAccount();
 	const [flags, setFlags] = useState(true);
 	const [flagsRemoveAvartar, setFlagsRemoveAvartar] = useState(false);
 	const handleUpdateUser = async () => {

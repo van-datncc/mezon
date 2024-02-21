@@ -1,12 +1,15 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
-import { useAppNavigation, useChat, useChatDirect } from '@mezon/core';
+import { useAppNavigation, useChatDirect } from '@mezon/core';
 import { Image } from '@mezon/ui';
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
+import { selectAllClans, selectCurrentClan } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
 function MyApp() {
-	const { clans, currentClan } = useChat();
+	const clans = useSelector(selectAllClans);	
+	const currentClan = useSelector(selectCurrentClan);
 	const [openListClans, setOpenListClans] = useState(false);
 	const [openCreateClan, setOpenCreateClans] = useState(false);
 	const { navigate, toClanPage } = useAppNavigation();
