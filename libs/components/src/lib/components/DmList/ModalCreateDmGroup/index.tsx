@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Modal } from '@mezon/ui';
-import { IFriend, directActions } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store';
-import { useNavigate } from 'react-router-dom';
 import { useAppNavigation, useChatDirect } from '@mezon/core';
-import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { IFriend, directActions, useAppDispatch } from '@mezon/store';
+import { Modal } from '@mezon/ui';
 import { ChannelTypeEnum } from '@mezon/utils';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 interface ModalCreateDMProps {
 	onClose: () => void;
 	isOpen: boolean;

@@ -1,39 +1,37 @@
-import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 // Layouts
+import AppLayout from '../layouts/AppLayout';
 import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
-import AppLayout from '../layouts/AppLayout';
 import ServerLayout from '../layouts/ServerLayout';
 
 // Pages
-import Main from '../pages/main';
 import Chanel from '../pages/channel';
-import Direct from '../pages/directMessage';
-import Login from '../pages/login';
-import ProtectedRoutes from './ProtectedRoutes';
-import InitialRoutes from './InititalRoutes';
-import ErrorRoutes from './ErrorRoutes';
-import InvitePage from '../pages/invite';
 import DirectMain from '../pages/directMessage';
+import InvitePage from '../pages/invite';
+import Login from '../pages/login';
+import Main from '../pages/main';
+import ErrorRoutes from './ErrorRoutes';
+import InitialRoutes from './InititalRoutes';
+import ProtectedRoutes from './ProtectedRoutes';
 
 // Loaders
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
+import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
+import { directLoader } from '../loaders/directLoader';
+import { directMessageLoader } from '../loaders/directMessageLoader';
+import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
-import { directLoader } from '../loaders/directLoader';
-import { friendsLoader } from '../loaders/friendsLoader';
-import { directMessageLoader } from '../loaders/directMessageLoader';
-import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
-import ClansRoutes from './ClanRoutes';
-import ChannelsRoutes from './ChannelsRoutes';
-import { ClanIndex } from '../pages/clan/ClanIndex';
 import { ChannelIndex } from '../pages/channel/ChannelIndex';
-import FriendsPage from '../pages/directMessage/FriendsPage';
-import DMRoutes from './DMRoutes';
-import { DirectMessageIndex } from '../pages/directMessage/DMPage/DirectMessageIndex';
+import { ClanIndex } from '../pages/clan/ClanIndex';
 import { DirectMessage } from '../pages/directMessage/DMPage';
+import { DirectMessageIndex } from '../pages/directMessage/DMPage/DirectMessageIndex';
+import FriendsPage from '../pages/directMessage/FriendsPage';
+import ChannelsRoutes from './ChannelsRoutes';
+import ClansRoutes from './ClanRoutes';
+import DMRoutes from './DMRoutes';
 
 // Components
 export const routes = createBrowserRouter([

@@ -1,16 +1,16 @@
-import { selectIsLogin } from "@mezon/store";
-import { useSelector } from "react-redux";
+import { selectIsLogin } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
-import { Navigate } from "react-router-dom";
+import { Navigate } from 'react-router-dom';
 
 const InitialRoutes = () => {
-    const isLogin = useSelector(selectIsLogin);
+	const isLogin = useSelector(selectIsLogin);
 
-    if (!isLogin) {
-        return <Navigate to="/guess/login" replace />;
-    }
+	if (!isLogin) {
+		return <Navigate to="/guess/login" replace />;
+	}
 
-    return <Navigate to="/chat/direct/friends" replace />;
+	return <Navigate to="/chat/direct/friends" replace />;
 };
 
 export default InitialRoutes;

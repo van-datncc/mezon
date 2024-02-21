@@ -1,50 +1,43 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { InputField, Modal } from '@mezon/ui';
-import { IClan, IClanProfile } from '@mezon/utils';
-import { ApiClanProfile } from '@mezon/mezon-js/dist/api.gen';
-import { useAuth, useClanProfileSetting } from '@mezon/core';
-import { string } from 'yup';
-
-  export type ModalSettingSave = {
-    flagOption: boolean;
-    handleClose: () => void;
-    handlSaveClose: () => void;
-    handleUpdateUser: () => void;
-  };
-  export type PropsModalSettingSave = {
-    PropsSave: ModalSettingSave;
-  };
-const SettingUserClanProfileSave = (props: PropsModalSettingSave)  => {
-    const { PropsSave} = props;
-  return (
-    <>
-    {PropsSave.flagOption ? (
-        <div className="flex flex-row gap-2  bg-gray-500 absolute w-[96] bottom-4 min-w-96 h-fit p-3 rounded transform ">
-          <div className="flex-1 flex items-center text-nowrap">
+export type ModalSettingSave = {
+	flagOption: boolean;
+	handleClose: () => void;
+	handlSaveClose: () => void;
+	handleUpdateUser: () => void;
+};
+export type PropsModalSettingSave = {
+	PropsSave: ModalSettingSave;
+};
+const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
+	const { PropsSave } = props;
+	return (
+		<>
+			{PropsSave.flagOption ? (
+				<div className="flex flex-row gap-2  bg-gray-500 absolute w-[96] bottom-4 min-w-96 h-fit p-3 rounded transform ">
+					<div className="flex-1 flex items-center text-nowrap">
 						<p>Carefull - you have unsaved changes!</p>
 					</div>
-          <div className="flex flex-row justify-end px-2 gap-3">
-            <button
-              className="ml-[300px] bg-gray-600 rounded-[8px] p-[8px]"
-              onClick={() => {
-                  PropsSave.handleClose();
-              }}
-            >
-              Reset
-            </button>
-            <button
-              className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
-              onClick={() => {
-                  PropsSave.handlSaveClose();
-                  PropsSave.handleUpdateUser();
-              }}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      ) : null}
-    </>
-  );
+					<div className="flex flex-row justify-end px-2 gap-3">
+						<button
+							className="ml-[300px] bg-gray-600 rounded-[8px] p-[8px]"
+							onClick={() => {
+								PropsSave.handleClose();
+							}}
+						>
+							Reset
+						</button>
+						<button
+							className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
+							onClick={() => {
+								PropsSave.handlSaveClose();
+								PropsSave.handleUpdateUser();
+							}}
+						>
+							Save Changes
+						</button>
+					</div>
+				</div>
+			) : null}
+		</>
+	);
 };
 export default SettingUserClanProfileSave;

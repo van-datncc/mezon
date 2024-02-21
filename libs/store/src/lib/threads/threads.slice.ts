@@ -1,12 +1,5 @@
 import { IThread, LoadingStatus } from '@mezon/utils';
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const THREADS_FEATURE_KEY = 'threads';
 
@@ -14,12 +7,12 @@ export const THREADS_FEATURE_KEY = 'threads';
  * Update these interfaces according to your requirements.
  */
 export interface ThreadsEntity extends IThread {
-  id: string; // Primary ID
+	id: string; // Primary ID
 }
 
 export interface ThreadsState extends EntityState<ThreadsEntity, string> {
-  loadingStatus: LoadingStatus;
-  error?: string | null;
+	loadingStatus: LoadingStatus;
+	error?: string | null;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -41,50 +34,42 @@ export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchThreads = createAsyncThunk<ThreadsEntity[]>(
-  'threads/fetchStatus',
-  async (_, thunkAPI) => {
-    /**
-     * Replace this with your custom fetch call.
-     * For example, `return myApi.getThreadss()`;
-     * Right now we just return an empty array.
-     */
-    return Promise.resolve([]);
-  }
-);
+export const fetchThreads = createAsyncThunk<ThreadsEntity[]>('threads/fetchStatus', async (_, thunkAPI) => {
+	/**
+	 * Replace this with your custom fetch call.
+	 * For example, `return myApi.getThreadss()`;
+	 * Right now we just return an empty array.
+	 */
+	return Promise.resolve([]);
+});
 
-export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
-  {
-    loadingStatus: 'not loaded',
-    error: null,
-  }
-);
+export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
+	loadingStatus: 'not loaded',
+	error: null,
+});
 
 export const threadsSlice = createSlice({
-  name: THREADS_FEATURE_KEY,
-  initialState: initialThreadsState,
-  reducers: {
-    add: threadsAdapter.addOne,
-    remove: threadsAdapter.removeOne,
-    // ...
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchThreads.pending, (state: ThreadsState) => {
-        state.loadingStatus = 'loading';
-      })
-      .addCase(
-        fetchThreads.fulfilled,
-        (state: ThreadsState, action: PayloadAction<ThreadsEntity[]>) => {
-          threadsAdapter.setAll(state, action.payload);
-          state.loadingStatus = 'loaded';
-        }
-      )
-      .addCase(fetchThreads.rejected, (state: ThreadsState, action) => {
-        state.loadingStatus = 'error';
-        state.error = action.error.message;
-      });
-  },
+	name: THREADS_FEATURE_KEY,
+	initialState: initialThreadsState,
+	reducers: {
+		add: threadsAdapter.addOne,
+		remove: threadsAdapter.removeOne,
+		// ...
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchThreads.pending, (state: ThreadsState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<ThreadsEntity[]>) => {
+				threadsAdapter.setAll(state, action.payload);
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(fetchThreads.rejected, (state: ThreadsState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+	},
 });
 
 /*
@@ -128,13 +113,8 @@ export const threadsActions = threadsSlice.actions;
  */
 const { selectAll, selectEntities } = threadsAdapter.getSelectors();
 
-export const getThreadsState = (rootState: {
-  [THREADS_FEATURE_KEY]: ThreadsState;
-}): ThreadsState => rootState[THREADS_FEATURE_KEY];
+export const getThreadsState = (rootState: { [THREADS_FEATURE_KEY]: ThreadsState }): ThreadsState => rootState[THREADS_FEATURE_KEY];
 
 export const selectAllThreads = createSelector(getThreadsState, selectAll);
 
-export const selectThreadsEntities = createSelector(
-  getThreadsState,
-  selectEntities
-);
+export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);

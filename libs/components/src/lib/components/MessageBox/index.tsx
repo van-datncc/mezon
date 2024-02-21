@@ -1,12 +1,14 @@
-import { IMessage } from '@mezon/utils';
-import { useCallback, useState, useRef } from 'react';
-import * as Icons from '../Icons';
 import { MentionData } from '@draft-js-plugins/mention';
+import { useAppParams, useChatChannel } from '@mezon/core';
+import { IMessage } from '@mezon/utils';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import * as Icons from '../Icons';
+// import mentions from '../MentionMessage/mentions';
 
-import React, { MouseEvent, ReactElement, memo, useMemo } from 'react';
-import { EditorState, convertToRaw } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, { defaultSuggestionsFilter, MentionPluginTheme } from '@draft-js-plugins/mention';
+import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import { EditorState, convertToRaw } from 'draft-js';
+import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
 export interface EntryComponentProps {
@@ -111,6 +113,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
+		// TODO: change the interface of onSend, remove the id and channelId
 		onSend({
 			content: { content: content, mentioned: userMentioned },
 			id: '',
@@ -120,7 +123,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 		setContent('');
 		setEditorState(() => EditorState.createEmpty());
-	}, [onSend, content]);
+	}, [content, onSend, userMentioned]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {

@@ -1,10 +1,9 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { MessageBox, IMessagePayload } from '@mezon/components';
-import { useChat, useChatChannel, useChatDirect } from '@mezon/core';
-import { ChannelMembersEntity, RootState } from '@mezon/store';
+import { IMessagePayload, MessageBox } from '@mezon/components';
+import { useChatChannel } from '@mezon/core';
+import { ChannelMembersEntity } from '@mezon/store';
 import { IMessage } from '@mezon/utils';
-import { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 
 type ChannelMessageBoxProps = {

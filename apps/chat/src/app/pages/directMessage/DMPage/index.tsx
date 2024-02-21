@@ -1,19 +1,10 @@
-import {
-	ChannelList,
-	ChannelTopbar,
-	FooterProfile,
-	MemberList,
-	ServerHeader,
-	DirectMessageBox,
-	DmTopbar,
-	MemberListGroupChat,
-} from '@mezon/components';
+import { DirectMessageBox, DmTopbar, MemberListGroupChat } from '@mezon/components';
 import { useAppNavigation, useAppParams, useChatChannel } from '@mezon/core';
-import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent } from '@mezon/store';
+import { RootState, selectDefaultChannelIdByClanId } from '@mezon/store';
+import { ChannelTypeEnum } from '@mezon/utils';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useEffect, useRef, useState } from 'react';
 import ChannelMessages from '../../channel/ChanneMessages';
-import { ChannelTypeEnum, IChannel } from '@mezon/utils';
 
 export function DirectMessage() {
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
@@ -35,7 +26,6 @@ export function DirectMessage() {
 			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
 		}
 	}, [isSending, [], messages]);
-
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
