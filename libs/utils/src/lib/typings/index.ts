@@ -6,8 +6,10 @@ import {
 	ApiClanDesc,
 	ApiClanProfile,
 	ApiPermission,
+	ApiRole,
 	ApiUser,
 	ChannelUserListChannelUser,
+	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
@@ -23,6 +25,14 @@ export type ICategory = ApiCategoryDesc & {
 };
 
 export type IPermissionUser = ApiPermission & {
+	id: string;
+};
+
+export type IRolesClan = ApiRole & {
+	id: string;
+};
+
+export type IUsersRole = RoleUserListRoleUser & {
 	id: string;
 };
 

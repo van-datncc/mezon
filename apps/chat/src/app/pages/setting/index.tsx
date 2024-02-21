@@ -1,4 +1,4 @@
-import { ExitSetting, SettingAccount, SettingItem, SettingProfile } from '@mezon/components';
+import { ExitSetting, SettingAccount, SettingItem, SettingRightProfile } from '@mezon/components';
 import { useState } from 'react';
 
 export type ModalSettingProps = {
@@ -20,7 +20,7 @@ const Setting = (props: ModalSettingProps) => {
 					<div className="flex text-gray- w-screen">
 						<SettingItem onItemClick={handleSettingItemClick} />
 						{currentSetting === 'Account' && <SettingAccount />}
-						{currentSetting === 'Profiles' && <SettingProfile />}
+						{currentSetting === 'Profiles' && <SettingRightProfile />}
 						<ExitSetting onClose={onClose} />
 					</div>
 				</div>

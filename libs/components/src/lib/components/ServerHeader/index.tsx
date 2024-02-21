@@ -7,6 +7,7 @@ import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import { useSelector } from 'react-redux';
+import ServerSetting from '../ServerSettings/serverSettings'
 
 export type ServerHeaderProps = {
 	name?: string;
@@ -19,6 +20,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openInvite, setOpenInvite] = useState(false);
+	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const { currentClan } = useClans();
 	const { createLinkInviteUser } = useInvite();
 	const [urlInvite, setUrlInvite] = useState('');
@@ -114,11 +116,27 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 								>
 									Invite clan
 								</Dropdown.Item>
+								<Dropdown.Item
+									icon={MdOutlineCreateNewFolder}
+									theme={{
+										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
+									}}
+									onClick={() => {setOpenServerSettings(true)}}
+								>
+									Server Settings
+								</Dropdown.Item>
 							</Dropdown>
 						</div>
 					</div>
 				</>
 			)}
+			<ServerSetting
+				// open={openServerSettings}
+				open={openServerSettings}
+				onClose={() => {
+					setOpenServerSettings(false);
+				}}
+			/>
 			<ModalInvite
 				title="Invite friend"
 				onClose={() => {

@@ -15,6 +15,8 @@ import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { PermissionsUserReducer } from './permissionuser/permissionuser.slice';
+import { RolesClanReducer } from './roleclan/roleclan.slice';
+import { MembersRoleReducer } from './getlistmemberinrole/getListMembersInRole.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 
@@ -49,6 +51,8 @@ const reducer = {
 	users: usersReducer,
 	categories: categoriesReducer,
 	permissionuser: PermissionsUserReducer,
+	rolesclan: RolesClanReducer,
+	membersRole: MembersRoleReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
