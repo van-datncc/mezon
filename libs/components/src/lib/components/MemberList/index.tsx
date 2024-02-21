@@ -7,7 +7,6 @@ export type MemberListProps = { className?: string };
 
 function MemberList() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const rawMembers = useSelector(selectMembersByChannelId(currentChannelId));
 	return (
 		<>
