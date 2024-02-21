@@ -85,6 +85,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const { onSend, onTyping } = props;
 
+
+
 	const onChange = useCallback(
 		(editorState: EditorState) => {
 			if (typeof onTyping === 'function') {
@@ -99,20 +101,29 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
 			setContent(contentBreakLine);
 			setUserMentioned(mentioned);
-			if(content.length === 1){
-				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-				setEditorState(updatedEditorState)
-			} else return
+
 		},
 		[onTyping],
 	);
+
+
 
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
 	}, []);
 
 	const [content, setContent] = useState('');
-
+	
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false)
+	useEffect(()=>{
+		if(content.length === 1){
+				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+				setEditorState(updatedEditorState)
+		} else setEditorState(editorState)
+		if(content.length === 0){
+			setShowPlaceHolder(true)
+		} else setShowPlaceHolder(false)
+	},[content])
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
@@ -157,7 +168,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						ref.current!.focus();
 					}}
 				>
-					<div className="p-[10px] flex items-center text-[15px]">
+					<div className="p-[10px] flex items-center text-[15px] relative">
 						<Editor
 							editorKey={'editor'}
 							editorState={editorState}
@@ -166,8 +177,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							ref={ref}
 							keyBindingFn={keyBindingFn}
 							handleKeyCommand={handleKeyCommand}
-							// placeholder='Write your thoughs here...'
 						/>
+						{ showPlaceHolder &&
+						<p className='absolute text-gray-500'>Write your thoughs here...</p>
+						}
 					</div>
 
 					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">
