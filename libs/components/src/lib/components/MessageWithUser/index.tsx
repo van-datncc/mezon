@@ -39,7 +39,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [timeDiff, message, preMessage]);
 
 	const renderMultilineContent = () => {
-		const lines = content.replace(/<br>/g, '\n').split('\n');
+		const lines = content.split('\n');
 		return lines.map((line: string, index: number) => {
 			const match = line.match(/(@\S+)/);
 			if (match) {
