@@ -1,8 +1,7 @@
 import { MentionData } from '@draft-js-plugins/mention';
 import { IMessage } from '@mezon/utils';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
-// import mentions from '../MentionMessage/mentions';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
