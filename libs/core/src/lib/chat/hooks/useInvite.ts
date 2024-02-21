@@ -1,7 +1,6 @@
-import { clansActions, selectAllThreads, useAppDispatch } from '@mezon/store';
+import { clansActions, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { ApiLinkInviteUser, ApiInviteUserRes } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export function useInvite() {
 	const dispatch = useAppDispatch();
@@ -43,10 +42,8 @@ export function useInvite() {
 		() => ({
 			createLinkInviteUser,
 			inviteUser,
-			getLinkInvite
-		}), [
-			createLinkInviteUser,
-			inviteUser,
-			getLinkInvite
-		]);
+			getLinkInvite,
+		}),
+		[createLinkInviteUser, inviteUser, getLinkInvite],
+	);
 }

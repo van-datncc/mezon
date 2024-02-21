@@ -1,11 +1,20 @@
-import { ClansEntity, clansActions, selectAllClans, selectCurrentClan, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import {
+	ClansEntity,
+	clansActions,
+	selectAllClans,
+	selectCurrentClan,
+	selectCurrentClanId,
+	useAppDispatch,
+	userClanProfileActions,
+} from '@mezon/store';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useClans() {
 	const dispatch = useAppDispatch();
 	const clans = useSelector(selectAllClans);
-	const currentClan = useSelector(selectCurrentClan);	
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClan = useSelector(selectCurrentClan);
 
 	const changeCurrentClan = React.useCallback(
 		async (clanId: string) => {
@@ -50,16 +59,13 @@ export function useClans() {
 
 	return useMemo(
 		() => ({
-		clans,
-		currentClan,
-		getUserClanProfile,
-		updateUserClanProfile,
-		createClans	
-	}), [
-		clans,
-		currentClan,
-		getUserClanProfile,
-		updateUserClanProfile,
-		createClans
-	]);
+			clans,
+			currentClanId,
+			currentClan,
+			getUserClanProfile,
+			updateUserClanProfile,
+			createClans,
+		}),
+		[clans, currentClanId, currentClan, getUserClanProfile, updateUserClanProfile, createClans],
+	);
 }

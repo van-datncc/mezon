@@ -1,7 +1,6 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { useAppParams, useChatChannel } from '@mezon/core';
 import { IMessage } from '@mezon/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 // import mentions from '../MentionMessage/mentions';
 

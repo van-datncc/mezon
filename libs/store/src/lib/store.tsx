@@ -14,7 +14,7 @@ import { channelsReducer } from './channels/channels.slice';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { messagesReducer } from './messages/messages.slice';
-import { PermissionsUserReducer } from './permissionuser/permissionuser.slice';
+import { POLICIES_FEATURE_KEY, policiesReducer } from './policies/policies.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 
@@ -48,7 +48,7 @@ const reducer = {
 	messages: messagesReducer,
 	users: usersReducer,
 	categories: categoriesReducer,
-	permissionuser: PermissionsUserReducer,
+	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
