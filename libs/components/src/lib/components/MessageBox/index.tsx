@@ -7,7 +7,7 @@ import * as Icons from '../Icons';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, convertToRaw } from 'draft-js';
+import { EditorState, SelectionState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
@@ -99,6 +99,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
 			setContent(content);
 			setUserMentioned(mentioned);
+			if(content.length === 1){
+				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+				setEditorState(updatedEditorState)
+			} else return
 		},
 		[onTyping],
 	);
@@ -114,6 +118,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 		// TODO: change the interface of onSend, remove the id and channelId
+		console.log("content", content)
 		onSend({
 			content: { content: content, mentioned: userMentioned },
 			id: '',
@@ -121,8 +126,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			body: { text: '' },
 			channelId: '',
 		});
-		setContent('');
 		setEditorState(() => EditorState.createEmpty());
+		setContent('');
+
 	}, [content, onSend, userMentioned]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
@@ -138,6 +144,24 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return 'not-handled';
 	}
+
+
+	const handleMoveCursorToEnd = () => {
+		const content = editorState.getCurrentContent();
+		const lastBlock = content.getLastBlock();
+		const lastBlockKey = lastBlock.getKey();
+		const lastBlockLength = lastBlock.getLength();
+	
+		const selection = new SelectionState({
+		  anchorKey: lastBlockKey,
+		  anchorOffset: lastBlockLength,
+		  focusKey: lastBlockKey,
+		  focusOffset: lastBlockLength,
+		});
+		const updatedEditorState = EditorState.forceSelection(editorState, selection);
+		setEditorState(updatedEditorState);
+	  };
+
 	return (
 		<div className="flex w-full items-center">
 			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-2 bg-black rounded-md pr-2">
@@ -149,9 +173,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					className={`w-[96%] relative bg-black gap-3`}
 					onClick={() => {
 						ref.current!.focus();
+						handleMoveCursorToEnd();
 					}}
 				>
-					<div className="p-[10px] flex items-center">
+					<div className="p-[10px] flex items-center text-[15px]">
 						<Editor
 							editorKey={'editor'}
 							editorState={editorState}
