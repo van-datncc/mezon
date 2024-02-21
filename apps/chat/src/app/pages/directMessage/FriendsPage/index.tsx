@@ -160,7 +160,7 @@ export default function FriendsPage() {
 				</div>
 				<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-borderDefault">
 					{tabData.map((tab, index) => (
-						<div className="relative">
+						<div key={index} className="relative">
 							<button
 								className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-[#151C2B]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
 								tabIndex={index}
@@ -202,8 +202,8 @@ export default function FriendsPage() {
 								{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 							</span>
 							{listFriendFilter.map((friend: Friend) => (
-								<div className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px]">
-									<div>
+								<div key={friend.user?.id} className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px]">
+									<div key={friend.user?.id}>
 										<MemberProfile
 											avatar={friend?.user?.avatar_url ?? ''}
 											name={friend?.user?.username ?? ''}
