@@ -59,12 +59,11 @@ export type IMessagePayload = IMessage & {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const [listUserMention, setListUserMention] = useState<MentionData[]>(props.memberList ?? []);
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
 			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
 		},
-		[listUserMention],
+		[props.memberList],
 	);
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
@@ -93,10 +92,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
-			const content = convertToRaw(contentState).blocks[0].text;
+			const contentRaw = convertToRaw(contentState).blocks;
+			const content = Object.values(contentRaw).map((item) => item.text);
+			const contentBreakLine = content.join('\n').replace(/,/g, '')
 			const mentionedRaw = convertToRaw(contentState).entityMap;
-			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
-			setContent(content);
+			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
+			setContent(contentBreakLine);
 			setUserMentioned(mentioned);
 			if(content.length === 1){
 				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
