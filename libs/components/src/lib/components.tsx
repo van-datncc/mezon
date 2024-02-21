@@ -10,7 +10,6 @@ export { default as MessageBox } from './components/MessageBox';
 export { default as FooterProfile } from './components/FooterProfile';
 export { default as MemberList } from './components/MemberList';
 export { default as MemberProfile } from './components/MemberProfile';
-export { default as MentionMessage } from './components/MentionMessage/index';
 export { default as Message } from './components/Message';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
 export { default as MessageWithUser } from './components/MessageWithUser';

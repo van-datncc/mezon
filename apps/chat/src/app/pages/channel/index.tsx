@@ -58,7 +58,7 @@ export default function Server() {
 						</div>
 					</div>
 					{isShow && (
-						<div className="w-[268px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
+						<div className="w-[245px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
 							<MemberList />
 						</div>
 					)}

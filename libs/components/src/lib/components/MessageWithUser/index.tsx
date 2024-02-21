@@ -40,7 +40,21 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 
 	const renderMultilineContent = () => {
 		const lines = content.replace(/<br>/g, '\n').split('<br>');
-		return lines.map((line: string, index: number) => <div key={index}>{line}</div>);
+		return lines.map((line: string, index: number) => {
+			const match = line.match(/(@\S+)/);
+			if (match) {
+				const startIndex = match.index || 0;
+				const endIndex = startIndex + match[0].length;
+				return (
+					<div key={index}>
+						<span>{line.substring(0, startIndex)}</span>
+						<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
+						<span>{line.substring(endIndex)}</span>
+					</div>
+				);
+			}
+			return <div key={index}>{line}</div>;
+		});
 	};
 
 	return (

@@ -17,7 +17,6 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const navigate = useNavigate();
 	const { friends } = useChatDirect(undefined);
 	const [length, setLength] = useState<number>(selectedFriends.length);
-	// const { listDM } = useChatDirect(undefined);
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
