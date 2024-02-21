@@ -38,12 +38,19 @@ export type UserTypingState = {
 	timeAt: number;
 };
 
+export type FetchMessageParam = {
+	cursor: string;
+	hasMore? : boolean
+};
+
+
 export interface MessagesState extends EntityState<MessagesEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isSending?: boolean;
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
+	paramEntries: Record<string, FetchMessageParam>;
 }
 
 export interface MessagesRootState {
@@ -60,32 +67,38 @@ export const TYPING_TIMEOUT = 3000;
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
 export const fetchMessagesCached = memoize(
-	(mezon: MezonValueContext, channelId: string) => mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false),
+	(mezon: MezonValueContext, channelId: string, cursor?: string) => mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false, cursor),
 	{
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
-		normalizer: (args) => args[1],
+		// normalizer: (args) => args[1],
 	},
 );
 
 type fetchMessageChannelPayload = {
 	channelId: string;
 	noCache?: boolean;
+	cursor?: string
 };
 
-export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({ channelId, noCache }: fetchMessageChannelPayload, thunkAPI) => {
+export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({ channelId, noCache, cursor }: fetchMessageChannelPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 	if (noCache) {
-		fetchMessagesCached.clear(mezon, channelId);
+		fetchMessagesCached.clear(mezon, channelId, cursor);
 	}
 
-	const response = await fetchMessagesCached(mezon, channelId);
+	const response = await fetchMessagesCached(mezon, channelId,cursor);
 	if (!response.messages) {
 		return thunkAPI.rejectWithValue([]);
 	}
 
 	const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
+
+	const nextCursor = response.cacheable_cursor || ''
+	const hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE  )
+	// console.log('HAS MORE: ', response.messages)
+	thunkAPI.dispatch(messagesActions.setMessageParams({channelId, param: {cursor: nextCursor, hasMore}}));
 
 	if (response.last_seen_message_id) {
 		thunkAPI.dispatch(
@@ -108,6 +121,25 @@ export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({
 
 	return messages;
 });
+
+type loadMoreMess = {
+	channelId: string;
+};
+
+
+export const loadMoreMessage = createAsyncThunk(
+	'messages/loadMoreMessage',
+	async ({ channelId }: loadMoreMess, thunkAPI) => {
+		try {
+			const cursor = selectCursorMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
+			await thunkAPI.dispatch(fetchMessages({channelId, cursor}))
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
+
 
 type UpdateMessageArgs = {
 	channelId: string;
@@ -174,7 +206,14 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	isSending: false,
 	unreadMessagesEntries: {},
 	typingUsers: {},
+	paramEntries: {}
 });
+
+export type SetCursorChannelArgs = {
+	channelId: string;
+	param: FetchMessageParam;
+};
+
 
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
@@ -182,6 +221,9 @@ export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
 	initialState: initialMessagesState,
 	reducers: {
+		setMessageParams : (state, action: PayloadAction<SetCursorChannelArgs>) => {
+			state.paramEntries[action.payload.channelId] = action.payload.param
+		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			messagesAdapter.addOne(state, action.payload);
 			if (action.payload.channel_id) {
@@ -284,6 +326,7 @@ export const messagesActions = {
 	updateLastSeenMessage,
 	updateTypingUsers,
 	sendTypingUser,
+	loadMoreMessage
 };
 
 /*
@@ -308,7 +351,7 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +a.creationTimeMs - +b.creationTimeMs;
+		return +b.creationTimeMs - +a.creationTimeMs;
 	}
 	return 0;
 }
@@ -323,7 +366,7 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.pop();
+		return messages.shift();
 	});
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
@@ -361,4 +404,20 @@ export const selectTypingUsersListByChannelId = (channelId: string) =>
 export const selectTypingUserById = (userId: string) =>
 	createSelector(selectTypingUsers, (typingUsers) => {
 		return typingUsers && typingUsers[userId];
+	});
+
+export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
+export const selectParamByChannelId = (channelId: string) =>
+	createSelector(selectMessageParams, (param) => {
+		return param && param[channelId];
+	});
+
+	export const selectHasMoreMessageByChannelId = (channelId: string) =>
+	createSelector(selectMessageParams, (param) => {
+		return param && param[channelId] && param[channelId].hasMore || false;
+	});
+
+	export const selectCursorMessageByChannelId = (channelId: string) =>
+	createSelector(selectMessageParams, (param) => {
+		return param && param[channelId] && param[channelId].cursor;
 	});

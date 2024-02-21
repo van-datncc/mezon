@@ -1,9 +1,9 @@
 import { useAppNavigation, useClans } from '@mezon/core';
+import { selectAllAccount } from '@mezon/store';
 import { InputField, Modal } from '@mezon/ui';
 import { useState } from 'react';
-import * as Icons from '../Icons';
-import { selectAllAccount } from '@mezon/store';
 import { useSelector } from 'react-redux';
+import * as Icons from '../Icons';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -53,12 +53,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 				</p>
 				<label className="block mt-8 mb-4">
 					{urlImage ? (
-						<img
-							id="preview_img"
-							className="h-[81px] w-[81px] object-cover rounded-full"
-							src={urlImage}
-							alt="Current profile"
-						/>
+						<img id="preview_img" className="h-[81px] w-[81px] object-cover rounded-full" src={urlImage} alt="Current profile" />
 					) : (
 						<div
 							id="preview_img"

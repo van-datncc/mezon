@@ -4,6 +4,7 @@ import {
 	selectAllAccount,
 	selectChannelMemberByUserIds,
 	selectCurrentClanId,
+	selectHasMoreMessageByChannelId,
 	selectLastMessageIdByChannelId,
 	selectTypingUserIdsByChannelId,
 	selectUnreadMessageIdByChannelId,
@@ -25,6 +26,8 @@ export function useChatChannel(channelId: string) {
 	// TODO: maybe add hook for current clan
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { userProfile } = useSelector(selectAllAccount);
+	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
+
 	const { messages } = useMessages({ channelId });
 	const { members } = useChannelMembers({ channelId });
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
@@ -36,6 +39,13 @@ export function useChatChannel(channelId: string) {
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
 
+	const loadMoreMessage =React.useCallback(
+		async () => {
+			
+			dispatch(messagesActions.loadMoreMessage({channelId}))
+		},
+		[dispatch, channelId],
+	);
 	const createLinkInviteUser = React.useCallback(
 		async (clan_id: string, channel_id: string, expiry_time: number) => {
 			const action = await dispatch(
@@ -116,10 +126,12 @@ export function useChatChannel(channelId: string) {
 			unreadMessageId,
 			lastMessageId,
 			typingUsers,
+			hasMoreMessage,
 			sendMessage,
 			createLinkInviteUser,
 			inviteUser,
 			sendMessageTyping,
+			loadMoreMessage
 		}),
 		[
 			client,
@@ -129,10 +141,12 @@ export function useChatChannel(channelId: string) {
 			unreadMessageId,
 			lastMessageId,
 			typingUsers,
+			hasMoreMessage,
 			sendMessage,
 			createLinkInviteUser,
 			inviteUser,
 			sendMessageTyping,
+			loadMoreMessage
 		],
 	);
 }
