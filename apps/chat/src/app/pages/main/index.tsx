@@ -27,8 +27,8 @@ function MyApp() {
 	const quantityPendingRequest = friends.filter((obj) => obj.state === 2).length || 0;
 
 	return (
-		<div className="flex h-screen text-gray-100">
-			<div className="hidden overflow-visible py-4 px-3 space-y-2 bg-bgPrimary md:block scrollbar-hide">
+		<div className="flex h-screen text-gray-100 overflow-hidden">
+			<div className="overflow-visible py-4 px-3 space-y-2 bg-bgPrimary scrollbar-hide">
 				<NavLink to="/chat/direct/friends">
 					<NavLinkComponent active={pathName.includes('direct')}>
 						<div>
@@ -41,7 +41,7 @@ function MyApp() {
 						</div>
 					</NavLinkComponent>
 				</NavLink>
-				<div className="py-2 border-t-2 border-t-borderDefault"></div>
+				<div className="py-2 border-t-2 border-t-borderDefault" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (
 					<NavLink to={`/chat/servers/${currentClan.id}`}>
 						<NavLinkComponent active={!pathName.includes('direct')}>

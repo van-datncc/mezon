@@ -1,6 +1,6 @@
 export const QRSection: React.FC = () => {
 	return (
-		<div className="flex flex-col justify-start items-center w-fit h-fit p-0 gap-y-7 rounded-none">
+		<div className="hidden flex-col justify-start items-center w-fit h-fit p-0 gap-y-7 rounded-none lg:flex">
 			<div className="w-[200px] h-[200px] flex items-center justify-center relative">
 				<img src={'/assets/images/qr-mezon.png'} className="rounded-[8px] border-[4px] border-[#ffffff]" alt="Mezon Logo" />
 				<div className="absolute flex items-center justify-center">

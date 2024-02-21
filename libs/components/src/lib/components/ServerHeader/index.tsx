@@ -69,11 +69,11 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	return (
 		<>
 			{type === 'direct' ? (
-				<div className="px-3 border-b-1 border-bgPrimary font-title font-semibold text-white">
+				<div className="px-3 border-b-1 border-bgPrimary font-title font-semibold text-white border-b-[#000] border-b-[1px] h-[72px] flex items-center">
 					<InputField
 						type="text"
 						placeholder="Find or start a conversation"
-						className="h-[10px] text-[10px] w-full bg-bgTertiary border-borderDefault"
+						className=" text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]"
 					/>
 				</div>
 			) : (

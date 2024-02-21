@@ -10,8 +10,8 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 
 const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, required, ...rest }) => {
 	return (
-		<div>
-			<div className={'text-[14px] mb-2'}>
+		<div className="w-full">
+			<div className={'text-[14px]'}>
 				{label}
 				{required && <span className={'text-colorDanger'}> *</span>}
 			</div>

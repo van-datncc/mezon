@@ -53,7 +53,6 @@ function DirectMessageList() {
 
 	return (
 		<>
-			<hr className="h-[0.08px] w-[272px] mt-[36px] border-[#1E1E1E]" />
 			<div className="absolute">
 				<ModalCreateDM onClose={onClickOpenModal} isOpen={isOpen} />
 			</div>
