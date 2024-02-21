@@ -36,6 +36,7 @@ module.exports = {
 				widChatBoxBreak: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${iconWidth})`,
 				450: '450px',
 				"4/5":"80%",
+				"9/10":"90%",
 			},
 			height: {
 				heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
@@ -46,6 +47,7 @@ module.exports = {
 
 			maxWidth: {
 				'9/10': '90%',
+				'2/5':"40%",
 			},
 
 			maxHeight: {
