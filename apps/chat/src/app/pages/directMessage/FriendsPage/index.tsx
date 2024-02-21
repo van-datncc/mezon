@@ -153,7 +153,7 @@ export default function FriendsPage() {
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start">
+			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-[72px]">
 				<div className="flex flex-row gap-2">
 					<IconFriends />
 					Friend
@@ -177,8 +177,9 @@ export default function FriendsPage() {
 					))}
 				</div>
 				<button
-					className={`px-3 py-[6px] rounded-[4px]  ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'}`}
+					className={`px-3 py-[6px] rounded-[4px]  ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
 					onClick={handleOpenRequestFriend}
+					style={{ whiteSpace: 'nowrap' }}
 				>
 					Add Friend
 				</button>
@@ -192,9 +193,9 @@ export default function FriendsPage() {
 									type="text"
 									onChange={(e) => setTextSearch(e.target.value)}
 									placeholder="Search"
-									className="mb-6 py-[10px] text-[14px]"
+									className="mb-6 py-[10px] text-[14px] h-[44px] placeholder-gray-600"
 								/>
-								<div className="absolute top-5 right-5">
+								<div className="absolute top-3 right-5">
 									<Search />
 								</div>
 							</div>
@@ -202,7 +203,10 @@ export default function FriendsPage() {
 								{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 							</span>
 							{listFriendFilter.map((friend: Friend) => (
-								<div key={friend.user?.id} className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px]">
+								<div
+									key={friend.user?.id}
+									className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px]"
+								>
 									<div key={friend.user?.id}>
 										<MemberProfile
 											avatar={friend?.user?.avatar_url ?? ''}
@@ -333,7 +337,7 @@ export default function FriendsPage() {
 						</div>
 					)}
 				</div>
-				<div className="w-[420px] bg-bgTertiary lg:flex hidden"></div>
+				<div className="w-[416px] max-w-2/5 bg-bgTertiary lg:flex hidden"></div>
 			</div>
 		</div>
 	);
