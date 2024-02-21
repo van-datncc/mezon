@@ -79,13 +79,13 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Advanced</button>
 				<br />
 				<button
-					className={`pt-1 pl-1 text-white ${selectedButton === 'LogOut' ? 'bg-blue-400' : ''} mt-[16px] w-[170px] text-left rounded-[5px]`}
+					className={`pt-1 pl-1 text-white ${selectedButton === 'Log Out' ? 'bg-blue-400' : ''} mt-[16px] w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
-						handleButtonClick('LogOut');
+						handleButtonClick('Log Out');
 						handleOpenModal();
 					}}
 				>
-					LogOut
+					Log Out
 				</button>
 				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
 			</div>

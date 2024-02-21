@@ -1,19 +1,21 @@
-import { useAuth, useChat } from '@mezon/core';
-import { channelsActions, useAppDispatch } from '@mezon/store';
+import { useAuth, useCategory, useClans, useInvite } from '@mezon/core';
+import { channelsActions, selectAllPermissionsUser, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
-import { CreateNewChannelModal } from 'libs/components/src/lib/components/CreateChannelModal/index';
 import { useState } from 'react';
 import ChannelLink from '../ChannelLink';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
+import { CreateNewChannelModal } from '../CreateChannelModal';
+import { useSelector } from 'react-redux';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
 	const { userProfile } = useAuth();
-	const { categorizedChannels, currentChanel } = useChat();
+	const { categorizedChannels } = useCategory();
+	const currentChanel = useSelector(selectCurrentChannel);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
 		categorizedChannels.reduce((acc, category) => {
 			acc[category.id] = false;
@@ -35,7 +37,10 @@ function ChannelList() {
 		}
 	};
 
-	const { currentClan, createLinkInviteUser, permissionsUser } = useChat();
+	const { currentClan } = useClans();
+	const { createLinkInviteUser } = useInvite();
+	
+	const permissionsUser = useSelector(selectAllPermissionsUser);
 	const containsViewChannelPermission = permissionsUser.some((permission) => permission.slug === 'administrator');
 	const shouldDisplayButton = currentClan?.creator_id === userProfile?.user?.id || containsViewChannelPermission;
 	const dispatch = useAppDispatch();

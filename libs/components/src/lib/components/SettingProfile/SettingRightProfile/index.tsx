@@ -1,9 +1,9 @@
-import { useChat } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { useEffect, useState } from 'react';
 import SettingRightClan from '../SettingRightClanProfile';
 import SettingRightUser from '../SettingRightUserProfile';
 const SettingRightProfile = () => {
-	const { userProfile } = useChat();
+	const { userProfile } = useAuth();
 	const [isUserSettings, setIsUserSettings] = useState(true);
 
 	const handleClanProfileClick = () => {

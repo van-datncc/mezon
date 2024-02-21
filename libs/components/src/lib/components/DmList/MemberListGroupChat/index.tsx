@@ -1,4 +1,4 @@
-import { useAppParams, useChat, useChatDirect } from '@mezon/core';
+import { useAppParams, useChatDirect } from '@mezon/core';
 import { MemberProfile } from '@mezon/components';
 import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';

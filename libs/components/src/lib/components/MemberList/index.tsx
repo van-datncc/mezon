@@ -1,13 +1,13 @@
-import { useChat } from '@mezon/core';
 import { MemberProfile } from '@mezon/components';
-import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
+import { useChannelMembers } from '@mezon/core';
+import { ChannelMembersEntity, selectCurrentChannelId, selectMembersByChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 export type MemberListProps = { className?: string };
 
 function MemberList() {
-	const { members, currentChanel } = useChat();
-	const rawMembers = useSelector(selectMembersByChannelId(currentChanel?.channel_id));
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const rawMembers = useSelector(selectMembersByChannelId(currentChannelId));
 	return (
 		<>
 			<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">

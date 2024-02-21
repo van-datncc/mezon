@@ -1,5 +1,5 @@
-import { useAppNavigation, useChat } from '@mezon/core';
-import { RootState, channelsActions, createNewChannel, useAppDispatch } from '@mezon/store';
+import { useAppNavigation } from '@mezon/core';
+import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { ChannelTypeEnum } from 'libs/utils/src/lib/typings/index';
 import { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ import { CreateChannelButton } from './CreateChannelButton';
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
 
-	const { currentClanId } = useChat();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const currentCategory = useSelector((state: RootState) => state.channels.currentCategory);
 	const isOpenModal = useSelector((state: RootState) => state.channels.isOpenCreateNewChannel);
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);

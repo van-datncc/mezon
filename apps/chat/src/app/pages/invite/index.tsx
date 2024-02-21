@@ -1,4 +1,4 @@
-import { useChat } from '@mezon/core';
+import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Button, Modal } from 'flowbite-react';
@@ -11,7 +11,7 @@ export default function InvitePage() {
 
 	const { inviteId: inviteIdParam } = useParams();
 	const navigate = useNavigate();
-	const { inviteUser, getLinkInvite } = useChat();
+	const { inviteUser, getLinkInvite } = useInvite();
 
 	const joinChannel = async () => {
 		if (inviteIdParam) {
