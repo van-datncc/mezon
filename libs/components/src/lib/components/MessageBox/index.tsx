@@ -4,10 +4,10 @@ import * as Icons from '../Icons';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import { IMessageSendPayload } from '@mezon/utils';
 import { EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-import { IMessageSendPayload } from '@mezon/utils';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -110,7 +110,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		onSend({text: content, mentioned: userMentioned});
+		onSend({ text: content, mentioned: userMentioned });
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
 	}, [content, onSend, userMentioned]);
