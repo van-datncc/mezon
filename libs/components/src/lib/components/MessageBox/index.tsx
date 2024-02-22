@@ -109,15 +109,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [content, setContent] = useState('');
 
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-	useEffect(() => {
-		if (content.length === 1 || content === '@') {
-			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-			setEditorState(updatedEditorState);
-		} else setEditorState(editorState);
-		if (content.length === 0) {
-			setShowPlaceHolder(true);
-		} else setShowPlaceHolder(false);
-	}, [content]);
+
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
@@ -133,6 +125,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
 	}, [content, onSend, userMentioned]);
+
+	useEffect(() => {
+		if (content.length === 1 || content === '@') {
+			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+			setEditorState(updatedEditorState);
+		} else setEditorState(editorState);
+		if (content.length === 0) {
+			setShowPlaceHolder(true);
+		} else setShowPlaceHolder(false);
+	}, [content,handleSend]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
