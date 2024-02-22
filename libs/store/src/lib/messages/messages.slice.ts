@@ -21,7 +21,12 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 		creationTime,
 		creationTimeMs,
 		id: channelMess.message_id || '',
-		user: null,
+		user: {
+			name: channelMess.username || '',
+			username: channelMess.username || '',
+			id: channelMess.sender_id || 'idUser',
+			avatarSm: '',
+		},
 		lastSeen: lastSeenId === channelMess.message_id,
 	};
 };
