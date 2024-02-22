@@ -1,4 +1,4 @@
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, selectMembersMap, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, selectCurrentChannelId, selectMembersMap, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -22,8 +22,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
-
-	const membersMap = useSelector(selectMembersMap);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const membersMap = useSelector(selectMembersMap(currentChannelId));
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessage) => {
