@@ -16,6 +16,7 @@ export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
 		<div id="scrollableDiv" style={{
 			height: '100%',
 			// overflow: "scroll",
+			overflowY: "scroll",
 			display: "flex",
 			flexDirection: "column-reverse",
 
