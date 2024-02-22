@@ -21,6 +21,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 		creationTime,
 		creationTimeMs,
 		id: channelMess.message_id || '',
+		date: new Date().toLocaleString(),
 		user: {
 			name: channelMess.username || '',
 			username: channelMess.username || '',
