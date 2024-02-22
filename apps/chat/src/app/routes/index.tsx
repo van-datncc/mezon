@@ -7,7 +7,8 @@ import MainLayout from '../layouts/MainLayout';
 import ServerLayout from '../layouts/ServerLayout';
 
 // Pages
-import Chanel from '../pages/channel';
+import ChannellayOut from '../pages/channel';
+
 import DirectMain from '../pages/directMessage';
 import InvitePage from '../pages/invite';
 import Login from '../pages/login';
@@ -97,7 +98,7 @@ export const routes = createBrowserRouter([
 																path: ':channelId',
 																loader: channelLoader,
 																shouldRevalidate: shouldRevalidateChannel,
-																element: <Chanel />,
+																element: <ChannellayOut />,
 															},
 														],
 													},

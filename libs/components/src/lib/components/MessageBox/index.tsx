@@ -58,6 +58,7 @@ export type IMessagePayload = IMessage & {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
+	console.log("rerrnder-MessageBox")
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
 			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));

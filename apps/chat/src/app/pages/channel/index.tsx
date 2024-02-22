@@ -1,26 +1,18 @@
-import { ChannelList, ChannelTopbar, FooterProfile, MemberList, ServerHeader } from '@mezon/components';
+import { MemberList } from '@mezon/components';
 import { useAuth, useChatChannel, useClans } from '@mezon/core';
 import { RootState, selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import Setting from '../setting';
 import ChannelMessages from './ChanneMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
 
-export default function Server() {
+export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 
 	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
 	const currentChanel = useSelector(selectCurrentChannel);
-	const { currentClan } = useClans();
-	const { userProfile } = useAuth();
-	const [openSetting, setOpenSetting] = useState(false);
-
-	const handleOpenCreate = () => {
-		setOpenSetting(true);
-	};
 
 	// New message always display in bottomn
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -34,18 +26,7 @@ export default function Server() {
 	// TODO: move clan related component to clan page
 	return (
 		<>
-			<div className="flex flex-col w-[272px] bg-bgSurface relative">
-				<ServerHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
-				<ChannelList />
-				<FooterProfile
-					name={userProfile?.user?.username || ''}
-					status={userProfile?.user?.online}
-					avatar={userProfile?.user?.avatar_url || ''}
-					openSetting={handleOpenCreate}
-				/>
-			</div>
 			<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
-				<ChannelTopbar channel={currentChanel} />
 				<div className="flex h-heightWithoutTopBar flex-row ">
 					<div className="flex flex-col flex-1 w-full h-full">
 						<div
@@ -66,12 +47,6 @@ export default function Server() {
 					)}
 				</div>
 			</div>
-			<Setting
-				open={openSetting}
-				onClose={() => {
-					setOpenSetting(false);
-				}}
-			/>
 		</>
 	);
 }
