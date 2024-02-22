@@ -1,7 +1,7 @@
 import { MemberList } from '@mezon/components';
-import { useAuth, useChatChannel, useChatMessages, useClans } from '@mezon/core';
+import { useChatMessages } from '@mezon/core';
 import { RootState, selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChanneMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';

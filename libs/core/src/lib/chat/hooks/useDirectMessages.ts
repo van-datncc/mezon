@@ -16,7 +16,6 @@ export type UseDirectMessagesOptions = {
 };
 
 export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
-
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 
 	const client = clientRef.current;

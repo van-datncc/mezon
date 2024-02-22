@@ -10,9 +10,12 @@ export function useFriends() {
 		return friends.filter((obj) => obj.state === 2).length || 0;
 	}, [friends]);
 
-	const addFriend = useCallback(async (requestAddFriend: requestAddFriendParam) => {
-		await dispatch(friendsActions.sendRequestAddFriend(requestAddFriend));
-	}, [dispatch]);
+	const addFriend = useCallback(
+		async (requestAddFriend: requestAddFriendParam) => {
+			await dispatch(friendsActions.sendRequestAddFriend(requestAddFriend));
+		},
+		[dispatch],
+	);
 
 	const acceptFriend = useCallback(
 		(userName: string, id: string) => {

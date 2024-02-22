@@ -6,7 +6,7 @@ type ChannelTypingProps = {
 };
 
 export function ChannelTyping({ channelId }: ChannelTypingProps) {
-	const { typingUsers } = useChatTypings({ channelId })
+	const { typingUsers } = useChatTypings({ channelId });
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {

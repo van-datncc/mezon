@@ -1,10 +1,6 @@
 import { IconChat, IconEditThreeDot, IconFriends, MemberProfile, Search } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
-import {
-	FriendsEntity,
-	RootState, friendsActions,
-	requestAddFriendParam, useAppDispatch
-} from '@mezon/store';
+import { FriendsEntity, RootState, friendsActions, requestAddFriendParam, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import { useState } from 'react';

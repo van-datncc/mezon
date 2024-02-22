@@ -1,10 +1,16 @@
-import { messagesActions, selectHasMoreMessageByChannelId, selectLastMessageIdByChannelId, selectMessageByChannelId, selectUnreadMessageIdByChannelId, useAppDispatch } from '@mezon/store';
-import { useMemo } from 'react';
+import {
+	messagesActions,
+	selectHasMoreMessageByChannelId,
+	selectLastMessageIdByChannelId,
+	selectMessageByChannelId,
+	selectUnreadMessageIdByChannelId,
+	useAppDispatch,
+} from '@mezon/store';
+import { useMezon } from '@mezon/transport';
+import { IMessageSendPayload } from '@mezon/utils';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useClans } from './useClans';
-import React from 'react';
-import { IMessageSendPayload } from '@mezon/utils';
-import { useMezon } from '@mezon/transport';
 
 export type useMessagesOptions = {
 	channelId: string;
@@ -17,7 +23,6 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
-
 
 	const messages = useSelector(selectMessageByChannelId(channelId));
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
@@ -35,7 +40,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 				console.log(client, session, socket, channel, currentClanId);
 				throw new Error('Client is not initialized');
 			}
-			
+
 			await socket.writeChatMessage(currentClanId, channel.id, message);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
@@ -45,13 +50,16 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
-	return useMemo(() => ({
-		client,
-		messages,
-		unreadMessageId,
-		lastMessageId,
-		hasMoreMessage,
-		sendMessage,
-		loadMoreMessage,
-	}), [client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendMessage, loadMoreMessage]);
+	return useMemo(
+		() => ({
+			client,
+			messages,
+			unreadMessageId,
+			lastMessageId,
+			hasMoreMessage,
+			sendMessage,
+			loadMoreMessage,
+		}),
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendMessage, loadMoreMessage],
+	);
 }

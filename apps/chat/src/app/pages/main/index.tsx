@@ -4,7 +4,7 @@ import { selectAllClans, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { NavLink, useFetchers, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 
 function MyApp() {

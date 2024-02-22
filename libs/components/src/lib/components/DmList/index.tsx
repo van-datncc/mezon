@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useDirect } from '@mezon/core';
+import { useAppNavigation, useDirect } from '@mezon/core';
 import { RootState, directActions, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';

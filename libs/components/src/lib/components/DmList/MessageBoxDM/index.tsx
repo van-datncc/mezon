@@ -1,9 +1,9 @@
+import { useDirectMessages } from '@mezon/core';
 import { RootState } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import MessageBox from '../../MessageBox';
-import { useDirectMessages } from '@mezon/core';
 
 interface DirectIdProps {
 	directParamId: string;
