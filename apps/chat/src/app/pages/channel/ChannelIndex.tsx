@@ -1,4 +1,3 @@
-import { MemberList } from '@mezon/components';
 import { useAppNavigation, useAppParams } from '@mezon/core';
 import { selectDefaultChannelIdByClanId } from '@mezon/store';
 import { useEffect } from 'react';
@@ -29,9 +28,9 @@ export function ChannelIndex() {
 						</div>
 					</div>
 					(
-					<div className="w-[245px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
+					{/* <div className="w-[245px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
 						<MemberList />
-					</div>
+					</div> */}
 					)
 				</div>
 			</div>
