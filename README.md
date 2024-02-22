@@ -36,7 +36,7 @@ To start the development server run `nx run dev:chat`. Open your browser and nav
 
 ## Architecture Overview
 
-[![Architecture Overview](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)
+[![Architecture Overview](./docs/mezon-overview.png)](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)
 
 ## Workspace Structure
 
