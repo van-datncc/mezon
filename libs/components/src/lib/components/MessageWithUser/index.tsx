@@ -18,15 +18,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [message, preMessage]);
 
 	const content = useMemo(() => {
-		if (typeof message.content === 'string') {
-			return message.content;
-		}
-
-		if (typeof message.content === 'object') {
-			if (typeof (message.content as unknown as any).text === 'string') {
-				return (message.content as unknown as any).text;
-			}
-		}
+		return message.content['text'];
 	}, [message]);
 
 	const isCombine = useMemo(() => {
