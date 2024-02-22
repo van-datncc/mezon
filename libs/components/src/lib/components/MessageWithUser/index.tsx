@@ -109,8 +109,8 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 						</div>
 					</div>
 				</div>
-				{message && (
-					<div className="absolute top-[100] right-2 flex flex-row items-center gap-x-1 text-xs text-gray-600">
+				{message && ( 
+					<div className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}>
 						<Icons.Sent />
 					</div>
 				)}
