@@ -40,19 +40,29 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 
 	const renderMultilineContent = () => {
 		const lines = content.split('\n');
+		const mentionRegex = /(@\w+)/g;
+
 		return lines.map((line: string, index: number) => {
-			const match = line.match(/(@\S+)/);
-			if (match) {
-				const startIndex = match.index || 0;
-				const endIndex = startIndex + match[0].length;
-				return (
-					<div key={index}>
-						<span>{line.substring(0, startIndex)}</span>
-						<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
-						<span>{line.substring(endIndex)}</span>
-					</div>
-				);
+			const matches = line.match(mentionRegex);
+
+			if (matches) {
+				let lastIndex = 0;
+				const elements = matches.map((match, i) => {
+					const startIndex = line.indexOf(match, lastIndex);
+					const endIndex = startIndex + match.length;
+					const nonMatchText = line.substring(lastIndex, startIndex);
+					lastIndex = endIndex;
+					return (
+						<span key={i}>
+							{nonMatchText && <span>{nonMatchText}</span>}
+							<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
+						</span>
+					);
+				});
+				elements.push(<span key={matches.length}>{line.substring(lastIndex)}</span>);
+				return <div key={index}>{elements}</div>;
 			}
+
 			return (
 				<div key={index} className="w-full">
 					{line}
@@ -94,7 +104,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 							</div>
 						)}
 						<div className="justify-start items-center inline-flex">
-							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px]  w-widthMessageTextChat">
+							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px]">
 								{renderMultilineContent()}
 							</div>
 						</div>

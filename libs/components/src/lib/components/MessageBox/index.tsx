@@ -5,7 +5,7 @@ import * as Icons from '../Icons';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, RichUtils, SelectionState, convertToRaw } from 'draft-js';
+import { EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
@@ -84,8 +84,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const { onSend, onTyping } = props;
 
-
-
 	const onChange = useCallback(
 		(editorState: EditorState) => {
 			if (typeof onTyping === 'function') {
@@ -95,40 +93,36 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const contentState = editorState.getCurrentContent();
 			const contentRaw = convertToRaw(contentState).blocks;
 			const content = Object.values(contentRaw).map((item) => item.text);
-			const contentBreakLine = content.join('\n').replace(/,/g, '')
+			const contentBreakLine = content.join('\n').replace(/,/g, '');
 			const mentionedRaw = convertToRaw(contentState).entityMap;
 			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
 			setContent(contentBreakLine);
 			setUserMentioned(mentioned);
-
 		},
 		[onTyping],
 	);
-
-
 
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
 	}, []);
 
 	const [content, setContent] = useState('');
-	
-	const [showPlaceHolder, setShowPlaceHolder] = useState(false)
-	useEffect(()=>{
-		if(content.length === 1){
-				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-				setEditorState(updatedEditorState)
-		} else setEditorState(editorState)
-		if(content.length === 0){
-			setShowPlaceHolder(true)
-		} else setShowPlaceHolder(false)
-	},[content])
+
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
+	useEffect(() => {
+		if (content.length === 1 || content === '@') {
+			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+			setEditorState(updatedEditorState);
+		} else setEditorState(editorState);
+		if (content.length === 0) {
+			setShowPlaceHolder(true);
+		} else setShowPlaceHolder(false);
+	}, [content]);
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
 		}
 		// TODO: change the interface of onSend, remove the id and channelId
-		console.log("content", content)
 		onSend({
 			content: { content: content, mentioned: userMentioned },
 			id: '',
@@ -143,7 +137,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			return 'onsend';
-		} return;
+		}
+		return;
 	}
 
 	function handleKeyCommand(command: string) {
@@ -156,7 +151,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	return (
 		<div className="flex w-full items-center">
-			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-2 bg-black rounded-md pr-2">
+			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
 				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
 					<Icons.AddCircle />
 				</div>
@@ -177,9 +172,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							keyBindingFn={keyBindingFn}
 							handleKeyCommand={handleKeyCommand}
 						/>
-						{ showPlaceHolder &&
-						<p className='absolute text-gray-500'>Write your thoughs here...</p>
-						}
+						{showPlaceHolder && <p className="absolute text-gray-300">Write your thoughs here...</p>}
 					</div>
 
 					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">
