@@ -95,7 +95,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 						</div>
 					)}
 					<div className="justify-start items-center inline-flex">
-						<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px]">
+						<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
 							{renderMultilineContent()}
 						</div>
 					</div>
