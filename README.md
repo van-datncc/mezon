@@ -8,9 +8,20 @@
 
 `npm install --global nx@latest`
 
+
+## Notes
+
+-  using `Git Bash` to run the commands
+-  using `VSCode` as the code editor
+
+
 ## Sync dependencies
 
 -   Run `npm run sync` to sync dependencies
+
+## Start the app
+
+To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
 
 ## Linting
 
@@ -22,17 +33,10 @@
 -   Run `npm run format` to format the codebase
 -   Run `npm run format:fix` to fix the formatting issues
 
-## Start the app
-
-To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
-
-## Notes
-
--   using `Git Bash` to run the commands
 
 ## Architecture Overview
 
-<iframe src="https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview" width="640" height="480"></iframe>
+[![Architecture Overview](./docs/mezon-overview.png)](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)
 
 ## Workspace Structure
 
@@ -80,7 +84,7 @@ The core concepts are `one-way` data flow and `single source of truth`.
 
 The application data flow is managed by some packages:
 
--   `mez-js`: The core package to communicate with the server through `WebSocket` and `REST` API
+-   `mezon-js`: The core package to communicate with the server through `WebSocket` and `REST` API
     -   `WebSocket`: send and listen to the messages from the server
     -   `REST`: send and receive the messages from the server
 -   `store`: The state management package to manage the state of the application. store is divided into multiple slices, each slice is a standalone slice and has its own reducer, action, and selector.
@@ -94,6 +98,20 @@ The application data flow is managed by some packages:
     -   loader: The loader to load the component dynamically
     -   route: The route to navigate to the component
     -   page: The page to render the component
+
+### Data concept
+
+- When the application starts, based on the initial route, the application will load the components and pages
+- Before render components and pages, the application will trigger `loader` to load the initial data
+- The `loader` will trigger the `action` to fetch the data from the server
+- The component will render the data based on the state of the store
+- The dispatched action will trigger an `asyncThunk` to fetch the data from the server using `mezon-js` package
+- The `asyncThunk` returns the data from the server and updates the state of the store by an `extraReducers` function
+- The component or hook will select the data from the store using `useSelector`
+- the selectors will select the data from the store based on the state of the store
+- When user interacts with the component, the component will dispatch the action to update the state of the store
+- We could group the data and logic into a custom hook to manage the data and logic of the component
+- The component could use the custom hook to manage the data and logic of the component
 
 ### Access Control
 
@@ -120,14 +138,36 @@ We have sevaral layout components to handle layout based on the route:
 -   `Main`: The main page to render the global components
 -   `/chat/server/:id` - `ServerLayout`: The layout for the server page
 -   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
+- routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
+- We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
+
+## Performance Optimization
+
+### Performance Factors
+
+The application performance is mostly affected by these factors:
+
+- The routing structure: we keep the routing straitforward and simple, make sure that one route is only re-render when the route changes
+- Unnecessary re-render: we use `memo` and `useMemo` to prevent unnecessary re-render
+- Memory leak: we use `useEffect` and `clear function` to prevent memory leak
+- Function changes reference: we use `useCallback` to prevent function changes reference
+- Api calls: we use `store` and `memoizee` to cache the api calls
+- Wrong level of abstraction: we use `custom hook` to manage the data and logic of the component, make sure that the custom hook group data of same level of abstraction, and not re-render the component when the unrelated data changes
+
+### Performance Tools
+
+We use several tools to measure the performance of the application:
+
+-  `React DevTools`: to measure the performance of the application
+-  `Chrome DevTools`: to measure the performance of the application
 
 ## Conventions and Guidelines
 
-## Code Style
+## Code Formatting
 
 Using `Prettier` and `ESLint` to format the codebase. The codebase should be formatted before committing the code.
 
-## file naming
+## Naming Convention
 
 -   `PascalCase` for the components and pages
 -   `camelCase` for the functions and variables

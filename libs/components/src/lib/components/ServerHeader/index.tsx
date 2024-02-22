@@ -77,8 +77,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 					/>
 				</div>
 			) : (
-				<>
-					<div className={`${bannerImage ? 'h-[136px]' : 'h-[49px]'} relative`}>
+				<div className={`${bannerImage ? 'h-[136px]' : 'h-[49px]'} relative`}>
 						{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
 						<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-[59px] justify-between items-center gap-2">
 							<p className="text-white text-lg font-bold">{name?.toLocaleUpperCase()}</p>
@@ -117,7 +116,6 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 							</Dropdown>
 						</div>
 					</div>
-				</>
 			)}
 			<ModalInvite
 				title="Invite friend"

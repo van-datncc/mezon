@@ -1,5 +1,4 @@
 import {
-	clansActions,
 	messagesActions,
 	selectAllAccount,
 	selectChannelMemberByUserIds,
@@ -14,7 +13,6 @@ import { useMezon } from '@mezon/transport';
 import { IMessage } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useChannelMembers } from './useChannelMembers';
 import { useMessages } from './useMessages';
 import { useThreads } from './useThreads';
@@ -45,30 +43,7 @@ export function useChatChannel(channelId: string) {
 			dispatch(messagesActions.loadMoreMessage({channelId}))
 		},
 		[dispatch, channelId],
-	);
-	const createLinkInviteUser = React.useCallback(
-		async (clan_id: string, channel_id: string, expiry_time: number) => {
-			const action = await dispatch(
-				clansActions.createLinkInviteUser({
-					clan_id: clan_id,
-					channel_id: channel_id,
-					expiry_time: expiry_time,
-				}),
-			);
-			const payload = action.payload as ApiLinkInviteUser;
-			return payload;
-		},
-		[dispatch],
-	);
-
-	const inviteUser = React.useCallback(
-		async (invite_id: string) => {
-			const action = await dispatch(clansActions.inviteUser({ inviteId: invite_id }));
-			const payload = action.payload as ApiInviteUserRes;
-			return payload;
-		},
-		[dispatch],
-	);
+	);	
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(messagesActions.sendTypingUser({ channelId }));
@@ -128,8 +103,6 @@ export function useChatChannel(channelId: string) {
 			typingUsers,
 			hasMoreMessage,
 			sendMessage,
-			createLinkInviteUser,
-			inviteUser,
 			sendMessageTyping,
 			loadMoreMessage
 		}),
@@ -143,8 +116,6 @@ export function useChatChannel(channelId: string) {
 			typingUsers,
 			hasMoreMessage,
 			sendMessage,
-			createLinkInviteUser,
-			inviteUser,
 			sendMessageTyping,
 			loadMoreMessage
 		],
