@@ -1,11 +1,10 @@
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, selectAllAccount, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent, Notification, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
-import { useSelector } from 'react-redux';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
