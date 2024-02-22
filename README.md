@@ -141,6 +141,26 @@ We have sevaral layout components to handle layout based on the route:
 - routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
 - We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
 
+## Performance Optimization
+
+### Performance Factors
+
+The application performance is mostly affected by these factors:
+
+- The routing structure: we keep the routing straitforward and simple, make sure that one route is only re-render when the route changes
+- Unnecessary re-render: we use `memo` and `useMemo` to prevent unnecessary re-render
+- Memory leak: we use `useEffect` and `clear function` to prevent memory leak
+- Function changes reference: we use `useCallback` to prevent function changes reference
+- Api calls: we use `store` and `memoizee` to cache the api calls
+- Wrong level of abstraction: we use `custom hook` to manage the data and logic of the component, make sure that the custom hook group data of same level of abstraction, and not re-render the component when the unrelated data changes
+
+### Performance Tools
+
+We use several tools to measure the performance of the application:
+
+-  `React DevTools`: to measure the performance of the application
+-  `Chrome DevTools`: to measure the performance of the application
+
 ## Conventions and Guidelines
 
 ## Code Formatting

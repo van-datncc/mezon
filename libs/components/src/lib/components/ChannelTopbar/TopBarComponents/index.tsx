@@ -5,34 +5,30 @@ import { ChannelProps, ChannelStatusEnum, ChannelTypeEnum, ThreadNameProps } fro
 
 export const ChannelLable: React.FC<ChannelProps> = ({ isPrivate, type, name }) => {
 	return (
-		<>
-			<div className="flex flex-row items-center relative">
-				<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">
-					{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_VOICE && (
-						<Icons.SpeakerLocked defaultSize="w-6 h-6" />
-					)}
-					{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_TEXT && (
-						<Icons.HashtagLocked defaultSize="w-6 h-6 " />
-					)}
-					{isPrivate === undefined && type === ChannelTypeEnum.CHANNEL_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
-					{isPrivate === undefined && type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
-				</div>
-
-				<p className="mb-0.5 text-zinc-400 font-thin font-['Manrope'] ml-7 mt-2">{name}</p>
+		<div className="flex flex-row items-center relative">
+			<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">
+				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_VOICE && (
+					<Icons.SpeakerLocked defaultSize="w-6 h-6" />
+				)}
+				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_TEXT && (
+					<Icons.HashtagLocked defaultSize="w-6 h-6 " />
+				)}
+				{isPrivate === undefined && type === ChannelTypeEnum.CHANNEL_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
+				{isPrivate === undefined && type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
-		</>
+
+			<p className="mb-0.5 text-zinc-400 font-thin font-['Manrope'] ml-7 mt-2">{name}</p>
+		</div>
 	);
 };
 
 export const ThreadLable: React.FC<ThreadNameProps> = ({ name }) => {
 	return (
-		<>
-			<div className="items-center flex flex-row gap-1">
-				<Icons.ArrowToThread />
-				<Icons.ThreadNotClick />
-				<p className="text-white mb-0.5 font-thin font-['Manrope']"> {name}</p>
-			</div>
-		</>
+		<div className="items-center flex flex-row gap-1">
+			<Icons.ArrowToThread />
+			<Icons.ThreadNotClick />
+			<p className="text-white mb-0.5 font-thin font-['Manrope']"> {name}</p>
+		</div>
 	);
 };
 
