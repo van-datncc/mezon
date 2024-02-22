@@ -1,5 +1,5 @@
 import { EPermission } from '@mezon/utils';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useUserPolicy } from '../hooks/useUserPolicy';
 
 type Props = {
@@ -16,11 +16,7 @@ export const MezonPolicy = React.createContext<MezonPolicyValue>({
 });
 
 export function MezonPolicyProvider({ children, clanId }: Props) {
-	const { permissionKeys, fetchPolicies } = useUserPolicy(clanId);
-
-	// useEffect(() => {
-	// 	fetchPolicies();
-	// }, [permissionKeys, clanId, fetchPolicies]);
+	const { permissionKeys } = useUserPolicy(clanId);
 
 	const value = React.useMemo(() => ({ permissionKeys }), [permissionKeys]);
 

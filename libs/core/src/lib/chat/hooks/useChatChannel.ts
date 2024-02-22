@@ -34,13 +34,9 @@ export function useChatChannel(channelId: string) {
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
 
-	const loadMoreMessage =React.useCallback(
-		async () => {
-			
-			dispatch(messagesActions.loadMoreMessage({channelId}))
-		},
-		[dispatch, channelId],
-	);	
+	const loadMoreMessage = React.useCallback(async () => {
+		dispatch(messagesActions.loadMoreMessage({ channelId }));
+	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(messagesActions.sendTypingUser({ channelId }));
@@ -75,7 +71,7 @@ export function useChatChannel(channelId: string) {
 			hasMoreMessage,
 			sendMessage,
 			sendMessageTyping,
-			loadMoreMessage
+			loadMoreMessage,
 		}),
 		[
 			client,
@@ -88,7 +84,7 @@ export function useChatChannel(channelId: string) {
 			hasMoreMessage,
 			sendMessage,
 			sendMessageTyping,
-			loadMoreMessage
+			loadMoreMessage,
 		],
 	);
 }

@@ -80,27 +80,27 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 				</div>
 			) : (
 				<div className={`${bannerImage ? 'h-[136px]' : 'h-[49px]'} relative`}>
-						{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
-						<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-[59px] justify-between items-center gap-2">
-							<p className="text-white text-lg font-bold">{name?.toLocaleUpperCase()}</p>
-							<Dropdown
-								label=""
-								className="bg-bgTertiary border-borderDefault text-contentPrimary p-2 w-[240px] text-[14px]"
-								dismissOnClick={true}
-								placement="bottom-end"
-								renderTrigger={() => (
-									<button className="w-6 h-8 relative flex flex-col justify-center">
-										<Icons.ArrowDown />
-									</button>
-								)}
+					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
+					<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-[59px] justify-between items-center gap-2">
+						<p className="text-white text-lg font-bold">{name?.toLocaleUpperCase()}</p>
+						<Dropdown
+							label=""
+							className="bg-bgTertiary border-borderDefault text-contentPrimary p-2 w-[240px] text-[14px]"
+							dismissOnClick={true}
+							placement="bottom-end"
+							renderTrigger={() => (
+								<button className="w-6 h-8 relative flex flex-col justify-center">
+									<Icons.ArrowDown />
+								</button>
+							)}
+						>
+							<Dropdown.Item
+								icon={MdOutlineCreateNewFolder}
+								theme={{
+									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
+								}}
+								onClick={() => setOpenCreateCate(true)}
 							>
-								<Dropdown.Item
-									icon={MdOutlineCreateNewFolder}
-									theme={{
-										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-									}}
-									onClick={() => setOpenCreateCate(true)}
-								>
 									Create category
 								</Dropdown.Item>
 								<Dropdown.Item
