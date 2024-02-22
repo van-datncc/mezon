@@ -25,7 +25,7 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 		[ChannelTypeEnum.GROUP_CHAT]: <Icons.Speaker defaultSize="w-6 h-6" />,
 	};
 
-	return (		
+	return (
 		<div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">
 			<ChannelLableModal labelProp={channelNameProps} />
 			<div className="ContentContainer self-stretch h-11 flex-col items-start flex">

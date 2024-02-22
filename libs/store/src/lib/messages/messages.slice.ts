@@ -39,9 +39,8 @@ export type UserTypingState = {
 
 export type FetchMessageParam = {
 	cursor: string;
-	hasMore? : boolean
+	hasMore?: boolean;
 };
-
 
 export interface MessagesState extends EntityState<MessagesEntity, string> {
 	loadingStatus: LoadingStatus;
@@ -66,7 +65,8 @@ export const TYPING_TIMEOUT = 3000;
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
 export const fetchMessagesCached = memoize(
-	(mezon: MezonValueContext, channelId: string, cursor?: string) => mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false, cursor),
+	(mezon: MezonValueContext, channelId: string, cursor?: string) =>
+		mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false, cursor),
 	{
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
@@ -77,68 +77,66 @@ export const fetchMessagesCached = memoize(
 type fetchMessageChannelPayload = {
 	channelId: string;
 	noCache?: boolean;
-	cursor?: string
+	cursor?: string;
 };
 
-export const fetchMessages = createAsyncThunk('messages/fetchMessages', async ({ channelId, noCache, cursor }: fetchMessageChannelPayload, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+export const fetchMessages = createAsyncThunk(
+	'messages/fetchMessages',
+	async ({ channelId, noCache, cursor }: fetchMessageChannelPayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-	if (noCache) {
-		fetchMessagesCached.clear(mezon, channelId, cursor);
-	}
-
-	const response = await fetchMessagesCached(mezon, channelId,cursor);
-	if (!response.messages) {
-		return thunkAPI.rejectWithValue([]);
-	}
-
-	const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
-
-	const nextCursor = response.cacheable_cursor || ''
-	const hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE  )
-	// console.log('HAS MORE: ', response.messages)
-	thunkAPI.dispatch(messagesActions.setMessageParams({channelId, param: {cursor: nextCursor, hasMore}}));
-
-	if (response.last_seen_message_id) {
-		thunkAPI.dispatch(
-			messagesActions.setChannelLastMessage({
-				channelId,
-				messageId: response.last_seen_message_id,
-			}),
-		);
-		const lastMessage = messages.find((message) => message.id === response.last_seen_message_id);
-
-		if (lastMessage) {
-			seenMessagePool.updateKnownSeenMessage({
-				channelId: lastMessage.channel_id || '',
-				messageId: lastMessage.id,
-				messageCreatedAt: lastMessage.creationTimeMs ? +lastMessage.creationTimeMs : 0,
-				messageSeenAt: 0,
-			});
+		if (noCache) {
+			fetchMessagesCached.clear(mezon, channelId, cursor);
 		}
-	}
 
-	return messages;
-});
+		const response = await fetchMessagesCached(mezon, channelId, cursor);
+		if (!response.messages) {
+			return thunkAPI.rejectWithValue([]);
+		}
+
+		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
+
+		const nextCursor = response.cacheable_cursor || '';
+		const hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
+		// console.log('HAS MORE: ', response.messages)
+		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { cursor: nextCursor, hasMore } }));
+
+		if (response.last_seen_message_id) {
+			thunkAPI.dispatch(
+				messagesActions.setChannelLastMessage({
+					channelId,
+					messageId: response.last_seen_message_id,
+				}),
+			);
+			const lastMessage = messages.find((message) => message.id === response.last_seen_message_id);
+
+			if (lastMessage) {
+				seenMessagePool.updateKnownSeenMessage({
+					channelId: lastMessage.channel_id || '',
+					messageId: lastMessage.id,
+					messageCreatedAt: lastMessage.creationTimeMs ? +lastMessage.creationTimeMs : 0,
+					messageSeenAt: 0,
+				});
+			}
+		}
+
+		return messages;
+	},
+);
 
 type loadMoreMess = {
 	channelId: string;
 };
 
-
-export const loadMoreMessage = createAsyncThunk(
-	'messages/loadMoreMessage',
-	async ({ channelId }: loadMoreMess, thunkAPI) => {
-		try {
-			const cursor = selectCursorMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
-			await thunkAPI.dispatch(fetchMessages({channelId, cursor}))
-		} catch (e) {
-			console.log(e);
-			return thunkAPI.rejectWithValue([]);
-		}
-	},
-);
-
+export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: loadMoreMess, thunkAPI) => {
+	try {
+		const cursor = selectCursorMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
+		await thunkAPI.dispatch(fetchMessages({ channelId, cursor }));
+	} catch (e) {
+		console.log(e);
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 type UpdateMessageArgs = {
 	channelId: string;
@@ -205,7 +203,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	isSending: false,
 	unreadMessagesEntries: {},
 	typingUsers: {},
-	paramEntries: {}
+	paramEntries: {},
 });
 
 export type SetCursorChannelArgs = {
@@ -213,15 +211,14 @@ export type SetCursorChannelArgs = {
 	param: FetchMessageParam;
 };
 
-
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
 	initialState: initialMessagesState,
 	reducers: {
-		setMessageParams : (state, action: PayloadAction<SetCursorChannelArgs>) => {
-			state.paramEntries[action.payload.channelId] = action.payload.param
+		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
+			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			messagesAdapter.addOne(state, action.payload);
@@ -325,7 +322,7 @@ export const messagesActions = {
 	updateLastSeenMessage,
 	updateTypingUsers,
 	sendTypingUser,
-	loadMoreMessage
+	loadMoreMessage,
 };
 
 /*
@@ -411,12 +408,12 @@ export const selectParamByChannelId = (channelId: string) =>
 		return param && param[channelId];
 	});
 
-	export const selectHasMoreMessageByChannelId = (channelId: string) =>
+export const selectHasMoreMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return param && param[channelId] && param[channelId].hasMore || false;
+		return (param && param[channelId] && param[channelId].hasMore) || false;
 	});
 
-	export const selectCursorMessageByChannelId = (channelId: string) =>
+export const selectCursorMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param && param[channelId] && param[channelId].cursor;
 	});

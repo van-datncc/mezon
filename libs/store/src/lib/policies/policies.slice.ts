@@ -60,7 +60,6 @@ export const policiesSlice = createSlice({
 			.addCase(fetchPermissionsUser.fulfilled, (state: PoliciesState, action: PayloadAction<IPermissionUser[]>) => {
 				policiesAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
-				console.log('action.payload.permission: ', action.payload);
 			})
 
 			.addCase(fetchPermissionsUser.rejected, (state: PoliciesState, action) => {
