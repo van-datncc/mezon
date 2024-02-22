@@ -18,9 +18,9 @@ export const MezonPolicy = React.createContext<MezonPolicyValue>({
 export function MezonPolicyProvider({ children, clanId }: Props) {
 	const { permissionKeys, fetchPolicies } = useUserPolicy(clanId);
 
-	useEffect(() => {
-		fetchPolicies();
-	}, [permissionKeys, clanId, fetchPolicies]);
+	// useEffect(() => {
+	// 	fetchPolicies();
+	// }, [permissionKeys, clanId, fetchPolicies]);
 
 	const value = React.useMemo(() => ({ permissionKeys }), [permissionKeys]);
 
