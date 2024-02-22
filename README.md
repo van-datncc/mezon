@@ -139,15 +139,15 @@ We have sevaral layout components to handle layout based on the route:
 -   `/chat/server/:id` - `ServerLayout`: The layout for the server page
 -   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
 - routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
-- Ưe are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
+- We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
 
 ## Conventions and Guidelines
 
-## Code Style
+## Code Formatting
 
 Using `Prettier` and `ESLint` to format the codebase. The codebase should be formatted before committing the code.
 
-## file naming
+## Naming Convention
 
 -   `PascalCase` for the components and pages
 -   `camelCase` for the functions and variables
