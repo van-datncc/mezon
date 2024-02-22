@@ -8,9 +8,20 @@
 
 `npm install --global nx@latest`
 
+
+## Notes
+
+-  using `Git Bash` to run the commands
+-  using `VSCode` as the code editor
+
+
 ## Sync dependencies
 
 -   Run `npm run sync` to sync dependencies
+
+## Start the app
+
+To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
 
 ## Linting
 
@@ -22,17 +33,10 @@
 -   Run `npm run format` to format the codebase
 -   Run `npm run format:fix` to fix the formatting issues
 
-## Start the app
-
-To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
-
-## Notes
-
--   using `Git Bash` to run the commands
 
 ## Architecture Overview
 
-<iframe src="https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview" width="640" height="480"></iframe>
+[![Architecture Overview](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)
 
 ## Workspace Structure
 
@@ -80,7 +84,7 @@ The core concepts are `one-way` data flow and `single source of truth`.
 
 The application data flow is managed by some packages:
 
--   `mez-js`: The core package to communicate with the server through `WebSocket` and `REST` API
+-   `mezon-js`: The core package to communicate with the server through `WebSocket` and `REST` API
     -   `WebSocket`: send and listen to the messages from the server
     -   `REST`: send and receive the messages from the server
 -   `store`: The state management package to manage the state of the application. store is divided into multiple slices, each slice is a standalone slice and has its own reducer, action, and selector.
@@ -94,6 +98,48 @@ The application data flow is managed by some packages:
     -   loader: The loader to load the component dynamically
     -   route: The route to navigate to the component
     -   page: The page to render the component
+
+### Data concept
+
+- When the application starts, based on the initial route, the application will load the components and pages
+- Before render components and pages, the application will trigger `loader` to load the initial data
+- The `loader` will trigger the `action` to fetch the data from the server
+- The component will render the data based on the state of the store
+- The dispatched action will trigger an `asyncThunk` to fetch the data from the server using `mezon-js` package
+- The `asyncThunk` returns the data from the server and updates the state of the store by an `extraReducers` function
+- The component or hook will select the data from the store using `useSelector`
+- the selectors will select the data from the store based on the state of the store
+- When user interacts with the component, the component will dispatch the action to update the state of the store
+- We could group the data and logic into a custom hook to manage the data and logic of the component
+- The component could use the custom hook to manage the data and logic of the component
+
+### Access Control
+
+Access control is managed by the `policies` slice. each user has it own permissions to access the resources. The permission is managed by the `policies` slice.
+
+There are several ways to manage the access control:
+
+-   using `policies` slice and `selectAllPermissionsUser` to get the permissions of the user
+-   using `useSelector(selectAllPermissionsUser)` to get the permissions of the user
+-   using `useUserPermissions` to get the permissions of the user
+-   using `UserRestrictionZone` to control displaying the components based on the user permissions
+-   using `useUserRestriction` to get the user restrictions based on the user permissions
+
+## Layouting
+
+how to layout the components and pages
+
+![Layouting](./docs/layouting.svg)
+
+We have sevaral layout components to handle layout based on the route:
+
+-   `/` - `AppLayout`: The layout for the application
+-   `/chat` -[logged in]- `MainLayout`: The layout for the main page
+-   `Main`: The main page to render the global components
+-   `/chat/server/:id` - `ServerLayout`: The layout for the server page
+-   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
+- routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
+- Ưe are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
 
 ## Conventions and Guidelines
 

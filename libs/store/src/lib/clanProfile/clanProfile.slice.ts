@@ -98,7 +98,7 @@ export const userClanProfileActions = {
 	updateUserClanProfile,
 };
 
-const { selectAll, selectEntities } = userClanProfileAdapter.getSelectors();
+const { selectAll } = userClanProfileAdapter.getSelectors();
 
 export const getUserClanProfileState = (rootState: { [USER_CLAN_PROFILE_FEATURE_KEY]: UserClanProfileState }): UserClanProfileState =>
 	rootState[USER_CLAN_PROFILE_FEATURE_KEY];
