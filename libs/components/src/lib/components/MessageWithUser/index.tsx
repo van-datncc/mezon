@@ -40,8 +40,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 
 	const renderMultilineContent = () => {
 		const lines = content.split('\n');
-		const mentionRegex = /(@\w+)/g;
-
+		const mentionRegex = /(@\S+?)\s/g;
 		return lines.map((line: string, index: number) => {
 			const matches = line.match(mentionRegex);
 
