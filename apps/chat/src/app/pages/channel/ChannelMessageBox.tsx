@@ -11,7 +11,6 @@ type ChannelMessageBoxProps = {
 };
 
 export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
-	console.log("rerender-ChannelMessageBox")
 	const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
 
 	const handleSend = useCallback(
