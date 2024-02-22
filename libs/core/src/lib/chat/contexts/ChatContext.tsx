@@ -23,6 +23,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const dispatch = useAppDispatch();
 
 	const onchannelmessage = useCallback(
+		
 		(message: ChannelMessage) => {
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 		},

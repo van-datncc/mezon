@@ -1,7 +1,5 @@
 import styles from './Message.module.scss';
 
-console.log(styles);
-
 export default function UnreadMessageBreak() {
 	return (
 		<div className={styles.UnreadMessage}>
