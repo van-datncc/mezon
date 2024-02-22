@@ -12,7 +12,6 @@ export function UserRestrictionZone({ policy, permissions, render, children }: U
 	const isPermissionsAllowed = useUserRestriction(permissions);
 	const isPolicyAllowed = typeof policy === 'boolean' ? policy : true;
 	const isAllowed = isPermissionsAllowed && isPolicyAllowed;
-	console.log('isAllowed: ', isPolicyAllowed, isPermissionsAllowed, isAllowed);
 	const renderChildren = render ? render : (children: React.ReactNode, isAllowed: boolean) => (isAllowed ? children : null);
 
 	return renderChildren(children, isAllowed);

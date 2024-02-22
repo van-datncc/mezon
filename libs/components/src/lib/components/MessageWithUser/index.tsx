@@ -86,9 +86,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 				<div className="flex-col w-full flex justify-center items-start relative gap-1">
 					{!isCombine && (
 						<div className="flex-row items-center w-full gap-4 flex">
-							<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">
-								{message.user?.username}
-							</div>
+							<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">{message.user?.username}</div>
 							<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{message?.date}</div>
 						</div>
 					)}
@@ -98,18 +96,18 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 						</div>
 						<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{message?.date}</div>
 					</div>
-				<div className="justify-start items-center inline-flex">
-					<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] text-wrap break-words w-widthMessageWithUser pr-10">
-						{renderMultilineContent()}
+					<div className="justify-start items-center inline-flex">
+						<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] text-wrap break-words w-widthMessageWithUser pr-10">
+							{renderMultilineContent()}
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		{message && (
-			<div className="absolute top-[100] right-2 flex flex-row items-center gap-x-1 text-xs text-gray-600">
-				<Icons.Sent />
-			</div>
-		)}
+			{message && (
+				<div className="absolute top-[100] right-2 flex flex-row items-center gap-x-1 text-xs text-gray-600">
+					<Icons.Sent />
+				</div>
+			)}
 		</div>
 	);
 }

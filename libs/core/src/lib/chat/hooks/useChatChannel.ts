@@ -39,13 +39,9 @@ export function useChatChannel(channelId: string) {
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
 
-	const loadMoreMessage =React.useCallback(
-		async () => {
-			
-			dispatch(messagesActions.loadMoreMessage({channelId}))
-		},
-		[dispatch, channelId],
-	);
+	const loadMoreMessage = React.useCallback(async () => {
+		dispatch(messagesActions.loadMoreMessage({ channelId }));
+	}, [dispatch, channelId]);
 	const createLinkInviteUser = React.useCallback(
 		async (clan_id: string, channel_id: string, expiry_time: number) => {
 			const action = await dispatch(
@@ -131,7 +127,7 @@ export function useChatChannel(channelId: string) {
 			createLinkInviteUser,
 			inviteUser,
 			sendMessageTyping,
-			loadMoreMessage
+			loadMoreMessage,
 		}),
 		[
 			client,
@@ -146,7 +142,7 @@ export function useChatChannel(channelId: string) {
 			createLinkInviteUser,
 			inviteUser,
 			sendMessageTyping,
-			loadMoreMessage
+			loadMoreMessage,
 		],
 	);
 }
