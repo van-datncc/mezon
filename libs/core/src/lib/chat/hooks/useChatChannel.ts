@@ -1,6 +1,5 @@
 import {
 	messagesActions,
-	selectAllAccount,
 	selectChannelMemberByUserIds,
 	selectCurrentClanId,
 	selectHasMoreMessageByChannelId,
@@ -10,20 +9,18 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessage } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChannelMembers } from './useChannelMembers';
 import { useMessages } from './useMessages';
 import { useThreads } from './useThreads';
+import { IMessageSendPayload } from '@mezon/utils';
 
 export function useChatChannel(channelId: string) {
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
-	// const { clans } = useClans();
 	const { threads } = useThreads();
 	// TODO: maybe add hook for current clan
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { userProfile } = useSelector(selectAllAccount);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 
 	const { messages } = useMessages({ channelId });
@@ -50,8 +47,7 @@ export function useChatChannel(channelId: string) {
 	}, [channelId, dispatch]);
 
 	const sendMessage = React.useCallback(
-		async (message: IMessage) => {
-			// TODO: send message to server using mezon client
+		async (message: IMessageSendPayload) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -61,35 +57,10 @@ export function useChatChannel(channelId: string) {
 				console.log(client, session, socket, channel, currentClanId);
 				throw new Error('Client is not initialized');
 			}
-
-			const payload = {
-				...message,
-				id: Math.random().toString(),
-				date: new Date().toLocaleString(),
-				user: {
-					name: userProfile?.user?.display_name || '',
-					username: userProfile?.user?.username || '',
-					id: userProfile?.user?.id || 'idUser',
-					avatarSm: userProfile?.user?.avatar_url || '',
-				},
-			};
-			if (!payload.channel_id) {
-				payload.channel_id = channelId || '';
-			}
-			await socket.writeChatMessage(currentClanId, channel.id, payload);
+			
+			await socket.writeChatMessage(currentClanId, channel.id, message);
 		},
-		[
-			sessionRef,
-			clientRef,
-			socketRef,
-			channelRef,
-			currentClanId,
-			userProfile?.user?.display_name,
-			userProfile?.user?.username,
-			userProfile?.user?.id,
-			userProfile?.user?.avatar_url,
-			channelId,
-		],
+		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
 	return useMemo(
