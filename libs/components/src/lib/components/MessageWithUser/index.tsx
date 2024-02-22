@@ -23,15 +23,10 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 		}
 
 		if (typeof message.content === 'object') {
-			if (typeof message.content.content === 'string') {
-				return message.content.content;
-			}
-
-			if (typeof message.content.content === 'object') {
-				return (message.content.content as unknown as any).content;
+			if (typeof message.content.text === 'string') {
+				return message.content.text;
 			}
 		}
-		return '';
 	}, [message]);
 
 	const isCombine = useMemo(() => {
@@ -71,8 +66,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	};
 
 	return (
-		<>
-			<div
+		<div
 				className={`flex py-0.5 h-15 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer relative ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
 			>
 				<div className="justify-start gap-4 inline-flex w-full relative">
@@ -115,7 +109,6 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 					</div>
 				)}
 			</div>
-		</>
 	);
 }
 
