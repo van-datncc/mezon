@@ -39,9 +39,9 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [timeDiff, message, preMessage]);
 
 	const renderMultilineContent = () => {
-		const lines = content.split('\n');
+		const lines = content?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;
-		return lines.map((line: string, index: number) => {
+		return lines?.map((line: string, index: number) => {
 			const matches = line.match(mentionRegex);
 
 			if (matches) {
