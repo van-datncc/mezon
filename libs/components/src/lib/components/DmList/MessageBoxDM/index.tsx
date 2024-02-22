@@ -1,9 +1,9 @@
 import { useChatDirect } from '@mezon/core';
 import { RootState } from '@mezon/store';
-import { IMessage } from '@mezon/utils';
+import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import MessageBox, { IMessagePayload } from '../../MessageBox';
+import MessageBox from '../../MessageBox';
 
 interface DirectIdProps {
 	directParamId: string;
@@ -13,12 +13,9 @@ export function DirectMessageBox({ directParamId }: DirectIdProps) {
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const handleSend = useCallback(
-		(mess: IMessagePayload) => {
+		(mess: IMessageSendPayload) => {
 			if (sessionUser) {
-				const messageToSend: IMessage = {
-					...mess,
-				};
-				sendDirectMessage(messageToSend);
+				sendDirectMessage(mess);
 			} else {
 				console.error('Session is not available');
 			}

@@ -1,5 +1,4 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { IMessage } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 
@@ -8,6 +7,7 @@ import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } fro
 import { EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
+import { IMessageSendPayload } from '@mezon/utils';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -36,7 +36,7 @@ function Entry(props: EntryComponentProps): ReactElement {
 		<div {...parentProps}>
 			<div className="flex items-center rounded-xl py-2 px-2 gap-2">
 				<div className="">
-					<img src={mention.avatar} className="w-8 h-8 rounded-full" role="presentation" />
+					<img src={mention.avatar} className="w-8 h-8 rounded-full" alt="presentation" />
 				</div>
 
 				<div className="flex justify-between gap-1">
@@ -48,13 +48,9 @@ function Entry(props: EntryComponentProps): ReactElement {
 }
 
 export type MessageBoxProps = {
-	onSend: (mes: IMessagePayload) => void;
+	onSend: (mes: IMessageSendPayload) => void;
 	onTyping?: () => void;
 	memberList?: MentionData[];
-};
-
-export type IMessagePayload = IMessage & {
-	channelId: string;
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
@@ -114,14 +110,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		// TODO: change the interface of onSend, remove the id and channelId
-		onSend({
-			content: { content: content, mentioned: userMentioned },
-			id: '',
-			channel_id: '',
-			body: { text: '' },
-			channelId: '',
-		});
+		onSend({text: content, mentioned: userMentioned});
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
 	}, [content, onSend, userMentioned]);
@@ -134,7 +123,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
 		} else setShowPlaceHolder(false);
-	}, [content, handleSend]);
+	}, [content, editorState, handleSend]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
