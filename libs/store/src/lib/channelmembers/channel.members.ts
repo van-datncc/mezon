@@ -234,11 +234,12 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
 
-export const selectMembersMap = createSelector(selectChannelMembesEntities, (entities) => {
+export const selectMembersMap = (channelId?: string | null) =>
+	createSelector(selectChannelMembesEntities, (entities) => {
 		const retval = new Map<string, ChannalMemberAvatar>();
 		const members = Object.values(entities);
 		
-		members.filter((member) => member && member.user !== null && member.user?.id).map(member => {
+		members.filter((member) => member && member.user !== null && member.user?.id && member.channelId === channelId).map(member => {
 			const key = member.user?.id as string;
 			retval.set(key, { name: member.user?.username || '', avatar: member.user?.avatar_url || ''});
 		})
