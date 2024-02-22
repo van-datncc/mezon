@@ -5,8 +5,7 @@ import { useSelector } from 'react-redux';
 
 export type MemberListProps = { className?: string; directMessageId: string | undefined };
 
-function MemberListGroupChat({ directMessageId }: MemberListProps) {
-	const { members } = useChatDirect(directMessageId);
+function MemberListGroupChat({ directMessageId }: MemberListProps) {	
 	const { directId } = useAppParams();
 	const rawMembers = useSelector(selectMembersByChannelId(directId));
 
