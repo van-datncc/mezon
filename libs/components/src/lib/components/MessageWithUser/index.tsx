@@ -23,8 +23,8 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 		}
 
 		if (typeof message.content === 'object') {
-			if (typeof message.content.text === 'string') {
-				return message.content.text;
+			if (typeof (message.content as unknown as any).text === 'string') {
+				return (message.content as unknown as any).text;
 			}
 		}
 	}, [message]);
