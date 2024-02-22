@@ -287,7 +287,7 @@ export default function FriendsPage() {
 								/>
 								<Button
 									label={'Send Friend Request'}
-									className="absolute top-5 right-3 text-[14px] py-[5px]"
+									className="absolute top-3 right-2 text-[14px] py-[5px]"
 									disable={!requestAddFriend.usernames?.length}
 									onClick={handleAddFriend}
 									aria-placeholder="SSSSS "
