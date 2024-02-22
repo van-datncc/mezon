@@ -1,7 +1,6 @@
 const SettingRightProfile = () => {
 	return (
-		<>
-			<div className="w-1/2 text-white">
+		<div className="w-1/2 text-white">
 				<p className="ml-[30px] mt-[30px]">PREVIEW</p>
 				<div className="bg-black h-[542px] ml-[30px] mt-[10px] rounded-[10px] flex flex-col relative">
 					<div className="h-1/6 bg-green-500 rounded-tr-[10px] rounded-tl-[10px]"></div>
@@ -33,7 +32,6 @@ const SettingRightProfile = () => {
 					</div>
 				</div>
 			</div>
-		</>
 	);
 };
 
