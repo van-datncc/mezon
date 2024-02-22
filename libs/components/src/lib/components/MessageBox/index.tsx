@@ -1,9 +1,7 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { useAppParams, useChatChannel } from '@mezon/core';
 import { IMessage } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
-// import mentions from '../MentionMessage/mentions';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
@@ -60,12 +58,11 @@ export type IMessagePayload = IMessage & {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const [listUserMention, setListUserMention] = useState<MentionData[]>(props.memberList ?? []);
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
 			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
 		},
-		[listUserMention],
+		[props.memberList],
 	);
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
@@ -94,10 +91,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
-			const content = convertToRaw(contentState).blocks[0].text;
+			const contentRaw = convertToRaw(contentState).blocks;
+			const content = Object.values(contentRaw).map((item) => item.text);
+			const contentBreakLine = content.join('\n').replace(/,/g, '');
 			const mentionedRaw = convertToRaw(contentState).entityMap;
-			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
-			setContent(content);
+			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
+			setContent(contentBreakLine);
 			setUserMentioned(mentioned);
 		},
 		[onTyping],
@@ -108,6 +107,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const [content, setContent] = useState('');
+
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
@@ -121,14 +122,25 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			body: { text: '' },
 			channelId: '',
 		});
-		setContent('');
 		setEditorState(() => EditorState.createEmpty());
+		setContent('');
 	}, [content, onSend, userMentioned]);
+
+	useEffect(() => {
+		if (content.length === 1 || content === '@') {
+			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+			setEditorState(updatedEditorState);
+		} else setEditorState(editorState);
+		if (content.length === 0) {
+			setShowPlaceHolder(true);
+		} else setShowPlaceHolder(false);
+	}, [content,handleSend]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			return 'onsend';
 		}
+		return;
 	}
 
 	function handleKeyCommand(command: string) {
@@ -138,9 +150,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return 'not-handled';
 	}
+
 	return (
 		<div className="flex w-full items-center">
-			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-2 bg-black rounded-md pr-2">
+			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
 				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
 					<Icons.AddCircle />
 				</div>
@@ -151,7 +164,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						ref.current!.focus();
 					}}
 				>
-					<div className="p-[10px] flex items-center">
+					<div className="p-[10px] flex items-center text-[15px] relative">
 						<Editor
 							editorKey={'editor'}
 							editorState={editorState}
@@ -160,8 +173,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							ref={ref}
 							keyBindingFn={keyBindingFn}
 							handleKeyCommand={handleKeyCommand}
-							// placeholder='Write your thoughs here...'
 						/>
+						{showPlaceHolder && <p className="absolute text-gray-300">Write your thoughs here...</p>}
 					</div>
 
 					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">

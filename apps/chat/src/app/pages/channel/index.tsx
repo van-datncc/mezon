@@ -34,7 +34,7 @@ export default function Server() {
 	// TODO: move clan related component to clan page
 	return (
 		<>
-			<div className="hidden flex-col w-[272px] bg-bgSurface md:flex">
+			<div className="flex flex-col w-[272px] bg-bgSurface relative">
 				<ServerHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
 				<ChannelList />
 				<FooterProfile

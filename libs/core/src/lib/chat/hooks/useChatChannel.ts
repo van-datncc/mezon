@@ -1,9 +1,9 @@
 import {
-	clansActions,
 	messagesActions,
 	selectAllAccount,
 	selectChannelMemberByUserIds,
 	selectCurrentClanId,
+	selectHasMoreMessageByChannelId,
 	selectLastMessageIdByChannelId,
 	selectTypingUserIdsByChannelId,
 	selectUnreadMessageIdByChannelId,
@@ -13,7 +13,6 @@ import { useMezon } from '@mezon/transport';
 import { IMessage } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useChannelMembers } from './useChannelMembers';
 import { useMessages } from './useMessages';
 import { useThreads } from './useThreads';
@@ -25,6 +24,8 @@ export function useChatChannel(channelId: string) {
 	// TODO: maybe add hook for current clan
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { userProfile } = useSelector(selectAllAccount);
+	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
+
 	const { messages } = useMessages({ channelId });
 	const { members } = useChannelMembers({ channelId });
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
@@ -36,29 +37,13 @@ export function useChatChannel(channelId: string) {
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
 
-	const createLinkInviteUser = React.useCallback(
-		async (clan_id: string, channel_id: string, expiry_time: number) => {
-			const action = await dispatch(
-				clansActions.createLinkInviteUser({
-					clan_id: clan_id,
-					channel_id: channel_id,
-					expiry_time: expiry_time,
-				}),
-			);
-			const payload = action.payload as ApiLinkInviteUser;
-			return payload;
+	const loadMoreMessage =React.useCallback(
+		async () => {
+			
+			dispatch(messagesActions.loadMoreMessage({channelId}))
 		},
-		[dispatch],
-	);
-
-	const inviteUser = React.useCallback(
-		async (invite_id: string) => {
-			const action = await dispatch(clansActions.inviteUser({ inviteId: invite_id }));
-			const payload = action.payload as ApiInviteUserRes;
-			return payload;
-		},
-		[dispatch],
-	);
+		[dispatch, channelId],
+	);	
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(messagesActions.sendTypingUser({ channelId }));
@@ -116,10 +101,10 @@ export function useChatChannel(channelId: string) {
 			unreadMessageId,
 			lastMessageId,
 			typingUsers,
+			hasMoreMessage,
 			sendMessage,
-			createLinkInviteUser,
-			inviteUser,
 			sendMessageTyping,
+			loadMoreMessage
 		}),
 		[
 			client,
@@ -129,10 +114,10 @@ export function useChatChannel(channelId: string) {
 			unreadMessageId,
 			lastMessageId,
 			typingUsers,
+			hasMoreMessage,
 			sendMessage,
-			createLinkInviteUser,
-			inviteUser,
 			sendMessageTyping,
+			loadMoreMessage
 		],
 	);
 }

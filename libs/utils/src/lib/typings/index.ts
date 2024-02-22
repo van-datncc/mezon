@@ -12,6 +12,8 @@ import {
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
+export * from './permissions';
+
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
 export type IClan = ApiClanDesc & {

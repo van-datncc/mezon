@@ -1,4 +1,4 @@
-import {  ClansEntity, clansActions, useAppDispatch } from '@mezon/store';
+import { ClansEntity, clansActions, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
 
 export function useAccount() {
@@ -21,8 +21,8 @@ export function useAccount() {
 
 	return useMemo(
 		() => ({
-			updateUser
-		}), [
-			updateUser
-		]);
+			updateUser,
+		}),
+		[updateUser],
+	);
 }
