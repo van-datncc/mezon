@@ -1,4 +1,4 @@
-import { useAppNavigation, useChatDirect } from '@mezon/core';
+import { useAppNavigation, useFriends } from '@mezon/core';
 import { IFriend, directActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { ChannelTypeEnum } from '@mezon/utils';
@@ -15,7 +15,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const dispatch = useAppDispatch();
 	const { toDmGroupPage } = useAppNavigation();
 	const navigate = useNavigate();
-	const { friends } = useChatDirect(undefined);
+	const { friends } = useFriends();
 	const [length, setLength] = useState<number>(selectedFriends.length);
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +55,9 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	};
 
 	const [searchTerm, setSearchTerm] = useState<string>('');
+	// TODO: move to custom hook
 	const filteredFriends = friends.filter((friend: IFriend) => friend.user?.username?.toLowerCase().includes(searchTerm.toLowerCase()));
+
 	useEffect(() => {
 		setLength(selectedFriends.length);
 	}, [selectedFriends]);
