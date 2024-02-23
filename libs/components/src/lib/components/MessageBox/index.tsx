@@ -4,11 +4,11 @@ import * as Icons from '../Icons';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import '@draft-js-plugins/mention/lib/plugin.css';
 import { IMessageSendPayload } from '@mezon/utils';
 import { EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-import '@draft-js-plugins/mention/lib/plugin.css';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -32,10 +32,8 @@ export type MessageBoxProps = {
 
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const listMemberMention = useMemo(() => {
-		return  props.memberList;
-	}, [ props.memberList]);
-
-	console.log("rerender")
+		return props.memberList;
+	}, [props.memberList]);
 
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
@@ -60,28 +58,24 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [suggestions, setSuggestions] = useState<MentionData[]>(listMemberMention as MentionData[]);
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const { onSend, onTyping } = props;
-	const [content, setContent] = useState('');
-	const onChange = useCallback(
-		(editorState: EditorState) => {
-			// if (typeof onTyping === 'function') {
-			// 	onTyping();
-			// }
-			setEditorState(editorState);
-			const contentState = editorState.getCurrentContent();
-			const contentRaw = convertToRaw(contentState).blocks;
-			const content = Object.values(contentRaw).map((item) => item.text);
-			const contentBreakLine = content.join('\n').replace(/,/g, '');
-			const mentionedRaw = convertToRaw(contentState).entityMap;
-			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
-			setContent(contentBreakLine);
-			setUserMentioned(mentioned);
-		},
-		[content],
-	);
 
-	const onOpenChange = useCallback((_open: boolean) => {
-		setOpen(_open);
-	}, []);
+	const [content, setContent] = useState('');
+	const onChange = useCallback((editorState: EditorState) => {
+		if (typeof onTyping === 'function') {
+			onTyping();
+		}
+		setEditorState(editorState);
+		const contentState = editorState.getCurrentContent();
+		const contentRaw = convertToRaw(contentState).blocks;
+		const content = Object.values(contentRaw).map((item) => item.text);
+		const contentBreakLine = content.join('\n').replace(/,/g, '');
+		const mentionedRaw = convertToRaw(contentState).entityMap;
+		const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
+		setContent(contentBreakLine);
+		setUserMentioned(mentioned);
+	}, [onTyping]);
+
+
 
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const handleSend = useCallback(() => {
@@ -94,7 +88,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [content, onSend, userMentioned]);
 
 	const checkSelectionCursor = () => {
-		if (content.length === 1 || content === "@") {
+		if (content.length === 1 || content === '@') {
 			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
 			setEditorState(updatedEditorState);
 		} else setEditorState(editorState);
@@ -102,6 +96,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setShowPlaceHolder(true);
 		} else setShowPlaceHolder(false);
 	};
+
+	const onOpenChange = useCallback((_open: boolean) => {
+		setOpen(_open);
+	}, []);
 
 	useEffect(() => {
 		checkSelectionCursor();
@@ -193,4 +191,4 @@ MessageBox.Skeleton = () => {
 	);
 };
 
-export default MessageBox
+export default MessageBox;
