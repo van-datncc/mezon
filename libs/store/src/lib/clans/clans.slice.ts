@@ -1,5 +1,5 @@
 import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
-import { IClan, LoadingStatus } from '@mezon/utils';
+import { IClan, LoadingStatus, LIMIT_CLAN_ITEM } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
@@ -45,7 +45,7 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '');
+		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
 
 		if (!response.clandesc) {
 			return thunkAPI.rejectWithValue([]);
