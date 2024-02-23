@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../../Icons';
 
-import { ChannelProps, ChannelStatusEnum, ChannelTypeEnum, ThreadNameProps } from 'libs/utils/src/lib/typings/index';
+import { ChannelProps, ChannelStatusEnum, ChannelTypeEnum, ThreadNameProps } from 'libs/utils/src/lib/types/index';
 
 export const ChannelLable: React.FC<ChannelProps> = ({ isPrivate, type, name }) => {
 	return (

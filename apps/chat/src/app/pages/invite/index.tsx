@@ -38,18 +38,15 @@ export default function InvitePage() {
 	useEffect(() => {
 		if (inviteIdParam) {
 			getLinkInvite(inviteIdParam).then((res) => {
-				console.log('res: ', res);
 				// if (res.channel_id && res.clan_id) {
 				// }
 				// navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
 				setClanName(res.clan_name ?? 'Mezon');
-				setChannelName(res.channel_name ?? 'general');
+				setChannelName(res.channel_name ?? res as string);
 				setOpenModal(true);
 			});
 		}
 	}, []);
-
-	console.log('clanName: ', clanName, 'channelName: ', clanName);
 	return (
 		<>
 			<div></div>

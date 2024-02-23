@@ -7,7 +7,8 @@ import MainLayout from '../layouts/MainLayout';
 import ServerLayout from '../layouts/ServerLayout';
 
 // Pages
-import Chanel from '../pages/channel';
+import ChannellayOut from '../pages/channel';
+
 import DirectMain from '../pages/directMessage';
 import InvitePage from '../pages/invite';
 import Login from '../pages/login';
@@ -24,6 +25,7 @@ import { directMessageLoader } from '../loaders/directMessageLoader';
 import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
+import { appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 import { ChannelIndex } from '../pages/channel/ChannelIndex';
 import { ClanIndex } from '../pages/clan/ClanIndex';
 import { DirectMessage } from '../pages/directMessage/DMPage';
@@ -32,11 +34,14 @@ import FriendsPage from '../pages/directMessage/FriendsPage';
 import ChannelsRoutes from './ChannelsRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
+import { loginLoader } from '../loaders/loginLoader';
 
 // Components
 export const routes = createBrowserRouter([
 	{
 		path: '',
+		loader: appLoader,
+		shouldRevalidate: shouldRevalidateApp,
 		element: <AppLayout />,
 		errorElement: <ErrorRoutes />,
 		children: [
@@ -51,6 +56,7 @@ export const routes = createBrowserRouter([
 				children: [
 					{
 						path: 'login',
+						loader: loginLoader,
 						element: <Login />,
 					},
 				],
@@ -97,7 +103,7 @@ export const routes = createBrowserRouter([
 																path: ':channelId',
 																loader: channelLoader,
 																shouldRevalidate: shouldRevalidateChannel,
-																element: <Chanel />,
+																element: <ChannellayOut />,
 															},
 														],
 													},
@@ -147,6 +153,8 @@ export const routes = createBrowserRouter([
 			{
 				path: 'invite',
 				loader: authLoader,
+				shouldRevalidate: shouldRevalidateAuth,
+				element: <ProtectedRoutes />,
 				children: [
 					{
 						path: ':inviteId',

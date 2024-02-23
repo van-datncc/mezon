@@ -1,5 +1,5 @@
 import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
-import { IClan, LoadingStatus } from '@mezon/utils';
+import { IClan, LoadingStatus, LIMIT_CLAN_ITEM } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
@@ -47,15 +47,20 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 });
 
 export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listClanDescs(mezon.session, 100, 1, '');
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
 
-	if (!response.clandesc) {
-		return thunkAPI.rejectWithValue([]);
-	}
+		if (!response.clandesc) {
+			return thunkAPI.rejectWithValue([]);
+		}
 
-	const clans = response.clandesc.map(mapClanToEntity);
-	return clans;
+		const clans = response.clandesc.map(mapClanToEntity);
+		return clans;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
+	}	
 });
 
 type CreatePayload = {
@@ -64,18 +69,23 @@ type CreatePayload = {
 };
 
 export const createClan = createAsyncThunk('clans/createClans', async ({ clan_name, logo }: CreatePayload, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const body = {
-		banner: '',
-		clan_name: clan_name,
-		creator_id: '',
-		logo: logo || '',
-	};
-	const response = await mezon.client.createClanDesc(mezon.session, body);
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const body = {
+			banner: '',
+			clan_name: clan_name,
+			creator_id: '',
+			logo: logo || '',
+		};
+		const response = await mezon.client.createClanDesc(mezon.session, body);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		return mapClanToEntity(response);
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-	return mapClanToEntity(response);
 });
 
 type UpdateLinkUser = {
@@ -85,23 +95,28 @@ type UpdateLinkUser = {
 };
 
 export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name }: UpdateLinkUser, thunkAPI) => {
-	const mezon = ensureClient(getMezonCtx(thunkAPI));
-	const body = {
-		avatar_url: avatar_url || '',
-		display_name: display_name || '',
-		lang_tag: 'en',
-		location: '',
-		timezone: '',
-		username: user_name,
-	};
-	const response = await mezon.client.updateAccount(mezon.session, body);
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
+	try {	
+		const mezon = ensureClient(getMezonCtx(thunkAPI));
+		const body = {
+			avatar_url: avatar_url || '',
+			display_name: display_name || '',
+			lang_tag: 'en',
+			location: '',
+			timezone: '',
+			username: user_name,
+		};
+		const response = await mezon.client.updateAccount(mezon.session, body);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		if (response) {
+			thunkAPI.dispatch(getUserProfile());
+		}
+		return response as true;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-	if (response) {
-		thunkAPI.dispatch(getUserProfile());
-	}
-	return response as true;
 });
 
 export type CreateLinkInviteUser = {
@@ -111,17 +126,22 @@ export type CreateLinkInviteUser = {
 };
 
 export const createLinkInviteUser = createAsyncThunk('clans/invite', async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const body = {
-		channel_id: channel_id,
-		clan_id: clan_id,
-		expiry_time: expiry_time,
-	};
-	const response = await mezon.client.createLinkInviteUser(mezon.session, body);
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const body = {
+			channel_id: channel_id,
+			clan_id: clan_id,
+			expiry_time: expiry_time,
+		};
+		const response = await mezon.client.createLinkInviteUser(mezon.session, body);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		return response as ApiLinkInviteUser;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-	return response as ApiLinkInviteUser;
 });
 
 type InviteUser = {
@@ -129,21 +149,32 @@ type InviteUser = {
 };
 
 export const inviteUser = createAsyncThunk('clans/inviteUser', async ({ inviteId }: InviteUser, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.inviteUser(mezon.session, inviteId);
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.inviteUser(mezon.session, inviteId);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		return response as ApiInviteUserRes;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-	return response as ApiInviteUserRes;
 });
 
 export const getLinkInvite = createAsyncThunk('clans/getLinkInvite', async ({ inviteId }: InviteUser, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
-	if (!response) {
-		return thunkAPI.rejectWithValue([]);
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));	
+		const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+
+		return response as ApiInviteUserRes;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
 	}
-	return response as ApiInviteUserRes;
 });
 
 export const initialClansState: ClansState = clansAdapter.getInitialState({

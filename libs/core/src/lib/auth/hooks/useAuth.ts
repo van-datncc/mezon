@@ -3,7 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useAuth() {
-	const { userProfile } = useSelector(selectAllAccount);
+	const userProfile = useSelector(selectAllAccount);
 
 	const dispatch = useAppDispatch();
 
