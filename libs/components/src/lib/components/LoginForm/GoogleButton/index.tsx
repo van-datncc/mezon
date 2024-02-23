@@ -6,6 +6,7 @@ const GoogleButtonLogin: React.FC = () => {
 	const { loginByGoogle } = useAuth();
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
+		ux_mode: 'popup',
 		onSuccess: async ({ code }) => {
 			await loginByGoogle(code);
 		},
