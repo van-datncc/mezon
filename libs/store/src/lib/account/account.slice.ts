@@ -22,7 +22,7 @@ export const initialAccountState: AccountState = {
 
 export const getUserProfile = createAsyncThunk<IUserAccount>('account/user', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon?.client.getAccount(mezon.session);
+	const response = await mezon.client.getAccount(mezon.session);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
