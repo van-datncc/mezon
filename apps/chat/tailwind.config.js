@@ -44,6 +44,7 @@ module.exports = {
 				heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
 				heightTopBar: topBarHeight,
 				heightChatBox: chatBoxHeight,
+				heightHeader:"58px",
 				"9/10":"90%",
 			},
 
