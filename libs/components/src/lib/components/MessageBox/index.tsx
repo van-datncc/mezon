@@ -8,6 +8,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
+import '@draft-js-plugins/mention/lib/plugin.css';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -30,11 +31,17 @@ export type MessageBoxProps = {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
+	const listMemberMention = useMemo(() => {
+		return  props.memberList;
+	}, [ props.memberList]);
+
+	console.log("rerender")
+
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
-			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
+			setSuggestions(defaultSuggestionsFilter(value, listMemberMention as MentionData[]));
 		},
-		[props.memberList],
+		[listMemberMention],
 	);
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
@@ -50,15 +57,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const plugins = [mentionPlugin];
 		return { plugins, MentionSuggestions };
 	}, []);
-	const [suggestions, setSuggestions] = useState<MentionData[]>(props.memberList ?? []);
+	const [suggestions, setSuggestions] = useState<MentionData[]>(listMemberMention as MentionData[]);
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const { onSend, onTyping } = props;
-
+	const [content, setContent] = useState('');
 	const onChange = useCallback(
 		(editorState: EditorState) => {
-			if (typeof onTyping === 'function') {
-				onTyping();
-			}
+			// if (typeof onTyping === 'function') {
+			// 	onTyping();
+			// }
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
 			const contentRaw = convertToRaw(contentState).blocks;
@@ -69,14 +76,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setContent(contentBreakLine);
 			setUserMentioned(mentioned);
 		},
-		[onTyping],
+		[content],
 	);
 
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
 	}, []);
 
-	const [content, setContent] = useState('');
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
@@ -88,7 +94,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [content, onSend, userMentioned]);
 
 	const checkSelectionCursor = () => {
-		if (content.length === 1) {
+		if (content.length === 1 || content === "@") {
 			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
 			setEditorState(updatedEditorState);
 		} else setEditorState(editorState);
@@ -146,7 +152,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						<MentionSuggestions
 							open={open}
 							onOpenChange={onOpenChange}
-							suggestions={props.memberList ?? []}
+							suggestions={suggestions}
 							onSearchChange={onSearchChange}
 							popoverContainer={({ children }: any) => <div>{children}</div>}
 						/>
@@ -187,4 +193,4 @@ MessageBox.Skeleton = () => {
 	);
 };
 
-export default MessageBox;
+export default MessageBox
