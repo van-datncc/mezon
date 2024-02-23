@@ -9,13 +9,13 @@ export type ChannelTopbarProps = {
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	return (
-		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
+		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader">
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLable type={Number(channel?.type)} name={channel?.channel_lable} isPrivate={channel?.channel_private} />
 			</div>
 
 			{/* Desktop buttons */}
-			<div className="hidden items-center h-full ml-auto lg:flex">
+			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
 					<div className="justify-start items-center gap-[15px] flex">
 						<ThreadButton />
