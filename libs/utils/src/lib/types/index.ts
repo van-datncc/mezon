@@ -183,3 +183,8 @@ export interface CategoryProps {
 export interface ThreadProps {
 	name: string;
 }
+
+
+export interface IWithError {
+	error: string | Error; 
+}

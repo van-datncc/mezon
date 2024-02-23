@@ -1,20 +1,21 @@
 import { GoogleButtonLogin, LoginForm, QRSection, TitleSection } from '@mezon/components';
+import { useAppNavigation } from '@mezon/core';
 import { selectIsLogin } from '@mezon/store';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
+import { ILoginLoaderData } from '../../loaders/loginLoader';
 
 function Login() {
+	const {navigate} = useAppNavigation();
 	const isLogin = useSelector(selectIsLogin);
-	const navigate = useNavigate();
+	const { redirectTo } = useLoaderData() as ILoginLoaderData;
 
 	useEffect(() => {
 		if (isLogin) {
-			navigate('/chat/direct/friends');
-		} else {
-			navigate('/guess/login');
+			navigate(redirectTo || '/chat/direct/friends');
 		}
-	}, [isLogin, navigate]);
+	}, [redirectTo, isLogin, navigate]);
 
 	return (
 		<div
