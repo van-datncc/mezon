@@ -12,14 +12,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 
 	return (
-		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink">
+		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 flex-shrink">
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
 					<Icons.Hashtag />
 					<h2 className="font-[Manrope] shrink-1 text-white text-ellipsis">{currentDmGroup.channel_lable}</h2>
 				</div>
 
-				<div className="hidden items-center h-full ml-auto lg:flex flex-1 justify-end">
+				<div className=" items-center h-full ml-auto flex flex-1 justify-end">
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>

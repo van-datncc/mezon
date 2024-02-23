@@ -125,6 +125,9 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 				showModal={openInvite}
 				confirmButton={() => handleCopyToClipboard(urlInvite)}
 				titleConfirm="Copy"
+				subTitleBox="Send invite link to a friend"
+				classSubTitleBox="ml-[-5px]"
+				borderBottomTitle="border-b "
 			>
 				<p>
 					<span>{urlInvite}</span>

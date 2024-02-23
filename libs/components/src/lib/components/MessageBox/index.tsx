@@ -152,7 +152,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							handleKeyCommand={handleKeyCommand}
 							keyBindingFn={keyBindingFn}
 						/>
-						{showPlaceHolder && <p className="absolute duration-300 text-gray-300">Write your thoughs here...</p>}
+						{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
 					</div>
 
 					<div className="absolute w-[100%] box-border top-10 left-9">

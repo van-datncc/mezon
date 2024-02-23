@@ -143,3 +143,11 @@ input:-webkit-autofill:active {
 	font-size: inherit;
 	font-family: Manrope;
 }
+
+// text more one line then hidden
+.one-line {
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}

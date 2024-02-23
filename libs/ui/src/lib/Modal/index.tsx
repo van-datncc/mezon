@@ -7,13 +7,25 @@ export type ModalProps = {
 	titleConfirm?: string;
 	disableButtonConfirm?: boolean;
 	classNameBox?: string;
-	titleBox?: string;
+	subTitleBox?: string;
 	borderBottomTitle?: string;
+	classSubTitleBox?: string;
 };
 
 const Modal = (props: ModalProps) => {
-	const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm, classNameBox, titleBox, borderBottomTitle } =
-		props;
+	const {
+		showModal,
+		onClose,
+		confirmButton,
+		title,
+		children,
+		titleConfirm,
+		disableButtonConfirm,
+		classNameBox,
+		subTitleBox,
+		borderBottomTitle,
+		classSubTitleBox,
+	} = props;
 	return (
 		// TODO: using modal component
 		// eslint-disable-next-line react/jsx-no-useless-fragment
@@ -27,8 +39,8 @@ const Modal = (props: ModalProps) => {
 									className={`flex items-start justify-between pt-[26px] px-[26px]  border-solid border-borderDefault rounded-t ${borderBottomTitle}`}
 								>
 									<div>
-										<h3 className="text-[22px] font-semibold ml-[-5px]">{title}</h3>
-										<p>{titleBox}</p>
+										<h3 className="text-[22px] font-semibold">{title}</h3>
+										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
 									<button className="flex items-center justify-center opacity-50" onClick={onClose}>
 										<span className="text-3xl leading-3">×</span>

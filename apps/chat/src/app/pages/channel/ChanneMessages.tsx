@@ -25,7 +25,7 @@ export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
+				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }} //To put endMessage and loader to the top.
 				inverse={true} //
 				hasMore={hasMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
