@@ -62,4 +62,4 @@ export const accountActions = { ...accountSlice.actions, getUserProfile };
 
 export const getAccountState = (rootState: { [ACCOUNT_FEATURE_KEY]: AccountState }): AccountState => rootState[ACCOUNT_FEATURE_KEY];
 
-export const selectAllAccount = createSelector(getAccountState, (state: AccountState) => state);
+export const selectAllAccount = createSelector(getAccountState, (state: AccountState) => state.userProfile);

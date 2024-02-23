@@ -59,30 +59,37 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const { onSend, onTyping } = props;
 
+	const onChange = useCallback(
+		(editorState: EditorState) => {
+			if (typeof onTyping === 'function') {
+				onTyping();
+			}
+			setEditorState(editorState);
+			const contentState = editorState.getCurrentContent();
+			const contentRaw = convertToRaw(contentState).blocks;
+			const content = Object.values(contentRaw).map((item) => item.text);
+			const contentBreakLine = content.join('\n').replace(/,/g, '');
+			const mentionedRaw = convertToRaw(contentState).entityMap;
+			const mentioned = Object.values(mentionedRaw).map((item) => item.data.m?.id);
+			setContent(contentBreakLine);
+			setUserMentioned(mentioned);
+		},
+		[onTyping],
+	);
+
+	const onOpenChange = useCallback((_open: boolean) => {
+		setOpen(_open);
+	}, []);
+
 	const [content, setContent] = useState('');
-	const onChange = useCallback((editorState: EditorState) => {
-		if (typeof onTyping === 'function') {
-			onTyping();
-		}
-		setEditorState(editorState);
-		const contentState = editorState.getCurrentContent();
-		const contentRaw = convertToRaw(contentState).blocks;
-		const content = Object.values(contentRaw).map((item) => item.text);
-		const contentBreakLine = content.join('\n').replace(/,/g, '');
-		const mentionedRaw = convertToRaw(contentState).entityMap;
-		const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
-		setContent(contentBreakLine);
-		setUserMentioned(mentioned);
-	}, [onTyping]);
-
-
 
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
 		}
-		onSend({ text: content, mentioned: userMentioned });
+		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
+		onSend(msg);
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
 	}, [content, onSend, userMentioned]);
@@ -96,10 +103,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setShowPlaceHolder(true);
 		} else setShowPlaceHolder(false);
 	};
-
-	const onOpenChange = useCallback((_open: boolean) => {
-		setOpen(_open);
-	}, []);
 
 	useEffect(() => {
 		checkSelectionCursor();
