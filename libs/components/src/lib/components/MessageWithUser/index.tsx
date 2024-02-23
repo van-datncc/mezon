@@ -2,6 +2,8 @@ import { IMessageWithUser, TIME_COMBINE, checkSameDay, convertDateString, conver
 import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
+import { selectCurrentChannelId, selectMembersMap } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -9,6 +11,9 @@ export type MessageWithUserProps = {
 };
 
 function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const membersMap = useSelector(selectMembersMap(currentChannelId));
+
 	const content = useMemo(() => {
 		return message.content['text'];
 	}, [message]);
@@ -70,15 +75,15 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 						</div>
 					) : (
 						<div>
-							{message.user?.avatarSm ? (
+							{membersMap.get(message.sender_id)?.avatar? (
 								<img
 									className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
-									src={message.user?.avatarSm || ''}
-									alt={message.user?.username || ''}
+									src={membersMap.get(message.sender_id)?.avatar || ''}
+									alt={membersMap.get(message.sender_id)?.avatar || ''}
 								/>
 							) : (
 								<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-									{message.user?.username.charAt(0).toUpperCase()}
+									{membersMap.get(message.sender_id)?.name.charAt(0).toUpperCase()}
 								</div>
 							)}
 						</div>
@@ -86,7 +91,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 					<div className="flex-col w-full flex justify-center items-start relative gap-1">
 						{!isCombine && (
 							<div className="flex-row items-center w-full gap-4 flex">
-								<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">{message.user?.username}</div>
+								<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">{membersMap.get(message.sender_id)?.name}</div>
 								<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{convertTimeString(message?.create_time as string)}</div>
 							</div>
 						)}
