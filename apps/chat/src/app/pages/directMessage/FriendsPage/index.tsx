@@ -112,7 +112,7 @@ export default function FriendsPage() {
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-[72px]">
+			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-heightHeader">
 				<div className="flex flex-row gap-2">
 					<IconFriends />
 					Friend

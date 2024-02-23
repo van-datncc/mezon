@@ -9,21 +9,10 @@ import { ChannelTyping } from './ChannelTyping';
 
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
-
-	// TODO: move selector to store
-	const isSending = useSelector((state: RootState) => state.messages.isSending);
 	const currentChanel = useSelector(selectCurrentChannel);
 
-	// New message always display in bottomn
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
 
-	useEffect(() => {
-		if (messagesContainerRef.current) {
-			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-		}
-	}, [isSending, [], messages]);
-	// TODO: move clan related component to clan page
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 			<div className="flex h-heightWithoutTopBar flex-row ">
