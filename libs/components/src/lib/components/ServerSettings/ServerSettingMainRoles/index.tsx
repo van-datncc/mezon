@@ -1,14 +1,28 @@
 
 // import SettingRightClan from '../SettingRightClanProfile';
 
-import { useRoles } from "@mezon/core";
+import { useClans, useRoles } from "@mezon/core";
 import { InputField } from "@mezon/ui";
+import { DeleteModal } from "../DeleteRoleModal/deleteRoleModal";
+import { useState } from "react";
+import { RolesClanActions, useAppDispatch } from "@mezon/store";
 
 // import SettingRightUser from '../SettingRightUserProfile';
 const ServerSettingMainRoles = () => {
     const { RolesClan } = useRoles();
-    
-    
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+    const dispatch = useAppDispatch();
+    const handleOpenModal = () => {
+		setShowModal(true);
+	};
+    const handleCloseModal = () => {
+        setShowModal(false);
+	};
+    const handleDeleteRole = async (roleId: string) => {
+        await dispatch(RolesClanActions.fetchDeleteRole({ roleId }));
+      };
+      
 	return (
 		<>
 			<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
@@ -30,7 +44,7 @@ const ServerSettingMainRoles = () => {
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-gray-200 uppercase tracking-wider">Roles - {RolesClan.length}</th>
                                 <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-gray-200 uppercase tracking-wider">Members</th>
-                                <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-gray-200 uppercase tracking-wider"></th>
+                                <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-gray-200 uppercase tracking-wider">Options</th>
                             </tr>
                         </thead>
                         <tbody className="bg-bgSecondary divide-y divide-gray-200">
@@ -43,9 +57,23 @@ const ServerSettingMainRoles = () => {
                             ) : (
                                 RolesClan.map((role) => (
                                     <tr key={role.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap"><p>{role.title}</p></td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><p></p></td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><p></p></td>
+                                        <td className="px-6 py-4 whitespace-nowrap"><p
+                                        onClick={() => {
+                                            handleCloseModal();
+                                        }}
+                                        >{role.title}</p></td>
+                                        <td className="px-6 py-4 whitespace-nowrap"><p>{role.role_user_list?.role_users?.length ?? 0}</p></td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <p
+                                                onClick={() => {
+                                                    handleOpenModal();
+                                                    setSelectedRoleId(role.id)
+                                                }}
+                                            >
+                                                delete
+                                            </p>
+                                            <DeleteModal isOpen={showModal} handleDelete={() => handleDeleteRole(selectedRoleId)} onClose={handleCloseModal} />
+                                        </td>
                                     </tr>
                                 ))
                             )}

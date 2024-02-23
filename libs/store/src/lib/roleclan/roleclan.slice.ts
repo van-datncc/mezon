@@ -23,6 +23,7 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 	error?: string | null;
 	currentRoleId?: string | null;
 	roleMembers:Record<string,RoleUserListRoleUser[]> 
+	roles: IRolesClan[];
 }
 
 export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
@@ -36,7 +37,7 @@ export const fetchRolesClan = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listRoles(mezon.session, 100,1,'',clanId);
 		if (!response.roles) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 		return response.roles.map(mapRolesClanToEntity);
 	},
@@ -63,10 +64,71 @@ export const fetchMembersRole = createAsyncThunk(
 		}) as FetchReturnMembersRole;
 	},
 );
+
+export const fetchDeleteRole = createAsyncThunk(
+
+	'DeleteRole/fetchDeleteRole',
+
+	async ({ roleId }: FetchMembersRolePayload, thunkAPI) => {
+		try{
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteRole(mezon.session,roleId);
+			thunkAPI.dispatch(RolesClanActions.remove(roleId))
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			return response;
+		}catch{
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
+
+
+
+type CreateRolePayload = {
+	title: string;
+	role_icon?: string;
+	display_online?: number;
+	description?:string;
+	active_permission_ids?: Array<string>,
+	add_user_ids?: Array<string>,
+	allow_mention?: number,
+	clan_id?: string,
+	color?: string,
+	logo?: string;
+};
+
+export const fetchCreateRole = createAsyncThunk(
+	'DeleteRole/fetchDeleteRole',
+	async ({ title,role_icon, allow_mention, display_online, description, clan_id, color, active_permission_ids, add_user_ids }: CreateRolePayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const body = {
+			active_permission_ids: active_permission_ids || [],
+    		add_user_ids: add_user_ids || [],
+    		allow_mention: allow_mention || 0,
+    		clan_id: clan_id,
+    		color: color || '',
+    		description: description || '',
+    		display_online: display_online || 0,
+    		role_icon: role_icon ||'',
+    		title: title,
+		}
+		const response = await mezon.client.createRole(mezon.session,body);
+		if (!response) {
+			
+			return thunkAPI.rejectWithValue([]);
+		}
+		return response;
+	},
+);
+
+
 export const initialRolesClanState: RolesClanState = RolesClanAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	RolesClan: [],
 	roleMembers: {},
+	roles: [],
 	error: null,
 });
 
@@ -105,8 +167,7 @@ export const RolesClanSlice = createSlice({
  * Export reducer for store configuration.
  */
 export const RolesClanReducer = RolesClanSlice.reducer;
-
-export const RolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole };
+export const RolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole, fetchDeleteRole };
 
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();

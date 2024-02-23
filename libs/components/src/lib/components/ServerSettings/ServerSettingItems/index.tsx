@@ -11,9 +11,6 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 	
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
-	const handleOpenModal = () => {
-		setOpenModal(true);
-	};
 	const handleLogOut = () => {
 		dispatch(authActions.logOut());
 	};
@@ -48,8 +45,6 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				<button
 					className={`pt-1 pl-1 text-white ${selectedButton === 'LogOut' ? 'bg-blue-400' : ''} mt-[16px] w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
-						handleButtonClick('LogOut');
-						handleOpenModal();
 					}}
 				>
 					Delete server

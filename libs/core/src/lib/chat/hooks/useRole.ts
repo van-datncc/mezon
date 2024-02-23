@@ -1,18 +1,24 @@
-import { selectAllRolesClan } from '@mezon/store';
-import { useMemo } from 'react';
+import { RolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useRoles() {
 	const RolesClan = useSelector(selectAllRolesClan);
-	// const MembersRole = useSelector(selectAllMembersRole);
+	const dispatch = useAppDispatch();
+	const deleteRole = React.useCallback(
+		async (roleId: string) => {
+			await dispatch(RolesClanActions.fetchDeleteRole({ roleId }));
+		},
+		[dispatch],
+	);
 	return useMemo(
 		() => ({
 			RolesClan,
-			// MembersRole,
+			deleteRole,
 		}),
 		[
 			RolesClan,
-			// MembersRole,
+			deleteRole,
 		],
 	);
 }
