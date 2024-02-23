@@ -2,6 +2,7 @@ import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useClans } from './useClans';
+import { messagesActions, useAppDispatch } from '@mezon/store';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -9,12 +10,10 @@ export type UseChatSendingOptions = {
 
 export function useChatSending({ channelId }: UseChatSendingOptions) {
 	const { currentClanId } = useClans();
+	const dispatch = useAppDispatch();
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
-
-	const client = clientRef.current;
-	// const dispatch = useAppDispatch();
-
+	
 	const sendMessage = React.useCallback(
 		async (message: IMessageSendPayload) => {
 			const session = sessionRef.current;
@@ -31,11 +30,16 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
+
+	const sendMessageTyping = React.useCallback(async () => {
+		dispatch(messagesActions.sendTypingUser({ channelId }));
+	}, [channelId, dispatch]);
+
 	return useMemo(
 		() => ({
-			client,
 			sendMessage,
+			sendMessageTyping,
 		}),
-		[client, sendMessage],
+		[sendMessage, sendMessageTyping],
 	);
 }

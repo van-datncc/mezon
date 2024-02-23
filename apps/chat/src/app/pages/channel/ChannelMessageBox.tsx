@@ -1,6 +1,6 @@
 import { MentionData } from '@draft-js-plugins/mention';
 import { MessageBox } from '@mezon/components';
-import { useChatChannel, useChatSending, useChatTypings } from '@mezon/core';
+import { useChannelMembers, useChatChannel, useChatSending, useChatTypings } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
@@ -11,8 +11,8 @@ type ChannelMessageBoxProps = {
 };
 
 export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId });
-	const { sendMessageTyping } = useChatTypings({ channelId });
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
+	console.log('render ChannelMessageBox');
 
 	const handleSend = useCallback(
 		(mess: IMessageSendPayload) => {
@@ -26,7 +26,7 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-	const { members } = useChatChannel(channelId);
+	const { members } = useChannelMembers({ channelId });
 	const userMentionRaw = members[0].users;
 	const newUserMentionList: MentionData[] = userMentionRaw?.map((item: ChannelMembersEntity) => ({
 		avatar: item?.user?.avatar_url ?? '',
