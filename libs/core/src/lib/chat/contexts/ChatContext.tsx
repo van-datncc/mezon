@@ -1,11 +1,10 @@
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, selectCurrentChannelId, selectMembersMap, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { ChannelMessage, ChannelPresenceEvent, MessageTypingEvent, Notification, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
-import { useSelector } from 'react-redux';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -22,18 +21,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const membersMap = useSelector(selectMembersMap(currentChannelId));
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessage) => {
-			dispatch(messagesActions.newMessage(mapMessageChannelToEntity({
-				...message,
-				avatar: membersMap.get(message.sender_id)?.avatar,
-				username: membersMap.get(message.sender_id)?.name || ''
-			})));
+			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 		},
-		[dispatch, membersMap],
+		[dispatch],
 	);
 
 	const onchannelpresence = useCallback(

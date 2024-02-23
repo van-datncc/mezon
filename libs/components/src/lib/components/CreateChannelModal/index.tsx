@@ -1,7 +1,7 @@
 import { useAppNavigation } from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { ChannelTypeEnum } from 'libs/utils/src/lib/typings/index';
+import { ChannelTypeEnum } from 'libs/utils/src/lib/types/index';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
