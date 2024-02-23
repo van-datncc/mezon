@@ -90,7 +90,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 								<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{convertTimeString(message?.create_time as string)}</div>
 							</div>
 						)}
-						<div className="justify-start items-center inline-flex">
+						<div className="justify-start items-center inline-flex w-full">
 							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
 								{renderMultilineContent()}
 							</div>
