@@ -16,7 +16,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const [nameClan, setNameClan] = useState('');
 	const { navigate, toClanPage } = useAppNavigation();
 	const { createClans } = useClans();
-	const { userProfile } = useSelector(selectAllAccount);
+	const userProfile = useSelector(selectAllAccount);
 	const handleFile = (e: any) => {
 		const fileToStore: File = e.target.files[0];
 		setUrlImage(URL.createObjectURL(fileToStore));
