@@ -65,7 +65,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const content = Object.values(contentRaw).map((item) => item.text);
 			const contentBreakLine = content.join('\n').replace(/,/g, '');
 			const mentionedRaw = convertToRaw(contentState).entityMap;
-			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention?.id);
+			const mentioned = Object.values(mentionedRaw).map((item) => item.data.m?.id);
 			setContent(contentBreakLine);
 			setUserMentioned(mentioned);
 		},
@@ -82,7 +82,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		onSend({ text: content, mentioned: userMentioned });
+		const msg = userMentioned.length > 0?{ t: content, m: userMentioned }: {t: content};			
+		onSend(msg);
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
 	}, [content, onSend, userMentioned]);

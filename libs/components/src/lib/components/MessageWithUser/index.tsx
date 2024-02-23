@@ -15,7 +15,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
 
 	const content = useMemo(() => {
-		return message.content['text'];
+		return message.content.t;
 	}, [message]);
 
 	const isCombine = useMemo(() => {

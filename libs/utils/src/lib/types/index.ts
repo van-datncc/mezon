@@ -91,8 +91,8 @@ export type IMessageMeta = {
 export type IMessage = ChannelMessage & {
 	id: string;
 	content: {
-		text?: string | undefined;
-		mentioned?: string[] | undefined;
+		t?: string | undefined;
+		m?: string[] | undefined;
 	};
 	date?: string | undefined;
 	creationTime?: Date;
@@ -105,8 +105,8 @@ export type IMessageWithUser = IMessage & {
 };
 
 export type IMessageSendPayload = {
-	text: string;
-	mentioned: string[];
+	t: string;
+	m?: string[] | undefined;
 };
 
 export type IUser = {
