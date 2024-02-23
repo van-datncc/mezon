@@ -4,11 +4,11 @@ import * as Icons from '../Icons';
 
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import '@draft-js-plugins/mention/lib/plugin.css';
 import { IMessageSendPayload } from '@mezon/utils';
 import { EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-
 export interface EntryComponentProps {
 	className?: string;
 	onMouseDown(event: MouseEvent): void;
@@ -30,15 +30,15 @@ export type MessageBoxProps = {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const onSearchChange = useCallback(
-		({ value }: { value: string }) => {
-			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
-		},
-		[props.memberList],
-	);
+	const [suggestions, setSuggestions] = useState(props.memberList);
+	useEffect(() => {
+		setSuggestions(props.memberList);
+	}, [props.memberList]);
+
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 	const [open, setOpen] = useState(false);
+
 	const { MentionSuggestions, plugins } = useMemo(() => {
 		const mentionPlugin = createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
@@ -50,9 +50,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const plugins = [mentionPlugin];
 		return { plugins, MentionSuggestions };
 	}, []);
-	const [suggestions, setSuggestions] = useState<MentionData[]>(props.memberList ?? []);
-	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+
 	const { onSend, onTyping } = props;
+	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const [content, setContent] = useState<string>('');
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -62,8 +64,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
 			const contentRaw = convertToRaw(contentState).blocks;
-			const content = Object.values(contentRaw).map((item) => item.text);
-			const contentBreakLine = content.join('\n').replace(/,/g, '');
+			const contentText = Object.values(contentRaw).map((item) => item.text);
+			const contentBreakLine = contentText.join('\n').replace(/,/g, '');
+			if (contentBreakLine === '@') {
+				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+				setEditorState(updatedEditorState);
+			}
 			const mentionedRaw = convertToRaw(contentState).entityMap;
 			const mentioned = Object.values(mentionedRaw).map((item) => item.data.m?.id);
 			setContent(contentBreakLine);
@@ -72,35 +78,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[onTyping],
 	);
 
-	const onOpenChange = useCallback((_open: boolean) => {
-		setOpen(_open);
-	}, []);
-
-	const [content, setContent] = useState('');
-	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
 		}
 		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
 		onSend(msg);
-		setEditorState(() => EditorState.createEmpty());
 		setContent('');
+		setEditorState(() => EditorState.createEmpty());
 	}, [content, onSend, userMentioned]);
-
-	const checkSelectionCursor = () => {
-		if (content.length === 1) {
-			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-			setEditorState(updatedEditorState);
-		} else setEditorState(editorState);
-		if (content.length === 0) {
-			setShowPlaceHolder(true);
-		} else setShowPlaceHolder(false);
-	};
-
-	useEffect(() => {
-		checkSelectionCursor();
-	}, [content]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -117,39 +103,64 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		return 'not-handled';
 	}
 
+	const onOpenChange = useCallback((_open: boolean) => {
+		setOpen(_open);
+	}, []);
+	const onSearchChange = useCallback(
+		({ value }: { value: string }) => {
+			setSuggestions(defaultSuggestionsFilter(value, props.memberList as MentionData[]));
+		},
+		[onChange],
+	);
+
+	const checkSelectionCursor = () => {
+		if (content.length === 1) {
+			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
+			setEditorState(updatedEditorState);
+		} else setEditorState(editorState);
+		if (content.length === 0) {
+			setShowPlaceHolder(true);
+		} else setShowPlaceHolder(false);
+	};
+
+	useEffect(() => {
+		checkSelectionCursor();
+	}, [content]);
+	const editorDiv = document.getElementById('editor');
+	const editorHeight = editorDiv?.clientHeight;
+	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
+
 	return (
-		<div className="flex w-full items-center">
+		<div className="flex w-full items-center relative">
 			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
 				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
 					<Icons.AddCircle />
 				</div>
 
 				<div
-					className={`w-[96%] relative bg-black gap-3`}
+					className={`w-[96%] bg-black gap-3`}
 					onClick={() => {
 						ref.current!.focus();
 					}}
 				>
-					<div className="p-[10px] flex items-center text-[15px] relative">
+					<div id="editor" className="p-[10px] flex items-center text-[15px]">
 						<Editor
-							editorKey={'editor'}
 							editorState={editorState}
 							onChange={onChange}
 							plugins={plugins}
 							ref={ref}
-							keyBindingFn={keyBindingFn}
 							handleKeyCommand={handleKeyCommand}
+							keyBindingFn={keyBindingFn}
 						/>
 						{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
 					</div>
 
-					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">
+					<div className="absolute w-[100%] box-border top-10 left-9">
 						<MentionSuggestions
-							open={open}
 							onOpenChange={onOpenChange}
-							suggestions={props.memberList ?? []}
+							open={open}
 							onSearchChange={onSearchChange}
-							popoverContainer={({ children }: any) => <div>{children}</div>}
+							suggestions={suggestions as MentionData[]}
 						/>
 					</div>
 				</div>
