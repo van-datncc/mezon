@@ -113,7 +113,12 @@ export const createLinkInviteUser = createAsyncThunk('clans/invite', async ({ ch
 		clan_id: clan_id,
 		expiry_time: expiry_time,
 	};
-	const response = await mezon.client.createLinkInviteUser(mezon.session, body);
+	const response = await mezon.client.createLinkInviteUser(mezon.session, body).catch(function(e) {
+		return e.json();
+	}).then(err => {
+		return thunkAPI.rejectWithValue(err.message);
+	});
+
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -126,7 +131,11 @@ type InviteUser = {
 
 export const inviteUser = createAsyncThunk('clans/inviteUser', async ({ inviteId }: InviteUser, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.inviteUser(mezon.session, inviteId);
+	const response = await mezon.client.inviteUser(mezon.session, inviteId).catch(function(e) {
+		return e.json();
+	}).then(err => {
+		return thunkAPI.rejectWithValue(err.message);
+	});
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -135,7 +144,11 @@ export const inviteUser = createAsyncThunk('clans/inviteUser', async ({ inviteId
 
 export const getLinkInvite = createAsyncThunk('clans/getLinkInvite', async ({ inviteId }: InviteUser, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
+	const response = await mezon.client.getLinkInvite(mezon.session, inviteId).catch(function(e) {
+		return e.json();
+	}).then(err => {
+		return thunkAPI.rejectWithValue(err.message);
+	});
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
