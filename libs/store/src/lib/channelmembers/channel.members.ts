@@ -17,7 +17,7 @@ export interface ChannelMembersEntity extends IChannelMember {
 	name?: string;
 }
 
-export interface ChannalMemberAvatar {
+export interface ChannelMemberAvatar {
 	avatar: string;
 	name: string;
 }
@@ -236,7 +236,7 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 
 export const selectMembersMap = (channelId?: string | null) =>
 	createSelector(selectChannelMembesEntities, (entities) => {
-		const retval = new Map<string, ChannalMemberAvatar>();
+		const retval = new Map<string, ChannelMemberAvatar>();
 		const members = Object.values(entities);
 		
 		members.filter((member) => member && member.user !== null && member.user?.id && member.channelId === channelId).map(member => {

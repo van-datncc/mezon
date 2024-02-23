@@ -23,16 +23,16 @@ function MemberList() {
 						<div className="flex flex-col gap-4">
 							{/* {role?.users.filter((obj: ChannelMembersEntity) => obj.user?.online).map((user: ChannelMembersEntity) => ( */}
 							{rawMembers
-								.filter((obj: ChannelMembersEntity) => obj.user?.online)
+								.filter((obj: ChannelMembersEntity) => obj?.user?.online)
 								.map((user: ChannelMembersEntity) => (
 									<MemberProfile
 										numberCharacterCollapse={30}
 										avatar={user?.user?.avatar_url ?? ''}
 										name={user?.user?.username ?? ''}
-										status={user.user?.online}
+										status={user?.user?.online}
 										isHideStatus={true}
 										isHideIconStatus={false}
-										key={user.id}
+										key={user?.id}
 										textColor="[#AEAEAE]"
 									/>
 								))}
@@ -48,15 +48,15 @@ function MemberList() {
 								{rawMembers
 									.filter((obj: ChannelMembersEntity) => !obj.user?.online)
 									.map((user: ChannelMembersEntity) => (
-										<div key={user.id} className="opacity-60">
+										<div key={user?.id} className="opacity-60">
 											<MemberProfile
 												numberCharacterCollapse={30}
 												avatar={user?.user?.avatar_url ?? ''}
 												name={user?.user?.username ?? ''}
-												status={user.user?.online}
+												status={user?.user?.online}
 												isHideStatus={true}
 												isHideIconStatus={true}
-												key={user.id}
+												key={user?.id}
 												textColor="[#AEAEAE]"
 											/>
 										</div>
