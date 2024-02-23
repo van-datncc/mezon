@@ -82,7 +82,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		const msg = userMentioned.length > 0?{ t: content, m: userMentioned }: {t: content};			
+		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
 		onSend(msg);
 		setEditorState(() => EditorState.createEmpty());
 		setContent('');
@@ -140,7 +140,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							keyBindingFn={keyBindingFn}
 							handleKeyCommand={handleKeyCommand}
 						/>
-						{showPlaceHolder && <p className="absolute duration-300 text-gray-300">Write your thoughs here...</p>}
+						{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
 					</div>
 
 					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">

@@ -17,7 +17,7 @@ const ServerLayout = () => {
 	return (
 		<div className="flex-row bg-bgSurface flex grow">
 			<MezonPolicyProvider clanId={serverId}>
-				<div className="flex flex-col w-[272px] bg-bgSurface relative">
+				<div className="flex flex-col w-widthSideBar max-w-[272px] bg-bgSurface relative">
 					<ServerHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
 					<ChannelList />
 					<FooterProfile
