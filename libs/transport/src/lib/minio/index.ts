@@ -1,4 +1,5 @@
 import * as minio from "minio";
+import { UploadedObjectInfo } from "minio";
 import { ResultCallback } from "minio/dist/main/internal/type";
 
 let clientInstance: minio.Client;
@@ -21,9 +22,12 @@ export function createMinIoClient() {
 	return client;
 }
 
-export function uploadImageToMinIO(bucket: string, name: string, callback: ResultCallback<string>) {
+export function uploadImageToMinIO(bucket: string, name: string, 
+		stream: Buffer,
+		callback: ResultCallback<UploadedObjectInfo>) {
 	if (!clientInstance) {
 		createMinIoClient();
 	}
-	clientInstance.presignedPutObject(bucket, name, callback)
+
+	clientInstance.putObject(bucket, name, stream, callback);
 }

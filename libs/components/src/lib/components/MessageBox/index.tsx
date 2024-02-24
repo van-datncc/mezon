@@ -3,14 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import Editor from '@draft-js-plugins/editor';
+import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
-import { ContentState, EditorState, convertToRaw } from 'draft-js';
+import { AtomicBlockUtils, ContentState, EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
+import { buffer } from 'stream/consumers';
 
 
 export interface EntryComponentProps {
@@ -58,8 +60,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			supportWhitespace: true,
 			mentionTrigger: '@',
 		});
+		const imagePlugin = createImagePlugin();
 		const { MentionSuggestions } = mentionPlugin;
-		const plugins = [mentionPlugin];
+		const plugins = [mentionPlugin, imagePlugin];
 		return { plugins, MentionSuggestions };
 	}, [onTyping, currentChannelId]);
 
@@ -68,20 +71,35 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const onPastedFiles = useCallback(
 		(files: Blob[]) => {
-			console.log("onpaste", files[0]);
-			const file = new File([files[0]], "filename");
+			for (const file of files) {
+				file.arrayBuffer().then(buffer => {
+					// upload to minio
+					uploadImageToMinIO('uploads', "image.jpg", Buffer.from(buffer), (err, url) => {
+						if (err) {
+							console.log(err);
+							return 'not-handled';
+						}
+						
+						const contentState = editorState.getCurrentContent();
+						const contentStateWithEntity = contentState.createEntity(
+							"image",
+							"IMMUTABLE",
+							{ src: "https://cdn.mezon.vn/uploads/image.jpg" }
+						);
+						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+						const newEditorState = EditorState.set(editorState, {
+							currentContent: contentStateWithEntity
+						});
+						
+						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));
+						return 'handled';
+					});
+				});
+			}
 
-			// upload to minio
-			uploadImageToMinIO('uploads', file.name, (err, url) => {
-				if (err) {
-					console.log(err);
-					return 'not-handled';
-				}
-				setEditorState(() => EditorState.createWithContent(ContentState.createFromText(url)));
-				return 'handled';
-			});
+			setEditorState(() => EditorState.createWithContent(ContentState.createFromText("Uploading...")));
 
-			return 'handled';
+			return 'not-handled';
 		}, []
 	);
 
