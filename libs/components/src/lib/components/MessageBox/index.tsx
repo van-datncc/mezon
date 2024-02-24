@@ -84,7 +84,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						const contentStateWithEntity = contentState.createEntity(
 							"image",
 							"IMMUTABLE",
-							{ src: "https://cdn.mezon.vn/uploads/image.jpg" }
+							{ src: "https://ncc.asia/assets/images/about_wedo-img.webp" }
 						);
 						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 						const newEditorState = EditorState.set(editorState, {
