@@ -5,9 +5,11 @@ import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ContentState, EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 
 
@@ -20,7 +22,7 @@ export interface EntryComponentProps {
 	id: string;
 	'aria-selected'?: boolean | 'false' | 'true';
 	theme?: MentionPluginTheme;
-	mention: MentionData;
+	// mention: MentionData;
 	isFocused: boolean;
 	searchValue?: string;
 }
@@ -32,10 +34,17 @@ export type MessageBoxProps = {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const [suggestions, setSuggestions] = useState(props.memberList);
+	const list = props.memberList as MentionData[];
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+
+	const { onSend, onTyping } = props;
+	const [content, setContent] = useState<string>('');
+	const [suggestions, setSuggestions] = useState<MentionData[]>(list);
+
 	useEffect(() => {
-		setSuggestions(props.memberList);
-	}, [props.memberList]);
+		if (props.memberList || suggestions.length === 0) setSuggestions(list);
+	}, [props.memberList, currentClanId, currentChannelId]);
 
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
@@ -47,15 +56,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			theme: mentionsStyles,
 			mentionPrefix: '@',
 			supportWhitespace: true,
+			mentionTrigger: '@',
 		});
 		const { MentionSuggestions } = mentionPlugin;
 		const plugins = [mentionPlugin];
 		return { plugins, MentionSuggestions };
-	}, []);
+	}, [onTyping, currentChannelId]);
 
-	const { onSend, onTyping } = props;
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
-	const [content, setContent] = useState<string>('');
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 
 	const onPastedFiles = useCallback(
@@ -130,9 +138,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const onSearchChange = useCallback(
 		({ value }: { value: string }) => {
-			setSuggestions(defaultSuggestionsFilter(value, props.memberList as MentionData[]));
+			setSuggestions(defaultSuggestionsFilter(value, list));
 		},
-		[onChange],
+		[onTyping, currentChannelId, currentClanId, content, list],
 	);
 
 	const checkSelectionCursor = () => {
@@ -179,12 +187,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					</div>
 
 					<div className="absolute w-[100%] box-border top-10 left-9">
-						<MentionSuggestions
-							onOpenChange={onOpenChange}
-							open={open}
-							onSearchChange={onSearchChange}
-							suggestions={suggestions as MentionData[]}
-						/>
+						<MentionSuggestions onOpenChange={onOpenChange} open={open} onSearchChange={onSearchChange} suggestions={suggestions} />
 					</div>
 				</div>
 
