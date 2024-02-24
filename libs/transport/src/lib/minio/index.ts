@@ -25,5 +25,5 @@ export function uploadImageToMinIO(bucket: string, name: string, callback: Resul
 	if (!clientInstance) {
 		createMinIoClient();
 	}
-	//clientInstance.presignedPutObject(bucket, name, callback)
+	clientInstance.presignedPutObject(bucket, name, callback)
 }
