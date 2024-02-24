@@ -1,16 +1,18 @@
 import { MentionData } from '@draft-js-plugins/mention';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
-
+import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
-import { EditorState, convertToRaw } from 'draft-js';
+import { ContentState, EditorState, convertToRaw } from 'draft-js';
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
+
+
 export interface EntryComponentProps {
 	className?: string;
 	onMouseDown(event: MouseEvent): void;
@@ -63,6 +65,25 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
+
+	const onPastedFiles = useCallback(
+		(files: Blob[]) => {
+			console.log("onpaste", files[0]);
+			const file = new File([files[0]], "filename");
+
+			// upload to minio
+			uploadImageToMinIO('uploads', file.name, (err, url) => {
+				if (err) {
+					console.log(err);
+					return 'not-handled';
+				}
+				setEditorState(() => EditorState.createWithContent(ContentState.createFromText(url)));
+				return 'handled';
+			});
+
+			return 'handled';
+		}, []
+	);
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -155,6 +176,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					<div id="editor" className="p-[10px] flex items-center text-[15px]">
 						<Editor
 							editorState={editorState}
+							handlePastedFiles={onPastedFiles}
 							onChange={onChange}
 							plugins={plugins}
 							ref={ref}
