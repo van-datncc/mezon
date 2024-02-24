@@ -17,6 +17,7 @@
 	"private": true,
 	"dependencies": {
 		"@draft-js-plugins/editor": "^4.1.4",
+		"@draft-js-plugins/image": "^4.1.4",
 		"@draft-js-plugins/mention": "^5.2.2",
 		"@heroiclabs/mezon-js": "file:vendors/mezon-js/packages/mezon-js",
 		"@hookform/resolvers": "^3.3.4",
