@@ -1,11 +1,12 @@
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, convertToRaw } from 'draft-js';
+import { EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 
-import '@draft-js-plugins/emoji/lib/plugin.css';
 import createImagePlugin from '@draft-js-plugins/image';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
@@ -152,6 +153,31 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
+	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
+
+	const [isShowEmoji, setShowEmoji] = useState(false);
+
+	const handleOpenEmoji = () => {
+		setShowEmoji(!isShowEmoji);
+	};
+
+	function EmojiReaction() {
+		const handleEmojiSelect = (emoji:any) => {
+			setShowPlaceHolder(false)
+			setEditorState((prevEditorState) => {
+			  const currentContentState = prevEditorState.getCurrentContent();
+			  const newContentState = Modifier.insertText(
+				currentContentState,
+				prevEditorState.getSelection(),
+				emoji.native
+			  );
+			  return EditorState.push(prevEditorState, newContentState, 'insert-characters');
+			});
+		  };
+
+
+		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
+	}
 
 	return (
 		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
@@ -160,7 +186,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 
 			<div
-				className={`w-[96%] bg-black gap-3`}
+				className={`w-[96%] bg-black gap-3 relative`}
 				onClick={() => {
 					editorRef.current!.focus();
 				}}
@@ -181,10 +207,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
 
-			<div className="flex flex-row h-full items-center gap-1 w-12">
+			<div className="flex flex-row h-full items-center gap-1 w-18">
 				<Icons.Gif />
 				<Icons.Help />
+				<button onClick={handleOpenEmoji}>
+					<Icons.Emoji />
+				</button>
 			</div>
+			{isShowEmoji && (
+				<div className="absolute right-4 bottom-[--bottom-emoji]">
+					<EmojiReaction />
+				</div>
+			)}
 		</div>
 	);
 }
