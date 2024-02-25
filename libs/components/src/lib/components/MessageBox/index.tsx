@@ -4,6 +4,7 @@ import * as Icons from '../Icons';
 import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
+import createEmojiPlugin from '@draft-js-plugins/emoji';
 import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
@@ -12,8 +13,8 @@ import { AtomicBlockUtils, ContentState, EditorState, convertToRaw } from 'draft
 import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-import { buffer } from 'stream/consumers';
-
+import '@draft-js-plugins/emoji/lib/plugin.css';
+//import editorStyles from './editorStyles.module.css';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -52,7 +53,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 	const [open, setOpen] = useState(false);
 
-	const { MentionSuggestions, plugins } = useMemo(() => {
+	const { EmojiSuggestions, EmojiSelect, MentionSuggestions, plugins } = useMemo(() => {
 		const mentionPlugin = createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
 			theme: mentionsStyles,
@@ -61,9 +62,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			mentionTrigger: '@',
 		});
 		const imagePlugin = createImagePlugin();
+		const emojiPlugin = createEmojiPlugin();
+
+		const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
 		const { MentionSuggestions } = mentionPlugin;
-		const plugins = [mentionPlugin, imagePlugin];
-		return { plugins, MentionSuggestions };
+		const plugins = [mentionPlugin, imagePlugin, emojiPlugin];
+		return { plugins, MentionSuggestions, EmojiSuggestions, EmojiSelect };
 	}, [onTyping, currentChannelId]);
 
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
@@ -210,8 +214,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							ref={ref}
 							handleKeyCommand={handleKeyCommand}
 							keyBindingFn={keyBindingFn}
-						/>
+						/>						
 						{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
+						<EmojiSuggestions />
 					</div>
 
 					<div className="absolute w-[100%] box-border top-10 left-9">
@@ -221,7 +226,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 				<div className="flex flex-row h-full items-center gap-1 w-12">
 					<Icons.Gif />
-					<Icons.Help />
+					<Icons.Help />					
+					<EmojiSelect closeOnEmojiSelect />					
 				</div>
 			</div>
 		</div>
