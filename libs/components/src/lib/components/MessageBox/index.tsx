@@ -112,7 +112,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText("Uploading...")));
 
 			return 'not-handled';
-		}, []
+		}, [currentChannelId, currentClanId, editorState]
 	);
 
 	const onChange = useCallback(
