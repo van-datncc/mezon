@@ -35,7 +35,6 @@
 		"match-sorter": "^6.3.3",
 		"memoizee": "^0.4.15",
 		"minio": "^7.1.3",
-		"moment": "^2.30.1",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
 		"react-hook-form": "^7.49.3",
