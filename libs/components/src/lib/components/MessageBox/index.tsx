@@ -73,25 +73,34 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		(files: Blob[]) => {
 			for (const file of files) {
 				file.arrayBuffer().then(buffer => {
+					const now = Date.now();
+					const bucket = currentChannelId || currentClanId || 'uploads';
+					const filename = (now + file.type).replace('image/', '.');
+
 					// upload to minio
-					uploadImageToMinIO('uploads', "image.jpg", Buffer.from(buffer), (err, url) => {
+					uploadImageToMinIO('uploads', filename, Buffer.from(buffer), (err, etag) => {
 						if (err) {
 							console.log(err);
 							return 'not-handled';
 						}
-						
+						const url = "https://ncc.asia/assets/images/about_wedo-img.webp";
 						const contentState = editorState.getCurrentContent();
 						const contentStateWithEntity = contentState.createEntity(
 							"image",
 							"IMMUTABLE",
-							{ src: "https://ncc.asia/assets/images/about_wedo-img.webp" }
+							{ 
+								src:  	url,
+								height: '20px',
+        						width: 	'auto',
+							}
 						);
 						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 						const newEditorState = EditorState.set(editorState, {
 							currentContent: contentStateWithEntity
 						});
 						
-						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));
+						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));						
+						setContent(url);
 						return 'handled';
 					});
 				});
@@ -129,6 +138,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
+
 		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
 		onSend(msg);
 		setContent('');
