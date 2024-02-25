@@ -1,7 +1,7 @@
 import { MentionData } from '@draft-js-plugins/mention';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
-import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
+import { uploadImageToMinIO } from '@mezon/transport';
 import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createEmojiPlugin from '@draft-js-plugins/emoji';
