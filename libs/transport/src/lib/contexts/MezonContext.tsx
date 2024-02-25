@@ -62,6 +62,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session = await clientRef.current.authenticateEmail(email, password, false);
 			sessionRef.current = session;
 
+			const socket = await createSocket(); // Create socket after authentication
+			socketRef.current = socket;
+
 			if (!socketRef.current) {
 				return session;
 			}
@@ -81,6 +84,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			}
 			const session = await clientRef.current.authenticateGoogle(token);
 			sessionRef.current = session;
+
+			const socket = await createSocket(); // Create socket after authentication
+			socketRef.current = socket;
 
 			if (!socketRef.current) {
 				return session;
