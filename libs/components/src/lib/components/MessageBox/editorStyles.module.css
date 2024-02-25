@@ -34,14 +34,13 @@
 	box-sizing: border-box;
 	transform-origin: 50% 0%;
 	transform: scaleY(0);
-	margin: -16px;
 	border: #033a6d;
 	color: white;
-	width: 100%;
+	width: 75%;
 	position: relative;
 	margin-bottom: calc(var(--editor-height));
 	font-size: 15px;
-	width: 70%;
+	max-width: 75%;
 }
 
 .mentionSuggestionsEntryFocused {
