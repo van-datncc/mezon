@@ -1,0 +1,65 @@
+.editor {
+	box-sizing: border-box;
+	border: 1px solid #ddd;
+	cursor: text;
+	padding: 16px;
+	border-radius: 2px;
+	margin-bottom: 2em;
+	box-shadow: inset 0px 1px 8px -3px #ababab;
+	background: #0f0f0f;
+	width: 500px;
+	color: white;
+}
+
+.editor :global(.public-DraftEditor-content) {
+	height: 10px;
+
+}
+
+.mention {
+	color: #3b82f6;
+	text-decoration: none;
+}
+
+#editor {
+	height: var(--editor-height);
+}
+
+.mentionSuggestions {
+	background-color: black;
+	border-radius: 10px;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	transform-origin: 50% 0%;
+	transform: scaleY(0);
+	margin: -16px;
+	border: #033a6d;
+	color: white;
+	width: 100%;
+	position: relative;
+	margin-bottom: calc(var(--editor-height));
+	font-size: 15px;
+	width: 70%;
+}
+
+.mentionSuggestionsEntryFocused {
+	background-color: #033a6d;
+	color: white;
+	border-radius: 10px;
+}
+
+.mentionSuggestionsEntryTitle {
+	font-size: 0%;
+	width: 90%;
+}
+
+.mentionSuggestionsEntryAvatar {
+	display: inline;
+	margin-left: auto;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	padding: 5px;
+}

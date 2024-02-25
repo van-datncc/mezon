@@ -1,152 +1,125 @@
-import { MentionData } from '@draft-js-plugins/mention';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import * as Icons from '../Icons';
-import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import Editor from '@draft-js-plugins/editor';
-import createImagePlugin from '@draft-js-plugins/image';
-import createEmojiPlugin from '@draft-js-plugins/emoji';
-import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import '@draft-js-plugins/mention/lib/plugin.css';
+import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import { EditorState, convertToRaw } from 'draft-js';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import * as Icons from '../Icons';
+
+import '@draft-js-plugins/emoji/lib/plugin.css';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
-import { AtomicBlockUtils, ContentState, EditorState, convertToRaw } from 'draft-js';
-import React, { MouseEvent, ReactElement, useMemo } from 'react';
+import { AtomicBlockUtils, ContentState } from 'draft-js';
+import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import { useSelector } from 'react-redux';
-import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-import '@draft-js-plugins/emoji/lib/plugin.css';
-//import editorStyles from './editorStyles.module.css';
-
-export interface EntryComponentProps {
-	className?: string;
-	onMouseDown(event: MouseEvent): void;
-	onMouseUp(event: MouseEvent): void;
-	onMouseEnter(event: MouseEvent): void;
-	role: string;
-	id: string;
-	'aria-selected'?: boolean | 'false' | 'true';
-	theme?: MentionPluginTheme;
-	// mention: MentionData;
-	isFocused: boolean;
-	searchValue?: string;
-}
+import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
 	onTyping?: () => void;
-	memberList?: MentionData[];
+	listMentions?: MentionData[] | undefined;
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const list = props.memberList as MentionData[];
+	const { onSend, onTyping, listMentions } = props;
+	const [editorState, setEditorState] = useState(EditorState.createEmpty());
+	const [suggestions, setSuggestions] = useState(listMentions);
+	const [clearEditor, setClearEditor] = useState(false);
+	const [content, setContent] = useState<string>('');
+	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
+	const [open, setOpen] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-
-	const { onSend, onTyping } = props;
-	const [content, setContent] = useState<string>('');
-	const [suggestions, setSuggestions] = useState<MentionData[]>(list);
-
-	useEffect(() => {
-		if (props.memberList || suggestions.length === 0) setSuggestions(list);
-	}, [props.memberList, currentClanId, currentChannelId]);
-
-	const ref = useRef<Editor>(null);
-	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
-	const [open, setOpen] = useState(false);
-
-	const { EmojiSuggestions, EmojiSelect, MentionSuggestions, plugins } = useMemo(() => {
-		const mentionPlugin = createMentionPlugin({
+	const mentionPlugin = useRef(
+		createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
-			theme: mentionsStyles,
+			theme: editorStyles,
 			mentionPrefix: '@',
 			supportWhitespace: true,
 			mentionTrigger: '@',
-		});
-		const imagePlugin = createImagePlugin();
-		const emojiPlugin = createEmojiPlugin();
-
-		const { EmojiSuggestions, EmojiSelect } = emojiPlugin;
-		const { MentionSuggestions } = mentionPlugin;
-		const plugins = [mentionPlugin, imagePlugin, emojiPlugin];
-		return { plugins, MentionSuggestions, EmojiSuggestions, EmojiSelect };
-	}, [onTyping, currentChannelId]);
-
-	const [userMentioned, setUserMentioned] = useState<string[]>([]);
-	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-
-	const onPastedFiles = useCallback(
-		(files: Blob[]) => {
-			for (const file of files) {
-				file.arrayBuffer().then(buffer => {
-					const now = Date.now();
-					const bucket = currentChannelId || currentClanId || 'uploads';
-					const filename = (now + file.type).replace('image/', '.');
-
-					// upload to minio
-					uploadImageToMinIO('uploads', filename, Buffer.from(buffer), (err, etag) => {
-						if (err) {
-							console.log(err);
-							return 'not-handled';
-						}
-						const url = "https://ncc.asia/assets/images/about_wedo-img.webp";
-						const contentState = editorState.getCurrentContent();
-						const contentStateWithEntity = contentState.createEntity(
-							"image",
-							"IMMUTABLE",
-							{ 
-								src:  	url,
-								height: '20px',
-        						width: 	'auto',
-							}
-						);
-						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-						const newEditorState = EditorState.set(editorState, {
-							currentContent: contentStateWithEntity
-						});
-						
-						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));						
-						setContent(url);
-						return 'handled';
-					});
-				});
-			}
-
-			setEditorState(() => EditorState.createWithContent(ContentState.createFromText("Uploading...")));
-
-			return 'not-handled';
-		}, []
-	);
-
+		}),
+	).current;
+	const { MentionSuggestions } = mentionPlugin;
+	const plugins = [mentionPlugin];
 	const onChange = useCallback(
 		(editorState: EditorState) => {
 			if (typeof onTyping === 'function') {
 				onTyping();
 			}
+			setClearEditor(false);
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
-			const contentRaw = convertToRaw(contentState).blocks;
-			const contentText = Object.values(contentRaw).map((item) => item.text);
-			const contentBreakLine = contentText.join('\n').replace(/,/g, '');
-			if (contentBreakLine === '@') {
-				const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-				setEditorState(updatedEditorState);
+			const raw = convertToRaw(contentState);
+
+			// get message
+			const messageRaw = raw.blocks;
+			const messageContent = Object.values(messageRaw).map((item) => item.text);
+			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
+			let mentionedUsers = [];
+			for (let key in raw.entityMap) {
+				const ent = raw.entityMap[key];
+				if (ent.type === 'mention') {
+					mentionedUsers.push(ent.data.mention);
+				}
 			}
-			const mentionedRaw = convertToRaw(contentState).entityMap;
-			const mentioned = Object.values(mentionedRaw).map((item) => item.data.m?.id);
-			setContent(contentBreakLine);
-			setUserMentioned(mentioned);
+			setContent(messageBreakline);
+			setUserMentioned(mentionedUsers);
 		},
 		[onTyping],
 	);
+
+	const onSearchChange = ({ value }: any) => {
+		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
+	};
+
+	const onOpenChange = useCallback((_open: boolean) => {
+		setOpen(_open);
+	}, []);
+
+	const onPastedFiles = useCallback((files: Blob[]) => {
+		for (const file of files) {
+			file.arrayBuffer().then((buffer) => {
+				const now = Date.now();
+				const bucket = currentChannelId || currentClanId || 'uploads';
+				const filename = (now + file.type).replace('image/', '.');
+
+				// upload to minio
+				uploadImageToMinIO('uploads', filename, Buffer.from(buffer), (err, etag) => {
+					if (err) {
+						console.log(err);
+						return 'not-handled';
+					}
+					const url = 'https://ncc.asia/assets/images/about_wedo-img.webp';
+					const contentState = editorState.getCurrentContent();
+					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+						src: url,
+						height: '20px',
+						width: 'auto',
+					});
+					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+					const newEditorState = EditorState.set(editorState, {
+						currentContent: contentStateWithEntity,
+					});
+
+					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+					setContent(url);
+					return 'handled';
+				});
+			});
+		}
+
+		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+
+		return 'not-handled';
+	}, []);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
 			return;
 		}
-
 		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
 		onSend(msg);
 		setContent('');
-		setEditorState(() => EditorState.createEmpty());
+		setClearEditor(true);
 	}, [content, onSend, userMentioned]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
@@ -163,72 +136,54 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return 'not-handled';
 	}
-
-	const onOpenChange = useCallback((_open: boolean) => {
-		setOpen(_open);
-	}, []);
-
-	const onSearchChange = useCallback(
-		({ value }: { value: string }) => {
-			setSuggestions(defaultSuggestionsFilter(value, list));
-		},
-		[onTyping, currentChannelId, currentClanId, content, list],
-	);
-
-	const checkSelectionCursor = () => {
-		if (content.length === 1) {
-			const updatedEditorState = EditorState.moveFocusToEnd(editorState);
-			setEditorState(updatedEditorState);
-		} else setEditorState(editorState);
-		if (content.length === 0) {
-			setShowPlaceHolder(true);
-		} else setShowPlaceHolder(false);
-	};
-
+	const editorRef = useRef<Editor | null>(null);
 	useEffect(() => {
-		checkSelectionCursor();
-	}, [content]);
+		if (editorRef.current && clearEditor) {
+			setTimeout(() => {
+				editorRef.current!.focus();
+			}, 0);
+		}
+	}, [clearEditor]);
+
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
 
 	return (
-		<div className="flex w-full items-center relative">
-			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
-				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
-					<Icons.AddCircle />
+		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
+			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
+				<Icons.AddCircle />
+			</div>
+
+			<div
+				className={`w-[96%] bg-black gap-3`}
+				onClick={() => {
+					editorRef.current!.focus();
+				}}
+			>
+				<div id="editor" className="p-[10px] flex items-center text-[15px]">
+					<Editor
+						keyBindingFn={keyBindingFn}
+						handleKeyCommand={handleKeyCommand}
+						editorState={clearEditor ? EditorState.createEmpty() : editorState}
+						onChange={onChange}
+						plugins={plugins}
+						ref={editorRef}
+						handlePastedFiles={onPastedFiles}
+					/>
+					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
+					{/* <EmojiSuggestions /> */}
 				</div>
 
-				<div
-					className={`w-[96%] bg-black gap-3`}
-					onClick={() => {
-						ref.current!.focus();
-					}}
-				>
-					<div id="editor" className="p-[10px] flex items-center text-[15px]">
-						<Editor
-							editorState={editorState}
-							handlePastedFiles={onPastedFiles}
-							onChange={onChange}
-							plugins={plugins}
-							ref={ref}
-							handleKeyCommand={handleKeyCommand}
-							keyBindingFn={keyBindingFn}
-						/>						
-						{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
-						<EmojiSuggestions />
-					</div>
-
-					<div className="absolute w-[100%] box-border top-10 left-9">
-						<MentionSuggestions onOpenChange={onOpenChange} open={open} onSearchChange={onSearchChange} suggestions={suggestions} />
-					</div>
+				<div className="absolute w-full box-border top-10 left-9">
+					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 				</div>
+			</div>
 
-				<div className="flex flex-row h-full items-center gap-1 w-12">
-					<Icons.Gif />
-					<Icons.Help />					
-					<EmojiSelect closeOnEmojiSelect />					
-				</div>
+			<div className="flex flex-row h-full items-center gap-1 w-12">
+				<Icons.Gif />
+				<Icons.Help />
+				{/* <EmojiSelect closeOnEmojiSelect /> */}
 			</div>
 		</div>
 	);

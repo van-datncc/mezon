@@ -3,7 +3,7 @@ import { RootState } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import MessageBox from '../../MessageBox';
+import {MessageBox} from '@mezon/components';
 
 interface DirectIdProps {
 	directParamId: string;
