@@ -42,7 +42,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin, imagePlugin];
-	
+
 	const onChange = useCallback(
 		(editorState: EditorState) => {
 			if (typeof onTyping === 'function') {
@@ -144,7 +144,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				editorRef.current!.focus();
 			}, 0);
 		}
-	}, [clearEditor]);
+		if (content.length === 0) {
+			setShowPlaceHolder(true);
+		} else setShowPlaceHolder(false);
+	}, [clearEditor, content]);
 
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
@@ -173,18 +176,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						handlePastedFiles={onPastedFiles}
 					/>
 					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
-					{/* <EmojiSuggestions /> */}
 				</div>
 
-				<div className="absolute w-full box-border top-10 left-9">
-					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
-				</div>
+				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
 
 			<div className="flex flex-row h-full items-center gap-1 w-12">
 				<Icons.Gif />
 				<Icons.Help />
-				{/* <EmojiSelect closeOnEmojiSelect /> */}
 			</div>
 		</div>
 	);
