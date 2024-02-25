@@ -102,8 +102,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							currentContent: contentStateWithEntity
 						});
 						
-						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));						
 						setContent(url);
+						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));						
 						return 'handled';
 					});
 				});
@@ -138,7 +138,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 
 	const handleSend = useCallback(() => {
-		console.log("content", content);
 		if (!content.trim()) {
 			return;
 		}
