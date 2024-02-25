@@ -14,7 +14,6 @@ import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
 import '@draft-js-plugins/emoji/lib/plugin.css';
-//import editorStyles from './editorStyles.module.css';
 
 export interface EntryComponentProps {
 	className?: string;
@@ -47,7 +46,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		if (props.memberList || suggestions.length === 0) setSuggestions(list);
-	}, [props.memberList, currentClanId, currentChannelId]);
+	}, [props.memberList, currentClanId, currentChannelId, suggestions.length, list]);
 
 	const ref = useRef<Editor>(null);
 	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
@@ -68,7 +67,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const { MentionSuggestions } = mentionPlugin;
 		const plugins = [mentionPlugin, imagePlugin, emojiPlugin];
 		return { plugins, MentionSuggestions, EmojiSuggestions, EmojiSelect };
-	}, [onTyping, currentChannelId]);
+	}, []);
 
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
@@ -168,11 +167,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setOpen(_open);
 	}, []);
 
-	const onSearchChange = useCallback(
+	const onSearchChange = useCallback(		
 		({ value }: { value: string }) => {
+			console.log("list", list);
 			setSuggestions(defaultSuggestionsFilter(value, list));
 		},
-		[onTyping, currentChannelId, currentClanId, content, list],
+		[list],
 	);
 
 	const checkSelectionCursor = () => {
