@@ -35,7 +35,7 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 
 	return (
 		<div>
-			<MessageBox memberList={newUserMentionList && newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
+			<MessageBox listMentions={newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
 		</div>
 	);
 }
