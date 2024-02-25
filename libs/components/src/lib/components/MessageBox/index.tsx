@@ -138,6 +138,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 
 	const handleSend = useCallback(() => {
+		console.log("content", content);
 		if (!content.trim()) {
 			return;
 		}
@@ -169,7 +170,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const onSearchChange = useCallback(		
 		({ value }: { value: string }) => {
-			console.log("list", list);
 			setSuggestions(defaultSuggestionsFilter(value, list));
 		},
 		[list],
