@@ -16,6 +16,10 @@ module.exports = composePlugins(
     // e.g. `config.plugins.push(new MyPlugin())`
     config.plugins.push(new NodePolyfillPlugin());
     config.resolve.fallback = { "fs": false };
+    config.loader = {
+      test: /plugin\.css$/,
+      loaders: ['style-loader', 'css'],
+    }
     return config;
   },
 );
