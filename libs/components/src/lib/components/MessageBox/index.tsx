@@ -5,6 +5,7 @@ import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 
 import '@draft-js-plugins/emoji/lib/plugin.css';
+import createImagePlugin from '@draft-js-plugins/image';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
@@ -39,7 +40,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}),
 	).current;
 	const { MentionSuggestions } = mentionPlugin;
-	const plugins = [mentionPlugin];
+	const imagePlugin = createImagePlugin();
+	const plugins = [mentionPlugin, imagePlugin];
+	
 	const onChange = useCallback(
 		(editorState: EditorState) => {
 			if (typeof onTyping === 'function') {
@@ -106,9 +109,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				});
 			});
 		}
-
 		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
-
 		return 'not-handled';
 	}, []);
 
