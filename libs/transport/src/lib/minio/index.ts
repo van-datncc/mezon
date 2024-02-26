@@ -11,9 +11,9 @@ export function getMinIoClient() {
 export function createMinIoClient() {
 	// TODO: hide it
 	const options = {
-		endPoint: 'minio.mezon.vn',
+		endPoint: 'minio-api.mezon.vn',
 		port: 9002,
-		useSSL: false,
+		useSSL: true,
 		accessKey: 'RqYFpw0saC8hvabCpu8A',
 		secretKey: '5NUOCq60NkGQk4JIkvl6YYk8tQ0QaMeUDEVfahVT'
 	}
