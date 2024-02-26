@@ -9,7 +9,7 @@ export function getMinIoClient() {
 }
 
 export function createMinIoClient() {
-	// TODO: hide it
+	// TODO: move to server
 	const options = {
 		endPoint: 'minio-api.mezon.vn',
 		port: 9002,
