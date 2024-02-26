@@ -1,7 +1,7 @@
-import { ExitSetting, SettingRightProfile } from '@mezon/components';
-import  ServerSettingItems  from './ServerSettingItems'
-import  ServerSettingMainRoles  from './ServerSettingMainRoles'
+import { ExitSetting } from '@mezon/components';
 import { useState } from 'react';
+import ServerSettingItems from './ServerSettingItems';
+import ServerSettingMainRoles from './ServerSettingMainRoles';
 
 export type ModalSettingProps = {
 	open: boolean;

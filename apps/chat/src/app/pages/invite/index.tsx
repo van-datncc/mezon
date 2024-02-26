@@ -42,7 +42,7 @@ export default function InvitePage() {
 				// }
 				// navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
 				setClanName(res.clan_name ?? 'Mezon');
-				setChannelName(res.channel_name ?? res as string);
+				setChannelName(res.channel_name ?? (res as string));
 				setOpenModal(true);
 			});
 		}
@@ -64,10 +64,10 @@ export default function InvitePage() {
 				</Modal.Body>
 				{/* <Modal.Footer> */}
 				<div className="flex justify-center flex-row items-center gap-4 pb-8 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
-					<Button color="gray" className="outline-none" onClick={handleCancelJoin}>
+					<Button color="gray" className="outline-none font-semibold" onClick={handleCancelJoin}>
 						No, Thanks
 					</Button>
-					<Button color="blue" onClick={handleJoinChannel}>
+					<Button color="blue" onClick={handleJoinChannel} className="font-semibold">
 						Join Mezon
 					</Button>
 				</div>

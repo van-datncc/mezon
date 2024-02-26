@@ -20,7 +20,7 @@ export default function ChannelLayout() {
 					>
 						{currentChanel ? <ChannelMessages channelId={currentChanel?.id} /> : <ChannelMessages.Skeleton />}
 					</div>
-					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
+					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
 						{currentChanel && <ChannelTyping channelId={currentChanel?.id} />}
 						{currentChanel ? <ChannelMessageBox channelId={currentChanel?.id} /> : <ChannelMessageBox.Skeleton />}
 					</div>
