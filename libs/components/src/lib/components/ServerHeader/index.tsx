@@ -7,7 +7,7 @@ import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
-import ServerSetting from '../ServerSettings/serverSettings'
+import ServerSetting from '../ServerSettings/serverSettings';
 
 export type ServerHeaderProps = {
 	name?: string;
@@ -101,32 +101,34 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 								}}
 								onClick={() => setOpenCreateCate(true)}
 							>
-									Create category
-								</Dropdown.Item>
-								<Dropdown.Item
-									icon={MdOutlineCreateNewFolder}
-									theme={{
-										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-									}}
-									onClick={() => {
-										setOpenInvite(true);
-										handleOpenInvite();
-									}}
-								>
-									Invite clan
-								</Dropdown.Item>
-								<Dropdown.Item
-									icon={MdOutlineCreateNewFolder}
-									theme={{
-										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-									}}
-									onClick={() => {setOpenServerSettings(true)}}
-								>
-									Server Settings
-								</Dropdown.Item>
-							</Dropdown>
-						</div>
+								Create Clan
+							</Dropdown.Item>
+							<Dropdown.Item
+								icon={MdOutlineCreateNewFolder}
+								theme={{
+									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
+								}}
+								onClick={() => {
+									setOpenInvite(true);
+									handleOpenInvite();
+								}}
+							>
+								Invite People
+							</Dropdown.Item>
+							<Dropdown.Item
+								icon={MdOutlineCreateNewFolder}
+								theme={{
+									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
+								}}
+								onClick={() => {
+									setOpenServerSettings(true);
+								}}
+							>
+								Server Settings
+							</Dropdown.Item>
+						</Dropdown>
 					</div>
+				</div>
 			)}
 			<ServerSetting
 				// open={openServerSettings}

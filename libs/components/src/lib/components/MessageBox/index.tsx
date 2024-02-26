@@ -8,9 +8,9 @@ import createImagePlugin from '@draft-js-plugins/image';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { uploadImageToMinIO } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
-import { uploadImageToMinIO } from '@mezon/transport';
 import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
 
@@ -162,25 +162,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	};
 
 	function EmojiReaction() {
-		const handleEmojiSelect = (emoji:any) => {
-			setShowPlaceHolder(false)
+		const handleEmojiSelect = (emoji: any) => {
+			setShowPlaceHolder(false);
 			setEditorState((prevEditorState) => {
-			  const currentContentState = prevEditorState.getCurrentContent();
-			  const newContentState = Modifier.insertText(
-				currentContentState,
-				prevEditorState.getSelection(),
-				emoji.native
-			  );
-			  return EditorState.push(prevEditorState, newContentState, 'insert-characters');
+				const currentContentState = prevEditorState.getCurrentContent();
+				const newContentState = Modifier.insertText(currentContentState, prevEditorState.getSelection(), emoji.native);
+				return EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			});
-		  };
-
+		};
 
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
 	}
 
 	return (
-		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
+		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content mt-3 mx-4 mb-5 bg-black rounded-md pr-2">
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
 				<Icons.AddCircle />
 			</div>

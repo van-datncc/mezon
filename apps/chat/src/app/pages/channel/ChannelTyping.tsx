@@ -18,5 +18,5 @@ export function ChannelTyping({ channelId }: ChannelTypingProps) {
 		return '';
 	}, [typingUsers]);
 
-	return <div className="pl-[66px] text-xs text-gray-400">{typingLabel}</div>;
+	return <div className="text-xs text-gray-400 absolute bottom-0 left-4 pl-4">{typingLabel}</div>;
 }
