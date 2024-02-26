@@ -1,7 +1,6 @@
 import { MemberList } from '@mezon/components';
-import { useChatMessages } from '@mezon/core';
-import { RootState, selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
-import { useEffect, useRef } from 'react';
+import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
+import { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChanneMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -10,9 +9,7 @@ import { ChannelTyping } from './ChannelTyping';
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChanel = useSelector(selectCurrentChannel);
-
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 			<div className="flex h-heightWithoutTopBar flex-row ">

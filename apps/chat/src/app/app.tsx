@@ -12,18 +12,19 @@ import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { routes } from './routes/index';
+import React from 'react';
 
 const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
 const mezon: CreateMezonClientOptions = {
 	host: 'dev-mezon.nccsoft.vn',
 	//host: '127.0.0.1',
-	port: '7350',
+	port: '7305',
 	key: 'defaultkey',
-	ssl: false,
+	ssl: true,
 };
 
-const theme = 'light';
+const theme = 'dark';
 
 export function App() {
 	const mezon = useMezon();
@@ -54,19 +55,21 @@ function AppWrapper() {
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 			<MezonContextProvider mezon={mezon} connect={true}>
-				<App />
-				<ToastContainer
-					position="top-right"
-					autoClose={2200}
-					hideProgressBar={false}
-					newestOnTop={false}
-					closeOnClick
-					rtl={false}
-					pauseOnFocusLoss
-					draggable
-					pauseOnHover
-					theme="light"
-				/>
+				<React.StrictMode>
+					<App />
+					<ToastContainer
+						position="top-right"
+						autoClose={2200}
+						hideProgressBar={false}
+						newestOnTop={false}
+						closeOnClick
+						rtl={false}
+						pauseOnFocusLoss
+						draggable
+						pauseOnHover
+						theme="light"
+					/>
+				</React.StrictMode>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
 	);

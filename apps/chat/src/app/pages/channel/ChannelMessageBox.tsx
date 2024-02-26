@@ -1,6 +1,6 @@
 import { MentionData } from '@draft-js-plugins/mention';
 import { MessageBox } from '@mezon/components';
-import { useChannelMembers, useChatChannel, useChatSending, useChatTypings } from '@mezon/core';
+import { useChannelMembers, useChatSending } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
@@ -12,7 +12,6 @@ type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
-	console.log('render ChannelMessageBox');
 
 	const handleSend = useCallback(
 		(mess: IMessageSendPayload) => {
@@ -36,7 +35,7 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 
 	return (
 		<div>
-			<MessageBox memberList={newUserMentionList && newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
+			<MessageBox listMentions={newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
 		</div>
 	);
 }

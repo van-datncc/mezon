@@ -1,38 +1,46 @@
-import { useChatMessages } from '@mezon/core';
+import { useAuth, useChatMessages } from '@mezon/core';
+import { useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
 };
+
 export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	const { userProfile } = useAuth();
+	const containerRef = useRef<HTMLDivElement>(null);
+
 	const fetchData = () => {
-		//call api
 		loadMoreMessage();
 	};
-	// console.log('HasMore: ', lastMessageId, unreadMessageId, messages.map(item => item.id))
+
+	const goBottom = () => {
+		if (containerRef.current !== null) {
+			containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	};
+
+	useEffect(() => {
+		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
+			goBottom();
+		}
+	}, [messages, userProfile]);
+
 	return (
-		<div
-			id="scrollableDiv"
-			style={{
-				height: '100%',
-				overflowY: 'auto',
-				display: 'flex',
-				flexDirection: 'column-reverse',
-			}}
-		>
+		<div id="scrollLoading" ref={containerRef} style={{ height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}>
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
-				inverse={true} //
+				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
+				inverse={true}
 				hasMore={hasMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
-				scrollableTarget="scrollableDiv"
-				// below props only if you need pull down functionality
+				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
-				pullDownToRefresh
+				endMessage={<></>}
+				pullDownToRefresh={true}
 				pullDownToRefreshThreshold={50}
 			>
 				{messages.map((message, i) => (

@@ -60,7 +60,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 			}
 
 			return (
-				<div key={index} className="w-full">
+				<div key={index} className="w-full min-w-[200px]">
 					{line}
 				</div>
 			);

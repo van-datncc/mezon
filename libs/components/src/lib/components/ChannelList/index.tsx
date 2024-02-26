@@ -152,7 +152,7 @@ function ChannelList() {
 				showModal={openInvite}
 				confirmButton={() => handleCopyToClipboard(urlInvite)}
 				titleConfirm="Copy"
-				titleBox="Send invite link to a friend"
+				subTitleBox="Send invite link to a friend"
 				borderBottomTitle="border-b "
 			>
 				<p className="px-[6px]">
