@@ -13,6 +13,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
+import { buffer } from 'stream/consumers';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
@@ -80,36 +81,39 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const onPastedFiles = useCallback((files: Blob[]) => {
-		for (const file of files) {
-			file.arrayBuffer().then((buffer) => {
-				const now = Date.now();
-				const bucket = currentChannelId || currentClanId || 'uploads';
-				const filename = (now + file.type).replace('image/', '.');
-
-				// upload to minio
-				uploadImageToMinIO('uploads', filename, Buffer.from(buffer), (err, etag) => {
-					if (err) {
-						console.log(err);
-						return 'not-handled';
-					}
-					const url = 'https://ncc.asia/assets/images/about_wedo-img.webp';
-					const contentState = editorState.getCurrentContent();
-					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-						src: url,
-						height: '20px',
-						width: 'auto',
-					});
-					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-					const newEditorState = EditorState.set(editorState, {
-						currentContent: contentStateWithEntity,
-					});
-
-					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-					setContent(url);
-					return 'handled';
+		const file = new File(files, "upload.png", { type: "image/png" });
+		const now = Date.now();
+		const bucket = "mezon";
+		const filename = (''+ currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + (now + file.type).replace('image/', '.');
+		const metaData = {
+			'Content-Type': 'image/png',
+			'Content-Language': file.size,
+		  };
+		file.arrayBuffer().then((buf) => {			
+			// upload to minio
+			uploadImageToMinIO(bucket, filename, Buffer.from(buf), file.size, metaData, (err, etag) => {
+				if (err) {
+					console.log("err", err);
+					return 'not-handled';
+				}
+				const url = 'https://cdn.mezon.vn/' + filename;
+				const contentState = editorState.getCurrentContent();
+				const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+					src: url,
+					height: '20px',
+					width: 'auto',
 				});
+				const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+				const newEditorState = EditorState.set(editorState, {
+					currentContent: contentStateWithEntity,
+				});
+
+				setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+				setContent(url);
+				return 'handled';
 			});
-		}
+		});
+
 		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 		return 'not-handled';
 	}, [currentChannelId, currentClanId, editorState]);
