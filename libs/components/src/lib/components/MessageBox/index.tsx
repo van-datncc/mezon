@@ -10,7 +10,7 @@ import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
-import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
+import { uploadImageToMinIO } from '@mezon/transport';
 import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
 
