@@ -1,4 +1,5 @@
 export * from './lib/app/hooks/useAppNavigation';
+export * from './lib/chat/hooks/useRole';
 export * from './lib/app/hooks/useAppParams';
 export * from './lib/auth/hooks/useAuth';
 export * from './lib/chat/contexts/ChatContext';
