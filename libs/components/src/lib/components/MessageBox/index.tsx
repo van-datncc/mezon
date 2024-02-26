@@ -13,7 +13,6 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
-import { buffer } from 'stream/consumers';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
