@@ -55,13 +55,13 @@ const Modal = (props: ModalProps) => {
 								{confirmButton && (
 									<div className="flex items-center p-[20px] pb-[32px] border-t border-solid border-borderDefault rounded-b justify-between">
 										<button
-											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-[16px] leading-6 "
+											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-[16px] leading-6 rounded-lg"
 											onClick={onClose}
 										>
 											Back
 										</button>
 										<button
-											className={`text-white font-semibold text-sm px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 bg-primary text-[16px] leading-6 ${disableButtonConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
+											className={`text-white font-semibold text-sm px-4 py-2 shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 bg-primary text-[16px] leading-6 rounded-lg ${disableButtonConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
 											onClick={() => {
 												confirmButton(), onClose();
 											}}

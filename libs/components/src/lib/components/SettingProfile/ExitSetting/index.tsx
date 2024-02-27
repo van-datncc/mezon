@@ -7,8 +7,8 @@ const ExitSetting = (props: ModalExitProps) => {
 		onClose();
 	};
 	return (
-		<div className="bg-bgSecondary w-1/5">
-			<div className="w-1/4 text-black ml-[40px] pt-[94px]">
+		<div className="bg-bgSecondary w-1/12 xl:w-1/5 2xl:flex-grow">
+			<div className="w-1/4 text-black ml-5 pt-[94px]">
 				<button className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold" onClick={handleClose}>
 					X
 				</button>

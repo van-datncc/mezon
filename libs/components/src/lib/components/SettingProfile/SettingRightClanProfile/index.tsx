@@ -15,7 +15,7 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	};
 	// console.log("currentClan: ", currentClan)
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[500px]">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
 				<h1 className="text-2xl font-bold">Profiles</h1>
 				<button className="pt-1 text-[#AEAEAE] mt-[20px] font-bold text-xl" onClick={handleUserProfileButtonClick}>
