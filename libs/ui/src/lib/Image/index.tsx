@@ -1,5 +1,4 @@
 import { Img, ImgProps } from 'react-image';
-import VisibilitySensor from 'react-visibility-sensor';
 
 export type ImageProps = ImgProps & {
 	src: string;
