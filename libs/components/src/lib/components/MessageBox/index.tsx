@@ -14,8 +14,8 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import editorStyles from './editorStyles.module.css';
-
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
@@ -32,6 +32,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const [metaData, setMetaData] = useState({});
+	const [type, setType] = useState<string>('');
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -45,9 +47,31 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			mentionTrigger: '@',
 		}),
 	);
-	const { MentionSuggestions } =  mentionPlugin.current;
+	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin.current, imagePlugin];
+	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g
+	const checkImage = async (url: string) => {
+		try {
+			const response = await axios.head(url);
+			const contentType = response.headers['content-type'];
+			if (contentType && contentType.startsWith('image')) {
+				setType('image')
+				setMetaData({
+					image: {
+						src: url,
+						height: '40px',
+						width: "auto"
+					}
+				})
+			} else {
+				setType('')
+			}
+		} catch (error) {
+			setType('')
+		}
+		return false
+	};
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -63,6 +87,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const messageRaw = raw.blocks;
 			const messageContent = Object.values(messageRaw).map((item) => item.text);
 			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
+			if (messageBreakline.match(urlImageRegex)) {
+				checkImage(messageBreakline)
+			}
 			let mentionedUsers = [];
 			for (let key in raw.entityMap) {
 				const ent = raw.entityMap[key];
@@ -117,6 +144,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 					setContent(url);
+					setType('image');
+					setMetaData({
+						image: {
+							src: url,
+							height: '40px',
+							width: 'auto',
+						}
+					})
 					return 'handled';
 				});
 			});
@@ -131,11 +166,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
+		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned, d: metaData, type: type } : { t: content, d: metaData, type: type };
+		// console.log('MMMMMMM: ', msg)
 		onSend(msg);
 		setContent('');
+		setType('');
+		setMetaData({})
 		setClearEditor(true);
-	}, [content, onSend, userMentioned]);
+	}, [content, onSend, userMentioned, type, metaData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
