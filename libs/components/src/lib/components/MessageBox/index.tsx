@@ -11,9 +11,8 @@ import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import editorStyles from './editorStyles.module.css';
-import { useMezon } from '@mezon/transport';
+import { uploadImageToMinIO } from '@mezon/transport';
 
-import { ApiUploadFileRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useSelector } from 'react-redux';
 
 export type MessageBoxProps = {
@@ -45,8 +44,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin, imagePlugin];
-
-	const { clientRef, sessionRef } = useMezon();
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -88,23 +85,19 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const filename = now + ".png";
 		const file = new File(files, filename, { type: "image/png" });
 		const fullfilename = (''+ currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+		const bucket = "mezon";
+		const metaData = {
+			'Content-Type': 'image/png',
+			'Content-Language': file.size,
+		};
 
 		file.arrayBuffer().then((buf) => {
-			const session = sessionRef.current;
-			const client = clientRef.current;
-			if (!client || !session) {
-				console.log(client, session);
-				throw new Error('Client is not initialized');
-			}
-
-			const body: ApiUploadFileRequest = {
-				filename: fullfilename,
-				filetype: 'image/png',
-				size: file.size,
-				stream: Buffer.from(buf).toString('base64'),
-			};
-
-			client.uploadFile(session, body).then(res => {
+			// upload to minio
+			uploadImageToMinIO(bucket, fullfilename, Buffer.from(buf), file.size, metaData, (err, etag) => {
+				if (err) {
+					console.log("err", err);
+					return 'not-handled';
+				}
 				const url = 'https://cdn.mezon.vn/' + fullfilename;
 				const contentState = editorState.getCurrentContent();
 				const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
@@ -120,14 +113,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 				setContent(url);
 				return 'handled';
-			}).catch(err => {
-				return 'not-handled';
 			});
 		});
 
 		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 		return 'not-handled';
-	}, [clientRef, currentChannelId, currentClanId, editorState, sessionRef]);
+	}, [currentChannelId, currentClanId, editorState]);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
