@@ -44,10 +44,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			supportWhitespace: true,
 			mentionTrigger: '@',
 		}),
-	).current;
-	const { MentionSuggestions } = mentionPlugin;
+	);
+	const { MentionSuggestions } =  mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
-	const plugins = [mentionPlugin, imagePlugin];
+	const plugins = [mentionPlugin.current, imagePlugin];
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -320,7 +320,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						plugins={plugins}
 						ref={editorRef}
 						handlePastedFiles={onPastedFiles}
-						// handleBeforeInput={handleBeforeInput}
 					/>
 					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
 				</div>
