@@ -6,7 +6,7 @@ const SettingRightProfile = () => {
 				<div className="h-1/6 bg-green-500 rounded-tr-[10px] rounded-tl-[10px]"></div>
 
 				<div className="bg-bgSecondary w-[380px] h-2/3 mt-[20px] ml-[15px] rounded-[20px]">
-					<div className="w-[300px] mt-[16px] ml-[16px]">
+					<div className="w-[300px] mt-[16px] ">
 						<p className="text-xl font-medium">{name}</p>
 						<p>{displayName}</p>
 					</div>
@@ -16,9 +16,9 @@ const SettingRightProfile = () => {
 							<img
 								src="https://i.postimg.cc/3RSsTnbD/3d63f5caeb33449b32d885e5aa94bbbf.jpg"
 								alt=""
-								className="w-[100px] h-[100px] rounded-[8px] mt-[16px]"
+								className="w-[100px] h-[100px] rounded-[8px]"
 							/>
-							<div className="mt-[40px] ml-[20px]">
+							<div className="">
 								<p>User Profile</p>
 								<p>
 									{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
@@ -27,7 +27,7 @@ const SettingRightProfile = () => {
 						</div>
 					</div>
 					<div className="w-[300px] mt-[40px] ml-[16px]">
-						<button className="w-5/6 h-[50px] ml-[30px] bg-black rounded-[8px]">Example button</button>
+						<button className="w-full h-[50px] bg-[#1E1E1E] rounded-lg">Example button</button>
 					</div>
 				</div>
 			</div>

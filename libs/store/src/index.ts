@@ -11,6 +11,7 @@ export * from './lib/direct/direct.slice';
 export * from './lib/friends/friend.slice';
 export * from './lib/messages/SeenMessagePool';
 export * from './lib/messages/messages.slice';
+export * from './lib/roleclan/roleclan.slice';
 export * from './lib/policies/policies.slice';
 export * from './lib/store';
 export * from './lib/threads/threads.slice';

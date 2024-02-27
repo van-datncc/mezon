@@ -13,8 +13,9 @@ import { uploadImageToMinIO } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
-import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
+
+import { useSelector } from 'react-redux';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
@@ -85,36 +86,41 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const onPastedFiles = useCallback(
 		(files: Blob[]) => {
-			for (const file of files) {
-				file.arrayBuffer().then((buffer) => {
-					const now = Date.now();
-					const bucket = currentChannelId || currentClanId || 'uploads';
-					const filename = (now + file.type).replace('image/', '.');
+			const now = Date.now();
+			const filename = now + '.png';
+			const file = new File(files, filename, { type: 'image/png' });
+			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+			const bucket = 'mezon';
+			const metaData = {
+				'Content-Type': 'image/png',
+				'Content-Language': file.size,
+			};
 
-					// upload to minio
-					uploadImageToMinIO('uploads', filename, Buffer.from(buffer), (err, etag) => {
-						if (err) {
-							console.log(err);
-							return 'not-handled';
-						}
-						const url = 'https://ncc.asia/assets/images/about_wedo-img.webp';
-						const contentState = editorState.getCurrentContent();
-						const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-							src: url,
-							height: '20px',
-							width: 'auto',
-						});
-						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-						const newEditorState = EditorState.set(editorState, {
-							currentContent: contentStateWithEntity,
-						});
-
-						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-						setContent(url);
-						return 'handled';
+			file.arrayBuffer().then((buf) => {
+				// upload to minio
+				uploadImageToMinIO(bucket, fullfilename, Buffer.from(buf), file.size, metaData, (err, etag) => {
+					if (err) {
+						console.log('err', err);
+						return 'not-handled';
+					}
+					const url = 'https://cdn.mezon.vn/' + fullfilename;
+					const contentState = editorState.getCurrentContent();
+					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+						src: url,
+						height: '20px',
+						width: 'auto',
 					});
+					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+					const newEditorState = EditorState.set(editorState, {
+						currentContent: contentStateWithEntity,
+					});
+
+					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+					setContent(url);
+					return 'handled';
 				});
-			}
+			});
+
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 			return 'not-handled';
 		},
@@ -157,6 +163,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
+			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
 		handleDetectEmoji(content);
 	}, [clearEditor, content]);
@@ -245,7 +252,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const regex = /:{2}./;
 	const handleDetectEmoji = async (value: string) => {
 		const inputValue = value;
-		if (!regex.test(inputValue)) return;
+		if (!regex.test(inputValue)) {
+			setShowEmojiSuggestion(false);
+			return;
+		}
 		const lastWord = inputValue.split(' ').pop();
 		const emojiPickerActive = lastWord?.startsWith(':');
 		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;

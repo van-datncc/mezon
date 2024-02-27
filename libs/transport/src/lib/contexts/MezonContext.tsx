@@ -1,4 +1,5 @@
 import { Channel, Client, Session, Socket, Status } from '@mezon/mezon-js';
+import { WebSocketAdapterPb } from "@mezon/mezon-js-protobuf"
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
@@ -43,7 +44,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!clientRef.current) {
 			throw new Error('Mezon client not initialized');
 		}
-		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false);
+		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false, new WebSocketAdapterPb());
 		socketRef.current = socket;
 		return socket;
 	}, [clientRef, socketRef]);
