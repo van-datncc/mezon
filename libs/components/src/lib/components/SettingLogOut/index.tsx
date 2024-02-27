@@ -6,7 +6,7 @@ const SettingRightProfile = () => {
 				<div className="h-1/6 bg-green-500 rounded-tr-[10px] rounded-tl-[10px]"></div>
 
 				<div className="bg-bgSecondary w-[380px] h-2/3 mt-[20px] ml-[15px] rounded-[20px]">
-					<div className="w-[300px] mt-[16px] ml-[16px]">
+					<div className="w-[300px] mt-[16px] ">
 						<p className="text-xl font-medium">{name}</p>
 						<p>{displayName}</p>
 					</div>
@@ -27,7 +27,7 @@ const SettingRightProfile = () => {
 						</div>
 					</div>
 					<div className="w-[300px] mt-[40px] ml-[16px]">
-						<button className="w-5/6 h-[50px] ml-[30px] bg-black rounded-[8px]">Example button</button>
+						<button className="w-full h-[50px] bg-[#1E1E1E] rounded-[8px]">Example button</button>
 					</div>
 				</div>
 			</div>

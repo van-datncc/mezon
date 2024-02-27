@@ -8,9 +8,9 @@ import createImagePlugin from '@draft-js-plugins/image';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { uploadImageToMinIO } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
-import { uploadImageToMinIO } from 'libs/transport/src/lib/minio';
 import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
 
@@ -80,39 +80,42 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const onPastedFiles = useCallback((files: Blob[]) => {
-		for (const file of files) {
-			file.arrayBuffer().then((buffer) => {
-				const now = Date.now();
-				const bucket = currentChannelId || currentClanId || 'uploads';
-				const filename = (now + file.type).replace('image/', '.');
-
-				// upload to minio
-				uploadImageToMinIO('uploads', filename, Buffer.from(buffer), (err, etag) => {
-					if (err) {
-						console.log(err);
-						return 'not-handled';
-					}
-					const url = 'https://ncc.asia/assets/images/about_wedo-img.webp';
-					const contentState = editorState.getCurrentContent();
-					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-						src: url,
-						height: '20px',
-						width: 'auto',
-					});
-					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-					const newEditorState = EditorState.set(editorState, {
-						currentContent: contentStateWithEntity,
-					});
-
-					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-					setContent(url);
-					return 'handled';
+		const file = new File(files, "upload.png", { type: "image/png" });
+		const now = Date.now();
+		const bucket = "mezon";
+		const filename = (''+ currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + (now + file.type).replace('image/', '.');
+		const metaData = {
+			'Content-Type': 'image/png',
+			'Content-Language': file.size,
+		  };
+		file.arrayBuffer().then((buf) => {			
+			// upload to minio
+			uploadImageToMinIO(bucket, filename, Buffer.from(buf), file.size, metaData, (err, etag) => {
+				if (err) {
+					console.log("err", err);
+					return 'not-handled';
+				}
+				const url = 'https://cdn.mezon.vn/' + filename;
+				const contentState = editorState.getCurrentContent();
+				const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+					src: url,
+					height: '20px',
+					width: 'auto',
 				});
+				const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+				const newEditorState = EditorState.set(editorState, {
+					currentContent: contentStateWithEntity,
+				});
+
+				setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+				setContent(url);
+				return 'handled';
 			});
-		}
+		});
+
 		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 		return 'not-handled';
-	}, []);
+	}, [currentChannelId, currentClanId, editorState]);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
@@ -162,25 +165,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	};
 
 	function EmojiReaction() {
-		const handleEmojiSelect = (emoji:any) => {
-			setShowPlaceHolder(false)
+		const handleEmojiSelect = (emoji: any) => {
+			setShowPlaceHolder(false);
 			setEditorState((prevEditorState) => {
-			  const currentContentState = prevEditorState.getCurrentContent();
-			  const newContentState = Modifier.insertText(
-				currentContentState,
-				prevEditorState.getSelection(),
-				emoji.native
-			  );
-			  return EditorState.push(prevEditorState, newContentState, 'insert-characters');
+				const currentContentState = prevEditorState.getCurrentContent();
+				const newContentState = Modifier.insertText(currentContentState, prevEditorState.getSelection(), emoji.native);
+				return EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			});
-		  };
-
+		};
 
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
 	}
 
 	return (
-		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2">
+		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content mt-3 mx-4 mb-5 bg-black rounded-md pr-2">
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
 				<Icons.AddCircle />
 			</div>

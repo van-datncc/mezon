@@ -118,10 +118,10 @@ const SettingRightClanEdit = ({
 	};
 	return (
 		<>
-			<div className="flex-1 flex mt-[10px] pl-[90px] ">
-				<div className="w-1/2 text-white">
+			<div className="flex-1 flex mt-[10px] gap-x-8 flex-col xl:flex-row">
+				<div className="w-full xl:w-1/2 text-white">
 					<div className="mt-[20px]">
-						<label className="font-normal">CLAN NICKNAME</label>
+						<label className="text-[#CCCCCC] font-bold">CLAN NICKNAME</label>
 						<br />
 						<InputField
 							onChange={handleDisplayName}
@@ -133,11 +133,11 @@ const SettingRightClanEdit = ({
 						/>
 					</div>
 					<div className="mt-[20px]">
-						<p>AVATAR</p>
+						<p className="text-[#CCCCCC] font-bold">AVATAR</p>
 						<div className="flex">
 							<label>
 								<div
-									className="w-[130px] bg-blue-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px]"
+									className="w-[130px] bg-blue-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -153,8 +153,8 @@ const SettingRightClanEdit = ({
 						</div>
 					</div>
 				</div>
-				<div className="w-1/2 text-white">
-					<p className="ml-[30px] mt-[30px]">PREVIEW</p>
+				<div className="w-full xl:w-1/2 text-white">
+					<p className="mt-[20px] text-[#CCCCCC] font-bold">PREVIEW</p>
 					<SettingRightClanCard profiles={editProfile} />
 				</div>
 			</div>
