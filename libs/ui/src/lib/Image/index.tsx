@@ -12,9 +12,7 @@ export type ImageProps = ImgProps & {
 
 function Image(params: ImageProps) {
 	return (
-		<VisibilitySensor>
-			<Img {...params} />
-		</VisibilitySensor>
+		<Img {...params} />		
 	);
 }
 
