@@ -206,6 +206,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		handleDetectEmoji(content);
 	}, [clearEditor, content]);
 
+	useEffect(() => {
+		const editorElement = document.querySelectorAll('[data-offset-key]');
+
+		editorElement[2].classList.add('break-all');
+		console.log(editorElement);
+	}, []);
+
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
