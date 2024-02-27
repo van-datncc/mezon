@@ -109,7 +109,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 						<button
 							disabled={length === 0}
 							onClick={handleCreateDM}
-							className="w-full bg-blue-700 py-2 disabled:cursor-not-allowed disabled:bg-gray-500"
+							className="w-full bg-blue-700 py-2 disabled:cursor-not-allowed disabled:bg-gray-500 rounded-lg"
 						>
 							{selectedFriends.length === 0
 								? 'CREATE DM or GROUP CHAT'
