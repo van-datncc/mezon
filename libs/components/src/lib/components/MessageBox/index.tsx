@@ -1,17 +1,19 @@
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, Modifier, convertToRaw } from 'draft-js';
+import { EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
 
 import createImagePlugin from '@draft-js-plugins/image';
 import data from '@emoji-mart/data';
+
 import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { uploadImageToMinIO } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
+import { SearchIndex, init } from 'emoji-mart';
 import editorStyles from './editorStyles.module.css';
-import { uploadImageToMinIO } from '@mezon/transport';
 
 import { useSelector } from 'react-redux';
 
@@ -20,6 +22,8 @@ export type MessageBoxProps = {
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 };
+
+init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const { onSend, onTyping, listMentions } = props;
@@ -40,21 +44,21 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			supportWhitespace: true,
 			mentionTrigger: '@',
 		}),
-	).current;
-	const { MentionSuggestions } = mentionPlugin;
+	);
+	const { MentionSuggestions } =  mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
-	const plugins = [mentionPlugin, imagePlugin];
+	const plugins = [mentionPlugin.current, imagePlugin];
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
 			if (typeof onTyping === 'function') {
 				onTyping();
 			}
+
 			setClearEditor(false);
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
 			const raw = convertToRaw(contentState);
-
 			// get message
 			const messageRaw = raw.blocks;
 			const messageContent = Object.values(messageRaw).map((item) => item.text);
@@ -80,45 +84,48 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setOpen(_open);
 	}, []);
 
-	const onPastedFiles = useCallback((files: Blob[]) => {		
-		const now = Date.now();
-		const filename = now + ".png";
-		const file = new File(files, filename, { type: "image/png" });
-		const fullfilename = (''+ currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
-		const bucket = "mezon";
-		const metaData = {
-			'Content-Type': 'image/png',
-			'Content-Language': file.size,
-		};
+	const onPastedFiles = useCallback(
+		(files: Blob[]) => {
+			const now = Date.now();
+			const filename = now + '.png';
+			const file = new File(files, filename, { type: 'image/png' });
+			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+			const bucket = 'mezon';
+			const metaData = {
+				'Content-Type': 'image/png',
+				'Content-Language': file.size,
+			};
 
-		file.arrayBuffer().then((buf) => {
-			// upload to minio
-			uploadImageToMinIO(bucket, fullfilename, Buffer.from(buf), file.size, metaData, (err, etag) => {
-				if (err) {
-					console.log("err", err);
-					return 'not-handled';
-				}
-				const url = 'https://cdn.mezon.vn/' + fullfilename;
-				const contentState = editorState.getCurrentContent();
-				const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-					src: url,
-					height: '20px',
-					width: 'auto',
-				});
-				const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-				const newEditorState = EditorState.set(editorState, {
-					currentContent: contentStateWithEntity,
-				});
+			file.arrayBuffer().then((buf) => {
+				// upload to minio
+				uploadImageToMinIO(bucket, fullfilename, Buffer.from(buf), file.size, metaData, (err, etag) => {
+					if (err) {
+						console.log('err', err);
+						return 'not-handled';
+					}
+					const url = 'https://cdn.mezon.vn/' + fullfilename;
+					const contentState = editorState.getCurrentContent();
+					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+						src: url,
+						height: '20px',
+						width: 'auto',
+					});
+					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+					const newEditorState = EditorState.set(editorState, {
+						currentContent: contentStateWithEntity,
+					});
 
-				setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-				setContent(url);
-				return 'handled';
+					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+					setContent(url);
+					return 'handled';
+				});
 			});
-		});
 
-		setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
-		return 'not-handled';
-	}, [currentChannelId, currentClanId, editorState]);
+			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+			return 'not-handled';
+		},
+		[currentChannelId, currentClanId, editorState],
+	);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim()) {
@@ -145,6 +152,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		return 'not-handled';
 	}
 	const editorRef = useRef<Editor | null>(null);
+
+	const [showEmojiSuggestion, setShowEmojiSuggestion] = useState(false);
+
 	useEffect(() => {
 		if (editorRef.current && clearEditor) {
 			setTimeout(() => {
@@ -153,7 +163,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
+			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
+		handleDetectEmoji(content);
 	}, [clearEditor, content]);
 
 	const editorDiv = document.getElementById('editor');
@@ -167,21 +179,128 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setShowEmoji(!isShowEmoji);
 	};
 
+	function handleEmojiClick(clickedEmoji: string) {
+		setEditorState((prevEditorState) => {
+			const currentContentState = prevEditorState.getCurrentContent();
+			const newContentState = Modifier.insertText(currentContentState, prevEditorState.getSelection(), clickedEmoji);
+			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
+			return newEditorState;
+		});
+	}
+
+	const handleKeyPress = (event: React.KeyboardEvent, emoji: string) => {
+		if (event.key === 'Enter') {
+			clickEmojiSugesstion(emoji);
+		}
+	};
+
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
 			setShowPlaceHolder(false);
-			setEditorState((prevEditorState) => {
-				const currentContentState = prevEditorState.getCurrentContent();
-				const newContentState = Modifier.insertText(currentContentState, prevEditorState.getSelection(), emoji.native);
-				return EditorState.push(prevEditorState, newContentState, 'insert-characters');
-			});
+			setShowEmoji(false);
+			handleEmojiClick(emoji.native);
 		};
-
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
 	}
 
+	const [emojiResult, setEmojiResult] = useState<string[]>([]);
+
+	function clickEmojiSugesstion(emoji: string) {
+		handleEmojiClick(emoji);
+		setShowEmojiSuggestion(false);
+		setEditorState((prevEditorState) => {
+			const currentContentState = prevEditorState.getCurrentContent();
+			const raw = convertToRaw(currentContentState);
+			const messageRaw = raw.blocks;
+			const emojiPicker = messageRaw[0].text.toString();
+			const regexEmoji = /[\uD800-\uDFFF][\uDC00-\uDFFF]|[\u0020-\uD7FF\uE000-\uFFFF]/g;
+			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
+			const lastEmoji = emojiArray.length > 0 ? emojiArray[emojiArray.length - 1] : null;
+			const regexSpaceToEmoji = /\s[^\s]+(?=$|[\p{Emoji}])/gu;
+			const blockMap = editorState.getCurrentContent().getBlockMap();
+			const selectionsToReplace: any = [];
+			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
+				const text = contentBlock?.getText();
+				const modifiedText = text?.startsWith(' ') ? text : ` ${text}`;
+				let matchArr, start, end;
+				while ((matchArr = regex.exec(modifiedText)) !== null) {
+					start = matchArr.index;
+					end = start + matchArr[0].length;
+					callback(start, end);
+				}
+			};
+
+			blockMap.forEach((contentBlock) => {
+				findWithRegex(regexSpaceToEmoji, contentBlock, (start: number, end: number) => {
+					const blockKey = contentBlock?.getKey();
+					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
+						anchorOffset: start,
+						focusOffset: end,
+					});
+
+					selectionsToReplace.push(blockSelection);
+				});
+			});
+			let contentState = editorState.getCurrentContent();
+			selectionsToReplace.forEach((selectionState: SelectionState) => {
+				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '');
+			});
+			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
+			return newEditorState;
+		});
+	}
+	const regex = /:{2}./;
+	const handleDetectEmoji = async (value: string) => {
+		const inputValue = value;
+		if (!regex.test(inputValue)) {
+			setShowEmojiSuggestion(false);
+			return;
+		}
+		const lastWord = inputValue.split(' ').pop();
+		const emojiPickerActive = lastWord?.startsWith(':');
+		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
+		const emojiSearch = emojiPickerActive ? inputValue.slice(Number(lastEmojiIdx)) : null;
+		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
+		let emojiResults = (await SearchIndex.search(emojiSearch)) || [];
+		if (emojiResults.length === 0) {
+			emojiResults = await SearchIndex.search(emojiSearchWithOutPrefix);
+		}
+
+		let results = emojiResults?.map((emoji: any) => {
+			return emoji.skins[0].native;
+		});
+
+		if (results) {
+			setShowPlaceHolder(false);
+			setShowEmojiSuggestion(true);
+		}
+		setEmojiResult(results);
+	};
+
 	return (
-		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content mt-3 mx-4 mb-5 bg-black rounded-md pr-2">
+		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+			{showEmojiSuggestion && (
+				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded max-w-[50%] w-fit h-fit">
+					<div className={emojiResult?.length > 0 ? 'p-2' : ''}>
+						<div className=" cursor-pointer flex flex-wrap">
+							{emojiResult?.map((emoji) => {
+								return (
+									<p
+										tabIndex={0}
+										className=" hover:bg-slate-800 rounded border-blue-500"
+										onClick={() => clickEmojiSugesstion(emoji)}
+										key={emoji}
+										onKeyDown={(e) => handleKeyPress(e, emoji)}
+									>
+										{emoji}
+									</p>
+								);
+							})}
+						</div>
+					</div>
+				</div>
+			)}
+
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
 				<Icons.AddCircle />
 			</div>
@@ -212,7 +331,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>
-					<Icons.Emoji />
+					<Icons.Emoji defaultFill={isShowEmoji ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			</div>
 			{isShowEmoji && (
