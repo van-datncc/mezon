@@ -17,11 +17,10 @@ import React from 'react';
 const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
 const mezon: CreateMezonClientOptions = {
-	host: 'dev-mezon.nccsoft.vn',
-	//host: '127.0.0.1',
-	port: '7305',
-	key: 'defaultkey',
-	ssl: true,
+	host: process.env.NX_CHAT_APP_API_HOST as string,
+	port: process.env.NX_CHAT_APP_API_PORT as string,
+	key: process.env.NX_CHAT_APP_API_KEY as string,
+	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
 
 const theme = 'dark';
