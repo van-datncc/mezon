@@ -9,13 +9,12 @@ export function getMinIoClient() {
 }
 
 export function createMinIoClient() {
-	// TODO: hide it
-	const options = {
-		endPoint: 'minio-api.mezon.vn',
-		port: 9002,
-		useSSL: true,
-		accessKey: 'RqYFpw0saC8hvabCpu8A',
-		secretKey: '5NUOCq60NkGQk4JIkvl6YYk8tQ0QaMeUDEVfahVT'
+	const options : minio.ClientOptions = {
+		endPoint: process.env.NX_MINIO_CLIENT_HOST || '',
+		port: parseInt(process.env.NX_MINIO_CLIENT_PORT || ''),
+		useSSL: process.env.NX_MINIO_CLIENT_USESSL === 'true',
+		accessKey: process.env.NX_MINIO_CLIENT_ACCESS_KEY || '',
+		secretKey: process.env.NX_MINIO_CLIENT_SECRET_KEY || ''
 	}
 	const client = new minio.Client(options);
 	clientInstance = client;
