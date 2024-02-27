@@ -1,4 +1,4 @@
-import { useClans, useInvite } from '@mezon/core';
+import { useAuth, useClans, useInvite } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField, Modal as ModalInvite } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
@@ -17,6 +17,7 @@ export type ServerHeaderProps = {
 
 function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	const dispatch = useAppDispatch();
+	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openInvite, setOpenInvite] = useState(false);
@@ -115,6 +116,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 							>
 								Invite People
 							</Dropdown.Item>
+							{currentClan?.creator_id === userProfile?.user?.id && (
 							<Dropdown.Item
 								icon={MdOutlineCreateNewFolder}
 								theme={{
@@ -126,6 +128,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 							>
 								Server Settings
 							</Dropdown.Item>
+							)}
 						</Dropdown>
 					</div>
 				</div>

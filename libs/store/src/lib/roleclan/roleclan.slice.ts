@@ -2,6 +2,7 @@ import { ApiRole, ApiRoleUserList, RoleUserListRoleUser } from '@mezon/mezon-js/
 import { IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
+import { RootState } from '../store';
 // import { MembersRoleActions } from '../getlistmemberinrole/getListMembersInRole.slice';
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
 
@@ -28,12 +29,12 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 
 export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
 
-type FetchRolesClanPayload = {
-	clanId: string;
+type CreateRolePayload = {
+	clanId?: string,
 };
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
-	async ({ clanId }: FetchRolesClanPayload, thunkAPI) => {
+	async ({ clanId }: CreateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listRoles(mezon.session, 100,1,'',clanId);
 		if (!response.roles) {
@@ -73,7 +74,7 @@ export const fetchDeleteRole = createAsyncThunk(
 		try{
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteRole(mezon.session,roleId);
-			thunkAPI.dispatch(RolesClanActions.remove(roleId))
+			thunkAPI.dispatch(rolesClanActions.remove(roleId))
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
@@ -86,33 +87,19 @@ export const fetchDeleteRole = createAsyncThunk(
 
 
 
-type CreateRolePayload = {
-	title: string;
-	role_icon?: string;
-	display_online?: number;
-	description?:string;
-	active_permission_ids?: Array<string>,
-	add_user_ids?: Array<string>,
-	allow_mention?: number,
-	clan_id?: string,
-	color?: string,
-	logo?: string;
-};
-
 export const fetchCreateRole = createAsyncThunk(
-	'DeleteRole/fetchDeleteRole',
-	async ({ title,role_icon, allow_mention, display_online, description, clan_id, color, active_permission_ids, add_user_ids }: CreateRolePayload, thunkAPI) => {
+	'CreatRole/fetchCreateRole',
+	async ({ clanId}: CreateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			active_permission_ids: active_permission_ids || [],
-    		add_user_ids: add_user_ids || [],
-    		allow_mention: allow_mention || 0,
-    		clan_id: clan_id,
-    		color: color || '',
-    		description: description || '',
-    		display_online: display_online || 0,
-    		role_icon: role_icon ||'',
-    		title: title,
+			active_permission_ids: [],
+    		add_user_ids: [],
+    		allow_mention: 0,
+    		clan_id: clanId,
+    		color: '',
+    		description: '',
+    		display_online: 0,
+    		title: 'New role',
 		}
 		const response = await mezon.client.createRole(mezon.session,body);
 		if (!response) {
@@ -123,6 +110,40 @@ export const fetchCreateRole = createAsyncThunk(
 	},
 );
 
+type UpdateRolePayload = {
+    role_id: string;
+    title: string | undefined;
+    add_user_ids: string[];
+    active_permission_ids: string[];
+    remove_user_ids: string[];
+    remove_permission_ids: string[];
+};
+
+export const fetchUpdateRole = createAsyncThunk(
+	'UpdateRole/fetchUpdateRole',
+	async ({ role_id, title, add_user_ids, active_permission_ids,remove_user_ids, remove_permission_ids}: UpdateRolePayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const body = {
+			role_id: role_id,
+			title: title || '',
+			color: '',
+			role_icon: '',
+			description: '',
+			display_online: 0,
+			allow_mention: 0,
+			add_user_ids: add_user_ids || [],
+			active_permission_ids: active_permission_ids || [],
+			remove_user_ids: remove_user_ids || [],
+			remove_permission_ids: remove_permission_ids || [],
+		}
+		const response = await mezon.client.updateRole(mezon.session, role_id, body);
+		if (!response) {
+			
+			return thunkAPI.rejectWithValue([]);
+		}
+		return response;
+	},
+);
 
 export const initialRolesClanState: RolesClanState = RolesClanAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -140,6 +161,7 @@ export const RolesClanSlice = createSlice({
 		remove: RolesClanAdapter.removeOne,
 		setCurrentRoleId: (state, action: PayloadAction<string>) => {
 			state.currentRoleId = action.payload;
+			console.log("state.currentRoleId: ", state.currentRoleId);
 		},
 	},
 	extraReducers: (builder) => {
@@ -163,11 +185,60 @@ export const RolesClanSlice = createSlice({
 	},
 });
 
+export const roleSlice = createSlice({
+	name: 'roleId',
+	initialState: {
+	  selectedRoleId: '',
+	},
+	reducers: {
+	  setSelectedRoleId: (state, action) => {
+		state.selectedRoleId = action.payload;
+	  },
+	},
+  });
+
+export const roleIdReducer = roleSlice.reducer;
+
+export const { setSelectedRoleId } = roleSlice.actions;
+
+const selectSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
+
+export const getSelectedRoleId = createSelector(
+  selectSelectedRoleId,
+  (roleId) => roleId
+);
+
+export const updateRoleSlice = createSlice({
+	name: 'isshow',
+	initialState: {
+	  isShow: false,
+	},
+	reducers: {
+	  toggleIsShowTrue: (state) => {
+		state.isShow = true;
+	  },
+	  toggleIsShowFalse: (state) => {
+		state.isShow = false;
+	  },
+	},
+  });
+  
+  export const IsShowReducer= updateRoleSlice.reducer;
+  
+  export const { toggleIsShowTrue, toggleIsShowFalse } = updateRoleSlice.actions;
+  
+  const selectIsShow = (state: RootState) => state.isshow.isShow;
+  
+  export const getIsShow = createSelector(
+	selectIsShow,
+	(isshow) => isshow
+  );
+
 /*
  * Export reducer for store configuration.
  */
 export const RolesClanReducer = RolesClanSlice.reducer;
-export const RolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole, fetchDeleteRole };
+export const rolesClanActions = { ...RolesClanSlice.actions, fetchRolesClan, fetchMembersRole, fetchDeleteRole, fetchCreateRole, fetchUpdateRole};
 
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
@@ -182,7 +253,6 @@ export const selectCurrentRoleId = createSelector(getRolesClanState, (state) => 
 export const selectRolesClanEntities = createSelector(getRolesClanState, selectEntities);
 
 export const selectCurrentRole = createSelector(selectRolesClanEntities, selectCurrentRoleId, (RolesClanEntities, RoleId) =>
-RoleId ? RolesClanEntities[RoleId] : null,
-);
+RoleId ? RolesClanEntities[RoleId] : null,);
 export const selectAllRoleMember = createSelector(getRolesClanState, (state)=>state.roleMembers);
 export const selectMembersByRoleID = (roleID:string)=>{createSelector(selectAllRoleMember, (roleMembers)=>{return roleMembers[roleID]});}
