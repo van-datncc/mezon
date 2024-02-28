@@ -1,5 +1,5 @@
 import { useClans, useRoles, useUserPolicy } from "@mezon/core";
-import { getSelectedRoleId, toggleIsShowFalse, toggleIsShowTrue } from "@mezon/store";
+import { getSelectedRoleId, setAddPermissions, setRemovePermissions, toggleIsShowFalse, toggleIsShowTrue } from "@mezon/store";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SettingUserClanProfileSave from "../../../SettingProfile/SettingRightClanProfile/settingUserClanProfileSave";
@@ -26,9 +26,6 @@ const SettingPermissions = () => {
     const removePermissionIds: string[] = permissionIds
     .filter(permissionId => !selectedPermissions.includes(permissionId as string))
     .filter(id => id !== undefined) as string[];
-
-    console.log("activePermissionIds: ", activePermissionIds);
-    console.log("removePermissionIds: ", removePermissionIds);
     
     const { currentClan } = useClans();
     const { permissionsDefault } = useUserPolicy(currentClan?.id||'');
@@ -38,6 +35,10 @@ const SettingPermissions = () => {
     const [flagOption, setFlagOption] = useState<boolean>(false);
     const dispatch = useDispatch();
     // dispatch(toggleIsShowFalse());
+    // dispatch(setAddPermissions([]));
+    // dispatch(setRemovePermissions([]));
+    console.log("activePermissionIds: ", activePermissionIds);
+    
     useEffect(() => {
         const results = permissionsDefault.filter(permission =>
             permission.slug?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -45,42 +46,44 @@ const SettingPermissions = () => {
         setSearchResults(results);
     }, [searchTerm, permissionsDefault]);
     
-    const handleClose = () =>{
-        setSelectedPermissions(permissionIds as string[])
-        setFlagOption(false)
-        dispatch(toggleIsShowFalse());
-    }
-    const handlSaveClose = () =>{
-        setFlagOption(false)
-        dispatch(toggleIsShowFalse());
-    }
-    const handleUpdateUser = async () =>{
-        await updateRole(currentClan?.id ?? '',clickRole,'',[],activePermissionIds,[],removePermissionIds);
-    }
-    const saveProfile: ModalSettingSave = {
-		flagOption:flagOption,
-        handleClose,
-		handlSaveClose,
-		handleUpdateUser,
-	};
+    // const handleClose = () =>{
+    //     setSelectedPermissions(permissionIds as string[])
+    //     setFlagOption(false)
+    //     dispatch(toggleIsShowFalse());
+    // }
+    // const handlSaveClose = () =>{
+    //     setFlagOption(false)
+    //     dispatch(toggleIsShowFalse());
+    // }
+    // const handleUpdateUser = async () =>{
+    //     await updateRole(currentClan?.id ?? '',clickRole,'',[],activePermissionIds,[],removePermissionIds);
+    // }
+    // const saveProfile: ModalSettingSave = {
+	// 	flagOption:flagOption,
+    //     handleClose,
+	// 	handlSaveClose,
+	// 	handleUpdateUser,
+	// };
 
     const handlePermissionToggle = (permissionId: string) => {
         setSelectedPermissions(prevPermissions => {
             const newPermissions = prevPermissions.includes(permissionId) 
                 ? prevPermissions.filter(id => id !== permissionId)
                 : [...prevPermissions, permissionId];
-            
+            dispatch(setAddPermissions(newPermissions))
             const isSamePermissions = newPermissions.length === permissionIds.length 
                 && newPermissions.every(id => permissionIds.includes(id));
             if (isSamePermissions){
                 dispatch(toggleIsShowFalse());
-                setFlagOption(false)
+                // setFlagOption(false)
             } else {
-                setFlagOption(true)
+                // setFlagOption(true)
                 dispatch(toggleIsShowTrue());
             }
             return newPermissions;
         });
+        dispatch(setAddPermissions(activePermissionIds));
+        dispatch(setRemovePermissions(removePermissionIds));
     };
     return (
         <>
@@ -110,7 +113,7 @@ const SettingPermissions = () => {
                     ))}
                 </ul>
             </div>
-            <SettingUserClanProfileSave PropsSave={saveProfile}/>
+            {/* <SettingUserClanProfileSave PropsSave={saveProfile}/> */}
         </>
     );
 };

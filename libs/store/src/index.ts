@@ -16,3 +16,4 @@ export * from './lib/policies/policies.slice';
 export * from './lib/store';
 export * from './lib/threads/threads.slice';
 export * from './lib/users/users.slice';
+export * from './lib/clanMembers/clan.members';

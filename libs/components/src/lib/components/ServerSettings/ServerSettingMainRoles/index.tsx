@@ -5,7 +5,7 @@ import { useClans, useRoles } from "@mezon/core";
 import { InputField } from "@mezon/ui";
 import { DeleteModal } from "../DeleteRoleModal/deleteRoleModal";
 import { useState } from "react";
-import { rolesClanActions, setSelectedRoleId, useAppDispatch } from "@mezon/store";
+import { rolesClanActions, setAddMemberRoles, setAddPermissions, setNameRoleNew, setRemoveMemberRoles, setRemovePermissions, setSelectedRoleId, useAppDispatch } from "@mezon/store";
 import { useDispatch } from "react-redux";
 
 export type ModalOpenEdit = {
@@ -13,9 +13,8 @@ export type ModalOpenEdit = {
 };
 // import SettingRightUser from '../SettingRightUserProfile';
 const ServerSettingMainRoles = (props: ModalOpenEdit) => {
-    const { RolesClan, createRole} = useRoles();
+    const { RolesClan} = useRoles();
     const [showModal, setShowModal] = useState<boolean>(false);
-    const { currentClan } = useClans();
     const [selectedRoleId, setSelectedRoleID] = useState<string>('');
     const dispatchRole = useDispatch();
     const dispatch = useAppDispatch();
@@ -29,14 +28,14 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
     const handleRoleClick = (roleId:string) => {
         setSelectedRoleID(roleId);
         dispatchRole(setSelectedRoleId(roleId));
+        dispatchRole(setAddPermissions([]));
+        dispatchRole(setRemovePermissions([]));
+        dispatchRole(setAddMemberRoles([]));
+        dispatchRole(setRemoveMemberRoles([]));
     };
     const handleDeleteRole = async (roleId: string) => {
         await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
       };
-      
-    const handCreateRole = async () => {
-        await createRole(currentClan?.id||'');
-    }
 	return (
 		<>
                 <h1 className="text-2xl font-bold mb-4">Roles</h1>
@@ -49,7 +48,12 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
                         />
                     </div>
                         <button className="bg-blue-600 rounded-[3px] p-[8px] pr-[10px] pl-[10px] text-nowrap"
-                        onClick={() => handCreateRole()}
+                        onClick={() => {dispatch(setSelectedRoleId(""));
+                                        dispatch(setNameRoleNew(""));
+                                        dispatch(setAddPermissions([]));
+                                        dispatch(setAddMemberRoles([]));
+                                        props.handleOpen();
+                                        }}
                         >Create Role</button>
                 </div>
                 <br />

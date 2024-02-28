@@ -14,8 +14,12 @@ export function useRoles() {
 	);
 
 	const createRole = React.useCallback(
-		async (clanId: string) => {
-			await dispatch(rolesClanActions.fetchCreateRole({clanId}));
+		async (clan_id: string,
+			clanId: string,
+			title: string,
+			add_user_ids: string[],
+			active_permission_ids: string[]) => {
+			await dispatch(rolesClanActions.fetchCreateRole({clan_id,title,add_user_ids,active_permission_ids}));
 			await dispatch(rolesClanActions.fetchRolesClan({clanId}))
 		},
 		[dispatch],

@@ -28,7 +28,6 @@ const SettingManageMembers = () => {
         setSearchResults(results || []);
     }, [memberRoles, searchTerm]);
     const handleRemoveMember = async (userID:string[]) =>{
-        console.log("userID: ", userID);
         
         await updateRole(currentClan?.id ?? '',clickRole,'',[],[],userID,[]);
     }
