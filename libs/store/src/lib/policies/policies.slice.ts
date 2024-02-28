@@ -39,6 +39,19 @@ export const fetchPermissionsUser = createAsyncThunk('policies/fetchPermissionsU
 	return response.permissions.map(mapPermissionUserToEntity);
 });
 
+export const fetchPermission = createAsyncThunk(
+	'policies/fetchPermission',
+	async (_,thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.getListPermission(mezon.session);
+		if (!response.permissions) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		return response.permissions?.map(mapPermissionUserToEntity);
+	},
+);
+
+
 export const initialPoliciesState: PoliciesState = policiesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	PermissionsUser: [],
@@ -66,15 +79,38 @@ export const policiesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+		// builder
+		// 	.addCase(fetchPermission.fulfilled, (state: PoliciesState, action: PayloadAction<IPermissionUser[]>) => {
+		// 		policiesAdapter.setAll(state, action.payload);
+		// 		state.loadingStatus = 'loaded';
+		// 	})
+			
 	},
 });
 
+
+export const policiesDefaultSlice = createSlice({
+	name: "policiesDefaultSlice",
+	initialState: initialPoliciesState,
+	reducers: {
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchPermission.fulfilled, (state: PoliciesState, action: PayloadAction<IPermissionUser[]>) => {
+				policiesAdapter.setAll(state, action.payload);
+				state.loadingStatus = 'loaded';
+			})
+			
+	},
+});
 /*
  * Export reducer for store configuration.
  */
 export const policiesReducer = policiesSlice.reducer;
 
-export const policiesActions = { ...policiesSlice.actions, fetchPermissionsUser };
+export const policiesDefaultReducer = policiesDefaultSlice.reducer;
+
+export const policiesActions = { ...policiesSlice.actions, fetchPermissionsUser, fetchPermission };
 
 const { selectAll } = policiesAdapter.getSelectors();
 
@@ -82,6 +118,11 @@ export const getPoliciesState = (rootState: { [POLICIES_FEATURE_KEY]: PoliciesSt
 
 export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
 
+export const getPoliciesDefaultState = (rootState: { ["policiesDefaultSlice"]: PoliciesState }): PoliciesState => rootState["policiesDefaultSlice"];
+
+export const selectAllPermissionsDefault = createSelector(getPoliciesDefaultState, selectAll);
+
 export const selectAllPermissionsUserKey = createSelector(selectAllPermissionsUser, (permissionsUser) => {
 	return permissionsUser.map((permissionUser) => permissionUser.slug);
 });
+

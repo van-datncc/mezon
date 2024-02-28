@@ -168,6 +168,8 @@ export interface ThreadProps {
 
 export type IUserAccount = ApiAccount;
 
+export type IPermission = ApiPermission;
+
 export enum ChannelStatusEnum {
 	isPrivate = 1,
 }
