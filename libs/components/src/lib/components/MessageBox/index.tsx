@@ -11,11 +11,11 @@ import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { uploadImageToMinIO } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
+import axios from 'axios';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
-import editorStyles from './editorStyles.module.css';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
@@ -50,27 +50,27 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin.current, imagePlugin];
-	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g
+	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
 	const checkImage = async (url: string) => {
 		try {
 			const response = await axios.head(url);
 			const contentType = response.headers['content-type'];
 			if (contentType && contentType.startsWith('image')) {
-				setType('image')
+				setType('image');
 				setMetaData({
 					image: {
 						src: url,
 						height: '40px',
-						width: "auto"
-					}
-				})
+						width: 'auto',
+					},
+				});
 			} else {
-				setType('')
+				setType('');
 			}
 		} catch (error) {
-			setType('')
+			setType('');
 		}
-		return false
+		return false;
 	};
 
 	const onChange = useCallback(
@@ -88,7 +88,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const messageContent = Object.values(messageRaw).map((item) => item.text);
 			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
 			if (messageBreakline.match(urlImageRegex)) {
-				checkImage(messageBreakline)
+				checkImage(messageBreakline);
 			}
 			let mentionedUsers = [];
 			for (let key in raw.entityMap) {
@@ -150,8 +150,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							src: url,
 							height: '40px',
 							width: 'auto',
-						}
-					})
+						},
+					});
 					return 'handled';
 				});
 			});
@@ -171,7 +171,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		onSend(msg);
 		setContent('');
 		setType('');
-		setMetaData({})
+		setMetaData({});
 		setClearEditor(true);
 	}, [content, onSend, userMentioned, type, metaData]);
 
@@ -346,7 +346,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</div>
 			)}
 
-			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
+			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 cursor-pointer">
 				<Icons.AddCircle />
 			</div>
 

@@ -17,28 +17,28 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
-				<h1 className="text-2xl font-bold">Profiles</h1>
-				<button className="pt-1 text-[#AEAEAE] mt-[20px] font-bold text-xl" onClick={handleUserProfileButtonClick}>
+				<h1 className="text-2xl font-bold tracking-wider">Profiles</h1>
+				<button className="pt-1 text-[#AEAEAE] mt-[20px] font-bold text-xl tracking-wider" onClick={handleUserProfileButtonClick}>
 					User Profile
 				</button>
-				<button className="pt-1 text-white mt-[20px] font-bold text-xl ml-[16px] border-b-2 border-blue-500 pb-2">Clan Profile</button>
-				<div className="flex mt-[30px] flex-col xl:flex-row gap-x-1">
+				<button className="pt-1 mt-[20px] font-bold text-xl ml-[16px] border-b-2 border-[#155EEF] pb-2 tracking-wider">Clan Profiles</button>
+				<div className="flex mt-[30px] flex-col xl:flex-row gap-x-1 text-sm font-normal">
 					<p>Show who you are with different profiles for each of your clans</p>
-					<a href="" className="text-blue-500">
+					<a href="" className="text-[#84ADFF] text-sm font-normal">
 						{' '}
 						Learn more about Clan Profiles
 					</a>
 				</div>
-				<p className="mt-[20px] font-bold text-[#CCCCCC]">CHOOSE A CLAN</p>
+				<p className="mt-[20px] font-bold text-[#CCCCCC] tracking-wide">CHOOSE A CLAN</p>
 				<select
 					name="clan"
-					className="block w-full mt-1 bg-black border border-black text-white rounded p-2"
+					className="block w-full mt-1 bg-black border border-black text-white rounded px-4 py-3 font-normal text-sm tracking-wide"
 					disabled={flagOption}
 					value={selectedClanId}
 					onChange={handleClanChange}
 				>
 					{clans.map((clan) => (
-						<option key={clan.id} value={clan.id} style={{ width: '200px' }}>
+						<option key={clan.id} value={clan.id} style={{ width: '200px' }} className="">
 							{clan.clan_name}
 						</option>
 					))}
