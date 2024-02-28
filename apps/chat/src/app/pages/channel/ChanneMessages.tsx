@@ -26,7 +26,7 @@ export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
 		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
 			goBottom();
 		}
-	}, [messages, userProfile]);
+	}, [messages[0]]);
 
 	return (
 		<div id="scrollLoading" ref={containerRef} style={{ height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}>
