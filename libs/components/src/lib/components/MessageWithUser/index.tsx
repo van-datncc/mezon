@@ -64,7 +64,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 			}
 
 			return (
-				<div key={index} className="w-full min-w-[200px]">
+				<div key={index} className="max-w-[40vw] lg:max-w-[30vw] xl:max-w-[50vw] lg:w-full min-w-full break-words ">
 					{line}
 				</div>
 			);
