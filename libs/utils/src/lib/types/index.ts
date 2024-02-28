@@ -103,8 +103,7 @@ export type IMessage = ChannelMessage & {
 	content: {
 		t?: string | undefined;
 		m?: string[] | undefined;
-		type?: string;
-		d?: any
+		md?: any
 	};
 	date?: string | undefined;
 	creationTime?: Date;
@@ -119,8 +118,7 @@ export type IMessageWithUser = IMessage & {
 export type IMessageSendPayload = {
 	t: string;
 	m?: string[] | undefined;
-	type?: string;
-	d?: any
+	md?: any
 };
 
 export type IUser = {

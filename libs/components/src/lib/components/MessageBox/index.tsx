@@ -33,7 +33,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [content, setContent] = useState<string>('');
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
 	const [metaData, setMetaData] = useState({});
-	const [type, setType] = useState<string>('');
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -56,19 +55,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const response = await axios.head(url);
 			const contentType = response.headers['content-type'];
 			if (contentType && contentType.startsWith('image')) {
-				setType('image');
 				setMetaData({
-					image: {
-						src: url,
-						height: '40px',
-						width: 'auto',
-					},
-				});
+					tp: 'image',
+					dt: {
+						s: content.length,
+						l: url.length,
+					}
+				})
 			} else {
-				setType('');
+				setMetaData({
+				})
 			}
 		} catch (error) {
-			setType('');
+			setMetaData({
+			})
 		}
 		return false;
 	};
@@ -97,10 +97,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					mentionedUsers.push(ent.data.mention);
 				}
 			}
-			setContent(messageBreakline);
+			setContent(content + messageBreakline);
 			setUserMentioned(mentionedUsers);
 		},
-		[onTyping],
+		[],
 	);
 
 	const onSearchChange = ({ value }: any) => {
@@ -143,15 +143,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					});
 
 					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-					setContent(url);
-					setType('image');
+					setContent(content + url);
 					setMetaData({
-						image: {
-							src: url,
-							height: '40px',
-							width: 'auto',
-						},
-					});
+						tp: 'image',
+						dt: {
+							s: content.length,
+							l: url.length,
+						}
+					})
 					return 'handled';
 				});
 			});
@@ -166,14 +165,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned, d: metaData, type: type } : { t: content, d: metaData, type: type };
+		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned, md: metaData } : { t: content, md: metaData };
 		// console.log('MMMMMMM: ', msg)
 		onSend(msg);
 		setContent('');
-		setType('');
-		setMetaData({});
+		setMetaData({})
 		setClearEditor(true);
-	}, [content, onSend, userMentioned, type, metaData]);
+	}, [content, onSend, userMentioned, metaData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
