@@ -21,7 +21,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 	return (
 		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow">
 			<div className="w-170px ">
-				<p className="text-blue-500 font-bold text-sm">USER SETTINGS</p>
+				<p className="text-[#84ADFF] font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
 					className={`p-1 text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left mt-3 ${selectedButton === 'Account' ? 'bg-blue-400 text-white' : ''}`}
 					onClick={() => {
@@ -58,7 +58,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				<br />
 				<button className="p-1 text-[#AEAEAE] text-[15px] mb-[10px] w-[170px] rounded-[5px] text-left mt-3">Friend Requests</button>
 				<hr className="border-t border-solid border-borderDefault mt-4" />
-				<button className="pt-2 text-blue-500 mt-3 font-bold text-sm">USER SETTINGS</button>
+				<button className="pt-2 text-[#84ADFF] mt-3 font-bold text-sm tracking-wider">USER SETTINGS</button>
 				<br />
 				<button className="p-1 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-3">Appearance</button>
 				<br />

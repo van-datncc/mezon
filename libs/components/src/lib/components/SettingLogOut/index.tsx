@@ -1,13 +1,13 @@
 const SettingRightProfile = () => {
 	return (
 		<div className="w-1/2 text-white">
-			<p className="ml-[30px] mt-[30px]">PREVIEW</p>
+			<p className="ml-[30px] mt-[30px] ">PREVIEW</p>
 			<div className="bg-black h-[542px] ml-[30px] mt-[10px] rounded-[10px] flex flex-col relative">
 				<div className="h-1/6 bg-green-500 rounded-tr-[10px] rounded-tl-[10px]"></div>
 
 				<div className="bg-bgSecondary w-[380px] h-2/3 mt-[20px] ml-[15px] rounded-[20px]">
 					<div className="w-[300px] mt-[16px] ">
-						<p className="text-xl font-medium">{name}</p>
+						<p className="text-xl font-bold">{name}</p>
 						<p>{displayName}</p>
 					</div>
 					<div className="w-[300px] mt-[50px] ml-[16px]">
