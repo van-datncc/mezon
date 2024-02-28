@@ -37,9 +37,8 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		if (content?.md?.tp === "image") {
-			return (
-				<MessageImage content={content.t} metaData={content.md} />)
+		if (content?.md?.tp === 'image') {
+			return <MessageImage content={content.t} metaData={content.md} />;
 		}
 		const lines = content.t?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;

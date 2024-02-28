@@ -156,6 +156,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+
+			console.log('add code handle');
 			return 'not-handled';
 		},
 		[currentChannelId, currentClanId, editorState],
@@ -206,9 +208,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
-
 		editorElement[2].classList.add('break-all');
-		console.log(editorElement);
 	}, []);
 
 	const editorDiv = document.getElementById('editor');
@@ -321,7 +321,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	};
 
 	return (
-		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
 				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded max-w-[50%] w-fit h-fit">
 					<div className={emojiResult?.length > 0 ? 'p-2' : ''}>
@@ -344,7 +344,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</div>
 			)}
 
-			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 cursor-pointer">
+			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
 				<Icons.AddCircle />
 			</div>
 
@@ -354,7 +354,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					editorRef.current!.focus();
 				}}
 			>
-				<div id="editor" className="p-[10px] flex items-center text-[15px]">
+				<div id="editor" className={`p-[10px] flex items-center text-[15px] break-all `}>
 					<Editor
 						keyBindingFn={keyBindingFn}
 						handleKeyCommand={handleKeyCommand}
@@ -370,7 +370,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
 
-			<div className="flex flex-row h-full items-center gap-1 w-18">
+			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>
