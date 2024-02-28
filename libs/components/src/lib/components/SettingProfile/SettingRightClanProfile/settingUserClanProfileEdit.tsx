@@ -121,7 +121,7 @@ const SettingRightClanEdit = ({
 			<div className="flex-1 flex mt-[10px] gap-x-8 flex-row">
 				<div className="w-1/2 text-white">
 					<div className="mt-[20px]">
-						<label className="text-[#CCCCCC] font-bold tracking-wide">CLAN NICKNAME</label>
+						<label className="text-[#CCCCCC] font-bold tracking-wide text-sm">CLAN NICKNAME</label>
 						<br />
 						<InputField
 							onChange={handleDisplayName}
@@ -133,11 +133,11 @@ const SettingRightClanEdit = ({
 						/>
 					</div>
 					<div className="mt-[20px]">
-						<p className="text-[#CCCCCC] font-bold tracking-wide">AVATAR</p>
+						<p className="text-[#CCCCCC] font-bold tracking-wide text-sm">AVATAR</p>
 						<div className="flex">
 							<label>
 								<div
-									className="w-[130px] bg-[#155EEF] rounded-lg mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -145,7 +145,7 @@ const SettingRightClanEdit = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="bg-gray-600 rounded-lg mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
+								className="bg-gray-600 rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -154,7 +154,7 @@ const SettingRightClanEdit = ({
 					</div>
 				</div>
 				<div className="w-1/2 text-white">
-					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide">PREVIEW</p>
+					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
 					<SettingRightClanCard profiles={editProfile} />
 				</div>
 			</div>
