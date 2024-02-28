@@ -128,7 +128,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 
 			file.arrayBuffer().then((buf) => {
-				client.uploadAttachmentFile(session, {filename: fullfilename, filetype:'image', size:file.size}).then(data => {
+				client.uploadAttachmentFile(session, {
+					filename: fullfilename, 
+					filetype: file.type, 
+					size: file.size,
+				}).then(data => {
 					if (!data || !data.url) {
 						return 'not-handled';
 					}
