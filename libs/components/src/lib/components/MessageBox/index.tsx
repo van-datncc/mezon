@@ -6,17 +6,20 @@ import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { uploadImageToMinIO, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import {  EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import * as Icons from '../Icons';
 import axios from 'axios';
-import { AtomicBlockUtils, ContentState } from 'draft-js';
+import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
+import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageBoxProps = {
-	onSend: (mes: IMessageSendPayload) => void;
+	onSend: (mes: IMessageSendPayload, 
+			mentions?: Array<ApiMessageMention>, 
+			attachments?: Array<ApiMessageAttachment>,
+			refrences?: Array<ApiMessageRef>) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
@@ -30,7 +33,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
-	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const [userMentioned, setUserMentioned] = useState<ApiMessageMention[]>([]);
 	const [metaData, setMetaData] = useState({});
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -46,6 +49,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			mentionTrigger: '@',
 		}),
 	);
+
 	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin.current, imagePlugin];
@@ -60,47 +64,45 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					dt: {
 						s: content.length,
 						l: url.length,
-					}
-				})
+					},
+				});
 			} else {
-				setMetaData({
-				})
+				setMetaData({});
 			}
 		} catch (error) {
-			setMetaData({
-			})
+			setMetaData({});
 		}
 		return false;
 	};
 
-	const onChange = useCallback(
-		(editorState: EditorState) => {
-			if (typeof onTyping === 'function') {
-				onTyping();
+	const onChange = useCallback((editorState: EditorState) => {
+		if (typeof onTyping === 'function') {
+			onTyping();
+		}
+		setClearEditor(false);
+		setEditorState(editorState);
+		const contentState = editorState.getCurrentContent();
+		const raw = convertToRaw(contentState);
+		// get message
+		const messageRaw = raw.blocks;
+		const messageContent = Object.values(messageRaw).map((item) => item.text);
+		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
+		if (messageBreakline.match(urlImageRegex)) {
+			checkImage(messageBreakline);
+		}
+		const mentionedUsers = [];
+		for (const key in raw.entityMap) {
+			const ent = raw.entityMap[key];
+			if (ent.type === 'mention') {
+				mentionedUsers.push({
+					user_id: ent.data.mention.id,
+					username: ent.data.mention.name
+				});
 			}
-			setClearEditor(false);
-			setEditorState(editorState);
-			const contentState = editorState.getCurrentContent();
-			const raw = convertToRaw(contentState);
-			// get message
-			const messageRaw = raw.blocks;
-			const messageContent = Object.values(messageRaw).map((item) => item.text);
-			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
-			if (messageBreakline.match(urlImageRegex)) {
-				checkImage(messageBreakline);
-			}
-			const mentionedUsers = [];
-			for (const key in raw.entityMap) {
-				const ent = raw.entityMap[key];
-				if (ent.type === 'mention') {
-					mentionedUsers.push(ent.data.mention);
-				}
-			}
-			setContent(content + messageBreakline);
-			setUserMentioned(mentionedUsers);
-		},
-		[],
-	);
+		}
+		setContent(content + messageBreakline);
+		setUserMentioned(mentionedUsers);
+	}, []);
 
 	const onSearchChange = ({ value }: any) => {
 		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
@@ -126,51 +128,53 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 
 			file.arrayBuffer().then((buf) => {
-				client.uploadAttachmentFile(session, {
-					filename: fullfilename,
-					filetype: file.type,
-					size: file.size,
-				}).then(data => {
-					if (!data || !data.url) {
-						return 'not-handled';
-					}
-					// upload to minio
-					uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then(res => {
-						if (res.status !== 200) {
+				client
+					.uploadAttachmentFile(session, {
+						filename: fullfilename,
+						filetype: file.type,
+						size: file.size,
+					})
+					.then((data) => {
+						if (!data || !data.url) {
 							return 'not-handled';
 						}
-						const url = 'https://cdn.mezon.vn/' + fullfilename;
-						const contentState = editorState.getCurrentContent();
-						const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-							src: url,
-							height: '20px',
-							width: 'auto',
-						});
-						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-						const newEditorState = EditorState.set(editorState, {
-							currentContent: contentStateWithEntity,
-						});
-
-						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-						setContent(content + url);
-						setMetaData({
-							tp: 'image',
-							dt: {
-								s: content.length,
-								l: url.length,
+						// upload to minio
+						uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
+							if (res.status !== 200) {
+								return 'not-handled';
 							}
-						})
-						return 'handled';
+							const url = 'https://cdn.mezon.vn/' + fullfilename;
+							const contentState = editorState.getCurrentContent();
+							const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+								src: url,
+								height: '20px',
+								width: 'auto',
+							});
+							const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+							const newEditorState = EditorState.set(editorState, {
+								currentContent: contentStateWithEntity,
+							});
+
+							setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+							setContent(content + url);
+							setMetaData({
+								tp: 'image',
+								dt: {
+									s: content.length,
+									l: url.length,
+								},
+							});
+
+							return 'handled';
+						});
 					});
-				});
 			});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
-			console.log('add code handle');
 			return 'not-handled';
 		},
-		[content, currentChannelId, currentClanId, editorState],
+		[clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
 	const handleSend = useCallback(() => {
@@ -178,11 +182,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned, md: metaData } : { t: content, md: metaData };
-		// console.log('MMMMMMM: ', msg)
-		onSend(msg);
+		
+		onSend({ t: content }, userMentioned);
 		setContent('');
-		setMetaData({})
+		setMetaData({});
 		setClearEditor(true);
 		setSelectedItemIndex(0);
 		liRefs?.current[selectedItemIndex]?.focus();
@@ -426,45 +429,46 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			throw new Error('Client is not initialized');
 		}
 		file?.arrayBuffer().then((buf) => {
-			client.uploadAttachmentFile(session, {
-				filename: fullfilename,
-				filetype: file.type,
-				size: file.size,
-			}).then(data => {
-				if (!data || !data.url) {
-					return 'not-handled';
-				}
-				// upload to minio
-				uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then(res => {
-					if (res.status !== 200) {
+			client
+				.uploadAttachmentFile(session, {
+					filename: fullfilename,
+					filetype: file.type,
+					size: file.size,
+				})
+				.then((data) => {
+					if (!data || !data.url) {
 						return 'not-handled';
 					}
-					const url = 'https://cdn.mezon.vn/' + fullfilename;
-					const contentState = editorState.getCurrentContent();
-					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-						src: url,
-						height: '20px',
-						width: 'auto',
-					});
-					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-					const newEditorState = EditorState.set(editorState, {
-						currentContent: contentStateWithEntity,
-					});
-
-					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-					setContent(content + url);
-					setMetaData({
-						tp: 'image',
-						dt: {
-							s: content.length,
-							l: url.length,
+					// upload to minio
+					uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
+						if (res.status !== 200) {
+							return 'not-handled';
 						}
-					})
-					return 'handled';
-				});
-			});
-		});
+						const url = 'https://cdn.mezon.vn/' + fullfilename;
+						const contentState = editorState.getCurrentContent();
+						const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+							src: url,
+							height: '20px',
+							width: 'auto',
+						});
+						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+						const newEditorState = EditorState.set(editorState, {
+							currentContent: contentStateWithEntity,
+						});
 
+						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+						setContent(content + url);
+						setMetaData({
+							tp: 'image',
+							dt: {
+								s: content.length,
+								l: url.length,
+							},
+						});
+						return 'handled';
+					});
+				});
+		});
 	};
 
 	return (
@@ -501,7 +505,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</div>
 			)}
 			<label>
-				<input id="preview_img" type="file" onChange={(e) => { handleFile(e), e.target.value = '' }} className="block w-full hidden" />
+				<input
+					id="preview_img"
+					type="file"
+					onChange={(e) => {
+						handleFile(e), (e.target.value = '');
+					}}
+					className="block w-full hidden"
+				/>
 				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
 					<Icons.AddCircle />
 				</div>
@@ -513,7 +524,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					editorRef.current!.focus();
 				}}
 			>
-				<div id="editor" className={`p-[10px] flex items-center text-[15px] break-all `}>
+				<div id="editor" className={`p-[10px] flex items-center text-[15px] break-all min-w-full relative `}>
 					<Editor
 						keyBindingFn={keyBindingFn}
 						handleKeyCommand={handleKeyCommand}

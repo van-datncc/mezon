@@ -3,6 +3,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useClans } from './useClans';
 import { messagesActions, useAppDispatch } from '@mezon/store';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -15,7 +16,10 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	
 	const sendMessage = React.useCallback(
-		async (message: IMessageSendPayload) => {
+		async (content: IMessageSendPayload, 
+			mentions?: Array<ApiMessageMention>, 
+			attachments?: Array<ApiMessageAttachment>,
+			refrences?: Array<ApiMessageRef>) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -25,7 +29,7 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(currentClanId, channel.id, message);
+			await socket.writeChatMessage(currentClanId, channel.id, content, mentions, attachments, refrences);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);

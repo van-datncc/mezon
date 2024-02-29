@@ -32,7 +32,7 @@ export default function ChannelLayout() {
 					</div>
 				</div>
 				{isShow && (
-					<div className="w-[245px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
+					<div className="w-[245px] bg-bgSurface  lg:flex hidden text-[#84ADFF] relative">
 						<MemberList />
 					</div>
 				)}
