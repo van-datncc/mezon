@@ -5,27 +5,39 @@ import { useClans, useRoles } from "@mezon/core";
 import { InputField } from "@mezon/ui";
 import { DeleteModal } from "../DeleteRoleModal/deleteRoleModal";
 import { useState } from "react";
-import { RolesClanActions, useAppDispatch } from "@mezon/store";
+import { rolesClanActions, setAddMemberRoles, setAddPermissions, setNameRoleNew, setRemoveMemberRoles, setRemovePermissions, setSelectedRoleId, useAppDispatch } from "@mezon/store";
+import { useDispatch } from "react-redux";
 
+export type ModalOpenEdit = {
+	handleOpen: () => void;
+};
 // import SettingRightUser from '../SettingRightUserProfile';
-const ServerSettingMainRoles = () => {
-    const { RolesClan } = useRoles();
+const ServerSettingMainRoles = (props: ModalOpenEdit) => {
+    const { RolesClan} = useRoles();
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+    const [selectedRoleId, setSelectedRoleID] = useState<string>('');
+    const dispatchRole = useDispatch();
     const dispatch = useAppDispatch();
-    const handleOpenModal = () => {
+    const activeRoles = RolesClan.filter(role => role.active === 1);
+    const handleOpenModalDelete = () => {
 		setShowModal(true);
 	};
     const handleCloseModal = () => {
         setShowModal(false);
 	};
+    const handleRoleClick = (roleId:string) => {
+        setSelectedRoleID(roleId);
+        dispatchRole(setSelectedRoleId(roleId));
+        dispatchRole(setAddPermissions([]));
+        dispatchRole(setRemovePermissions([]));
+        dispatchRole(setAddMemberRoles([]));
+        dispatchRole(setRemoveMemberRoles([]));
+    };
     const handleDeleteRole = async (roleId: string) => {
-        await dispatch(RolesClanActions.fetchDeleteRole({ roleId }));
+        await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
       };
-      
 	return (
 		<>
-			<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
                 <h1 className="text-2xl font-bold mb-4">Roles</h1>
                 <div className="flex items-center space-x-4"> 
                     <div className="w-full flex-grow">
@@ -35,7 +47,14 @@ const ServerSettingMainRoles = () => {
                             placeholder="Search Roles"
                         />
                     </div>
-                        <button className="bg-blue-600 rounded-[3px] p-[8px] pr-[10px] pl-[10px] text-nowrap">Create Role</button>
+                        <button className="bg-blue-600 rounded-[3px] p-[8px] pr-[10px] pl-[10px] text-nowrap"
+                        onClick={() => {dispatch(setSelectedRoleId(""));
+                                        dispatch(setNameRoleNew(""));
+                                        dispatch(setAddPermissions([]));
+                                        dispatch(setAddMemberRoles([]));
+                                        props.handleOpen();
+                                        }}
+                        >Create Role</button>
                 </div>
                 <br />
                 <div className="overflow-x-auto">
@@ -48,14 +67,14 @@ const ServerSettingMainRoles = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-bgSecondary divide-y divide-gray-200">
-                            {RolesClan.length === 0 ? (
+                            {activeRoles.length === 0 ? (
                                 <tr>
                                     <td className="px-6 py-4 whitespace-nowrap text-gray-300">
                                         <p>No Roles</p>
                                     </td>
                                 </tr>
                             ) : (
-                                RolesClan.map((role) => (
+                                activeRoles.map((role) => (
                                     <tr key={role.id}>
                                         <td className="px-6 py-4 whitespace-nowrap"><p
                                         onClick={() => {
@@ -64,14 +83,24 @@ const ServerSettingMainRoles = () => {
                                         >{role.title}</p></td>
                                         <td className="px-6 py-4 whitespace-nowrap"><p>{role.role_user_list?.role_users?.length ?? 0}</p></td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <p
-                                                onClick={() => {
-                                                    handleOpenModal();
-                                                    setSelectedRoleId(role.id)
-                                                }}
-                                            >
-                                                delete
-                                            </p>
+                                            <div className="flex">
+                                                <p className="mr-[15px]"
+                                                    onClick={() => {
+                                                        props.handleOpen();
+                                                        handleRoleClick(role.id);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </p>
+                                                <p
+                                                    onClick={() => {
+                                                        handleOpenModalDelete();
+                                                        handleRoleClick(role.id);
+                                                    }}
+                                                >
+                                                    Delete
+                                                </p>
+                                            </div>
                                             <DeleteModal isOpen={showModal} handleDelete={() => handleDeleteRole(selectedRoleId)} onClose={handleCloseModal} />
                                         </td>
                                     </tr>
@@ -80,7 +109,6 @@ const ServerSettingMainRoles = () => {
                         </tbody>
                     </table>
                 </div>
-            </div>
 		</>
 	);
 };

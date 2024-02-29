@@ -65,32 +65,32 @@ const SettingRightUser = ({
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
-				<h1 className="text-2xl font-bold">Profiles</h1>
-				<button className="pt-1 text-white mt-[20px] font-bold text-xl border-b-2 border-blue-500 pb-2">User Profile</button>
-				<button className="pt-1 text-[#AEAEAE] mt-[20px] text-xl ml-[16px] font-bold" onClick={handleClanProfileButtonClick}>
-					Clan Profile
+				<h1 className="text-2xl font-bold tracking-wider mb-8">Profiles</h1>
+				<button className="pt-1 font-bold text-xl border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
+				<button className="pt-1 text-[#AEAEAE] text-xl ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
+					Clan Profiles
 				</button>
 			</div>
 			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 flex-row">
 				<div className="w-1/2 text-[#CCCCCC]">
 					<div className="mt-[20px]">
-						<label className="font-bold">DISPLAY NAME</label>
+						<label className="font-bold tracking-wide text-sm">DISPLAY NAME</label>
 						<br />
 						<InputField
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black"
+							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
 							defaultValue={displayName}
 						/>
 					</div>
 					<div className="mt-8">
-						<p className="font-bold">AVATAR</p>
+						<p className="font-bold tracking-wide text-sm">AVATAR</p>
 						<div className="flex">
 							<label>
 								<div
-									className="text-white w-[130px] bg-blue-600 rounded-lg mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="text-white w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -98,7 +98,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-gray-600 rounded-lg mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
+								className="text-white bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -114,7 +114,7 @@ const SettingRightUser = ({
                     </div> */}
 				</div>
 				<div className="w-1/2 text-white">
-					<p className="mt-[20px] text-[#CCCCCC] font-bold">PREVIEW</p>
+					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
 			</div>

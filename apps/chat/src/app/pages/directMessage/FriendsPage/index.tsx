@@ -164,7 +164,7 @@ export default function FriendsPage() {
 							{listFriendFilter.map((friend: Friend) => (
 								<div
 									key={friend.user?.id}
-									className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px]"
+									className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px] cursor-pointer"
 								>
 									<div key={friend.user?.id}>
 										<MemberProfile

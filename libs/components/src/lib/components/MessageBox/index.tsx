@@ -4,13 +4,15 @@ import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@dra
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
-import { uploadImageToMinIO } from '@mezon/transport';
+import { uploadImageToMinIO, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
-import { SearchIndex, init } from 'emoji-mart';
+import {  EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import axios from 'axios';
+import { AtomicBlockUtils, ContentState } from 'draft-js';
+import { SearchIndex, init } from 'emoji-mart';
+import { useSelector } from 'react-redux';
 import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
@@ -29,10 +31,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
 	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const [metaData, setMetaData] = useState({});
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const { sessionRef, clientRef } = useMezon();
 	const mentionPlugin = useRef(
 		createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
@@ -45,6 +49,29 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin.current, imagePlugin];
+	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
+	const checkImage = async (url: string) => {
+		try {
+			const response = await axios.head(url);
+			const contentType = response.headers['content-type'];
+			if (contentType && contentType.startsWith('image')) {
+				setMetaData({
+					tp: 'image',
+					dt: {
+						s: content.length,
+						l: url.length,
+					}
+				})
+			} else {
+				setMetaData({
+				})
+			}
+		} catch (error) {
+			setMetaData({
+			})
+		}
+		return false;
+	};
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -59,6 +86,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const messageRaw = raw.blocks;
 			const messageContent = Object.values(messageRaw).map((item) => item.text);
 			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
+			if (messageBreakline.match(urlImageRegex)) {
+				checkImage(messageBreakline);
+			}
 			const mentionedUsers = [];
 			for (const key in raw.entityMap) {
 				const ent = raw.entityMap[key];
@@ -66,10 +96,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					mentionedUsers.push(ent.data.mention);
 				}
 			}
-			setContent(messageBreakline);
+			setContent(content + messageBreakline);
 			setUserMentioned(mentionedUsers);
 		},
-		[onTyping],
+		[],
 	);
 
 	const onSearchChange = ({ value }: any) => {
@@ -86,41 +116,61 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const filename = now + '.png';
 			const file = new File(files, filename, { type: 'image/png' });
 			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
-			const bucket = 'mezon';
-			const metaData = {
-				'Content-Type': 'image/png',
-				'Content-Language': file.size,
-			};
+
+			const session = sessionRef.current;
+			const client = clientRef.current;
+
+			if (!client || !session || !currentClanId) {
+				console.log(client, session, currentClanId);
+				throw new Error('Client is not initialized');
+			}
 
 			file.arrayBuffer().then((buf) => {
-				// upload to minio
-				uploadImageToMinIO(bucket, fullfilename, Buffer.from(buf), file.size, metaData, (err, etag) => {
-					if (err) {
-						console.log('err', err);
+				client.uploadAttachmentFile(session, {
+					filename: fullfilename,
+					filetype: file.type,
+					size: file.size,
+				}).then(data => {
+					if (!data || !data.url) {
 						return 'not-handled';
 					}
-					const url = 'https://cdn.mezon.vn/' + fullfilename;
-					const contentState = editorState.getCurrentContent();
-					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-						src: url,
-						height: '20px',
-						width: 'auto',
-					});
-					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-					const newEditorState = EditorState.set(editorState, {
-						currentContent: contentStateWithEntity,
-					});
+					// upload to minio
+					uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then(res => {
+						if (res.status !== 200) {
+							return 'not-handled';
+						}
+						const url = 'https://cdn.mezon.vn/' + fullfilename;
+						const contentState = editorState.getCurrentContent();
+						const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+							src: url,
+							height: '20px',
+							width: 'auto',
+						});
+						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+						const newEditorState = EditorState.set(editorState, {
+							currentContent: contentStateWithEntity,
+						});
 
-					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-					setContent(url);
-					return 'handled';
+						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+						setContent(content + url);
+						setMetaData({
+							tp: 'image',
+							dt: {
+								s: content.length,
+								l: url.length,
+							}
+						})
+						return 'handled';
+					});
 				});
 			});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+
+			console.log('add code handle');
 			return 'not-handled';
 		},
-		[currentChannelId, currentClanId, editorState],
+		[content, currentChannelId, currentClanId, editorState],
 	);
 
 	const handleSend = useCallback(() => {
@@ -128,9 +178,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned } : { t: content };
+		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned, md: metaData } : { t: content, md: metaData };
+		// console.log('MMMMMMM: ', msg)
 		onSend(msg);
 		setContent('');
+		setMetaData({})
 		setClearEditor(true);
 		setSelectedItemIndex(0);
 		liRefs?.current[selectedItemIndex]?.focus();
@@ -189,6 +241,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setEditorState(updatedEditorState);
 		}
 	}, [clearEditor, content, showEmojiSuggestion, selectionToEnd]);
+
+	useEffect(() => {
+		const editorElement = document.querySelectorAll('[data-offset-key]');
+		editorElement[2].classList.add('break-all');
+	}, []);
 
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
@@ -359,8 +416,59 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		liRefs?.current[selectedItemIndex]?.focus();
 	}, [content]);
 
+	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!client || !session || !currentClanId) {
+			console.log(client, session, currentClanId);
+			throw new Error('Client is not initialized');
+		}
+		file?.arrayBuffer().then((buf) => {
+			client.uploadAttachmentFile(session, {
+				filename: fullfilename,
+				filetype: file.type,
+				size: file.size,
+			}).then(data => {
+				if (!data || !data.url) {
+					return 'not-handled';
+				}
+				// upload to minio
+				uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then(res => {
+					if (res.status !== 200) {
+						return 'not-handled';
+					}
+					const url = 'https://cdn.mezon.vn/' + fullfilename;
+					const contentState = editorState.getCurrentContent();
+					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+						src: url,
+						height: '20px',
+						width: 'auto',
+					});
+					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+					const newEditorState = EditorState.set(editorState, {
+						currentContent: contentStateWithEntity,
+					});
+
+					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+					setContent(content + url);
+					setMetaData({
+						tp: 'image',
+						dt: {
+							s: content.length,
+							l: url.length,
+						}
+					})
+					return 'handled';
+				});
+			});
+		});
+
+	};
+
 	return (
-		<div className="flex flex-inline w-max-[97%] items-center gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
 				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
 					<p className=" text-center p-2">Emoji Matching: {syntax}</p>
@@ -392,10 +500,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					</div>
 				</div>
 			)}
-
-			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
-				<Icons.AddCircle />
-			</div>
+			<label>
+				<input id="preview_img" type="file" onChange={(e) => { handleFile(e), e.target.value = '' }} className="block w-full hidden" />
+				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
+					<Icons.AddCircle />
+				</div>
+			</label>
 
 			<div
 				className={`w-[96%] bg-black gap-3 relative`}
@@ -403,7 +513,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					editorRef.current!.focus();
 				}}
 			>
-				<div id="editor" className="p-[10px] flex items-center text-[15px]">
+				<div id="editor" className={`p-[10px] flex items-center text-[15px] break-all `}>
 					<Editor
 						keyBindingFn={keyBindingFn}
 						handleKeyCommand={handleKeyCommand}
@@ -419,7 +529,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
 
-			<div className="flex flex-row h-full items-center gap-1 w-18">
+			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>

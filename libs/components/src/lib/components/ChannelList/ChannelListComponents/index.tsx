@@ -2,7 +2,7 @@ import * as Icons from '../../Icons';
 
 export const BrowseChannel = () => {
 	return (
-		<div className="h-5 justify-start items-center gap-2 flex">
+		<div className="h-5 w-full justify-start items-center gap-2 flex cursor-pointer">
 			<div className="w-5 h-5 relative">
 				<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
 					<Icons.BrowwseChannel />
@@ -15,7 +15,7 @@ export const BrowseChannel = () => {
 
 export const Events = () => {
 	return (
-		<div className="self-stretch inline-flex">
+		<div className="self-stretch inline-flex cursor-pointer">
 			<div className="grow w-5 flex-row h-5 items-center gap-2 flex">
 				<div className="w-5 h-5 relative flex flex-row items-center">
 					<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">

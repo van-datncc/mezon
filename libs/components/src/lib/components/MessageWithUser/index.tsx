@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
+import MessageImage from './MessageImage';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -23,7 +24,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
 
 	const content = useMemo(() => {
-		return message.content.t;
+		return message.content;
 	}, [message]);
 
 	const isCombine = useMemo(() => {
@@ -36,11 +37,13 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		const lines = content?.split('\n');
+		if (content?.md?.tp === 'image') {
+			return <MessageImage content={content.t} metaData={content.md} />;
+		}
+		const lines = content.t?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;
 		return lines?.map((line: string, index: number) => {
 			const matches = line.match(mentionRegex);
-
 			if (matches) {
 				let lastIndex = 0;
 				const elements = matches.map((match, i) => {
@@ -60,13 +63,12 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 			}
 
 			return (
-				<div key={index} className="w-full min-w-[200px]">
+				<div key={index} className="max-w-[40vw] lg:max-w-[30vw] xl:max-w-[50vw] lg:w-full min-w-full break-words ">
 					{line}
 				</div>
 			);
 		});
 	};
-
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
@@ -129,7 +131,6 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 		</>
 	);
 }
-
 MessageWithUser.Skeleton = () => {
 	return (
 		<div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer  flex-shrink-1">

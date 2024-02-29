@@ -18,7 +18,7 @@ function MemberProfile({
 	textColor = 'contentSecondary',
 }: MemberProfileProps) {
 	return (
-		<div className="relative gap-[5px] flex items-center ">
+		<div className="relative gap-[5px] flex items-center cursor-pointer">
 			<a className="mr-[2px] relative inline-flex items-center justify-start w-10 h-10 text-lg text-white rounded-full">
 				{avatar ? (
 					<img

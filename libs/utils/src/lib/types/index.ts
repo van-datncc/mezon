@@ -9,6 +9,7 @@ import {
 	ApiRole,
 	ApiUser,
 	ChannelUserListChannelUser,
+	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
@@ -27,6 +28,10 @@ export type ICategory = ApiCategoryDesc & {
 };
 
 export type IPermissionUser = ApiPermission & {
+	id: string;
+};
+
+export type IUsersClan = ClanUserListClanUser & {
 	id: string;
 };
 
@@ -103,6 +108,7 @@ export type IMessage = ChannelMessage & {
 	content: {
 		t?: string | undefined;
 		m?: string[] | undefined;
+		md?: any
 	};
 	date?: string | undefined;
 	creationTime?: Date;
@@ -117,6 +123,7 @@ export type IMessageWithUser = IMessage & {
 export type IMessageSendPayload = {
 	t: string;
 	m?: string[] | undefined;
+	md?: any
 };
 
 export type IUser = {
@@ -163,6 +170,8 @@ export interface ThreadProps {
 }
 
 export type IUserAccount = ApiAccount;
+
+export type IPermission = ApiPermission;
 
 export enum ChannelStatusEnum {
 	isPrivate = 1,
