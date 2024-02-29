@@ -94,7 +94,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		for (const key in raw.entityMap) {
 			const ent = raw.entityMap[key];
 			if (ent.type === 'mention') {
-				console.log('raw mention', ent.data.mention);
 				mentionedUsers.push({
 					user_id: ent.data.mention.id,
 					username: ent.data.mention.name
@@ -183,7 +182,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		console.log('userMentioned', userMentioned)
+		
 		onSend({ t: content }, userMentioned);
 		setContent('');
 		setMetaData({});
@@ -413,12 +412,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 
 		emojiResult.length > 0 ? setShowEmojiSuggestion(true) : setShowEmojiSuggestion(false);
-	}, [showEmojiSuggestion, emojiResult, syntax, selectedItemIndex]);
+	}, [showEmojiSuggestion, emojiResult, syntax]);
 
 	useEffect(() => {
 		handleDetectEmoji(content);
 		liRefs?.current[selectedItemIndex]?.focus();
-	}, [content, selectedItemIndex]);
+	}, [content]);
 
 	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files && e.target.files[0];
