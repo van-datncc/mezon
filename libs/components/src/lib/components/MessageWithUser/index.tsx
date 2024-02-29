@@ -13,22 +13,22 @@ import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import MessageImage from './MessageImage';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
 };
 
-function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, mentions, attachments, references }: MessageWithUserProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
 
 	const content = useMemo(() => {
 		return message.content;
-	}, [message]);
-
-	const attachments = useMemo(() => {
-		return message.attachments;
 	}, [message]);
 
 	const isCombine = useMemo(() => {
@@ -41,8 +41,7 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {
-			console.log("attachment ===", attachments);
+		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {			
 			// TODO: render multiple attachment
 			return <MessageImage attachmentData={attachments[0]} />;
 		}

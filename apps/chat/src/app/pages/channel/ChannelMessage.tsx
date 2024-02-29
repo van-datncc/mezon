@@ -34,7 +34,12 @@ export function ChannelMessage(props: MessageProps) {
 
 	return (
 		<div>
-			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} />
+			<MessageWithUser message={mess as IMessageWithUser} 
+				preMessage={messPre as IMessageWithUser}
+				mentions={mess.mentions}
+				attachments={mess.attachments}
+				references={mess.references}
+			/>
 			{lastSeen && <UnreadMessageBreak />}
 		</div>
 	);
