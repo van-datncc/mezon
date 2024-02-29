@@ -11,6 +11,8 @@ const SettingListRole = (props: closeEditRole) => {
     
     const clickRole = useSelector(getSelectedRoleId);
     const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
+    const [nameRoleNew, setNameRoleNew] = useState("New role")
+    
     const dispatch = useDispatch();
     const { RolesClan,  createRole} = useRoles();
     const { currentClan } = useClans();
@@ -20,9 +22,6 @@ const SettingListRole = (props: closeEditRole) => {
             dispatch(setSelectedRoleId(roleId));
         }
     };
-    const handCreateRole = async () => {
-        await createRole(currentClan?.id||'');
-    }
     const activeRoles = RolesClan.filter(role => role.active === 1);
 	return (
         <div className="w-1/3 pr-[10px]">
@@ -32,25 +31,36 @@ const SettingListRole = (props: closeEditRole) => {
                     >
                         BACK
                     </div>
-                    <div className="text-2xl"
-                        onClick={() => handCreateRole()}
-                    >
-                        +
-                    </div>
                 </div>
-                <div>
-                {activeRoles.map((role) => (
-                    <div key={role.id} className="mb-2">
-                        <button
-                            onClick={() => handleRoleClick(role.id)}
-                            className={`block w-full py-1 px-4 rounded ${
-                                clickedRole === role.id ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
-                            } text-white font-bold`}
-                        >
-                            {role.title}
-                        </button>
-                    </div>
-                ))}
+                <br />
+                <div className="overflow-auto h-full">
+                    {
+                        clickedRole === '' ? (
+                            <div className="mb-2">
+                                <button
+                                    // onClick={() => handleRoleClick(role.id)}
+                                    className={`block w-full py-1 px-4 rounded ${
+                                        clickedRole === '' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
+                                    } text-white font-bold`}
+                                >
+                                    {nameRoleNew}
+                                </button>
+                            </div>
+                        ) : (
+                            activeRoles.map((role) => (
+                                <div key={role.id} className="mb-2">
+                                    <button
+                                        onClick={() => handleRoleClick(role.id)}
+                                        className={`block w-full py-1 px-4 rounded ${
+                                            clickedRole === role.id ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
+                                        } text-white font-bold`}
+                                    >
+                                        {role.title}
+                                    </button>
+                                </div>
+                            ))
+                        )
+                    }
                 </div>
             </div>
 	);

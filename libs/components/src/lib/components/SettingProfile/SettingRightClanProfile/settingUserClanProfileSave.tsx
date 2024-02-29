@@ -1,3 +1,6 @@
+import { getSelectedRoleId } from "@mezon/store";
+import { useSelector } from "react-redux";
+
 export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
@@ -9,9 +12,10 @@ export type PropsModalSettingSave = {
 };
 const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
 	const { PropsSave } = props;
+	const clickRole = useSelector(getSelectedRoleId);
 	return (
 		<>
-			{PropsSave.flagOption ? (
+			{PropsSave.flagOption || clickRole === '' ? (
 				<div className="flex flex-row gap-2  bg-gray-500 absolute w-[96] bottom-4 min-w-96 h-fit p-3 rounded transform ">
 					<div className="flex-1 flex items-center text-nowrap">
 						<p>Carefull - you have unsaved changes!</p>

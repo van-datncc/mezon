@@ -23,6 +23,7 @@ import { usersReducer } from './users/users.slice';
 
 import { directReducer } from './direct/direct.slice';
 import { friendsReducer } from './friends/friend.slice';
+import { usersClanReducer } from './clanMembers/clan.members';
 
 const persistedReducer = persistReducer(
 	{
@@ -52,6 +53,7 @@ const reducer = {
 	users: usersReducer,
 	categories: categoriesReducer,
 	rolesclan: RolesClanReducer,
+	usersClan: usersClanReducer,
 	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,

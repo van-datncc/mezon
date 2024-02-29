@@ -29,12 +29,12 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 
 export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
 
-type CreateRolePayload = {
+type GetRolePayload = {
 	clanId?: string,
 };
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
-	async ({ clanId }: CreateRolePayload, thunkAPI) => {
+	async ({ clanId }: GetRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listRoles(mezon.session, 100,1,'',clanId);
 		if (!response.roles) {
@@ -73,7 +73,7 @@ export const fetchDeleteRole = createAsyncThunk(
 	async ({ roleId }: FetchMembersRolePayload, thunkAPI) => {
 		try{
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteRole(mezon.session,roleId);
+			const response = await mezon.client.updateRoleDelete(mezon.session,roleId,{});
 			thunkAPI.dispatch(rolesClanActions.remove(roleId))
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
@@ -85,21 +85,26 @@ export const fetchDeleteRole = createAsyncThunk(
 	},
 );
 
-
+type CreateRolePayload = {
+	clan_id: string;
+    title: string | undefined;
+    add_user_ids: string[];
+    active_permission_ids: string[];
+};
 
 export const fetchCreateRole = createAsyncThunk(
 	'CreatRole/fetchCreateRole',
-	async ({ clanId}: CreateRolePayload, thunkAPI) => {
+	async ({ clan_id, title, add_user_ids, active_permission_ids}: CreateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			active_permission_ids: [],
-    		add_user_ids: [],
+			active_permission_ids: active_permission_ids || [],
+    		add_user_ids: add_user_ids || [],
     		allow_mention: 0,
-    		clan_id: clanId,
+    		clan_id: clan_id,
     		color: '',
     		description: '',
     		display_online: 0,
-    		title: 'New role',
+    		title: title || '',
 		}
 		const response = await mezon.client.createRole(mezon.session,body);
 		if (!response) {
@@ -189,24 +194,79 @@ export const roleSlice = createSlice({
 	name: 'roleId',
 	initialState: {
 	  selectedRoleId: '',
+	  nameRoleNew: '',
+	  addPermissions: [],
+	  addMemberRoles: [],
+	  removePermissions: [],
+	  removeMemberRoles: [],
 	},
 	reducers: {
 	  setSelectedRoleId: (state, action) => {
 		state.selectedRoleId = action.payload;
+	  },
+	  setNameRoleNew: (state, action) => {
+		state.nameRoleNew = action.payload;
+	  },
+	  setAddPermissions: (state, action) => {
+		state.addPermissions = action.payload;
+	  },
+	  setAddMemberRoles: (state, action) => {
+		state.addMemberRoles = action.payload;
+	  },
+	  setRemovePermissions: (state, action) => {
+		state.removePermissions = action.payload;
+	  },
+	  setRemoveMemberRoles: (state, action) => {
+		state.removeMemberRoles = action.payload;
 	  },
 	},
   });
 
 export const roleIdReducer = roleSlice.reducer;
 
-export const { setSelectedRoleId } = roleSlice.actions;
+export const { setSelectedRoleId, setNameRoleNew, setAddPermissions, setAddMemberRoles, setRemovePermissions, setRemoveMemberRoles } = roleSlice.actions;
 
 const selectSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
+
+const setNewNameRole = (state: RootState) => state.roleId.nameRoleNew;
+
+const setNewAddPermissions = (state: RootState) => state.roleId.addPermissions;
+
+const setNewAddMembers = (state: RootState) => state.roleId.addMemberRoles;
+
+const setNewRemovePermissions = (state: RootState) => state.roleId.removePermissions;
+
+const setNewRemoveMemberRoles = (state: RootState) => state.roleId.removeMemberRoles;
 
 export const getSelectedRoleId = createSelector(
   selectSelectedRoleId,
   (roleId) => roleId
 );
+
+export const getNewNameRole = createSelector(
+	setNewNameRole,
+	(nameRoleNew) => nameRoleNew
+  );
+
+export const getNewAddPermissions = createSelector(
+	setNewAddPermissions,
+	(addPermissions) => addPermissions
+  );
+
+export const getNewAddMembers = createSelector(
+	setNewAddMembers,
+	(addMemberRoles) => addMemberRoles
+  );
+
+export const getRemovePermissions = createSelector(
+	setNewRemovePermissions,
+	(removePermissions) => removePermissions
+  );
+
+export const getRemoveMemberRoles = createSelector(
+	setNewRemoveMemberRoles,
+	(removeMemberRoles) => removeMemberRoles
+  );
 
 export const updateRoleSlice = createSlice({
 	name: 'isshow',

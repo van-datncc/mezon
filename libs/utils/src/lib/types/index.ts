@@ -9,6 +9,7 @@ import {
 	ApiRole,
 	ApiUser,
 	ChannelUserListChannelUser,
+	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
@@ -27,6 +28,10 @@ export type ICategory = ApiCategoryDesc & {
 };
 
 export type IPermissionUser = ApiPermission & {
+	id: string;
+};
+
+export type IUsersClan = ClanUserListClanUser & {
 	id: string;
 };
 

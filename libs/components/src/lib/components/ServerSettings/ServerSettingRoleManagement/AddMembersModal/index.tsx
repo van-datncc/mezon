@@ -1,7 +1,7 @@
 import { useCategory, useClans, useRoles } from "@mezon/core";
-import { getSelectedRoleId, selectCurrentChannel, selectCurrentChannelId, selectMembersByChannelId } from "@mezon/store";
+import { getSelectedRoleId, selectAllChannelMembers, selectCurrentChannel, selectCurrentChannelId, selectMembersByChannelId, setAddMemberRoles } from "@mezon/store";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface ModalProps {
 	isOpen: boolean;
@@ -10,26 +10,18 @@ interface ModalProps {
 
 export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const { RolesClan, updateRole } = useRoles();
+    const dispatch = useDispatch();
     const clickRole = useSelector(getSelectedRoleId);
     const activeRole = RolesClan.find(role => role.id === clickRole);
     const memberRoles = activeRole?.role_user_list?.role_users;
     const [searchTerm, setSearchTerm] = useState('');
-    const { currentClan } = useClans();
+    const { usersClan, currentClan } = useClans();
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-    const { categorizedChannels } = useCategory();
-    const channelsWithNullPrivate = categorizedChannels.map(category => ({
-        ...category,
-        channels: category.channels.filter(channel => channel.channel_private !== 1)
-    }));
-    const categoriesWithNonNullChannels = channelsWithNullPrivate.filter(category =>
-        category.channels.length > 0
-        );
-        const idchannel = categoriesWithNonNullChannels.at(0)?.channels.at(0)?.channel_id;
-        const rawMembers = useSelector(selectMembersByChannelId(idchannel));
-        const membersNotInRoles = rawMembers.filter(member => {
-            return !memberRoles || !memberRoles.some(roleMember => roleMember.id === member.id);
-        });
-        const [searchResults, setSearchResults] = useState<any[]>(membersNotInRoles);
+
+    const membersNotInRoles = usersClan.filter(member => {
+        return !memberRoles || !memberRoles.some(roleMember => roleMember.id === member.id);
+    });
+    const [searchResults, setSearchResults] = useState<any[]>(membersNotInRoles);
     const handleUserToggle = (permissionId: string) => {
         setSelectedUsers(prevPermissions => {
             if (prevPermissions.includes(permissionId)) {
@@ -46,10 +38,18 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         );
         setSearchResults(results);
     }, [ searchTerm]);
-
+    
     const handleUpdateRole = async () =>{
-        await updateRole(currentClan?.id ?? '',clickRole,'',selectedUsers,[],[],[]);
+        if (clickRole==='') {
+            
+            dispatch(setAddMemberRoles(selectedUsers));
+        }else{
+
+            await updateRole(currentClan?.id ?? '',clickRole,'',selectedUsers,[],[],[]);
+        }
     }
+    console.log("selectedUsers: ", selectedUsers);
+    
 	return (
 		<>
 			{isOpen && (

@@ -79,11 +79,6 @@ export const policiesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		// builder
-		// 	.addCase(fetchPermission.fulfilled, (state: PoliciesState, action: PayloadAction<IPermissionUser[]>) => {
-		// 		policiesAdapter.setAll(state, action.payload);
-		// 		state.loadingStatus = 'loaded';
-		// 	})
 			
 	},
 });
