@@ -13,9 +13,13 @@ import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
+import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageBoxProps = {
-	onSend: (mes: IMessageSendPayload) => void;
+	onSend: (mes: IMessageSendPayload, 
+			mentions?: Array<ApiMessageMention>, 
+			attachments?: Array<ApiMessageAttachment>,
+			refrences?: Array<ApiMessageRef>) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
@@ -29,7 +33,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
-	const [userMentioned, setUserMentioned] = useState<string[]>([]);
+	const [userMentioned, setUserMentioned] = useState<ApiMessageMention[]>([]);
 	const [metaData, setMetaData] = useState({});
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -90,7 +94,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		for (const key in raw.entityMap) {
 			const ent = raw.entityMap[key];
 			if (ent.type === 'mention') {
-				mentionedUsers.push(ent.data.mention);
+				console.log('raw mention', ent.data.mention);
+				mentionedUsers.push({
+					user_id: ent.data.mention.id,
+					username: ent.data.mention.name
+				});
 			}
 		}
 		setContent(content + messageBreakline);
@@ -167,7 +175,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			return 'not-handled';
 		},
-		[content, currentChannelId, currentClanId, editorState],
+		[clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
 	const handleSend = useCallback(() => {
@@ -175,9 +183,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		const msg = userMentioned.length > 0 ? { t: content, m: userMentioned, md: metaData } : { t: content, md: metaData };
-		// console.log('MMMMMMM: ', msg)
-		onSend(msg);
+		console.log('userMentioned', userMentioned)
+		onSend({ t: content }, userMentioned);
 		setContent('');
 		setMetaData({});
 		setClearEditor(true);
@@ -406,12 +413,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 
 		emojiResult.length > 0 ? setShowEmojiSuggestion(true) : setShowEmojiSuggestion(false);
-	}, [showEmojiSuggestion, emojiResult, syntax]);
+	}, [showEmojiSuggestion, emojiResult, syntax, selectedItemIndex]);
 
 	useEffect(() => {
 		handleDetectEmoji(content);
 		liRefs?.current[selectedItemIndex]?.focus();
-	}, [content]);
+	}, [content, selectedItemIndex]);
 
 	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files && e.target.files[0];
