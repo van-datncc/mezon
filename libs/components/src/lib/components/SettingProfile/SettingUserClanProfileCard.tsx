@@ -15,7 +15,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 			<div className="h-20 bg-[#8CBC4F] rounded-tr-[10px] rounded-tl-[10px]"></div>
 			<div className="text-black ml-[50px]">
 				{profiles.urlImage === undefined || profiles.urlImage === '' ? (
-					<div className="w-[100px] h-[100px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[50px] mt-[-50px] ml-[-25px]">
+					<div className="w-[90px] h-[90px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[50px] mt-[-50px] ml-[-25px]">
 						{userProfile?.user?.username?.charAt(0).toUpperCase()}
 					</div>
 				) : (
