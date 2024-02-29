@@ -129,15 +129,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			file.arrayBuffer().then((buf) => {
 				client.uploadAttachmentFile(session, {
-					filename: fullfilename, 
-					filetype: file.type, 
+					filename: fullfilename,
+					filetype: file.type,
 					size: file.size,
 				}).then(data => {
 					if (!data || !data.url) {
 						return 'not-handled';
 					}
 					// upload to minio
-					uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then( res => {
+					uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then(res => {
 						if (res.status !== 200) {
 							return 'not-handled';
 						}
@@ -164,7 +164,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						})
 						return 'handled';
 					});
-				});				
+				});
 			});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
@@ -332,6 +332,57 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEmojiResult(results);
 	};
 
+	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!client || !session || !currentClanId) {
+			console.log(client, session, currentClanId);
+			throw new Error('Client is not initialized');
+		}
+		file?.arrayBuffer().then((buf) => {
+			client.uploadAttachmentFile(session, {
+				filename: fullfilename,
+				filetype: file.type,
+				size: file.size,
+			}).then(data => {
+				if (!data || !data.url) {
+					return 'not-handled';
+				}
+				// upload to minio
+				uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then(res => {
+					if (res.status !== 200) {
+						return 'not-handled';
+					}
+					const url = 'https://cdn.mezon.vn/' + fullfilename;
+					const contentState = editorState.getCurrentContent();
+					const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+						src: url,
+						height: '20px',
+						width: 'auto',
+					});
+					const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+					const newEditorState = EditorState.set(editorState, {
+						currentContent: contentStateWithEntity,
+					});
+
+					setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+					setContent(content + url);
+					setMetaData({
+						tp: 'image',
+						dt: {
+							s: content.length,
+							l: url.length,
+						}
+					})
+					return 'handled';
+				});
+			});
+		});
+
+	};
+
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
@@ -355,10 +406,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					</div>
 				</div>
 			)}
-
-			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
-				<Icons.AddCircle />
-			</div>
+			<label>
+				<input id="preview_img" type="file" onChange={(e) => { handleFile(e), e.target.value = '' }} className="block w-full hidden" />
+				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
+					<Icons.AddCircle />
+				</div>
+			</label>
 
 			<div
 				className={`w-[96%] bg-black gap-3 relative`}

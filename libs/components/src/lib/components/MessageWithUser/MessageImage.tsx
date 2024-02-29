@@ -8,11 +8,13 @@ function MessageImage({ content, metaData }: MessageImage) {
 	const srcImg = content?.substring(metaData.dt.s, metaData.dt.s + metaData.dt.l + 1);
 	const sufferText = content?.substring(metaData.dt.s + metaData.dt.l + 1);
 	return (
-		<div>
-			{prefixText && <div>{prefixText}</div>}
-			{srcImg && <img className="max-w-[350px] py-2" src={srcImg} alt="" />}
-			{sufferText && <div>{sufferText}</div>}
-		</div>
+		<>
+			<div>
+				{prefixText && <div>{prefixText}</div>}
+				{srcImg && <img className="max-w-[350px] max-h-[250px] py-2 cursor-pointer" src={srcImg} alt="" />}
+				{sufferText && <div>{sufferText}</div>}
+			</div>
+		</>
 	);
 }
 
