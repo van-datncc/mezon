@@ -1,3 +1,4 @@
+import { useChatReactionMessage } from '@mezon/core';
 import { selectCurrentChannelId, selectMembersMap } from '@mezon/store';
 import {
 	IMessageWithUser,
@@ -8,7 +9,7 @@ import {
 	convertTimeString,
 	getTimeDifferenceInSeconds,
 } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
@@ -70,12 +71,19 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 		});
 	};
 
-
-	const handleReactMessage = () => {
-		console.log("reacted")
-	}
-
-
+	const reactionMessage = useChatReactionMessage({ currentChannelId });
+	const handleReactMessage = useCallback(
+		async (channelId: string, messageId: string, emoji: string) => {
+			try {
+				console.log("run-2")
+				await reactionMessage.reactionMessage(channelId, messageId, emoji);
+			} catch (error) {
+				console.error('Error reacting to message:', error);
+				// Handle the error as needed
+			}
+		},
+		[reactionMessage],
+	);
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
@@ -90,7 +98,12 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 				className={`flex py-0.5 h-15 group hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer ml-4 relative w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
 			>
 				<div className=" z-50 absolute w-32 h-10 group-hover:flex  bg-blue-500 right-16 top-2 rounded flex justify-center">
-					<button onClick={handleReactMessage} className='border m-2'>React</button>
+					<button
+						onClick={() => handleReactMessage(currentChannelId ?? '', 'cd618adf-d6ef-45cc-818c-39de07e83a0b', '😀')}
+						className="border m-2"
+					>
+						React
+					</button>
 				</div>
 
 				<div className="justify-start gap-4 inline-flex w-full relative">
