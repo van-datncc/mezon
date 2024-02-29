@@ -8,9 +8,10 @@ import { useThrottledCallback } from 'use-debounce';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
+	controlEmoji?: boolean;
 };
 
-export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
+export function ChannelMessageBox({ channelId, controlEmoji }: ChannelMessageBoxProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
 
 	const handleSend = useCallback(
@@ -35,7 +36,12 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 
 	return (
 		<div>
-			<MessageBox listMentions={newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
+			<MessageBox
+				isOpenEmojiPropOutside={controlEmoji}
+				listMentions={newUserMentionList}
+				onSend={handleSend}
+				onTyping={handleTypingDebounced}
+			/>
 		</div>
 	);
 }

@@ -1,6 +1,6 @@
 import { MemberList } from '@mezon/components';
 import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChanneMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -10,8 +10,14 @@ export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChanel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+	const [isCloseEmoji, setIsCloseEmoji] = useState<boolean>(false)
+	const handleCloseEmoji = () => {
+		setIsCloseEmoji(!isCloseEmoji)
+	}
+
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
+		<div onClick={handleCloseEmoji} className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full">
 					<div
@@ -22,7 +28,7 @@ export default function ChannelLayout() {
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
 						{currentChanel && <ChannelTyping channelId={currentChanel?.id} />}
-						{currentChanel ? <ChannelMessageBox channelId={currentChanel?.id} /> : <ChannelMessageBox.Skeleton />}
+						{currentChanel ? <ChannelMessageBox controlEmoji={isCloseEmoji} channelId={currentChanel?.id} /> : <ChannelMessageBox.Skeleton />}
 					</div>
 				</div>
 				{isShow && (

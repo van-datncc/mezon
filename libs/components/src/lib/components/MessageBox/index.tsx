@@ -1,16 +1,14 @@
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import * as Icons from '../Icons';
-
 import createImagePlugin from '@draft-js-plugins/image';
+import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
-
 import Picker from '@emoji-mart/react';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { uploadImageToMinIO, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
+import {  EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import * as Icons from '../Icons';
 import axios from 'axios';
 import { AtomicBlockUtils, ContentState } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
@@ -21,12 +19,13 @@ export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
+	isOpenEmojiPropOutside?: boolean | undefined;
 };
 
 init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { onSend, onTyping, listMentions } = props;
+	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
@@ -79,7 +78,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (typeof onTyping === 'function') {
 				onTyping();
 			}
-
 			setClearEditor(false);
 			setEditorState(editorState);
 			const contentState = editorState.getCurrentContent();
@@ -91,8 +89,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (messageBreakline.match(urlImageRegex)) {
 				checkImage(messageBreakline);
 			}
-			let mentionedUsers = [];
-			for (let key in raw.entityMap) {
+			const mentionedUsers = [];
+			for (const key in raw.entityMap) {
 				const ent = raw.entityMap[key];
 				if (ent.type === 'mention') {
 					mentionedUsers.push(ent.data.mention);
@@ -176,6 +174,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 
 	const handleSend = useCallback(() => {
+		setShowEmojiSuggestion(false);
 		if (!content.trim()) {
 			return;
 		}
@@ -185,13 +184,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setContent('');
 		setMetaData({})
 		setClearEditor(true);
-	}, [content, onSend, userMentioned, metaData]);
+		setSelectedItemIndex(0);
+		liRefs?.current[selectedItemIndex]?.focus();
+		setEditorState(() => EditorState.createEmpty());
+	}, [content, onSend, userMentioned]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			return 'onsend';
 		}
-		return;
 	}
 
 	function handleKeyCommand(command: string) {
@@ -199,24 +200,47 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			handleSend();
 			return 'handled';
 		}
+
 		return 'not-handled';
 	}
 	const editorRef = useRef<Editor | null>(null);
 
 	const [showEmojiSuggestion, setShowEmojiSuggestion] = useState(false);
 
+	const moveSelectionToEnd = () => {
+		editorRef.current!.focus();
+		const editorContent = editorState.getCurrentContent();
+		const editorSelection = editorState.getSelection();
+		const updatedSelection = editorSelection.merge({
+			anchorKey: editorContent.getLastBlock().getKey(),
+			anchorOffset: editorContent.getLastBlock().getText().length,
+			focusKey: editorContent.getLastBlock().getKey(),
+			focusOffset: editorContent.getLastBlock().getText().length,
+		});
+		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+		setEditorState(updatedEditorState);
+	};
+	const [selectionToEnd, setSelectionToEnd] = useState(false);
+
 	useEffect(() => {
-		if (editorRef.current && clearEditor) {
-			setTimeout(() => {
-				editorRef.current!.focus();
-			}, 0);
-		}
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
 			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
-		handleDetectEmoji(content);
-	}, [clearEditor, content]);
+
+		if (content.length === 1 || content === '@') {
+			const editorContent = editorState.getCurrentContent();
+			const editorSelection = editorState.getSelection();
+			const updatedSelection = editorSelection.merge({
+				anchorKey: editorContent.getLastBlock().getKey(),
+				anchorOffset: editorContent.getLastBlock().getText().length,
+				focusKey: editorContent.getLastBlock().getKey(),
+				focusOffset: editorContent.getLastBlock().getText().length,
+			});
+			const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+			setEditorState(updatedEditorState);
+		}
+	}, [clearEditor, content, showEmojiSuggestion, selectionToEnd]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -228,12 +252,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
 	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
 
-	const [isShowEmoji, setShowEmoji] = useState(false);
-
-	const handleOpenEmoji = () => {
-		setShowEmoji(!isShowEmoji);
-	};
-
 	function handleEmojiClick(clickedEmoji: string) {
 		setEditorState((prevEditorState) => {
 			const currentContentState = prevEditorState.getCurrentContent();
@@ -243,11 +261,22 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 
-	const handleKeyPress = (event: React.KeyboardEvent, emoji: string) => {
-		if (event.key === 'Enter') {
-			clickEmojiSugesstion(emoji);
+	const [isShowEmoji, setShowEmoji] = useState<boolean>(false);
+	const handleOpenEmoji = () => {
+		setShowEmoji(!isShowEmoji);
+		if (isOpenEmojiPropOutside && isShowEmoji) {
+			setShowEmoji(true);
 		}
 	};
+
+	useEffect(() => {
+		if (isOpenEmojiPropOutside && isShowEmoji) {
+			setShowEmoji(true);
+		}
+		if (!isOpenEmojiPropOutside && isShowEmoji) {
+			setShowEmoji(false);
+		}
+	}, [isOpenEmojiPropOutside]);
 
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
@@ -260,25 +289,23 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
 
-	function clickEmojiSugesstion(emoji: string) {
+	function clickEmojiSuggestion(emoji: string, index: number) {
+		setSelectedItemIndex(index);
 		handleEmojiClick(emoji);
-		setShowEmojiSuggestion(false);
 		setEditorState((prevEditorState) => {
 			const currentContentState = prevEditorState.getCurrentContent();
 			const raw = convertToRaw(currentContentState);
 			const messageRaw = raw.blocks;
 			const emojiPicker = messageRaw[0].text.toString();
-			const regexEmoji = /[\uD800-\uDFFF][\uDC00-\uDFFF]|[\u0020-\uD7FF\uE000-\uFFFF]/g;
+			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
 			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
-			const lastEmoji = emojiArray.length > 0 ? emojiArray[emojiArray.length - 1] : null;
-			const regexSpaceToEmoji = /\s[^\s]+(?=$|[\p{Emoji}])/gu;
+			const lastEmoji = emojiArray[0]?.slice(syntax.length);
 			const blockMap = editorState.getCurrentContent().getBlockMap();
-			const selectionsToReplace: any = [];
+			const selectionsToReplace: SelectionState[] = [];
 			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
-				const text = contentBlock?.getText();
-				const modifiedText = text?.startsWith(' ') ? text : ` ${text}`;
+				const text = contentBlock?.getText() || '';
 				let matchArr, start, end;
-				while ((matchArr = regex.exec(modifiedText)) !== null) {
+				while ((matchArr = regex.exec(text)) !== null) {
 					start = matchArr.index;
 					end = start + matchArr[0].length;
 					callback(start, end);
@@ -286,7 +313,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			};
 
 			blockMap.forEach((contentBlock) => {
-				findWithRegex(regexSpaceToEmoji, contentBlock, (start: number, end: number) => {
+				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
 					const blockKey = contentBlock?.getKey();
 					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
 						anchorOffset: start,
@@ -298,21 +325,26 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			});
 			let contentState = editorState.getCurrentContent();
 			selectionsToReplace.forEach((selectionState: SelectionState) => {
-				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '');
+				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '�️');
 			});
 			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
+
 			return newEditorState;
 		});
 	}
-	const regex = /:{2}./;
+	const [syntax, setSyntax] = useState<string>('');
+	const regexDetect = /:.{2,}/;
+
 	const handleDetectEmoji = async (value: string) => {
 		const inputValue = value;
-		if (!regex.test(inputValue)) {
+		if (!regexDetect.test(inputValue)) {
+			setEmojiResult([]);
 			setShowEmojiSuggestion(false);
 			return;
 		}
-		const lastWord = inputValue.split(' ').pop();
-		const emojiPickerActive = lastWord?.startsWith(':');
+		const matches = regexDetect.exec(inputValue)?.[0];
+		matches && setSyntax(matches);
+		const emojiPickerActive = matches?.startsWith(':');
 		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
 		const emojiSearch = emojiPickerActive ? inputValue.slice(Number(lastEmojiIdx)) : null;
 		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
@@ -321,16 +353,68 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			emojiResults = await SearchIndex.search(emojiSearchWithOutPrefix);
 		}
 
-		let results = emojiResults?.map((emoji: any) => {
-			return emoji.skins[0].native;
-		});
-
+		const results =
+			emojiResults.map((emoji: any) => {
+				return emoji.skins[0];
+			}) || [];
 		if (results) {
 			setShowPlaceHolder(false);
-			setShowEmojiSuggestion(true);
+			setEmojiResult(results);
+			moveSelectionToEnd();
 		}
-		setEmojiResult(results);
 	};
+
+	const handleKeyPress = (e: React.KeyboardEvent, native: string) => {
+		switch (e.key) {
+			case 'ArrowUp':
+				e.preventDefault();
+				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex - 1));
+				liRefs?.current[selectedItemIndex]?.focus();
+				setClicked(!clicked);
+				break;
+			case 'ArrowDown':
+				e.preventDefault();
+				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex + 1));
+				liRefs?.current[selectedItemIndex]?.focus();
+				setClicked(!clicked);
+				break;
+			case 'Enter':
+				clickEmojiSuggestion(native as string, selectedItemIndex);
+				setTimeout(() => {
+					editorRef.current!.focus();
+				}, 0);
+				setEmojiResult([]);
+				break;
+			case 'Escape':
+				setShowEmojiSuggestion(false);
+				setTimeout(() => {
+					editorRef.current!.focus();
+				}, 0);
+				break;
+
+			default:
+				editorRef.current!.focus();
+				setSelectionToEnd(!selectionToEnd);
+				break;
+		}
+	};
+
+	const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+	const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+	const ulRef = useRef<HTMLUListElement | null>(null);
+	const [clicked, setClicked] = useState<boolean>(false);
+	useEffect(() => {
+		if (liRefs.current[selectedItemIndex]) {
+			liRefs?.current[selectedItemIndex]?.focus();
+		}
+
+		emojiResult.length > 0 ? setShowEmojiSuggestion(true) : setShowEmojiSuggestion(false);
+	}, [showEmojiSuggestion, emojiResult, syntax]);
+
+	useEffect(() => {
+		handleDetectEmoji(content);
+		liRefs?.current[selectedItemIndex]?.focus();
+	}, [content]);
 
 	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files && e.target.files[0];
@@ -386,23 +470,33 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
-				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded max-w-[50%] w-fit h-fit">
-					<div className={emojiResult?.length > 0 ? 'p-2' : ''}>
-						<div className=" cursor-pointer flex flex-wrap">
-							{emojiResult?.map((emoji) => {
-								return (
-									<p
-										tabIndex={0}
-										className=" hover:bg-slate-800 rounded border-blue-500"
-										onClick={() => clickEmojiSugesstion(emoji)}
-										key={emoji}
-										onKeyDown={(e) => handleKeyPress(e, emoji)}
-									>
-										{emoji}
-									</p>
-								);
-							})}
-						</div>
+				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
+					<p className=" text-center p-2">Emoji Matching: {syntax}</p>
+					<div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
+						<ul
+							ref={ulRef}
+							className="w-full flex flex-col"
+							onKeyDown={(e) => {
+								if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+									e.preventDefault();
+								}
+							}}
+						>
+							{emojiResult?.map((emoji: any, index: number) => (
+								<li
+									ref={(el) => (liRefs.current[index] = el)}
+									key={emoji.shortcodes}
+									onKeyDown={(e) => handleKeyPress(e, emoji.native)}
+									onClick={() => clickEmojiSuggestion(emoji.native, index)}
+									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
+										selectedItemIndex === index ? 'selected-item' : ''
+									}`}
+									tabIndex={0}
+								>
+									{emoji.native} {emoji.shortcodes}
+								</li>
+							))}
+						</ul>
 					</div>
 				</div>
 			)}
@@ -443,7 +537,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</button>
 			</div>
 			{isShowEmoji && (
-				<div className="absolute right-4 bottom-[--bottom-emoji]">
+				<div className="absolute right-4 bottom-[--bottom-emoji] z-20">
 					<EmojiReaction />
 				</div>
 			)}
