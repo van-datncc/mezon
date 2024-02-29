@@ -11,7 +11,7 @@ export default function ChannelLayout() {
 	const currentChanel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
+		<div  className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full">
 					<div

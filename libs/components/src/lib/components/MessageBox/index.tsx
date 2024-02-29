@@ -14,17 +14,19 @@ import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
 // import { useDebounce } from 'use-debounce';
 
-
 export type MessageBoxProps = {
 	onSend: (mes: IMessageSendPayload) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
+	// onBlurEmoji?: () => void;
+	isOpenEmoji?: boolean;
 };
 
 init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { onSend, onTyping, listMentions } = props;
+	const { onSend, onTyping, listMentions, isOpenEmoji } = props;
+	console.log(isOpenEmoji);
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
@@ -153,11 +155,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		return;
 	}
 
-
-
-	
-
-
 	function handleKeyCommand(command: string) {
 		if (command === 'onsend') {
 			handleSend();
@@ -174,28 +171,38 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const [showEmojiSuggestion, setShowEmojiSuggestion] = useState(false);
 
+	const moveSelectionToEnd = () => {
+		setTimeout(() => {
+			editorRef.current!.focus();
+		}, 0);
+
+		const editorContent = editorState.getCurrentContent();
+		const editorSelection = editorState.getSelection();
+		const updatedSelection = editorSelection.merge({
+			anchorKey: editorContent.getLastBlock().getKey(),
+			anchorOffset: editorContent.getLastBlock().getText().length,
+			focusKey: editorContent.getLastBlock().getKey(),
+			focusOffset: editorContent.getLastBlock().getText().length,
+		});
+		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+		setEditorState(updatedEditorState);
+	};
+	const [selectionToEnd, setSelectionToEnd] = useState(false);
+
 	useEffect(() => {
-		if (editorRef.current && clearEditor) {
-			setTimeout(() => {
-				editorRef.current!.focus();
-			}, 0);
+		if ((editorRef.current && clearEditor) || showEmojiSuggestion === false) {
+			moveSelectionToEnd();
 		}
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
 			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
-	}, [clearEditor, content, showEmojiSuggestion]);
+	}, [clearEditor, content, showEmojiSuggestion, selectionToEnd]);
 
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
 	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
-
-	const [isShowEmoji, setShowEmoji] = useState(false);
-
-	const handleOpenEmoji = () => {
-		setShowEmoji(!isShowEmoji);
-	};
 
 	function handleEmojiClick(clickedEmoji: string) {
 		setEditorState((prevEditorState) => {
@@ -204,7 +211,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			return newEditorState;
 		});
+		setTimeout(() => {
+			editorRef.current!.focus();
+		}, 0);
 	}
+
+	const [isShowEmoji, setShowEmoji] = useState(false);
+
+	const handleOpenEmoji = () => {
+		setShowEmoji(!isShowEmoji);
+	};
 
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
@@ -212,7 +228,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setShowEmoji(false);
 			handleEmojiClick(emoji.native);
 		};
-		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
+
+		return (
+			<>
+				{isOpenEmoji && (
+					<div tabIndex={0}>
+						<Picker data={data} onEmojiSelect={handleEmojiSelect} />
+					</div>
+				)}
+			</>
+		);
 	}
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
@@ -308,6 +333,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				break;
 			case 'Enter':
 				clickEmojiSuggestion(native as string, selectedItemIndex);
+				console.log('native', native);
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
@@ -320,7 +346,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				}, 0);
 				setEmojiResult([]);
 				break;
+			case 'Space': {
+				e.preventDefault();
+			}
+			case 'Backspace': {
+				setTimeout(() => {
+					setSelectionToEnd(!selectionToEnd);
+				}, 0);
+				e.preventDefault();
+			}
 			default:
+				setTimeout(() => {
+					editorRef.current!.focus();
+				}, 0);
+				setSelectionToEnd(!selectionToEnd);
 				break;
 		}
 	};
@@ -333,14 +372,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (liRefs.current[selectedItemIndex]) {
 			liRefs?.current[selectedItemIndex]?.focus();
 		}
-		if (emojiResult.length > 0) {
-			// liRefs?.current[selectedItemIndex]?.focus();
-			// setSelectedItemIndex(0);
-			setShowEmojiSuggestion(true);
-		}
-	}, [showEmojiSuggestion, emojiResult, syntax]);
 
-	console.log('syntax-detectEmoji', syntax);
+		emojiResult.length > 0 ? setShowEmojiSuggestion(true) : setShowEmojiSuggestion(false);
+	}, [showEmojiSuggestion, emojiResult, syntax]);
 
 	useEffect(() => {
 		handleDetectEmoji(content);
@@ -373,7 +407,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 									}`}
 									tabIndex={0}
 								>
-									{emoji.native} {emoji.shortcodes} {index}
+									{emoji.native} {emoji.shortcodes}
 								</li>
 							))}
 						</ul>
@@ -411,10 +445,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>
-					<Icons.Emoji defaultFill={isShowEmoji ? '#FFFFFF' : '#AEAEAE'} />
+					<Icons.Emoji defaultFill={isShowEmoji || isOpenEmoji ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			</div>
-			{isShowEmoji && (
+			{isShowEmoji || isOpenEmoji && (
 				<div className="absolute right-4 bottom-[--bottom-emoji]">
 					<EmojiReaction />
 				</div>

@@ -3,7 +3,7 @@ import { MessageBox } from '@mezon/components';
 import { useChannelMembers, useChatSending } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 
 type ChannelMessageBoxProps = {
@@ -33,9 +33,21 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 		id: item?.user?.id ?? '',
 	}));
 
+	const [isOpen, setIsOpen] = useState(false);
+	const handleBlurEmoji = () => {
+		console.log('clicked');
+		return setIsOpen(!isOpen);
+	};
+
 	return (
-		<div>
-			<MessageBox listMentions={newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
+		<div onClick={handleBlurEmoji}>
+			<MessageBox
+				// onBlurEmoji={handleBlurEmoji}
+				isOpenEmoji={isOpen}
+				listMentions={newUserMentionList}
+				onSend={handleSend}
+				onTyping={handleTypingDebounced}
+			/>
 		</div>
 	);
 }
