@@ -13,13 +13,17 @@ import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import MessageImage from './MessageImage';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
 };
 
-function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, mentions, attachments, references }: MessageWithUserProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
 
@@ -37,8 +41,9 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		if (content?.md?.tp === 'image') {
-			return <MessageImage content={content.t} metaData={content.md} />;
+		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {			
+			// TODO: render multiple attachment
+			return <MessageImage attachmentData={attachments[0]} />;
 		}
 		const lines = content.t?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;

@@ -33,8 +33,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
-	const [userMentioned, setUserMentioned] = useState<ApiMessageMention[]>([]);
-	const [metaData, setMetaData] = useState({});
+	const [mentionData, setmentionData] = useState<ApiMessageMention[]>([]);
+	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -56,21 +56,24 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
 	const checkImage = async (url: string) => {
 		try {
+			// TODO: use fetch
 			const response = await axios.head(url);
 			const contentType = response.headers['content-type'];
-			if (contentType && contentType.startsWith('image')) {
-				setMetaData({
-					tp: 'image',
-					dt: {
-						s: content.length,
-						l: url.length,
-					},
-				});
+			if (contentType && contentType.startsWith('image')) {				
+				attachmentData.push({
+					filename: url,
+					url: url,
+					filetype: 'image',
+					size: 0,
+					width: 0,
+					height: 0
+				})
+				setAttachmentData(attachmentData);
 			} else {
-				setMetaData({});
+				setAttachmentData([]);
 			}
 		} catch (error) {
-			setMetaData({});
+			setAttachmentData([]);
 		}
 		return false;
 	};
@@ -101,7 +104,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 		}
 		setContent(content + messageBreakline);
-		setUserMentioned(mentionedUsers);
+		setmentionData(mentionedUsers);
 	}, []);
 
 	const onSearchChange = ({ value }: any) => {
@@ -157,13 +160,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 							setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 							setContent(content + url);
-							setMetaData({
-								tp: 'image',
-								dt: {
-									s: content.length,
-									l: url.length,
-								},
-							});
+							attachmentData.push({
+								filename: file.name,
+								url: url,
+								filetype: 'image',
+								size: file.size,
+								width: 0,
+								height: 0
+							})
+							setAttachmentData(attachmentData);
 
 							return 'handled';
 						});
@@ -174,7 +179,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			return 'not-handled';
 		},
-		[clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
+		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
 	const handleSend = useCallback(() => {
@@ -182,15 +187,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		
-		onSend({ t: content }, userMentioned);
+
+		onSend({ t: content }, mentionData, attachmentData);
 		setContent('');
-		setMetaData({});
+		setAttachmentData([]);
 		setClearEditor(true);
 		setSelectedItemIndex(0);
 		liRefs?.current[selectedItemIndex]?.focus();
 		setEditorState(() => EditorState.createEmpty());
-	}, [content, onSend, userMentioned]);
+	}, [content, onSend, mentionData, attachmentData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -458,13 +463,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 						setContent(content + url);
-						setMetaData({
-							tp: 'image',
-							dt: {
-								s: content.length,
-								l: url.length,
-							},
-						});
+						attachmentData.push({
+							filename: file.name,
+							url: url,
+							filetype: 'image',
+							size: file.size,
+							width: 0,
+							height: 0
+						})
+						setAttachmentData(attachmentData);						
 						return 'handled';
 					});
 				});
