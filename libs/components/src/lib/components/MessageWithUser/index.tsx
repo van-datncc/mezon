@@ -27,6 +27,10 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 		return message.content;
 	}, [message]);
 
+	const attachments = useMemo(() => {
+		return message.attachments;
+	}, [message]);
+
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -37,8 +41,10 @@ function MessageWithUser({ message, preMessage }: MessageWithUserProps) {
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		if (content?.md?.tp === 'image') {
-			return <MessageImage content={content.t} metaData={content.md} />;
+		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {
+			console.log("attachment ===", attachments);
+			// TODO: render multiple attachment
+			return <MessageImage attachmentData={attachments[0]} />;
 		}
 		const lines = content.t?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;
