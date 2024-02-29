@@ -90,7 +90,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const messageRaw = raw.blocks;
 		const messageContent = Object.values(messageRaw).map((item) => item.text);
 		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
-		if (messageBreakline.match(urlImageRegex)) {
+
+		if (messageBreakline.length > 2000) {
+			setContent('Message too long. @TODO: convert it to attachment');
+			return;
+		}
+
+		// limit url within 128
+		if (messageBreakline.match(urlImageRegex) && messageBreakline.length < 128) {
 			checkImage(messageBreakline);
 		}
 		const mentionedUsers = [];
