@@ -3,14 +3,12 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { uploadImageToMinIO, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import axios from 'axios';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
@@ -25,12 +23,14 @@ export type MessageBoxProps = {
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
+	currentChannelId?: string;
+	currentClanId?: string;
 };
 
 init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside } = props;
+	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
@@ -39,8 +39,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { sessionRef, clientRef } = useMezon();
 	const mentionPlugin = useRef(
 		createMentionPlugin({
@@ -282,7 +280,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
-
 	const [isShowEmoji, setShowEmoji] = useState<boolean>(false);
 	const handleOpenEmoji = () => {
 		setShowEmoji(!isShowEmoji);
