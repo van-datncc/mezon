@@ -10,11 +10,9 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		window.open(attachmentData.url);
 	};
 	return (
-		<>
-			<div className="break-all cursor-pointer text-blue-500 underline" onClick={handleDownload}>
-				{attachmentData.url}
-			</div>
-		</>
+		<div className="break-all cursor-pointer text-blue-500 underline" onClick={handleDownload}>
+			{attachmentData.url}
+		</div>
 	);
 }
 

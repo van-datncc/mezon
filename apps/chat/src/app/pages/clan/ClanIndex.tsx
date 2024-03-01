@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 export function ClanIndex() {
-	const { serverId } = useAppParams();
-	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(serverId || ''));
+	const { clanId } = useAppParams();
+	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
 
 	useEffect(() => {

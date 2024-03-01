@@ -82,7 +82,7 @@ export const routes = createBrowserRouter([
 										element: <ClansRoutes />,
 										children: [
 											{
-												path: ':serverId',
+												path: ':clanId',
 												loader: serverLoader,
 												shouldRevalidate: shouldRevalidateServer,
 												element: <ServerLayout />,

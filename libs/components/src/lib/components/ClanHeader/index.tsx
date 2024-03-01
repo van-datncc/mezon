@@ -7,7 +7,7 @@ import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
-import ServerSetting from '../ServerSettings/serverSettings';
+import ClanSetting from '../ClanSettings/clanSettings';
 
 export type ServerHeaderProps = {
 	name?: string;
@@ -133,7 +133,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 					</div>
 				</div>
 			)}
-			<ServerSetting
+			<ClanSetting
 				// open={openServerSettings}
 				open={openServerSettings}
 				onClose={() => {

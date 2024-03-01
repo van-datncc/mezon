@@ -75,6 +75,7 @@ function ChannelList() {
 
 	const handleCopyToClipboard = (content: string) => {
 		// Send DM to user
+		
 
 		if (window.isSecureContext && navigator.clipboard) {
 			navigator.clipboard.writeText(content);
@@ -133,7 +134,7 @@ function ChannelList() {
 									})
 									.map((channel: IChannel) => (
 										<ChannelLink
-											serverId={channel?.clan_id}
+											clanId={channel?.clan_id}
 											channel={channel}
 											active={currentChanel?.id === channel.id}
 											key={channel.id}

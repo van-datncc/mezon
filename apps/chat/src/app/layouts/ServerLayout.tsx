@@ -6,7 +6,7 @@ import { ServerLoaderData } from '../loaders/serverLoader';
 import Setting from '../pages/setting';
 
 const ServerLayout = () => {
-	const { serverId } = useLoaderData() as ServerLoaderData;
+	const { clanId } = useLoaderData() as ServerLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const [openSetting, setOpenSetting] = useState(false);
@@ -16,7 +16,7 @@ const ServerLayout = () => {
 
 	return (
 		<div className="flex-row bg-bgSurface flex grow">
-			<MezonPolicyProvider clanId={serverId}>
+			<MezonPolicyProvider clanId={clanId}>
 				<div className="flex flex-col w-widthSideBar max-w-[272px] bg-bgSurface relative">
 					<ServerHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
 					<ChannelList />
