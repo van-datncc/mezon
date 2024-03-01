@@ -1,7 +1,7 @@
-import { ExitSetting, SettingRightProfile } from '@mezon/components';
+import { ExitSetting } from '@mezon/components';
 import  ServerSettingItems  from './ServerSettingItems'
 import  ServerSettingMainRoles  from './ServerSettingMainRoles'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ServerSettingRoleManagement from './ServerSettingRoleManagement';
 
 export type ModalSettingProps = {
@@ -12,13 +12,19 @@ export type ModalSettingProps = {
 const ServerSetting = (props: ModalSettingProps) => {
 	const { open, onClose } = props;
 	const [currentSetting, setCurrentSetting] = useState<string>('Roles');
-	const [openEdit, setOpenEdit] = useState<boolean>(false);
 	const handleSettingItemClick = (settingName: string) => {
 		setCurrentSetting(settingName);
 	};
+	const [openEdit, setOpenEdit] = useState<boolean>(false);
 	const closeSettingEdit = () => {
 		setOpenEdit(false)
 	};
+	
+	useEffect(() => {
+		if (!open) {
+			setOpenEdit(false);
+		}
+	}, [open]);
 
 	const openSettingEdit = () => {
 		setOpenEdit(true)

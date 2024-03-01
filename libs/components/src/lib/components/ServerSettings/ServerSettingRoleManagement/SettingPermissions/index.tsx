@@ -1,8 +1,7 @@
 import { useClans, useRoles, useUserPolicy } from "@mezon/core";
-import { getNewAddPermissions, getNewNameRole, getNewSelectedPermissions, getSelectedRoleId, setAddPermissions, setRemovePermissions, setSelectedPermissions, toggleIsShowFalse, toggleIsShowTrue } from "@mezon/store";
+import { getNewNameRole, getNewSelectedPermissions, getSelectedRoleId, setAddPermissions, setRemovePermissions, setSelectedPermissions, toggleIsShowFalse, toggleIsShowTrue } from "@mezon/store";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import SettingUserClanProfileSave from "../../../SettingProfile/SettingRightClanProfile/settingUserClanProfileSave";
 
 export type ModalSettingSave = {
     flagOption: boolean;
@@ -13,7 +12,6 @@ export type ModalSettingSave = {
 const SettingPermissions = () => {
     const dispatch = useDispatch();
     const { RolesClan } = useRoles();
-    const addPermissions = useSelector(getNewAddPermissions);
     const { currentClan } = useClans();
     const { permissionsDefault } = useUserPolicy(currentClan?.id||'');
     const clickRole = useSelector(getSelectedRoleId);
@@ -21,21 +19,12 @@ const SettingPermissions = () => {
     const selectedPermissions = useSelector(getNewSelectedPermissions)
     const nameRole = useSelector(getNewNameRole);
     
-    const [selectPermissions, setSelectPermissions] = useState<string[]>([]);
     const activeRole = RolesClan.find(role => role.id === clickRole);
     const permissionsRole = activeRole?.permission_list;
     const permissions = permissionsRole?.permissions?.filter(permission => permission.active === 1) || [];
     const permissionIds = permissions.map(permission => permission.id) || [];
     
     const [searchResults, setSearchResults] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (clickRole !== "New Role") {
-            setSelectPermissions(permissionIds as string[]);
-        }else{
-            setSelectPermissions(addPermissions as string[]);
-        }
-    }, [clickRole]);
     
     useEffect(() => {
         const results = permissionsDefault.filter(permission =>
@@ -45,28 +34,29 @@ const SettingPermissions = () => {
     }, [searchTerm, permissionsDefault]);
 
     const handlePermissionToggle = (permissionId: string) => {
-        setSelectPermissions(prevPermissions => {
-            const newPermissions = prevPermissions.includes(permissionId) 
-                ? prevPermissions.filter(id => id !== permissionId)
-                : [...prevPermissions, permissionId];
+            const isSelected = selectedPermissions.includes(permissionId);
+            const newPermissions = isSelected
+                ? selectedPermissions.filter(id => id !== permissionId)
+                : [...selectedPermissions, permissionId];
             dispatch(setSelectedPermissions(newPermissions));
-    
+
             const newActivePermissionIds = newPermissions.filter(permissionId => !permissionIds.includes(permissionId));
             const newRemovePermissionIds = permissionIds.filter(id => id !== undefined && !newPermissions.includes(id));
             dispatch(setAddPermissions(newActivePermissionIds));
             dispatch(setRemovePermissions(newRemovePermissionIds));
-            
-            return newPermissions;
-        });
     };
+
     
-    const isSamePermissions = selectedPermissions.length === permissionIds.length 
-                && selectedPermissions.every(id => permissionIds.includes(id));
-    if (nameRole !== activeRole?.title || !isSamePermissions) {
-        dispatch(toggleIsShowTrue());
-    }else{
-        dispatch(toggleIsShowFalse());
-    }
+    useEffect(() => {
+        const isSamePermissions = selectedPermissions.length === permissionIds.length 
+            && selectedPermissions.every(id => permissionIds.includes(id));
+
+        if (nameRole !== activeRole?.title || !isSamePermissions) {
+            dispatch(toggleIsShowTrue());
+        } else {
+            dispatch(toggleIsShowFalse());
+        }
+    }, [nameRole, selectedPermissions]);
 
     return (
         <>

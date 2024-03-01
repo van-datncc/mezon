@@ -1,7 +1,7 @@
 
 // import SettingRightClan from '../SettingRightClanProfile';
 
-import { useClans, useRoles } from "@mezon/core";
+import { useRoles } from "@mezon/core";
 import { InputField } from "@mezon/ui";
 import { DeleteModal } from "../DeleteRoleModal/deleteRoleModal";
 import { useState } from "react";
@@ -32,9 +32,9 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
         const permissionIds = permissions
         ? permissions.filter(permission => permission.active === 1).map(permission => permission.id) : [];
         const memberIDRoles = activeRole?.role_user_list?.role_users?.map(member => member.id) || [];
+        dispatchRole(setSelectedPermissions(permissionIds));
         dispatchRole(setNameRoleNew(activeRole?.title));
         dispatchRole(setSelectedRoleId(roleId));
-        dispatchRole(setSelectedPermissions(permissionIds));
         dispatchRole(setAddPermissions([]));
         dispatchRole(setRemovePermissions([]));
         dispatchRole(setAddMemberRoles(memberIDRoles));

@@ -14,17 +14,27 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const { usersClan, currentClan } = useClans();
     const addUsers = useSelector(getNewAddMembers);
-    const [selectedUsers, setSelectedUsers] = useState<string[]>(addUsers);
-
+    
     const clickRole = useSelector(getSelectedRoleId);
     const activeRole = RolesClan.find(role => role.id === clickRole);
     const memberRoles = activeRole?.role_user_list?.role_users;
-
     const membersNotInRoles = usersClan.filter(member => {
         return !memberRoles || !memberRoles.some(roleMember => roleMember.id === member.id);
     });
+    
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    
+    useEffect(() => {
+        if (isOpen) {
+            const filteredMemberIds = membersNotInRoles
+                .filter(member => addUsers.includes(member.id))
+                .map(member => member.id);
+            setSelectedUsers(filteredMemberIds);
+        }
+    }, [isOpen]);
+    
     const [searchResults, setSearchResults] = useState<any[]>(membersNotInRoles);
-
+    
     const handleUserToggle = (permissionId: string) => {
         setSelectedUsers(prevPermissions => {
             if (prevPermissions.includes(permissionId)) {
@@ -40,22 +50,19 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setSearchResults(results);
-    }, [ searchTerm]);
+    }, [searchTerm]);
     
     const handleUpdateRole = async () =>{
         if (clickRole === 'New Role') {
-            
             dispatch(setAddMemberRoles(selectedUsers));
         }else{
             await updateRole(currentClan?.id ?? '',clickRole,'',selectedUsers,[],[],[]);
         }
     }
-    console.log("selectedUsers: ", selectedUsers);
     
 	return (
 		<>
 			{isOpen && (
-
                     <div className="fixed  inset-0 flex items-center justify-center z-50">
                         <div className="fixed inset-0 bg-black opacity-50"></div>
                         <div className="relative z-10 dark:bg-gray-900  bg-bgDisable p-6 rounded-[5px] text-center h-[400px]">

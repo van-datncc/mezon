@@ -1,5 +1,6 @@
 import { useRoles } from "@mezon/core";
 import { getNewNameRole, getNewSelectedPermissions, getSelectedRoleId, setNameRoleNew, toggleIsShowFalse, toggleIsShowTrue } from "@mezon/store";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export type ModalSettingSave = {
@@ -8,12 +9,12 @@ export type ModalSettingSave = {
 	handlSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-// import SettingRightUser from '../SettingRightUserProfile';
+
 const SettingDisplayRole = () => {
-    const { RolesClan } = useRoles();
-    const clickRole = useSelector(getSelectedRoleId);
     const nameRole = useSelector(getNewNameRole);
     const selectedPermissions = useSelector(getNewSelectedPermissions)
+    const { RolesClan } = useRoles();
+    const clickRole = useSelector(getSelectedRoleId);
 
     const activeRole = RolesClan.find(role => role.id === clickRole);
     const permissionsRole = activeRole?.permission_list;
@@ -26,13 +27,16 @@ const SettingDisplayRole = () => {
         dispatch(setNameRoleNew(event.target.value))
     };
 
-    const isSamePermissions = selectedPermissions.length === permissionIds.length 
-                && selectedPermissions.every(id => permissionIds.includes(id));
-    if (nameRole !== activeRole?.title || !isSamePermissions) {
-        dispatch(toggleIsShowTrue());
-    }else{
-        dispatch(toggleIsShowFalse());
-    }
+    useEffect(() => {
+        const isSamePermissions = selectedPermissions.length === permissionIds.length 
+        && selectedPermissions.every(id => permissionIds.includes(id));
+        
+        if (nameRole !== activeRole?.title || !isSamePermissions) {
+            dispatch(toggleIsShowTrue());
+        } else {
+            dispatch(toggleIsShowFalse());
+        }
+    }, [nameRole, selectedPermissions]);
 
 	return (
             <div className="w-full pr-[10px]">
