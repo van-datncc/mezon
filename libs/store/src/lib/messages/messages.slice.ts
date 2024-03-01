@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelMessageEvent } from '@mezon/mezon-js/dist';
+import { ChannelMessage } from '@mezon/mezon-js/dist';
 import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -76,7 +76,9 @@ export const fetchMessagesCached = memoize(
 	{
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
-		// normalizer: (args) => args[1],
+		normalizer: (args) => {
+			return args[1] + args[2];
+		}
 	},
 );
 
