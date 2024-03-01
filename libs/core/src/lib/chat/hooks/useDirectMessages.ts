@@ -10,6 +10,7 @@ import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type UseDirectMessagesOptions = {
 	channelId: string;
@@ -27,7 +28,10 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 
 	const sendDirectMessage = React.useCallback(
-		async (message: IMessageSendPayload) => {
+		async (content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>, 
+			attachments?: Array<ApiMessageAttachment>,
+			references?: Array<ApiMessageRef>) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -38,7 +42,7 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('', channel.id, message);
+			await socket.writeChatMessage('', channel.id, content, mentions, attachments, references);
 		},
 		[sessionRef, clientRef, socketRef, channelRef],
 	);
