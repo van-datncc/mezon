@@ -3,6 +3,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import { toast } from 'react-toastify';
 import { Friend } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { ensureSession, getMezonCtx } from '../helpers';
+import { channelMembersActions } from '../channelmembers/channel.members';
 export const FRIEND_FEATURE_KEY = 'friends';
 
 export interface FriendsEntity extends Friend {
@@ -31,7 +32,11 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 	if (!response.friends) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	return response.friends.map(mapFriendToEntity);
+	const listFriends = response.friends.map(mapFriendToEntity);
+	const userIds = listFriends.map((friend) => friend.user?.id || '');
+	thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds))
+	thunkAPI.dispatch(channelMembersActions.followUserStatus());
+	return listFriends
 });
 
 export type requestAddFriendParam = {

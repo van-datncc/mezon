@@ -5,10 +5,8 @@ import { Client } from "vendors/mezon-js/packages/mezon-js/dist/client";
 
 const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
 
-export function uploadImageToMinIO(url: string,
-		stream: Buffer,
-		size: number) {
-	return fetch(url, {method: 'PUT', body: stream});
+export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
+	return fetch(url, { method: 'PUT', body: stream });
 }
 
 export function handleUploadFile(client: Client, session: Session, 
@@ -29,11 +27,16 @@ export function handleUploadFile(client: Client, session: Session,
 					return 'not-handled';
 				}
 				const url = 'https://cdn.mezon.vn/' + fullfilename;
-				
+				let fileTypeUpload = 'image';
+					if (file.type.includes('pdf')) {
+						fileTypeUpload = 'pdf';
+					} else if (file.type.includes('text')) {
+						fileTypeUpload = 'text';
+					}
 				callback(url, {
 					filename: file.name,
 					url: url,
-					filetype: file.type,
+					filetype: fileTypeUpload,
 					size: file.size,
 					width: 0,
 					height: 0,
