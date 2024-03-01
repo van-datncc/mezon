@@ -352,8 +352,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 	const [syntax, setSyntax] = useState<string>('');
-	const regexDetect = /:[^ ]{2,}/;
-
+	const regexDetect = /:[^\s]{2,}/;
 	const handleDetectEmoji = async (value: string) => {
 		const inputValue = value;
 		if (!regexDetect.test(inputValue)) {
@@ -403,6 +402,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
+				break;
+			case 'Escape':
+				setShowEmojiSuggestion(false);
+				console.log('fdfdfd');
+				setEmojiResult([]);
 				break;
 			case 'Backscape':
 				setShowEmojiSuggestion(false);
