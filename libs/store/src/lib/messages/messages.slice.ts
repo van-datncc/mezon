@@ -78,7 +78,7 @@ export const fetchMessagesCached = memoize(
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
 			return args[1] + args[2];
-		}
+		},
 	},
 );
 
@@ -107,13 +107,13 @@ export const fetchMessages = createAsyncThunk(
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
 
 		const nextCursor = response.cacheable_cursor || '';
-		let hasMore = currentHasMore
-		
+		let hasMore = currentHasMore;
+
 		// console.log('AAAAAAAAAAA: ', response.messages.length)
-		if(currentCursor === cursor) {
-			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE ) ;
+		if (currentCursor === cursor) {
+			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
 		}
-		
+
 		// console.log('HAS MORE: ', response.messages)
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { cursor: nextCursor, hasMore } }));
 
@@ -189,6 +189,21 @@ export const updateTypingUsers = createAsyncThunk(
 		// after 30 seconds recalculate typing users
 		await sleep(TYPING_TIMEOUT + 100);
 		thunkAPI.dispatch(messagesActions.recheckTypingUsers());
+	},
+);
+
+export type UpdateReactionMessageArgs = {
+	channelId: string;
+	messageId: string;
+	emoji: string;
+	userId: string;
+};
+
+export const updateReactionMessage = createAsyncThunk(
+	'messages/updateReactionMessage',
+	async ({ channelId, messageId, emoji, userId }: UpdateReactionMessageArgs, thunkAPI) => {
+		console.log("message.slice")
+		
 	},
 );
 
@@ -339,6 +354,7 @@ export const messagesActions = {
 	updateTypingUsers,
 	sendTypingUser,
 	loadMoreMessage,
+	updateReactionMessage,
 };
 
 /*

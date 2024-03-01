@@ -2,7 +2,14 @@ import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messa
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { ChannelMessageEvent, ChannelPresenceEvent, MessageTypingEvent, Notification, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import {
+	ChannelMessageEvent,
+	ChannelPresenceEvent,
+	MessageReactionEvent,
+	MessageTypingEvent,
+	Notification,
+	StatusPresenceEvent,
+} from 'vendors/mezon-js/packages/mezon-js/dist';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
@@ -75,6 +82,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId],
 	);
 
+	const onmessagereaction = useCallback(
+		(e: MessageReactionEvent) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const event = (e as any).message_reaction_event;
+			dispatch(
+				messagesActions.updateReactionMessage({
+					channelId: event.channel_id,
+					messageId: event.message_id,
+					emoji: event.emoji,
+					userId:event.sender_id
+				}),
+			);
+		},
+		[dispatch, userId],
+	);
+
 	const value = React.useMemo<ChatContextValue>(() => ({}), []);
 
 	useEffect(() => {
@@ -91,6 +114,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		socket.onmessagetyping = onmessagetyping;
 
+		socket.onmessagereaction = onmessagereaction;
+
 		socket.onnotification = onnotification;
 
 		socket.onstatuspresence = onstatuspresence;
@@ -101,8 +126,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onnotification = () => {};
 			socket.onstatuspresence = () => {};
 			socket.ondisconnect = () => {};
+			
 		};
-	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onnotification, onstatuspresence, socketRef]);
+	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef]);
 
 	useEffect(() => {
 		initWorker();

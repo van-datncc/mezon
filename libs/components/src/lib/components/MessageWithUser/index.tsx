@@ -12,9 +12,9 @@ import {
 import { useCallback, useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons/index';
 import MessageImage from './MessageImage';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -22,15 +22,17 @@ export type MessageWithUserProps = {
 	mentions?: Array<ApiMessageMention>;
 	attachments?: Array<ApiMessageAttachment>;
 	references?: Array<ApiMessageRef>;
+	reactions?: Array<ApiMessageReaction>;
 };
 
-function MessageWithUser({ message, preMessage, mentions, attachments, references }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, mentions, attachments, references, reactions }: MessageWithUserProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
-
 	const content = useMemo(() => {
 		return message.content;
 	}, [message]);
+
+	console.log('messageGetWithEmj', message);
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -42,7 +44,7 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {			
+		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {
 			// TODO: render multiple attachment
 			return <MessageImage attachmentData={attachments[0]} />;
 		}
@@ -80,15 +82,14 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 	const handleReactMessage = useCallback(
 		async (channelId: string, messageId: string, emoji: string) => {
 			try {
-				console.log("run-2")
 				await reactionMessage.reactionMessage(channelId, messageId, emoji);
 			} catch (error) {
 				console.error('Error reacting to message:', error);
-				// Handle the error as needed
 			}
 		},
 		[reactionMessage],
 	);
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
@@ -102,15 +103,16 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 			<div
 				className={`flex py-0.5 h-15 group hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer ml-4 relative w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
 			>
+				{message?.reactions &&
+					message.reactions?.map((emoji,index) => {
+						return <p key={index}>{emoji.emoji}</p>;
+					})}
+
 				<div className=" z-50 absolute w-32 h-10 group-hover:flex  bg-blue-500 right-16 top-2 rounded flex justify-center">
-					<button
-						onClick={() => handleReactMessage(currentChannelId ?? '', 'cd618adf-d6ef-45cc-818c-39de07e83a0b', '😀')}
-						className="border m-2"
-					>
+					<button onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '😀')} className="border m-2">
 						React
 					</button>
 				</div>
-
 				<div className="justify-start gap-4 inline-flex w-full relative">
 					{isCombine ? (
 						<div className="w-[38px] flex items-center justify-center min-w-[38px]">
