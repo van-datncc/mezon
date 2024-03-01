@@ -248,7 +248,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
 
-		if (content.length === 1 || content === '@') {
+		if (content.length >= 0) {
 			const editorContent = editorState.getCurrentContent();
 			const editorSelection = editorState.getSelection();
 			const updatedSelection = editorSelection.merge({
@@ -260,7 +260,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 			setEditorState(updatedEditorState);
 		}
-	}, [clearEditor, content, showEmojiSuggestion, selectionToEnd]);
+	}, [clearEditor, content, showEmojiSuggestion]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -352,7 +352,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 	const [syntax, setSyntax] = useState<string>('');
-	const regexDetect = /:.{2,}/;
+	const regexDetect = /:[^ ]{2,}/;
 
 	const handleDetectEmoji = async (value: string) => {
 		const inputValue = value;
@@ -362,6 +362,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 		const matches = regexDetect.exec(inputValue)?.[0];
+
 		matches && setSyntax(matches);
 		const emojiPickerActive = matches?.startsWith(':');
 		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
@@ -402,15 +403,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
-				setEmojiResult([]);
 				break;
-			case 'Escape':
+			case 'Backscape':
 				setShowEmojiSuggestion(false);
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
+				moveSelectionToEnd();
 				break;
-
 			default:
 				editorRef.current!.focus();
 				setSelectionToEnd(!selectionToEnd);
