@@ -1,5 +1,5 @@
 import { useClans, useRoles } from "@mezon/core";
-import { getIsShow, getSelectedRoleId, rolesClanActions, setSelectedRoleId } from "@mezon/store";
+import { getIsShow, getSelectedRoleId, rolesClanActions, setAddMemberRoles, setNameRoleNew, setSelectedRoleId } from "@mezon/store";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 type closeEditRole = {
@@ -11,13 +11,16 @@ const SettingListRole = (props: closeEditRole) => {
     
     const clickRole = useSelector(getSelectedRoleId);
     const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
-    const [nameRoleNew, setNameRoleNew] = useState("New role")
+    const [nameRoleNew] = useState("New role")
     
     const dispatch = useDispatch();
-    const { RolesClan,  createRole} = useRoles();
-    const { currentClan } = useClans();
+    const { RolesClan } = useRoles();
     const handleRoleClick = (roleId:string) => {
         if (!isChange) {
+            const activeRole = RolesClan.find(role => role.id === roleId);
+            const memberIDRoles = activeRole?.role_user_list?.role_users?.map(member => member.id) || [];
+            dispatch(setNameRoleNew(activeRole?.title));
+            dispatch(setAddMemberRoles(memberIDRoles));
             setClickedRole(roleId);
             dispatch(setSelectedRoleId(roleId));
         }
@@ -35,12 +38,12 @@ const SettingListRole = (props: closeEditRole) => {
                 <br />
                 <div className="overflow-auto h-full">
                     {
-                        clickedRole === '' ? (
+                        clickedRole === 'New Role' ? (
                             <div className="mb-2">
                                 <button
                                     // onClick={() => handleRoleClick(role.id)}
                                     className={`block w-full py-1 px-4 rounded ${
-                                        clickedRole === '' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
+                                        clickedRole === 'New Role' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
                                     } text-white font-bold`}
                                 >
                                     {nameRoleNew}

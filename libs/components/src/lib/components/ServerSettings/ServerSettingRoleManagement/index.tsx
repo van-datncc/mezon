@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import SettingListRole from "./SettingListRole";
 import SettingValueDisplayRole from "./SettingOptionRole";
-import { getIsShow, getNewAddMembers, getNewAddPermissions, getNewNameRole, getRemovePermissions, getSelectedRoleId } from "@mezon/store";
+import { getIsShow, getNewAddMembers, getNewAddPermissions, getNewNameRole, getRemovePermissions, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, toggleIsShowFalse } from "@mezon/store";
 import { useState } from "react";
 import SettingUserClanProfileSave from "../../SettingProfile/SettingRightClanProfile/settingUserClanProfileSave";
 import { useClans, useRoles } from "@mezon/core";
@@ -22,27 +22,37 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
     const namRole = useSelector(getNewNameRole);
     const addPermissions = useSelector(getNewAddPermissions);
     const removePermissions = useSelector(getRemovePermissions);
-    const users = useSelector(getNewAddMembers);
-    
+    const addUsers = useSelector(getNewAddMembers);
+    const { RolesClan } = useRoles();
     const dispatch = useDispatch();
     const { currentClan } = useClans();
     const isChange = useSelector(getIsShow);
-    console.log("isChange: ", isChange);
     
     
     const handleClose = () =>{
+        if (clickRole === 'New Role') {
+            props.handleClose()
+        }else{
+            const activeRole = RolesClan.find(role => role.id === clickRole);
+            const memberIDRoles = activeRole?.role_user_list?.role_users?.map(member => member.id) || [];
+            dispatch(setNameRoleNew(activeRole?.title));
+            dispatch(setAddMemberRoles(memberIDRoles));
+            // await updateRole(currentClan?.id ?? '',clickRole,namRole,[],addPermissions,[],removePermissions);
+        }
         // setRoleName(activeRole?.title || '');
         // SetFlagOption(false)
         // dispatch(toggleIsShowFalse());
     }
     const handlSaveClose = () =>{
-        // SetFlagOption(false)
-        // dispatch(toggleIsShowFalse());
-    }
-    const handleUpdateUser = async () =>{
-        if (clickRole==='') {
+        if (clickRole ==='New Role') {
             props.handleClose()
-            await createRole(currentClan?.id||'', currentClan?.id||'',namRole,users,addPermissions);
+        }
+    }
+    
+    
+    const handleUpdateUser = async () =>{
+        if (clickRole === 'New Role') {
+            await createRole(currentClan?.id||'', currentClan?.id||'',namRole,addUsers,addPermissions);
         }else{
             await updateRole(currentClan?.id ?? '',clickRole,namRole,[],addPermissions,[],removePermissions);
         }
@@ -62,7 +72,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
                 <div className="border-l border-gray-400"></div>
                 <div className=" w-2/3">
                     <div className="font-semibold ml-[15px]">
-                        {clickRole === '' ? (
+                        {clickRole === 'New Role' ? (
                             <div className="">
                                 NEW ROLE
                             </div>

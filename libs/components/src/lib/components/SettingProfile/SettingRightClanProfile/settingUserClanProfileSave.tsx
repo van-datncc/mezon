@@ -13,7 +13,7 @@ export type PropsModalSettingSave = {
 const SettingUserClanProfileSave = (props: PropsModalSettingSave) => {
 	const { PropsSave } = props;
 	const clickRole = useSelector(getSelectedRoleId);
-	return PropsSave.flagOption && clickRole === '' ? (
+	return PropsSave.flagOption && clickRole === 'New Role' ? (
 		<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform">
 			<div className="flex-1 flex items-center text-nowrap">
 				<p>Carefull - you have unsaved changes!</p>

@@ -1,34 +1,39 @@
 import { useClans, useRoles } from "@mezon/core";
-import { getSelectedRoleId } from "@mezon/store";
+import { getNewAddMembers, getSelectedRoleId } from "@mezon/store";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { AddMembersModal } from "../AddMembersModal";
 
 const SettingManageMembers = () => {
     const { RolesClan, updateRole } = useRoles();
+    const { currentClan } = useClans();
+    const addUsers: string[] = useSelector(getNewAddMembers);
     const clickRole = useSelector(getSelectedRoleId);
     const activeRole = RolesClan.find(role => role.id === clickRole);
+    const { usersClan } = useClans();
     const memberRoles = activeRole?.role_user_list?.role_users;
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const { currentClan } = useClans();
+    
+    const commonUsers = usersClan.filter(user => addUsers.includes(user.id));
+    const [searchResults, setSearchResults] = useState<any[]>(commonUsers);
     const handleOpenModal = () => {
 		setOpenModal(true);
 	};
-
+    
     const handleCloseModal = () => {
 		setOpenModal(false);
 	};
 
     useEffect(() => {
-        const results = memberRoles?.filter(member =>
-            member.display_name?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setSearchResults(results || []);
-    }, [memberRoles, searchTerm]);
+            const results = commonUsers?.filter(member =>
+                member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setSearchResults(results || []);
+    }, [memberRoles, searchTerm, addUsers, clickRole]);
+
+    
     const handleRemoveMember = async (userID:string[]) =>{
-        
         await updateRole(currentClan?.id ?? '',clickRole,'',[],[],userID,[]);
     }
     return (
@@ -53,12 +58,15 @@ const SettingManageMembers = () => {
             <div>
                 <ul>
                     {searchResults.map((member: any) => (
-                        <li key={member.id} className="flex justify-between items-center">
-                        <span>{member.display_name}</span>
-                        <span onClick={() => handleRemoveMember(member.id)} className="text-white cursor-pointer">x</span>
-                    </li>
+                        <li key={member.user.id} className="flex justify-between items-center">
+                            <span>{member.user.display_name}</span>
+                            {clickRole !== "New Role" ?(
+                                <span onClick={() => handleRemoveMember(member.user.id)} className="text-white cursor-pointer">x</span>
+                            ):null
+                            }
+                        </li>
                     ))}
-                </ul>
+                </ul>  
             </div>
             <AddMembersModal isOpen={openModal} onClose={handleCloseModal} />
         </>

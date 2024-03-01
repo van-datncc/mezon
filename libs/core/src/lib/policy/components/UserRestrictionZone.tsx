@@ -2,16 +2,21 @@ import { EPermission } from '@mezon/utils';
 import { useUserRestriction } from '../hooks/useUserRestriction';
 
 export type UserRestrictionZoneProps = {
-	permissions: EPermission[];
+	permissions?: EPermission[];
 	policy?: boolean | undefined | null;
 	children: React.ReactNode;
 	render?: (children: React.ReactNode, isAllowed: boolean) => React.ReactNode;
+	condistion?: "and" | "or" ,
 };
 
-export function UserRestrictionZone({ policy, permissions, render, children }: UserRestrictionZoneProps) {
+export function UserRestrictionZone({ policy, permissions = [], render, children, condistion='and' }: UserRestrictionZoneProps) {
 	const isPermissionsAllowed = useUserRestriction(permissions);
+	console.log("isPermissionsAllowed: ", isPermissionsAllowed);
+	console.log(" policy: ", policy);
+	
+	
 	const isPolicyAllowed = typeof policy === 'boolean' ? policy : true;
-	const isAllowed = isPermissionsAllowed && isPolicyAllowed;
+	const isAllowed = condistion === "and"? isPermissionsAllowed && isPolicyAllowed : isPermissionsAllowed || isPolicyAllowed;
 	const renderChildren = render ? render : (children: React.ReactNode, isAllowed: boolean) => (isAllowed ? children : null);
 
 	return renderChildren(children, isAllowed);
