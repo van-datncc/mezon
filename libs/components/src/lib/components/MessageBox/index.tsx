@@ -11,15 +11,17 @@ import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, 
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageBoxProps = {
-	onSend: (mes: IMessageSendPayload, 
-			mentions?: Array<ApiMessageMention>, 
-			attachments?: Array<ApiMessageAttachment>,
-			refrences?: Array<ApiMessageRef>) => void;
+	onSend: (
+		mes: IMessageSendPayload,
+		mentions?: Array<ApiMessageMention>,
+		attachments?: Array<ApiMessageAttachment>,
+		refrences?: Array<ApiMessageRef>,
+	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
@@ -96,7 +98,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (ent.type === 'mention') {
 				mentionedUsers.push({
 					user_id: ent.data.mention.id,
-					username: ent.data.mention.name
+					username: ent.data.mention.name,
 				});
 			}
 		}
@@ -182,7 +184,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (!content.trim()) {
 			return;
 		}
-		
+
 		onSend({ t: content }, userMentioned);
 		setContent('');
 		setMetaData({});
@@ -335,6 +337,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
+
 	const [syntax, setSyntax] = useState<string>('');
 	const regexDetect = /:.{2,}/;
 
