@@ -109,7 +109,7 @@ function ChannelList() {
 								</button>
 								<UserRestrictionZone
 
-									policy={isClanCreator|| hasManageChannelPermission}
+									policy={isClanCreator || hasManageChannelPermission}
 								>
 									<button
 										onClick={() => {

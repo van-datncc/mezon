@@ -43,7 +43,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }, [ searchTerm]);
     
     const handleUpdateRole = async () =>{
-        if (clickRole==='New Role') {
+        if (clickRole === 'New Role') {
             
             dispatch(setAddMemberRoles(selectedUsers));
         }else{

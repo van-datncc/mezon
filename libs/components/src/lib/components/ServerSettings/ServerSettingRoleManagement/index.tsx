@@ -30,7 +30,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
     
     
     const handleClose = () =>{
-        if (clickRole==='New Role') {
+        if (clickRole === 'New Role') {
             props.handleClose()
         }else{
             const activeRole = RolesClan.find(role => role.id === clickRole);
@@ -44,14 +44,14 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
         // dispatch(toggleIsShowFalse());
     }
     const handlSaveClose = () =>{
-        if (clickRole==='New Role') {
+        if (clickRole ==='New Role') {
             props.handleClose()
         }
     }
     
     
     const handleUpdateUser = async () =>{
-        if (clickRole==='New Role') {
+        if (clickRole === 'New Role') {
             await createRole(currentClan?.id||'', currentClan?.id||'',namRole,addUsers,addPermissions);
         }else{
             await updateRole(currentClan?.id ?? '',clickRole,namRole,[],addPermissions,[],removePermissions);
