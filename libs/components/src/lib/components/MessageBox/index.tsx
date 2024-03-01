@@ -11,15 +11,17 @@ import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, 
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 export type MessageBoxProps = {
-	onSend: (mes: IMessageSendPayload, 
-			mentions?: Array<ApiMessageMention>, 
-			attachments?: Array<ApiMessageAttachment>,
-			refrences?: Array<ApiMessageRef>) => void;
+	onSend: (
+		mes: IMessageSendPayload,
+		mentions?: Array<ApiMessageMention>,
+		attachments?: Array<ApiMessageAttachment>,
+		refrences?: Array<ApiMessageRef>,
+	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
@@ -59,15 +61,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			// TODO: use fetch
 			const response = await axios.head(url);
 			const contentType = response.headers['content-type'];
-			if (contentType && contentType.startsWith('image')) {				
+			if (contentType && contentType.startsWith('image')) {
 				attachmentData.push({
 					filename: url,
 					url: url,
 					filetype: 'image',
 					size: 0,
 					width: 0,
-					height: 0
-				})
+					height: 0,
+				});
 				setAttachmentData(attachmentData);
 			} else {
 				setAttachmentData([]);
@@ -77,6 +79,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return false;
 	};
+
+	//clear Editor after navigate channel
+	useEffect(() => {
+		setEditorState(EditorState.createEmpty());
+	}, [currentChannelId, currentClanId]);
 
 	const onChange = useCallback((editorState: EditorState) => {
 		if (typeof onTyping === 'function') {
@@ -106,7 +113,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (ent.type === 'mention') {
 				mentionedUsers.push({
 					user_id: ent.data.mention.id,
-					username: ent.data.mention.name
+					username: ent.data.mention.name,
 				});
 			}
 		}
@@ -173,8 +180,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 								filetype: 'image',
 								size: file.size,
 								width: 0,
-								height: 0
-							})
+								height: 0,
+							});
 							setAttachmentData(attachmentData);
 
 							return 'handled';
@@ -476,9 +483,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							filetype: 'image',
 							size: file.size,
 							width: 0,
-							height: 0
-						})
-						setAttachmentData(attachmentData);						
+							height: 0,
+						});
+						setAttachmentData(attachmentData);
 						return 'handled';
 					});
 				});
@@ -538,7 +545,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					editorRef.current!.focus();
 				}}
 			>
-				<div id="editor" className={`p-[10px] flex items-center text-[15px] break-all min-w-full relative `}>
+				<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
 					<Editor
 						keyBindingFn={keyBindingFn}
 						handleKeyCommand={handleKeyCommand}
@@ -548,7 +555,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						ref={editorRef}
 						handlePastedFiles={onPastedFiles}
 					/>
-					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
+					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>}
 				</div>
 
 				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
