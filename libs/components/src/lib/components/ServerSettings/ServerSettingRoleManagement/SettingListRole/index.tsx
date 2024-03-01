@@ -1,5 +1,5 @@
 import { useRoles } from "@mezon/core";
-import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedRoleId } from "@mezon/store";
+import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from "@mezon/store";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 type closeEditRole = {
@@ -18,8 +18,14 @@ const SettingListRole = (props: closeEditRole) => {
         if (!isChange) {
             const activeRole = RolesClan.find(role => role.id === roleId);
             const memberIDRoles = activeRole?.role_user_list?.role_users?.map(member => member.id) || [];
+
+            const permissionsRole = activeRole?.permission_list;
+            const permissions = permissionsRole?.permissions?.filter(permission => permission.active === 1) || [];
+            const permissionIds = permissions.map(permission => permission.id) || [];
+
             dispatch(setNameRoleNew(activeRole?.title));
             dispatch(setAddMemberRoles(memberIDRoles));
+            dispatch(setSelectedPermissions(permissionIds))
             setClickedRole(roleId);
             dispatch(setSelectedRoleId(roleId));
         }
