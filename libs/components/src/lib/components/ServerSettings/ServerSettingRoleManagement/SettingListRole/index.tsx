@@ -1,11 +1,10 @@
-import { useClans, useRoles } from "@mezon/core";
-import { getIsShow, getSelectedRoleId, rolesClanActions, setAddMemberRoles, setNameRoleNew, setSelectedRoleId } from "@mezon/store";
-import { useEffect, useState } from "react";
+import { useRoles } from "@mezon/core";
+import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedRoleId } from "@mezon/store";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 type closeEditRole = {
 	handleClose: () => void;
 };
-// import SettingRightUser from '../SettingRightUserProfile';
 const SettingListRole = (props: closeEditRole) => {
     const isChange = useSelector(getIsShow);
     
@@ -41,7 +40,6 @@ const SettingListRole = (props: closeEditRole) => {
                         clickedRole === 'New Role' ? (
                             <div className="mb-2">
                                 <button
-                                    // onClick={() => handleRoleClick(role.id)}
                                     className={`block w-full py-1 px-4 rounded ${
                                         clickedRole === 'New Role' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
                                     } text-white font-bold`}

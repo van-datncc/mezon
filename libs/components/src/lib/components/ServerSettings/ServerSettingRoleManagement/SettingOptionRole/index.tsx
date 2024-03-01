@@ -1,8 +1,6 @@
 import { useRoles } from "@mezon/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SettingDisplayRole from "../SettingDisplayRole";
-import SettingUserClanProfileSave from "../../../SettingProfile/SettingRightClanProfile/settingUserClanProfileSave";
-import { fail } from "assert";
 import { useDispatch, useSelector } from "react-redux";
 import { getSelectedRoleId, toggleIsShowFalse } from "@mezon/store";
 import SettingManageMembers from "../SettingManageMembers";

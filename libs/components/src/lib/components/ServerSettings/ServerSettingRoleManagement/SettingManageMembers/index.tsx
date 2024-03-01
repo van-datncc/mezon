@@ -5,17 +5,16 @@ import {  useSelector } from "react-redux";
 import { AddMembersModal } from "../AddMembersModal";
 
 const SettingManageMembers = () => {
-    const { RolesClan, updateRole } = useRoles();
+    const { updateRole } = useRoles();
     const { currentClan } = useClans();
     const addUsers: string[] = useSelector(getNewAddMembers);
     const clickRole = useSelector(getSelectedRoleId);
-    const activeRole = RolesClan.find(role => role.id === clickRole);
     const { usersClan } = useClans();
-    const memberRoles = activeRole?.role_user_list?.role_users;
     const [searchTerm, setSearchTerm] = useState('');
     const [openModal, setOpenModal] = useState<boolean>(false);
     
     const commonUsers = usersClan.filter(user => addUsers.includes(user.id));
+
     const [searchResults, setSearchResults] = useState<any[]>(commonUsers);
     const handleOpenModal = () => {
 		setOpenModal(true);
@@ -30,7 +29,7 @@ const SettingManageMembers = () => {
                 member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase())
             );
             setSearchResults(results || []);
-    }, [memberRoles, searchTerm, addUsers, clickRole]);
+    }, [ searchTerm, addUsers, clickRole ]);
 
     
     const handleRemoveMember = async (userID:string[]) =>{
