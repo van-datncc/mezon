@@ -405,7 +405,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				break;
 			case 'Escape':
 				setShowEmojiSuggestion(false);
-				console.log('fdfdfd');
 				setEmojiResult([]);
 				break;
 			case 'Backscape':
