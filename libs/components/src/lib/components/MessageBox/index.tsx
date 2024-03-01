@@ -138,7 +138,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 			const retval = handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
 				handleFinishUpload(url, attachment);
-			});			
+			});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
