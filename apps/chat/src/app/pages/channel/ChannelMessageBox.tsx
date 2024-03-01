@@ -5,22 +5,24 @@ import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
 	controlEmoji?: boolean;
-	clanId?:string
+	clanId?: string;
 };
 
-export function ChannelMessageBox({ channelId, controlEmoji,clanId }: ChannelMessageBoxProps) {
+export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMessageBoxProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
 
 	const handleSend = useCallback(
-		(content: IMessageSendPayload,
-			mentions?: Array<ApiMessageMention>, 
+		(
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			refrences?: Array<ApiMessageRef>) => {
+			refrences?: Array<ApiMessageRef>,
+		) => {
 			sendMessage(content, mentions, attachments, refrences);
 		},
 		[sendMessage],
