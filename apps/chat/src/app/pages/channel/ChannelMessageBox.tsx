@@ -10,9 +10,10 @@ import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/
 type ChannelMessageBoxProps = {
 	channelId: string;
 	controlEmoji?: boolean;
+	clanId?:string
 };
 
-export function ChannelMessageBox({ channelId, controlEmoji }: ChannelMessageBoxProps) {
+export function ChannelMessageBox({ channelId, controlEmoji,clanId }: ChannelMessageBoxProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
 
 	const handleSend = useCallback(
@@ -45,6 +46,8 @@ export function ChannelMessageBox({ channelId, controlEmoji }: ChannelMessageBox
 				listMentions={newUserMentionList}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
+				currentChannelId={channelId}
+				currentClanId={clanId}
 			/>
 		</div>
 	);

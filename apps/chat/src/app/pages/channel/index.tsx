@@ -9,12 +9,13 @@ import { ChannelTyping } from './ChannelTyping';
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChanel = useSelector(selectCurrentChannel);
+
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-	const [isCloseEmoji, setIsCloseEmoji] = useState<boolean>(false)
+	const [isCloseEmoji, setIsCloseEmoji] = useState<boolean>(false);
 	const handleCloseEmoji = () => {
-		setIsCloseEmoji(!isCloseEmoji)
-	}
+		setIsCloseEmoji(!isCloseEmoji);
+	};
 
 	return (
 		<div onClick={handleCloseEmoji} className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
@@ -28,7 +29,11 @@ export default function ChannelLayout() {
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
 						{currentChanel && <ChannelTyping channelId={currentChanel?.id} />}
-						{currentChanel ? <ChannelMessageBox controlEmoji={isCloseEmoji} channelId={currentChanel?.id} /> : <ChannelMessageBox.Skeleton />}
+						{currentChanel ? (
+							<ChannelMessageBox clanId={currentChanel.clan_id} controlEmoji={isCloseEmoji} channelId={currentChanel?.id} />
+						) : (
+							<ChannelMessageBox.Skeleton />
+						)}
 					</div>
 				</div>
 				{isShow && (

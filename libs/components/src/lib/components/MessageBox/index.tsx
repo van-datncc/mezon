@@ -3,14 +3,12 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { uploadImageToMinIO, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import axios from 'axios';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
@@ -25,12 +23,14 @@ export type MessageBoxProps = {
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
+	currentChannelId?: string;
+	currentClanId?: string;
 };
 
 init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside } = props;
+	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
@@ -39,8 +39,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { sessionRef, clientRef } = useMezon();
 	const mentionPlugin = useRef(
 		createMentionPlugin({
@@ -250,7 +248,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
 
-		if (content.length === 1 || content === '@') {
+		if (content.length >= 0) {
 			const editorContent = editorState.getCurrentContent();
 			const editorSelection = editorState.getSelection();
 			const updatedSelection = editorSelection.merge({
@@ -262,7 +260,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 			setEditorState(updatedEditorState);
 		}
-	}, [clearEditor, content, showEmojiSuggestion, selectionToEnd]);
+	}, [clearEditor, content, showEmojiSuggestion]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -282,7 +280,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
-
 	const [isShowEmoji, setShowEmoji] = useState<boolean>(false);
 	const handleOpenEmoji = () => {
 		setShowEmoji(!isShowEmoji);
@@ -355,8 +352,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 	const [syntax, setSyntax] = useState<string>('');
-	const regexDetect = /:.{2,}/;
-
+	const regexDetect = /:[^\s]{2,}/;
 	const handleDetectEmoji = async (value: string) => {
 		const inputValue = value;
 		if (!regexDetect.test(inputValue)) {
@@ -365,6 +361,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 		const matches = regexDetect.exec(inputValue)?.[0];
+
 		matches && setSyntax(matches);
 		const emojiPickerActive = matches?.startsWith(':');
 		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
@@ -405,15 +402,19 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
-				setEmojiResult([]);
 				break;
 			case 'Escape':
+				setShowEmojiSuggestion(false);
+				console.log('fdfdfd');
+				setEmojiResult([]);
+				break;
+			case 'Backscape':
 				setShowEmojiSuggestion(false);
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
+				moveSelectionToEnd();
 				break;
-
 			default:
 				editorRef.current!.focus();
 				setSelectionToEnd(!selectionToEnd);
