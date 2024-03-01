@@ -2,6 +2,7 @@ export * from './lib/app/hooks/useAppNavigation';
 export * from './lib/chat/hooks/useRole';
 export * from './lib/app/hooks/useAppParams';
 export * from './lib/auth/hooks/useAuth';
+export * from './lib/auth/hooks/useMemberStatus';
 export * from './lib/chat/contexts/ChatContext';
 export * from './lib/chat/hooks/useAccount';
 export * from './lib/chat/hooks/useCategory';

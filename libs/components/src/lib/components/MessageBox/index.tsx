@@ -52,8 +52,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin.current, imagePlugin];
-	
-
 	//clear Editor after navigate channel
 	useEffect(() => {
 		setEditorState(EditorState.createEmpty());
@@ -81,7 +79,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			attachmentData.push(attachment);
 			setAttachmentData(attachmentData);
 		});
-		
+
 		const mentionedUsers = [];
 		for (const key in raw.entityMap) {
 			const ent = raw.entityMap[key];
@@ -105,9 +103,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const handleFinishUpload = useCallback((url: string, attachment: ApiMessageAttachment) => {
+		let urlFile = url
+		if (attachment.filetype === 'pdf') {
+			urlFile = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png'
+		} else if (attachment.filetype === 'text') {
+			urlFile = "https://e7.pngegg.com/pngimages/735/737/png-clipart-logo-plain-text-organization-text-file-others-miscellaneous-angle-thumbnail.png"
+		}
+
 		const contentState = editorState.getCurrentContent();
 		const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-			src: url,
+			src: urlFile,
 			height: '20px',
 			width: 'auto',
 		});
@@ -115,7 +120,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const newEditorState = EditorState.set(editorState, {
 			currentContent: contentStateWithEntity,
 		});
-	
 		setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 		setContent(content + url);
 		attachmentData.push(attachment);
@@ -396,7 +400,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;
 		const session = sessionRef.current;
 		const client = clientRef.current;
-		if (!file ) return;
+		if (!file) return;
 		if (!client || !session || !currentClanId) {
 			console.log(client, session, currentClanId);
 			throw new Error('Client or file is not initialized');
@@ -428,9 +432,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 									key={emoji.shortcodes}
 									onKeyDown={(e) => handleKeyPress(e, emoji.native)}
 									onClick={() => clickEmojiSuggestion(emoji.native, index)}
-									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
-										selectedItemIndex === index ? 'selected-item' : ''
-									}`}
+									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${selectedItemIndex === index ? 'selected-item' : ''
+										}`}
 									tabIndex={0}
 								>
 									{emoji.native} {emoji.shortcodes}
