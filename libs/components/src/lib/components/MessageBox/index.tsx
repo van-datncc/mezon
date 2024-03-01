@@ -3,9 +3,8 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { uploadImageToMinIO, useMezon } from '@mezon/transport';
+import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import axios from 'axios';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
@@ -15,10 +14,10 @@ import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
 	onSend: (
-		mes: IMessageSendPayload,
+		content: IMessageSendPayload,
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
-		refrences?: Array<ApiMessageRef>,
+		references?: Array<ApiMessageRef>,
 	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
@@ -35,7 +34,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
-	const [mentionData, setmentionData] = useState<ApiMessageMention[]>([]);
+	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -53,30 +52,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { MentionSuggestions } = mentionPlugin.current;
 	const imagePlugin = createImagePlugin();
 	const plugins = [mentionPlugin.current, imagePlugin];
-	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
-	const checkImage = async (url: string) => {
-		try {
-			// TODO: use fetch
-			const response = await axios.head(url);
-			const contentType = response.headers['content-type'];
-			if (contentType && contentType.startsWith('image')) {
-				attachmentData.push({
-					filename: url,
-					url: url,
-					filetype: 'image',
-					size: 0,
-					width: 0,
-					height: 0,
-				});
-				setAttachmentData(attachmentData);
-			} else {
-				setAttachmentData([]);
-			}
-		} catch (error) {
-			setAttachmentData([]);
-		}
-		return false;
-	};
+	
 
 	//clear Editor after navigate channel
 	useEffect(() => {
@@ -101,10 +77,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 
-		// limit url within 128
-		if (messageBreakline.match(urlImageRegex) && messageBreakline.length < 128) {
-			checkImage(messageBreakline);
-		}
+		handleUrlInput(messageBreakline, (attachment) => {
+			attachmentData.push(attachment);
+			setAttachmentData(attachmentData);
+		});
+		
 		const mentionedUsers = [];
 		for (const key in raw.entityMap) {
 			const ent = raw.entityMap[key];
@@ -116,7 +93,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 		}
 		setContent(content + messageBreakline);
-		setmentionData(mentionedUsers);
+		setMentionData(mentionedUsers);
 	}, []);
 
 	const onSearchChange = ({ value }: any) => {
@@ -126,6 +103,24 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
 	}, []);
+
+	const handleFinishUpload = useCallback((url: string, attachment: ApiMessageAttachment) => {
+		const contentState = editorState.getCurrentContent();
+		const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+			src: url,
+			height: '20px',
+			width: 'auto',
+		});
+		const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+		const newEditorState = EditorState.set(editorState, {
+			currentContent: contentStateWithEntity,
+		});
+	
+		setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+		setContent(content + url);
+		attachmentData.push(attachment);
+		setAttachmentData(attachmentData);
+	}, [attachmentData, content, editorState]);
 
 	const onPastedFiles = useCallback(
 		(files: Blob[]) => {
@@ -141,51 +136,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				console.log(client, session, currentClanId);
 				throw new Error('Client is not initialized');
 			}
-
-			file.arrayBuffer().then((buf) => {
-				client
-					.uploadAttachmentFile(session, {
-						filename: fullfilename,
-						filetype: file.type,
-						size: file.size,
-					})
-					.then((data) => {
-						if (!data || !data.url) {
-							return 'not-handled';
-						}
-						// upload to minio
-						uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
-							if (res.status !== 200) {
-								return 'not-handled';
-							}
-							const url = 'https://cdn.mezon.vn/' + fullfilename;
-							const contentState = editorState.getCurrentContent();
-							const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-								src: url,
-								height: '20px',
-								width: 'auto',
-							});
-							const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-							const newEditorState = EditorState.set(editorState, {
-								currentContent: contentStateWithEntity,
-							});
-
-							setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-							setContent(content + url);
-							attachmentData.push({
-								filename: file.name,
-								url: url,
-								filetype: 'image',
-								size: file.size,
-								width: 0,
-								height: 0,
-							});
-							setAttachmentData(attachmentData);
-
-							return 'handled';
-						});
-					});
-			});
+			handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
+				handleFinishUpload(url, attachment);
+			});			
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
@@ -443,52 +396,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;
 		const session = sessionRef.current;
 		const client = clientRef.current;
+		if (!file ) return;
 		if (!client || !session || !currentClanId) {
 			console.log(client, session, currentClanId);
-			throw new Error('Client is not initialized');
+			throw new Error('Client or file is not initialized');
 		}
-		file?.arrayBuffer().then((buf) => {
-			client
-				.uploadAttachmentFile(session, {
-					filename: fullfilename,
-					filetype: file.type,
-					size: file.size,
-				})
-				.then((data) => {
-					if (!data || !data.url) {
-						return 'not-handled';
-					}
-					// upload to minio
-					uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
-						if (res.status !== 200) {
-							return 'not-handled';
-						}
-						const url = 'https://cdn.mezon.vn/' + fullfilename;
-						const contentState = editorState.getCurrentContent();
-						const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-							src: url,
-							height: '20px',
-							width: 'auto',
-						});
-						const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-						const newEditorState = EditorState.set(editorState, {
-							currentContent: contentStateWithEntity,
-						});
 
-						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-						setContent(content + url);
-						attachmentData.push({
-							filename: file.name,
-							url: url,
-							filetype: 'image',
-							size: file.size,
-							width: 0,
-							height: 0,
-						});
-						setAttachmentData(attachmentData);
-						return 'handled';
-					});
-				});
+		handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
+			handleFinishUpload(url, attachment);
 		});
 	};
 

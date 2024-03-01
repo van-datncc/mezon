@@ -120,8 +120,6 @@ export type IMessageWithUser = IMessage & {
 
 export type IMessageSendPayload = {
 	t: string;
-	m?: string[] | undefined;
-	md?: any
 };
 
 export type IUser = {
