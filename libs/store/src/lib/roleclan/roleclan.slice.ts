@@ -195,6 +195,7 @@ export const roleSlice = createSlice({
 	initialState: {
 	  selectedRoleId: '',
 	  nameRoleNew: '',
+	  selectedPermissions: [] as string[],
 	  addPermissions: [],
 	  addMemberRoles: [],
 	  removePermissions: [],
@@ -206,6 +207,9 @@ export const roleSlice = createSlice({
 	  },
 	  setNameRoleNew: (state, action) => {
 		state.nameRoleNew = action.payload;
+	  },
+	  setSelectedPermissions: (state, action) => {
+		state.selectedPermissions = action.payload;
 	  },
 	  setAddPermissions: (state, action) => {
 		state.addPermissions = action.payload;
@@ -224,11 +228,13 @@ export const roleSlice = createSlice({
 
 export const roleIdReducer = roleSlice.reducer;
 
-export const { setSelectedRoleId, setNameRoleNew, setAddPermissions, setAddMemberRoles, setRemovePermissions, setRemoveMemberRoles } = roleSlice.actions;
+export const { setSelectedRoleId, setNameRoleNew, setAddPermissions, setAddMemberRoles, setRemovePermissions, setRemoveMemberRoles, setSelectedPermissions} = roleSlice.actions;
 
 const selectSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
 
 const setNewNameRole = (state: RootState) => state.roleId.nameRoleNew;
+
+const setNewSelectedPermissions = (state: RootState) => state.roleId.selectedPermissions;
 
 const setNewAddPermissions = (state: RootState) => state.roleId.addPermissions;
 
@@ -246,6 +252,11 @@ export const getSelectedRoleId = createSelector(
 export const getNewNameRole = createSelector(
 	setNewNameRole,
 	(nameRoleNew) => nameRoleNew
+  );
+
+export const getNewSelectedPermissions = createSelector(
+	setNewSelectedPermissions,
+	(selectedPermissions) => selectedPermissions
   );
 
 export const getNewAddPermissions = createSelector(

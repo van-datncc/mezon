@@ -1,5 +1,5 @@
-import { useCategory, useClans, useRoles } from "@mezon/core";
-import { getSelectedRoleId, selectAllChannelMembers, selectCurrentChannel, selectCurrentChannelId, selectMembersByChannelId, setAddMemberRoles } from "@mezon/store";
+import { useClans, useRoles } from "@mezon/core";
+import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from "@mezon/store";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,17 +11,20 @@ interface ModalProps {
 export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const { RolesClan, updateRole } = useRoles();
     const dispatch = useDispatch();
+    const [searchTerm, setSearchTerm] = useState('');
+    const { usersClan, currentClan } = useClans();
+    const addUsers = useSelector(getNewAddMembers);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(addUsers);
+
     const clickRole = useSelector(getSelectedRoleId);
     const activeRole = RolesClan.find(role => role.id === clickRole);
     const memberRoles = activeRole?.role_user_list?.role_users;
-    const [searchTerm, setSearchTerm] = useState('');
-    const { usersClan, currentClan } = useClans();
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
     const membersNotInRoles = usersClan.filter(member => {
         return !memberRoles || !memberRoles.some(roleMember => roleMember.id === member.id);
     });
     const [searchResults, setSearchResults] = useState<any[]>(membersNotInRoles);
+
     const handleUserToggle = (permissionId: string) => {
         setSelectedUsers(prevPermissions => {
             if (prevPermissions.includes(permissionId)) {
@@ -40,11 +43,10 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }, [ searchTerm]);
     
     const handleUpdateRole = async () =>{
-        if (clickRole==='') {
+        if (clickRole==='New Role') {
             
             dispatch(setAddMemberRoles(selectedUsers));
         }else{
-
             await updateRole(currentClan?.id ?? '',clickRole,'',selectedUsers,[],[],[]);
         }
     }

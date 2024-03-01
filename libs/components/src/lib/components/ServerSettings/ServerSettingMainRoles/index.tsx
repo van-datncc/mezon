@@ -5,7 +5,7 @@ import { useClans, useRoles } from "@mezon/core";
 import { InputField } from "@mezon/ui";
 import { DeleteModal } from "../DeleteRoleModal/deleteRoleModal";
 import { useState } from "react";
-import { rolesClanActions, setAddMemberRoles, setAddPermissions, setNameRoleNew, setRemoveMemberRoles, setRemovePermissions, setSelectedRoleId, useAppDispatch } from "@mezon/store";
+import { rolesClanActions, setAddMemberRoles, setAddPermissions, setNameRoleNew, setRemoveMemberRoles, setRemovePermissions, setSelectedPermissions, setSelectedRoleId, useAppDispatch } from "@mezon/store";
 import { useDispatch } from "react-redux";
 
 export type ModalOpenEdit = {
@@ -27,10 +27,17 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	};
     const handleRoleClick = (roleId:string) => {
         setSelectedRoleID(roleId);
+        const activeRole = RolesClan.find(role => role.id === roleId);
+        const permissions = activeRole?.permission_list?.permissions;
+        const permissionIds = permissions
+        ? permissions.filter(permission => permission.active === 1).map(permission => permission.id) : [];
+        const memberIDRoles = activeRole?.role_user_list?.role_users?.map(member => member.id) || [];
+        dispatchRole(setNameRoleNew(activeRole?.title));
         dispatchRole(setSelectedRoleId(roleId));
+        dispatchRole(setSelectedPermissions(permissionIds));
         dispatchRole(setAddPermissions([]));
         dispatchRole(setRemovePermissions([]));
-        dispatchRole(setAddMemberRoles([]));
+        dispatchRole(setAddMemberRoles(memberIDRoles));
         dispatchRole(setRemoveMemberRoles([]));
     };
     const handleDeleteRole = async (roleId: string) => {
@@ -48,8 +55,8 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
                         />
                     </div>
                         <button className="bg-blue-600 rounded-[3px] p-[8px] pr-[10px] pl-[10px] text-nowrap"
-                        onClick={() => {dispatch(setSelectedRoleId(""));
-                                        dispatch(setNameRoleNew(""));
+                        onClick={() => {dispatch(setSelectedRoleId("New Role"));
+                                        dispatch(setNameRoleNew("New Role"));
                                         dispatch(setAddPermissions([]));
                                         dispatch(setAddMemberRoles([]));
                                         props.handleOpen();

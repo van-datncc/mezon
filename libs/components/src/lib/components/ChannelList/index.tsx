@@ -1,4 +1,4 @@
-import { UserRestrictionZone, useAuth, useCategory, useClans, useInvite } from '@mezon/core';
+import { UserRestrictionZone, useAuth, useCategory, useClanRestriction, useClans, useInvite, useUserPolicy, useUserRestriction } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
@@ -13,8 +13,8 @@ export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
-	const { userProfile } = useAuth();
 	const { categorizedChannels } = useCategory();
+	const [hasManageChannelPermission, {isClanCreator}] = useClanRestriction([EPermission.manageChannel]);
 	const currentChanel = useSelector(selectCurrentChannel);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
 		categorizedChannels.reduce((acc, category) => {
@@ -36,8 +36,7 @@ function ChannelList() {
 			}));
 		}
 	};
-
-	const { currentClan } = useClans();
+	
 	const { createLinkInviteUser } = useInvite();
 
 	const dispatch = useAppDispatch();
@@ -45,6 +44,7 @@ function ChannelList() {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
+	
 
 	const [openInvite, setOpenInvite] = useState(false);
 
@@ -108,8 +108,8 @@ function ChannelList() {
 									{category.category_name}
 								</button>
 								<UserRestrictionZone
-									permissions={[EPermission.administrator]}
-									policy={currentClan?.creator_id === userProfile?.user?.id}
+
+									policy={isClanCreator|| hasManageChannelPermission}
 								>
 									<button
 										onClick={() => {
