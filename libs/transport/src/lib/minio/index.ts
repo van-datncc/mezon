@@ -32,7 +32,7 @@ export function handleUploadFile(client: Client, session: Session,
 					callback(url, {
 						filename: file.name,
 						url: url,
-						filetype: 'image',
+						filetype: file.type,
 						size: file.size,
 						width: 0,
 						height: 0,
@@ -55,7 +55,7 @@ export function handleUrlInput(input: string, callback: (attachment: ApiMessageA
 					callback({
 						filename: input,
 						url: input,
-						filetype: 'image',
+						filetype: contentType,
 						size: Number(contentSize),
 						width: 0,
 						height: 0,
