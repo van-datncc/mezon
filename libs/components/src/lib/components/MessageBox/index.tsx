@@ -136,13 +136,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				console.log(client, session, currentClanId);
 				throw new Error('Client is not initialized');
 			}
-			handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
+			const retval = handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
 				handleFinishUpload(url, attachment);
 			});			
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
-			return 'not-handled';
+			return retval;
 		},
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
