@@ -3,14 +3,12 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { uploadImageToMinIO, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import axios from 'axios';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import editorStyles from './editorStyles.module.css';
@@ -25,22 +23,22 @@ export type MessageBoxProps = {
 	onTyping?: () => void;
 	listMentions?: MentionData[] | undefined;
 	isOpenEmojiPropOutside?: boolean | undefined;
+	currentChannelId?: string;
+	currentClanId?: string;
 };
 
 init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside } = props;
+	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
-	const [userMentioned, setUserMentioned] = useState<ApiMessageMention[]>([]);
-	const [metaData, setMetaData] = useState({});
+	const [mentionData, setmentionData] = useState<ApiMessageMention[]>([]);
+	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { sessionRef, clientRef } = useMezon();
 	const mentionPlugin = useRef(
 		createMentionPlugin({
@@ -58,24 +56,32 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
 	const checkImage = async (url: string) => {
 		try {
+			// TODO: use fetch
 			const response = await axios.head(url);
 			const contentType = response.headers['content-type'];
 			if (contentType && contentType.startsWith('image')) {
-				setMetaData({
-					tp: 'image',
-					dt: {
-						s: content.length,
-						l: url.length,
-					},
+				attachmentData.push({
+					filename: url,
+					url: url,
+					filetype: 'image',
+					size: 0,
+					width: 0,
+					height: 0,
 				});
+				setAttachmentData(attachmentData);
 			} else {
-				setMetaData({});
+				setAttachmentData([]);
 			}
 		} catch (error) {
-			setMetaData({});
+			setAttachmentData([]);
 		}
 		return false;
 	};
+
+	//clear Editor after navigate channel
+	useEffect(() => {
+		setEditorState(EditorState.createEmpty());
+	}, [currentChannelId, currentClanId]);
 
 	const onChange = useCallback((editorState: EditorState) => {
 		if (typeof onTyping === 'function') {
@@ -89,7 +95,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const messageRaw = raw.blocks;
 		const messageContent = Object.values(messageRaw).map((item) => item.text);
 		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
-		if (messageBreakline.match(urlImageRegex)) {
+
+		if (messageBreakline.length > 2000) {
+			setContent('Message too long. @TODO: convert it to attachment');
+			return;
+		}
+
+		// limit url within 128
+		if (messageBreakline.match(urlImageRegex) && messageBreakline.length < 128) {
 			checkImage(messageBreakline);
 		}
 		const mentionedUsers = [];
@@ -103,7 +116,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 		}
 		setContent(content + messageBreakline);
-		setUserMentioned(mentionedUsers);
+		setmentionData(mentionedUsers);
 	}, []);
 
 	const onSearchChange = ({ value }: any) => {
@@ -159,13 +172,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 							setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 							setContent(content + url);
-							setMetaData({
-								tp: 'image',
-								dt: {
-									s: content.length,
-									l: url.length,
-								},
+							attachmentData.push({
+								filename: file.name,
+								url: url,
+								filetype: 'image',
+								size: file.size,
+								width: 0,
+								height: 0,
 							});
+							setAttachmentData(attachmentData);
 
 							return 'handled';
 						});
@@ -176,7 +191,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			return 'not-handled';
 		},
-		[clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
+		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
 	const handleSend = useCallback(() => {
@@ -185,14 +200,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 
-		onSend({ t: content }, userMentioned);
+		onSend({ t: content }, mentionData, attachmentData);
 		setContent('');
-		setMetaData({});
+		setAttachmentData([]);
 		setClearEditor(true);
 		setSelectedItemIndex(0);
 		liRefs?.current[selectedItemIndex]?.focus();
 		setEditorState(() => EditorState.createEmpty());
-	}, [content, onSend, userMentioned]);
+	}, [content, onSend, mentionData, attachmentData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -233,7 +248,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setShowEmojiSuggestion(false);
 		} else setShowPlaceHolder(false);
 
-		if (content.length === 1 || content === '@') {
+		if (content.length >= 0) {
 			const editorContent = editorState.getCurrentContent();
 			const editorSelection = editorState.getSelection();
 			const updatedSelection = editorSelection.merge({
@@ -245,7 +260,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 			setEditorState(updatedEditorState);
 		}
-	}, [clearEditor, content, showEmojiSuggestion, selectionToEnd]);
+	}, [clearEditor, content, showEmojiSuggestion]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -265,7 +280,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
-
 	const [isShowEmoji, setShowEmoji] = useState<boolean>(false);
 	const handleOpenEmoji = () => {
 		setShowEmoji(!isShowEmoji);
@@ -339,8 +353,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}
 
 	const [syntax, setSyntax] = useState<string>('');
-	const regexDetect = /:.{2,}/;
-
+	const regexDetect = /:[^\s]{2,}/;
 	const handleDetectEmoji = async (value: string) => {
 		const inputValue = value;
 		if (!regexDetect.test(inputValue)) {
@@ -349,6 +362,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 		const matches = regexDetect.exec(inputValue)?.[0];
+
 		matches && setSyntax(matches);
 		const emojiPickerActive = matches?.startsWith(':');
 		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
@@ -389,15 +403,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
-				setEmojiResult([]);
 				break;
 			case 'Escape':
+				setShowEmojiSuggestion(false);
+				setEmojiResult([]);
+				break;
+			case 'Backscape':
 				setShowEmojiSuggestion(false);
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
+				moveSelectionToEnd();
 				break;
-
 			default:
 				editorRef.current!.focus();
 				setSelectionToEnd(!selectionToEnd);
@@ -461,13 +478,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 						setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
 						setContent(content + url);
-						setMetaData({
-							tp: 'image',
-							dt: {
-								s: content.length,
-								l: url.length,
-							},
+						attachmentData.push({
+							filename: file.name,
+							url: url,
+							filetype: 'image',
+							size: file.size,
+							width: 0,
+							height: 0,
 						});
+						setAttachmentData(attachmentData);
 						return 'handled';
 					});
 				});
@@ -527,7 +546,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					editorRef.current!.focus();
 				}}
 			>
-				<div id="editor" className={`p-[10px] flex items-center text-[15px] break-all min-w-full relative `}>
+				<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
 					<Editor
 						keyBindingFn={keyBindingFn}
 						handleKeyCommand={handleKeyCommand}
@@ -537,7 +556,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						ref={editorRef}
 						handlePastedFiles={onPastedFiles}
 					/>
-					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap">Write your thoughs here...</p>}
+					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>}
 				</div>
 
 				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />

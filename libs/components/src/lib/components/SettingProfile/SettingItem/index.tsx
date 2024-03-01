@@ -58,7 +58,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				<br />
 				<button className="p-2 text-[#AEAEAE] text-[15px] mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Friend Requests</button>
 				<hr className="border-t border-solid border-borderDefault mt-4" />
-				<button className="pt-2 text-[#84ADFF] mt-4 font-bold text-sm tracking-wider">USER SETTINGS</button>
+				<button className="pt-2 text-[#84ADFF] mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
 				<br />
 				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-4 ml-[-8px]">Appearance</button>
 				<br />

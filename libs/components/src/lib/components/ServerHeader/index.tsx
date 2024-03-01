@@ -102,7 +102,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 								}}
 								onClick={() => setOpenCreateCate(true)}
 							>
-								Create Clan
+								Create Category
 							</Dropdown.Item>
 							<Dropdown.Item
 								icon={MdOutlineCreateNewFolder}
@@ -117,17 +117,17 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 								Invite People
 							</Dropdown.Item>
 							{currentClan?.creator_id === userProfile?.user?.id && (
-							<Dropdown.Item
-								icon={MdOutlineCreateNewFolder}
-								theme={{
-									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-								}}
-								onClick={() => {
-									setOpenServerSettings(true);
-								}}
-							>
-								Server Settings
-							</Dropdown.Item>
+								<Dropdown.Item
+									icon={MdOutlineCreateNewFolder}
+									theme={{
+										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
+									}}
+									onClick={() => {
+										setOpenServerSettings(true);
+									}}
+								>
+									Server Settings
+								</Dropdown.Item>
 							)}
 						</Dropdown>
 					</div>
