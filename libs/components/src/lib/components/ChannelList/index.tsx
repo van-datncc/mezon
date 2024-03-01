@@ -1,4 +1,4 @@
-import { UserRestrictionZone, useAuth, useCategory, useClanRestriction, useClans, useInvite, useUserPolicy, useUserRestriction } from '@mezon/core';
+import { UserRestrictionZone, useCategory, useClanRestriction, useInvite } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
@@ -22,7 +22,7 @@ function ChannelList() {
 			return acc;
 		}, {} as CategoriesState),
 	);
-
+	
 	const handleToggleCategory = (category: ICategoryChannel, setToTrue?: boolean) => {
 		if (setToTrue) {
 			setCategoriesState((prevState) => ({
@@ -74,6 +74,8 @@ function ChannelList() {
 	};
 
 	const handleCopyToClipboard = (content: string) => {
+		// Send DM to user
+
 		if (window.isSecureContext && navigator.clipboard) {
 			navigator.clipboard.writeText(content);
 		} else {

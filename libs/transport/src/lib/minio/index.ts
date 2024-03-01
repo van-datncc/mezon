@@ -1,3 +1,4 @@
+import { DraftHandleValue } from "draft-js";
 import { Session } from "vendors/mezon-js/packages/mezon-js/dist";
 import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 import { Client } from "vendors/mezon-js/packages/mezon-js/dist/client";
@@ -12,36 +13,38 @@ export function uploadImageToMinIO(url: string,
 
 export function handleUploadFile(client: Client, session: Session, 
 	fullfilename: string, file: File, 
-	callback: (url: string, attachment: ApiMessageAttachment) => void) {
+	callback: (url: string, attachment: ApiMessageAttachment) => void) : DraftHandleValue {
 	file?.arrayBuffer().then((buf) => {
 		client.uploadAttachmentFile(session, {
-				filename: fullfilename,
-				filetype: file.type,
-				size: file.size,
-			}).then((data) => {
-				if (!data || !data.url) {
+			filename: fullfilename,
+			filetype: file.type,
+			size: file.size,
+		}).then((data) => {
+			if (!data || !data.url) {
+				return 'not-handled';
+			}
+			// upload to minio
+			uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
+				if (res.status !== 200) {
 					return 'not-handled';
 				}
-				// upload to minio
-				uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
-					if (res.status !== 200) {
-						return 'not-handled';
-					}
-					const url = 'https://cdn.mezon.vn/' + fullfilename;
-					
-					callback(url, {
-						filename: file.name,
-						url: url,
-						filetype: file.type,
-						size: file.size,
-						width: 0,
-						height: 0,
-					});
-									
-					return 'handled';
+				const url = 'https://cdn.mezon.vn/' + fullfilename;
+				
+				callback(url, {
+					filename: file.name,
+					url: url,
+					filetype: file.type,
+					size: file.size,
+					width: 0,
+					height: 0,
 				});
+								
+				return 'handled';
 			});
+		});
 	});
+
+	return 'not-handled';
 }
 
 export function handleUrlInput(input: string, callback: (attachment: ApiMessageAttachment) => void) {
