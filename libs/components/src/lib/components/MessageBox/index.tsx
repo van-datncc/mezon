@@ -105,9 +105,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const handleFinishUpload = useCallback((url: string, attachment: ApiMessageAttachment) => {
 		let urlFile = url
 		if (attachment.filetype === 'pdf') {
-			urlFile = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png'
+			urlFile = '/assets/images/pdficon.png'
 		} else if (attachment.filetype === 'text') {
-			urlFile = "https://e7.pngegg.com/pngimages/735/737/png-clipart-logo-plain-text-organization-text-file-others-miscellaneous-angle-thumbnail.png"
+			urlFile = "/assets/images/text.png"
 		}
 
 		const contentState = editorState.getCurrentContent();
