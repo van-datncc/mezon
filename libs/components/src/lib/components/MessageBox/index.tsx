@@ -75,9 +75,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 
-		handleUrlInput(messageBreakline, (attachment) => {
-			attachmentData.push(attachment);
-			setAttachmentData(attachmentData);
+		handleUrlInput(messageBreakline).then(attachment => {
+			handleFinishUpload(attachment);
 		});
 
 		const mentionedUsers = [];
@@ -102,11 +101,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setOpen(_open);
 	}, []);
 
-	const handleFinishUpload = useCallback((url: string, attachment: ApiMessageAttachment) => {
-		let urlFile = url
-		if (attachment.filetype === 'pdf') {
+	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
+		let urlFile = attachment.url;
+		if (attachment.filetype?.indexOf('pdf') !== -1) {
 			urlFile = '/assets/images/pdficon.png'
-		} else if (attachment.filetype === 'text') {
+		} else if (attachment.filetype?.indexOf('text') !== -1) {
 			urlFile = "/assets/images/text.png"
 		}
 
@@ -121,7 +120,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			currentContent: contentStateWithEntity,
 		});
 		setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-		setContent(content + url);
 		attachmentData.push(attachment);
 		setAttachmentData(attachmentData);
 	}, [attachmentData, content, editorState]);
@@ -137,23 +135,25 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const client = clientRef.current;
 
 			if (!client || !session || !currentClanId) {
-				console.log(client, session, currentClanId);
 				throw new Error('Client is not initialized');
 			}
-			const retval = handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
-				handleFinishUpload(url, attachment);
+			handleUploadFile(client, session, fullfilename, file).then(attachment => {
+				handleFinishUpload(attachment);
+				return 'handled';
+			}).catch(err => {
+				return 'not-handled';
 			});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
-			return retval;
+			return 'not-handled';
 		},
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
 	const handleSend = useCallback(() => {
 		setShowEmojiSuggestion(false);
-		if (!content.trim()) {
+		if (!content.trim() && !attachmentData && !mentionData) {
 			return;
 		}
 
@@ -402,12 +402,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const client = clientRef.current;
 		if (!file) return;
 		if (!client || !session || !currentClanId) {
-			console.log(client, session, currentClanId);
 			throw new Error('Client or file is not initialized');
 		}
 
-		handleUploadFile(client, session, fullfilename, file, (url, attachment) => {
-			handleFinishUpload(url, attachment);
+		handleUploadFile(client, session, fullfilename, file).then(attachment => {
+			handleFinishUpload(attachment);
 		});
 	};
 

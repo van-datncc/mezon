@@ -1,77 +1,77 @@
-import { DraftHandleValue } from "draft-js";
 import { Session } from "vendors/mezon-js/packages/mezon-js/dist";
 import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 import { Client } from "vendors/mezon-js/packages/mezon-js/dist/client";
 
-const urlImageRegex = /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/g;
+const isValidUrl = (urlString: string) => {
+	let url;
+	try { 
+		url =new URL(urlString); 
+	} catch(e) { 
+		return false; 
+	}
+	return url.protocol === "https:";
+}
 
 export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
 	return fetch(url, { method: 'PUT', body: stream });
 }
 
 export function handleUploadFile(client: Client, session: Session, 
-	fullfilename: string, file: File, 
-	callback: (url: string, attachment: ApiMessageAttachment) => void) : DraftHandleValue {
-	file?.arrayBuffer().then((buf) => {
-		client.uploadAttachmentFile(session, {
-			filename: fullfilename,
-			filetype: file.type,
-			size: file.size,
-		}).then((data) => {
-			if (!data || !data.url) {
-				return 'not-handled';
-			}
-			// upload to minio
-			uploadImageToMinIO(data.url, Buffer.from(buf), file.size).then((res) => {
-				if (res.status !== 200) {
-					return 'not-handled';
-				}
-				const url = 'https://cdn.mezon.vn/' + fullfilename;
-				let fileTypeUpload = 'image';
-					if (file.type.includes('pdf')) {
-						fileTypeUpload = 'pdf';
-					} else if (file.type.includes('text')) {
-						fileTypeUpload = 'text';
+	fullfilename: string, file: File): Promise<ApiMessageAttachment> {
+	return new Promise<ApiMessageAttachment>(function(resolve, reject) {
+		file?.arrayBuffer().then((buf) => {
+			client.uploadAttachmentFile(session, {
+				filename: fullfilename,
+				filetype: file.type,
+				size: file.size,
+			}).then((data) => {
+				if (!data || !data.url) {
+					reject({});
+				}				
+				// upload to minio
+				uploadImageToMinIO(data.url || '', Buffer.from(buf), file.size).then((res) => {
+					if (res.status !== 200) {
+						reject({});
 					}
-				callback(url, {
-					filename: file.name,
-					url: url,
-					filetype: fileTypeUpload,
-					size: file.size,
-					width: 0,
-					height: 0,
-				});
-								
-				return 'handled';
-			});
-		});
-	});
-
-	return 'not-handled';
-}
-
-export function handleUrlInput(input: string, callback: (attachment: ApiMessageAttachment) => void) {
-	// limit url within 128
-	if (input.match(urlImageRegex) && input.length < 128) {
-		try {
-			fetch(input, {method: 'HEAD'}).then(response => {
-				const contentSize = response.headers.get('content-length');
-				const contentType = response.headers.get('content-type');
-				if (contentType) {
-					callback({
-						filename: input,
-						url: input,
-						filetype: contentType,
-						size: Number(contentSize),
+					const url = 'https://cdn.mezon.vn/' + fullfilename;
+					resolve({
+						filename: file.name,
+						url: url,
+						filetype: file.type,
+						size: file.size,
 						width: 0,
 						height: 0,
 					});
-				}
-			}).catch(e => {
-				callback({});
+				});
 			});
-		} catch(e) {
-			callback({});
+		});
+	});
+}
+
+export function handleUrlInput(url: string) : Promise<ApiMessageAttachment> {
+	return new Promise<ApiMessageAttachment>(function(resolve, reject) {
+		// limit url within 512
+		if (isValidUrl(url) === true && url.length < 512) {
+			try {
+				fetch(url, {method: 'HEAD'}).then(response => {
+					const contentSize = response.headers.get('Content-Length');
+					const contentType = response.headers.get('Content-Type');					
+					if (contentType) {
+						resolve({
+							filename: url,
+							url: url,
+							filetype: contentType,
+							size: Number(contentSize),
+							width: 0,
+							height: 0,
+						});
+					}
+				}).catch(e => {
+					reject({});
+				});
+			} catch(e) {
+				reject({});
+			}
 		}
-	}
+	});
 }
