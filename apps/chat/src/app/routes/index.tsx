@@ -4,7 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
 import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
-import ServerLayout from '../layouts/ServerLayout';
+import ServerLayout from '../layouts/ClanLayout';
 
 // Pages
 import ChannellayOut from '../pages/channel';
@@ -24,7 +24,7 @@ import { directLoader } from '../loaders/directLoader';
 import { directMessageLoader } from '../loaders/directMessageLoader';
 import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
-import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
+import { clanLoader, shouldRevalidateServer } from '../loaders/clanLoader';
 import { appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 import { ChannelIndex } from '../pages/channel/ChannelIndex';
 import { ClanIndex } from '../pages/clan/ClanIndex';
@@ -83,7 +83,7 @@ export const routes = createBrowserRouter([
 										children: [
 											{
 												path: ':clanId',
-												loader: serverLoader,
+												loader: clanLoader,
 												shouldRevalidate: shouldRevalidateServer,
 												element: <ServerLayout />,
 												children: [
