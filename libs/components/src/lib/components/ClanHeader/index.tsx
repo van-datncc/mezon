@@ -1,4 +1,4 @@
-import { useAuth, useClans, useInvite } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useDirect, useInvite } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField, Modal as ModalInvite } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
@@ -7,15 +7,15 @@ import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
-import ServerSetting from '../ServerSettings/serverSettings';
+import ClanSetting from '../ClanSettings/clanSettings';
 
-export type ServerHeaderProps = {
+export type ClanHeaderProps = {
 	name?: string;
 	type: string;
 	bannerImage?: string;
 };
 
-function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
+function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -25,6 +25,8 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	const { currentClan } = useClans();
 	const { createLinkInviteUser } = useInvite();
 	const [urlInvite, setUrlInvite] = useState('');
+	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
+	const { createDirectMessageWithUser } = useDirect();
 
 	const handleOpenInvite = () => {
 		setOpenInvite(true);
@@ -53,6 +55,18 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 		} else {
 			unsecuredCopyToClipboard(content);
 		}
+
+		// send DM to user
+		const userId = '2640ec35-9de3-44c1-8481-07615e66d240';
+		createDirectMessageWithUser(userId).then(res => {
+			if (res.channel_id) {
+				console.log("channel id", res.channel_id, res.type);
+				const directChat = toDmGroupPageFromFriendPage(res.channel_id, Number(res.type));
+            	navigate(directChat);
+			}
+		}).catch(err => {
+			console.log("error", err);
+		});
 	};
 	const onClose = () => {
 		setOpenCreateCate(false);
@@ -133,7 +147,7 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 					</div>
 				</div>
 			)}
-			<ServerSetting
+			<ClanSetting
 				// open={openServerSettings}
 				open={openServerSettings}
 				onClose={() => {
@@ -190,4 +204,4 @@ function ServerHeader({ name, type, bannerImage }: ServerHeaderProps) {
 	);
 }
 
-export default ServerHeader;
+export default ClanHeader;

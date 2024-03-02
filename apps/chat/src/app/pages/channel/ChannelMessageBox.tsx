@@ -21,9 +21,9 @@ export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMe
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			refrences?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>,
 		) => {
-			sendMessage(content, mentions, attachments, refrences);
+			sendMessage(content, mentions, attachments, references);
 		},
 		[sendMessage],
 	);

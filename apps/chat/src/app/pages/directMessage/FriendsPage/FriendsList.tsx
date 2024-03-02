@@ -8,8 +8,9 @@ const FriendList = ({ listFriendFilter }: ListFriendsProps) => {
     return (
         <>
             {listFriendFilter.map((friend: FriendsEntity) => (
-                <FriendsListItem friend={friend} />
-            ))}</>
+                <FriendsListItem friend={friend} key={friend.id}/>
+            ))}
+        </>
     )
 }
 

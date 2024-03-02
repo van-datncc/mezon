@@ -1,12 +1,12 @@
-import { ChannelList, ChannelTopbar, FooterProfile, ServerHeader } from '@mezon/components';
+import { ChannelList, ChannelTopbar, FooterProfile, ClanHeader } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans } from '@mezon/core';
 import { useState } from 'react';
 import { Outlet, useLoaderData } from 'react-router-dom';
-import { ServerLoaderData } from '../loaders/serverLoader';
+import { ClanLoaderData } from '../loaders/clanLoader';
 import Setting from '../pages/setting';
 
 const ServerLayout = () => {
-	const { serverId } = useLoaderData() as ServerLoaderData;
+	const { clanId } = useLoaderData() as ClanLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const [openSetting, setOpenSetting] = useState(false);
@@ -16,9 +16,9 @@ const ServerLayout = () => {
 
 	return (
 		<div className="flex-row bg-bgSurface flex grow">
-			<MezonPolicyProvider clanId={serverId}>
+			<MezonPolicyProvider clanId={clanId}>
 				<div className="flex flex-col w-widthSideBar max-w-[272px] bg-bgSurface relative">
-					<ServerHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
+					<ClanHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
 					<ChannelList />
 					<FooterProfile
 						name={userProfile?.user?.username || ''}

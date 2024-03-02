@@ -10,8 +10,8 @@ export function DirectMessage() {
 	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
 
-	const { serverId, directId, type } = useAppParams();
-	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(serverId || ''));
+	const { clanId, directId, type } = useAppParams();
+	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
 
 	const { messages } = useDirectMessages({ channelId: directId ?? '' });

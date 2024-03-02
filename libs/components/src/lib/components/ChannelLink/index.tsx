@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom';
 import * as Icons from '../Icons';
 import { AddPerson } from '../Icons';
 export type ChannelLinkProps = {
-	serverId?: string;
+	clanId?: string;
 	channel: IChannel;
 	active?: boolean;
-	createInviteLink: (serverId: string, channelId: string) => void;
+	createInviteLink: (clanId: string, channelId: string) => void;
 	isPrivate?: number;
 };
 
-function ChannelLink({ serverId, channel, active, isPrivate, createInviteLink }: ChannelLinkProps) {
+function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 
 	const classes = {
@@ -23,7 +23,7 @@ function ChannelLink({ serverId, channel, active, isPrivate, createInviteLink }:
 	const { toChannelPage } = useAppNavigation();
 
 	const handleCreateLinkInvite = () => {
-		createInviteLink(serverId || '', channel.channel_id || '');
+		createInviteLink(clanId || '', channel.channel_id || '');
 	};
 
 	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');

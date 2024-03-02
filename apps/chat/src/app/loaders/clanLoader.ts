@@ -1,25 +1,25 @@
 import { clansActions, getStoreAsync } from '@mezon/store';
 import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
 
-export type ServerLoaderData = {
-	serverId: string;
+export type ClanLoaderData = {
+	clanId: string;
 };
 
-export const serverLoader: LoaderFunction = async ({ params }) => {
-	const { serverId } = params;
+export const clanLoader: LoaderFunction = async ({ params }) => {
+	const { clanId } = params;
 	const store = await getStoreAsync();
-	if (!serverId) {
+	if (!clanId) {
 		throw new Error('Server ID null');
 	}
-	store.dispatch(clansActions.changeCurrentClan({ clanId: serverId }));
+	store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	return {
-		serverId,
-	} as ServerLoaderData;
+		clanId,
+	} as ClanLoaderData;
 };
 
 export const shouldRevalidateServer: ShouldRevalidateFunction = (ctx) => {
 	const { currentParams, nextParams } = ctx;
-	const { serverId: currentServerId } = currentParams;
-	const { serverId: nextServerId } = nextParams;
+	const { clanId: currentServerId } = currentParams;
+	const { clanId: nextServerId } = nextParams;
 	return currentServerId !== nextServerId;
 };

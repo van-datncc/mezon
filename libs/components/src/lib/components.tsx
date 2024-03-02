@@ -16,7 +16,7 @@ export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
-export { default as ServerHeader } from './components/ServerHeader';
+export { default as ClanHeader } from './components/ClanHeader';
 export { default as SettingAccount } from './components/SettingAccount';
 
 export * from './components/Icons';

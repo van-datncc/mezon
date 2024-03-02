@@ -1,15 +1,15 @@
 import { ExitSetting } from '@mezon/components';
-import  ServerSettingItems  from './ServerSettingItems'
-import  ServerSettingMainRoles  from './ServerSettingMainRoles'
+import  ServerSettingItems  from './SettingItems'
+import  ServerSettingMainRoles  from './SettingMainRoles'
 import { useEffect, useState } from 'react';
-import ServerSettingRoleManagement from './ServerSettingRoleManagement';
+import ServerSettingRoleManagement from './SettingRoleManagement';
 
 export type ModalSettingProps = {
 	open: boolean;
 	onClose: () => void;
 };
 
-const ServerSetting = (props: ModalSettingProps) => {
+const ClanSetting = (props: ModalSettingProps) => {
 	const { open, onClose } = props;
 	const [currentSetting, setCurrentSetting] = useState<string>('Roles');
 	const handleSettingItemClick = (settingName: string) => {
@@ -53,4 +53,4 @@ const ServerSetting = (props: ModalSettingProps) => {
 	);
 };
 
-export default ServerSetting;
+export default ClanSetting;
