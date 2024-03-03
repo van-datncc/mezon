@@ -46,7 +46,7 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 			// TODO: render multiple attachment
 			return <MessageImage attachmentData={attachments[0]} />;
 		}
-		if (attachments && attachments.length > 0 && attachments[0].filetype !== 'image') {
+		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
 			return <MessageLinkFile attachmentData={attachments[0]} />;
 		}
 		const lines = content.t?.split('\n');
