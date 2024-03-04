@@ -1,5 +1,5 @@
 import { useMezon } from '@mezon/transport';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useClans } from './useClans';
 
 export type UseMessageReactionOption = {
@@ -21,28 +21,33 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 			}
 			// const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			console.log('ckec--sdsd');
+			console.log(channelId);
+			console.log(messageId);
+			console.log(emoji);
+			console.log(action_delete);
+
 			await socket.writeMessageReaction(channelId, messageId, emoji, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
-	const reactionMessageAction = useCallback(
-		async (channelId: string, messageId: string, emoji: string, action_delete: boolean) => {
-			try {
-				console.log('reactionMessageAction', channelId, messageId, emoji, action_delete);
-				await reactionMessage(channelId, messageId, emoji, action_delete);
-			} catch (error) {
-				console.error('Error reacting to message:', error);
-			}
-		},
-		[reactionMessage],
-	);
+	// const reactionMessageAction = useCallback(
+	// 	async (channelId: string, messageId: string, emoji: string, action_delete: boolean) => {
+	// 		try {
+	// 			console.log('reactionMessageAction', channelId, messageId, emoji, action_delete);
+	// 			await reactionMessage(channelId, messageId, emoji, action_delete);
+	// 		} catch (error) {
+	// 			console.error('Error reacting to message:', error);
+	// 		}
+	// 	},
+	// 	[reactionMessage],
+	// );
 
 	return useMemo(
 		() => ({
 			reactionMessage,
-			reactionMessageAction,
+			// reactionMessageAction,
 		}),
-		[reactionMessage, reactionMessageAction],
+		[reactionMessage],
 	);
 }

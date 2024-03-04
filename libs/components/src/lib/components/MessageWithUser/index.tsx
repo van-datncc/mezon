@@ -154,11 +154,7 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 			// 	}),
 			// );
 			// await reactionMessage(currentChannelId ?? '', message.message_id, emoji, existingEmoji.isReacted ? false : true);
-			console.log('currentChannelId', currentChannelId);
-			console.log('message.message_id', messageId);
-			console.log('emij', emoji);
-			const sendSocketReactionMessage = await reactionMessage(currentChannelId ?? '', messageId, emoji, false);
-			console.log('sendSocketReactionMessage', sendSocketReactionMessage);
+			await reactionMessage(currentChannelId ?? '', messageId, emoji, false);
 		} else {
 			setEmojiData((prevEmojiData: emojiOptions[]) => [
 				...prevEmojiData,
