@@ -22,16 +22,10 @@ export function ChannelMessage(props: MessageProps) {
 
 	// TODO: recheck this
 	const mess = useMemo(() => {
-		if (typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
-			return message.content;
-		}
 		return message;
 	}, [message]);
 
 	const messPre = useMemo(() => {
-		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
-			return preMessage.content;
-		}
 		return preMessage;
 	}, [preMessage]);
 
