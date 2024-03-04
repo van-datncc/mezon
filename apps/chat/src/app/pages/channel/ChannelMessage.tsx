@@ -1,6 +1,7 @@
 import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
+import * as Icons from 'libs/components/src/lib/components/Icons/index';
 import { useEffect, useMemo } from 'react';
 
 type MessageProps = {
@@ -33,14 +34,20 @@ export function ChannelMessage(props: MessageProps) {
 	}, [preMessage]);
 
 	return (
-		<div>
-			<MessageWithUser message={mess as IMessageWithUser} 
+		<div className="relative group">
+			<MessageWithUser
+				message={mess as IMessageWithUser}
 				preMessage={messPre as IMessageWithUser}
 				mentions={mess.mentions}
 				attachments={mess.attachments}
 				references={mess.references}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
+			<div className="absolute top-0 p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:bg-slate-800">
+				<button className="h-full p-1">
+					<Icons.Smile />
+				</button>
+			</div>
 		</div>
 	);
 }

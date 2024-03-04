@@ -1,5 +1,5 @@
 import { useAuth, useChatReactionMessage } from '@mezon/core';
-import { selectCurrentChannelId, selectMembersMap, selectMessageReacted } from '@mezon/store';
+import { selectCurrentChannelId, selectMembersMap, selectMessageReacted, useAppDispatch } from '@mezon/store';
 import {
 	IMessageWithUser,
 	TIME_COMBINE,
@@ -25,15 +25,26 @@ export type MessageWithUserProps = {
 	reactions?: Array<ApiMessageReaction>;
 };
 
+export type emojiOptions = {
+	emoji: string;
+	count: number;
+	isReacted: boolean;
+};
+
 function MessageWithUser({ message, preMessage, mentions, attachments, references, reactions }: MessageWithUserProps) {
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
-	const { reactionMessageAction } = useChatReactionMessage({ currentChannelId });
+	const { reactionMessage } = useChatReactionMessage({ currentChannelId });
 	const reactionMessageData = useSelector(selectMessageReacted);
+	// console.log('reactionMessageData', reactionMessageData);
 	const content = useMemo(() => {
 		return message.content;
 	}, [message]);
+
+	console.log('message', message);
+
+	const dispatch = useAppDispatch();
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -79,55 +90,77 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 		});
 	};
 
+	const [emojiData, setEmojiData] = useState<emojiOptions[]>([]);
 	const calculateEmojiCount = useCallback(() => {
+		
 		return (
 			message.reactions &&
-			message.reactions?.reduce(
-				(count: Record<string, { count: number; isReacted: boolean }>, currentEmoji) => {
-					const { emoji } = currentEmoji as any;
-					count[emoji] = {
-						count: (count[emoji]?.count || 0) + 1,
-						isReacted: false,
-					};
-					return count;
-				},
-				{} as Record<string, { count: number; isReacted: boolean }>,
-			)
+			Object.entries(
+				message.reactions.reduce(
+					(count: Record<string, { count: number; isReacted: boolean }>, currentEmoji) => {
+						const { emoji } = currentEmoji as emojiOptions;
+						count[emoji] = {
+							count: (count[emoji]?.count || 0) + 1,
+							isReacted: false,
+						};
+						return count;
+					},
+					{} as Record<string, { count: number; isReacted: boolean }>,
+				),
+			).map(([emoji, emojiInfo]) => ({
+				emoji,
+				count: emojiInfo.count,
+				isReacted: emojiInfo.isReacted,
+			}))
 		);
 	}, [message.reactions]);
 
 	useEffect(() => {
-		calculateEmojiCount();
+		setEmojiData(calculateEmojiCount() ?? []);
 	}, [message]);
 
 	const [changingCount, setChangingCount] = useState<number>(0);
-	const [isReacted, setIsReacted] = useState<boolean>(false);
-
-	const checkEmojiExist = (emoji: string) => {
-		const emojiEntry = emojiClassify.find((entry: any) => entry.emoji === emoji) || {};
-		return emojiEntry;
-	};
-	const [prevEmojiState, setEmojiState] = useState(emojiClassify);
-
 	const handleReactMessage = async (channelId: string, messageId: string, emoji: string) => {
-		console.log('emoji-ip', emoji);
-		const emojiResultCheck = checkEmojiExist(emoji);
-		console.log('emojiResultCheck', emojiResultCheck);
-		console.log('checked', emoji === emojiResultCheck?.emoji);
-		setEmojiState((prevEmojiState: any) => {
-			const updatedEmojis = prevEmojiState.map((prevEmoji: any) => {
-				if (prevEmoji.emoji === emojiResultCheck?.emoji) {
-					return {
-						...prevEmoji,
-						isReacted: !prevEmoji.isReacted,
-					};
-				}
-				return prevEmoji;
-			});
-			return updatedEmojis;
-		});
+		console.log('click-1');
 
-		setChangingCount((prevChangingCount) => (emojiResultCheck?.isReacted ? prevChangingCount - 1 : prevChangingCount + 1));
+		const existingEmoji = emojiData.find((e: emojiOptions) => e.emoji === emoji);
+
+		console.log('existingEmoji', existingEmoji);
+
+		if (existingEmoji) {
+			const updatedEmojiData = emojiData.map((e: emojiOptions) =>
+				e.emoji === emoji
+					? {
+							...e,
+							isReacted: !e.isReacted,
+							count: e.isReacted ? e.count - 1 : e.count + 1,
+						}
+					: e,
+			);
+
+			setEmojiData(updatedEmojiData);
+			// dispatch(
+			// 	messagesActions.sendMessageReaction({
+
+			// 		channelId: currentChannelId ?? '',
+			// 		messageId: message.message_id,
+			// 		emoji: emoji,
+			// 		action: existingEmoji.isReacted ? 0 : 1,
+			// 	}),
+			// );
+			await reactionMessage(currentChannelId ?? '', message.message_id, emoji, existingEmoji.isReacted ? false : true);
+		} else {
+			setEmojiData((prevEmojiData: emojiOptions[]) => [
+				...prevEmojiData,
+				{
+					emoji,
+					count: 1,
+					isReacted: true,
+				},
+			]);
+			// reactionMessage(currentChannelId ?? '', message.message_id, emoji, 1);
+		}
+		setChangingCount((prevChangingCount) => (existingEmoji?.isReacted ? prevChangingCount - 1 : prevChangingCount + 1));
 	};
 
 	return (
@@ -181,20 +214,23 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 							</div>
 						</div>
 						<div className="flex justify-start flex-row w-full gap-2">
-							{emojiClassify &&
-								emojiClassify.map((emoji: any, index: number) => {
-									return (
-										<div
-											key={index}
-											className={`relative ${emoji.isReacted ? 'bg-[#373A54] border-blue-600 border' : ' bg-[#313338] '}  rounded-md  w-12 gap-1 h-5 flex flex-row justify-center items-center`}
-										>
-											<span>{emoji.emoji}</span>
-											<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
-												<p className="text-[13px]">{emoji.isReacted ? emoji.count + changingCount : emoji.count}</p>
-											</span>
-										</div>
-									);
-								})}
+							{emojiData &&
+								emojiData
+									.filter((emoji: emojiOptions) => emoji.count > 0)
+									.map((emoji: emojiOptions, index: number) => {
+										return (
+											<div
+												key={index}
+												className={`relative ${emoji.isReacted ? 'bg-[#373A54] border-blue-600 border' : ' bg-[#313338] '}  rounded-md  w-12 gap-1 h-5 flex flex-row justify-center items-center`}
+												onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji)}
+											>
+												<span>{emoji.emoji}</span>
+												<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
+													<p className="text-[13px]">{emoji.count}</p>
+												</span>
+											</div>
+										);
+									})}
 						</div>
 					</div>
 				</div>

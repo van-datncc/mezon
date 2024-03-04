@@ -10,7 +10,7 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 	const { currentClanId } = useClans();
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const reactionMessage = React.useCallback(
-		async (channelId: string, messageId: string, emoji: string) => {
+		async (channelId: string, messageId: string, emoji: string, action_delete: boolean) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -19,15 +19,18 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeMessageReaction(channelId, messageId, emoji);
+			// const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			console.log('ckec--sdsd');
+			socket.writeMessageReaction(channelId, messageId, emoji, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
 	const reactionMessageAction = useCallback(
-		async (channelId: string, messageId: string, emoji: string) => {
+		async (channelId: string, messageId: string, emoji: string, action_delete: boolean) => {
 			try {
-				await reactionMessage(channelId, messageId, emoji);
+				console.log('reactionMessageAction', channelId, messageId, emoji, action_delete);
+				await reactionMessage(channelId, messageId, emoji, action_delete);
 			} catch (error) {
 				console.error('Error reacting to message:', error);
 			}

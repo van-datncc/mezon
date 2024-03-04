@@ -28,7 +28,6 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-
 			await socket.writeChatMessage(currentClanId, channel.id, content, mentions, attachments, refrences);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
