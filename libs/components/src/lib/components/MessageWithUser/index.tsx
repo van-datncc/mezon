@@ -1,4 +1,4 @@
-import { selectCurrentChannelId, selectMembersMap } from '@mezon/store';
+import { selectCurrentChannelId, selectMembersByChannelId, selectMembersMap } from '@mezon/store';
 import {
 	IMessageWithUser,
 	TIME_COMBINE,
@@ -15,6 +15,7 @@ import * as Icons from '../Icons/index';
 import MessageImage from './MessageImage';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import MessageLinkFile from './MessageLinkFile';
+import { useAppParams } from '@mezon/core';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -27,7 +28,9 @@ export type MessageWithUserProps = {
 function MessageWithUser({ message, preMessage, mentions, attachments, references }: MessageWithUserProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
-
+	const { directId } = useAppParams();
+	const rawMembers = useSelector(selectMembersByChannelId(directId));
+	
 	const content = useMemo(() => {
 		return message.content;
 	}, [message]);
@@ -40,7 +43,8 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
-
+	console.log("attachments: ", attachments);
+	
 	const renderMultilineContent = () => {
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
 			// TODO: render multiple attachment
@@ -100,15 +104,33 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 						</div>
 					) : (
 						<div>
-							{membersMap.get(message.sender_id)?.avatar ? (
-								<img
-									className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
-									src={membersMap.get(message.sender_id)?.avatar || ''}
-									alt={membersMap.get(message.sender_id)?.avatar || ''}
-								/>
-							) : (
-								<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-									{membersMap.get(message.sender_id)?.name.charAt(0).toUpperCase()}
+							{membersMap.size !== 0 && rawMembers.length === 0 ? (
+								<div>
+									{membersMap.get(message.sender_id)?.avatar ? (
+										<img
+											className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
+											src={membersMap.get(message.sender_id)?.avatar || ''}
+											alt={membersMap.get(message.sender_id)?.avatar || ''}
+										/>
+									) : (
+										<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
+											{membersMap.get(message.sender_id)?.name.charAt(0).toUpperCase()}
+										</div>
+									)}
+								</div>
+							):(
+								<div>
+									{rawMembers.find(member => member.id === message.sender_id)?.user?.avatar_url ? (
+										<img
+											className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px]"
+											src={rawMembers.find(member => member.id === message.sender_id)?.user?.avatar_url || ''}
+											alt={rawMembers.find(member => member.id === message.sender_id)?.user?.avatar_url || ''}
+										/>
+									) : (
+										<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
+											{rawMembers.find(member => member.id === message.sender_id)?.user?.username?.charAt(0).toUpperCase()}
+										</div>
+									)}
 								</div>
 							)}
 						</div>
@@ -117,7 +139,15 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 						{!isCombine && (
 							<div className="flex-row items-center w-full gap-4 flex">
 								<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider">
-									{membersMap.get(message.sender_id)?.name}
+									{membersMap.size !== 0 && rawMembers.length === 0 ? (
+										<div>
+											{membersMap.get(message.sender_id)?.name}
+										</div>
+									):(
+										<div>
+											{rawMembers.find(member => member.id === message.sender_id)?.user?.username || ''}
+										</div>
+									)}
 								</div>
 								<div className=" text-zinc-400 font-['Manrope'] text-[10px]">{convertTimeString(message?.create_time as string)}</div>
 							</div>
