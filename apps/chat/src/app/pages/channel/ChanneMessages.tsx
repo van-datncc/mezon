@@ -2,12 +2,17 @@ import { useAuth, useChatMessages } from '@mezon/core';
 import { useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
+import { ChatWelcome } from '@mezon/components';
+import { useSelector } from 'react-redux';
+import { selectDmGroupCurrentId } from '@mezon/store';
 
 type ChannelMessagesProps = {
 	channelId: string;
+	type: string
+	channelName?: string;
 };
 
-export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
+export default function ChannelMessages({ channelId, channelName, type }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -39,7 +44,7 @@ export default function ChannelMessages({ channelId }: ChannelMessagesProps) {
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
 				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
-				endMessage={<></>}
+				endMessage={<ChatWelcome type={type} name={channelName} />}
 				pullDownToRefresh={true}
 				pullDownToRefreshThreshold={50}
 			>

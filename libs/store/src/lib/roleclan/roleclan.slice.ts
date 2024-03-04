@@ -197,7 +197,7 @@ export const roleSlice = createSlice({
 	  nameRoleNew: '',
 	  selectedPermissions: [] as string[],
 	  addPermissions: [],
-	  addMemberRoles: [],
+	  addMemberRoles: [] as string[],
 	  removePermissions: [],
 	  removeMemberRoles: [],
 	},

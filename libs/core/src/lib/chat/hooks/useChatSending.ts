@@ -19,7 +19,7 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 		async (content: IMessageSendPayload, 
 			mentions?: Array<ApiMessageMention>, 
 			attachments?: Array<ApiMessageAttachment>,
-			refrences?: Array<ApiMessageRef>) => {
+			references?: Array<ApiMessageRef>) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -28,7 +28,8 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeChatMessage(currentClanId, channel.id, content, mentions, attachments, refrences);
+
+			await socket.writeChatMessage(currentClanId, channel.id, content, mentions, attachments, references);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);

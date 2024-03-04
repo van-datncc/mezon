@@ -11,6 +11,7 @@ export type UserRestrictionZoneProps = {
 
 export function UserRestrictionZone({ policy, permissions = [], render, children, condistion = 'and' }: UserRestrictionZoneProps) {
 	const isPermissionsAllowed = useUserRestriction(permissions);
+	
 	const isPolicyAllowed = typeof policy === 'boolean' ? policy : true;
 	const isAllowed = condistion === 'and' ? isPermissionsAllowed && isPolicyAllowed : isPermissionsAllowed || isPolicyAllowed;
 	const renderChildren = render ? render : (children: React.ReactNode, isAllowed: boolean) => (isAllowed ? children : null);

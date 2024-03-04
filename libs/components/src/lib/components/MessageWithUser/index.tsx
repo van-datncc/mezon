@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons/index';
 import MessageImage from './MessageImage';
+import MessageLinkFile from './MessageLinkFile';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -56,9 +57,12 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 	}, [message, preMessage]);
 
 	const renderMultilineContent = () => {
-		if (attachments && attachments.length > 0 && attachments[0].filetype === 'image') {
+		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
 			// TODO: render multiple attachment
 			return <MessageImage attachmentData={attachments[0]} />;
+		}
+		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
+			return <MessageLinkFile attachmentData={attachments[0]} />;
 		}
 		const lines = content.t?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;
@@ -167,9 +171,9 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
 				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
-					<div className="w-full border-b-[1px] border-borderFocus text-center"></div>
+					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{convertDateString(message?.create_time as string)}</span>
-					<div className="w-full border-b-[1px] border-borderFocus text-center"></div>
+					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
 
