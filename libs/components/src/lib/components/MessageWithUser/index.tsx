@@ -66,13 +66,11 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 					const nonMatchText = line.substring(lastIndex, startIndex);
 					lastIndex = endIndex;
 					return (
-						<>
+						<span key={i}>
 							{renderAttachments()}
-							<span key={i}>
-								{nonMatchText && <span>{nonMatchText}</span>}
-								<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
-							</span>
-						</>
+							{nonMatchText && <span>{nonMatchText}</span>}
+							<span key={i} className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
+						</span>
 					);
 				});
 				elements.push(<span key={matches.length}>{line.substring(lastIndex)}</span>);
