@@ -9,7 +9,7 @@ import {
 	convertTimeString,
 	getTimeDifferenceInSeconds,
 } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
@@ -43,7 +43,7 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 		return message.content;
 	}, [message]);
 
-	console.log('message', message);
+	// console.log('message', message);
 
 	const dispatch = useAppDispatch();
 
@@ -95,33 +95,34 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 	};
 
 	const [emojiData, setEmojiData] = useState<emojiOptions[]>([]);
-	const calculateEmojiCount = useCallback(() => {
-		
-		return (
-			message.reactions &&
-			Object.entries(
-				message.reactions.reduce(
-					(count: Record<string, { count: number; isReacted: boolean }>, currentEmoji) => {
-						const { emoji } = currentEmoji as emojiOptions;
-						count[emoji] = {
-							count: (count[emoji]?.count || 0) + 1,
-							isReacted: false,
-						};
-						return count;
-					},
-					{} as Record<string, { count: number; isReacted: boolean }>,
-				),
-			).map(([emoji, emojiInfo]) => ({
-				emoji,
-				count: emojiInfo.count,
-				isReacted: emojiInfo.isReacted,
-			}))
-		);
-	}, [message.reactions]);
+	// console.log('message', typeof message.reactions);
 
-	useEffect(() => {
-		setEmojiData(calculateEmojiCount() ?? []);
-	}, [message]);
+	// const calculateEmojiCount = useCallback(() => {
+	// 	return (
+	// 		message.reactions &&
+	// 		Object.entries(
+	// 			message.reactions?.reduce(
+	// 				(count: Record<string, { count: number; isReacted: boolean }>, currentEmoji: any) => {
+	// 					const { emoji } = currentEmoji;
+	// 					count[emoji] = {
+	// 						count: (count[emoji]?.count || 0) + 1,
+	// 						isReacted: false,
+	// 					};
+	// 					return count;
+	// 				},
+	// 				{} as Record<string, { count: number; isReacted: boolean }>,
+	// 			),
+	// 		).map(([emoji, emojiInfo]) => ({
+	// 			emoji,
+	// 			count: emojiInfo.count,
+	// 			isReacted: emojiInfo.isReacted,
+	// 		}))
+	// 	);
+	// }, [message.reactions]);
+
+	// useEffect(() => {
+	// 	setEmojiData(calculateEmojiCount());
+	// }, [message]);
 
 	const [changingCount, setChangingCount] = useState<number>(0);
 	const handleReactMessage = async (channelId: string, messageId: string, emoji: string) => {
@@ -152,7 +153,12 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 			// 		action: existingEmoji.isReacted ? 0 : 1,
 			// 	}),
 			// );
-			await reactionMessage(currentChannelId ?? '', message.message_id, emoji, existingEmoji.isReacted ? false : true);
+			// await reactionMessage(currentChannelId ?? '', message.message_id, emoji, existingEmoji.isReacted ? false : true);
+			console.log('currentChannelId', currentChannelId);
+			console.log('message.message_id', messageId);
+			console.log('emij', emoji);
+			const sendSocketReactionMessage = await reactionMessage(currentChannelId ?? '', messageId, emoji, false);
+			console.log('sendSocketReactionMessage', sendSocketReactionMessage);
 		} else {
 			setEmojiData((prevEmojiData: emojiOptions[]) => [
 				...prevEmojiData,
@@ -250,13 +256,13 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 						<Icons.Smile />
 					</div>
 				</div> */}
-				{
+				{/* {
 					<div className="flex flex-row right-8 relative">
 						<div onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '🤣')}>🤣</div>
 						<div onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '🥰')}>🥰</div>
 						<div onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '🤩')}>🤩</div>
 					</div>
-				}
+				} */}
 			</div>
 		</>
 	);

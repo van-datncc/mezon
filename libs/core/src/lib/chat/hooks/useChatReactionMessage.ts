@@ -21,7 +21,7 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 			}
 			// const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			console.log('ckec--sdsd');
-			socket.writeMessageReaction(channelId, messageId, emoji, action_delete);
+			await socket.writeMessageReaction(channelId, messageId, emoji, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
