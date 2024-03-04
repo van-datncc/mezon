@@ -1,7 +1,14 @@
 import { IChannelMember } from "@mezon/utils";
 import { useMemo } from "react";
 
-export function useMessageSender(user?: IChannelMember | null) {
+export type IMessageSender = {
+    avatarImg: string;
+    hasAvatar: boolean;
+    username: string;
+    avatarChar: string;
+}
+
+export function useMessageSender(user?: IChannelMember | null): IMessageSender  {
     const avatarImg = useMemo(() => {
         return user?.user?.avatar_url || ''
     }, [user]);

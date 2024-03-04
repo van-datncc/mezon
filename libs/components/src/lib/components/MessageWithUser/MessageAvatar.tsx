@@ -1,19 +1,17 @@
-import { IChannelMember, IMessageWithUser } from "@mezon/utils";
-import { useMessageSender } from "./useMessageSender";
-import { useMessageParser } from "./useMessageParser";
+import { IMessageSender } from "./useMessageSender";
+import { IParsedMessage } from "./useMessageParser";
 
 type IMessageAvatarProps = {
-    user?: IChannelMember | null;
-    message: IMessageWithUser;
-    isCombine: boolean;
+    sender: IMessageSender;
+    parsedMessage: IParsedMessage
 }
 
-const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
-    const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user)
+const MessageAvatar = ({ sender, parsedMessage }: IMessageAvatarProps) => {
+    const { hasAvatar, avatarChar, avatarImg } = sender
 
-    const { messageHour } = useMessageParser(message)
+    const { messageHour, isCombine } = parsedMessage;
 
-    if (isCombine || !user) {
+    if (isCombine) {
         return (
             <div className="w-[38px] flex items-center justify-center min-w-[38px]">
                 <div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block">
