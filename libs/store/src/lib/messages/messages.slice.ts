@@ -55,6 +55,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
+	reactionMessageData?: UpdateReactionMessageArgs;
 }
 
 export interface MessagesRootState {
@@ -201,9 +202,14 @@ export type UpdateReactionMessageArgs = {
 
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
-	async ({ channelId, messageId, emoji, userId }: UpdateReactionMessageArgs, thunkAPI) => {
-		console.log("message.slice")
-		
+
+	async ({ channelId, messageId, userId, emoji }: UpdateReactionMessageArgs, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(messagesActions.setReactionMessage({ channelId, messageId, userId, emoji }));
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
 	},
 );
 
@@ -235,6 +241,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
+	reactionMessageData: { channelId: '', messageId: '', userId: '', emoji: '' },
 });
 
 export type SetCursorChannelArgs = {
@@ -292,6 +299,16 @@ export const messagesSlice = createSlice({
 				},
 			};
 		},
+
+		setReactionMessage: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
+			state.reactionMessageData = {
+				channelId: action.payload.channelId,
+				messageId: action.payload.messageId,
+				userId: action.payload.userId,
+				emoji: action.payload.emoji,
+			};
+		},
+
 		recheckTypingUsers: (state) => {
 			const now = Date.now();
 			const typingUsers = { ...state.typingUsers };
@@ -449,3 +466,5 @@ export const selectCursorMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param && param[channelId] && param[channelId].cursor;
 	});
+
+export const selectMessageReacted = createSelector(getMessagesState, (state) => state.reactionMessageData);

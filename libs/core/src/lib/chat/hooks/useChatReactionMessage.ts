@@ -1,5 +1,5 @@
 import { useMezon } from '@mezon/transport';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useClans } from './useClans';
 
 export type UseMessageReactionOption = {
@@ -24,10 +24,22 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
+	const reactionMessageAction = useCallback(
+		async (channelId: string, messageId: string, emoji: string) => {
+			try {
+				await reactionMessage(channelId, messageId, emoji);
+			} catch (error) {
+				console.error('Error reacting to message:', error);
+			}
+		},
+		[reactionMessage],
+	);
+
 	return useMemo(
 		() => ({
 			reactionMessage,
+			reactionMessageAction,
 		}),
-		[reactionMessage],
+		[reactionMessage, reactionMessageAction],
 	);
 }

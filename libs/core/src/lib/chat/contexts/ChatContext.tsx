@@ -86,6 +86,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(e: MessageReactionEvent) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const event = (e as any).message_reaction_event;
+		
 			dispatch(
 				messagesActions.updateReactionMessage({
 					channelId: event.channel_id,
