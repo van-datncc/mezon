@@ -6,6 +6,7 @@ import { IMessageWithUser } from '@mezon/utils';
 import * as Icons from 'libs/components/src/lib/components/Icons/index';
 import { useEffect, useMemo, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+// module "c:/MEZON/mezon-fe/libs/components/src/lib/components/Icons/index"
 
 type MessageProps = {
 	message: IMessageWithUser;
@@ -61,7 +62,7 @@ export function ChannelMessage(props: MessageProps) {
 				references={references as ApiMessageRef[]}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			<div className="absolute top-[0] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:bg-slate-800">
+			<div className="z-20 absolute top-[0] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:bg-slate-800">
 				<button
 					className="h-full p-1 group"
 					onClick={() => {

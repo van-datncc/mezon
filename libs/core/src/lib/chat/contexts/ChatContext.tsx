@@ -66,7 +66,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const event = (e as any);
+			const event = e as any;
 			if (event && event.sender_id === userId) {
 				return;
 			}
@@ -86,17 +86,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(e: MessageReactionEvent) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const event = (e as any).message_reaction_event;
-			console.log("event-hứng", event)
-			dispatch(
-				messagesActions.updateReactionMessage({
-					channelId: event.channel_id,
-					messageId: event.message_id,
-					emoji: event.emoji,
-					userId:event.sender_id
-				}),
-			);
+			console.log('event-receive', event);
+
+			if (event) {
+				dispatch(
+					messagesActions.updateReactionMessage({
+						channelId: event.channel_id,
+						messageId: event.message_id,
+						emoji: event.emoji,
+						userId: event.sender_id,
+					}),
+				);
+			}
 		},
-		[dispatch, userId],
+		[dispatch],
 	);
 
 	const value = React.useMemo<ChatContextValue>(() => ({}), []);
@@ -127,7 +130,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onnotification = () => {};
 			socket.onstatuspresence = () => {};
 			socket.ondisconnect = () => {};
-			
 		};
 	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef]);
 

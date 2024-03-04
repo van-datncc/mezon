@@ -75,7 +75,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 
-		handleUrlInput(messageBreakline).then(attachment => {
+		handleUrlInput(messageBreakline).then((attachment) => {
 			handleFinishUpload(attachment);
 		});
 
@@ -101,28 +101,31 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setOpen(_open);
 	}, []);
 
-	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
-		let urlFile = attachment.url;
-		if (attachment.filetype?.indexOf('pdf') !== -1) {
-			urlFile = '/assets/images/pdficon.png'
-		} else if (attachment.filetype?.indexOf('text') !== -1) {
-			urlFile = "/assets/images/text.png"
-		}
+	const handleFinishUpload = useCallback(
+		(attachment: ApiMessageAttachment) => {
+			let urlFile = attachment.url;
+			if (attachment.filetype?.indexOf('pdf') !== -1) {
+				urlFile = '/assets/images/pdficon.png';
+			} else if (attachment.filetype?.indexOf('text') !== -1) {
+				urlFile = '/assets/images/text.png';
+			}
 
-		const contentState = editorState.getCurrentContent();
-		const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-			src: urlFile,
-			height: '20px',
-			width: 'auto',
-		});
-		const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-		const newEditorState = EditorState.set(editorState, {
-			currentContent: contentStateWithEntity,
-		});
-		setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-		attachmentData.push(attachment);
-		setAttachmentData(attachmentData);
-	}, [attachmentData, content, editorState]);
+			const contentState = editorState.getCurrentContent();
+			const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+				src: urlFile,
+				height: '20px',
+				width: 'auto',
+			});
+			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+			const newEditorState = EditorState.set(editorState, {
+				currentContent: contentStateWithEntity,
+			});
+			setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+			attachmentData.push(attachment);
+			setAttachmentData(attachmentData);
+		},
+		[attachmentData, content, editorState],
+	);
 
 	const onPastedFiles = useCallback(
 		(files: Blob[]) => {
@@ -137,12 +140,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (!client || !session || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			handleUploadFile(client, session, fullfilename, file).then(attachment => {
-				handleFinishUpload(attachment);
-				return 'handled';
-			}).catch(err => {
-				return 'not-handled';
-			});
+			handleUploadFile(client, session, fullfilename, file)
+				.then((attachment) => {
+					handleFinishUpload(attachment);
+					return 'handled';
+				})
+				.catch((err) => {
+					return 'not-handled';
+				});
 
 			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
@@ -406,7 +411,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			throw new Error('Client or file is not initialized');
 		}
 
-		handleUploadFile(client, session, fullfilename, file).then(attachment => {
+		handleUploadFile(client, session, fullfilename, file).then((attachment) => {
 			handleFinishUpload(attachment);
 		});
 	};
@@ -432,8 +437,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 									key={emoji.shortcodes}
 									onKeyDown={(e) => handleKeyPress(e, emoji.native)}
 									onClick={() => clickEmojiSuggestion(emoji.native, index)}
-									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${selectedItemIndex === index ? 'selected-item' : ''
-										}`}
+									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
+										selectedItemIndex === index ? 'selected-item' : ''
+									}`}
 									tabIndex={0}
 								>
 									{emoji.native} {emoji.shortcodes}
