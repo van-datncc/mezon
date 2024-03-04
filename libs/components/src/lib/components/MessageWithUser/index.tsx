@@ -43,15 +43,16 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
-	console.log("attachments: ", attachments);
 	
 	const renderMultilineContent = () => {
-		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
-			// TODO: render multiple attachment
-			return <MessageImage attachmentData={attachments[0]} />;
-		}
-		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
-			return <MessageLinkFile attachmentData={attachments[0]} />;
+		const renderAttachments = () => {
+			if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
+				// TODO: render multiple attachment
+				return <MessageImage attachmentData={attachments[0]} />;
+			}
+			if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
+				return <MessageLinkFile attachmentData={attachments[0]} />;
+			}
 		}
 		const lines = content.t?.split('\n');
 		const mentionRegex = /(@\S+?)\s/g;
@@ -65,10 +66,13 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 					const nonMatchText = line.substring(lastIndex, startIndex);
 					lastIndex = endIndex;
 					return (
-						<span key={i}>
-							{nonMatchText && <span>{nonMatchText}</span>}
-							<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
-						</span>
+						<>
+							{renderAttachments()}
+							<span key={i}>
+								{nonMatchText && <span>{nonMatchText}</span>}
+								<span className="text-blue-500">{line.substring(startIndex, endIndex)}</span>
+							</span>
+						</>
 					);
 				});
 				elements.push(<span key={matches.length}>{line.substring(lastIndex)}</span>);
@@ -77,6 +81,7 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 
 			return (
 				<div key={index} className="max-w-[40vw] lg:max-w-[30vw] xl:max-w-[50vw] lg:w-full min-w-full break-words ">
+					{renderAttachments()}
 					{line}
 				</div>
 			);
