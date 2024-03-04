@@ -1,7 +1,9 @@
 import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage } from '@mezon/core';
+import { selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 type MessageProps = {
 	message: IMessageWithUser;
@@ -12,6 +14,7 @@ type MessageProps = {
 export function ChannelMessage(props: MessageProps) {
 	const { message, lastSeen, preMessage } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
+	const user = useSelector(selectMemberByUserId(message.sender_id));
 
 	useEffect(() => {
 		markMessageAsSeen(message);
@@ -34,11 +37,10 @@ export function ChannelMessage(props: MessageProps) {
 
 	return (
 		<div>
-			<MessageWithUser message={mess as IMessageWithUser} 
+			<MessageWithUser
+				message={mess as IMessageWithUser} 
 				preMessage={messPre as IMessageWithUser}
-				mentions={mess.mentions}
-				attachments={mess.attachments}
-				references={mess.references}
+				user={user}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
 		</div>
