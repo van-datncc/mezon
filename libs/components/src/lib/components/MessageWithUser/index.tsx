@@ -3,7 +3,6 @@ import {
 	IMessageWithUser
 } from '@mezon/utils';
 import Skeleton from 'react-loading-skeleton';
-import * as Icons from '../Icons/index';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import MessageAvatar from './MessageAvatar';
 import { useMessageParser } from './useMessageParser';
@@ -11,6 +10,7 @@ import MessageHead from './MessageHead';
 import MessageContent from './MessageContent';
 import MessageTime from './MessageTime';
 import { useMessageSender } from './useMessageSender';
+import MessageStatus from './MessageStatus';
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -46,13 +46,7 @@ function MessageWithUser({ message, preMessage, user }: MessageWithUserProps) {
 						</div>
 					</div>
 				</div>
-				{message && (
-					<div
-						className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
-					>
-						<Icons.Sent />
-					</div>
-				)}
+				<MessageStatus sender={parsedSender} parsedMessage={parsedMessage} />
 			</div>
 		</>
 	);
