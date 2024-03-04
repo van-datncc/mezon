@@ -2,6 +2,7 @@ import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useMemo } from 'react';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 type MessageProps = {
 	message: IMessageWithUser;
@@ -19,26 +20,32 @@ export function ChannelMessage(props: MessageProps) {
 
 	// TODO: recheck this
 	const mess = useMemo(() => {
-		if (typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
-			return message.content;
-		}
 		return message;
 	}, [message]);
 
 	const messPre = useMemo(() => {
-		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
-			return preMessage.content;
-		}
 		return preMessage;
 	}, [preMessage]);
+
+	const mentions = useMemo(() => {
+		return message.mentions as any;
+	}, [message.mentions]);
+
+	const attachments = useMemo(() => {
+		return message.attachments as any;
+	}, [message.attachments]);
+
+	const references = useMemo(() => {
+		return message.references as any;
+	}, [message.references]);
 
 	return (
 		<div>
 			<MessageWithUser message={mess as IMessageWithUser} 
 				preMessage={messPre as IMessageWithUser}
-				mentions={mess.mentions}
-				attachments={mess.attachments}
-				references={mess.references}
+				mentions={mentions as ApiMessageMention[]}
+				attachments={attachments as ApiMessageAttachment[]}
+				references={references as ApiMessageRef[]}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
 		</div>
