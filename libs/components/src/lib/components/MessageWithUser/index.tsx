@@ -26,12 +26,17 @@ export type MessageWithUserProps = {
 	reactions?: Array<ApiMessageReaction>;
 };
 
-export type emojiOptions = {
-	emoji: string;
+type SenderInfo = {
+	id: string;
 	count: number;
 	isReacted: boolean;
+	emojiIdList: string[];
 };
 
+type EmojiData = {
+	emoji: string;
+	senders: SenderInfo[];
+};
 function MessageWithUser({ message, preMessage, mentions, attachments, references, reactions }: MessageWithUserProps) {
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -91,69 +96,98 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 	const [emojiData, setEmojiData] = useState<emojiOptions[]>([]);
 	const [dataEmojiFetch] = useState<any>(message.reactions);
 
+	console.log('dataEmojiFetch', dataEmojiFetch);
 	const calculateEmojiCount = useCallback(() => {
 		return (
 			dataEmojiFetch &&
-			Object.entries<Record<string, { count: number }>>(
-				dataEmojiFetch.reduce(
-					(count: any, currentEmoji: any) => {
-						const { emoji, sender_id } = currentEmoji;
-						const key = `${emoji}_${sender_id}`;
+			Object.values(
+				dataEmojiFetch.reduce((count: any, currentEmoji: any) => {
+					const { id, emoji, sender_id } = currentEmoji;
+					const key = emoji;
+
+					if (!count[key]) {
 						count[key] = {
-							count: (count[key]?.count || 0) + 1,
+							emoji,
+							count: 0,
+							senderIdList: [],
+							emojiIdList: [],
 						};
-						return count;
-					},
-					{} as Record<string, { count: number }>,
-				),
-			).map(([key, emojiInfo]) => {
-				const [emoji, sender_id] = key.split('_'); // Split the key to extract emoji and sender_id
-				return {
-					emoji,
-					sender_id: [sender_id], // Convert sender_id to an array
-					count: emojiInfo.count,
-				};
-			})
+					}
+
+					count[key].count += 1;
+					count[key].senderIdList.push(sender_id);
+					count[key].emojiIdList.push(id);
+
+					return count;
+				}, {}),
+			)
 		);
 	}, [dataEmojiFetch]);
-	
-	
 
-	console.log('calculateEmojiCount()', calculateEmojiCount());
+	const processData = () => {
+		const result: any = [];
 
+		dataEmojiFetch.forEach((item: any) => {
+			const existingEmoji = result.find((emojiItem: any) => emojiItem.emoji === item.emoji);
 
+			if (existingEmoji) {
+				const existingSender = existingEmoji.senders.find((senderItem: any) => senderItem.id === item.sender_id);
 
+				if (existingSender) {
+					// If the sender already exists for the emoji
+					existingSender.count += 1;
+					existingSender.emojiIdList.push(item.id);
+				} else {
+					// If the sender doesn't exist for the emoji
+					existingEmoji.senders.push({
+						id: item.sender_id,
+						count: 1,
+						isReacted: false,
+						emojiIdList: [item.id],
+					});
+				}
+			} else {
+				// If the emoji doesn't exist in the result array
+				result.push({
+					emoji: item.emoji,
+					senders: [
+						{
+							id: item.sender_id,
+							count: 1,
+							isReacted: false,
+							emojiIdList: [item.id],
+						},
+					],
+				});
+			}
+		});
 
-	const [emojiCount, setEmojiCount] = useState([]);
+		return result;
+	};
+
+	console.log(processData());
+
 	useEffect(() => {
-		const result = calculateEmojiCount();
-		const updatedEmojiCount = result.map((emoji: any) => ({
-			...emoji,
-			isReacted: emoji.sender_id === userId,
-		}));
-		setEmojiCount(updatedEmojiCount);
-	}, [calculateEmojiCount, userId]);
-
-	useEffect(() => {
-		setEmojiData(calculateEmojiCount());
+		setEmojiData(processData());
 	}, [message]);
 
 	const [changingCount, setChangingCount] = useState<number>(0);
 	const handleReactMessage = async (channelId: string, messageId: string, emoji: string) => {
-		const existingEmoji = emojiData.find((e: emojiOptions) => e.emoji === emoji);
+		const existingEmoji = emojiData.find((e: EmojiData) => e.emoji === emoji);
 		if (existingEmoji) {
-			const updatedEmojiData = emojiData.map((e: emojiOptions) =>
+			const updatedEmojiData = emojiData.map((e: EmojiData) =>
 				e.emoji === emoji
 					? {
 							...e,
 							count: e.count + 1,
+							isReacted: true,
 						}
 					: e,
 			);
 			setEmojiData(updatedEmojiData);
 			await reactionMessageAction(channelId, messageId, emoji, false);
 		} else {
-			setEmojiData((prevEmojiData: emojiOptions[]) => [
+			setEmojiData((prevEmojiData: EmojiData[]) => [
 				...prevEmojiData,
 				{
 					emoji,
@@ -165,6 +199,8 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 		}
 		setChangingCount((prevChangingCount) => prevChangingCount + 1);
 	};
+
+	console.log('emmm', emojiData);
 
 	return (
 		<>
@@ -219,17 +255,17 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 						<div className="flex justify-start flex-row w-full gap-2">
 							{emojiData &&
 								emojiData
-									.filter((emoji: emojiOptions) => emoji.count > 0)
-									.map((emoji: emojiOptions, index: number) => {
+									// .filter((emoji: emojiOptions) => emoji.count > 0)
+									.map((emoji: EmojiData, index: number) => {
 										return (
 											<div
 												key={index}
-												className={`relative ${emojiCount ? 'bg-[#373A54] border-blue-600 border' : ' bg-[#313338] '}  rounded-md  w-12 gap-1 h-5 flex flex-row justify-center items-center`}
+												// className={`relative  ${isReacted ? 'bg-[#373A54] border-blue-600 border' : ' bg-[#313338] '}  rounded-md  w-12 gap-1 h-5 flex flex-row justify-center items-center`}
 												onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji)}
 											>
 												<span>{emoji.emoji}</span>
 												<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
-													<p className="text-[13px]">{emoji.count}</p>
+													<p className="text-[13px]">{emoji.senders.map((item: SenderInfo) => item.count)}</p>
 												</span>
 											</div>
 										);
@@ -269,3 +305,35 @@ MessageWithUser.Skeleton = () => {
 };
 
 export default MessageWithUser;
+
+// const input = [
+// 	{
+// 		emoji: '🤣',
+// 		sender_id: '2640ec35-9de3-44c1-8481-07615e66d240,2640ec35-9de3-44c1-8481-07615e66d242',
+// 		emojiIdList: ['08ab23c5-97c3-4bb6-9901-93847ee06feb'],
+// 	},
+// 	{
+// 		emoji: '🥰',
+// 		sender_id: '2640ec35-9de3-44c1-8481-07615e66d240,2640ec35-9de3-44c1-8481-07615e66d240',
+// 		emojiIdList: ['156a7dd5-3bd8-4734-96cf-038297823fae'],
+// 	},
+// 	{
+// 		emoji: '🤩',
+// 		sender_id: '2640ec35-9de3-44c1-8481-07615e66d240, 2640ec35-9de3-44c1-8481-07615e66d241',
+// 		emojiIdList: ['ec545b74-5a5d-42e5-a54d-8519a47d034d'],
+// 	},
+// ];
+
+// xử lý mảng này để được kết quả có định dạng:
+
+// [
+// 	emoji: '🤣',
+// 	sender:[
+// 		{id: "2640ec35-9de3-44c1-8481-07615e66d240",
+// 		count: 1 // số lần lặp lại của id đó
+// 		isReacted: false}
+// 	]
+
+// 	emojiIdList: ['08ab23c5-97c3-4bb6-9901-93847ee06feb'],
+
+// ]

@@ -49,7 +49,7 @@ export function ChannelMessage(props: MessageProps) {
 			console.log(emoji.native);
 			setIsOpenReactEmoji(false);
 		};
-		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
+		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />
 	}
 
 	return (
@@ -73,7 +73,7 @@ export function ChannelMessage(props: MessageProps) {
 				</button>
 			</div>
 			{isOpenReactEmoji && (
-				<div className="absolute right-32 top-[0]">
+				<div className="absolute right-32 bottom-0">
 					<EmojiReaction />
 				</div>
 			)}
