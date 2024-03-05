@@ -198,23 +198,8 @@ export type UpdateReactionMessageArgs = {
 	messageId?: string;
 	emoji?: string;
 	userId?: string;
-	action?: number;
+	action_delete?: boolean;
 };
-
-// export const sendMessageReaction = createAsyncThunk(
-// 	'messages/sendMessageReaction',
-// 	async ({ channelId, messageId, emoji, action }: UpdateReactionMessageArgs, thunkAPI) => {
-// 		console.log(channelId, messageId, emoji, action);
-// 		console.log("got")
-// 		try {
-// 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-// 			await mezon.socketRef.current?.writeMessageReaction(channelId ?? '', messageId ?? '', emoji ?? '', action ?? 0);
-// 		} catch (e) {
-// 			console.log(e);
-// 			return thunkAPI.rejectWithValue([]);
-// 		}
-// 	},
-// );
 
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
@@ -387,7 +372,6 @@ export const messagesActions = {
 	updateTypingUsers,
 	sendTypingUser,
 	loadMoreMessage,
-	// sendMessageReaction,
 	updateReactionMessage,
 };
 
