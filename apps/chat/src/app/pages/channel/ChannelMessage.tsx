@@ -1,7 +1,9 @@
 import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage } from '@mezon/core';
+import { selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 type MessageProps = {
@@ -13,7 +15,8 @@ type MessageProps = {
 export function ChannelMessage(props: MessageProps) {
 	const { message, lastSeen, preMessage } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
-
+	const user = useSelector(selectMemberByUserId(message.sender_id));
+	
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);

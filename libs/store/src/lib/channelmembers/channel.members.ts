@@ -287,3 +287,10 @@ export const selectMemberById = (userId: string) =>
 	createSelector(getChannelMembersState, (state) => {
 		return selectById(state, userId);
 	});
+
+export const selectMemberByUserId = (userId: string) => 
+	createSelector(selectAllChannelMembers,	
+	(entities) => {
+		return entities.find(ent => ent?.user?.id === userId) || null;
+	}
+)
