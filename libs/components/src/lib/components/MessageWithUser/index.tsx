@@ -9,13 +9,17 @@ import {
 	convertTimeString,
 	getTimeDifferenceInSeconds,
 } from '@mezon/utils';
+import { ReactedOutsideOptional } from 'apps/chat/src/app/pages/channel/ChannelMessage';
 import { useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons/index';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
+
+// D:\MEZON\mezon-fe\apps\chat\src\app\pages\channel\ChannelMessage.tsx
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -24,6 +28,7 @@ export type MessageWithUserProps = {
 	attachments?: Array<ApiMessageAttachment>;
 	references?: Array<ApiMessageRef>;
 	reactions?: Array<ApiMessageReaction>;
+	reactionOutsideProps?: ReactedOutsideOptional;
 };
 
 type SenderInfoOptionals = {
@@ -45,7 +50,7 @@ type EmojiItemOptionals = {
 	emoji: string;
 };
 
-function MessageWithUser({ message, preMessage, mentions, attachments, references, reactions }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, mentions, attachments, references, reactions, reactionOutsideProps }: MessageWithUserProps) {
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const membersMap = useSelector(selectMembersMap(currentChannelId));
@@ -105,7 +110,6 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>([]);
 	const [dataEmojiFetch] = useState<any>(message.reactions);
-
 	const processData = (dataEmoji: any) => {
 		const result: EmojiDataOptionals[] = [];
 		dataEmoji.forEach((item: EmojiItemOptionals) => {
@@ -144,26 +148,23 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 
 	const [changingCount, setChangingCount] = useState<number>(0);
 
-	const [update, setUpdate] = useState(false);
 	const handleReactMessage = async (channelId: string, messageId: string, emoji: string, userId: string) => {
-		setUpdate(!update);
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
 			const userIndex = (emojiDataIncSocket &&
 				emojiDataIncSocket[existingEmojiIndex].senders.findIndex((sender) => sender.id === userId)) as number;
 			if (userIndex !== -1) {
-				const updatedEmojiData = [...emojiData];
-				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 1;
+				const updatedEmojiData = [...emojiDataIncSocket];
+				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 0;
 				setEmojiData(updatedEmojiData);
 				await reactionMessageAction(channelId, messageId, emoji, false);
 			} else {
-				const updatedEmojiData = [...emojiData];
+				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders.push({
 					id: userId,
 					count: 1,
 					emojiIdList: [],
 				});
-
 				setEmojiData(updatedEmojiData);
 				await reactionMessageAction(channelId, messageId, emoji, false);
 			}
@@ -172,72 +173,82 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 				...prevEmojiDataOptionals,
 				{
 					emoji,
-					count: 1,
-					isReacted: true,
+					count: 0,
 					senders: [
 						{
 							id: userId,
-							count: 1,
+							count: 0,
 							emojiIdList: [],
 						},
 					],
+					channelId: channelId,
+					messageId: messageId,
 				},
 			]);
 			await reactionMessageAction(channelId, messageId, emoji, false);
 		}
-
 		setChangingCount((prevChangingCount) => prevChangingCount + 1);
 	};
 
-	const mergeEmojiData = (emojiData: EmojiDataOptionals[], emojiSocket: EmojiDataOptionals[]) => {
+	const mergeEmojiData = (emojiDataArr: EmojiDataOptionals[], emojiSocket: EmojiDataOptionals[]) => {
 		emojiSocket?.forEach((socketEmoji) => {
-			const existingEmojiIndex = emojiData.findIndex((dataEmoji) => dataEmoji.emoji === socketEmoji.emoji);
+			const existingEmojiIndex = emojiDataArr.findIndex(
+				(dataEmoji) =>
+					dataEmoji.emoji === socketEmoji.emoji &&
+					dataEmoji.channelId === socketEmoji.channelId &&
+					dataEmoji.messageId === socketEmoji.messageId,
+			);
+
 			if (existingEmojiIndex !== -1) {
-				const existingSenderIndex = emojiData[existingEmojiIndex].senders.findIndex((sender) => sender.id === socketEmoji.senders[0].id);
+				const existingSenderIndex = emojiDataArr[existingEmojiIndex].senders.findIndex((sender) => sender.id === socketEmoji.senders[0].id);
 
 				if (existingSenderIndex !== -1) {
-					emojiData[existingEmojiIndex].senders[existingSenderIndex].count += socketEmoji.senders[0].count;
+					emojiDataArr[existingEmojiIndex].senders[existingSenderIndex].count += socketEmoji.senders[0].count;
 				} else {
-					emojiData[existingEmojiIndex].senders.push(socketEmoji.senders[0]);
+					emojiDataArr[existingEmojiIndex].senders.push(socketEmoji.senders[0]);
 				}
 			} else {
-				emojiData.push(socketEmoji);
+				emojiDataArr.push(socketEmoji);
 			}
 		});
-		return emojiData;
+
+		return emojiDataArr;
 	};
 
-	const [messReactConvert, setMessReactConvert] = useState<any>();
-	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
-
+	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(emojiData);
 	useEffect(() => {
-		const transformData = () => {
-			if (messageDataReactedFromSocket) {
-				const transformedData = [
-					{
-						emoji: messageDataReactedFromSocket.emoji,
-						senders: [
-							{
-								id: messageDataReactedFromSocket.userId,
-								count: 1,
-								emojiIdList: [''],
-							},
-						],
-						channelId: messageDataReactedFromSocket.channelId,
-						messageId: messageDataReactedFromSocket.messageId,
-					},
-				];
-				setMessReactConvert(transformedData);
-			}
-		};
-		transformData();
-		setEmojiDataIncSocket(mergeEmojiData(emojiData, messReactConvert));
-		console.log('emojiDataIncSocket', emojiDataIncSocket);
+		if (
+			messageDataReactedFromSocket?.channelId &&
+			messageDataReactedFromSocket.messageId &&
+			messageDataReactedFromSocket.userId &&
+			messageDataReactedFromSocket.emoji
+		) {
+			const reactDataArray: EmojiDataOptionals[] = [
+				{
+					emoji: messageDataReactedFromSocket?.emoji ?? '',
+					senders: [
+						{
+							id: messageDataReactedFromSocket?.userId ?? '',
+							count: 1,
+							emojiIdList: [],
+						},
+					],
+					channelId: messageDataReactedFromSocket?.channelId ?? '',
+					messageId: messageDataReactedFromSocket?.messageId ?? '',
+				},
+			];
+			const updatedDataE = mergeEmojiData(emojiData, reactDataArray);
+			setEmojiDataIncSocket(updatedDataE);
+		}
 	}, [messageDataReactedFromSocket]);
 
 	useEffect(() => {
 		setEmojiData(processData(dataEmojiFetch));
-	}, [message, update]);
+	}, [message]);
+
+	useEffect(() => {
+		setEmojiDataIncSocket(emojiData);
+	}, [emojiData]);
 
 	return (
 		<>
@@ -291,20 +302,26 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 						</div>
 						<div className="flex justify-start flex-row w-full gap-2">
 							{emojiDataIncSocket &&
-								emojiDataIncSocket.map((emoji: EmojiDataOptionals, index: number) => {
+								emojiDataIncSocket.map((emoji: EmojiDataOptionals) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
+									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.message_id;
+									const uniqueKey = uuidv4();
+
 									return (
-										<div
-											key={index}
-											className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
-											onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji, userId ?? '')}
-										>
-											<span>{emoji.emoji}</span>
-											<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
-												<p className="text-[13px]">
-													{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}
-												</p>
-											</span>
+										<div key={uniqueKey}>
+											{checkID && (
+												<div
+													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
+													onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji, userId ?? '')}
+												>
+													<span>{emoji.emoji}</span>
+													<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
+														<p className="text-[13px]">
+															{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}
+														</p>
+													</span>
+												</div>
+											)}
 										</div>
 									);
 								})}
@@ -318,14 +335,6 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 						<Icons.Sent />
 					</div>
 				)}
-
-				{
-					<div className="flex flex-row right-8 relative">
-						<div onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '🤣', userId ?? '')}>🤣</div>
-						<div onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '🥰', userId ?? '')}>🥰</div>
-						<div onClick={() => handleReactMessage(currentChannelId ?? '', message.id, '🤩', userId ?? '')}>🤩</div>
-					</div>
-				}
 			</div>
 		</>
 	);

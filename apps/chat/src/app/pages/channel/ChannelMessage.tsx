@@ -3,6 +3,7 @@ import Picker from '@emoji-mart/react';
 import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
+import * as Icons from 'libs/components/src/lib/components/Icons/index';
 import { useEffect, useMemo, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
@@ -12,6 +13,10 @@ type MessageProps = {
 	lastSeen?: boolean;
 };
 
+export type ReactedOutsideOptional = {
+	emoji: string;
+	messageId: string;
+};
 export function ChannelMessage(props: MessageProps) {
 	const { message, lastSeen, preMessage } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
@@ -42,9 +47,12 @@ export function ChannelMessage(props: MessageProps) {
 	}, [message.references]);
 
 	const [isOpenReactEmoji, setIsOpenReactEmoji] = useState(false);
+	const [emojiPicker, setEmojiPicker] = useState<string>('');
+	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
-			console.log(emoji.native);
+			setEmojiPicker(emoji.native);
+			setReactionOutside({ emoji: emoji.native, messageId: mess.message_id });
 			setIsOpenReactEmoji(false);
 		};
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
@@ -53,6 +61,7 @@ export function ChannelMessage(props: MessageProps) {
 	return (
 		<div className="relative group">
 			<MessageWithUser
+				reactionOutsideProps={reactionOutside}
 				message={mess as IMessageWithUser}
 				preMessage={messPre as IMessageWithUser}
 				mentions={mentions as ApiMessageMention[]}
@@ -60,7 +69,7 @@ export function ChannelMessage(props: MessageProps) {
 				references={references as ApiMessageRef[]}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			{/* <div className="z-20 absolute top-[0] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:bg-slate-800">
+			<div className="z-20 top-[-15px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:bg-slate-800">
 				<button
 					className="h-full p-1 group"
 					onClick={() => {
@@ -69,9 +78,9 @@ export function ChannelMessage(props: MessageProps) {
 				>
 					<Icons.Smile />
 				</button>
-			</div> */}
+			</div>
 			{isOpenReactEmoji && (
-				<div className="absolute right-32 bottom-0">
+				<div className="absolute right-32 bottom-0 z-50">
 					<EmojiReaction />
 				</div>
 			)}
