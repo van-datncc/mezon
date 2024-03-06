@@ -61,7 +61,6 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		);
 	}, [message, preMessage]);
 
-	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>([]);
 	const [dataEmojiFetch] = useState<any>(message.reactions);
 	const processData = (dataEmoji: any) => {
 		const result: EmojiDataOptionals[] = [];
@@ -99,7 +98,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		return result;
 	};
 
-	const [changingCount, setChangingCount] = useState<number>(0);
+	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
 
 	const handleReactMessage = async (channelId: string, messageId: string, emoji: string, userId: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
@@ -115,7 +114,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders.push({
 					id: userId,
-					count: 1,
+					count: 0,
 					emojiIdList: [],
 				});
 				setEmojiData(updatedEmojiData);
@@ -140,7 +139,6 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			]);
 			await reactionMessageAction(channelId, messageId, emoji, false);
 		}
-		setChangingCount((prevChangingCount) => prevChangingCount + 1);
 	};
 
 	const mergeEmojiData = (emojiDataArr: EmojiDataOptionals[], emojiSocket: EmojiDataOptionals[]) => {
@@ -168,7 +166,8 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		return emojiDataArr;
 	};
 
-	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(emojiData);
+	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
+	const [reactedConvert, setReactConvert] = useState<EmojiDataOptionals[]>([]);
 	useEffect(() => {
 		if (
 			messageDataReactedFromSocket?.channelId &&
@@ -190,18 +189,11 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					messageId: messageDataReactedFromSocket?.messageId ?? '',
 				},
 			];
+			setReactConvert(reactDataArray);
 			const updatedDataE = mergeEmojiData(emojiData, reactDataArray);
 			setEmojiDataIncSocket(updatedDataE);
 		}
 	}, [messageDataReactedFromSocket]);
-
-	useEffect(() => {
-		setEmojiData(processData(dataEmojiFetch));
-	}, [message]);
-
-	useEffect(() => {
-		setEmojiDataIncSocket(processData(dataEmojiFetch));
-	}, [emojiData]);
 
 	useEffect(() => {
 		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
