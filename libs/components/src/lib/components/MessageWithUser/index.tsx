@@ -22,7 +22,6 @@ export type MessageWithUserProps = {
 	attachments?: Array<ApiMessageAttachment>;
 	references?: Array<ApiMessageRef>;
 	user?: IChannelMember | null;
-
 	reactions?: Array<ApiMessageReaction>;
 	reactionOutsideProps?: ReactedOutsideOptional;
 };

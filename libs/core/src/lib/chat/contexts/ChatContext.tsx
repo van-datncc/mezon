@@ -19,11 +19,21 @@ type ChatContextProviderProps = {
 
 export type ChatContextValue = {
 	// TODO: add your context value here
+	receiver: string;
+	setReceiver: React.Dispatch<React.SetStateAction<string>>;
+
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
+	const receiver = React.useMemo<ChatContextValue>(() => {
+		return {
+			receiver: 'defaultReceiver',
+		};
+	}, []);
+	const value = React.useMemo<ChatContextValue>(() => receiver, [receiver]);
+
 	const { socketRef } = useMezon();
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
@@ -99,8 +109,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-
-	const value = React.useMemo<ChatContextValue>(() => ({}), []);
 
 	useEffect(() => {
 		const socket = socketRef.current;

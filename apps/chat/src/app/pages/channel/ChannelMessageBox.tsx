@@ -1,5 +1,5 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { MessageBox } from '@mezon/components';
+import { MessageBox, ReplyMessage } from '@mezon/components';
 import { useChannelMembers, useChatSending } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
@@ -43,6 +43,7 @@ export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMe
 
 	return (
 		<div>
+			<ReplyMessage />
 			<MessageBox
 				isOpenEmojiPropOutside={controlEmoji}
 				listMentions={newUserMentionList}
