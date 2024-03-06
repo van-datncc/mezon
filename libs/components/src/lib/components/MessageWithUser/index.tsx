@@ -22,9 +22,9 @@ export type MessageWithUserProps = {
 	attachments?: Array<ApiMessageAttachment>;
 	references?: Array<ApiMessageRef>;
 	user?: IChannelMember | null;
-
 	reactions?: Array<ApiMessageReaction>;
 	reactionOutsideProps?: ReactedOutsideOptional;
+	isMessNotifyMention?: boolean
 };
 
 type SenderInfoOptionals = {
@@ -46,7 +46,7 @@ type EmojiItemOptionals = {
 	emoji: string;
 };
 
-function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
 	const { messageTime } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -204,7 +204,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 
 	return (
 		<>
-			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
+			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
 				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageTime}</span>
@@ -252,7 +252,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						</div>
 					</div>
 				</div>
-				{message && (
+				{message && !isMessNotifyMention && (
 					<div
 						className={`absolute top-[100] right-2  flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}
 					>

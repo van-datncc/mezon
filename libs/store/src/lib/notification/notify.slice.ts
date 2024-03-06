@@ -1,8 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import {  Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
+import {  ChannelMessageTS, Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { ensureSession, getMezonCtx } from '../helpers';
-import { ApiMessageMention } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 
 export interface NotificationEntity extends Notification {
@@ -21,7 +20,7 @@ export const mapNotificationToEntity = (notifyRes: Notification): INotification 
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	notificationMentions: ApiMessageMention[]
+	notificationMentions: ChannelMessageTS[]
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -42,8 +41,8 @@ export const fetchNotifyMention = createAsyncThunk('notification/notifyMention',
 	if (!response.messages) {
 		return thunkAPI.rejectWithValue([]);
 	}
+	// console.log('HHHHHHHHHHHH: ', response)
 	return response.messages
-
 });
 
 
@@ -78,7 +77,7 @@ export const notificationSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchListNotification.fulfilled, (state: NotificationState, action: PayloadAction<INotification[]>) => {
-				notificationAdapter.setAll(state, action.payload);
+				notificationAdapter.setMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchListNotification.rejected, (state: NotificationState, action) => {
@@ -89,7 +88,7 @@ export const notificationSlice = createSlice({
 			.addCase(fetchNotifyMention.pending, (state: NotificationState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchNotifyMention.fulfilled, (state: NotificationState, action: PayloadAction<ApiMessageMention[]>) => {
+			.addCase(fetchNotifyMention.fulfilled, (state: NotificationState, action: PayloadAction<ChannelMessageTS[]>) => {
 				state.notificationMentions = action.payload;
 			})
 			.addCase(fetchNotifyMention.rejected, (state: NotificationState, action) => {
