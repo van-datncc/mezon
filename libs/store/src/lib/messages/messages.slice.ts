@@ -55,6 +55,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
+	reactionMessageData?: UpdateReactionMessageArgs;
 }
 
 export interface MessagesRootState {
@@ -78,7 +79,7 @@ export const fetchMessagesCached = memoize(
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
 			return args[1] + args[2];
-		}
+		},
 	},
 );
 
@@ -190,6 +191,27 @@ export const updateTypingUsers = createAsyncThunk(
 	},
 );
 
+export type UpdateReactionMessageArgs = {
+	channelId?: string;
+	messageId?: string;
+	emoji?: string;
+	userId?: string;
+	action_delete?: boolean;
+};
+
+export const updateReactionMessage = createAsyncThunk(
+	'messages/updateReactionMessage',
+
+	async ({ channelId, messageId, userId, emoji }: UpdateReactionMessageArgs, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(messagesActions.setReactionMessage({ channelId, messageId, userId, emoji }));
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
+
 export type SendMessageArgs = {
 	channelId: string;
 };
@@ -218,6 +240,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
+	reactionMessageData: { channelId: '', messageId: '', userId: '', emoji: '' },
 });
 
 export type SetCursorChannelArgs = {
@@ -275,6 +298,16 @@ export const messagesSlice = createSlice({
 				},
 			};
 		},
+
+		setReactionMessage: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
+			state.reactionMessageData = {
+				channelId: action.payload.channelId,
+				messageId: action.payload.messageId,
+				userId: action.payload.userId,
+				emoji: action.payload.emoji,
+			};
+		},
+
 		recheckTypingUsers: (state) => {
 			const now = Date.now();
 			const typingUsers = { ...state.typingUsers };
@@ -337,6 +370,7 @@ export const messagesActions = {
 	updateTypingUsers,
 	sendTypingUser,
 	loadMoreMessage,
+	updateReactionMessage,
 };
 
 /*
@@ -431,3 +465,5 @@ export const selectCursorMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param && param[channelId] && param[channelId].cursor;
 	});
+
+export const selectMessageReacted = createSelector(getMessagesState, (state) => state.reactionMessageData);
