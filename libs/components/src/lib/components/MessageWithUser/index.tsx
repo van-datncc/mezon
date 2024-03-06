@@ -201,6 +201,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		}
 	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
 
+	console.log('messsage', message);
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (

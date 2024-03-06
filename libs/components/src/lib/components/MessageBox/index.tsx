@@ -3,11 +3,13 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import { ChatContext } from '@mezon/core';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
@@ -37,6 +39,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const [referenceData, setReferencesData] = useState<ApiMessageRef[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
@@ -165,19 +168,35 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
+	const { messageRep, isOpenReply, setIsOpenReply } = useContext(ChatContext);
+	useEffect(() => {
+		if (messageRep) {
+			const messageRefId = uuidv4();
+			setReferencesData([{ message_id: messageRep.id, message_ref_id: messageRefId, ref_type: 1 }]);
+		}
+	}, [messageRep]);
 	const handleSend = useCallback(() => {
 		setShowEmojiSuggestion(false);
-		if (!content.trim() && !attachmentData && !mentionData) {
+		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
-
-		onSend({ t: content }, mentionData, attachmentData);
-		setContent('');
-		setAttachmentData([]);
-		setClearEditor(true);
-		setSelectedItemIndex(0);
-		liRefs?.current[selectedItemIndex]?.focus();
-		setEditorState(() => EditorState.createEmpty());
+		if (isOpenReply) {
+			console.log('referenceData', referenceData);
+			onSend({ t: content }, mentionData, attachmentData, referenceData);
+			setContent('');
+			setAttachmentData([]);
+			setMentionData([]);
+			setEditorState(() => EditorState.createEmpty());
+			setIsOpenReply(false);
+		} else {
+			onSend({ t: content }, mentionData, attachmentData);
+			setContent('');
+			setAttachmentData([]);
+			setClearEditor(true);
+			setSelectedItemIndex(0);
+			liRefs?.current[selectedItemIndex]?.focus();
+			setEditorState(() => EditorState.createEmpty());
+		}
 	}, [content, onSend, mentionData, attachmentData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {

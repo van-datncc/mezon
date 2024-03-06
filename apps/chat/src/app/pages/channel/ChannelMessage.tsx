@@ -54,11 +54,12 @@ export function ChannelMessage(props: MessageProps) {
 		};
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
 	}
-	const { receiver, setReceiver } = useContext(ChatContext);
+	const { setMessageRep, setIsOpenReply } = useContext(ChatContext);
+
 	const handleClickReply = () => {
-		console.log("clicked reply", mess)
-		setReceiver("newRE")
-	}
+		setIsOpenReply(true);
+		setMessageRep(mess);
+	};
 
 	return (
 		<div className="relative group ">
@@ -78,7 +79,7 @@ export function ChannelMessage(props: MessageProps) {
 				>
 					<Icons.Smile />
 				</button>
-				<button onClick={handleClickReply} className="border flex flex-row justify-center items-center rotate-180">
+				<button onClick={handleClickReply} className=" flex flex-row justify-center items-center rotate-180">
 					<Icons.Reply />
 				</button>
 			</div>
