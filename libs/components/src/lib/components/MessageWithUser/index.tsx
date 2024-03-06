@@ -203,12 +203,12 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		setEmojiDataIncSocket(processData(dataEmojiFetch));
 	}, [emojiData]);
 
-	// useEffect(() => {
-	// 	if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-	// 		handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId);
-	// 		return;
-	// 	}
-	// }, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
+	useEffect(() => {
+		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
+			handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId);
+			return;
+		}
+	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
 
 	return (
 		<>
