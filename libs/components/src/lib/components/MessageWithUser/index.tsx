@@ -190,6 +190,10 @@ function MessageWithUser({ message, preMessage, mentions, attachments, reference
 		setChangingCount((prevChangingCount) => prevChangingCount + 1);
 	};
 
+	useEffect(() => {
+		handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId ?? '', reactionOutsideProps?.emoji ?? '', userId ?? '');
+	}, [reactionOutsideProps]);
+
 	const mergeEmojiData = (emojiDataArr: EmojiDataOptionals[], emojiSocket: EmojiDataOptionals[]) => {
 		emojiSocket?.forEach((socketEmoji) => {
 			const existingEmojiIndex = emojiDataArr.findIndex(
