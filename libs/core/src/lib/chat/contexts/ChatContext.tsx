@@ -3,7 +3,7 @@ import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import {
-	ChannelMessageEvent,
+	ChannelMessageTSEvent,
 	ChannelPresenceEvent,
 	MessageReactionEvent,
 	MessageTypingEvent,
@@ -30,7 +30,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const dispatch = useAppDispatch();
 
 	const onchannelmessage = useCallback(
-		(message: ChannelMessageEvent) => {
+		(message: ChannelMessageTSEvent) => {
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 		},
 		[dispatch],

@@ -10,6 +10,7 @@ import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
+import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
@@ -50,7 +51,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 
 	const { MentionSuggestions } = mentionPlugin.current;
-	const imagePlugin = createImagePlugin();
+	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
 	const plugins = [mentionPlugin.current, imagePlugin];
 	//clear Editor after navigate channel
 	useEffect(() => {
@@ -115,6 +116,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				src: urlFile,
 				height: '20px',
 				width: 'auto',
+				onRemove: () => handleRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 			const newEditorState = EditorState.set(editorState, {
@@ -155,6 +157,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		},
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
+
+	const handleRemove = () => {
+		const currentContentState = editorState.getCurrentContent();
+		const newContentState = Modifier.applyEntity(currentContentState, editorState.getSelection(), null);
+		const newEditorState = EditorState.push(editorState, newContentState, 'apply-entity');
+		setEditorState(newEditorState);
+	};
 
 	const handleSend = useCallback(() => {
 		setShowEmojiSuggestion(false);

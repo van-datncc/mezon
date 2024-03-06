@@ -41,7 +41,7 @@ function MyApp() {
 				</NavLink>
 				<div className="py-2 border-t-2 border-t-borderDefault" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (
-					<NavLink to={`/chat/servers/${currentClan.id}`}>
+					<NavLink to={`/chat/clans/${currentClan.id}`}>
 						<NavLinkComponent active={!pathName.includes('direct')}>
 							{currentClan?.logo ? (
 								<Image
@@ -72,7 +72,7 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					<Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} />
+					<Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" />
 					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
 						<ModalListClans
 							options={clans}

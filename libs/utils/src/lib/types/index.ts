@@ -1,10 +1,10 @@
-import { ChannelMessage } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelMessageTS } from '@mezon/mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
-	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiMessageMention,
 	ApiPermission,
 	ApiRole,
 	ApiUser,
@@ -12,6 +12,10 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
+
+import {
+	ApiChannelDescription,
+} from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
 
@@ -103,7 +107,7 @@ export type IMessageMeta = {
 	contextMenu: IMessageContextMenu;
 };
 
-export type IMessage = ChannelMessage & {
+export type IMessage = ChannelMessageTS & {
 	id: string;
 	content: {
 		t?: string | undefined;

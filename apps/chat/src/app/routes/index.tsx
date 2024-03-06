@@ -4,7 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
 import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
-import ServerLayout from '../layouts/ClanLayout';
+import ClanLayout from '../layouts/ClanLayout';
 
 // Pages
 import ChannellayOut from '../pages/channel';
@@ -78,14 +78,14 @@ export const routes = createBrowserRouter([
 								element: <Main />,
 								children: [
 									{
-										path: 'servers',
+										path: 'clans',
 										element: <ClansRoutes />,
 										children: [
 											{
 												path: ':clanId',
 												loader: clanLoader,
 												shouldRevalidate: shouldRevalidateServer,
-												element: <ServerLayout />,
+												element: <ClanLayout />,
 												children: [
 													{
 														path: '',
