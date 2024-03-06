@@ -30,7 +30,6 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 	const reactionMessageAction = useCallback(
 		async (channelId: string, messageId: string, emoji: string, action_delete: boolean) => {
 			try {
-				console.log(channelId, messageId, emoji, action_delete)
 				await reactionMessage(channelId, messageId, emoji, action_delete);
 			} catch (error) {
 				console.error('Error reacting to message:', error);
