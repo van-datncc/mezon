@@ -6,20 +6,24 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
+import { useModal } from 'react-modal-hook';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const [openListClans, setOpenListClans] = useState(false);
-	const [openCreateClan, setOpenCreateClans] = useState(false);
 	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
 
+	const [openCreateClanModal, closeCreateClanModal] = useModal(() => (
+		<ModalCreateClan
+			open={true}
+			onClose={closeCreateClanModal}
+		/>
+	));
+
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
-	};
-	const handleOpenCreate = () => {
-		setOpenCreateClans(true);
 	};
 
 	const { quantityPendingRequest } = useFriends();
@@ -79,19 +83,13 @@ function MyApp() {
 							showModal={openListClans}
 							idSelectedClan={currentClan?.clan_id}
 							onChangeClan={handleChangeClan}
-							createClan={handleOpenCreate}
+							createClan={openCreateClanModal}
 							onClose={() => setOpenListClans(false)}
 						/>
 					</div>
 				</div>
 			</div>
 			<MainContent />
-			<ModalCreateClan
-				open={openCreateClan}
-				onClose={() => {
-					setOpenCreateClans(false);
-				}}
-			/>
 		</div>
 	);
 }
