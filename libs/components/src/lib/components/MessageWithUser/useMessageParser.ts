@@ -4,15 +4,15 @@ import { useMemo } from "react";
 
 export function useMessageParser( message: IMessageWithUser) {
     const attachments = useMemo(() => {
-		return message.attachments as any;
+		return message.attachments;
 	}, [message])
 
     const mentions = useMemo(() => {
-		return message.mentions as any;
+		return message.mentions;
 	}, [message])
 
 	const content = useMemo(() => {
-		return message.content as any;
+		return message.content;
 	}, [message]);
 
     const lines =   useMemo(() => {

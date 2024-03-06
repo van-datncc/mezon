@@ -2,7 +2,7 @@ import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messa
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { ChannelMessageEvent, ChannelPresenceEvent, MessageTypingEvent, Notification, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelMessageEvent, ChannelMessageTSEvent, ChannelPresenceEvent, MessageTypingEvent, Notification, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
@@ -23,7 +23,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const dispatch = useAppDispatch();
 
 	const onchannelmessage = useCallback(
-		(message: ChannelMessageEvent) => {
+		(message: ChannelMessageTSEvent) => {
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 		},
 		[dispatch],
