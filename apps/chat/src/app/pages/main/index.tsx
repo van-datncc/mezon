@@ -76,7 +76,10 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					<Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" />
+					{/* <Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" /> */}
+					<div className="size-12 bg-[#1E1E1E] flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl hover:bg-slate-800 transition-all duration-200 ">
+						<p className="text-2xl font-bold text-[#155EEF]">+</p>
+					</div>
 					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">
 						<ModalListClans
 							options={clans}

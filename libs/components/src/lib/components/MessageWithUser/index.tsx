@@ -220,11 +220,11 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					<div className="flex-col w-full flex justify-center items-start relative gap-1">
 						<MessageHead message={message} user={user} isCombine={isCombine} />
 						<div className="justify-start items-center inline-flex w-full">
-							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
+							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat break-all">
 								<MessageContent message={message} user={user} isCombine={isCombine} />
 							</div>
 						</div>
-						<div className="flex justify-start flex-row w-full gap-2">
+						<div className="flex justify-start flex-row w-full gap-2 flex-wrap">
 							{emojiDataIncSocket &&
 								emojiDataIncSocket.map((emoji: EmojiDataOptionals) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);

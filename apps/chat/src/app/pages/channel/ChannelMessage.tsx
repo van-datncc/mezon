@@ -15,7 +15,7 @@ type MessageProps = {
 };
 
 export type ReactedOutsideOptional = {
-	emoji: string ;
+	emoji: string;
 	messageId: string;
 };
 export function ChannelMessage(props: MessageProps) {
