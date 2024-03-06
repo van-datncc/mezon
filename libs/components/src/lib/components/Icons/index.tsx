@@ -22,7 +22,7 @@ export function OnlineStatus(props: React.HTMLAttributes<SVGElement>) {
 export function OfflineStatus(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" stroke-width="3" />
+			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" strokeWidth="3" />
 		</svg>
 	);
 }
@@ -941,7 +941,7 @@ export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" stroke-width="1.5" stroke-linecap="round" />
+				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" stroke-linecap="round" />
 			</g>
 		</svg>
 	);
@@ -951,7 +951,7 @@ export const ShortCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) =>
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" stroke-width="1.5" stroke-linecap="round" />
+				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" stroke-linecap="round" />
 			</g>
 		</svg>
 	);

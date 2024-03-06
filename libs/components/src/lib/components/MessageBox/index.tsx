@@ -114,6 +114,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const contentState = editorState.getCurrentContent();
 			const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
 				src: urlFile,
+				height: '20px',
+				width: 'auto',
 				onRemove: () => handleRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
@@ -320,6 +322,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
+
 	const [syntax, setSyntax] = useState<string>('');
 	const regexDetect = /:[^\s]{2,}/;
 	const handleDetectEmoji = async (value: string) => {
