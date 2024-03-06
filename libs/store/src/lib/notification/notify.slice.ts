@@ -38,11 +38,11 @@ export const fetchListNotification = createAsyncThunk('notification/fetchListNot
 
 export const fetchNotifyMention = createAsyncThunk('notification/notifyMention', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listMessageMentions(mezon.session,50,true);
-	if (!response.mentions) {
+	const response = await mezon.client.listMessageMentions(mezon.session, 50, true);
+	if (!response.messages) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	return response.mentions
+	return response.messages
 
 });
 
