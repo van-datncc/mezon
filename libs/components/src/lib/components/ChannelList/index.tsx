@@ -2,6 +2,7 @@ import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/cor
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
@@ -34,14 +35,14 @@ export const handleCopyToClipboard = (content: string) => {
 
 function ChannelList() {
 	const { categorizedChannels } = useCategory();
-	const [hasManageChannelPermission, {isClanCreator}] = useClanRestriction([EPermission.manageChannel]);
+	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
 		categorizedChannels.reduce((acc, category) => {
 			acc[category.id] = false;
 			return acc;
 		}, {} as CategoriesState),
 	);
-	
+
 	const handleToggleCategory = (category: ICategoryChannel, setToTrue?: boolean) => {
 		if (setToTrue) {
 			setCategoriesState((prevState) => ({
@@ -88,10 +89,7 @@ function ChannelList() {
 									)}
 									{category.category_name}
 								</button>
-								<UserRestrictionZone
-
-									policy={isClanCreator || hasManageChannelPermission}
-								>
+								<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
 									<button
 										onClick={() => {
 											handleToggleCategory(category, true);
@@ -110,9 +108,10 @@ function ChannelList() {
 										const categoryIsOpen = !categoriesState[category.id];
 										return categoryIsOpen || channel?.unread;
 									})
-									.map((channel: IChannel) => (
-										<ChannelListItem channel={channel} />
-									))}
+									.map((channel: IChannel) => {
+										const uniqueKey = uuidv4();
+										return <ChannelListItem key={uniqueKey} channel={channel} />;
+									})}
 							</div>
 						)}
 					</div>
@@ -123,4 +122,3 @@ function ChannelList() {
 }
 
 export default ChannelList;
-
