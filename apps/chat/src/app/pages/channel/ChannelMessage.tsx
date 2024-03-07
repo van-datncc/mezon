@@ -52,7 +52,16 @@ export function ChannelMessage(props: MessageProps) {
 			setReactionOutside({ emoji: emoji.native, messageId: mess.id });
 			setIsOpenReactEmoji(false);
 		};
-		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
+		return (
+			<Picker
+				data={data}
+				onEmojiSelect={handleEmojiSelect}
+				theme="dark"
+				onClickOutside={() => {
+					setIsOpenReactEmoji(false);
+				}}
+			/>
+		);
 	}
 	const { isOpenReply, setMessageRef, setIsOpenReply } = useContext(ChatContext);
 
@@ -62,7 +71,7 @@ export function ChannelMessage(props: MessageProps) {
 	};
 
 	return (
-		<div className="relative group ">
+		<div className="relative group hover:bg-gray-950/[.07]">
 			<MessageWithUser
 				reactionOutsideProps={reactionOutside}
 				message={mess as IMessageWithUser}
@@ -70,10 +79,11 @@ export function ChannelMessage(props: MessageProps) {
 				user={user}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			<div className="z-20 top-[-15px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 gap-1 group-hover:bg-slate-800">
+			<div className="hidden z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary group-hover:block">
 				<button
 					className="h-full p-1 group"
-					onClick={() => {
+					onClick={(event) => {
+						event.stopPropagation();
 						setIsOpenReactEmoji(!isOpenReactEmoji);
 					}}
 				>

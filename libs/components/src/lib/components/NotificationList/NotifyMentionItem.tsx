@@ -10,7 +10,8 @@ export type NotifyMentionProps = {
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
     const user = useSelector(selectMemberClanByUserId(notify.sender_id));
     const channelInfo = notify.channel_id ? useSelector(selectChannelById(notify.channel_id)) : null;
-    const clanInfo = notify?.clan_id ? useSelector(selectClanById(notify.clan_id)) : null;
+    const clanInfo = channelInfo?.clan_id ? useSelector(selectClanById(channelInfo.clan_id)) : null;
+
     return (
         <div className='flex flex-col gap-2 py-3 px-3 w-full'>
             <div className='flex justify-between'>
