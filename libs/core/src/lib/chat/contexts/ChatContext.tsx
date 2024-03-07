@@ -1,5 +1,6 @@
 import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { IMessageWithUser } from '@mezon/utils';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -19,11 +20,28 @@ type ChatContextProviderProps = {
 
 export type ChatContextValue = {
 	// TODO: add your context value here
+	messageRef: IMessageWithUser | undefined;
+	setMessageRef: React.Dispatch<React.SetStateAction<IMessageWithUser | undefined>>;
+	isOpenReply: boolean;
+	setIsOpenReply: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
+	const [messageRef, setMessageRef] = React.useState<IMessageWithUser>();
+	const [isOpenReply, setIsOpenReply] = React.useState<boolean>(false);
+
+	const value = React.useMemo<ChatContextValue>(
+		() => ({
+			messageRef,
+			setMessageRef,
+			isOpenReply,
+			setIsOpenReply,
+		}),
+		[messageRef, setMessageRef, isOpenReply, setIsOpenReply],
+	);
+
 	const { socketRef } = useMezon();
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
@@ -99,8 +117,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-
-	const value = React.useMemo<ChatContextValue>(() => ({}), []);
 
 	useEffect(() => {
 		const socket = socketRef.current;

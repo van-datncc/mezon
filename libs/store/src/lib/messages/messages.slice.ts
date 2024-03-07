@@ -108,12 +108,12 @@ export const fetchMessages = createAsyncThunk(
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
 
 		const nextCursor = response.cacheable_cursor || '';
-		let hasMore = currentHasMore
+		let hasMore = currentHasMore;
 
-		if(currentCursor === cursor) {
-			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE ) ;
+		if (currentCursor === cursor) {
+			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
 		}
-		
+
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { cursor: nextCursor, hasMore } }));
 
 		if (response.last_seen_message_id) {
@@ -465,5 +465,7 @@ export const selectCursorMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param && param[channelId] && param[channelId].cursor;
 	});
-
 export const selectMessageReacted = createSelector(getMessagesState, (state) => state.reactionMessageData);
+
+export const selectMessageByMessageId = (messageId: string) =>
+	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
