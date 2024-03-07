@@ -1,10 +1,10 @@
 import MessageWithUser from '../MessageWithUser';
 import { IMessageWithUser } from '@mezon/utils';
-import { ChannelMessageTS } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { useSelector } from 'react-redux';
 import { selectChannelById, selectClanById, selectMemberClanByUserId } from '@mezon/store';
 export type NotifyMentionProps = {
-    notify: ChannelMessageTS;
+    notify: ChannelMessage;
 };
 
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
