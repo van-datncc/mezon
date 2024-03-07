@@ -1,6 +1,6 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import {  ChannelMessageTS, Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
+import {  ChannelMessage, Notification } from 'vendors/mezon-js/packages/mezon-js/dist';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 
@@ -20,7 +20,7 @@ export const mapNotificationToEntity = (notifyRes: Notification): INotification 
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	notificationMentions: ChannelMessageTS[]
+	notificationMentions: ChannelMessage[]
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -41,7 +41,7 @@ export const fetchNotifyMention = createAsyncThunk('notification/notifyMention',
 	if (!response.messages) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	// console.log('HHHHHHHHHHHH: ', response)
+	
 	return response.messages
 });
 
@@ -88,7 +88,7 @@ export const notificationSlice = createSlice({
 			.addCase(fetchNotifyMention.pending, (state: NotificationState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchNotifyMention.fulfilled, (state: NotificationState, action: PayloadAction<ChannelMessageTS[]>) => {
+			.addCase(fetchNotifyMention.fulfilled, (state: NotificationState, action: PayloadAction<ChannelMessage[]>) => {
 				state.notificationMentions = action.payload;
 			})
 			.addCase(fetchNotifyMention.rejected, (state: NotificationState, action) => {

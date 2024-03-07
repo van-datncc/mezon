@@ -91,7 +91,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					],
 
 					channelId: message.channel_id,
-					messageId: message.message_id,
+					messageId: message.id,
 				});
 			}
 		});
@@ -228,7 +228,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 							{emojiDataIncSocket &&
 								emojiDataIncSocket.map((emoji: EmojiDataOptionals) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
-									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.message_id;
+									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
 									const uniqueKey = uuidv4();
 
 									return (
