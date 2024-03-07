@@ -89,7 +89,7 @@ export function ChannelMessage(props: MessageProps) {
 				>
 					<Icons.Smile />
 				</button>
-				<button onClick={handleClickReply} className=" flex flex-row justify-center items-center rotate-180">
+				<button onClick={handleClickReply} className="rotate-180">
 					<Icons.Reply />
 				</button>
 			</div>
