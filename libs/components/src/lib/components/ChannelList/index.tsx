@@ -1,13 +1,11 @@
-import { UserRestrictionZone, useCategory, useClanRestriction, useInvite } from '@mezon/core';
-import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
-import { ListMemberInvite, Modal } from '@mezon/ui';
+import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
+import { channelsActions, useAppDispatch } from '@mezon/store';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import ChannelLink from '../ChannelLink';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
+import ChannelListItem from './ChannelListItem';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -36,9 +34,7 @@ export const handleCopyToClipboard = (content: string) => {
 
 function ChannelList() {
 	const { categorizedChannels } = useCategory();
-	const [selecteChannelID, setSelecteChannelID] = useState('');
 	const [hasManageChannelPermission, {isClanCreator}] = useClanRestriction([EPermission.manageChannel]);
-	const currentChanel = useSelector(selectCurrentChannel);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
 		categorizedChannels.reduce((acc, category) => {
 			acc[category.id] = false;
@@ -59,30 +55,12 @@ function ChannelList() {
 			}));
 		}
 	};
-	
-	const { createLinkInviteUser } = useInvite();
 
 	const dispatch = useAppDispatch();
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
-	
-
-	const [openInvite, setOpenInvite] = useState(false);
-
-	const [urlInvite, setUrlInvite] = useState('');
-
-	const handleOpenInvite = (currentServerId: string, currentChannelId: string) => {
-		setOpenInvite(true);
-		setSelecteChannelID(currentChannelId);
-		createLinkInviteUser(currentServerId ?? '', currentChannelId ?? '', 10).then((res) => {
-			if (res && res.invite_link) {
-				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
-			}
-		});
-	};
-
 
 	return (
 		<>
@@ -133,40 +111,16 @@ function ChannelList() {
 										return categoryIsOpen || channel?.unread;
 									})
 									.map((channel: IChannel) => (
-										<ChannelLink
-											clanId={channel?.clan_id}
-											channel={channel}
-											active={currentChanel?.id === channel.id}
-											key={channel.id}
-											createInviteLink={handleOpenInvite}
-											isPrivate={channel.channel_private}
-										/>
+										<ChannelListItem channel={channel} />
 									))}
 							</div>
 						)}
 					</div>
 				))}
 			</div>
-			<Modal
-				title="Invite friend"
-				onClose={() => {
-					setOpenInvite(false);
-				}}
-				showModal={openInvite}
-				confirmButton={() => handleCopyToClipboard(urlInvite)}
-				titleConfirm="Copy"
-				subTitleBox="Send invite link to a friend"
-				borderBottomTitle="border-b "
-			>
-				<div>
-					<ListMemberInvite url={urlInvite} channelID={selecteChannelID} />
-					<p className='pt-[10px]'>
-						<span>{urlInvite}</span>
-					</p>
-				</div>
-			</Modal>
 		</>
 	);
 }
 
 export default ChannelList;
+
