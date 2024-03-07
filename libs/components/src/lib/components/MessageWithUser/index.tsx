@@ -98,7 +98,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	};
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
-	const handleReactMessage = async (channelId: string, messageId: string, emoji: string, userId: string) => {
+	const handleReactMessage = async (channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
 			const userIndex = (emojiDataIncSocket &&
@@ -107,7 +107,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 0;
 				setEmojiData(updatedEmojiData);
-				await reactionMessageAction(channelId, messageId, emoji, false);
+				await reactionMessageAction(channelId, messageId, emoji, message_sender_id, false);
 			} else {
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders.push({
@@ -116,7 +116,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					emojiIdList: [],
 				});
 				setEmojiData(updatedEmojiData);
-				await reactionMessageAction(channelId, messageId, emoji, false);
+				await reactionMessageAction(channelId, messageId, emoji, message_sender_id, false);
 			}
 		} else {
 			setEmojiData((prevEmojiDataOptionals: EmojiDataOptionals[]) => [
@@ -135,7 +135,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					messageId: messageId,
 				},
 			]);
-			await reactionMessageAction(channelId, messageId, emoji, false);
+			await reactionMessageAction(channelId, messageId, emoji, message_sender_id, false);
 		}
 	};
 
@@ -195,7 +195,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 
 	useEffect(() => {
 		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-			handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId);
+			handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId, message.sender_id);
 			return;
 		}
 	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
@@ -267,7 +267,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 											{checkID && (
 												<div
 													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
-													onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji, userId ?? '')}
+													onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji, userId ?? '', message.sender_id)}
 												>
 													<span>{emoji.emoji}</span>
 													<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
