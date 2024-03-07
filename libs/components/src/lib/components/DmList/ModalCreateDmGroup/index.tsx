@@ -87,7 +87,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 							aria-labelledby="dropdownSearchButton"
 						>
 							{filteredFriends.map((friend, index) => (
-								<li key={index}>
+								<li key={friend.id}>
 									<div className="flex items-center py-2 my-2 rounded w-full">
 										<input
 											id={`checkbox-item-${index}`}

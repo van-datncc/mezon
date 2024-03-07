@@ -44,7 +44,7 @@ return(
         />	
         <div className='py-[10px]'>
             {filteredListBySearch.map((dmGroup) => (
-                <ListMemberInviteItem dmGroup = {dmGroup} url = {props.url} onSend={handleSend} isSent={!!(sendIds[dmGroup.id])}/>
+                <ListMemberInviteItem dmGroup = {dmGroup} key={dmGroup.id} url = {props.url} onSend={handleSend} isSent={!!(sendIds[dmGroup.id])}/>
             ))}
         </div>
         <hr className='border-solid border-borderDefault rounded-t '/>
