@@ -941,7 +941,7 @@ export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" stroke-linecap="round" />
+				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
 			</g>
 		</svg>
 	);
@@ -951,7 +951,7 @@ export const ShortCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) =>
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" stroke-linecap="round" />
+				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
 			</g>
 		</svg>
 	);
@@ -1199,6 +1199,14 @@ export const CircleClose: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defa
 					<rect width="20" height="20" fill="white" transform="translate(2 2)" />
 				</clipPath>
 			</defs>
+		</svg>
+	);
+};
+
+export const ReplyCorner: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg width="32" height="20" viewBox="0 0 32 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 9V6C1 3.23858 3.23858 1 6 1H31" stroke="#535353" strokeLinecap="round" />
 		</svg>
 	);
 };

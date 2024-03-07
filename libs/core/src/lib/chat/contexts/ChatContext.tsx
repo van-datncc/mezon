@@ -19,8 +19,8 @@ type ChatContextProviderProps = {
 
 export type ChatContextValue = {
 	// TODO: add your context value here
-	messageRep: any;
-	setMessageRep: React.Dispatch<React.SetStateAction<any>>;
+	messageRef: any;
+	setMessageRef: React.Dispatch<React.SetStateAction<any>>;
 	isOpenReply: boolean;
 	setIsOpenReply: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -28,17 +28,17 @@ export type ChatContextValue = {
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const [messageRep, setMessageRep] = React.useState<string>('');
+	const [messageRef, setMessageRef] = React.useState<string>('');
 	const [isOpenReply, setIsOpenReply] = React.useState<boolean>(false);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
-			messageRep,
-			setMessageRep,
+			messageRef,
+			setMessageRef,
 			isOpenReply,
 			setIsOpenReply,
 		}),
-		[messageRep, setMessageRep, isOpenReply, setIsOpenReply],
+		[messageRef, setMessageRef, isOpenReply, setIsOpenReply],
 	);
 
 	const { socketRef } = useMezon();

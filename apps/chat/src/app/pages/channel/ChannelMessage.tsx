@@ -54,11 +54,11 @@ export function ChannelMessage(props: MessageProps) {
 		};
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
 	}
-	const { setMessageRep, setIsOpenReply } = useContext(ChatContext);
+	const { isOpenReply, setMessageRef, setIsOpenReply } = useContext(ChatContext);
 
 	const handleClickReply = () => {
 		setIsOpenReply(true);
-		setMessageRep(mess);
+		setMessageRef(mess);
 	};
 
 	return (

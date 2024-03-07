@@ -9,7 +9,6 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
@@ -168,20 +167,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
-	const { messageRep, isOpenReply, setIsOpenReply } = useContext(ChatContext);
+	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
+
 	useEffect(() => {
-		if (messageRep) {
-			const messageRefId = uuidv4();
-			setReferencesData([{ message_id: messageRep.id, message_ref_id: messageRefId, ref_type: 1 }]);
+		if (messageRef) {
+			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0 }]);
 		}
-	}, [messageRep]);
+	}, [messageRef]);
+
 	const handleSend = useCallback(() => {
 		setShowEmojiSuggestion(false);
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
 		if (isOpenReply) {
-			console.log('referenceData', referenceData);
 			onSend({ t: content }, mentionData, attachmentData, referenceData);
 			setContent('');
 			setAttachmentData([]);
@@ -443,6 +442,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			handleFinishUpload(attachment);
 		});
 	};
+
+
+	useEffect(() => {
+		if (isOpenReply) {
+			editorRef.current!.focus();
+		}
+	}, [isOpenReply]);
 
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">

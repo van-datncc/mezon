@@ -1,8 +1,8 @@
-import { useAuth, useChatReactionMessage } from '@mezon/core';
-import { selectCurrentChannelId } from '@mezon/store';
+import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
+import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { ReactedOutsideOptional } from 'apps/chat/src/app/pages/channel/ChannelMessage';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,8 +12,6 @@ import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
-
-// D:\MEZON\mezon-fe\apps\chat\src\app\pages\channel\ChannelMessage.tsx
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -49,6 +47,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	const { messageTime } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
+
 	const { messageDataReactedFromSocket } = useChatReactionMessage({ currentChannelId });
 	const { reactionMessageAction } = useChatReactionMessage({ currentChannelId });
 	const isCombine = useMemo(() => {
@@ -98,7 +97,6 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	};
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
-
 	const handleReactMessage = async (channelId: string, messageId: string, emoji: string, userId: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
@@ -201,7 +199,27 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		}
 	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
 
-	console.log('messsage', message);
+	const [isReply, setIsReply] = useState<boolean>(true);
+	const [messageIdRef] = useState<string>((message.references && message?.references[0]?.message_ref_id) ?? '');
+	const getMessageRef = useSelector(selectMessageByMessageId(messageIdRef));
+	const getSenderMessage = useSelector(selectMemberByUserId(getMessageRef?.sender_id));
+	const [isMessRef, setIsMessRef] = useState<boolean>(false);
+	const { messageRef, isOpenReply } = useContext(ChatContext);
+
+	useEffect(() => {
+		if (messageIdRef && getMessageRef && getSenderMessage) {
+			setIsReply(true);
+		} else {
+			setIsReply(false);
+		}
+
+		if (message.message_id === messageRef.message_id && isOpenReply) {
+			setIsMessRef(true);
+		} else if (message.message_id !== messageRef.message_id || !isOpenReply) {
+			setIsMessRef(false);
+		}
+	}, [messageIdRef, getMessageRef, getSenderMessage, messageRef, isOpenReply, message.message_id]);
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && (
@@ -213,14 +231,28 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			)}
 
 			<div
-				className={`flex py-0.5 h-15 group hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer ml-4 relative w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+				className={`flex py-0.5 h-15 flex-col group hover:bg-gray-950/[.07] ${isMessRef ? 'bg-[#393B47] rounded-sm' : ''} overflow-x-hidden cursor-pointer ml-4 relative w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
 			>
+				{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
+					<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
+						<Icons.ReplyCorner />
+						<div className="flex flex-row gap-1 mb-2">
+							<div className="w-5 h-5">
+								<img className="rounded-full" src={getSenderMessage.user?.avatar_url} alt={getSenderMessage.user?.avatar_url}></img>
+							</div>
+							<p className="gap-1">
+								<span className=" text-[#84ADFF] font-bold">@{getSenderMessage.user?.username} </span>
+								<span className="text-[13px] font-manrope"> {getMessageRef?.content.t}</span>
+							</p>
+						</div>
+					</div>
+				)}
 				<div className="justify-start gap-4 inline-flex w-full relative">
-					<MessageAvatar user={user} message={message} isCombine={isCombine} />
+					<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 					<div className="flex-col w-full flex justify-center items-start relative gap-1">
-						<MessageHead message={message} user={user} isCombine={isCombine} />
+						<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
 						<div className="justify-start items-center inline-flex w-full">
-							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat">
+							<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap w-widthMessageTextChat">
 								<MessageContent message={message} user={user} isCombine={isCombine} />
 							</div>
 						</div>
@@ -230,7 +262,6 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
 									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.message_id;
 									const uniqueKey = uuidv4();
-
 									return (
 										<div key={uniqueKey}>
 											{checkID && (
