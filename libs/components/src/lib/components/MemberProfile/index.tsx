@@ -25,19 +25,13 @@ function MemberProfile({
 		<div className="relative gap-[5px] flex items-center cursor-pointer">
 			<a className="mr-[2px] relative inline-flex items-center justify-start w-10 h-10 text-lg text-white rounded-full">
 				{avatar ? (
-					<div>
-						{!avatar.includes(',') ? (
-							<img src={avatar} className="w-[38px] h-[38px] rounded-full object-cover" />
-						) : (
-							<img src={`/assets/images/avatar-group.png`} className="w-[38px] h-[38px] rounded-full object-cover" />
-						)}
-					</div>
+					<img src={avatar} className="w-[38px] h-[38px] rounded-full object-cover" />		
 				) : (
 					<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
 						{name.charAt(0).toUpperCase()}
 					</div>
 				)}
-				{!isHideIconStatus && !avatar.includes(',') ? (
+				{!isHideIconStatus && avatar !== "/assets/images/avatar-group.png" ? (
 					<span
 						className={`absolute bottom-[-1px] right-[-1px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white bg-[#111] rounded-full`}
 					>

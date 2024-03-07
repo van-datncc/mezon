@@ -19,6 +19,8 @@ export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessage } from './components/ReplyMessage';
 export { default as SettingAccount } from './components/SettingAccount';
+export { default as ListMemberInvite } from './components/ListMemberInvite';
+export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
 
 export * from './components/Icons';
 export * from './components/LoginForm';

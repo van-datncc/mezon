@@ -38,7 +38,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
         >
             <MemberProfile
                 numberCharacterCollapse={22}
-                avatar={directMessage?.channel_avatar ?? ''}
+                avatar={Array.isArray(directMessage?.channel_avatar) && directMessage?.channel_avatar?.length !== 1 ? '/assets/images/avatar-group.png' : (directMessage?.channel_avatar ?? '')}
                 name={directMessage?.channel_lable ?? ''}
                 status={userStatus}
                 isHideStatus={true}

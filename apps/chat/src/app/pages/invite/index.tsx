@@ -38,7 +38,7 @@ export default function InvitePage() {
 		if (inviteIdParam) {
 			getLinkInvite(inviteIdParam).then((res) => {
 				setClanName(res.clan_name ?? 'Mezon');
-				setChannelName(res.channel_name ?? (res as string));
+				setChannelName(res.channel_name || '');
 				setOpenModal(true);
 			});
 		}
@@ -55,7 +55,9 @@ export default function InvitePage() {
 						</div>
 						<p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">You've been invite to join</p>
 						<p className="text-4xl text-white font-semibold mt-4">{clanName}</p>
-						<p className="text-4xl text-white text-[18px]">#{channelName}</p>
+						{channelName && (
+							<p className="text-4xl text-white text-[18px]">#{channelName}</p>
+						)}
 					</div>
 				</Modal.Body>
 				{/* <Modal.Footer> */}

@@ -1,6 +1,6 @@
-import { useAuth, useClans, useInvite } from '@mezon/core';
+import { useAuth, useClans } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { InputField, ListMemberInvite, Modal as ModalInvite } from '@mezon/ui';
+import { InputField} from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
 import { useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
@@ -8,7 +8,8 @@ import { useSelector } from 'react-redux';
 import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ClanSetting from '../ClanSettings/clanSettings';
-import { handleCopyToClipboard } from '../ChannelList';
+import { useModal } from 'react-modal-hook';
+import ModalInvite from '../ListMemberInvite/modalInvite';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -21,23 +22,14 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateCate, setOpenCreateCate] = useState(false);
-	const [openInvite, setOpenInvite] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const { currentClan } = useClans();
-	const { createLinkInviteUser } = useInvite();
-	const [urlInvite, setUrlInvite] = useState('');
 
-	const handleOpenInvite = () => {
-		setOpenInvite(true);
-		createLinkInviteUser(currentClan?.clan_id ?? '', '', 10).then((res) => {
-			if (res && res.invite_link) {
-				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
-			}
-		});
-	};
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteClanModal} open={true} channelID=''/>
+	));
 	const onClose = () => {
 		setOpenCreateCate(false);
-		setOpenInvite(false);
 	};
 	const [nameCate, setNameCate] = useState('');
 
@@ -91,8 +83,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
 								}}
 								onClick={() => {
-									setOpenInvite(true);
-									handleOpenInvite();
+									openInviteClanModal()
+									// handleOpenInvite()
 								}}
 							>
 								Invite People
@@ -121,25 +113,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					setOpenServerSettings(false);
 				}}
 			/>
-			<ModalInvite
-				title="Invite friend"
-				onClose={() => {
-					setOpenInvite(false);
-				}}
-				showModal={openInvite}
-				confirmButton={() => handleCopyToClipboard(urlInvite)}
-				titleConfirm="Copy"
-				subTitleBox="Send invite link to a friend"
-				classSubTitleBox="ml-[-5px]"
-				borderBottomTitle="border-b "
-			>
-				<div>
-					<ListMemberInvite url={urlInvite} />
-					<p className='pt-[10px]'>
-						<span>{urlInvite}</span>
-					</p>
-				</div>
-			</ModalInvite>
 			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary" size="lg">
 				<div className="bg-[#313338] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-[500]">Create Category</div>
