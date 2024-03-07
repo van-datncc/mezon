@@ -1,11 +1,11 @@
 import { useNotification } from '@mezon/core';
 import NotificationItem from './NotificationItem';
-import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import * as Icons from '../Icons';
 import { Dropdown } from 'flowbite-react';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useState } from 'react';
-
+import NotifyMentionItem from './NotifyMentionItem';
+import { ChannelMessageTS } from 'vendors/mezon-js/packages/mezon-js/dist';
 export type MemberListProps = { className?: string };
 
 const tabDataNotify = [
@@ -58,8 +58,8 @@ function NotificationList() {
             </div>
             )}
             {currentTabNotify === 'mention' && (<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
-                {notifyMention.map((notify: ChannelMessage) => (
-                    <NotificationItem notify={notify} key={notify.id} />
+                {notifyMention.map((notify: ChannelMessageTS) => (
+                    <NotifyMentionItem notify={notify} key={notify.message_id} />
                 ))}
             </div>
             )}
