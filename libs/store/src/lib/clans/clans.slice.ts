@@ -215,7 +215,6 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(createClan.fulfilled, (state: ClansState, action: PayloadAction<IClan>) => {
-				console.log('Response: ', action.payload);
 				clansAdapter.addOne(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
