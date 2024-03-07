@@ -3,11 +3,12 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import { ChatContext } from '@mezon/core';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
@@ -37,6 +38,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const [referenceData, setReferencesData] = useState<ApiMessageRef[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
@@ -165,19 +167,35 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
+	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
+
+	useEffect(() => {
+		if (messageRef) {
+			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0 }]);
+		}
+	}, [messageRef]);
+
 	const handleSend = useCallback(() => {
 		setShowEmojiSuggestion(false);
-		if (!content.trim() && !attachmentData && !mentionData) {
+		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
-
-		onSend({ t: content }, mentionData, attachmentData);
-		setContent('');
-		setAttachmentData([]);
-		setClearEditor(true);
-		setSelectedItemIndex(0);
-		liRefs?.current[selectedItemIndex]?.focus();
-		setEditorState(() => EditorState.createEmpty());
+		if (isOpenReply) {
+			onSend({ t: content }, mentionData, attachmentData, referenceData);
+			setContent('');
+			setAttachmentData([]);
+			setMentionData([]);
+			setEditorState(() => EditorState.createEmpty());
+			setIsOpenReply(false);
+		} else {
+			onSend({ t: content }, mentionData, attachmentData);
+			setContent('');
+			setAttachmentData([]);
+			setClearEditor(true);
+			setSelectedItemIndex(0);
+			liRefs?.current[selectedItemIndex]?.focus();
+			setEditorState(() => EditorState.createEmpty());
+		}
 	}, [content, onSend, mentionData, attachmentData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
@@ -424,6 +442,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			handleFinishUpload(attachment);
 		});
 	};
+
+
+	useEffect(() => {
+		if (isOpenReply) {
+			editorRef.current!.focus();
+		}
+	}, [isOpenReply]);
 
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">

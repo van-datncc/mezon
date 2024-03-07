@@ -1,9 +1,9 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { MessageBox } from '@mezon/components';
-import { useChannelMembers, useChatSending } from '@mezon/core';
+import { MessageBox, ReplyMessage } from '@mezon/components';
+import { ChatContext, useChannelMembers, useChatSending } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
-import { useCallback } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
@@ -41,8 +41,15 @@ export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMe
 		id: item?.user?.id ?? '',
 	}));
 
+	const { setIsOpenReply } = useContext(ChatContext);
+
+	useEffect(() => {
+		setIsOpenReply(false);
+	}, [channelId, clanId]);
+
 	return (
 		<div>
+			<ReplyMessage />
 			<MessageBox
 				isOpenEmojiPropOutside={controlEmoji}
 				listMentions={newUserMentionList}

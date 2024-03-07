@@ -1,11 +1,11 @@
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage } from '@mezon/core';
+import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import * as Icons from 'libs/components/src/lib/components/Icons/index';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
@@ -54,9 +54,15 @@ export function ChannelMessage(props: MessageProps) {
 		};
 		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
 	}
+	const { isOpenReply, setMessageRef, setIsOpenReply } = useContext(ChatContext);
+
+	const handleClickReply = () => {
+		setIsOpenReply(true);
+		setMessageRef(mess);
+	};
 
 	return (
-		<div className="relative group">
+		<div className="relative group ">
 			<MessageWithUser
 				reactionOutsideProps={reactionOutside}
 				message={mess as IMessageWithUser}
@@ -64,7 +70,7 @@ export function ChannelMessage(props: MessageProps) {
 				user={user}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			<div className="z-20 top-[-15px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:bg-slate-800">
+			<div className="z-20 top-[-15px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 gap-1 group-hover:bg-slate-800">
 				<button
 					className="h-full p-1 group"
 					onClick={() => {
@@ -72,6 +78,9 @@ export function ChannelMessage(props: MessageProps) {
 					}}
 				>
 					<Icons.Smile />
+				</button>
+				<button onClick={handleClickReply} className=" flex flex-row justify-center items-center rotate-180">
+					<Icons.Reply />
 				</button>
 			</div>
 			{isOpenReactEmoji && (

@@ -941,7 +941,7 @@ export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" stroke-linecap="round" />
+				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
 			</g>
 		</svg>
 	);
@@ -951,7 +951,7 @@ export const ShortCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) =>
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" stroke-linecap="round" />
+				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
 			</g>
 		</svg>
 	);
@@ -1166,6 +1166,47 @@ export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 					fill={defaultFill}
 				/>
 			</g>
+		</svg>
+	);
+};
+
+export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M5 4C5.55228 4 6 4.44772 6 5V12C6 13.1046 6.89543 14 8 14H17.5858L15.2929 11.7071C14.9024 11.3166 14.9024 10.6834 15.2929 10.2929C15.6834 9.90237 16.3166 9.90237 16.7071 10.2929L20.7071 14.2929C20.8946 14.4804 21 14.7348 21 15C21 15.2652 20.8946 15.5196 20.7071 15.7071L16.7071 19.7071C16.3166 20.0976 15.6834 20.0976 15.2929 19.7071C14.9024 19.3166 14.9024 18.6834 15.2929 18.2929L17.5858 16H8C5.79086 16 4 14.2091 4 12V5C4 4.44772 4.44772 4 5 4Z"
+				fill={defaultFill}
+			/>
+		</svg>
+	);
+};
+
+export const CircleClose: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<g clipPath="url(#clip0_403_4302)">
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM7.61612 7.61612C8.10427 7.12796 8.89573 7.12796 9.38388 7.61612L12 10.2322L14.6161 7.61612C15.1043 7.12796 15.8957 7.12796 16.3839 7.61612C16.872 8.10427 16.872 8.89573 16.3839 9.38388L13.7678 12L16.3839 14.6161C16.872 15.1043 16.872 15.8957 16.3839 16.3839C15.8957 16.872 15.1043 16.872 14.6161 16.3839L12 13.7678L9.38388 16.3839C8.89573 16.872 8.10427 16.872 7.61612 16.3839C7.12796 15.8957 7.12796 15.1043 7.61612 14.6161L10.2322 12L7.61612 9.38388C7.12796 8.89573 7.12796 8.10427 7.61612 7.61612Z"
+					fill={defaultFill}
+				/>
+			</g>
+			<defs>
+				<clipPath id="clip0_403_4302">
+					<rect width="20" height="20" fill="white" transform="translate(2 2)" />
+				</clipPath>
+			</defs>
+		</svg>
+	);
+};
+
+export const ReplyCorner: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg width="32" height="20" viewBox="0 0 32 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 9V6C1 3.23858 3.23858 1 6 1H31" stroke="#535353" strokeLinecap="round" />
 		</svg>
 	);
 };
