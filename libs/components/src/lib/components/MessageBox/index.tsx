@@ -171,7 +171,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		if (messageRef) {
-			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0 }]);
+			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0, message_sender_id: messageRef.sender_id }]);
 		}
 	}, [messageRef]);
 
