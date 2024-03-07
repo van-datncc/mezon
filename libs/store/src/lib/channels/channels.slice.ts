@@ -32,7 +32,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
-function waitUntil<T>(condition: () => T | undefined, ms: number = 100): Promise<T> {
+function waitUntil<T>(condition: () => T | undefined, ms: number = 1000): Promise<T> {
 	return new Promise((resolve) => {
 		const interval = setInterval(() => {
 			const result = condition();
@@ -64,13 +64,13 @@ export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ chann
 		if (!noFetchMembers) {
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
 		}
-		const chanel = await waitUntil(() => selectChannelById(channelId)(getChannelsRootState(thunkAPI)));
-		if (!chanel || !chanel.channel_lable) {
+		const channel = await waitUntil(() => selectChannelById(channelId)(getChannelsRootState(thunkAPI)));
+		if (!channel || !channel.channel_lable) {
 			return thunkAPI.rejectWithValue([]);
 		}
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
-		return chanel;
+		await mezon.joinChatChannel(channelId, channel?.channel_lable || '');
+		return channel;
 	} catch (error) {
 		console.log(error);
 		return thunkAPI.rejectWithValue([]);
