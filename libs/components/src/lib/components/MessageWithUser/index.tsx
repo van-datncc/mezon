@@ -258,7 +258,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						<div className="flex-col w-full flex justify-center items-start relative gap-1">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
 							<div className="justify-start items-center inline-flex w-full">
-								<div className="flex flex-col gap-1 cursor-text text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat break-all">
+								<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text break-all">
 									<MessageContent message={message} user={user} isCombine={isCombine} />
 								</div>
 							</div>
