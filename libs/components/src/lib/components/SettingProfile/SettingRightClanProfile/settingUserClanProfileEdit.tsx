@@ -128,7 +128,6 @@ const SettingRightClanEdit = ({
 							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
-							defaultValue={displayName}
 						/>
 					</div>
 					<div className="mt-[20px]">

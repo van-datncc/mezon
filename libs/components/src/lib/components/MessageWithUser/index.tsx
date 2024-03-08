@@ -230,7 +230,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				</div>
 			)}
 			<div
-				className={`flex py-0.5 h-15 flex-col ${isMessRef ? 'bg-[#393B47] rounded-sm' : ''} overflow-x-hidden cursor-pointer ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+				className={`flex py-0.5 h-15 flex-col ${isMessRef ? 'bg-[#393B47] rounded-sm' : ''} overflow-x-hidden ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
 			>
 				{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 					<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">

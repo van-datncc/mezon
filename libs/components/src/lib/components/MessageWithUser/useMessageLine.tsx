@@ -22,7 +22,7 @@ export function useMessageLine(line: string): IMessageLine {
         let lastIndex = 0;
         let nonMatchText = line;
         
-        let mentions = matches.map((match, i) => {
+        const mentions = matches.map((match, i) => {
           const startIndex = line.indexOf(match, lastIndex);
           const endIndex = startIndex + match.length;          
           const matchedText = line.substring(startIndex, endIndex);
@@ -44,7 +44,14 @@ export function useMessageLine(line: string): IMessageLine {
             endIndex:0
           }];
         }
-
+        if (lastIndex < line.length) {
+          mentions.push({
+              nonMatchText: line.substring(lastIndex),
+              matchedText: '',
+              startIndex: lastIndex,
+              endIndex: line.length
+          });
+        }
         return mentions;
 
       }, [line, matches]);
