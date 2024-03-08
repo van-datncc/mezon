@@ -2,7 +2,6 @@ import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/cor
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
@@ -108,9 +107,8 @@ function ChannelList() {
 										const categoryIsOpen = !categoriesState[category.id];
 										return categoryIsOpen || channel?.unread;
 									})
-									.map((channel: IChannel) => {
-										const uniqueKey = uuidv4();
-										return <ChannelListItem key={uniqueKey} channel={channel} />;
+									.map((channel: IChannel, index: number) => {
+										return <ChannelListItem key={index} channel={channel} />;
 									})}
 							</div>
 						)}
