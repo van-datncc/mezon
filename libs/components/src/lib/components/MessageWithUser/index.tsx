@@ -255,7 +255,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 								<MessageContent message={message} user={user} isCombine={isCombine} />
 							</div>
 						</div>
-						<div className="flex justify-start flex-row w-full gap-2 flex-wrap">
+						<div onMouseDown={(e) => e.preventDefault()} className="flex justify-start flex-row w-full gap-2 flex-wrap">
 							{emojiDataIncSocket &&
 								emojiDataIncSocket.map((emoji: EmojiDataOptionals, index) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
@@ -264,7 +264,9 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 										<Fragment key={index}>
 											{checkID && (
 												<div
-													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
+													className={` justify-center items-center relative
+													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] border'}
+													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center`}
 													onClick={() =>
 														handleReactMessage(
 															currentChannelId ?? '',
@@ -274,13 +276,12 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 															message.sender_id,
 														)
 													}
+													onMouseDown={(e) => e.preventDefault()}
 												>
-													<span>{emoji.emoji}</span>
-													<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
-														<p className="text-[13px]">
-															{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}
-														</p>
-													</span>
+													<span className=" relative left-[-10px]">{emoji.emoji}</span>
+													<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
+														<p>{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}</p>
+													</div>
 												</div>
 											)}
 										</Fragment>
