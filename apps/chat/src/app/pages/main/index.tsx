@@ -53,7 +53,6 @@ function MyApp() {
 									alt={currentClan?.clan_name || ''}
 									placeholder="blur"
 									width={48}
-									style={{ borderRadius: '50%' }}
 									blurDataURL={currentClan?.logo}
 								/>
 							) : (
