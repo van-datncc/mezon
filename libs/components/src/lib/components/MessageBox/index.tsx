@@ -449,6 +449,17 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [isOpenReply]);
 
+	const editorElement = document.getElementById('editor');
+	useEffect(() => {
+		const hasFigure = editorElement?.querySelector('figure');
+		const firstChildHasBr = editorElement?.querySelector('br');
+		if (hasFigure) {
+			if (firstChildHasBr) {
+				firstChildHasBr.style.display = 'none';
+			}
+		}
+	}, [editorState]);
+
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
