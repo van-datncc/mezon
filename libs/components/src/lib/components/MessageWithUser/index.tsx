@@ -2,10 +2,9 @@ import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { ReactedOutsideOptional } from 'apps/chat/src/app/pages/channel/ChannelMessage';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import { v4 as uuidv4 } from 'uuid';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons/index';
 import MessageAvatar from './MessageAvatar';
@@ -22,7 +21,7 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	reactions?: Array<ApiMessageReaction>;
 	reactionOutsideProps?: ReactedOutsideOptional;
-	isMessNotifyMention?: boolean
+	isMessNotifyMention?: boolean;
 };
 
 type SenderInfoOptionals = {
@@ -231,7 +230,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				</div>
 			)}
 			<div
-				className={`flex py-0.5 h-15 flex-col ${isMessRef ? 'bg-[#393B47] rounded-sm' : ''} overflow-x-hidden cursor-pointer ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
+				className={`flex py-0.5 h-15 flex-col ${isMessRef ? 'bg-[#393B47] rounded-sm' : ''} overflow-x-hidden ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}
 			>
 				{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 					<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
@@ -258,16 +257,23 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						</div>
 						<div className="flex justify-start flex-row w-full gap-2 flex-wrap">
 							{emojiDataIncSocket &&
-								emojiDataIncSocket.map((emoji: EmojiDataOptionals) => {
+								emojiDataIncSocket.map((emoji: EmojiDataOptionals, index) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
 									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
-									const uniqueKey = uuidv4();
 									return (
-										<div key={uniqueKey}>
+										<Fragment key={index}>
 											{checkID && (
 												<div
 													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
-													onClick={() => handleReactMessage(currentChannelId ?? '', message.id, emoji.emoji, userId ?? '', message.sender_id)}
+													onClick={() =>
+														handleReactMessage(
+															currentChannelId ?? '',
+															message.id,
+															emoji.emoji,
+															userId ?? '',
+															message.sender_id,
+														)
+													}
 												>
 													<span>{emoji.emoji}</span>
 													<span className="font-manrope flex flex-row items-center justify-center pt-[2px] relative">
@@ -277,7 +283,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 													</span>
 												</div>
 											)}
-										</div>
+										</Fragment>
 									);
 								})}
 						</div>

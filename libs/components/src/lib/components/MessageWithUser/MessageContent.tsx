@@ -1,5 +1,4 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import { v4 as uuidv4 } from 'uuid';
 import MessageLine from './MesageLine';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
@@ -26,9 +25,8 @@ const MessageContent = ({ user, message, isCombine }: IMessageContentProps) => {
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
-			{lines?.map((line: string) => {
-				const uniqueKey = uuidv4();
-				return <MessageLine line={line} key={uniqueKey} />;
+			{lines?.map((line: string, index: number) => {
+				return <MessageLine line={line} key={index} />;
 			})}
 		</>
 	);

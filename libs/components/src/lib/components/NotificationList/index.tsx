@@ -6,7 +6,6 @@ import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import * as Icons from '../Icons';
 import NotificationItem from './NotificationItem';
 import NotifyMentionItem from './NotifyMentionItem';
-import { v4 as uuidv4 } from 'uuid';
 
 export type MemberListProps = { className?: string };
 
@@ -40,11 +39,9 @@ function NotificationList() {
 					<div>InBox </div>
 				</div>
 				<div className="flex flex-row gap-4 py-3">
-					{tabDataNotify.map((tab, index) => {
-						const uniqueKey = uuidv4();
-
+					{tabDataNotify.map((tab, index: number) => {
 						return (
-							<div key={uniqueKey}>
+							<div key={index}>
 								<button
 									className={`px-2 py-[4px] rounded-[4px] font-[600] ${currentTabNotify === tab.value ? 'bg-bgTertiary text-contentPrimary font-[700]' : ''}`}
 									tabIndex={index}

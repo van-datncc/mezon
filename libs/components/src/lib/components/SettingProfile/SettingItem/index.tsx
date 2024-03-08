@@ -2,7 +2,7 @@ import { authActions, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
 const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => void }) => {
-	const [selectedButton, setSelectedButton] = useState<string | null>('Account');
+	const [selectedButton, setSelectedButton] = useState<string | null>('Profiles');
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};

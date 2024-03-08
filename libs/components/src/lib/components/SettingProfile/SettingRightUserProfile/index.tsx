@@ -16,8 +16,6 @@ const SettingRightUser = ({
 	avatar: string;
 	nameDisplay: string;
 }) => {
-	const [minutes, setMinutes] = useState(0);
-	const [seconds, setSeconds] = useState(0);
 	const [userName, setUserName] = useState(name);
 	const [displayName, setDisplayName] = useState(nameDisplay);
 	const [urlImage, setUrlImage] = useState(avatar);
@@ -65,9 +63,9 @@ const SettingRightUser = ({
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
-				<h1 className="text-2xl font-bold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 font-bold text-xl border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
-				<button className="pt-1 text-[#AEAEAE] text-xl ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
+				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
+				<button className="pt-1 font-bold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
+				<button className="pt-1 text-[#AEAEAE] text-base ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
 					Clan Profiles
 				</button>
 			</div>
@@ -82,7 +80,6 @@ const SettingRightUser = ({
 							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
-							defaultValue={displayName}
 						/>
 					</div>
 					<div className="mt-8">
