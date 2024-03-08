@@ -1,24 +1,29 @@
 import { MentionData } from '@draft-js-plugins/mention';
-import { IMessagePayload, MessageBox } from '@mezon/components';
-import { useChatChannel } from '@mezon/core';
+import { MessageBox, ReplyMessage } from '@mezon/components';
+import { ChatContext, useChannelMembers, useChatSending } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
-import { IMessage } from '@mezon/utils';
-import { useCallback } from 'react';
+import { IMessageSendPayload } from '@mezon/utils';
+import { useCallback, useContext, useEffect } from 'react';
 import { useThrottledCallback } from 'use-debounce';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
+	controlEmoji?: boolean;
+	clanId?: string;
 };
 
-export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
-	const { sendMessage, sendMessageTyping } = useChatChannel(channelId);
+export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMessageBoxProps) {
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
 
 	const handleSend = useCallback(
-		(mess: IMessagePayload) => {
-			const messageToSend: IMessage = {
-				...mess,
-			};
-			sendMessage(messageToSend);
+		(
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
+			attachments?: Array<ApiMessageAttachment>,
+			references?: Array<ApiMessageRef>,
+		) => {
+			sendMessage(content, mentions, attachments, references);
 		},
 		[sendMessage],
 	);
@@ -28,7 +33,7 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-	const { members } = useChatChannel(channelId);
+	const { members } = useChannelMembers({ channelId });
 	const userMentionRaw = members[0].users;
 	const newUserMentionList: MentionData[] = userMentionRaw?.map((item: ChannelMembersEntity) => ({
 		avatar: item?.user?.avatar_url ?? '',
@@ -36,9 +41,23 @@ export function ChannelMessageBox({ channelId }: ChannelMessageBoxProps) {
 		id: item?.user?.id ?? '',
 	}));
 
+	const { setIsOpenReply } = useContext(ChatContext);
+
+	useEffect(() => {
+		setIsOpenReply(false);
+	}, [channelId, clanId]);
+
 	return (
 		<div>
-			<MessageBox memberList={newUserMentionList && newUserMentionList} onSend={handleSend} onTyping={handleTypingDebounced} />
+			<ReplyMessage />
+			<MessageBox
+				isOpenEmojiPropOutside={controlEmoji}
+				listMentions={newUserMentionList}
+				onSend={handleSend}
+				onTyping={handleTypingDebounced}
+				currentChannelId={channelId}
+				currentClanId={clanId}
+			/>
 		</div>
 	);
 }

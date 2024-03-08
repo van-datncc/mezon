@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../../Icons';
 
-import { ChannelProps, ChannelStatusEnum, ChannelTypeEnum, ThreadNameProps } from 'libs/utils/src/lib/typings/index';
+import { ChannelProps, ChannelStatusEnum, ChannelTypeEnum, ThreadNameProps } from 'libs/utils/src/lib/types/index';
 
 export const ChannelLable: React.FC<ChannelProps> = ({ isPrivate, type, name }) => {
 	return (
 		<div className="flex flex-row items-center relative">
 			<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">
-				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_VOICE && (
-					<Icons.SpeakerLocked defaultSize="w-6 h-6" />
-				)}
-				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_TEXT && (
-					<Icons.HashtagLocked defaultSize="w-6 h-6 " />
-				)}
+				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_VOICE && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
+				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
 				{isPrivate === undefined && type === ChannelTypeEnum.CHANNEL_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
 				{isPrivate === undefined && type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>

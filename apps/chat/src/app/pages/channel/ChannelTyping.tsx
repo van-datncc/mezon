@@ -1,4 +1,4 @@
-import { useChatChannel } from '@mezon/core';
+import { useChatTypings } from '@mezon/core';
 import { useMemo } from 'react';
 
 type ChannelTypingProps = {
@@ -6,7 +6,7 @@ type ChannelTypingProps = {
 };
 
 export function ChannelTyping({ channelId }: ChannelTypingProps) {
-	const { typingUsers } = useChatChannel(channelId);
+	const { typingUsers } = useChatTypings({ channelId });
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
@@ -18,5 +18,5 @@ export function ChannelTyping({ channelId }: ChannelTypingProps) {
 		return '';
 	}, [typingUsers]);
 
-	return <div className="pl-[66px] text-xs text-gray-400">{typingLabel}</div>;
+	return <div className="text-xs text-gray-400 absolute bottom-0 left-4 pl-4 cursor-default">{typingLabel}</div>;
 }

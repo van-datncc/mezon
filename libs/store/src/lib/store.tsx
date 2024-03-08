@@ -14,12 +14,16 @@ import { channelsReducer } from './channels/channels.slice';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { messagesReducer } from './messages/messages.slice';
-import { POLICIES_FEATURE_KEY, policiesReducer } from './policies/policies.slice';
+// import { PermissionsUserReducer } from './permissionuser/permissionuser.slice';
+import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
+// import { MembersRoleReducer } from './getlistmemberinrole/getListMembersInRole.slice';
+import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
-
 import { directReducer } from './direct/direct.slice';
 import { friendsReducer } from './friends/friend.slice';
+import { usersClanReducer } from './clanMembers/clan.members';
+import { notificationReducer } from './notification/notify.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -48,10 +52,17 @@ const reducer = {
 	messages: messagesReducer,
 	users: usersReducer,
 	categories: categoriesReducer,
+	rolesclan: RolesClanReducer,
+	usersClan: usersClanReducer,
+	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
+	roleId: roleIdReducer,
+	policiesDefaultSlice: policiesDefaultReducer,
+	isshow: IsShowReducer,
+	notification: notificationReducer
 };
 
 let storeInstance = configureStore({

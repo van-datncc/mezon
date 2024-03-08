@@ -1,20 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
+import loadable from '@loadable/component';
+
 
 // Layouts
 import AppLayout from '../layouts/AppLayout';
 import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
-import ServerLayout from '../layouts/ServerLayout';
-
-// Pages
-import Chanel from '../pages/channel';
-import DirectMain from '../pages/directMessage';
-import InvitePage from '../pages/invite';
-import Login from '../pages/login';
-import Main from '../pages/main';
-import ErrorRoutes from './ErrorRoutes';
-import InitialRoutes from './InititalRoutes';
-import ProtectedRoutes from './ProtectedRoutes';
 
 // Loaders
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
@@ -23,20 +14,38 @@ import { directLoader } from '../loaders/directLoader';
 import { directMessageLoader } from '../loaders/directMessageLoader';
 import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
-import { serverLoader, shouldRevalidateServer } from '../loaders/serverLoader';
-import { ChannelIndex } from '../pages/channel/ChannelIndex';
-import { ClanIndex } from '../pages/clan/ClanIndex';
-import { DirectMessage } from '../pages/directMessage/DMPage';
-import { DirectMessageIndex } from '../pages/directMessage/DMPage/DirectMessageIndex';
-import FriendsPage from '../pages/directMessage/FriendsPage';
+import { clanLoader, shouldRevalidateServer } from '../loaders/clanLoader';
+import { appLoader, shouldRevalidateApp } from '../loaders/appLoader';
+
+
 import ChannelsRoutes from './ChannelsRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
+import { loginLoader } from '../loaders/loginLoader';
+
+// Pages
+import ErrorRoutes from './ErrorRoutes';
+import InitialRoutes from './InititalRoutes';
+import ProtectedRoutes from './ProtectedRoutes';
+
+const Login = loadable(() => import('../pages/login'));
+const Main = loadable(() => import('../pages/main'));
+const DirectMain = loadable(() => import('../pages/directMessage'));
+const InvitePage = loadable(() => import('../pages/invite'));
+const ChannelMain = loadable(() => import('../pages/channel'));
+const ChannelIndex = loadable(() => import('../pages/channel/ChannelIndex'));
+const ClanIndex = loadable(() => import('../pages/clan/ClanIndex'));
+const DirectMessage = loadable(() => import('../pages/directMessage/DMPage'));
+const DirectMessageIndex = loadable(() => import('../pages/directMessage/DMPage/DirectMessageIndex'));
+const FriendsPage = loadable(() => import('../pages/directMessage/FriendsPage'));
+const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 
 // Components
 export const routes = createBrowserRouter([
 	{
 		path: '',
+		loader: appLoader,
+		shouldRevalidate: shouldRevalidateApp,
 		element: <AppLayout />,
 		errorElement: <ErrorRoutes />,
 		children: [
@@ -51,6 +60,7 @@ export const routes = createBrowserRouter([
 				children: [
 					{
 						path: 'login',
+						loader: loginLoader,
 						element: <Login />,
 					},
 				],
@@ -72,14 +82,14 @@ export const routes = createBrowserRouter([
 								element: <Main />,
 								children: [
 									{
-										path: 'servers',
+										path: 'clans',
 										element: <ClansRoutes />,
 										children: [
 											{
-												path: ':serverId',
-												loader: serverLoader,
+												path: ':clanId',
+												loader: clanLoader,
 												shouldRevalidate: shouldRevalidateServer,
-												element: <ServerLayout />,
+												element: <ClanLayout />,
 												children: [
 													{
 														path: '',
@@ -97,7 +107,7 @@ export const routes = createBrowserRouter([
 																path: ':channelId',
 																loader: channelLoader,
 																shouldRevalidate: shouldRevalidateChannel,
-																element: <Chanel />,
+																element: <ChannelMain />,
 															},
 														],
 													},
@@ -147,6 +157,8 @@ export const routes = createBrowserRouter([
 			{
 				path: 'invite',
 				loader: authLoader,
+				shouldRevalidate: shouldRevalidateAuth,
+				element: <ProtectedRoutes />,
 				children: [
 					{
 						path: ':inviteId',

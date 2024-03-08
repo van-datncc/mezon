@@ -4,6 +4,7 @@ import { InputField, Modal } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -14,17 +15,28 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { open, onClose } = props;
 	const [urlImage, setUrlImage] = useState('');
 	const [nameClan, setNameClan] = useState('');
+	const { sessionRef, clientRef } = useMezon();
 	const { navigate, toClanPage } = useAppNavigation();
 	const { createClans } = useClans();
-	const { userProfile } = useSelector(selectAllAccount);
+	const userProfile = useSelector(selectAllAccount);
 	const handleFile = (e: any) => {
-		const fileToStore: File = e.target.files[0];
-		setUrlImage(URL.createObjectURL(fileToStore));
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!file) return;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+			setUrlImage(attachment.url ?? '');
+		});
 	};
+
 	const handleCreateClan = () => {
 		// TODO: validate
 		if (nameClan) {
-			createClans(nameClan, '').then((res) => {
+			createClans(nameClan, urlImage).then((res) => {
 				if (res && res.clan_id) {
 					navigate(toClanPage(res.clan_id || ''));
 				}
@@ -45,10 +57,11 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			titleConfirm="Create"
 			confirmButton={handleCreateClan}
 			disableButtonConfirm={!nameClan ? true : false}
+			classNameBox="h-full"
 		>
-			<div className="flex items-center flex-col justify-center max-w-lg ">
-				<span className="text-contentPrimary text-[24px] pb-2 font-[500]">Customize Your Server</span>
-				<p className="text-contentTertiary  text-center">
+			<div className="flex items-center flex-col justify-center ">
+				<span className="text-contentPrimary text-[24px] pb-4 font-[700] leading-8">Customize Your Server</span>
+				<p className="text-contentTertiary  text-center text-[20px] leading-6 font-[400]">
 					Give your new clan a personality with a name and an icon. You can always change it later.
 				</p>
 				<label className="block mt-8 mb-4">
@@ -57,7 +70,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					) : (
 						<div
 							id="preview_img"
-							className="h-[81px] w-[81px] flex justify-center items-center flex-col bg-bgSecondary border-white relative border-[1px] border-dashed rounded-full"
+							className="h-[81px] w-[81px] flex justify-center items-center flex-col bg-bgSecondary border-white relative border-[1px] border-dashed rounded-full cursor-pointer transform hover:scale-105 transition duration-300 ease-in-out"
 						>
 							<div className="absolute right-0 top-[-3px] left-[54px]">
 								<Icons.AddIcon />
@@ -69,11 +82,11 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					<input id="preview_img" type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 				</label>
 				<div className="w-full">
-					<span className="font-[600]">CLAN NAME</span>
+					<span className="font-[700] text-[16px] leading-6">CLAN NAME</span>
 					<InputField
 						onChange={(e) => setNameClan(e.target.value)}
 						type="text"
-						className="bg-bgSurface mb-2 mt-1"
+						className="bg-bgSurface mb-2 mt-4"
 						placeholder={`${userProfile?.user?.username}'s clan`}
 					/>
 					<span className="text-[14px] text-contentTertiary">

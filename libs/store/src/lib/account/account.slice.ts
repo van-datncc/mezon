@@ -22,7 +22,7 @@ export const initialAccountState: AccountState = {
 
 export const getUserProfile = createAsyncThunk<IUserAccount>('account/user', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon?.client.getAccount(mezon.session);
+	const response = await mezon.client.getAccount(mezon.session);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
@@ -62,4 +62,4 @@ export const accountActions = { ...accountSlice.actions, getUserProfile };
 
 export const getAccountState = (rootState: { [ACCOUNT_FEATURE_KEY]: AccountState }): AccountState => rootState[ACCOUNT_FEATURE_KEY];
 
-export const selectAllAccount = createSelector(getAccountState, (state: AccountState) => state);
+export const selectAllAccount = createSelector(getAccountState, (state: AccountState) => state.userProfile);

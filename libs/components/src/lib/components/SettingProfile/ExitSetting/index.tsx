@@ -7,12 +7,15 @@ const ExitSetting = (props: ModalExitProps) => {
 		onClose();
 	};
 	return (
-		<div className="bg-bgSecondary w-1/5">
-			<div className="w-1/4 text-black ml-[40px] pt-[94px]">
-				<button className="bg-white w-[30px] h-[30px] rounded-[50px] font-bold" onClick={handleClose}>
+		<div className="bg-bgSecondary w-1/12 xl:w-1/5 2xl:flex-grow">
+			<div className="w-1/4 text-black ml-5 pt-[94px]">
+				<button
+					className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out"
+					onClick={handleClose}
+				>
 					X
 				</button>
-				<p className="text-white mt-[10px]">ESC</p>
+				<p className="text-[#AEAEAE] mt-[10px]">ESC</p>
 			</div>
 		</div>
 	);

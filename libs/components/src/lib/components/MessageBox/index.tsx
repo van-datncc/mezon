@@ -1,128 +1,215 @@
-import { MentionData } from '@draft-js-plugins/mention';
-import { IMessage } from '@mezon/utils';
-import { useCallback, useRef, useState } from 'react';
-import * as Icons from '../Icons';
-// import mentions from '../MentionMessage/mentions';
-
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, { MentionPluginTheme, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
-import { EditorState, convertToRaw } from 'draft-js';
-import React, { MouseEvent, ReactElement, useMemo } from 'react';
-import mentionsStyles from '../MentionMessage/MentionsStyles.module.css';
-
-export interface EntryComponentProps {
-	className?: string;
-	onMouseDown(event: MouseEvent): void;
-	onMouseUp(event: MouseEvent): void;
-	onMouseEnter(event: MouseEvent): void;
-	role: string;
-	id: string;
-	'aria-selected'?: boolean | 'false' | 'true';
-	theme?: MentionPluginTheme;
-	mention: MentionData;
-	isFocused: boolean;
-	searchValue?: string;
-}
-
-function Entry(props: EntryComponentProps): ReactElement {
-	const {
-		mention,
-		theme,
-		searchValue, // eslint-disable-line @typescript-eslint/no-unused-vars
-		isFocused, // eslint-disable-line @typescript-eslint/no-unused-vars
-		...parentProps
-	} = props;
-
-	return (
-		<div {...parentProps}>
-			<div className="flex items-center rounded-xl py-2 px-2 gap-2">
-				<div className="">
-					<img src={mention.avatar} className="w-8 h-8 rounded-full" role="presentation" />
-				</div>
-
-				<div className="flex justify-between gap-1">
-					<div className="">{mention.name}</div>
-				</div>
-			</div>
-		</div>
-	);
-}
+import createImagePlugin from '@draft-js-plugins/image';
+import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { ChatContext } from '@mezon/core';
+import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
+import { IMessageSendPayload } from '@mezon/utils';
+import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
+import { SearchIndex, init } from 'emoji-mart';
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import * as Icons from '../Icons';
+import ImageComponent from './ImageComponet';
+import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
-	onSend: (mes: IMessagePayload) => void;
+	onSend: (
+		content: IMessageSendPayload,
+		mentions?: Array<ApiMessageMention>,
+		attachments?: Array<ApiMessageAttachment>,
+		references?: Array<ApiMessageRef>,
+	) => void;
 	onTyping?: () => void;
-	memberList?: MentionData[];
+	listMentions?: MentionData[] | undefined;
+	isOpenEmojiPropOutside?: boolean | undefined;
+	currentChannelId?: string;
+	currentClanId?: string;
 };
 
-export type IMessagePayload = IMessage & {
-	channelId: string;
-};
+init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const [listUserMention, setListUserMention] = useState<MentionData[]>(props.memberList ?? []);
-	const onSearchChange = useCallback(
-		({ value }: { value: string }) => {
-			setSuggestions(defaultSuggestionsFilter(value, props.memberList ?? []));
-		},
-		[listUserMention],
-	);
-	const ref = useRef<Editor>(null);
-	const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
+	const [editorState, setEditorState] = useState(EditorState.createEmpty());
+	const [suggestions, setSuggestions] = useState(listMentions);
+	const [clearEditor, setClearEditor] = useState(false);
+	const [content, setContent] = useState<string>('');
+	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const [referenceData, setReferencesData] = useState<ApiMessageRef[]>([]);
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
+	const { sessionRef, clientRef } = useMezon();
+	const { isOpenEmojiChatBox, setIsOpenEmojiChatBox } = useContext(ChatContext);
 
-	const { MentionSuggestions, plugins } = useMemo(() => {
-		const mentionPlugin = createMentionPlugin({
+	const mentionPlugin = useRef(
+		createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
-			theme: mentionsStyles,
+			theme: editorStyles,
 			mentionPrefix: '@',
 			supportWhitespace: true,
-			mentionTrigger: ['@', '('],
-		});
-		const { MentionSuggestions } = mentionPlugin;
-		const plugins = [mentionPlugin];
-		return { plugins, MentionSuggestions };
-	}, []);
-	const [suggestions, setSuggestions] = useState<MentionData[]>(props.memberList ?? []);
-	const [userMentioned, setUserMentioned] = useState<string[]>([]);
-	const { onSend, onTyping } = props;
-
-	const onChange = useCallback(
-		(editorState: EditorState) => {
-			if (typeof onTyping === 'function') {
-				onTyping();
-			}
-			setEditorState(editorState);
-			const contentState = editorState.getCurrentContent();
-			const content = convertToRaw(contentState).blocks[0].text;
-			const mentionedRaw = convertToRaw(contentState).entityMap;
-			const mentioned = Object.values(mentionedRaw).map((item) => item.data.mention.id);
-			setContent(content);
-			setUserMentioned(mentioned);
-		},
-		[onTyping],
+			mentionTrigger: '@',
+		}),
 	);
+
+	const { MentionSuggestions } = mentionPlugin.current;
+	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
+	const plugins = [mentionPlugin.current, imagePlugin];
+	//clear Editor after navigate channel
+	useEffect(() => {
+		setEditorState(EditorState.createEmpty());
+		setIsOpenEmojiChatBox(false);
+	}, [currentChannelId, currentClanId]);
+
+	const onChange = useCallback((editorState: EditorState) => {
+		if (typeof onTyping === 'function') {
+			onTyping();
+		}
+		setClearEditor(false);
+		setEditorState(editorState);
+		const contentState = editorState.getCurrentContent();
+		const raw = convertToRaw(contentState);
+		// get message
+		const messageRaw = raw.blocks;
+		const messageContent = Object.values(messageRaw)
+			.filter(item => item.text.trim() !== '')
+			.map((item) => item.text);
+		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
+
+		if (messageBreakline.length > 2000) {
+			setContent('Message too long. @TODO: convert it to attachment');
+			return;
+		}
+
+		handleUrlInput(messageBreakline).then((attachment) => {
+			handleFinishUpload(attachment);
+		});
+
+		const mentionedUsers = [];
+		for (const key in raw.entityMap) {
+			const ent = raw.entityMap[key];
+			if (ent.type === 'mention') {
+				mentionedUsers.push({
+					user_id: ent.data.mention.id,
+					username: ent.data.mention.name,
+				});
+			}
+		}
+		setContent(content + messageBreakline);
+		setMentionData(mentionedUsers);
+	}, []);
+
+	const onSearchChange = ({ value }: any) => {
+		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
+	};
 
 	const onOpenChange = useCallback((_open: boolean) => {
 		setOpen(_open);
 	}, []);
 
-	const [content, setContent] = useState('');
+	const handleFinishUpload = useCallback(
+		(attachment: ApiMessageAttachment) => {
+			let urlFile = attachment.url;
+			if (attachment.filetype?.indexOf('pdf') !== -1) {
+				urlFile = '/assets/images/pdficon.png';
+			} else if (attachment.filetype?.indexOf('text') !== -1) {
+				urlFile = '/assets/images/text.png';
+			}
+
+			const contentState = editorState.getCurrentContent();
+			const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
+				src: urlFile,
+				height: '20px',
+				width: 'auto',
+				onRemove: () => handleRemove(),
+			});
+			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+			
+			const newEditorState = EditorState.push(editorState, contentStateWithEntity, 'insert-fragment');
+			const newEditorStateWithImage = EditorState.forceSelection(
+				newEditorState,
+				newEditorState.getSelection().merge({
+					anchorOffset: 0,
+					focusOffset: 0,
+				})
+			);
+			const newStateWithImage = AtomicBlockUtils.insertAtomicBlock(newEditorStateWithImage, entityKey, ' ');
+			setEditorState(newStateWithImage);
+	
+			attachmentData.push(attachment);
+			setAttachmentData(attachmentData);
+		},
+		[attachmentData, content, editorState],
+	);
+
+	const onPastedFiles = useCallback(
+		(files: Blob[]) => {
+			const now = Date.now();
+			const filename = now + '.png';
+			const file = new File(files, filename, { type: 'image/png' });
+			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+
+			const session = sessionRef.current;
+			const client = clientRef.current;
+
+			if (!client || !session || !currentClanId) {
+				throw new Error('Client is not initialized');
+			}
+			handleUploadFile(client, session, fullfilename, file)
+				.then((attachment) => {
+					handleFinishUpload(attachment);
+					return 'handled';
+				})
+				.catch((err) => {
+					return 'not-handled';
+				});
+
+			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+
+			return 'not-handled';
+		},
+		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
+	);
+
+	const handleRemove = () => {
+		const currentContentState = editorState.getCurrentContent();
+		const newContentState = Modifier.applyEntity(currentContentState, editorState.getSelection(), null);
+		const newEditorState = EditorState.push(editorState, newContentState, 'apply-entity');
+		setEditorState(newEditorState);
+	};
+
+	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
+
+	useEffect(() => {
+		if (messageRef) {
+			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0, message_sender_id: messageRef.sender_id }]);
+		}
+	}, [messageRef]);
 
 	const handleSend = useCallback(() => {
-		if (!content.trim()) {
+		setIsOpenEmojiChatBoxSuggestion(false);
+		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
-		// TODO: change the interface of onSend, remove the id and channelId
-		onSend({
-			content: { content: content, mentioned: userMentioned },
-			id: '',
-			channel_id: '',
-			body: { text: '' },
-			channelId: '',
-		});
-		setContent('');
-		setEditorState(() => EditorState.createEmpty());
-	}, [content, onSend, userMentioned]);
+		if (isOpenReply) {
+			onSend({ t: content }, mentionData, attachmentData, referenceData);
+			setContent('');
+			setAttachmentData([]);
+			setMentionData([]);
+			setEditorState(() => EditorState.createEmpty());
+			setIsOpenReply(false);
+		} else {
+			onSend({ t: content }, mentionData, attachmentData);
+			setContent('');
+			setAttachmentData([]);
+			setClearEditor(true);
+			setSelectedItemIndex(0);
+			liRefs?.current[selectedItemIndex]?.focus();
+			setEditorState(() => EditorState.createEmpty());
+		}
+	}, [content, onSend, mentionData, attachmentData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -135,51 +222,337 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			handleSend();
 			return 'handled';
 		}
+
 		return 'not-handled';
 	}
+	const editorRef = useRef<Editor | null>(null);
+
+	const [showEmojiSuggestion, setIsOpenEmojiChatBoxSuggestion] = useState(false);
+
+	const moveSelectionToEnd = () => {
+		editorRef.current!.focus();
+		const editorContent = editorState.getCurrentContent();
+		const editorSelection = editorState.getSelection();
+		const updatedSelection = editorSelection.merge({
+			anchorKey: editorContent.getLastBlock().getKey(),
+			anchorOffset: editorContent.getLastBlock().getText().length,
+			focusKey: editorContent.getLastBlock().getKey(),
+			focusOffset: editorContent.getLastBlock().getText().length,
+		});
+		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+		setEditorState(updatedEditorState);
+	};
+	const [selectionToEnd, setSelectionToEnd] = useState(false);
+
+	useEffect(() => {
+		if (content.length === 0) {
+			setShowPlaceHolder(true);
+			setIsOpenEmojiChatBoxSuggestion(false);
+		} else setShowPlaceHolder(false);
+
+		if (content.length >= 0) {
+			const editorContent = editorState.getCurrentContent();
+			const editorSelection = editorState.getSelection();
+			const updatedSelection = editorSelection.merge({
+				anchorKey: editorContent.getLastBlock().getKey(),
+				anchorOffset: editorContent.getLastBlock().getText().length,
+				focusKey: editorContent.getLastBlock().getKey(),
+				focusOffset: editorContent.getLastBlock().getText().length,
+			});
+			const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+			setEditorState(updatedEditorState);
+		}
+	}, [clearEditor, content, showEmojiSuggestion]);
+
+	useEffect(() => {
+		const editorElement = document.querySelectorAll('[data-offset-key]');
+		editorElement[2].classList.add('break-all');
+	}, []);
+
+	const editorDiv = document.getElementById('editor');
+	const editorHeight = editorDiv?.clientHeight;
+	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
+	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
+
+	function handleEmojiClick(clickedEmoji: string) {
+		setEditorState((prevEditorState) => {
+			const currentContentState = prevEditorState.getCurrentContent();
+			const newContentState = Modifier.insertText(currentContentState, prevEditorState.getSelection(), clickedEmoji);
+			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
+			return newEditorState;
+		});
+	}
+	const handleOpenEmoji = () => {
+		setIsOpenEmojiChatBox(!isOpenEmojiChatBox);
+		if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(true);
+		}
+	};
+
+	useEffect(() => {
+		if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(true);
+		}
+		if (!isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(false);
+		}
+	}, [isOpenEmojiPropOutside]);
+
+	function EmojiReaction() {
+		const handleEmojiSelect = (emoji: any) => {
+			setShowPlaceHolder(false);
+			setIsOpenEmojiChatBox(false);
+			handleEmojiClick(emoji.native);
+		};
+		return <Picker data={data} onEmojiSelect={handleEmojiSelect} theme="dark" />;
+	}
+
+	const [emojiResult, setEmojiResult] = useState<string[]>([]);
+
+	function clickEmojiSuggestion(emoji: string, index: number) {
+		setSelectedItemIndex(index);
+		handleEmojiClick(emoji);
+		setEditorState((prevEditorState) => {
+			const currentContentState = prevEditorState.getCurrentContent();
+			const raw = convertToRaw(currentContentState);
+			const messageRaw = raw.blocks;
+			const emojiPicker = messageRaw[0].text.toString();
+			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
+			const lastEmoji = emojiArray[0]?.slice(syntax.length);
+			const blockMap = editorState.getCurrentContent().getBlockMap();
+			const selectionsToReplace: SelectionState[] = [];
+			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
+				const text = contentBlock?.getText() || '';
+				let matchArr, start, end;
+				while ((matchArr = regex.exec(text)) !== null) {
+					start = matchArr.index;
+					end = start + matchArr[0].length;
+					callback(start, end);
+				}
+			};
+
+			blockMap.forEach((contentBlock) => {
+				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
+					const blockKey = contentBlock?.getKey();
+					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
+						anchorOffset: start,
+						focusOffset: end,
+					});
+
+					selectionsToReplace.push(blockSelection);
+				});
+			});
+			let contentState = editorState.getCurrentContent();
+			selectionsToReplace.forEach((selectionState: SelectionState) => {
+				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '�️');
+			});
+			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
+
+			return newEditorState;
+		});
+	}
+
+	const [syntax, setSyntax] = useState<string>('');
+	const regexDetect = /:[^\s]{2,}/;
+	const handleDetectEmoji = async (value: string) => {
+		const inputValue = value;
+		if (!regexDetect.test(inputValue)) {
+			setEmojiResult([]);
+			setIsOpenEmojiChatBoxSuggestion(false);
+			return;
+		}
+		const matches = regexDetect.exec(inputValue)?.[0];
+
+		matches && setSyntax(matches);
+		const emojiPickerActive = matches?.startsWith(':');
+		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
+		const emojiSearch = emojiPickerActive ? inputValue.slice(Number(lastEmojiIdx)) : null;
+		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
+		let emojiResults = (await SearchIndex.search(emojiSearch)) || [];
+		if (emojiResults.length === 0) {
+			emojiResults = await SearchIndex.search(emojiSearchWithOutPrefix);
+		}
+
+		const results =
+			emojiResults.map((emoji: any) => {
+				return emoji.skins[0];
+			}) || [];
+		if (results) {
+			setShowPlaceHolder(false);
+			setEmojiResult(results);
+			moveSelectionToEnd();
+		}
+	};
+
+	const handleKeyPress = (e: React.KeyboardEvent, native: string) => {
+		switch (e.key) {
+			case 'ArrowUp':
+				e.preventDefault();
+				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex - 1));
+				liRefs?.current[selectedItemIndex]?.focus();
+				setClicked(!clicked);
+				break;
+			case 'ArrowDown':
+				e.preventDefault();
+				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex + 1));
+				liRefs?.current[selectedItemIndex]?.focus();
+				setClicked(!clicked);
+				break;
+			case 'Enter':
+				clickEmojiSuggestion(native as string, selectedItemIndex);
+				setTimeout(() => {
+					editorRef.current!.focus();
+				}, 0);
+				break;
+			case 'Escape':
+				setIsOpenEmojiChatBoxSuggestion(false);
+				setEmojiResult([]);
+				break;
+			case 'Backscape':
+				setIsOpenEmojiChatBoxSuggestion(false);
+				setTimeout(() => {
+					editorRef.current!.focus();
+				}, 0);
+				moveSelectionToEnd();
+				break;
+			default:
+				editorRef.current!.focus();
+				setSelectionToEnd(!selectionToEnd);
+				break;
+		}
+	};
+
+	const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+	const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+	const ulRef = useRef<HTMLUListElement | null>(null);
+	const [clicked, setClicked] = useState<boolean>(false);
+	useEffect(() => {
+		if (liRefs.current[selectedItemIndex]) {
+			liRefs?.current[selectedItemIndex]?.focus();
+		}
+
+		emojiResult.length > 0 ? setIsOpenEmojiChatBoxSuggestion(true) : setIsOpenEmojiChatBoxSuggestion(false);
+	}, [showEmojiSuggestion, emojiResult, syntax]);
+
+	useEffect(() => {
+		handleDetectEmoji(content);
+		liRefs?.current[selectedItemIndex]?.focus();
+	}, [content]);
+
+	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!file) return;
+		if (!client || !session || !currentClanId) {
+			throw new Error('Client or file is not initialized');
+		}
+
+		handleUploadFile(client, session, fullfilename, file).then((attachment) => {
+			handleFinishUpload(attachment);
+		});
+	};
+
+	useEffect(() => {
+		if (isOpenReply) {
+			editorRef.current!.focus();
+		}
+	}, [isOpenReply]);
+
+	const editorElement = document.getElementById('editor');
+	useEffect(() => {
+		const hasFigure = editorElement?.querySelector('figure');
+		const firstChildHasBr = editorElement?.querySelector('br');
+		if (hasFigure) {
+			if (firstChildHasBr) {
+				firstChildHasBr.style.display = 'none';
+			}
+		}
+	}, [editorState]);
+
 	return (
-		<div className="flex w-full items-center">
-			<div className="flex flex-inline w-full items-center gap-2 box-content m-4 mr-4 mb-2 bg-black rounded-md pr-2">
-				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2">
+		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+			{showEmojiSuggestion && (
+				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
+					<p className=" text-center p-2">Emoji Matching: {syntax}</p>
+					<div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
+						<ul
+							ref={ulRef}
+							className="w-full flex flex-col"
+							onKeyDown={(e) => {
+								if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+									e.preventDefault();
+								}
+							}}
+						>
+							{emojiResult?.map((emoji: any, index: number) => (
+								<li
+									ref={(el) => (liRefs.current[index] = el)}
+									key={emoji.shortcodes}
+									onKeyDown={(e) => handleKeyPress(e, emoji.native)}
+									onClick={() => clickEmojiSuggestion(emoji.native, index)}
+									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
+										selectedItemIndex === index ? 'selected-item' : ''
+									}`}
+									tabIndex={0}
+								>
+									{emoji.native} {emoji.shortcodes}
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+			)}
+			<label>
+				<input
+					id="preview_img"
+					type="file"
+					onChange={(e) => {
+						handleFile(e), (e.target.value = '');
+					}}
+					className="block w-full hidden"
+				/>
+				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
 					<Icons.AddCircle />
 				</div>
+			</label>
 
-				<div
-					className={`w-[96%] relative bg-black gap-3`}
-					onClick={() => {
-						ref.current!.focus();
-					}}
-				>
-					<div className="p-[10px] flex items-center">
-						<Editor
-							editorKey={'editor'}
-							editorState={editorState}
-							onChange={onChange}
-							plugins={plugins}
-							ref={ref}
-							keyBindingFn={keyBindingFn}
-							handleKeyCommand={handleKeyCommand}
-							// placeholder='Write your thoughs here...'
-						/>
-					</div>
-
-					<div className="absolute w-full box-border bottom-16  bg-black rounded-md ">
-						<MentionSuggestions
-							open={open}
-							onOpenChange={onOpenChange}
-							suggestions={props.memberList ?? []}
-							onSearchChange={onSearchChange}
-							entryComponent={Entry}
-							popoverContainer={({ children }: any) => <div>{children}</div>}
-						/>
-					</div>
+			<div
+				className={`w-[96%] bg-black gap-3 relative`}
+				onClick={() => {
+					editorRef.current!.focus();
+				}}
+			>
+				<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
+					<Editor
+						keyBindingFn={keyBindingFn}
+						handleKeyCommand={handleKeyCommand}
+						editorState={clearEditor ? EditorState.createEmpty() : editorState}
+						onChange={onChange}
+						plugins={plugins}
+						ref={editorRef}
+						handlePastedFiles={onPastedFiles}
+					/>
+					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>}
 				</div>
 
-				<div className="flex flex-row h-full items-center gap-1 w-12">
-					<Icons.Gif />
-					<Icons.Help />
-				</div>
+				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
+
+			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
+				<Icons.Gif />
+				<Icons.Help />
+				<button onClick={handleOpenEmoji}>
+					<Icons.Emoji defaultFill={isOpenEmojiChatBox ? '#FFFFFF' : '#AEAEAE'} />
+				</button>
+			</div>
+			{isOpenEmojiChatBox && (
+				<div className="absolute right-4 bottom-[--bottom-emoji] z-20">
+					<EmojiReaction />
+				</div>
+			)}
 		</div>
 	);
 }

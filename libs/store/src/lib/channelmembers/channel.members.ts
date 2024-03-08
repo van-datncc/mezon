@@ -17,6 +17,11 @@ export interface ChannelMembersEntity extends IChannelMember {
 	name?: string;
 }
 
+export interface ChannelMemberAvatar {
+	avatar: string;
+	name: string;
+}
+
 // TODO: remove channelId from the parameter
 export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
 	return { ...channelRes, id: channelRes?.user?.id || '', channelId };
@@ -31,6 +36,8 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 	error?: string | null;
 	currentChannelId?: string | null;
 	followingUserIds?: string[];
+	onlineStatusUser:  Record<string, boolean>;
+	toFollowUserIds: string[];
 }
 
 export interface ChannelMemberRootState {
@@ -72,6 +79,8 @@ export const fetchChannelMembers = createAsyncThunk(
 		}
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
+		const userIds = members.map((member) => member.user?.id || '');
+		thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds))
 		thunkAPI.dispatch(channelMembersActions.followUserStatus());
 		return members;
 	},
@@ -79,10 +88,18 @@ export const fetchChannelMembers = createAsyncThunk(
 
 export const followUserStatus = createAsyncThunk('channelMembers/followUserStatus', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const listUserIds = selectAllUserIds(getChannelMemberRootState(thunkAPI));
+	const listUserIds = selectAllUserIdsToFollow(getChannelMemberRootState(thunkAPI));
 	const listFollowingUserIds = selectFollowingUserIds(getChannelMemberRootState(thunkAPI));
 	if (listUserIds.length !== listFollowingUserIds?.length || listUserIds.some((id) => !listFollowingUserIds.includes(id))) {
 		const response = await mezon.addStatusFollow(listUserIds);
+		const onlineStatus = response.presences.map(item => {
+			return {userId: item.user_id, status: true}
+		})
+		mezon.sessionRef.current?.user_id
+		thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus))
+		if(mezon.sessionRef.current?.user_id) {
+			thunkAPI.dispatch(channelMembersActions.setStatusUser({userId: mezon.sessionRef.current?.user_id, status: true}))
+		}
 		thunkAPI.dispatch(channelMembersActions.setFollowingUserIds(listUserIds));
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
@@ -98,9 +115,7 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 		if (channelPresence.joins.length > 0) {
 			const userId = channelPresence.joins[0].user_id;
 			const channelId = channelPresence.channel_id;
-
 			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
-
 			if (!user) {
 				thunkAPI.dispatch(fetchChannelMembers({ channelId }));
 			}
@@ -110,27 +125,32 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 
 export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus', async (statusPresence: StatusPresenceEvent, thunkAPI) => {
 	//user exist
-	let userId = '';
 	if (statusPresence?.leaves?.length) {
-		userId = statusPresence.leaves[0].user_id;
-	} else if (statusPresence?.joins?.length) {
-		userId = statusPresence.joins[0].user_id;
+		for(const leave of  statusPresence.leaves){
+			const userId = leave.user_id
+			thunkAPI.dispatch(channelMembersActions.setStatusUser({userId, status: false}))
+		}
+	} 
+	 if (statusPresence?.joins?.length) {
+		for(const join of  statusPresence.joins){
+			const userId = join.user_id
+			thunkAPI.dispatch(channelMembersActions.setStatusUser({userId, status: true}))
+		}
 	}
-	const userChange = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
-	const updateUser = {
-		...userChange,
-		user: {
-			...userChange.user,
-			online: statusPresence?.joins?.length ? true : undefined,
-		},
-	};
-	thunkAPI.dispatch(channelMembersActions.onUpdateStatusUserPresence(updateUser));
 });
+
 
 export const initialChannelMembersState: ChannelMembersState = channelMembersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	onlineStatusUser: {},
+	toFollowUserIds: []
 });
+
+export type StatusUserArgs = {
+	userId: string;
+	status: boolean;
+};
 
 export const channelMembers = createSlice({
 	name: CHANNEL_MEMBERS_FEATURE_KEY,
@@ -138,15 +158,21 @@ export const channelMembers = createSlice({
 	reducers: {
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
-		onUpdateStatusUserPresence: (state: ChannelMembersState, update: PayloadAction<IChannelMember>) => {
-			channelMembersAdapter.updateOne(state, {
-				id: update.payload.id,
-				changes: update.payload,
-			});
-		},
+		setManyStatusUser : (state, action: PayloadAction<StatusUserArgs[]>) => {
+		for (let i of action.payload){
+			state.onlineStatusUser[i.userId] = i.status;
+		}
+	},
 		addMany: channelMembersAdapter.addMany,
 		setFollowingUserIds: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
 			state.followingUserIds = action.payload;
+		},
+		setStatusUser: (state, action: PayloadAction<StatusUserArgs>) => {
+			state.onlineStatusUser[action.payload.userId] = action.payload.status;
+		},
+		addUserIdsToFollow: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
+			const newUsers = [...state.toFollowUserIds, ...action.payload]
+			state.toFollowUserIds = [...new Set(newUsers)];
 		},
 	},
 	extraReducers: (builder) => {
@@ -223,11 +249,33 @@ export const selectAllUserIds = createSelector(selectChannelMembesEntities, (ent
 	return members.filter((item) => item.user?.id).map((member) => member.user?.id as string);
 });
 
+export const selectAllUserIdsToFollow = createSelector(getChannelMembersState, (state) => {
+	return state.toFollowUserIds
+});
+
 export const selectMembersByChannelId = (channelId?: string | null) =>
 	createSelector(selectChannelMembesEntities, (entities) => {
 		const members = Object.values(entities);
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
+
+export const selectMembersMap = (channelId?: string | null) =>
+	createSelector(selectChannelMembesEntities, (entities) => {
+		const retval = new Map<string, ChannelMemberAvatar>();
+		const members = Object.values(entities);
+		
+		members.filter((member) => member && member.user !== null && member.user?.id && member.channelId === channelId).map(member => {
+			const key = member.user?.id as string;
+			retval.set(key, { name: member.user?.username || '', avatar: member.user?.avatar_url || ''});
+		})
+
+		return retval;
+	});
+export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser)
+
+export const selectMemberOnlineStatusById = (userId:string) => createSelector(selectMemberStatus,(status) => {
+	return status?.[userId] || false
+})
 
 export const selectChannelMemberByUserIds = (channelId: string, userIds: string[]) =>
 	createSelector(selectChannelMembesEntities, (entities) => {
@@ -239,3 +287,10 @@ export const selectMemberById = (userId: string) =>
 	createSelector(getChannelMembersState, (state) => {
 		return selectById(state, userId);
 	});
+
+export const selectMemberByUserId = (userId: string) => 
+	createSelector(selectAllChannelMembers,	
+	(entities) => {
+		return entities.find(ent => ent?.user?.id === userId) || null;
+	}
+)

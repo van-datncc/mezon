@@ -18,8 +18,7 @@ const SettingRightClanEdit = ({
 	clanId: string;
 }) => {
 	const { userProfile } = useAuth();
-	// console.log("clanId: ", clanId)
-
+	
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId || '', userProfile?.user?.id || ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 
@@ -118,26 +117,25 @@ const SettingRightClanEdit = ({
 	};
 	return (
 		<>
-			<div className="flex-1 flex mt-[10px] pl-[90px] ">
+			<div className="flex-1 flex mt-[10px] gap-x-8 flex-row">
 				<div className="w-1/2 text-white">
 					<div className="mt-[20px]">
-						<label className="font-normal">CLAN NICKNAME</label>
+						<label className="text-[#CCCCCC] font-bold tracking-wide text-sm">CLAN NICKNAME</label>
 						<br />
 						<InputField
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black"
+							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
-							defaultValue={displayName}
 						/>
 					</div>
 					<div className="mt-[20px]">
-						<p>AVATAR</p>
+						<p className="text-[#CCCCCC] font-bold tracking-wide text-sm">AVATAR</p>
 						<div className="flex">
 							<label>
 								<div
-									className="w-[130px] bg-blue-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px]"
+									className="w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -145,7 +143,7 @@ const SettingRightClanEdit = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="bg-gray-600 rounded-[3px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
+								className="bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -154,7 +152,7 @@ const SettingRightClanEdit = ({
 					</div>
 				</div>
 				<div className="w-1/2 text-white">
-					<p className="ml-[30px] mt-[30px]">PREVIEW</p>
+					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
 					<SettingRightClanCard profiles={editProfile} />
 				</div>
 			</div>

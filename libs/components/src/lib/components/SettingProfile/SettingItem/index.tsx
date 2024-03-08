@@ -2,7 +2,7 @@ import { authActions, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
 const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => void }) => {
-	const [selectedButton, setSelectedButton] = useState<string | null>('Account');
+	const [selectedButton, setSelectedButton] = useState<string | null>('Profiles');
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
@@ -19,11 +19,11 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 		setSelectedButton('');
 	};
 	return (
-		<div className="hidden overflow-y-auto w-1/4 bg-black md:block pt-96 pl-[142px] pr-[16px] pb-[96px] scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow">
 			<div className="w-170px ">
-				<p className="text-blue-500 ">USER SETTINGS</p>
+				<p className="text-[#84ADFF] font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
-					className={`pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px] ${selectedButton === 'Account' ? 'bg-blue-400' : ''}`}
+					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 ${selectedButton === 'Account' ? 'bg-blue-400 text-white' : ''}`}
 					onClick={() => {
 						handleButtonClick('Account');
 						onItemClick && onItemClick('Account');
@@ -33,7 +33,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				</button>
 				<br />
 				<button
-					className={`pt-1 pl-1 text-white ${selectedButton === 'Profiles' ? 'bg-blue-400' : ''} mt-[16px] w-[170px] text-left rounded-[5px]`}
+					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px] ${selectedButton === 'Profiles' ? 'bg-blue-400 text-white' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Profiles');
 						onItemClick && onItemClick('Profiles');
@@ -42,44 +42,44 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 					Profiles
 				</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Privacy & Safety</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Privacy & Safety</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Family Center</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Family Center</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Family Center</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Family Center</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Authorized Apps</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Authorized Apps</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Devices</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Devices</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Connections</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Connections</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Clips</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Clips</button>
 				<br />
-				<button className="pt-1 pl-1 text-white mb-[10px] w-[170px] rounded-[5px] text-left mt-[16px]">Friend Requests</button>
-				<hr className="border-t-1 border-#1E1E1E" />
-				<button className="pt-2 text-blue-500 mt-[16px]">USER SETTINGS</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Friend Requests</button>
+				<hr className="border-t border-solid border-borderDefault mt-4" />
+				<button className="pt-2 text-[#84ADFF] mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Appearance</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-4 ml-[-8px]">Appearance</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Accessibility</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Accessibility</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Voice & Video</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Voice & Video</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Text & Image</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Text & Image</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Notifications</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Notifications</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Keybinds</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Keybinds</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Language</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Language</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Streamer Mode</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Streamer Mode</button>
 				<br />
-				<button className="pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px]">Advanced</button>
+				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px]">Advanced</button>
 				<br />
 				<button
-					className={`pt-1 pl-1 text-white ${selectedButton === 'Log Out' ? 'bg-blue-400' : ''} mt-[16px] w-[170px] text-left rounded-[5px]`}
+					className={`p-2 text-[#AEAEAE] text-[15px] ${selectedButton === 'Log Out' ? 'bg-blue-400' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px]`}
 					onClick={() => {
 						handleButtonClick('Log Out');
 						handleOpenModal();
@@ -88,6 +88,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 					Log Out
 				</button>
 				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
+				<div className="h-9"></div>
 			</div>
 		</div>
 	);

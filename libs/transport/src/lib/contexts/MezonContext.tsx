@@ -1,4 +1,5 @@
 import { Channel, Client, Session, Socket, Status } from '@mezon/mezon-js';
+import { WebSocketAdapterPb } from "@mezon/mezon-js-protobuf"
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
@@ -43,7 +44,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!clientRef.current) {
 			throw new Error('Mezon client not initialized');
 		}
-		const socket = clientRef.current.createSocket();
+		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false, new WebSocketAdapterPb());
 		socketRef.current = socket;
 		return socket;
 	}, [clientRef, socketRef]);
@@ -61,6 +62,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			}
 			const session = await clientRef.current.authenticateEmail(email, password, false);
 			sessionRef.current = session;
+
+			const socket = await createSocket(); // Create socket after authentication
+			socketRef.current = socket;
 
 			if (!socketRef.current) {
 				return session;
@@ -81,6 +85,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			}
 			const session = await clientRef.current.authenticateGoogle(token);
 			sessionRef.current = session;
+
+			const socket = await createSocket(); // Create socket after authentication
+			socketRef.current = socket;
 
 			if (!socketRef.current) {
 				return session;
@@ -138,17 +145,12 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const joinChatChannel = React.useCallback(
-		async (channelId: string, channelName: string) => {
+		async (channelId: string, channelName: string) => {			
 			const socket = socketRef.current;
 
 			if (!socket) {
 				throw new Error('Socket is not initialized');
 			}
-
-			// if (channelRef.current) {
-			//     await socket.leaveChat(channelRef.current.id);
-			//     channelRef.current = null;
-			// }
 
 			const join = await socket.joinChat(channelId, channelName, 1, true, false);
 

@@ -4,7 +4,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MezonUiProvider } from '@mezon/ui';
 import { useEffect, useMemo } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,18 +11,17 @@ import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { routes } from './routes/index';
+import React from 'react';
 
 const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
 const mezon: CreateMezonClientOptions = {
-	host: 'dev-mezon.nccsoft.vn',
-	// host: '127.0.0.1',
-	port: '7350',
-	key: 'defaultkey',
-	ssl: false,
+	host: process.env.NX_CHAT_APP_API_HOST as string,
+	port: process.env.NX_CHAT_APP_API_PORT as string,
+	key: process.env.NX_CHAT_APP_API_KEY as string,
+	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
 
-const theme = 'light';
 
 export function App() {
 	const mezon = useMezon();
@@ -35,9 +33,7 @@ export function App() {
 	}
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<MezonUiProvider themeName={theme}>
-				<RouterProvider router={routes} />
-			</MezonUiProvider>
+			<RouterProvider router={routes} />
 		</MezonStoreProvider>
 	);
 }
@@ -54,19 +50,21 @@ function AppWrapper() {
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 			<MezonContextProvider mezon={mezon} connect={true}>
-				<App />
-				<ToastContainer
-					position="top-right"
-					autoClose={2200}
-					hideProgressBar={false}
-					newestOnTop={false}
-					closeOnClick
-					rtl={false}
-					pauseOnFocusLoss
-					draggable
-					pauseOnHover
-					theme="light"
-				/>
+				<React.StrictMode>
+					<App />
+					<ToastContainer
+						position="top-right"
+						autoClose={2200}
+						hideProgressBar={false}
+						newestOnTop={false}
+						closeOnClick
+						rtl={false}
+						pauseOnFocusLoss
+						draggable
+						pauseOnHover
+						theme="light"
+					/>
+				</React.StrictMode>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
 	);

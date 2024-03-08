@@ -1,7 +1,7 @@
 const SettingAccount = () => {
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px]">
-			<p className="text-blue-500">chua lam</p>
+		<div className="flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] min-w-[500px] 2xl:min-w-[900px]">
+			<p className="text-blue-500">not implemented</p>
 		</div>
 	);
 };

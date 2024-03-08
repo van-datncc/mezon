@@ -21,11 +21,15 @@ export function useAppNavigation() {
 	}, []);
 
 	const toChannelPage = useCallback((channelId: string, clanId: string) => {
-		return `/chat/servers/${clanId}/channels/${channelId}`;
+		return `/chat/clans/${clanId}/channels/${channelId}`;
+	}, []);
+
+	const toMessageChannel = useCallback((channelId: string, clanId: string, messageId:string) => {
+		return `/chat/clans/${clanId}/channels/${channelId}?messageId=${messageId}`;
 	}, []);
 
 	const toClanPage = useCallback((clanId: string) => {
-		return `/chat/servers/${clanId}/channels`;
+		return `/chat/clans/${clanId}/channels`;
 	}, []);
 
 	const toDmGroupPage = useCallback((directId: string, type: number) => {
@@ -46,7 +50,8 @@ export function useAppNavigation() {
 			toClanPage,
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
+			toMessageChannel
 		}),
-		[navigate, toLoginPage, toHomePage, toDirectMessagePage, toChannelPage, toClanPage, toDmGroupPage, toDmGroupPageFromFriendPage],
+		[navigate, toLoginPage, toHomePage, toDirectMessagePage, toChannelPage, toClanPage, toDmGroupPage, toDmGroupPageFromFriendPage, toMessageChannel],
 	);
 }

@@ -35,6 +35,8 @@ module.exports = {
 				widthMessageWithUser: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${avatarWidth})`,
 				widChatBoxBreak: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${memberWidth} - ${iconWidth})`,
 				widthMessageTextChat:`calc(100% - 40px)`,
+				widthChannelTypeText:`calc(100% - 10px)`,
+				widthSideBar:`calc(100vw - 72px)`,
 				450: '450px',
 				"4/5":"80%",
 				"9/10":"90%",
@@ -44,6 +46,8 @@ module.exports = {
 				heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
 				heightTopBar: topBarHeight,
 				heightChatBox: chatBoxHeight,
+				heightHeader:"58px",
+				"9/10":"90%",
 			},
 
 			maxWidth: {
@@ -53,6 +57,8 @@ module.exports = {
 
 			maxHeight: {
 				'4/5': '80%',
+				'9/10':"90%",
+				heightInBox:`calc(100vh - 170px)`,
 			},
 
 			minHeight: {

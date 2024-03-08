@@ -36,7 +36,7 @@ function waitUntil<T>(condition: () => T | undefined, ms: number = 100): Promise
 	return new Promise((resolve) => {
 		const interval = setInterval(() => {
 			const result = condition();
-			if (result !== undefined) {
+			if (result !== undefined && result !== null) {
 				clearInterval(interval);
 				resolve(result);
 			}
@@ -64,13 +64,10 @@ export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ chann
 		if (!noFetchMembers) {
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
 		}
-		const chanel = await waitUntil(() => selectChannelById(channelId)(getChannelsRootState(thunkAPI)));
-		if (!chanel || !chanel.channel_lable) {
-			return thunkAPI.rejectWithValue([]);
-		}
+		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));		
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.joinChatChannel(channelId, chanel?.channel_lable || '');
-		return chanel;
+		await mezon.joinChatChannel(channelId, channel?.channel_lable || '');
+		return channel;
 	} catch (error) {
 		console.log(error);
 		return thunkAPI.rejectWithValue([]);
@@ -232,7 +229,7 @@ export const selectAllChannels = createSelector(getChannelsState, selectAll);
 
 export const selectChannelsEntities = createSelector(getChannelsState, selectEntities);
 
-export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id]);
+export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id] || null);
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 

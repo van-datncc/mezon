@@ -1,11 +1,11 @@
 import { MemberProfile } from '@mezon/components';
-import { useAppParams, useChatDirect } from '@mezon/core';
+import { useAppParams } from '@mezon/core';
 import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 export type MemberListProps = { className?: string; directMessageId: string | undefined };
 
-function MemberListGroupChat({ directMessageId }: MemberListProps) {	
+function MemberListGroupChat({ directMessageId }: MemberListProps) {
 	const { directId } = useAppParams();
 	const rawMembers = useSelector(selectMembersByChannelId(directId));
 
@@ -29,7 +29,7 @@ function MemberListGroupChat({ directMessageId }: MemberListProps) {
 									numberCharacterCollapse={30}
 									avatar={user?.user?.avatar_url ?? ''}
 									name={user?.user?.username ?? ''}
-									status={user.user?.online}
+									status={user?.user?.online}
 									isHideStatus={false}
 									key={user.id}
 								/>

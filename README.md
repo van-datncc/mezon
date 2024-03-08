@@ -8,12 +8,10 @@
 
 `npm install --global nx@latest`
 
-
 ## Notes
 
--  using `Git Bash` to run the commands
--  using `VSCode` as the code editor
-
+-   using `Git Bash` to run the commands
+-   using `VSCode` as the code editor
 
 ## Sync dependencies
 
@@ -32,7 +30,6 @@ To start the development server run `nx run dev:chat`. Open your browser and nav
 
 -   Run `npm run format` to format the codebase
 -   Run `npm run format:fix` to fix the formatting issues
-
 
 ## Architecture Overview
 
@@ -101,17 +98,33 @@ The application data flow is managed by some packages:
 
 ### Data concept
 
-- When the application starts, based on the initial route, the application will load the components and pages
-- Before render components and pages, the application will trigger `loader` to load the initial data
-- The `loader` will trigger the `action` to fetch the data from the server
-- The component will render the data based on the state of the store
-- The dispatched action will trigger an `asyncThunk` to fetch the data from the server using `mezon-js` package
-- The `asyncThunk` returns the data from the server and updates the state of the store by an `extraReducers` function
-- The component or hook will select the data from the store using `useSelector`
-- the selectors will select the data from the store based on the state of the store
-- When user interacts with the component, the component will dispatch the action to update the state of the store
-- We could group the data and logic into a custom hook to manage the data and logic of the component
-- The component could use the custom hook to manage the data and logic of the component
+-   When the application starts, based on the initial route, the application will load the components and pages
+-   Before render components and pages, the application will trigger `loader` to load the initial data
+-   The `loader` will trigger the `action` to fetch the data from the server
+-   The component will render the data based on the state of the store
+-   The dispatched action will trigger an `asyncThunk` to fetch the data from the server using `mezon-js` package
+-   The `asyncThunk` returns the data from the server and updates the state of the store by an `extraReducers` function
+-   The component or hook will select the data from the store using `useSelector`
+-   the selectors will select the data from the store based on the state of the store
+-   When user interacts with the component, the component will dispatch the action to update the state of the store
+-   We could group the data and logic into a custom hook to manage the data and logic of the component
+-   The component could use the custom hook to manage the data and logic of the component
+
+## Layouting
+
+how to layout the components and pages
+
+![Layouting](./docs/layouting.svg)
+
+We have sevaral layout components to handle layout based on the route:
+
+-   `/` - `AppLayout`: The layout for the application
+-   `/chat` -[logged in]- `MainLayout`: The layout for the main page
+-   `Main`: The main page to render the global components
+-   `/chat/server/:id` - `ClanLayout`: The layout for the server page
+-   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
+-   routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
+-   We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
 
 ### Access Control
 
@@ -125,41 +138,25 @@ There are several ways to manage the access control:
 -   using `UserRestrictionZone` to control displaying the components based on the user permissions
 -   using `useUserRestriction` to get the user restrictions based on the user permissions
 
-## Layouting
-
-how to layout the components and pages
-
-![Layouting](./docs/layouting.svg)
-
-We have sevaral layout components to handle layout based on the route:
-
--   `/` - `AppLayout`: The layout for the application
--   `/chat` -[logged in]- `MainLayout`: The layout for the main page
--   `Main`: The main page to render the global components
--   `/chat/server/:id` - `ServerLayout`: The layout for the server page
--   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
-- routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
-- We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
-
 ## Performance Optimization
 
 ### Performance Factors
 
 The application performance is mostly affected by these factors:
 
-- The routing structure: we keep the routing straitforward and simple, make sure that one route is only re-render when the route changes
-- Unnecessary re-render: we use `memo` and `useMemo` to prevent unnecessary re-render
-- Memory leak: we use `useEffect` and `clear function` to prevent memory leak
-- Function changes reference: we use `useCallback` to prevent function changes reference
-- Api calls: we use `store` and `memoizee` to cache the api calls
-- Wrong level of abstraction: we use `custom hook` to manage the data and logic of the component, make sure that the custom hook group data of same level of abstraction, and not re-render the component when the unrelated data changes
+-   The routing structure: we keep the routing straitforward and simple, make sure that one route is only re-render when the route changes
+-   Unnecessary re-render: we use `memo` and `useMemo` to prevent unnecessary re-render
+-   Memory leak: we use `useEffect` and `clear function` to prevent memory leak
+-   Function changes reference: we use `useCallback` to prevent function changes reference
+-   Api calls: we use `store` and `memoizee` to cache the api calls
+-   Wrong level of abstraction: we use `custom hook` to manage the data and logic of the component, make sure that the custom hook group data of same level of abstraction, and not re-render the component when the unrelated data changes
 
 ### Performance Tools
 
 We use several tools to measure the performance of the application:
 
--  `React DevTools`: to measure the performance of the application
--  `Chrome DevTools`: to measure the performance of the application
+-   `React DevTools`: to measure the performance of the application
+-   `Chrome DevTools`: to measure the performance of the application
 
 ## Conventions and Guidelines
 

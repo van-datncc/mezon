@@ -3,6 +3,9 @@ import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
 import * as Icons from '../../Icons/index';
+import MemberProfile from '../../MemberProfile';
+import NotificationList from '../../NotificationList';
+import { useMemberStatus } from '@mezon/core';
 
 export type ChannelTopbarProps = {
 	dmGroupId?: string;
@@ -10,16 +13,25 @@ export type ChannelTopbarProps = {
 
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
+	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '')
 
 	return (
-		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink">
+		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 flex-shrink">
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
-					<Icons.Hashtag />
+					<MemberProfile
+						numberCharacterCollapse={22}
+						avatar={Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1 ? '/assets/images/avatar-group.png' : (currentDmGroup?.channel_avatar ?? '')}
+						name={''}
+						status={userStatus}
+						isHideStatus={true}
+						isHideIconStatus={false}
+						key={currentDmGroup.channel_id}
+					/>
 					<h2 className="font-[Manrope] shrink-1 text-white text-ellipsis">{currentDmGroup.channel_lable}</h2>
 				</div>
 
-				<div className="hidden items-center h-full ml-auto lg:flex flex-1 justify-end">
+				<div className=" items-center h-full ml-auto flex flex-1 justify-end">
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>
@@ -45,7 +57,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						<SearchMessage />
 						<div className="justify-start items-start gap-4 flex">
 							<button>
-								<Icons.Inbox />
+								<NotificationList />
 							</button>
 							<button>
 								<Icons.Help />

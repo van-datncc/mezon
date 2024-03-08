@@ -2,6 +2,7 @@ import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import NotificationList from '../NotificationList';
 import { ChannelLable, SearchMessage } from './TopBarComponents';
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
@@ -9,13 +10,13 @@ export type ChannelTopbarProps = {
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	return (
-		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink ">
+		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader relative">
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLable type={Number(channel?.type)} name={channel?.channel_lable} isPrivate={channel?.channel_private} />
 			</div>
 
 			{/* Desktop buttons */}
-			<div className="hidden items-center h-full ml-auto lg:flex">
+			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
 					<div className="justify-start items-center gap-[15px] flex">
 						<ThreadButton />
@@ -25,8 +26,8 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<ThreeDotButton />
 					</div>
 					<SearchMessage />
-					<div className="justify-start items-start gap-4 flex">
-						<InboxButton />
+					<div className="justify-start items-start gap-4 flex" id="inBox">
+						<NotificationList />
 						<HelpButton />
 					</div>
 				</div>

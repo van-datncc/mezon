@@ -17,8 +17,7 @@ export default function InvitePage() {
 		if (inviteIdParam) {
 			inviteUser(inviteIdParam).then((res) => {
 				if (res.channel_id && res.clan_id) {
-					console.log('LInk : ', `/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
-					navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
+					navigate(`/chat/clans/${res.clan_id}/channels/${res.channel_id}`);
 				}
 			});
 		}
@@ -38,18 +37,12 @@ export default function InvitePage() {
 	useEffect(() => {
 		if (inviteIdParam) {
 			getLinkInvite(inviteIdParam).then((res) => {
-				console.log('res: ', res);
-				// if (res.channel_id && res.clan_id) {
-				// }
-				// navigate(`/chat/servers/${res.clan_id}/channels/${res.channel_id}`);
 				setClanName(res.clan_name ?? 'Mezon');
-				setChannelName(res.channel_name ?? 'general');
+				setChannelName(res.channel_name || '');
 				setOpenModal(true);
 			});
 		}
 	}, []);
-
-	console.log('clanName: ', clanName, 'channelName: ', clanName);
 	return (
 		<>
 			<div></div>
@@ -62,15 +55,17 @@ export default function InvitePage() {
 						</div>
 						<p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">You've been invite to join</p>
 						<p className="text-4xl text-white font-semibold mt-4">{clanName}</p>
-						<p className="text-4xl text-white text-[18px]">#{channelName}</p>
+						{channelName && (
+							<p className="text-4xl text-white text-[18px]">#{channelName}</p>
+						)}
 					</div>
 				</Modal.Body>
 				{/* <Modal.Footer> */}
 				<div className="flex justify-center flex-row items-center gap-4 pb-8 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
-					<Button color="gray" className="outline-none" onClick={handleCancelJoin}>
+					<Button color="gray" className="outline-none font-semibold rounded" onClick={handleCancelJoin}>
 						No, Thanks
 					</Button>
-					<Button color="blue" onClick={handleJoinChannel}>
+					<Button color="blue" onClick={handleJoinChannel} className="font-semibold rounded">
 						Join Mezon
 					</Button>
 				</div>

@@ -1,24 +1,25 @@
-import { useChatDirect } from '@mezon/core';
+import { useDirectMessages } from '@mezon/core';
 import { RootState } from '@mezon/store';
-import { IMessage } from '@mezon/utils';
+import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import MessageBox, { IMessagePayload } from '../../MessageBox';
+import {MessageBox} from '@mezon/components';
+import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 interface DirectIdProps {
 	directParamId: string;
 }
 export function DirectMessageBox({ directParamId }: DirectIdProps) {
-	const { sendDirectMessage } = useChatDirect(directParamId);
+	const { sendDirectMessage } = useDirectMessages({ channelId: directParamId });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const handleSend = useCallback(
-		(mess: IMessagePayload) => {
+		(content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>, 
+			attachments?: Array<ApiMessageAttachment>,
+			references?: Array<ApiMessageRef>) => {
 			if (sessionUser) {
-				const messageToSend: IMessage = {
-					...mess,
-				};
-				sendDirectMessage(messageToSend);
+				sendDirectMessage(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}
