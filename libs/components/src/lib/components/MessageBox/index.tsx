@@ -73,7 +73,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const raw = convertToRaw(contentState);
 		// get message
 		const messageRaw = raw.blocks;
-		const messageContent = Object.values(messageRaw).map((item) => item.text);
+		const messageContent = Object.values(messageRaw)
+			.filter(item => item.text.trim() !== '')
+			.map((item) => item.text);
 		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
 
 		if (messageBreakline.length > 2000) {
@@ -124,10 +126,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				onRemove: () => handleRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-			const newEditorState = EditorState.set(editorState, {
-				currentContent: contentStateWithEntity,
-			});
-			setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
+			
+			const newEditorState = EditorState.push(editorState, contentStateWithEntity, 'insert-fragment');
+			const newEditorStateWithImage = EditorState.forceSelection(
+				newEditorState,
+				newEditorState.getSelection().merge({
+					anchorOffset: 0,
+					focusOffset: 0,
+				})
+			);
+			const newStateWithImage = AtomicBlockUtils.insertAtomicBlock(newEditorStateWithImage, entityKey, ' ');
+			setEditorState(newStateWithImage);
+	
 			attachmentData.push(attachment);
 			setAttachmentData(attachmentData);
 		},
