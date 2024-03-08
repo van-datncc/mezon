@@ -1,16 +1,20 @@
 import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { ReactedOutsideOptional } from 'apps/chat/src/app/pages/channel/ChannelMessage';
 import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons/index';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
+
+export type ReactedOutsideOptional = {
+	emoji: string;
+	messageId: string;
+};
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;
@@ -44,7 +48,7 @@ type EmojiItemOptionals = {
 };
 
 function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
-	const { messageTime } = useMessageParser(message);
+	const { messageTime, messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
@@ -225,7 +229,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
 				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
-					<span className="text-center px-3 whitespace-nowrap">{messageTime}</span>
+					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
@@ -260,36 +264,38 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 							</div>
 							<div onMouseDown={(e) => e.preventDefault()} className="flex justify-start flex-row w-full gap-2 flex-wrap">
 								{emojiDataIncSocket &&
-									emojiDataIncSocket.map((emoji: EmojiDataOptionals, index) => {
-										const userSender = emoji.senders.find((sender) => sender.id === userId);
-										const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
-										return (
-											<Fragment key={index}>
-												{checkID && (
-													<div
-														className={` justify-center items-center relative
+									emojiDataIncSocket
+										.filter((obj) => obj.messageId === message.id)
+										?.map((emoji: EmojiDataOptionals, index) => {
+											const userSender = emoji.senders.find((sender) => sender.id === userId);
+											const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
+											return (
+												<Fragment key={index}>
+													{checkID && (
+														<div
+															className={` justify-center items-center relative
 													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] border'}
 													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center`}
-														onClick={() =>
-															handleReactMessage(
-																currentChannelId ?? '',
-																message.id,
-																emoji.emoji,
-																userId ?? '',
-																message.sender_id,
-															)
-														}
-														onMouseDown={(e) => e.preventDefault()}
-													>
-														<span className=" relative left-[-10px]">{emoji.emoji}</span>
-														<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
-															<p>{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}</p>
+															onClick={() =>
+																handleReactMessage(
+																	currentChannelId ?? '',
+																	message.id,
+																	emoji.emoji,
+																	userId ?? '',
+																	message.sender_id,
+																)
+															}
+															onMouseDown={(e) => e.preventDefault()}
+														>
+															<span className=" relative left-[-10px]">{emoji.emoji}</span>
+															<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
+																<p>{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}</p>
+															</div>
 														</div>
-													</div>
-												)}
-											</Fragment>
-										);
-									})}
+													)}
+												</Fragment>
+											);
+										})}
 							</div>
 						</div>
 					</div>

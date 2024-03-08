@@ -8,7 +8,7 @@ export type ModalSettingProps = {
 
 const Setting = (props: ModalSettingProps) => {
 	const { open, onClose } = props;
-	const [currentSetting, setCurrentSetting] = useState<string>('Account');
+	const [currentSetting, setCurrentSetting] = useState<string>('Profiles');
 	const handleSettingItemClick = (settingName: string) => {
 		setCurrentSetting(settingName);
 	};

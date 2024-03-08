@@ -2,6 +2,7 @@ import { useAccount } from '@mezon/core';
 import { InputField } from '@mezon/ui';
 import { useState } from 'react';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 // import * as Icons from '../../Icons';
 
 // import React, { useState, useEffect } from 'react';
@@ -16,9 +17,8 @@ const SettingRightUser = ({
 	avatar: string;
 	nameDisplay: string;
 }) => {
-	const [minutes, setMinutes] = useState(0);
-	const [seconds, setSeconds] = useState(0);
 	const [userName, setUserName] = useState(name);
+	const { sessionRef, clientRef } = useMezon();
 	const [displayName, setDisplayName] = useState(nameDisplay);
 	const [urlImage, setUrlImage] = useState(avatar);
 	const { updateUser } = useAccount();
@@ -30,8 +30,17 @@ const SettingRightUser = ({
 		}
 	};
 	const handleFile = (e: any) => {
-		const fileToStore: File = e.target.files[0];
-		setUrlImage(URL.createObjectURL(fileToStore));
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!file) return;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+			setUrlImage(attachment.url ?? '');
+		});
 		setFlags(true);
 	};
 	const handleClose = () => {
@@ -65,9 +74,9 @@ const SettingRightUser = ({
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
-				<h1 className="text-2xl font-bold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 font-bold text-xl border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
-				<button className="pt-1 text-[#AEAEAE] text-xl ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
+				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
+				<button className="pt-1 font-bold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
+				<button className="pt-1 text-[#AEAEAE] text-base ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
 					Clan Profiles
 				</button>
 			</div>
@@ -82,7 +91,6 @@ const SettingRightUser = ({
 							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
-							defaultValue={displayName}
 						/>
 					</div>
 					<div className="mt-8">
@@ -105,13 +113,6 @@ const SettingRightUser = ({
 							</button>
 						</div>
 					</div>
-					{/* <div className="mt-[20px]">
-                        <p>ABOUT ME</p>
-                        <textarea className="rounded-[3px] w-full min-h-[3em] resize-none p-[5px] pl-[10px] bg-black mt-[10px]" rows={5}
-                            //   onChange={handleChange}
-                            placeholder="Introduce something cool..."
-                        />
-                    </div> */}
 				</div>
 				<div className="w-1/2 text-white">
 					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>

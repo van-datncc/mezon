@@ -4,6 +4,7 @@ import { InputField, Modal } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -14,17 +15,28 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { open, onClose } = props;
 	const [urlImage, setUrlImage] = useState('');
 	const [nameClan, setNameClan] = useState('');
+	const { sessionRef, clientRef } = useMezon();
 	const { navigate, toClanPage } = useAppNavigation();
 	const { createClans } = useClans();
 	const userProfile = useSelector(selectAllAccount);
 	const handleFile = (e: any) => {
-		const fileToStore: File = e.target.files[0];
-		setUrlImage(URL.createObjectURL(fileToStore));
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!file) return;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+			setUrlImage(attachment.url ?? '');
+		});
 	};
+
 	const handleCreateClan = () => {
 		// TODO: validate
 		if (nameClan) {
-			createClans(nameClan, '').then((res) => {
+			createClans(nameClan, urlImage).then((res) => {
 				if (res && res.clan_id) {
 					navigate(toClanPage(res.clan_id || ''));
 				}

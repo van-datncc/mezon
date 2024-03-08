@@ -5,7 +5,7 @@ type MessageLineProps = {
 	line: string;
 };
 
-const MentionSpan = ({ text }: { text: string }) => <span className="text-blue-500">{text}</span>;
+const MentionSpan = ({ text }: { text: string }) => <span className="text-blue-500 cursor-pointer">{text}</span>;
 
 type ILinePartWithMention = {
 	mention: ILineMention;

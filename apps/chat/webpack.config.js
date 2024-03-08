@@ -5,7 +5,10 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 // Nx plugins for webpack.
 module.exports = composePlugins(
-  withNx(),
+  withNx({
+    optimization: true,
+    namedChunks: true,
+  }),
   withReact({
     // Uncomment this line if you don't want to use SVGR
     // See: https://react-svgr.com/

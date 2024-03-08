@@ -6,7 +6,6 @@ import loadable from '@loadable/component';
 import AppLayout from '../layouts/AppLayout';
 import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
-import ClanLayout from '../layouts/ClanLayout';
 
 // Loaders
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
@@ -24,26 +23,22 @@ import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
 import { loginLoader } from '../loaders/loginLoader';
 
-
 // Pages
-
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
-
-import { ChannelIndex } from '../pages/channel/ChannelIndex';
-import { ClanIndex } from '../pages/clan/ClanIndex';
-import { DirectMessage } from '../pages/directMessage/DMPage';
-import { DirectMessageIndex } from '../pages/directMessage/DMPage/DirectMessageIndex';
-import FriendsPage from '../pages/directMessage/FriendsPage';
 
 const Login = loadable(() => import('../pages/login'));
 const Main = loadable(() => import('../pages/main'));
 const DirectMain = loadable(() => import('../pages/directMessage'));
 const InvitePage = loadable(() => import('../pages/invite'));
 const ChannelMain = loadable(() => import('../pages/channel'));
-
-
+const ChannelIndex = loadable(() => import('../pages/channel/ChannelIndex'));
+const ClanIndex = loadable(() => import('../pages/clan/ClanIndex'));
+const DirectMessage = loadable(() => import('../pages/directMessage/DMPage'));
+const DirectMessageIndex = loadable(() => import('../pages/directMessage/DMPage/DirectMessageIndex'));
+const FriendsPage = loadable(() => import('../pages/directMessage/FriendsPage'));
+const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 
 // Components
 export const routes = createBrowserRouter([

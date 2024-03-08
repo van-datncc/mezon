@@ -1,5 +1,5 @@
-import { IconFriends, Search } from '@mezon/components';
-import { useDirect, useFriends } from '@mezon/core';
+import { Icons } from '@mezon/components';
+import { useFriends } from '@mezon/core';
 import { FriendsEntity, RootState, friendsActions, requestAddFriendParam, selectMemberStatus, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { useState } from 'react';
@@ -78,15 +78,13 @@ export default function FriendsPage() {
 		}
 	};
 
-
 	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
-
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
 			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-heightHeader">
 				<div className="flex flex-row gap-2">
-					<IconFriends />
+					<Icons.IconFriends />
 					Friend
 				</div>
 				<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-borderDefault">
@@ -127,7 +125,7 @@ export default function FriendsPage() {
 									className="mb-6 py-[10px] text-[14px] h-[44px] placeholder-gray-600"
 								/>
 								<div className="absolute top-3 right-5">
-									<Search />
+									<Icons.Search />
 								</div>
 							</div>
 							<span className="text-[14px] text-contentSecondary mb-4 font-bold px-[14px]">
@@ -145,7 +143,7 @@ export default function FriendsPage() {
 								<InputField
 									onChange={(e) => handleChange('username', e.target.value)}
 									type="text"
-									className="bg-bgSurface mb-2 mt-1"
+									className="bg-bgSurface mb-2 mt-1 py-3"
 									value={requestAddFriend.usernames}
 									placeholder="Usernames"
 								/>
