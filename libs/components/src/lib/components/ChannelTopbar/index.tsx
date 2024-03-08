@@ -2,15 +2,15 @@ import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
-import { ChannelLable, SearchMessage } from './TopBarComponents';
 import NotificationList from '../NotificationList';
+import { ChannelLable, SearchMessage } from './TopBarComponents';
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	return (
-		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader">
+		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader relative">
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLable type={Number(channel?.type)} name={channel?.channel_lable} isPrivate={channel?.channel_private} />
 			</div>
@@ -26,7 +26,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<ThreeDotButton />
 					</div>
 					<SearchMessage />
-					<div className="justify-start items-start gap-4 flex">
+					<div className="justify-start items-start gap-4 flex" id="inBox">
 						<NotificationList />
 						<HelpButton />
 					</div>
