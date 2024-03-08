@@ -65,6 +65,7 @@ export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ chann
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
 		}
 		const channel = await waitUntil(() => selectChannelById(channelId)(getChannelsRootState(thunkAPI)));
+		// 
 		if (!channel || !channel.channel_lable) {
 			return thunkAPI.rejectWithValue([]);
 		}
