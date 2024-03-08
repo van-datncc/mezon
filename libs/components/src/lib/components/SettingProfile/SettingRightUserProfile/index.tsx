@@ -2,6 +2,7 @@ import { useAccount } from '@mezon/core';
 import { InputField } from '@mezon/ui';
 import { useState } from 'react';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 // import * as Icons from '../../Icons';
 
 // import React, { useState, useEffect } from 'react';
@@ -17,6 +18,7 @@ const SettingRightUser = ({
 	nameDisplay: string;
 }) => {
 	const [userName, setUserName] = useState(name);
+	const { sessionRef, clientRef } = useMezon();
 	const [displayName, setDisplayName] = useState(nameDisplay);
 	const [urlImage, setUrlImage] = useState(avatar);
 	const { updateUser } = useAccount();
@@ -28,8 +30,17 @@ const SettingRightUser = ({
 		}
 	};
 	const handleFile = (e: any) => {
-		const fileToStore: File = e.target.files[0];
-		setUrlImage(URL.createObjectURL(fileToStore));
+		const file = e.target.files && e.target.files[0];
+		const fullfilename = file?.name;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!file) return;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+			setUrlImage(attachment.url ?? '');
+		});
 		setFlags(true);
 	};
 	const handleClose = () => {
@@ -102,13 +113,6 @@ const SettingRightUser = ({
 							</button>
 						</div>
 					</div>
-					{/* <div className="mt-[20px]">
-                        <p>ABOUT ME</p>
-                        <textarea className="rounded-[3px] w-full min-h-[3em] resize-none p-[5px] pl-[10px] bg-black mt-[10px]" rows={5}
-                            //   onChange={handleChange}
-                            placeholder="Introduce something cool..."
-                        />
-                    </div> */}
 				</div>
 				<div className="w-1/2 text-white">
 					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>

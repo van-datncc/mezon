@@ -44,7 +44,7 @@ type EmojiItemOptionals = {
 };
 
 function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
-	const { messageTime } = useMessageParser(message);
+	const { messageTime, messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
@@ -225,7 +225,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
 				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
-					<span className="text-center px-3 whitespace-nowrap">{messageTime}</span>
+					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
@@ -257,7 +257,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						</div>
 						<div className="flex justify-start flex-row w-full gap-2 flex-wrap">
 							{emojiDataIncSocket &&
-								emojiDataIncSocket.map((emoji: EmojiDataOptionals, index) => {
+								emojiDataIncSocket.filter(obj => obj.messageId === message.id)?.map((emoji: EmojiDataOptionals, index) => {
 									const userSender = emoji.senders.find((sender) => sender.id === userId);
 									const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
 									return (

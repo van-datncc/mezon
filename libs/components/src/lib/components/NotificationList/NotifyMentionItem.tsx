@@ -31,7 +31,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
                     </div>
                     <div className='flex flex-col gap-1'>
                         <div className='font-bold text-[16px]'># {channelInfo?.channel_lable}</div>
-                        <div className='text-[10px]'>{clanInfo?.clan_name} {'>'} {channelInfo?.category_name}</div>
+                        <div className='text-[10px] uppercase'>{clanInfo?.clan_name} {'>'} {channelInfo?.category_name}</div>
                     </div>
                 </div>
                 <button
