@@ -1,6 +1,7 @@
 import { MemberList } from '@mezon/components';
+import { ChatContext } from '@mezon/core';
 import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChanneMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -9,13 +10,19 @@ import { ChannelTyping } from './ChannelTyping';
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChanel = useSelector(selectCurrentChannel);
-
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const { isOpenEmojiChatBox, setIsOpenEmojiChatBox } = useContext(ChatContext);
+
+	const handleCloseEmojiPopup = () => {
+		if (isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(false);
+		}
+	};
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 			<div className="flex h-heightWithoutTopBar flex-row ">
-				<div className="flex flex-col flex-1 w-full h-full">
+				<div onClick={handleCloseEmojiPopup} className="flex flex-col flex-1 w-full h-full">
 					<div
 						className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 						ref={messagesContainerRef}
