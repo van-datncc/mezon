@@ -22,7 +22,9 @@ export { default as SettingAccount } from './components/SettingAccount';
 export { default as ListMemberInvite } from './components/ListMemberInvite';
 export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
 
-export * from './components/Icons';
+export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export * from './components/SettingProfile';
+export * from './components/MessageWithUser';
+
