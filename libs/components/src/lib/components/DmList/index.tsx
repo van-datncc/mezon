@@ -58,9 +58,8 @@ function DirectMessageList() {
 			</div>
 			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
-					{filteredDataDM.map((directMessage: any) => {
-						const uniqueKey = uuidv4();
-						return <DMListItem key={uniqueKey} directMessage={directMessage} />;
+					{filteredDataDM.map((directMessage: any, index:number) => {
+						return <DMListItem key={index} directMessage={directMessage} />;
 					})}
 				</div>
 			</div>

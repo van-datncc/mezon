@@ -47,8 +47,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	return (
 		<div>
 			{mentions.map((mention, i) => {
-				const uniqueKey = uuidv4();
-				return <LineWithMention key={uniqueKey} mention={mention} />;
+				return <LineWithMention key={i} mention={mention} />;
 			})}
 		</div>
 	);

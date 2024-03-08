@@ -1,6 +1,5 @@
 import { IClan } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Tick } from '../Icons';
 
 export type ModalListClansProps = {
@@ -53,12 +52,11 @@ const ModalListClans = (props: ModalListClansProps) => {
          border-borderDefault bg-bgSecondary rounded-lg"
 		>
 			<div className="overflow-y-auto max-h-36">
-				{options.map((option: IClan, index) => {
-					const uniqueKey = uuidv4();
+				{options.map((option: IClan) => {
 					return (
 						<div
 							className={`w-auto flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`}
-							key={uniqueKey}
+							key={option.id}
 							onClick={() => onChangeClan(option.id)}
 						>
 							<div className="flex items-center gap-4 w-10/12">
