@@ -17,11 +17,11 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 			<div className="text-white">
-				<h1 className="text-2xl font-bold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 text-[#AEAEAE] font-bold text-xl tracking-wider" onClick={handleUserProfileButtonClick}>
+				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
+				<button className="pt-1 text-[#AEAEAE] font-bold text-base tracking-wider" onClick={handleUserProfileButtonClick}>
 					User Profile
 				</button>
-				<button className="pt-1 font-bold text-xl ml-[16px] border-b-2 border-[#155EEF] pb-2 tracking-wider">Clan Profiles</button>
+				<button className="pt-1 font-bold text-base ml-[16px] border-b-2 border-[#155EEF] pb-2 tracking-wider">Clan Profiles</button>
 				<div className="flex mt-[30px] flex-col xl:flex-row gap-x-1 text-sm font-normal">
 					<p>Show who you are with different profiles for each of your clans</p>
 					<a href="" className="text-[#84ADFF] text-sm font-normal">

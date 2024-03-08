@@ -2,7 +2,7 @@ import { authActions, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
 const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => void }) => {
-	const [selectedButton, setSelectedButton] = useState<string | null>('Account');
+	const [selectedButton, setSelectedButton] = useState<string | null>('Profiles');
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
@@ -24,10 +24,10 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				<p className="text-[#84ADFF] font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
 					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 ${selectedButton === 'Account' ? 'bg-blue-400 text-white' : ''}`}
-					onClick={() => {
-						handleButtonClick('Account');
-						onItemClick && onItemClick('Account');
-					}}
+					// onClick={() => {
+					// 	handleButtonClick('Account');
+					// 	onItemClick && onItemClick('Account');
+					// }}
 				>
 					My Account
 				</button>
