@@ -1,16 +1,20 @@
 import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { ReactedOutsideOptional } from 'apps/chat/src/app/pages/channel/ChannelMessage';
 import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import * as Icons from '../Icons/index';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
+
+export type ReactedOutsideOptional = {
+	emoji: string;
+	messageId: string;
+};
 
 export type MessageWithUserProps = {
 	message: IMessageWithUser;

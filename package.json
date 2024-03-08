@@ -15,7 +15,8 @@
 		"build:chat": "nx run chat:build",
 		"build-stats:chat": "nx run chat:build --statsJson",
 		"bundle-analyzer:chat": "webpack-bundle-analyzer ./dist/apps/chat/stats.json",
-		"analyze:chat": "yarn build-stats:chat && yarn bundle-analyzer:chat"
+		"analyze:chat": "yarn build-stats:chat && yarn bundle-analyzer:chat",
+		"serve:chat": "serve -s ./dist/apps/chat"
 	},
 	"private": true,
 	"dependencies": {

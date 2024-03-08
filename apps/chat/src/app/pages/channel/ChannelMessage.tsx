@@ -1,10 +1,9 @@
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak, Icons } from '@mezon/components';
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import * as Icons from 'libs/components/src/lib/components/Icons/index';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -14,10 +13,7 @@ type MessageProps = {
 	lastSeen?: boolean;
 };
 
-export type ReactedOutsideOptional = {
-	emoji: string;
-	messageId: string;
-};
+
 export function ChannelMessage(props: MessageProps) {
 	const { message, lastSeen, preMessage } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);

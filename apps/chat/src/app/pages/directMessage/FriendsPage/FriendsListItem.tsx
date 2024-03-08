@@ -1,4 +1,4 @@
-import { IconChat, IconEditThreeDot, MemberProfile } from "@mezon/components"
+import { Icons, MemberProfile } from "@mezon/components"
 import { useAppNavigation, useDirect, useFriends, useMemberStatus } from "@mezon/core"
 import { FriendsEntity } from "@mezon/store"
 import { Dropdown } from 'flowbite-react';
@@ -59,7 +59,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
                             onClick={() => directMessageWithUser(friend.user?.id ?? '')}
                             className="bg-bgTertiary rounded-full p-2"
                         >
-                            <IconChat />
+                            <Icons.IconChat />
                         </button>
                         <Dropdown
                             label=""
@@ -68,7 +68,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
                             placement="right-start"
                             renderTrigger={() => (
                                 <button className="bg-bgTertiary rounded-full p-2">
-                                    <IconEditThreeDot />
+                                    <Icons.IconEditThreeDot />
                                 </button>
                             )}
                         >

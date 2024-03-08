@@ -3,7 +3,7 @@ import { useAppNavigation, useAppParams } from '@mezon/core';
 import { useEffect } from 'react';
 import ChannelMessages from '../../channel/ChanneMessages';
 
-export function DirectMessageIndex() {
+export default function DirectMessageIndex() {
 	const { directId } = useAppParams();
 	const { navigate } = useAppNavigation();
 

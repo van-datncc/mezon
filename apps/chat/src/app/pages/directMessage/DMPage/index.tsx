@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChanneMessages';
 
-export function DirectMessage() {
+export default function DirectMessage() {
 	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
 

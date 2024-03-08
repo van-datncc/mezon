@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChanneMessages';
 
-export function ChannelIndex() {
+export default function ChannelIndex() {
 	const { clanId } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();

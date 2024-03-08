@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-export function ClanIndex() {
+export default function ClanIndex() {
 	const { clanId } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
