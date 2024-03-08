@@ -239,7 +239,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 							<div className="w-5 h-5">
 								<img className="rounded-full" src={getSenderMessage.user?.avatar_url} alt={getSenderMessage.user?.avatar_url}></img>
 							</div>
-							<p className="gap-1">
+							<p className="gap-1 cursor-pointer">
 								<span className=" text-[#84ADFF] font-bold">@{getSenderMessage.user?.username} </span>
 								<span className="text-[13px] font-manrope"> {getMessageRef?.content.t}</span>
 							</p>
@@ -264,7 +264,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 										<Fragment key={index}>
 											{checkID && (
 												<div
-													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center`}
+													className={`relative ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338]'} rounded-md w-12 gap-1 h-5 flex flex-row justify-center items-center cursor-pointer`}
 													onClick={() =>
 														handleReactMessage(
 															currentChannelId ?? '',
