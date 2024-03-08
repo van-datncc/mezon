@@ -59,12 +59,23 @@ export function ChannelMessage(props: MessageProps) {
 			/>
 		);
 	}
-	const { isOpenReply, setMessageRef, setIsOpenReply } = useContext(ChatContext);
+	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef } = useContext(ChatContext);
 
 	const handleClickReply = () => {
 		setIsOpenReply(true);
 		setMessageRef(mess);
 	};
+
+	const handleClickReact = () => {
+		setIsOpenReactEmoji(!isOpenReactEmoji);
+		setMessageRef(mess);
+	};
+
+	useEffect(() => {
+		if (messageRef?.id !== mess.id) {
+			return setIsOpenReactEmoji(false);
+		}
+	}, [messageRef?.id, mess.id, setIsOpenReactEmoji, setMessageRef, isOpenReply, isOpenReactEmoji]);
 
 	return (
 		<div className="relative group hover:bg-gray-950/[.07]">
@@ -75,18 +86,20 @@ export function ChannelMessage(props: MessageProps) {
 				user={user}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			<div className="hidden z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary group-hover:block">
+			<div
+				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenReactEmoji ? 'block' : 'hidden'} group-hover:block`}
+			>
 				<button
 					className="h-full p-1 group"
 					onClick={(event) => {
 						event.stopPropagation();
-						setIsOpenReactEmoji(!isOpenReactEmoji);
+						handleClickReact();
 					}}
 				>
-					<Icons.Smile />
+					<Icons.Smile defaultFill={isOpenReactEmoji ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 				<button onClick={handleClickReply} className="rotate-180">
-					<Icons.Reply />
+					<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			</div>
 			{isOpenReactEmoji && (

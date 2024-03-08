@@ -24,6 +24,9 @@ export type ChatContextValue = {
 	setMessageRef: React.Dispatch<React.SetStateAction<IMessageWithUser | undefined>>;
 	isOpenReply: boolean;
 	setIsOpenReply: React.Dispatch<React.SetStateAction<boolean>>;
+
+	isOpenEmojiChatBox: boolean;
+	setIsOpenEmojiChatBox: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -31,6 +34,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
 	const [messageRef, setMessageRef] = React.useState<IMessageWithUser>();
 	const [isOpenReply, setIsOpenReply] = React.useState<boolean>(false);
+	const [isOpenEmojiChatBox, setIsOpenEmojiChatBox] = React.useState<boolean>(false);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -38,8 +42,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setMessageRef,
 			isOpenReply,
 			setIsOpenReply,
+			isOpenEmojiChatBox,
+			setIsOpenEmojiChatBox,
 		}),
-		[messageRef, setMessageRef, isOpenReply, setIsOpenReply],
+		[
+			messageRef,
+			setMessageRef,
+			isOpenReply,
+			setIsOpenReply,
+			isOpenEmojiChatBox,
+			setIsOpenEmojiChatBox,
+		],
 	);
 
 	const { socketRef } = useMezon();

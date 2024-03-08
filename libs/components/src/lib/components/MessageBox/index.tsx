@@ -42,6 +42,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
+	const { isOpenEmojiChatBox, setIsOpenEmojiChatBox } = useContext(ChatContext);
+
 	const mentionPlugin = useRef(
 		createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
@@ -58,6 +60,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	//clear Editor after navigate channel
 	useEffect(() => {
 		setEditorState(EditorState.createEmpty());
+		setIsOpenEmojiChatBox(false);
 	}, [currentChannelId, currentClanId]);
 
 	const onChange = useCallback((editorState: EditorState) => {
@@ -176,7 +179,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [messageRef]);
 
 	const handleSend = useCallback(() => {
-		setShowEmojiSuggestion(false);
+		setIsOpenEmojiChatBoxSuggestion(false);
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
@@ -214,7 +217,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}
 	const editorRef = useRef<Editor | null>(null);
 
-	const [showEmojiSuggestion, setShowEmojiSuggestion] = useState(false);
+	const [showEmojiSuggestion, setIsOpenEmojiChatBoxSuggestion] = useState(false);
 
 	const moveSelectionToEnd = () => {
 		editorRef.current!.focus();
@@ -234,7 +237,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
-			setShowEmojiSuggestion(false);
+			setIsOpenEmojiChatBoxSuggestion(false);
 		} else setShowPlaceHolder(false);
 
 		if (content.length >= 0) {
@@ -269,30 +272,29 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
-	const [isShowEmoji, setShowEmoji] = useState<boolean>(false);
 	const handleOpenEmoji = () => {
-		setShowEmoji(!isShowEmoji);
-		if (isOpenEmojiPropOutside && isShowEmoji) {
-			setShowEmoji(true);
+		setIsOpenEmojiChatBox(!isOpenEmojiChatBox);
+		if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(true);
 		}
 	};
 
 	useEffect(() => {
-		if (isOpenEmojiPropOutside && isShowEmoji) {
-			setShowEmoji(true);
+		if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(true);
 		}
-		if (!isOpenEmojiPropOutside && isShowEmoji) {
-			setShowEmoji(false);
+		if (!isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+			setIsOpenEmojiChatBox(false);
 		}
 	}, [isOpenEmojiPropOutside]);
 
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
 			setShowPlaceHolder(false);
-			setShowEmoji(false);
+			setIsOpenEmojiChatBox(false);
 			handleEmojiClick(emoji.native);
 		};
-		return <Picker data={data} onEmojiSelect={handleEmojiSelect} />;
+		return <Picker data={data} onEmojiSelect={handleEmojiSelect} theme="dark" />;
 	}
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
@@ -347,7 +349,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const inputValue = value;
 		if (!regexDetect.test(inputValue)) {
 			setEmojiResult([]);
-			setShowEmojiSuggestion(false);
+			setIsOpenEmojiChatBoxSuggestion(false);
 			return;
 		}
 		const matches = regexDetect.exec(inputValue)?.[0];
@@ -394,11 +396,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				}, 0);
 				break;
 			case 'Escape':
-				setShowEmojiSuggestion(false);
+				setIsOpenEmojiChatBoxSuggestion(false);
 				setEmojiResult([]);
 				break;
 			case 'Backscape':
-				setShowEmojiSuggestion(false);
+				setIsOpenEmojiChatBoxSuggestion(false);
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
@@ -420,7 +422,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			liRefs?.current[selectedItemIndex]?.focus();
 		}
 
-		emojiResult.length > 0 ? setShowEmojiSuggestion(true) : setShowEmojiSuggestion(false);
+		emojiResult.length > 0 ? setIsOpenEmojiChatBoxSuggestion(true) : setIsOpenEmojiChatBoxSuggestion(false);
 	}, [showEmojiSuggestion, emojiResult, syntax]);
 
 	useEffect(() => {
@@ -533,10 +535,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>
-					<Icons.Emoji defaultFill={isShowEmoji ? '#FFFFFF' : '#AEAEAE'} />
+					<Icons.Emoji defaultFill={isOpenEmojiChatBox ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			</div>
-			{isShowEmoji && (
+			{isOpenEmojiChatBox && (
 				<div className="absolute right-4 bottom-[--bottom-emoji] z-20">
 					<EmojiReaction />
 				</div>
