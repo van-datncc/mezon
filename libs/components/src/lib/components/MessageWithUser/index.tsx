@@ -234,7 +234,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				</div>
 			)}
 			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
-				<div className={`flex py-0.5 h-15 flex-col  overflow-x-hidden cursor-pointer ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}>
+				<div className={`flex py-0.5 h-15 flex-col  overflow-x-hidden ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
 							<Icons.ReplyCorner />
@@ -247,8 +247,8 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									></img>
 								</div>
 								<p className="gap-1">
-									<span className=" text-[#84ADFF] font-bold">@{getSenderMessage.user?.username} </span>
-									<span className="text-[13px] font-manrope"> {getMessageRef?.content.t}</span>
+									<span  className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">@{getSenderMessage.user?.username} </span>
+									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]"> {getMessageRef?.content.t}</span>
 								</p>
 							</div>
 						</div>
@@ -258,7 +258,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						<div className="flex-col w-full flex justify-center items-start relative gap-1">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
 							<div className="justify-start items-center inline-flex w-full">
-								<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat break-all">
+								<div className="flex flex-col gap-1 cursor-text text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-widthMessageTextChat break-all">
 									<MessageContent message={message} user={user} isCombine={isCombine} />
 								</div>
 							</div>
