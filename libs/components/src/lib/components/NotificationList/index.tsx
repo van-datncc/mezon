@@ -24,7 +24,7 @@ function NotificationList() {
 	return (
 		<Dropdown
 			label=""
-			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1"
+			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1 w-1/2 min-w-[480px] max-w-[600px]"
 			dismissOnClick={true}
 			placement="bottom"
 			renderTrigger={() => (
@@ -32,8 +32,9 @@ function NotificationList() {
 					<InboxButton />
 				</div>
 			)}
+			theme={{}}
 		>
-			<div className="py-2 px-3 bg-bgPrimary w-[600px]">
+			<div className="py-2 px-3 bg-bgPrimary">
 				<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
 					<InboxButton />
 					<div>InBox </div>
@@ -55,7 +56,7 @@ function NotificationList() {
 				</div>
 			</div>
 			{currentTabNotify === 'individual' && (
-				<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[800px] max-h-[700px] overflow-auto">
+				<div className="bg-bgSecondary flex flex-col max-w-[800px] overflow-y-auto max-h-heightInBox">
 					{notification.map((notify: INotification) => (
 						<NotificationItem notify={notify} key={notify.id} />
 					))}
