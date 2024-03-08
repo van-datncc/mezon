@@ -32,11 +32,11 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
-function waitUntil<T>(condition: () => T | undefined, ms: number = 1000): Promise<T> {
+function waitUntil<T>(condition: () => T | undefined, ms: number = 100): Promise<T> {
 	return new Promise((resolve) => {
 		const interval = setInterval(() => {
 			const result = condition();
-			if (result !== undefined) {
+			if (result !== undefined && result !== null) {
 				clearInterval(interval);
 				resolve(result);
 			}
