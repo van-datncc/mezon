@@ -12,7 +12,10 @@
 		"lint:fix": "nx run-many --target=lint --all --fix",
 		"format": "nx format:check",
 		"format:fix": "nx format:write",
-		"build:chat": "nx run chat:build"
+		"build:chat": "nx run chat:build",
+		"build-stats:chat": "nx run chat:build --statsJson",
+		"bundle-analyzer:chat": "webpack-bundle-analyzer ./dist/apps/chat/stats.json",
+		"analyze:chat": "yarn build-stats:chat && yarn bundle-analyzer:chat"
 	},
 	"private": true,
 	"dependencies": {
@@ -109,7 +112,8 @@
 		"ts-jest": "^29.1.1",
 		"ts-node": "10.9.2",
 		"typescript": "~5.3.3",
-		"url-loader": "^4.1.1"
+		"url-loader": "^4.1.1",
+		"webpack-bundle-analyzer": "^4.10.1"
 	},
 	"engines": {
 		"node": "18.x"
