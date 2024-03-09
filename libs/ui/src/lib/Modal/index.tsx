@@ -52,7 +52,7 @@ const Modal = (props: ModalProps) => {
 									<div className="bg-[#323232] ounded-[5px] bg-transparent">{children}</div>
 								</div>
 								{/*footer*/}
-								{/* {confirmButton && (
+								{confirmButton && (
 									<div className="flex items-center p-[20px] pb-[32px] border-t border-solid border-borderDefault rounded-b justify-between">
 										<button
 											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-[16px] leading-6 rounded-lg"
@@ -70,7 +70,7 @@ const Modal = (props: ModalProps) => {
 											{titleConfirm}
 										</button>
 									</div>
-								)} */}
+								)}
 							</div>
 						</div>
 					</div>
