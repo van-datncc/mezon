@@ -22,7 +22,7 @@
 						"input": "libs/assets/src/assets/",
 						"output": "./assets/"
 					},
-					{ "glob": "apps/chat/src/favicon.ico", "input": "./", "output": "./" }
+					{ "glob": "apps/chat/src/assets/favicon.ico", "input": "./", "output": "./" }
 				],
 				"styles": ["apps/chat/src/styles.scss"],
 				"scripts": [],
