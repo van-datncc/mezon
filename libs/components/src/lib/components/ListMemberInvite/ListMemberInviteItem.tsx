@@ -24,17 +24,19 @@ const ListMemberInviteItem = (props: ItemPorp) => {
         setIsInviteSent(isSent)
     },[isSent])
     return (
-        <div key={dmGroup.channel_id} className="flex items-center justify-between py-[5px]">
+        <div key={dmGroup.channel_id} className="flex items-center justify-between h-14">
                     {Array.isArray(dmGroup.channel_avatar) && dmGroup.channel_avatar.length > 1 ? (
-                        <img src={`/assets/images/avatar-group.png`} alt="" className="w-[30px] rounded-full" />
+                        <img src={`/assets/images/avatar-group.png`} alt="" className="w-[40px] rounded-full" />
                     ) : (
-                        <img src={dmGroup.channel_avatar} alt="" className="w-[30px] rounded-full" />
+                        <img src={dmGroup.channel_avatar} alt="" className="w-[40px] rounded-full" />
                     )}
                     <p style={{ marginRight: 'auto' }} className='pl-[10px]'>{dmGroup.channel_lable}</p>
                     <button 
                         onClick={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
                         disabled={isInviteSent}   
-                        className={isInviteSent ? "bg-gray-400 text-gray-700 cursor-not-allowed border border-solid border-gray-400 rounded-[5px] py-[5px] px-[10px]" : "bg-green-500 hover:bg-green-600 text-white border border-solid border-green-500 rounded-[5px] py-[5px] px-[10px]"} 
+                        className={isInviteSent ? "bg-gray-400 text-gray-700 cursor-not-allowed border border-solid border-gray-400 rounded-[5px] py-[5px] px-[10px]" 
+                        : 
+                        "font-sans font-normal text-[16px] bg-blue-200 hover:text-blue-300 text-blue-700 border border-solid border-green-500 rounded-[5px] py-[5px] px-[29px]"} 
                     >
                         {isInviteSent ? 'Sent' : 'Invite'}
                     </button>
