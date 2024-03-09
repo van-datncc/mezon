@@ -48,7 +48,7 @@ type EmojiItemOptionals = {
 };
 
 function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
-	const { messageTime, messageDate } = useMessageParser(message);
+	const { messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
