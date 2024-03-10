@@ -51,7 +51,6 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	const { messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-
 	const { messageDataReactedFromSocket } = useChatReactionMessage({ currentChannelId });
 	const { reactionMessageAction } = useChatReactionMessage({ currentChannelId });
 	const isCombine = useMemo(() => {
@@ -64,9 +63,9 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
-	const processData = (dataEmoji: any) => {
+	const processData = (dataEmoji: EmojiItemOptionals[]) => {
 		const result: EmojiDataOptionals[] = [];
-		dataEmoji.forEach((item: EmojiItemOptionals) => {
+		dataEmoji.length && dataEmoji.forEach((item: EmojiItemOptionals) => {
 			const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
 
 			if (existingEmoji) {
@@ -247,7 +246,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									></img>
 								</div>
 								<p className="gap-1">
-									<span  className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">@{getSenderMessage.user?.username} </span>
+									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">@{getSenderMessage.user?.username} </span>
 									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]"> {getMessageRef?.content.t}</span>
 								</p>
 							</div>
