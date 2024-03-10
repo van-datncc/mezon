@@ -2,7 +2,6 @@ import { useNotification } from '@mezon/core';
 import { Dropdown } from 'flowbite-react';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useState } from 'react';
-import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import * as Icons from '../Icons';
 import NotificationItem from './NotificationItem';
 import NotifyMentionItem from './NotifyMentionItem';
@@ -15,16 +14,17 @@ const tabDataNotify = [
 ];
 
 function NotificationList() {
-	const { notification, notifyMention } = useNotification();
+	const { notification } = useNotification();
 	const [currentTabNotify, setCurrentTabNotify] = useState('individual');
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
 
+	console.log(notification.length)
 	return (
 		<Dropdown
 			label=""
-			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1 w-1/2 min-w-[480px] max-w-[600px]"
+			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50"
 			dismissOnClick={true}
 			placement="bottom"
 			renderTrigger={() => (
@@ -56,15 +56,15 @@ function NotificationList() {
 				</div>
 			</div>
 			{currentTabNotify === 'individual' && (
-				<div className="bg-bgSecondary flex flex-col max-w-[800px] overflow-y-auto max-h-heightInBox">
-					{notification.map((notify: INotification) => (
+				<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
+					{notification.filter(item => item.code !== -9).map((notify: INotification) => (
 						<NotificationItem notify={notify} key={notify.id} />
 					))}
 				</div>
 			)}
 			{currentTabNotify === 'mention' && (
 				<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
-					{notifyMention.map((notify: ChannelMessage) => (
+					{notification.filter(item => item.code === -9).map((notify: INotification) => (
 						<NotifyMentionItem notify={notify} key={notify.id} />
 					))}
 				</div>
