@@ -74,7 +74,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		// get message
 		const messageRaw = raw.blocks;
 		const messageContent = Object.values(messageRaw)
-			.filter(item => item.text.trim() !== '')
+			.filter((item) => item.text.trim() !== '')
 			.map((item) => item.text);
 		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
 
@@ -126,18 +126,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				onRemove: () => handleRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-			
+
 			const newEditorState = EditorState.push(editorState, contentStateWithEntity, 'insert-fragment');
 			const newEditorStateWithImage = EditorState.forceSelection(
 				newEditorState,
 				newEditorState.getSelection().merge({
 					anchorOffset: 0,
 					focusOffset: 0,
-				})
+				}),
 			);
 			const newStateWithImage = AtomicBlockUtils.insertAtomicBlock(newEditorStateWithImage, entityKey, ' ');
 			setEditorState(newStateWithImage);
-	
+
 			attachmentData.push(attachment);
 			setAttachmentData(attachmentData);
 		},
@@ -182,13 +182,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
 
-	useEffect(() => {		
+	useEffect(() => {
 		if (messageRef) {
-			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0, 
-				message_sender_id: messageRef.sender_id, 
-				has_attachment: messageRef.attachments?.length as number > 0,
-				content: JSON.stringify(messageRef.content)
-			}]);
+			setReferencesData([
+				{
+					message_id: '',
+					message_ref_id: messageRef.id,
+					ref_type: 0,
+					message_sender_id: messageRef.sender_id,
+					has_attachment: (messageRef.attachments?.length as number) > 0,
+					content: JSON.stringify(messageRef.content),
+				},
+			]);
 		}
 	}, [messageRef]);
 
@@ -477,7 +482,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 
 	return (
-		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative overflow-x-hidden">
 			{showEmojiSuggestion && (
 				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
 					<p className=" text-center p-2">Emoji Matching: {syntax}</p>

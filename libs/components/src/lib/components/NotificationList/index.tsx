@@ -20,11 +20,11 @@ function NotificationList() {
 		setCurrentTabNotify(valueTab);
 	};
 
-	console.log(notification.length)
+	console.log(notification.length);
 	return (
 		<Dropdown
 			label=""
-			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50"
+			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden"
 			dismissOnClick={true}
 			placement="bottom"
 			renderTrigger={() => (
@@ -56,17 +56,21 @@ function NotificationList() {
 				</div>
 			</div>
 			{currentTabNotify === 'individual' && (
-				<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
-					{notification.filter(item => item.code !== -9).map((notify: INotification) => (
-						<NotificationItem notify={notify} key={notify.id} />
-					))}
+				<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
+					{notification
+						.filter((item) => item.code !== -9)
+						.map((notify: INotification) => (
+							<NotificationItem notify={notify} key={notify.id} />
+						))}
 				</div>
 			)}
 			{currentTabNotify === 'mention' && (
-				<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
-					{notification.filter(item => item.code === -9).map((notify: INotification) => (
-						<NotifyMentionItem notify={notify} key={notify.id} />
-					))}
+				<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
+					{notification
+						.filter((item) => item.code === -9)
+						.map((notify: INotification) => (
+							<NotifyMentionItem notify={notify} key={notify.id} />
+						))}
 				</div>
 			)}
 		</Dropdown>

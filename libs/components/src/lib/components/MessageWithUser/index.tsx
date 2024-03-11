@@ -12,7 +12,7 @@ import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
-	id: string,
+	id: string;
 	emoji: string;
 	messageId: string;
 };
@@ -36,7 +36,7 @@ type SenderInfoOptionals = {
 };
 
 type EmojiDataOptionals = {
-	id: string,
+	id: string;
 	emoji: string;
 	senders: SenderInfoOptionals[];
 	channelId?: string;
@@ -67,38 +67,39 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	const [dataEmojiFetch] = useState<any>(message.reactions);
 	const processData = (dataEmoji: EmojiItemOptionals[]) => {
 		const result: EmojiDataOptionals[] = [];
-		dataEmoji.length && dataEmoji.forEach((item: EmojiItemOptionals) => {
-			const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
+		dataEmoji.length &&
+			dataEmoji.forEach((item: EmojiItemOptionals) => {
+				const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
 
-			if (existingEmoji) {
-				const existingSender = existingEmoji.senders.find((senderItem: SenderInfoOptionals) => senderItem.id === item.sender_id);
-				if (existingSender) {
-					existingSender.count += 1;
-					existingSender.emojiIdList.push(item.id);
-				} else {
-					existingEmoji.senders.push({
-						id: item.sender_id,
-						count: 1,
-						emojiIdList: [item.id],
-					});
-				}
-			} else {
-				result.push({
-					id: item.id,
-					emoji: item.emoji,
-					senders: [
-						{
+				if (existingEmoji) {
+					const existingSender = existingEmoji.senders.find((senderItem: SenderInfoOptionals) => senderItem.id === item.sender_id);
+					if (existingSender) {
+						existingSender.count += 1;
+						existingSender.emojiIdList.push(item.id);
+					} else {
+						existingEmoji.senders.push({
 							id: item.sender_id,
 							count: 1,
 							emojiIdList: [item.id],
-						},
-					],
+						});
+					}
+				} else {
+					result.push({
+						id: item.id,
+						emoji: item.emoji,
+						senders: [
+							{
+								id: item.sender_id,
+								count: 1,
+								emojiIdList: [item.id],
+							},
+						],
 
-					channelId: message.channel_id,
-					messageId: message.id,
-				});
-			}
-		});
+						channelId: message.channel_id,
+						messageId: message.id,
+					});
+				}
+			});
 		return result;
 	};
 
@@ -202,7 +203,14 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 
 	useEffect(() => {
 		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-			handleReactMessage(reactionOutsideProps?.id, currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId, message.sender_id);
+			handleReactMessage(
+				reactionOutsideProps?.id,
+				currentChannelId ?? '',
+				reactionOutsideProps?.messageId,
+				reactionOutsideProps?.emoji,
+				userId,
+				message.sender_id,
+			);
 			return;
 		}
 	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
@@ -238,7 +246,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				</div>
 			)}
 			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
-				<div className={`flex py-0.5 h-15 flex-col  overflow-x-hidden ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}>
+				<div className={`flex h-15 flex-col  overflow-x-hidden w-auto p-3`}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
 							<Icons.ReplyCorner />
@@ -251,15 +259,20 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									></img>
 								</div>
 								<p className="gap-1">
-									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">@{getSenderMessage.user?.username} </span>
-									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]"> {getMessageRef?.content.t}</span>
+									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">
+										@{getSenderMessage.user?.username}{' '}
+									</span>
+									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]">
+										{' '}
+										{getMessageRef?.content.t}
+									</span>
 								</p>
 							</div>
 						</div>
 					)}
-					<div className="justify-start gap-4 inline-flex w-full relative">
+					<div className="justify-center gap-4 inline-flex w-full relative">
 						<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
-						<div className="flex-col w-full flex justify-center items-start relative gap-1">
+						<div className="flex-col w-full flex justify-center items-start relative ">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
 							<div className="justify-start items-center inline-flex w-full">
 								<div className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text break-all">
