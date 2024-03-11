@@ -45,7 +45,8 @@ export function ChannelMessage(props: MessageProps) {
 	function EmojiReaction() {
 		const handleEmojiSelect = (emoji: any) => {
 			setEmojiPicker(emoji.native);
-			setReactionOutside({ emoji: emoji.native, messageId: mess.id });
+			//TODO: check if already react this emoji
+			setReactionOutside({ id: "", emoji: emoji.native, messageId: mess.id });
 			setIsOpenReactEmoji(false);
 		};
 		return (
