@@ -36,7 +36,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
                         disabled={isInviteSent}   
                         className={isInviteSent ? "bg-gray-400 text-gray-700 cursor-not-allowed border border-solid border-gray-400 rounded-[5px] py-[5px] px-[10px]" 
                         : 
-                        "font-sans font-normal text-[16px] bg-blue-200 hover:text-blue-300 text-blue-700 border border-solid border-green-500 rounded-[5px] py-[5px] px-[29px]"} 
+                        "font-sans font-normal text-[16px] bg-blue-200 hover:text-blue-300 text-blue-700 border border-solid border-green-500 rounded-[5px] py-[5px] px-[29px] mr-[8px]"} 
                     >
                         {isInviteSent ? 'Sent' : 'Invite'}
                     </button>
