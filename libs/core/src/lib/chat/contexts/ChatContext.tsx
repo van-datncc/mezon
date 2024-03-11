@@ -120,6 +120,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (event) {
 				dispatch(
 					messagesActions.updateReactionMessage({
+						id: event.id,
 						channelId: event.channel_id,
 						messageId: event.message_id,
 						emoji: event.emoji,

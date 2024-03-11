@@ -12,6 +12,7 @@ import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
+	id: string,
 	emoji: string;
 	messageId: string;
 };
@@ -35,6 +36,7 @@ type SenderInfoOptionals = {
 };
 
 type EmojiDataOptionals = {
+	id: string,
 	emoji: string;
 	senders: SenderInfoOptionals[];
 	channelId?: string;
@@ -82,6 +84,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				}
 			} else {
 				result.push({
+					id: item.id,
 					emoji: item.emoji,
 					senders: [
 						{
@@ -100,7 +103,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	};
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
-	const handleReactMessage = async (channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
+	const handleReactMessage = async (id: string, channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
 			const userIndex = (emojiDataIncSocket &&
@@ -109,7 +112,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 0;
 				setEmojiData(updatedEmojiData);
-				await reactionMessageAction(channelId, messageId, emoji, message_sender_id, false);
+				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
 			} else {
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders.push({
@@ -118,12 +121,13 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					emojiIdList: [],
 				});
 				setEmojiData(updatedEmojiData);
-				await reactionMessageAction(channelId, messageId, emoji, message_sender_id, false);
+				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
 			}
 		} else {
 			setEmojiData((prevEmojiDataOptionals: EmojiDataOptionals[]) => [
 				...prevEmojiDataOptionals,
 				{
+					id,
 					emoji,
 					count: 0,
 					senders: [
@@ -137,7 +141,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 					messageId: messageId,
 				},
 			]);
-			await reactionMessageAction(channelId, messageId, emoji, message_sender_id, false);
+			await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
 		}
 	};
 
@@ -177,6 +181,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		) {
 			const reactDataArray: EmojiDataOptionals[] = [
 				{
+					id: messageDataReactedFromSocket?.id,
 					emoji: messageDataReactedFromSocket?.emoji ?? '',
 					senders: [
 						{
@@ -197,7 +202,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 
 	useEffect(() => {
 		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-			handleReactMessage(currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId, message.sender_id);
+			handleReactMessage(reactionOutsideProps?.id, currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId, message.sender_id);
 			return;
 		}
 	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
@@ -277,6 +282,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center`}
 															onClick={() =>
 																handleReactMessage(
+																	emoji.id,
 																	currentChannelId ?? '',
 																	message.id,
 																	emoji.emoji,
