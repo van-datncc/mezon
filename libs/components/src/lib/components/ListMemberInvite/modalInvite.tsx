@@ -12,7 +12,6 @@ export type ModalParam = {
 }
 
 const ModalInvite = (props: ModalParam) => {
-    console.log("props.channelID: ", props.channelID);
     const [urlInvite, setUrlInvite] = useState('');
     const { currentClanId } = useClans();
     const { createLinkInviteUser } = useInvite();
@@ -22,7 +21,6 @@ const ModalInvite = (props: ModalParam) => {
 		confirmButton,
 
 	} = props;
-console.log("currentClanId: ", currentClanId);
 
     const handleOpenInvite = () => {
         createLinkInviteUser(currentClanId ?? '', props.channelID ?? '' , 10).then((res) => {
