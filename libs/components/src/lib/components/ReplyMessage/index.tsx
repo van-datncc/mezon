@@ -18,7 +18,7 @@ function ReplyMessage() {
 			{isOpenReply && (
 				<div className="flex flex-row items-center justify-between w-[98%] m-4 bg-[#2B2D31] p-2 rounded-md text-[14px]">
 					<div className="">
-						Replying to <span className=" text-green-500 font-semibold">{getSenderMessage?.user?.username}</span>
+						Replying to <span className=" text-[#84ADFF] font-semibold">{getSenderMessage?.user?.username}</span>
 					</div>
 					<button className="relative" onClick={handleRemoveReply}>
 						<Icons.CircleClose />

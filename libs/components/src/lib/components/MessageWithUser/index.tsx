@@ -12,8 +12,8 @@ import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
-	id: string,
-	emoji: string;
+	id: string;
+	emoji?: string;
 	messageId: string;
 };
 
@@ -36,7 +36,7 @@ type SenderInfoOptionals = {
 };
 
 type EmojiDataOptionals = {
-	id: string,
+	id: string;
 	emoji: string;
 	senders: SenderInfoOptionals[];
 	channelId?: string;
@@ -47,6 +47,7 @@ type EmojiItemOptionals = {
 	id: string;
 	sender_id: string;
 	emoji: string;
+	count: number;
 };
 
 function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
@@ -65,44 +66,48 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
+	// console.log('dataEmojiFetch', dataEmojiFetch);
+
 	const processData = (dataEmoji: EmojiItemOptionals[]) => {
 		const result: EmojiDataOptionals[] = [];
-		dataEmoji.length && dataEmoji.forEach((item: EmojiItemOptionals) => {
-			const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
+		dataEmoji.length &&
+			dataEmoji.forEach((item: EmojiItemOptionals) => {
+				const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
 
-			if (existingEmoji) {
-				const existingSender = existingEmoji.senders.find((senderItem: SenderInfoOptionals) => senderItem.id === item.sender_id);
-				if (existingSender) {
-					existingSender.count += 1;
-					existingSender.emojiIdList.push(item.id);
-				} else {
-					existingEmoji.senders.push({
-						id: item.sender_id,
-						count: 1,
-						emojiIdList: [item.id],
-					});
-				}
-			} else {
-				result.push({
-					id: item.id,
-					emoji: item.emoji,
-					senders: [
-						{
+				if (existingEmoji) {
+					const existingSender = existingEmoji.senders.find((senderItem: SenderInfoOptionals) => senderItem.id === item.sender_id);
+					if (existingSender) {
+						existingSender.count += 1;
+						existingSender.emojiIdList.push(item.id);
+					} else {
+						existingEmoji.senders.push({
 							id: item.sender_id,
 							count: 1,
 							emojiIdList: [item.id],
-						},
-					],
+						});
+					}
+				} else {
+					result.push({
+						id: item.id,
+						emoji: item.emoji,
+						senders: [
+							{
+								id: item.sender_id,
+								count: 1,
+								emojiIdList: [item.id],
+							},
+						],
 
-					channelId: message.channel_id,
-					messageId: message.id,
-				});
-			}
-		});
+						channelId: message.channel_id,
+						messageId: message.id,
+					});
+				}
+			});
 		return result;
 	};
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
+
 	const handleReactMessage = async (id: string, channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
@@ -177,8 +182,10 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			messageDataReactedFromSocket?.channelId &&
 			messageDataReactedFromSocket.messageId &&
 			messageDataReactedFromSocket.userId &&
-			messageDataReactedFromSocket.emoji
+			messageDataReactedFromSocket.emoji !== ''
 		) {
+			console.log('messageDataReactedFromSocket', messageDataReactedFromSocket);
+
 			const reactDataArray: EmojiDataOptionals[] = [
 				{
 					id: messageDataReactedFromSocket?.id,
@@ -200,12 +207,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		}
 	}, [messageDataReactedFromSocket]);
 
-	useEffect(() => {
-		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-			handleReactMessage(reactionOutsideProps?.id, currentChannelId ?? '', reactionOutsideProps?.messageId, reactionOutsideProps?.emoji, userId, message.sender_id);
-			return;
-		}
-	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
+	const { emojiSelected } = useContext(ChatContext);
 
 	const [isReply, setIsReply] = useState<boolean>(true);
 	const [messageIdRef] = useState<string>((message.references && message?.references[0]?.message_ref_id) ?? '');
@@ -227,6 +229,19 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			setIsMessRef(false);
 		}
 	}, [messageIdRef, getMessageRef, getSenderMessage, messageRef, isOpenReply, message.id]);
+
+	useEffect(() => {
+		if (reactionOutsideProps?.messageId === messageRef?.id && userId && emojiSelected) {
+			handleReactMessage(
+				reactionOutsideProps?.id ?? '',
+				currentChannelId ?? '',
+				messageRef?.id ?? '',
+				emojiSelected,
+				userId,
+				message.sender_id,
+			);
+		}
+	}, [emojiSelected, reactionOutsideProps?.messageId]);
 
 	return (
 		<>
@@ -251,8 +266,13 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									></img>
 								</div>
 								<p className="gap-1">
-									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">@{getSenderMessage.user?.username} </span>
-									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]"> {getMessageRef?.content.t}</span>
+									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">
+										@{getSenderMessage.user?.username}{' '}
+									</span>
+									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]">
+										{' '}
+										{getMessageRef?.content.t}
+									</span>
 								</p>
 							</div>
 						</div>

@@ -9,7 +9,7 @@ export type ChatWelComeProp = {
 function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 
     return (
-        <div className="space-y-2 px-4 mb-4 mt-[50px]" >
+        <div className="space-y-2 px-4 mb-4 mt-[150px]" >
             {type === 'channel' ? (
                 <div className="h-[75px] w-[75px] rounded-full bg-zinc-700 flex items-center justify-center pl-2">
                     <Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />

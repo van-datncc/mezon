@@ -20,7 +20,6 @@ function NotificationList() {
 		setCurrentTabNotify(valueTab);
 	};
 
-	console.log(notification.length)
 	return (
 		<Dropdown
 			label=""
