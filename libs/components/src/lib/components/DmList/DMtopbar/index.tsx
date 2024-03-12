@@ -1,3 +1,4 @@
+import { useMemberStatus } from '@mezon/core';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -5,7 +6,6 @@ import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
 import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
 import NotificationList from '../../NotificationList';
-import { useMemberStatus } from '@mezon/core';
 
 export type ChannelTopbarProps = {
 	dmGroupId?: string;
@@ -13,7 +13,7 @@ export type ChannelTopbarProps = {
 
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
-	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '')
+	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 
 	return (
 		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 flex-shrink">
@@ -21,7 +21,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 				<div className="flex flex-row gap-1 items-center">
 					<MemberProfile
 						numberCharacterCollapse={22}
-						avatar={Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1 ? '/assets/images/avatar-group.png' : (currentDmGroup?.channel_avatar ?? '')}
+						avatar={
+							Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1
+								? '/assets/images/avatar-group.png'
+								: currentDmGroup?.channel_avatar ?? ''
+						}
 						name={''}
 						status={userStatus}
 						isHideStatus={true}
@@ -37,19 +41,15 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							<button>
 								<Icons.ThreadIcon />
 							</button>
-
 							<button>
 								<Icons.MuteBell />
 							</button>
-
 							<button>
 								<Icons.PinRight />
 							</button>
-
 							<button>
 								<Icons.MemberList />
 							</button>
-
 							<button>
 								<Icons.ThreeDot />
 							</button>

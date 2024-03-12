@@ -43,7 +43,7 @@ export default function ChannelLayout() {
 					</div>
 				</div>
 				{isShow && (
-					<div className="w-[245px] bg-bgSurface hidden md:flex text-[#84ADFF] relative">
+					<div className="w-[245px] bg-bgSurface flex text-[#84ADFF] relative">
 						<MemberList />
 					</div>
 				)}

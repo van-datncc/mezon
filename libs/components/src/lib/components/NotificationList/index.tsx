@@ -20,7 +20,6 @@ function NotificationList() {
 		setCurrentTabNotify(valueTab);
 	};
 
-	console.log(notification.length);
 	return (
 		<Dropdown
 			label=""
@@ -37,7 +36,7 @@ function NotificationList() {
 			<div className="py-2 px-3 bg-bgPrimary">
 				<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
 					<InboxButton />
-					<div>InBox </div>
+					<div>Inbox </div>
 				</div>
 				<div className="flex flex-row gap-4 py-3">
 					{tabDataNotify.map((tab, index: number) => {

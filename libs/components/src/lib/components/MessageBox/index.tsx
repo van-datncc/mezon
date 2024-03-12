@@ -98,7 +98,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setMentionData(mentionedUsers);
 	}, []);
 
-	const onConvertToFiles =(content: string) => {
+	const onConvertToFiles = (content: string) => {
 		if (content.length > 2000) {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
@@ -117,7 +117,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			});
 			return;
 		}
-		};
+	};
 	const onSearchChange = ({ value }: any) => {
 		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
 	};
@@ -499,7 +499,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 
 	return (
-		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative overflow-x-hidden">
+		<div className="flex flex-inline w-[96%] items-end gap-2 box-content mt-2 mb-4 mx-auto pr-2 bg-black relative overflow-x-hidden iconHover rounded-lg">
 			{showEmojiSuggestion && (
 				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
 					<p className=" text-center p-2">Emoji Matching: {syntax}</p>
@@ -540,7 +540,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					}}
 					className="block w-full hidden"
 				/>
-				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
+				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer iconHover">
 					<Icons.AddCircle />
 				</div>
 			</label>
@@ -567,7 +567,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 			</div>
 
-			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
+			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3 iconHover">
 				<Icons.Gif />
 				<Icons.Help />
 				<button onClick={handleOpenEmoji}>
@@ -575,7 +575,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</button>
 			</div>
 			{isOpenEmojiChatBox && (
-				<div className="absolute right-4 bottom-[--bottom-emoji] z-20">
+				<div className="absolute right-4 bottom-[--bottom-emoji] z-20 iconHover">
 					<EmojiReaction />
 				</div>
 			)}

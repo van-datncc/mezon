@@ -2,7 +2,6 @@ import { useDirect } from '@mezon/core';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import * as Icons from '../Icons';
 import { IconFriends } from '../Icons';
 import DMListItem from './DMListItem';
@@ -51,14 +50,17 @@ function DirectMessageList() {
 
 				<div className="text-[14px] px-3 font-bold text-[#fff] mt-6 flex flex-row items-center w-full justify-between px-1 pb-5 h-5">
 					<p>DIRECT MESSAGE</p>
-					<button onClick={onClickOpenModal} className="cursor-pointer flex flex-row justify-end  ml-0">
+					<button
+						onClick={onClickOpenModal}
+						className="cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
+					>
 						<Icons.Plus />
 					</button>
 				</div>
 			</div>
 			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
-					{filteredDataDM.map((directMessage: any, index:number) => {
+					{filteredDataDM.map((directMessage: any, index: number) => {
 						return <DMListItem key={index} directMessage={directMessage} />;
 					})}
 				</div>

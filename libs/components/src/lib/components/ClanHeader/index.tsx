@@ -61,7 +61,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 							dismissOnClick={true}
 							placement="bottom-end"
 							renderTrigger={() => (
-								<button className="w-6 h-8 relative flex flex-col justify-center">
+								<button className="w-6 h-8 relative flex flex-col justify-center iconHover">
 									<Icons.ArrowDown />
 								</button>
 							)}
@@ -115,7 +115,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				<div className="bg-[#313338] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-[500]">Create Category</div>
 					<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-						<span className="text-4xl">×</span>
+						<span className="text-4xl hover:text-white">×</span>
 					</button>
 				</div>
 				<Modal.Body className="bg-[#313338] px-6 py-4">

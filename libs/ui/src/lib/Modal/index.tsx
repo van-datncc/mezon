@@ -41,7 +41,7 @@ const Modal = (props: ModalProps) => {
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
 									<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-										<span className="text-5xl leading-3">×</span>
+										<span className="text-5xl leading-3 hover:text-white">×</span>
 									</button>
 								</div>
 
@@ -50,7 +50,7 @@ const Modal = (props: ModalProps) => {
 									<div className="bg-[#323232] ounded-[5px] bg-transparent">{children}</div>
 								</div>
 								{/*footer*/}
-								{confirmButton && title !== "Invite friends to KOMU" &&(
+								{confirmButton && title !== 'Invite friends to KOMU' && (
 									<div className="flex items-center p-[20px] pb-[32px] border-t border-solid border-borderDefault rounded-b justify-between">
 										<button
 											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 
