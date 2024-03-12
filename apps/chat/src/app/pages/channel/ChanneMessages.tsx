@@ -1,14 +1,14 @@
+import { ChatWelcome } from '@mezon/components';
 import { useAuth, useChatMessages } from '@mezon/core';
 import { useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
-import { ChatWelcome } from '@mezon/components';
 
 type ChannelMessagesProps = {
 	channelId: string;
-	type: string
+	type: string;
 	channelName?: string;
-	avatarDM?: string
+	avatarDM?: string;
 };
 
 export default function ChannelMessages({ channelId, channelName, type, avatarDM }: ChannelMessagesProps) {
@@ -22,7 +22,7 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 
 	const goBottom = () => {
 		if (containerRef.current !== null) {
-			containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+			containerRef.current.scrollTo({ top: 10, behavior: 'smooth' });
 		}
 	};
 
@@ -33,7 +33,17 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 	}, [messages[0]]);
 
 	return (
-		<div id="scrollLoading" ref={containerRef} style={{ height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}>
+		<div
+			id="scrollLoading"
+			ref={containerRef}
+			style={{
+				height: '100%',
+				overflowY: 'scroll',
+				display: 'flex',
+				flexDirection: 'column-reverse',
+				overflowX: 'hidden',
+			}}
+		>
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
@@ -44,7 +54,7 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
 				endMessage={<ChatWelcome type={type} name={channelName} avatarDM={avatarDM} />}
-				pullDownToRefresh={true}
+				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 			>
 				{messages.map((message, i) => (
