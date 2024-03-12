@@ -15,7 +15,7 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	};
 
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 py-[94px] pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
 			<div className="text-white">
 				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 text-[#AEAEAE] font-bold text-base tracking-wider" onClick={handleUserProfileButtonClick}>

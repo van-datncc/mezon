@@ -246,7 +246,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				</div>
 			)}
 			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
-				<div className={`flex h-15 flex-col  overflow-x-hidden w-auto p-3`}>
+				<div className={`flex h-15 flex-col  overflow-x-hidden w-auto p-1`}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
 							<Icons.ReplyCorner />
@@ -259,7 +259,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									></img>
 								</div>
 								<p className="gap-1">
-									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer">
+									<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">
 										@{getSenderMessage.user?.username}{' '}
 									</span>
 									<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8]">

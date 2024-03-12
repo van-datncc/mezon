@@ -1,6 +1,6 @@
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak, Icons } from '@mezon/components';
+import { Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
@@ -12,7 +12,6 @@ type MessageProps = {
 	preMessage?: IMessageWithUser;
 	lastSeen?: boolean;
 };
-
 
 export function ChannelMessage(props: MessageProps) {
 	const { message, lastSeen, preMessage } = props;
@@ -46,7 +45,7 @@ export function ChannelMessage(props: MessageProps) {
 		const handleEmojiSelect = (emoji: any) => {
 			setEmojiPicker(emoji.native);
 			//TODO: check if already react this emoji
-			setReactionOutside({ id: "", emoji: emoji.native, messageId: mess.id });
+			setReactionOutside({ id: '', emoji: emoji.native, messageId: mess.id });
 			setIsOpenReactEmoji(false);
 		};
 		return (
@@ -88,7 +87,7 @@ export function ChannelMessage(props: MessageProps) {
 			/>
 			{lastSeen && <UnreadMessageBreak />}
 			<div
-				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenReactEmoji ? 'block' : 'hidden'} group-hover:block`}
+				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary iconHover ${isOpenReactEmoji ? 'block' : 'hidden'} group-hover:block`}
 			>
 				<button
 					className="h-full p-1 group"

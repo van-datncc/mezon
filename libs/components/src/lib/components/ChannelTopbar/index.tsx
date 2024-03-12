@@ -18,7 +18,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			{/* Desktop buttons */}
 			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
-					<div className="justify-start items-center gap-[15px] flex">
+					<div className="justify-start items-center gap-[15px] flex iconHover">
 						<ThreadButton />
 						<MuteButton />
 						<PinButton />
@@ -26,7 +26,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<ThreeDotButton />
 					</div>
 					<SearchMessage />
-					<div className="justify-start items-start gap-4 flex" id="inBox">
+					<div className="justify-start items-start gap-4 flex iconHover" id="inBox">
 						<NotificationList />
 						<HelpButton />
 					</div>
