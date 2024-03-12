@@ -1,7 +1,7 @@
 import { EmojiPicker, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -46,33 +46,22 @@ export function ChannelMessage(props: MessageProps) {
 		setMessageRef(mess);
 	};
 
-	const handleClickReact = (event: any) => {
+	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsOpenEmojiReacted(true);
-		event.stopPropagation();
 		setMessageRef(mess);
-		setTimeout(() => {
-			setReactionOutside({
-				id: '',
-				emoji: emojiSelected,
-				messageId: mess.id,
-			});
-		}, 0);
+		event.stopPropagation();
 	};
 
 	return (
 		<div className="relative group hover:bg-gray-950/[.07]">
-			<MessageWithUser
-				reactionOutsideProps={reactionOutside}
-				message={mess as IMessageWithUser}
-				preMessage={messPre as IMessageWithUser}
-				user={user}
-			/>
+			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
 			<div
 				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenEmojiReacted && mess.id === messageRef?.id ? 'block' : 'hidden'} group-hover:block`}
 			>
 				<div onClick={handleClickReact} className="h-full p-1 group">
 					<EmojiPicker
+						emojiAction={EmojiPlaces.EMOJI_REACTION}
 						messageEmoji={mess}
 						classNameParentDiv="absolute z-50"
 						classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}

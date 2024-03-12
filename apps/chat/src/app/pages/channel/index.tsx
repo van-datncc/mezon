@@ -11,12 +11,12 @@ export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChanel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const { isOpenEmojiChatBox, setIsOpenEmojiChatBox } = useContext(ChatContext);
+	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 
 	const handleCloseEmojiPopup = () => {
-		if (isOpenEmojiChatBox) {
-			setIsOpenEmojiChatBox(false);
-		}
+		// if (isOpenEmojiChatBox) {
+		// 	setIsOpenEmojiChatBox(false);
+		// }
 	};
 
 	return (

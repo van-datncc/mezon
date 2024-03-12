@@ -12,9 +12,7 @@ import {
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
-import {
-	ApiChannelDescription,
-} from '@mezon/mezon-js/api.gen';
+import { ApiChannelDescription } from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
 
@@ -202,7 +200,11 @@ export interface ThreadProps {
 	name: string;
 }
 
-
 export interface IWithError {
-	error: string | Error; 
+	error: string | Error;
+}
+
+export enum EmojiPlaces {
+	EMOJI_REACTION = 'EMOJI_REACTION',
+	EMOJI_EDITOR = 'EMOJI_EDITOR',
 }

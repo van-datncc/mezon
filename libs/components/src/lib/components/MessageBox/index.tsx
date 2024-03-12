@@ -2,14 +2,14 @@ import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
 import { ChatContext } from '@mezon/core';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import EmojiPicker from '../EmojiPicker';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
@@ -42,7 +42,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
-	const { isOpenEmojiChatBox, setIsOpenEmojiChatBox } = useContext(ChatContext);
 
 	const mentionPlugin = useRef(
 		createMentionPlugin({
@@ -60,7 +59,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	//clear Editor after navigate channel
 	useEffect(() => {
 		setEditorState(EditorState.createEmpty());
-		setIsOpenEmojiChatBox(false);
+		// setIsOpenEmojiChatBox(false);
 	}, [currentChannelId, currentClanId]);
 
 	const onChange = useCallback((editorState: EditorState) => {
@@ -74,7 +73,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		// get message
 		const messageRaw = raw.blocks;
 		const messageContent = Object.values(messageRaw)
-			.filter(item => item.text.trim() !== '')
+			.filter((item) => item.text.trim() !== '')
 			.map((item) => item.text);
 		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
 
@@ -126,18 +125,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				onRemove: () => handleRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-			
+
 			const newEditorState = EditorState.push(editorState, contentStateWithEntity, 'insert-fragment');
 			const newEditorStateWithImage = EditorState.forceSelection(
 				newEditorState,
 				newEditorState.getSelection().merge({
 					anchorOffset: 0,
 					focusOffset: 0,
-				})
+				}),
 			);
 			const newStateWithImage = AtomicBlockUtils.insertAtomicBlock(newEditorStateWithImage, entityKey, ' ');
 			setEditorState(newStateWithImage);
-	
+
 			attachmentData.push(attachment);
 			setAttachmentData(attachmentData);
 		},
@@ -182,13 +181,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
 
-	useEffect(() => {		
+	useEffect(() => {
 		if (messageRef) {
-			setReferencesData([{ message_id: '', message_ref_id: messageRef.id, ref_type: 0, 
-				message_sender_id: messageRef.sender_id, 
-				has_attachment: messageRef.attachments?.length as number > 0,
-				content: JSON.stringify(messageRef.content)
-			}]);
+			setReferencesData([
+				{
+					message_id: '',
+					message_ref_id: messageRef.id,
+					ref_type: 0,
+					message_sender_id: messageRef.sender_id,
+					has_attachment: (messageRef.attachments?.length as number) > 0,
+					content: JSON.stringify(messageRef.content),
+				},
+			]);
 		}
 	}, [messageRef]);
 
@@ -286,30 +290,33 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
+
+	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const handleOpenEmoji = () => {
-		setIsOpenEmojiChatBox(!isOpenEmojiChatBox);
-		if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
-			setIsOpenEmojiChatBox(true);
-		}
+		// setIsOpenEmojiChatBox(!isOpenEmojiChatBox);
+		setIsOpenEmojiMessBox(!isOpenEmojiMessBox)
+		// if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+		// 	setIsOpenEmojiChatBox(true);
+		// }
 	};
 
-	useEffect(() => {
-		if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
-			setIsOpenEmojiChatBox(true);
-		}
-		if (!isOpenEmojiPropOutside && isOpenEmojiChatBox) {
-			setIsOpenEmojiChatBox(false);
-		}
-	}, [isOpenEmojiPropOutside]);
+	// useEffect(() => {
+	// 	if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+	// 		setIsOpenEmojiChatBox(true);
+	// 	}
+	// 	if (!isOpenEmojiPropOutside && isOpenEmojiChatBox) {
+	// 		setIsOpenEmojiChatBox(false);
+	// 	}
+	// }, [isOpenEmojiPropOutside]);
 
-	function EmojiReaction() {
-		const handleEmojiSelect = (emoji: any) => {
-			setShowPlaceHolder(false);
-			setIsOpenEmojiChatBox(false);
-			handleEmojiClick(emoji.native);
-		};
-		return <Picker data={data} onEmojiSelect={handleEmojiSelect} theme="dark" />;
-	}
+	// function EmojiReaction() {
+	// 	const handleEmojiSelect = (emoji: any) => {
+	// 		setShowPlaceHolder(false);
+	// 		setIsOpenEmojiChatBox(false);
+	// 		handleEmojiClick(emoji.native);
+	// 	};
+	// 	return <Picker data={data} onEmojiSelect={handleEmojiSelect} theme="dark" />;
+	// }
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
 
@@ -548,17 +555,37 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
 				<Icons.Gif />
 				<Icons.Help />
-				<button onClick={handleOpenEmoji}>
+				{/* <button onClick={handleOpenEmoji}>
 					<Icons.Emoji defaultFill={isOpenEmojiChatBox ? '#FFFFFF' : '#AEAEAE'} />
-				</button>
-			</div>
-			{isOpenEmojiChatBox && (
-				<div className="absolute right-4 bottom-[--bottom-emoji] z-20">
-					<EmojiReaction />
+				</button> */}
+				<div onClick={handleOpenEmoji} className="h-full flex flex-row items-center group">
+					<EmojiPicker
+						emojiAction={EmojiPlaces.EMOJI_EDITOR}
+						classNameParentDiv="absolute z-50"
+						classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}
+					/>
 				</div>
-			)}
+			</div>
+
+			{/* {isOpenEmojiChatBox && <div className="absolute right-4 bottom-[--bottom-emoji] z-20"></div>} */}
 		</div>
 	);
+}
+
+{
+	/* <div
+	className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenEmojiReacted && mess.id === messageRef?.id ? 'block' : 'hidden'} group-hover:block`}
+>
+	<div onClick={handleClickReact} className="h-full p-1 group">
+		<EmojiPicker
+			emojiAction={EmojiPlaces.EMOJI_REACTION}
+			messageEmoji={mess}
+			classNameParentDiv="absolute z-50"
+			classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}
+		/>
+	</div>
+
+</div>; */
 }
 
 MessageBox.Skeleton = () => {

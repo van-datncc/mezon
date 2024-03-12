@@ -36,9 +36,8 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 		<div
 			id="scrollLoading"
 			ref={containerRef}
-			className=""
 			style={{
-				height: '99.99%',
+				height: '100%',
 				overflowY: 'scroll',
 				display: 'flex',
 				flexDirection: 'column-reverse',
@@ -55,7 +54,7 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
 				endMessage={<ChatWelcome type={type} name={channelName} avatarDM={avatarDM} />}
-				pullDownToRefresh={true}
+				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 			>
 				{messages.map((message, i) => (
