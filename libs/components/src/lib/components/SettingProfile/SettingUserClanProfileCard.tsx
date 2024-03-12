@@ -29,7 +29,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 			<div className="px-[16px]">
 				<div className="bg-bgSecondary w-full p-4 my-[16px] rounded-[10px] flex flex-col gap-y-6 xl:gap-y-7">
 					<div className="w-[300px]">
-						<p className="font-bold tracking-wider text-xl">{profiles.displayName}</p>
+						<p className="font-bold tracking-wider text-xl one-line">{profiles.displayName}</p>
 						<p className="font-medium tracking-wide text-sm">{userProfile?.user?.username}</p>
 					</div>
 					<div className="w-full">

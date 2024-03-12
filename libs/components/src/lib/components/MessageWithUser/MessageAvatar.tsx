@@ -25,9 +25,9 @@ const MessageAvatar = ({ user, message, isCombine, isReply }: IMessageAvatarProp
 	return (
 		<div>
 			{hasAvatar ? (
-				<img className="w-[38px] h-[38px] rounded-full object-cover min-w-[38px] min-h-[38px] cursor-pointer" src={avatarImg} alt={avatarImg} />
+				<img className="size-10 rounded-full object-cover min-w-10 min-h-[38px] cursor-pointer" src={avatarImg} alt={avatarImg} />
 			) : (
-				<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
+				<div className="size-10 bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
 					{avatarChar}
 				</div>
 			)}

@@ -202,4 +202,7 @@ input:-webkit-autofill:active {
 
 #inBox [data-testid='flowbite-dropdown'] {
 	min-width: 480px !important;
+	ul {
+		padding-bottom: 0;
+	}
 }

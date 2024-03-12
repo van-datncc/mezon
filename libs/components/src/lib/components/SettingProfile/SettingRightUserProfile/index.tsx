@@ -1,8 +1,8 @@
 import { useAccount } from '@mezon/core';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
 import { useState } from 'react';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
-import { handleUploadFile, useMezon } from '@mezon/transport';
 // import * as Icons from '../../Icons';
 
 // import React, { useState, useEffect } from 'react';
@@ -72,7 +72,7 @@ const SettingRightUser = ({
 		setUrlImage('');
 	};
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 py-[94px] pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
 			<div className="text-white">
 				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 font-bold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
