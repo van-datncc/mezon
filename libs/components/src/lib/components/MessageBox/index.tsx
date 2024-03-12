@@ -78,10 +78,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			.map((item) => item.text);
 		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
 
-		if (messageBreakline.length > 2000) {
-			setContent('Message too long. @TODO: convert it to attachment');
-			return;
-		}
+		onConvertToFiles(messageBreakline);
 
 		handleUrlInput(messageBreakline).then((attachment) => {
 			handleFinishUpload(attachment);
@@ -101,6 +98,26 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setMentionData(mentionedUsers);
 	}, []);
 
+	const onConvertToFiles =(content: string) => {
+		if (content.length > 2000) {
+			const fileContent = new Blob([content], { type: 'text/plain' });
+			const now = Date.now();
+			const filename = now + '.txt';
+			const file = new File([fileContent], filename, { type: 'text/plain' });
+			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+
+			const session = sessionRef.current;
+			const client = clientRef.current;
+
+			if (!client || !session || !currentClanId) {
+				throw new Error('Client is not initialized');
+			}
+			handleUploadFile(client, session, fullfilename, file).then((attachment) => {
+				handleFinishUpload(attachment);
+			});
+			return;
+		}
+		};
 	const onSearchChange = ({ value }: any) => {
 		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
 	};
