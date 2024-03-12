@@ -33,6 +33,9 @@ export type ChatContextValue = {
 
 	isOpenEmojiReacted: boolean;
 	setIsOpenEmojiReacted: React.Dispatch<React.SetStateAction<boolean>>;
+
+	emojiPlaceActive: string;
+	setEmojiPlaceActive: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -43,6 +46,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [isOpenEmojiMessBox, setIsOpenEmojiMessBox] = React.useState<boolean>(false);
 	const [emojiSelected, setEmojiSelected] = React.useState<string>('');
 	const [isOpenEmojiReacted, setIsOpenEmojiReacted] = React.useState<boolean>(false);
+	const [emojiPlaceActive, setEmojiPlaceActive] = React.useState<string>('');
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -56,6 +60,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setEmojiSelected,
 			isOpenEmojiReacted,
 			setIsOpenEmojiReacted,
+			emojiPlaceActive,
+			setEmojiPlaceActive,
 		}),
 		[
 			messageRef,
@@ -68,6 +74,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setEmojiSelected,
 			isOpenEmojiReacted,
 			setIsOpenEmojiReacted,
+			emojiPlaceActive,
+			setEmojiPlaceActive,
 		],
 	);
 

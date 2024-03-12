@@ -294,7 +294,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const handleOpenEmoji = () => {
 		// setIsOpenEmojiChatBox(!isOpenEmojiChatBox);
-		setIsOpenEmojiMessBox(!isOpenEmojiMessBox)
+		setIsOpenEmojiMessBox(!isOpenEmojiMessBox);
+		console.log('clicked');
 		// if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
 		// 	setIsOpenEmojiChatBox(true);
 		// }
@@ -483,6 +484,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [editorState]);
 
+
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
@@ -555,37 +557,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
 				<Icons.Gif />
 				<Icons.Help />
-				{/* <button onClick={handleOpenEmoji}>
-					<Icons.Emoji defaultFill={isOpenEmojiChatBox ? '#FFFFFF' : '#AEAEAE'} />
-				</button> */}
 				<div onClick={handleOpenEmoji} className="h-full flex flex-row items-center group">
 					<EmojiPicker
 						emojiAction={EmojiPlaces.EMOJI_EDITOR}
 						classNameParentDiv="absolute z-50"
-						classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}
+						classNameChildDiv={`absolute transform right-0 mr-[-3rem] bottom-[-1rem]`}
 					/>
 				</div>
 			</div>
-
-			{/* {isOpenEmojiChatBox && <div className="absolute right-4 bottom-[--bottom-emoji] z-20"></div>} */}
 		</div>
 	);
-}
-
-{
-	/* <div
-	className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenEmojiReacted && mess.id === messageRef?.id ? 'block' : 'hidden'} group-hover:block`}
->
-	<div onClick={handleClickReact} className="h-full p-1 group">
-		<EmojiPicker
-			emojiAction={EmojiPlaces.EMOJI_REACTION}
-			messageEmoji={mess}
-			classNameParentDiv="absolute z-50"
-			classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}
-		/>
-	</div>
-
-</div>; */
 }
 
 MessageBox.Skeleton = () => {

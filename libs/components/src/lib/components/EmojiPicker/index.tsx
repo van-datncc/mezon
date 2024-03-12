@@ -2,7 +2,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { ChatContext } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Icons } from '../../components';
 
 export type EmojiPickerOptions = {
@@ -17,57 +17,94 @@ function EmojiPicker(props: EmojiPickerOptions) {
 	const { isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
 	const { emojiSelected, setEmojiSelected, messageRef, setMessageRef } = useContext(ChatContext);
 
-	const handleEmojiSelect = (emoji: any, event: React.MouseEvent<HTMLDivElement>) => {
-		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION) {
-			setEmojiSelected(emoji.native);
-			setIsOpenEmojiReacted(false);
+	// const handleEmojiSelect = (emoji: any, event: React.MouseEvent<HTMLDivElement>) => {
+	// 	if (props.emojiAction === EmojiPlaces.EMOJI_REACTION) {
+	// 		setEmojiSelected(emoji.native);
+	// 		setIsOpenEmojiReacted(false);
+	// 		event.stopPropagation();
+	// 	} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+	// 	}
+	// };
+	const { emojiPlaceActive, setEmojiPlaceActive } = useContext(ChatContext);
+	const [smileClass, setIsSmile] = useState<string>('#AEAEAE');
+	const handleClickSmileEmoji = (event: React.MouseEvent) => {
+		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION && isOpenEmojiReacted) {
+			setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
+			setIsOpenEmojiReacted(true);
+			setIsOpenEmojiMessBox(false);
 			event.stopPropagation();
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
-			console.log('í-ok', isOpenEmojiMessBox);
+			event.stopPropagation();
+			setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
+			setIsOpenEmojiReacted(false);
+			setIsOpenEmojiMessBox(true);
+			setIsSmile('#FFFFFF');
 		}
 	};
-	console.log(props.emojiAction);
-	return (
-		<>
-			{EmojiPlaces.EMOJI_REACTION ? (
-				<>
-					{props.messageEmoji?.id === messageRef?.id && isOpenEmojiReacted && (
+
+	console.log('emk', isOpenEmojiReacted);
+	// useEffect(() => {
+	// 	if (isOpenEmojiMessBox) {
+	// 		setIsOpenEmojiReacted(false);
+	// 		setIsSmile('#AEAEAE');
+	// 	} else if (isOpenEmojiReacted === true && props.messageEmoji?.id === messageRef?.id) {
+	// 		setIsOpenEmojiMessBox(false);
+	// 		setIsSmile('#FFFFFF');
+	// 	}
+	// }, [isOpenEmojiMessBox, isOpenEmojiReacted]);
+
+	if (props.messageEmoji?.id === messageRef?.id && isOpenEmojiReacted) {
+		return (
+			<>
+				<div className={props.classNameParentDiv}>
+					<div className={`${props.classNameChildDiv} scale-75`}>
+						<Picker
+							data={data}
+							// onEmojiSelect={handleEmojiSelect}
+							theme="dark"
+							onClickOutside={() => {
+								setIsOpenEmojiMessBox(false);
+								setIsOpenEmojiReacted(false);
+							}}
+						/>
+					</div>
+				</div>
+				<button onClick={handleClickSmileEmoji}>
+					<Icons.Smile defaultFill={smileClass} />
+				</button>
+			</>
+		);
+	} else if (isOpenEmojiMessBox) {
+		return (
+			<>
+				{emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR && (
+					<>
 						<div className={props.classNameParentDiv}>
 							<div className={`${props.classNameChildDiv} scale-75`}>
 								<Picker
 									data={data}
-									onEmojiSelect={handleEmojiSelect}
+									// onEmojiSelect={handleEmojiSelect}
 									theme="dark"
 									onClickOutside={() => {
+										setIsOpenEmojiMessBox(false);
 										setIsOpenEmojiReacted(false);
 									}}
 								/>
 							</div>
 						</div>
-					)}
-					<button>
-						<Icons.Smile defaultFill={props.messageEmoji?.id === messageRef?.id && isOpenEmojiReacted ? '#FFFFFF' : '#AEAEAE'} />
-					</button>
-				</>
-			) : (
-				EmojiPlaces.EMOJI_EDITOR &&
-				isOpenEmojiMessBox && (
-					<>
-						<Picker
-							data={data}
-							onEmojiSelect={handleEmojiSelect}
-							theme="dark"
-							// onClickOutside={() => {
-							// 	setIsOpenEmojiReacted(false);
-							// }}
-						/>
-						<button>
-							<Icons.Smile defaultFill={isOpenEmojiMessBox ? '#FFFFFF' : '#AEAEAE'} />
+						<button onClick={handleClickSmileEmoji}>
+							<Icons.Smile defaultFill={smileClass} />
 						</button>
 					</>
-				)
-			)}
-		</>
+				)}
+			</>
+		);
+	}
+
+	return (
+		<button onClick={handleClickSmileEmoji}>
+			<Icons.Smile defaultFill={'#AEAEAE'} />
+		</button>
 	);
 }
 
