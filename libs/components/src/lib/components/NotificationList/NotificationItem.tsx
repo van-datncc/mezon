@@ -13,8 +13,13 @@ function NotificationItem({ notify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 
 	const userName = notify?.content?.username;
-	const userNameLenght = userName.length;
-	const notice = notify?.subject?.slice(userNameLenght);
+	
+	let notice = notify?.subject;
+
+	if (userName) {
+		const userNameLenght = userName.length;
+		notice = notify?.subject?.slice(userNameLenght);
+	}
 
 	return (
 		<div className="flex flex-row justify-between hover:bg-bgSurface py-3 px-3 w-full">
