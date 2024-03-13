@@ -1,4 +1,4 @@
-import { clansActions, useAppDispatch } from '@mezon/store';
+import { inviteActions, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
 import { ApiInviteUserRes, ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
@@ -8,7 +8,7 @@ export function useInvite() {
 	const createLinkInviteUser = React.useCallback(
 		async (clan_id: string, channel_id: string, expiry_time: number) => {
 			const action = await dispatch(
-				clansActions.createLinkInviteUser({
+				inviteActions.createLinkInviteUser({
 					clan_id: clan_id,
 					channel_id: channel_id,
 					expiry_time: expiry_time,
@@ -22,7 +22,7 @@ export function useInvite() {
 
 	const inviteUser = React.useCallback(
 		async (invite_id: string) => {
-			const action = await dispatch(clansActions.inviteUser({ inviteId: invite_id }));
+			const action = await dispatch(inviteActions.inviteUser({ inviteId: invite_id }));
 			const payload = action.payload as ApiInviteUserRes;
 			return payload;
 		},
@@ -31,7 +31,7 @@ export function useInvite() {
 
 	const getLinkInvite = React.useCallback(
 		async (invite_id: string) => {
-			const action = await dispatch(clansActions.getLinkInvite({ inviteId: invite_id }));
+			const action = await dispatch(inviteActions.getLinkInvite({ inviteId: invite_id }));
 			const payload = action.payload as ApiInviteUserRes;
 			return payload;
 		},

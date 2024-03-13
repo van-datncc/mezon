@@ -12,12 +12,12 @@ function MemberList() {
 
 	const onlineMembers = useMemo(() => {
 		if (!rawMembers) return [];
-		return rawMembers.filter(({ id }) => onlineStatus[id]);
+		return rawMembers.filter(({ user }) => onlineStatus[ user?.id|| '']);
 	}, [onlineStatus, rawMembers]);
 
 	const offlineMembers = useMemo(() => {
 		if (!rawMembers) return [];
-		return rawMembers.filter(({ id }) => !onlineStatus[id]);
+		return rawMembers.filter(({ user }) => !onlineStatus[user?.id|| '']);
 	}, [onlineStatus, rawMembers]);
 	return (
 		<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">
