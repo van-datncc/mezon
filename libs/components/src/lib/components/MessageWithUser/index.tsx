@@ -1,8 +1,8 @@
 import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import { EmojiPlaces, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
@@ -119,7 +119,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 0;
 				setEmojiData(updatedEmojiData);
 				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
-				setEmojiSelected('');
+				setEmojiSelectedReacted('');
 				setMessageRef(undefined);
 			} else {
 				const updatedEmojiData = [...emojiDataIncSocket];
@@ -130,7 +130,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 				});
 				setEmojiData(updatedEmojiData);
 				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
-				setEmojiSelected('');
+				setEmojiSelectedReacted('');
 				setMessageRef(undefined);
 			}
 		} else {
@@ -152,7 +152,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 				},
 			]);
 			await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
-			setEmojiSelected('');
+			setEmojiSelectedReacted('');
 			setMessageRef(undefined);
 		}
 	};
@@ -193,8 +193,6 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 			messageDataReactedFromSocket.userId &&
 			messageDataReactedFromSocket.emoji !== ''
 		) {
-			console.log('messageDataReactedFromSocket', messageDataReactedFromSocket);
-
 			const reactDataArray: EmojiDataOptionals[] = [
 				{
 					id: messageDataReactedFromSocket?.id,
@@ -216,7 +214,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		}
 	}, [messageDataReactedFromSocket]);
 
-	const { emojiSelected } = useContext(ChatContext);
+	const { emojiSelectedReacted } = useContext(ChatContext);
 
 	const [isReply, setIsReply] = useState<boolean>(true);
 	const [messageIdRef] = useState<string>((message.references && message?.references[0]?.message_ref_id) ?? '');
@@ -242,18 +240,42 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const { isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
 
 	useEffect(() => {
-		if (messageRef?.id === message.id && emojiSelected)
-			handleReactMessage('', currentChannelId ?? '', messageRef?.id ?? '', emojiSelected ?? '', userId ?? '', message.sender_id);
-	}, [messageRef?.id, emojiSelected]);
+		if (messageRef?.id === message.id && emojiSelectedReacted)
+			handleReactMessage('', currentChannelId ?? '', messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
+	}, [messageRef?.id, emojiSelectedReacted]);
 
-	const { setEmojiSelected, setMessageRef } = useContext(ChatContext);
-	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
-		setMessageRef(message);
-		setIsOpenEmojiReacted(true);
-		event.stopPropagation();
-	};
+	const { setEmojiSelectedReacted, setMessageRef } = useContext(ChatContext);
 
 	const [isHovered, setIsHovered] = useState(false);
+	const { setEmojiPlaceActive, emojiPlaceActive } = useContext(ChatContext);
+	const [divWidth, setDivWidth] = useState<number | null>(null);
+	const divRef = useRef<HTMLDivElement>(null);
+	const { widthEmojiBar, setWidthEmojiBar } = useContext(ChatContext);
+
+	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
+		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
+		if (divWidth) {
+			setWidthEmojiBar(divWidth);
+			setIsOpenEmojiReacted(true);
+			setMessageRef(message);
+			event.stopPropagation();
+		}
+	};
+
+	useEffect(() => {
+		const handleResize = () => {
+			if (divRef.current && message.id === messageRef?.id) {
+				const width = divRef.current.offsetWidth;
+				setDivWidth(width);
+				console.log(width);
+			}
+		};
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, [emojiSelectedReacted, widthEmojiBar, divWidth, setDivWidth]);
 
 	return (
 		<>
@@ -299,10 +321,11 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 								</div>
 							</div>
 							<div
+								ref={divRef}
 								onMouseDown={(e) => e.preventDefault()}
 								onMouseEnter={() => setIsHovered(true)}
 								onMouseLeave={() => setIsHovered(false)}
-								className="flex justify-start flex-row w-fit gap-2 flex-wrap  pr-8 relative"
+								className="flex justify-start flex-row w-fit gap-2 flex-wrap  pr-8 relative border"
 							>
 								{emojiDataIncSocket &&
 									emojiDataIncSocket
@@ -339,8 +362,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 											);
 										})}
 								{emojiDataIncSocket && emojiDataIncSocket.length > 0 && (
-									<div className="" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-										<div className="bg-transparent w-8 h-6  flex flex-row items-center rounded-md cursor-pointer absolute "></div>
+									<div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+										<div className="bg-transparent w-8 h-6  flex flex-row items-center rounded-md cursor-pointer absolute"></div>
 										<div
 											onClick={handleClickOpenEmojiBottom}
 											className={`absolute top-0 right-0 bg-[#313338] border-[#313338] w-8 border h-6 px-2 flex flex-row items-center rounded-md cursor-pointer ${

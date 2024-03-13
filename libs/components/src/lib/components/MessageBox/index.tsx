@@ -291,33 +291,21 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 
-	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
+	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive } = useContext(ChatContext);
+
 	const handleOpenEmoji = () => {
-		// setIsOpenEmojiChatBox(!isOpenEmojiChatBox);
-		setIsOpenEmojiMessBox(!isOpenEmojiMessBox);
-		console.log('clicked');
-		// if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
-		// 	setIsOpenEmojiChatBox(true);
-		// }
+		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
+		// setIsOpenEmojiMessBox(true);
 	};
-
-	// useEffect(() => {
-	// 	if (isOpenEmojiPropOutside && isOpenEmojiChatBox) {
-	// 		setIsOpenEmojiChatBox(true);
-	// 	}
-	// 	if (!isOpenEmojiPropOutside && isOpenEmojiChatBox) {
-	// 		setIsOpenEmojiChatBox(false);
-	// 	}
-	// }, [isOpenEmojiPropOutside]);
-
-	// function EmojiReaction() {
-	// 	const handleEmojiSelect = (emoji: any) => {
-	// 		setShowPlaceHolder(false);
-	// 		setIsOpenEmojiChatBox(false);
-	// 		handleEmojiClick(emoji.native);
-	// 	};
-	// 	return <Picker data={data} onEmojiSelect={handleEmojiSelect} theme="dark" />;
-	// }
+	useEffect(() => {
+		if (emojiSelectedMess && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR) {
+			setShowPlaceHolder(false);
+			handleEmojiClick(emojiSelectedMess);
+			setTimeout(() => {
+				editorRef.current!.focus();
+			}, 0);
+		}
+	}, [emojiSelectedMess]);
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
 
@@ -484,7 +472,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [editorState]);
 
-
 	return (
 		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
 			{showEmojiSuggestion && (
@@ -558,11 +545,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				<Icons.Gif />
 				<Icons.Help />
 				<div onClick={handleOpenEmoji} className="h-full flex flex-row items-center group">
-					<EmojiPicker
-						emojiAction={EmojiPlaces.EMOJI_EDITOR}
-						classNameParentDiv="absolute z-50"
-						classNameChildDiv={`absolute transform right-0 mr-[-3rem] bottom-[-1rem]`}
-					/>
+					<EmojiPicker emojiAction={EmojiPlaces.EMOJI_EDITOR} />
 				</div>
 			</div>
 		</div>

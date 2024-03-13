@@ -36,42 +36,42 @@ export function ChannelMessage(props: MessageProps) {
 		return preMessage;
 	}, [preMessage]);
 
-	// const [isOpenReactEmoji, setIsOpenReactEmoji] = useState(false);
-	// const [emojiPicker, setEmojiPicker] = useState<string>('');
-	// const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
-	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef, isOpenEmojiReacted, setIsOpenEmojiReacted, emojiSelected, setEmojiSelected } =
-		useContext(ChatContext);
+	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef, isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
 	const handleClickReply = () => {
 		setIsOpenReply(true);
 		setMessageRef(mess);
 	};
+	const { emojiPlaceActive, setEmojiPlaceActive, widthEmojiBar } = useContext(ChatContext);
+	console.log('widthEmojiBar', widthEmojiBar);
 
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
+		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
 		setIsOpenEmojiReacted(true);
 		setMessageRef(mess);
 		event.stopPropagation();
 	};
-	const { emojiPlaceActive } = useContext(ChatContext);
+
 	return (
-		<div className="relative group hover:bg-gray-950/[.07]">
+		<div className="relative group hover:bg-gray-950/[.07] border">
 			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
 			<div
 				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenEmojiReacted && mess.id === messageRef?.id ? 'block' : 'hidden'} group-hover:block`}
 			>
 				<div onClick={handleClickReact} className="h-full p-1 group">
-					<EmojiPicker
-						emojiAction={EmojiPlaces.EMOJI_REACTION}
-						messageEmoji={mess}
-						classNameParentDiv="absolute z-50"
-						classNameChildDiv={`absolute transform right-[110%] mr-[-2rem] bottom-[-5rem]`}
-					/>
+					<EmojiPicker emojiAction={EmojiPlaces.EMOJI_REACTION} messageEmoji={mess} />
 				</div>
 
 				<button onClick={handleClickReply} className="rotate-180 absolute left-8 top-1.5">
 					<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			</div>
+
+			{/* {emojiPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM && mess.id === messageRef?.id && (
+				<div className="h-full p-1 group absolute">
+					<EmojiPicker emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} messageEmoji={mess} />
+				</div>
+			)} */}
 		</div>
 	);
 }

@@ -206,5 +206,6 @@ export interface IWithError {
 
 export enum EmojiPlaces {
 	EMOJI_REACTION = 'EMOJI_REACTION',
+	EMOJI_REACTION_BOTTOM = 'EMOJI_REACTION_BOTTOM',
 	EMOJI_EDITOR = 'EMOJI_EDITOR',
 }

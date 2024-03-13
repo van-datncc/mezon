@@ -2,12 +2,12 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { ChatContext } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Icons } from '../../components';
 
 export type EmojiPickerOptions = {
-	classNameParentDiv?: string;
-	classNameChildDiv?: string;
+	// classNameParentDiv?: string;
+	// classNameChildDiv?: string;
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 };
@@ -15,52 +15,81 @@ export type EmojiPickerOptions = {
 function EmojiPicker(props: EmojiPickerOptions) {
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const { isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
-	const { emojiSelected, setEmojiSelected, messageRef, setMessageRef } = useContext(ChatContext);
+	const {
+		emojiSelectedReacted,
+		setEmojiSelectedReacted,
+		messageRef,
+		setMessageRef,
+		emojiPlaceActive,
+		setEmojiPlaceActive,
+		setEmojiSelectedMess,
+		widthEmojiBar,
+	} = useContext(ChatContext);
 
-	// const handleEmojiSelect = (emoji: any, event: React.MouseEvent<HTMLDivElement>) => {
-	// 	if (props.emojiAction === EmojiPlaces.EMOJI_REACTION) {
-	// 		setEmojiSelected(emoji.native);
-	// 		setIsOpenEmojiReacted(false);
-	// 		event.stopPropagation();
-	// 	} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
-	// 	}
-	// };
-	const { emojiPlaceActive, setEmojiPlaceActive } = useContext(ChatContext);
-	const [smileClass, setIsSmile] = useState<string>('#AEAEAE');
-	const handleClickSmileEmoji = (event: React.MouseEvent) => {
-		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION && isOpenEmojiReacted) {
-			setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
-			setIsOpenEmojiReacted(true);
-			setIsOpenEmojiMessBox(false);
+	const handleEmojiSelect = (emoji: any, event: React.MouseEvent<HTMLDivElement>) => {
+		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION) {
+			setEmojiSelectedReacted(emoji.native);
+			setIsOpenEmojiReacted(false);
 			event.stopPropagation();
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+			setEmojiSelectedMess(emoji.native);
 			event.stopPropagation();
-			setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
-			setIsOpenEmojiReacted(false);
-			setIsOpenEmojiMessBox(true);
-			setIsSmile('#FFFFFF');
+			setIsOpenEmojiMessBox(false);
 		}
 	};
 
-	console.log('emk', isOpenEmojiReacted);
-	// useEffect(() => {
-	// 	if (isOpenEmojiMessBox) {
-	// 		setIsOpenEmojiReacted(false);
-	// 		setIsSmile('#AEAEAE');
-	// 	} else if (isOpenEmojiReacted === true && props.messageEmoji?.id === messageRef?.id) {
-	// 		setIsOpenEmojiMessBox(false);
-	// 		setIsSmile('#FFFFFF');
-	// 	}
-	// }, [isOpenEmojiMessBox, isOpenEmojiReacted]);
+	const [colorReation, setColorReaction] = useState<string>('#AEAEAE');
+	const [colorEmojiChat, setColorEmojiChat] = useState<string>('#AEAEAE');
 
-	if (props.messageEmoji?.id === messageRef?.id && isOpenEmojiReacted) {
+	const handleClickSmileEmoji = (event: React.MouseEvent) => {
+		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION && isOpenEmojiReacted) {
+			// setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
+			setIsOpenEmojiReacted(true);
+			setIsOpenEmojiMessBox(false);
+			setColorReaction('#FFFFFF');
+			setColorEmojiChat('#AEAEAE');
+			event.stopPropagation();
+		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+			// setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
+			setIsOpenEmojiReacted(false);
+			setIsOpenEmojiMessBox(true);
+			setColorReaction('#AEAEAE');
+			setColorEmojiChat('#FFFFFF');
+			event.stopPropagation();
+		}
+	};
+
+	const [parentClassName, setParentClassName] = useState<string>('');
+	const [childClassName, setChildClassName] = useState<string>('');
+	console.log('width', widthEmojiBar);
+
+	useEffect(() => {
+		switch (emojiPlaceActive) {
+			// case EmojiPlaces.EMOJI_EDITOR:
+			// 	setParentClassName('absolute z-50');
+			// 	setChildClassName('absolute transform right-0 mr-[-3rem]  scale-75');
+			// 	break;
+			case EmojiPlaces.EMOJI_REACTION:
+				setParentClassName(`absolute`);
+				setChildClassName('absolute transform right-[110%] mr-[-2rem] bottom-[-5rem] scale-75');
+				break;
+			// case EmojiPlaces.EMOJI_REACTION_BOTTOM:
+			// 	setParentClassName(`absolute bottom-10 z-10 left-${widthEmojiBar}`);
+			// 	setChildClassName('scale-75');
+			// 	break;
+			default:
+				break;
+		}
+	}, [emojiPlaceActive, widthEmojiBar]);
+
+	if ((props.messageEmoji?.id === messageRef?.id && isOpenEmojiReacted) || (isOpenEmojiMessBox && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR)) {
 		return (
 			<>
-				<div className={props.classNameParentDiv}>
-					<div className={`${props.classNameChildDiv} scale-75`}>
+				<div className={parentClassName}>
+					<div className={childClassName}>
 						<Picker
 							data={data}
-							// onEmojiSelect={handleEmojiSelect}
+							onEmojiSelect={handleEmojiSelect}
 							theme="dark"
 							onClickOutside={() => {
 								setIsOpenEmojiMessBox(false);
@@ -70,37 +99,13 @@ function EmojiPicker(props: EmojiPickerOptions) {
 					</div>
 				</div>
 				<button onClick={handleClickSmileEmoji}>
-					<Icons.Smile defaultFill={smileClass} />
+					<Icons.Smile
+						defaultFill={`${props.messageEmoji?.id === messageRef?.id && isOpenEmojiReacted ? '#FFFFFF' : isOpenEmojiMessBox && colorEmojiChat}`}
+					/>
 				</button>
 			</>
 		);
-	} else if (isOpenEmojiMessBox) {
-		return (
-			<>
-				{emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR && (
-					<>
-						<div className={props.classNameParentDiv}>
-							<div className={`${props.classNameChildDiv} scale-75`}>
-								<Picker
-									data={data}
-									// onEmojiSelect={handleEmojiSelect}
-									theme="dark"
-									onClickOutside={() => {
-										setIsOpenEmojiMessBox(false);
-										setIsOpenEmojiReacted(false);
-									}}
-								/>
-							</div>
-						</div>
-						<button onClick={handleClickSmileEmoji}>
-							<Icons.Smile defaultFill={smileClass} />
-						</button>
-					</>
-				)}
-			</>
-		);
 	}
-
 	return (
 		<button onClick={handleClickSmileEmoji}>
 			<Icons.Smile defaultFill={'#AEAEAE'} />
