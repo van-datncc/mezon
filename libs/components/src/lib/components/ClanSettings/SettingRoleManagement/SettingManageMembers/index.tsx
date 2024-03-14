@@ -1,18 +1,19 @@
 import { useClans, useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId } from '@mezon/store';
+import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from '@mezon/store';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AddMembersModal } from '../AddMembersModal';
 
 const SettingManageMembers = () => {
-	const { updateRole } = useRoles();
+	const { RolesClan, updateRole } = useRoles();
+	const dispatchRole = useDispatch();
 	const { currentClan } = useClans();
 	const addUsers: string[] = useSelector(getNewAddMembers);
 	const clickRole = useSelector(getSelectedRoleId);
 	const { usersClan } = useClans();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
-
+	const activeRole = RolesClan.find((role) => role.id === clickRole);
 	const commonUsers = usersClan.filter((user) => addUsers.includes(user.id));
 
 	const [searchResults, setSearchResults] = useState<any[]>(commonUsers);
@@ -29,8 +30,16 @@ const SettingManageMembers = () => {
 		setSearchResults(results || []);
 	}, [searchTerm, addUsers, clickRole]);
 
-	const handleRemoveMember = async (userID: string[]) => {
-		await updateRole(currentClan?.id ?? '', clickRole, '', [], [], userID, []);
+	useEffect(() => {
+		if (clickRole !== 'New Role') {
+			const memberIDRoles = activeRole?.role_user_list?.role_users?.map((member) => member.id) || [];
+			dispatchRole(setAddMemberRoles(memberIDRoles));
+		}
+	}, [activeRole]);
+
+	const handleRemoveMember = async (userID: string) => {
+		const userIDArray = userID.split(','); 
+		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
 	return (
 		<>

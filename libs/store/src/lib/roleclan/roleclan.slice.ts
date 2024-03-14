@@ -229,54 +229,20 @@ export const roleIdReducer = roleSlice.reducer;
 
 export const { setSelectedRoleId, setNameRoleNew, setAddPermissions, setAddMemberRoles, setRemovePermissions, setRemoveMemberRoles, setSelectedPermissions} = roleSlice.actions;
 
-const selectSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
+export const getSelectedRoleId = (state: RootState) => state.roleId.selectedRoleId;
 
-const setNewNameRole = (state: RootState) => state.roleId.nameRoleNew;
+export const getNewNameRole = (state: RootState) => state.roleId.nameRoleNew;
 
-const setNewSelectedPermissions = (state: RootState) => state.roleId.selectedPermissions;
+export const getNewSelectedPermissions = (state: RootState) => state.roleId.selectedPermissions;
 
-const setNewAddPermissions = (state: RootState) => state.roleId.addPermissions;
+export const getNewAddPermissions = (state: RootState) => state.roleId.addPermissions;
 
-const setNewAddMembers = (state: RootState) => state.roleId.addMemberRoles;
+export const getNewAddMembers = (state: RootState) => state.roleId.addMemberRoles;
 
-const setNewRemovePermissions = (state: RootState) => state.roleId.removePermissions;
+export const getRemovePermissions = (state: RootState) => state.roleId.removePermissions;
 
-const setNewRemoveMemberRoles = (state: RootState) => state.roleId.removeMemberRoles;
+export const getRemoveMemberRoles = (state: RootState) => state.roleId.removeMemberRoles;
 
-export const getSelectedRoleId = createSelector(
-  selectSelectedRoleId,
-  (roleId) => roleId
-);
-
-export const getNewNameRole = createSelector(
-	setNewNameRole,
-	(nameRoleNew) => nameRoleNew
-  );
-
-export const getNewSelectedPermissions = createSelector(
-	setNewSelectedPermissions,
-	(selectedPermissions) => selectedPermissions
-  );
-
-export const getNewAddPermissions = createSelector(
-	setNewAddPermissions,
-	(addPermissions) => addPermissions
-  );
-
-export const getNewAddMembers = createSelector(
-	setNewAddMembers,
-	(addMemberRoles) => addMemberRoles
-  );
-
-export const getRemovePermissions = createSelector(
-	setNewRemovePermissions,
-	(removePermissions) => removePermissions
-  );
-
-export const getRemoveMemberRoles = createSelector(
-	setNewRemoveMemberRoles,
-	(removeMemberRoles) => removeMemberRoles
-  );
 
 export const updateRoleSlice = createSlice({
 	name: 'isshow',
@@ -297,12 +263,7 @@ export const updateRoleSlice = createSlice({
   
   export const { toggleIsShowTrue, toggleIsShowFalse } = updateRoleSlice.actions;
   
-  const selectIsShow = (state: RootState) => state.isshow.isShow;
-  
-  export const getIsShow = createSelector(
-	selectIsShow,
-	(isshow) => isshow
-  );
+  export const getIsShow = (state: RootState) => state.isshow.isShow;
 
 /*
  * Export reducer for store configuration.
