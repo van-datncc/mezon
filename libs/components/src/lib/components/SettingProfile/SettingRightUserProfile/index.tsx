@@ -72,7 +72,7 @@ const SettingRightUser = ({
 		setUrlImage('');
 	};
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="text-white">
 				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 font-bold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
@@ -98,7 +98,7 @@ const SettingRightUser = ({
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
-									className="text-white bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px]"
+									className="text-white bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px] hover:font-bold"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -106,7 +106,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px]"
+								className="text-white bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px] hover:font-bold"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar

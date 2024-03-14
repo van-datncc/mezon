@@ -35,6 +35,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	const handleUnBlockFriend = (userName: string, id: string) => {
 		unBlockFriend(userName, id);
 	};
+
 	return (
 		<div
 			key={friend.user?.id}
@@ -49,7 +50,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					isHideIconStatus={friend.state !== 0 ? true : false}
 					key={friend.user?.id}
 					numberCharacterCollapse={100}
-					classParent="friendList"
+					classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList'}
 				/>
 			</div>
 			<div>

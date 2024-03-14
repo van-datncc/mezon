@@ -19,9 +19,9 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 		setSelectedButton('');
 	};
 	return (
-		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
 			<div className="w-170px ">
-				<p className="text-[#84ADFF] font-bold text-sm tracking-wider uppercase">{currentClan?.clan_name}</p>
+				<p className="text-[#84ADFF] font-bold text-base tracking-wider uppercase">{currentClan?.clan_name}</p>
 				{/* <button
 					className={`pt-1 pl-1 text-white w-[170px] rounded-[5px] text-left mt-[16px] ${selectedButton === 'Account' ? 'bg-blue-400' : ''}`}
 					onClick={() => {
@@ -33,7 +33,7 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				</button> */}
 				{/* <br /> */}
 				<button
-					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Roles' ? 'bg-blue-400 text-white' : ''}`}
+					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Roles' ? 'bg-[#155EEF1A] text-white' : ''}`}
 					onClick={() => {
 						handleButtonClick('Roles');
 						onItemClick && onItemClick('Roles');
@@ -43,7 +43,7 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-blue-400' : ''} w-[170px] text-left rounded-[5px]`}
+					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-[#155EEF1A]' : ''} w-[170px] text-left rounded-[5px] hover:text-white`}
 					onClick={() => {}}
 				>
 					Delete Server

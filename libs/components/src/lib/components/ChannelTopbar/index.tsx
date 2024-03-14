@@ -18,7 +18,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			{/* Desktop buttons */}
 			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
-					<div className="flex pr-[70px]">
+					<div className="pr-[70px] hidden ssm:flex">
 						<div className="justify-start items-center gap-[15px] flex iconHover">
 							<ThreadButton />
 							<MuteButton />
@@ -29,7 +29,10 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<SearchMessage />
 					</div>
 
-					<div className="justify-start items-start gap-4 iconHover absolute right-3 flex" id="inBox">
+					<div
+						className="gap-4 iconHover absolute flex  w-[82px] h-8 justify-center items-center  bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)] left-[345px] ssm:left-auto ssm:right-0"
+						id="inBox"
+					>
 						<NotificationList />
 						<HelpButton />
 					</div>
