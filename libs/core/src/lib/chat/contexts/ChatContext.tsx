@@ -56,7 +56,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [emojiSelectedMess, setEmojiSelectedMess] = React.useState<string>('');
 	const [isOpenEmojiReacted, setIsOpenEmojiReacted] = React.useState<boolean>(false);
 	const [isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom] = React.useState<boolean>(false);
-
 	const [emojiPlaceActive, setEmojiPlaceActive] = React.useState<string>('');
 	const [widthEmojiBar, setWidthEmojiBar] = React.useState<number>(0);
 

@@ -5,6 +5,7 @@ import { EmojiPlaces, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameD
 import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import EmojiPicker from '../EmojiPicker';
 import * as Icons from '../Icons/index';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -239,12 +240,15 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
 	const { isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
 
+	console.log('message', message);
+
 	useEffect(() => {
 		if (messageRef?.id === message.id && emojiSelectedReacted)
 			handleReactMessage('', currentChannelId ?? '', messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
 	}, [messageRef?.id, emojiSelectedReacted]);
 
-	const { setEmojiSelectedReacted, setMessageRef, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
+	const { setEmojiSelectedReacted, setMessageRef, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom, setIsOpenEmojiMessBox } =
+		useContext(ChatContext);
 
 	const [isHovered, setIsHovered] = useState(false);
 	const { setEmojiPlaceActive, emojiPlaceActive } = useContext(ChatContext);
@@ -253,11 +257,11 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const { widthEmojiBar, setWidthEmojiBar } = useContext(ChatContext);
 
 	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
-		console.log('clickBottom');
+		setIsOpenEmojiReacted(false);
+		setIsOpenEmojiMessBox(false);
+		setMessageRef(message);
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
 		setIsOpenEmojiReactedBottom(true);
-		setIsOpenEmojiReacted(false);
-		setMessageRef(message);
 		event.stopPropagation();
 	};
 
@@ -274,7 +278,20 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
-	}, [emojiSelectedReacted, widthEmojiBar, divWidth, setDivWidth]);
+	}, [isOpenEmojiReactedBottom, message.id, isOpenEmojiReacted, messageRef?.id, isOpenEmojiReacted, emojiPlaceActive]);
+
+	const divMessageWithUser = useRef<HTMLDivElement>(null);
+	const widthMessageWithUser = divMessageWithUser?.current?.offsetWidth;
+	const WIDTH_EMOJI_BOARD: number = 264;
+
+	const [className, setClassName] = useState<string>('');
+	useEffect(() => {
+		if (widthMessageWithUser && widthMessageWithUser - widthEmojiBar < WIDTH_EMOJI_BOARD) {
+			setClassName('right-0');
+		} else {
+			setClassName('ml-10');
+		}
+	}, [, widthEmojiBar, widthMessageWithUser]);
 
 	return (
 		<>
@@ -285,7 +302,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
+			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''} `}>
 				<div className={`flex py-0.5 h-15 flex-col  overflow-x-hidden ml-4 w-auto mr-4 ${isCombine ? '' : 'mt-3'}`}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1">
@@ -310,7 +327,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 							</div>
 						</div>
 					)}
-					<div className="justify-start gap-4 inline-flex w-full relative">
+					<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-y-hidden" ref={divMessageWithUser}>
 						<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 						<div className="flex-col w-full flex justify-center items-start relative gap-1">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
@@ -324,7 +341,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 								onMouseDown={(e) => e.preventDefault()}
 								onMouseEnter={() => setIsHovered(true)}
 								onMouseLeave={() => setIsHovered(false)}
-								className="flex justify-start flex-row w-fit gap-2 flex-wrap  pr-8 relative border"
+								className="flex justify-start flex-row w-fit gap-2 flex-wrap  pr-8 relative"
 							>
 								{emojiDataIncSocket &&
 									emojiDataIncSocket
@@ -365,15 +382,18 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 										<div className="bg-transparent w-8 h-6  flex flex-row items-center rounded-md cursor-pointer absolute"></div>
 										<div
 											onClick={handleClickOpenEmojiBottom}
-											className={`absolute top-0 right-0 bg-[#313338] border-[#313338] w-8 border h-6 px-2 flex flex-row items-center rounded-md cursor-pointer ${
-												isHovered ? 'block' : 'hidden'
-											}`}
+											className={`absolute top-0 right-0 bg-[#313338] border-[#313338] w-8 border h-6 px-2 flex flex-row items-center rounded-md cursor-pointer ${(isOpenEmojiReactedBottom && message.id === messageRef?.id) || isHovered ? 'block' : 'hidden'}`}
 										>
 											<Icons.Smile
 												defaultSize="w-4 h-4"
-												defaultFill={message.id === messageRef?.id && isOpenEmojiReactedBottom ? '#FFFFFF' : '#AEAEAE'}
+												defaultFill={isOpenEmojiReactedBottom && message.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'}
 											/>
 										</div>
+										{isOpenEmojiReactedBottom && message.id === messageRef?.id && (
+											<div className={`scale-75 transform ${className}  bottom-24 origin-left fixed z-50`}>
+												<EmojiPicker messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+											</div>
+										)}
 									</div>
 								)}
 							</div>

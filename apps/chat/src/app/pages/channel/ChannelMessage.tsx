@@ -2,7 +2,7 @@ import { EmojiPicker, Icons, MessageWithUser, UnreadMessageBreak } from '@mezon/
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
@@ -46,16 +46,16 @@ export function ChannelMessage(props: MessageProps) {
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
 		setIsOpenEmojiReactedBottom(false);
-		setIsOpenEmojiReacted(true);
 		setIsOpenEmojiMessBox(false);
+		setIsOpenEmojiReacted(true);
 		setMessageRef(mess);
 		event.stopPropagation();
 	};
 
-	console.log('widthEmojiBar', widthEmojiBar);
+
 
 	return (
-		<div className="relative group hover:bg-gray-950/[.07] border">
+		<div className="relative group hover:bg-gray-950/[.07]" >
 			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
 
@@ -77,13 +77,6 @@ export function ChannelMessage(props: MessageProps) {
 					<div className="w-fit absolute left-[-20rem] top-[-23rem] right-0">
 						<div className="scale-75 transform mb-0 z-10">
 							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-						</div>
-					</div>
-				)}
-				{isOpenEmojiReactedBottom && mess.id === messageRef?.id && (
-					<div className="w-fit absolute left-0 top-[-23rem] right-0">
-						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
 						</div>
 					</div>
 				)}
