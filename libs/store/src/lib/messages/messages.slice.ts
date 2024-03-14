@@ -44,7 +44,7 @@ export type UserTypingState = {
 };
 
 export type FetchMessageParam = {
-	cursor: string;
+	lastLoadMessageId: string;
 	hasMore?: boolean;
 };
 
@@ -72,13 +72,13 @@ export const TYPING_TIMEOUT = 3000;
 export const messagesAdapter = createEntityAdapter<MessagesEntity>();
 
 export const fetchMessagesCached = memoize(
-	(mezon: MezonValueContext, channelId: string, cursor?: string) =>
-		mezon.client.listChannelMessages(mezon.session, channelId, LIMIT_MESSAGE, false, cursor),
+	(mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>
+		mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE),
 	{
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2];
+			return args[1] + args[2] + args[3];
 		},
 	},
 );
@@ -86,35 +86,34 @@ export const fetchMessagesCached = memoize(
 type fetchMessageChannelPayload = {
 	channelId: string;
 	noCache?: boolean;
-	cursor?: string;
+	messageId?: string;
+	direction?: number;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
-	async ({ channelId, noCache, cursor }: fetchMessageChannelPayload, thunkAPI) => {
+	async ({ channelId, noCache, messageId, direction }: fetchMessageChannelPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
-			fetchMessagesCached.clear(mezon, channelId, cursor);
+			fetchMessagesCached.clear(mezon, channelId, messageId, direction);
 		}
 
-		const response = await fetchMessagesCached(mezon, channelId, cursor);
+		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		const currentCursor = selectCursorMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
+		const currentLastLoadMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
 
-		const nextCursor = response.cacheable_cursor || '';
 		let hasMore = currentHasMore;
-
-		if (currentCursor === cursor) {
+		if (currentLastLoadMessageId === messageId) {			
 			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
 		}
 
-		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { cursor: nextCursor, hasMore } }));
+		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length-1].id, hasMore } }));
 
 		if (response.last_seen_message_id) {
 			thunkAPI.dispatch(
@@ -145,8 +144,13 @@ type loadMoreMess = {
 
 export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: loadMoreMess, thunkAPI) => {
 	try {
-		const cursor = selectCursorMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
-		await thunkAPI.dispatch(fetchMessages({ channelId, cursor }));
+		const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
+		await thunkAPI.dispatch(fetchMessages({ 
+			channelId: channelId, 
+			noCache: false,
+			messageId: lastScrollMessageId,
+			direction: 3
+		}));
 	} catch (e) {
 		console.log(e);
 		return thunkAPI.rejectWithValue([]);
@@ -463,9 +467,9 @@ export const selectHasMoreMessageByChannelId = (channelId: string) =>
 		return (param && param[channelId] && param[channelId].hasMore) || false;
 	});
 
-export const selectCursorMessageByChannelId = (channelId: string) =>
+export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return param && param[channelId] && param[channelId].cursor;
+		return param && param[channelId] && param[channelId].lastLoadMessageId;
 	});
 export const selectMessageReacted = createSelector(getMessagesState, (state) => state.reactionMessageData);
 
