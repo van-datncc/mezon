@@ -60,7 +60,7 @@ const SettingPermissions = () => {
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, selectedPermissions]);
+	}, [nameRole, selectedPermissions, activeRole]);
 
 	return (
 		<>

@@ -36,7 +36,7 @@ const SettingDisplayRole = () => {
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, selectedPermissions]);
+	}, [nameRole, selectedPermissions, activeRole]);
 
 	return (
 		<div className="w-full flex flex-col gap-y-5">
