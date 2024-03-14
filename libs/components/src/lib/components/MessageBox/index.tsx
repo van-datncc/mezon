@@ -59,7 +59,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	//clear Editor after navigate channel
 	useEffect(() => {
 		setEditorState(EditorState.createEmpty());
-		// setIsOpenEmojiChatBox(false);
 	}, [currentChannelId, currentClanId]);
 
 	const onChange = useCallback((editorState: EditorState) => {
