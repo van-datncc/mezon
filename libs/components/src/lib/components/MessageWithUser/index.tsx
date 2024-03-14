@@ -1,10 +1,11 @@
 import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import { EmojiPlaces, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import EmojiPicker from '../EmojiPicker';
 import * as Icons from '../Icons/index';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -13,7 +14,7 @@ import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
 	id: string;
-	emoji: string;
+	emoji?: string;
 	messageId: string;
 };
 
@@ -25,7 +26,6 @@ export type MessageWithUserProps = {
 	references?: Array<ApiMessageRef>;
 	user?: IChannelMember | null;
 	reactions?: Array<ApiMessageReaction>;
-	reactionOutsideProps?: ReactedOutsideOptional;
 	isMessNotifyMention?: boolean;
 };
 
@@ -47,9 +47,10 @@ type EmojiItemOptionals = {
 	id: string;
 	sender_id: string;
 	emoji: string;
+	count: number;
 };
 
-function MessageWithUser({ message, preMessage, attachments, reactionOutsideProps, user, isMessNotifyMention }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyMention }: MessageWithUserProps) {
 	const { messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -65,21 +66,24 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
-	const processData = (dataEmoji: EmojiItemOptionals[]) => {
+
+	const processData = (dataEmoji: EmojiItemOptionals[], message: { channel_id: string; id: string }) => {
 		const result: EmojiDataOptionals[] = [];
+
 		dataEmoji.length &&
 			dataEmoji.forEach((item: EmojiItemOptionals) => {
 				const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
 
 				if (existingEmoji) {
 					const existingSender = existingEmoji.senders.find((senderItem: SenderInfoOptionals) => senderItem.id === item.sender_id);
+
 					if (existingSender) {
-						existingSender.count += 1;
+						existingSender.count += item.count || 1;
 						existingSender.emojiIdList.push(item.id);
 					} else {
 						existingEmoji.senders.push({
 							id: item.sender_id,
-							count: 1,
+							count: item.count || 1,
 							emojiIdList: [item.id],
 						});
 					}
@@ -90,20 +94,21 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 						senders: [
 							{
 								id: item.sender_id,
-								count: 1,
+								count: item.count || 1,
 								emojiIdList: [item.id],
 							},
 						],
-
 						channelId: message.channel_id,
 						messageId: message.id,
 					});
 				}
 			});
+
 		return result;
 	};
 
-	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
+	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }));
+
 	const handleReactMessage = async (id: string, channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
@@ -114,6 +119,8 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 0;
 				setEmojiData(updatedEmojiData);
 				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
+				setEmojiSelectedReacted('');
+				setMessageRef(undefined);
 			} else {
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders.push({
@@ -123,6 +130,8 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				});
 				setEmojiData(updatedEmojiData);
 				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
+				setEmojiSelectedReacted('');
+				setMessageRef(undefined);
 			}
 		} else {
 			setEmojiData((prevEmojiDataOptionals: EmojiDataOptionals[]) => [
@@ -143,6 +152,8 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 				},
 			]);
 			await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
+			setEmojiSelectedReacted('');
+			setMessageRef(undefined);
 		}
 	};
 
@@ -171,14 +182,16 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		return emojiDataArr;
 	};
 
-	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch));
+	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(
+		processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }),
+	);
 	const [reactedConvert, setReactConvert] = useState<EmojiDataOptionals[]>([]);
 	useEffect(() => {
 		if (
 			messageDataReactedFromSocket?.channelId &&
 			messageDataReactedFromSocket.messageId &&
 			messageDataReactedFromSocket.userId &&
-			messageDataReactedFromSocket.emoji
+			messageDataReactedFromSocket.emoji !== ''
 		) {
 			const reactDataArray: EmojiDataOptionals[] = [
 				{
@@ -201,19 +214,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 		}
 	}, [messageDataReactedFromSocket]);
 
-	useEffect(() => {
-		if (reactionOutsideProps?.messageId && reactionOutsideProps?.emoji && userId) {
-			handleReactMessage(
-				reactionOutsideProps?.id,
-				currentChannelId ?? '',
-				reactionOutsideProps?.messageId,
-				reactionOutsideProps?.emoji,
-				userId,
-				message.sender_id,
-			);
-			return;
-		}
-	}, [reactionOutsideProps?.emoji, reactionOutsideProps?.messageId]);
+	const { emojiSelectedReacted } = useContext(ChatContext);
 
 	const [isReply, setIsReply] = useState<boolean>(true);
 	const [messageIdRef] = useState<string>((message.references && message?.references[0]?.message_ref_id) ?? '');
@@ -235,6 +236,59 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 			setIsMessRef(false);
 		}
 	}, [messageIdRef, getMessageRef, getSenderMessage, messageRef, isOpenReply, message.id]);
+	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
+	const { isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
+
+	useEffect(() => {
+		if (messageRef?.id === message.id && emojiSelectedReacted)
+			handleReactMessage('', currentChannelId ?? '', messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
+	}, [messageRef?.id, emojiSelectedReacted]);
+
+	const { setEmojiSelectedReacted, setMessageRef, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom, setIsOpenEmojiMessBox } =
+		useContext(ChatContext);
+
+	const [isHovered, setIsHovered] = useState(false);
+	const { setEmojiPlaceActive, emojiPlaceActive } = useContext(ChatContext);
+	const [divWidth, setDivWidth] = useState<number | null>(null);
+	const divRef = useRef<HTMLDivElement>(null);
+	const { widthEmojiBar, setWidthEmojiBar } = useContext(ChatContext);
+
+	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
+		setIsOpenEmojiReacted(false);
+		setIsOpenEmojiMessBox(false);
+		setMessageRef(message);
+		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
+		setIsOpenEmojiReactedBottom(true);
+		event.stopPropagation();
+	};
+
+	useEffect(() => {
+		const handleResize = () => {
+			if (divRef.current && message.id === messageRef?.id) {
+				const width = divRef.current.offsetWidth;
+				setDivWidth(width);
+				setWidthEmojiBar(width);
+			}
+		};
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, [isOpenEmojiReactedBottom, message.id, isOpenEmojiReacted, messageRef?.id, isOpenEmojiReacted, emojiPlaceActive]);
+
+	const divMessageWithUser = useRef<HTMLDivElement>(null);
+	const widthMessageWithUser = divMessageWithUser?.current?.offsetWidth;
+	const WIDTH_EMOJI_BOARD: number = 264;
+
+	const [className, setClassName] = useState<string>('');
+	useEffect(() => {
+		if (widthMessageWithUser && widthMessageWithUser - widthEmojiBar < WIDTH_EMOJI_BOARD) {
+			setClassName('right-0');
+		} else {
+			setClassName('ml-10');
+		}
+	}, [, widthEmojiBar, widthMessageWithUser]);
 
 	return (
 		<>
@@ -270,7 +324,7 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 							</div>
 						</div>
 					)}
-					<div className="justify-center gap-4 inline-flex w-full relative">
+					<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-y-hidden" ref={divMessageWithUser}>
 						<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 						<div className="flex-col w-full flex justify-center items-start relative ">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
@@ -282,7 +336,13 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 									<MessageContent message={message} user={user} isCombine={isCombine} />
 								</div>
 							</div>
-							<div onMouseDown={(e) => e.preventDefault()} className="flex justify-start flex-row w-full gap-2 flex-wrap">
+							<div
+								ref={divRef}
+								onMouseDown={(e) => e.preventDefault()}
+								onMouseEnter={() => setIsHovered(true)}
+								onMouseLeave={() => setIsHovered(false)}
+								className="flex justify-start flex-row w-fit gap-2 flex-wrap  pr-8 relative"
+							>
 								{emojiDataIncSocket &&
 									emojiDataIncSocket
 										.filter((obj) => obj.messageId === message.id)
@@ -294,8 +354,8 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 													{checkID && (
 														<div
 															className={` justify-center items-center relative
-													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] border'}
-													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center`}
+													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] '}
+													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 															onClick={() =>
 																handleReactMessage(
 																	emoji.id,
@@ -317,6 +377,26 @@ function MessageWithUser({ message, preMessage, attachments, reactionOutsideProp
 												</Fragment>
 											);
 										})}
+								{emojiDataIncSocket && emojiDataIncSocket.length > 0 && (
+									<div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+										<div className="bg-transparent w-8 h-6  flex flex-row items-center rounded-md cursor-pointer absolute"></div>
+										<div
+											onClick={handleClickOpenEmojiBottom}
+											className={`absolute top-0 right-0 bg-[#313338] border-[#313338] w-8 border h-6 px-2 flex flex-row items-center rounded-md cursor-pointer
+											 ${(isOpenEmojiReactedBottom && message.id === messageRef?.id) || isHovered ? 'block' : 'hidden'} `}
+										>
+											<Icons.Smile
+												defaultSize="w-4 h-4"
+												defaultFill={isOpenEmojiReactedBottom && message.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'}
+											/>
+										</div>
+										{isOpenEmojiReactedBottom && message.id === messageRef?.id && (
+											<div className={`scale-75 transform ${className}  bottom-24 origin-left fixed z-50`}>
+												<EmojiPicker messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+											</div>
+										)}
+									</div>
+								)}
 							</div>
 						</div>
 					</div>

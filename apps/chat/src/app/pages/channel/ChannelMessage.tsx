@@ -1,10 +1,11 @@
+import { EmojiPicker, Icons, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
+import {  ReactedOutsideOptional,  } from '@mezon/components';
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
@@ -38,6 +39,8 @@ export function ChannelMessage(props: MessageProps) {
 		return preMessage;
 	}, [preMessage]);
 
+	const { isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } =
+		useContext(ChatContext);
 	const [isOpenReactEmoji, setIsOpenReactEmoji] = useState(false);
 	const [emojiPicker, setEmojiPicker] = useState<string>('');
 	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
@@ -65,48 +68,45 @@ export function ChannelMessage(props: MessageProps) {
 		setIsOpenReply(true);
 		setMessageRef(mess);
 	};
-
-	const handleClickReact = () => {
-		setIsOpenReactEmoji(!isOpenReactEmoji);
+	const { emojiPlaceActive, setEmojiPlaceActive, widthEmojiBar, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
+	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
+		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
+		setIsOpenEmojiReactedBottom(false);
+		setIsOpenEmojiMessBox(false);
+		setIsOpenEmojiReacted(true);
 		setMessageRef(mess);
+		event.stopPropagation();
 	};
 
-	useEffect(() => {
-		if (messageRef?.id !== mess.id) {
-			return setIsOpenReactEmoji(false);
-		}
-	}, [messageRef?.id, mess.id, setIsOpenReactEmoji, setMessageRef, isOpenReply, isOpenReactEmoji]);
+
 
 	return (
-		<div className="relative group hover:bg-gray-950/[.07]">
-			<MessageWithUser
-				reactionOutsideProps={reactionOutside}
-				message={mess as IMessageWithUser}
-				preMessage={messPre as IMessageWithUser}
-				user={user}
-			/>
+		<div className="relative group hover:bg-gray-950/[.07]" >
+			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
+
 			<div
-				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary iconHover ${isOpenReactEmoji ? 'block' : 'hidden'} group-hover:block`}
+				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary 
+				 ${(isOpenEmojiReacted && mess.id === messageRef?.id) || (isOpenEmojiReactedBottom && mess.id === messageRef?.id) ? 'block' : 'hidden'} group-hover:block`}
 			>
-				<button
-					className="h-full p-1 group"
-					onClick={(event) => {
-						event.stopPropagation();
-						handleClickReact();
-					}}
-				>
-					<Icons.Smile defaultFill={isOpenReactEmoji ? '#FFFFFF' : '#AEAEAE'} />
-				</button>
-				<button onClick={handleClickReply} className="rotate-180">
-					<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
-				</button>
-			</div>
-			{isOpenReactEmoji && (
-				<div className="absolute right-32 bottom-0 z-50">
-					<EmojiReaction />
+				<div>
+					<div onClick={handleClickReact} className="h-full p-1 group cursor-pointer">
+						<Icons.Smile defaultFill={`${isOpenEmojiReacted && mess.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'}`} />
+					</div>
+
+					<button onClick={handleClickReply} className="rotate-180 absolute left-8 top-1">
+						<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
+					</button>
 				</div>
-			)}
+
+				{isOpenEmojiReacted && mess.id === messageRef?.id && (
+					<div className="w-fit absolute left-[-20rem] top-[-23rem] right-0">
+						<div className="scale-75 transform mb-0 z-10">
+							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }
