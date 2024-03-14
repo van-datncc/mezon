@@ -291,12 +291,17 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 
-	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive } = useContext(ChatContext);
+	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive, isOpenEmojiMessBox, setMessageRef } =
+		useContext(ChatContext);
 
-	const handleOpenEmoji = () => {
+	const handleOpenEmoji = (event: React.MouseEvent<HTMLDivElement>) => {
+		console.log('clicked-emoji-bottom');
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
-		// setIsOpenEmojiMessBox(true);
+		setIsOpenEmojiMessBox(!isOpenEmojiMessBox);
+		setMessageRef(undefined);
+		event.stopPropagation();
 	};
+
 	useEffect(() => {
 		if (emojiSelectedMess && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR) {
 			setShowPlaceHolder(false);
@@ -308,7 +313,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [emojiSelectedMess]);
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
-
 	function clickEmojiSuggestion(emoji: string, index: number) {
 		setSelectedItemIndex(index);
 		handleEmojiClick(emoji);
@@ -471,81 +475,91 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			}
 		}
 	}, [editorState]);
-
 	return (
-		<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
-			{showEmojiSuggestion && (
-				<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
-					<p className=" text-center p-2">Emoji Matching: {syntax}</p>
-					<div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
-						<ul
-							ref={ulRef}
-							className="w-full flex flex-col"
-							onKeyDown={(e) => {
-								if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-									e.preventDefault();
-								}
-							}}
-						>
-							{emojiResult?.map((emoji: any, index: number) => (
-								<li
-									ref={(el) => (liRefs.current[index] = el)}
-									key={emoji.shortcodes}
-									onKeyDown={(e) => handleKeyPress(e, emoji.native)}
-									onClick={() => clickEmojiSuggestion(emoji.native, index)}
-									className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
-										selectedItemIndex === index ? 'selected-item' : ''
-									}`}
-									tabIndex={0}
-								>
-									{emoji.native} {emoji.shortcodes}
-								</li>
-							))}
-						</ul>
+		<div className="relative">
+			{isOpenEmojiMessBox && (
+				<div className="w-full relative">
+					<div className="scale-75 transform right-5 mt-0 z-10 top-[-25rem] absolute">
+						<EmojiPicker messageEmoji={undefined} emojiAction={EmojiPlaces.EMOJI_EDITOR} />
 					</div>
 				</div>
 			)}
-			<label>
-				<input
-					id="preview_img"
-					type="file"
-					onChange={(e) => {
-						handleFile(e), (e.target.value = '');
-					}}
-					className="block w-full hidden"
-				/>
-				<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
-					<Icons.AddCircle />
-				</div>
-			</label>
 
-			<div
-				className={`w-[96%] bg-black gap-3 relative`}
-				onClick={() => {
-					editorRef.current!.focus();
-				}}
-			>
-				<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
-					<Editor
-						keyBindingFn={keyBindingFn}
-						handleKeyCommand={handleKeyCommand}
-						editorState={clearEditor ? EditorState.createEmpty() : editorState}
-						onChange={onChange}
-						plugins={plugins}
-						ref={editorRef}
-						handlePastedFiles={onPastedFiles}
+			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+				{showEmojiSuggestion && (
+					<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
+						<p className=" text-center p-2">Emoji Matching: {syntax}</p>
+						<div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
+							<ul
+								ref={ulRef}
+								className="w-full flex flex-col"
+								onKeyDown={(e) => {
+									if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+										e.preventDefault();
+									}
+								}}
+							>
+								{emojiResult?.map((emoji: any, index: number) => (
+									<li
+										ref={(el) => (liRefs.current[index] = el)}
+										key={emoji.shortcodes}
+										onKeyDown={(e) => handleKeyPress(e, emoji.native)}
+										onClick={() => clickEmojiSuggestion(emoji.native, index)}
+										className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
+											selectedItemIndex === index ? 'selected-item' : ''
+										}`}
+										tabIndex={0}
+									>
+										{emoji.native} {emoji.shortcodes}
+									</li>
+								))}
+							</ul>
+						</div>
+					</div>
+				)}
+				<label>
+					<input
+						id="preview_img"
+						type="file"
+						onChange={(e) => {
+							handleFile(e), (e.target.value = '');
+						}}
+						className="block w-full hidden"
 					/>
-					{showPlaceHolder && <p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>}
+					<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
+						<Icons.AddCircle />
+					</div>
+				</label>
+
+				<div
+					className={`w-[96%] bg-black gap-3 relative`}
+					onClick={() => {
+						editorRef.current!.focus();
+					}}
+				>
+					<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
+						<Editor
+							keyBindingFn={keyBindingFn}
+							handleKeyCommand={handleKeyCommand}
+							editorState={clearEditor ? EditorState.createEmpty() : editorState}
+							onChange={onChange}
+							plugins={plugins}
+							ref={editorRef}
+							handlePastedFiles={onPastedFiles}
+						/>
+						{showPlaceHolder && (
+							<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
+						)}
+					</div>
+					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 				</div>
 
-				<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
-			</div>
-
-			<div className="flex flex-row h-full items-center gap-1 w-18 mb-3">
-				<Icons.Gif />
-				<Icons.Help />
-				<div onClick={handleOpenEmoji} className="h-full flex flex-row items-center group">
-					<EmojiPicker emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+				<div className="flex flex-row h-full items-center gap-1 w-18 mb-3 relative">
+					<Icons.Gif />
+					<Icons.Help />
+					<div onClick={handleOpenEmoji} className="cursor-pointer">
+						<Icons.Smile defaultFill={`${isOpenEmojiMessBox ? '#FFFFFF' : '#AEAEAE'}`} />
+					</div>
 				</div>
 			</div>
 		</div>

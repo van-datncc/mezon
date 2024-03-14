@@ -36,42 +36,58 @@ export function ChannelMessage(props: MessageProps) {
 		return preMessage;
 	}, [preMessage]);
 
-	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef, isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
+	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef, isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } =
+		useContext(ChatContext);
 	const handleClickReply = () => {
 		setIsOpenReply(true);
 		setMessageRef(mess);
 	};
-	const { emojiPlaceActive, setEmojiPlaceActive, widthEmojiBar } = useContext(ChatContext);
-	console.log('widthEmojiBar', widthEmojiBar);
-
+	const { emojiPlaceActive, setEmojiPlaceActive, widthEmojiBar, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
+		setIsOpenEmojiReactedBottom(false);
 		setIsOpenEmojiReacted(true);
+		setIsOpenEmojiMessBox(false);
 		setMessageRef(mess);
 		event.stopPropagation();
 	};
+
+	console.log('widthEmojiBar', widthEmojiBar);
 
 	return (
 		<div className="relative group hover:bg-gray-950/[.07] border">
 			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
+
 			<div
-				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary ${isOpenEmojiReacted && mess.id === messageRef?.id ? 'block' : 'hidden'} group-hover:block`}
+				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary 
+				 ${(isOpenEmojiReacted && mess.id === messageRef?.id) || (isOpenEmojiReactedBottom && mess.id === messageRef?.id) ? 'block' : 'hidden'} group-hover:block`}
 			>
-				<div onClick={handleClickReact} className="h-full p-1 group">
-					<EmojiPicker emojiAction={EmojiPlaces.EMOJI_REACTION} messageEmoji={mess} />
+				<div>
+					<div onClick={handleClickReact} className="h-full p-1 group cursor-pointer">
+						<Icons.Smile defaultFill={`${isOpenEmojiReacted && mess.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'}`} />
+					</div>
+
+					<button onClick={handleClickReply} className="rotate-180 absolute left-8 top-1">
+						<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
+					</button>
 				</div>
 
-				<button onClick={handleClickReply} className="rotate-180 absolute left-8 top-1.5">
-					<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
-				</button>
+				{isOpenEmojiReacted && mess.id === messageRef?.id && (
+					<div className="w-fit absolute left-[-20rem] top-[-23rem] right-0">
+						<div className="scale-75 transform mb-0 z-10">
+							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+						</div>
+					</div>
+				)}
+				{isOpenEmojiReactedBottom && mess.id === messageRef?.id && (
+					<div className="w-fit absolute left-0 top-[-23rem] right-0">
+						<div className="scale-75 transform mb-0 z-10">
+							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+						</div>
+					</div>
+				)}
 			</div>
-
-			{/* {emojiPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM && mess.id === messageRef?.id && (
-				<div className="h-full p-1 group absolute">
-					<EmojiPicker emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} messageEmoji={mess} />
-				</div>
-			)} */}
 		</div>
 	);
 }

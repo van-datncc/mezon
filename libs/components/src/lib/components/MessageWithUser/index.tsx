@@ -244,7 +244,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 			handleReactMessage('', currentChannelId ?? '', messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
 	}, [messageRef?.id, emojiSelectedReacted]);
 
-	const { setEmojiSelectedReacted, setMessageRef } = useContext(ChatContext);
+	const { setEmojiSelectedReacted, setMessageRef, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
 
 	const [isHovered, setIsHovered] = useState(false);
 	const { setEmojiPlaceActive, emojiPlaceActive } = useContext(ChatContext);
@@ -253,13 +253,12 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const { widthEmojiBar, setWidthEmojiBar } = useContext(ChatContext);
 
 	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
+		console.log('clickBottom');
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
-		if (divWidth) {
-			setWidthEmojiBar(divWidth);
-			setIsOpenEmojiReacted(true);
-			setMessageRef(message);
-			event.stopPropagation();
-		}
+		setIsOpenEmojiReactedBottom(true);
+		setIsOpenEmojiReacted(false);
+		setMessageRef(message);
+		event.stopPropagation();
 	};
 
 	useEffect(() => {
@@ -267,7 +266,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 			if (divRef.current && message.id === messageRef?.id) {
 				const width = divRef.current.offsetWidth;
 				setDivWidth(width);
-				console.log(width);
+				setWidthEmojiBar(width);
 			}
 		};
 		window.addEventListener('resize', handleResize);
@@ -338,7 +337,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 													{checkID && (
 														<div
 															className={` justify-center items-center relative
-													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] border'}
+													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] '}
 													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 															onClick={() =>
 																handleReactMessage(
@@ -372,7 +371,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 										>
 											<Icons.Smile
 												defaultSize="w-4 h-4"
-												defaultFill={message.id === messageRef?.id && isOpenEmojiReacted ? '#FFFFFF' : '#AEAEAE'}
+												defaultFill={message.id === messageRef?.id && isOpenEmojiReactedBottom ? '#FFFFFF' : '#AEAEAE'}
 											/>
 										</div>
 									</div>
