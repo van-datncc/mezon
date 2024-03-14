@@ -50,7 +50,6 @@ function AppWrapper() {
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 			<MezonContextProvider mezon={mezon} connect={true}>
-				<React.StrictMode>
 					<App />
 					<ToastContainer
 						position="top-right"
@@ -64,7 +63,6 @@ function AppWrapper() {
 						pauseOnHover
 						theme="light"
 					/>
-				</React.StrictMode>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
 	);

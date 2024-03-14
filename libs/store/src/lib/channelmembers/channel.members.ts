@@ -24,7 +24,8 @@ export interface ChannelMemberAvatar {
 
 // TODO: remove channelId from the parameter
 export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
-	return { ...channelRes, id: channelRes?.user?.id || '', channelId };
+	const id = channelRes.id ? channelRes.id : `${channelId}${channelRes.user?.id}`
+	return { ...channelRes, id: id || '', channelId };
 };
 
 export const mapUserIdToEntity = (userId: string, username: string) => {
@@ -95,7 +96,6 @@ export const followUserStatus = createAsyncThunk('channelMembers/followUserStatu
 		const onlineStatus = response.presences.map(item => {
 			return {userId: item.user_id, status: true}
 		})
-		mezon.sessionRef.current?.user_id
 		thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus))
 		if(mezon.sessionRef.current?.user_id) {
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({userId: mezon.sessionRef.current?.user_id, status: true}))
@@ -181,7 +181,7 @@ export const channelMembers = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-				channelMembersAdapter.setAll(state, action.payload);
+				channelMembersAdapter.addMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {

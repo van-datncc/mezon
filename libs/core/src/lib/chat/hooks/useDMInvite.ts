@@ -1,23 +1,22 @@
-import { selectAllChannels, selectMembersByChannelId } from '@mezon/store';
-import React, { useMemo } from 'react';
+import { channelMembersActions, inviteActions, selectAllChannels, selectMembersByChannelId } from '@mezon/store';
+import React, { useEffect, useMemo } from 'react';
 import { useDirect } from './useDirect';
 import { useSelector } from 'react-redux';
-import { clansActions, useAppDispatch } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store';
 import { ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 import { useClans } from './useClans';
 
 export function useDMInvite(channelID?:string) {
 	const dispatch = useAppDispatch();
 	const { listDM: dmGroupChatList } = useDirect({autoFetch:true});
-	const rawMembers = useSelector(selectMembersByChannelId(channelID));
-	
-	const { usersClan } = useClans();
-	const allChannels = useSelector(selectAllChannels);
-	const isChannelPrivate = allChannels.find(channel => channel.channel_id === channelID)?.channel_private === 1;
-	const listDMInvite = useMemo(() => {
-		const userIdInClanArray = usersClan.map(user => user.id);
-		const memberIds = rawMembers.map(member => member.id);
-		const filteredListUserClan = dmGroupChatList.filter(item => {
+		const rawMembers = useSelector(selectMembersByChannelId(channelID));
+		const { usersClan } = useClans();
+		const allChannels = useSelector(selectAllChannels);
+		const isChannelPrivate = allChannels.find(channel => channel.channel_id === channelID)?.channel_private === 1;
+		const listDMInvite = useMemo(() => {
+			const userIdInClanArray = usersClan.map(user => user.id);
+			const memberIds = rawMembers.map(member => member.user?.id);
+			const filteredListUserClan = dmGroupChatList.filter(item => {
 			if ((item.user_id && item.user_id.length > 1) || 
 			(item.user_id && item.user_id.length === 1 && !userIdInClanArray.includes(item.user_id[0]))) {
 				return true;
@@ -29,7 +28,7 @@ export function useDMInvite(channelID?:string) {
 			}
 			const filteredListUserChannel = dmGroupChatList.filter(item => {
 				if ((item.user_id && item.user_id.length > 1) || 
-					(item.user_id && item.user_id.length === 1 && !memberIds.includes(item.user_id[0]))) {
+				(item.user_id && item.user_id.length === 1 && !memberIds.includes(item.user_id[0]))) {
 					return true;
 				}
 				return false;
@@ -43,7 +42,7 @@ export function useDMInvite(channelID?:string) {
 	const createLinkInviteUser = React.useCallback(
 		async (clan_id: string, channel_id: string, expiry_time: number) => {
 			const action = await dispatch(
-				clansActions.createLinkInviteUser({
+				inviteActions.createLinkInviteUser({
 					clan_id: clan_id,
 					channel_id: channel_id,
 					expiry_time: expiry_time,
@@ -56,12 +55,18 @@ export function useDMInvite(channelID?:string) {
 	);
 
     const listUserInvite = useMemo(() => {
-		const memberIds = rawMembers.map(member => member.id);
+		const memberIds = rawMembers.map(member => member.user?.id);
 		const usersClanFiltered = usersClan.filter(user => !memberIds.some(userId => userId === user.id));
 		if (isChannelPrivate) {
 			return usersClanFiltered;
 		}
 	}, [usersClan, rawMembers, isChannelPrivate]);    
+
+	useEffect(() => {
+		if (channelID) {
+			dispatch(channelMembersActions.fetchChannelMembers({channelId:channelID || ''}));
+		}
+	}, [channelID]);
 
 	return useMemo(
 		() => ({
