@@ -13,16 +13,12 @@ export default function ChannelLayout() {
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 
-	const handleCloseEmojiPopup = () => {
-		// if (isOpenEmojiChatBox) {
-		// 	setIsOpenEmojiChatBox(false);
-		// }
-	};
+
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
 			<div className="flex h-heightWithoutTopBar flex-row ">
-				<div onClick={handleCloseEmojiPopup} className="flex flex-col flex-1 w-full h-full">
+				<div  className="flex flex-col flex-1 w-full h-full">
 					<div
 						className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 						ref={messagesContainerRef}
