@@ -16,8 +16,8 @@ function DirectMessageList() {
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
 		return data.filter((obj: IChannel) => {
-			const isUnique = !uniqueLabels.has(obj.channel_lable);
-			uniqueLabels.add(obj.channel_lable);
+			const isUnique = !uniqueLabels.has(obj.channel_label);
+			uniqueLabels.add(obj.channel_label);
 			return isUnique;
 		});
 	};

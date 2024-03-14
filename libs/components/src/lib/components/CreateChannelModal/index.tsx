@@ -46,7 +46,7 @@ export const CreateNewChannelModal = () => {
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId?.toString(),
 			type: channelType,
-			channel_lable: channelName,
+			channel_label: channelName,
 			channel_private: isPrivate,
 			category_id: currentCategory?.category_id,
 		};

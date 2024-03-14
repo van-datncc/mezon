@@ -30,9 +30,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						status={userStatus}
 						isHideStatus={true}
 						isHideIconStatus={false}
-						key={currentDmGroup.channel_id}
+						key={currentDmGroup?.channel_id}
 					/>
-					<h2 className="font-[Manrope] shrink-1 text-white text-ellipsis">{currentDmGroup.channel_lable}</h2>
+					<h2 className="font-[Manrope] shrink-1 text-white text-ellipsis">{currentDmGroup?.channel_label}</h2>
 				</div>
 
 				<div className=" items-center h-full ml-auto flex flex-1 justify-end">

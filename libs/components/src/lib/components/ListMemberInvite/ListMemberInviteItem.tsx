@@ -48,7 +48,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 						<img src={dmGroup.channel_avatar} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
 					)}
 					<p style={{ marginRight: 'auto' }} className="pl-[10px]">
-						{dmGroup.channel_lable}
+						{dmGroup.channel_label}
 					</p>
 					<button
 						onClick={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
