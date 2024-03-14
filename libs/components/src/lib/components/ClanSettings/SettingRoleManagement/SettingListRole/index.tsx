@@ -55,8 +55,8 @@ const SettingListRole = (props: closeEditRole) => {
 							<button
 								onClick={() => handleRoleClick(role.id)}
 								className={`w-full py-2 px-4 rounded ${
-									clickedRole === role.id ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
-								} text-white font-bold truncate`}
+									clickedRole === role.id ? 'bg-[#535353] font-bold hover:op' : 'bg-[#1E1E1E] hover:font-bold'
+								} text-white truncate`}
 							>
 								{role.title}
 							</button>
