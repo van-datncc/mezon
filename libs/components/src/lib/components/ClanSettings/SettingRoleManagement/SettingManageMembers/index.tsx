@@ -45,14 +45,14 @@ const SettingManageMembers = () => {
 		<>
 			<div className="w-full flex gap-x-3">
 				<input
-					className="flex-grow bg-black p-[7px] border rounded-lg"
+					className="flex-grow bg-black p-[7px] border rounded-lg font-normal"
 					type="text"
 					placeholder="Search Members"
 					value={searchTerm}
 					onChange={(e) => setSearchTerm(e.target.value)}
 				/>
 				<button
-					className="flex-grow bg-blue-500 hover:bg-blue-400 text-white p-[7px] rounded-lg"
+					className="flex-grow bg-blue-500 hover:bg-blue-400 text-white p-[7px] rounded-lg font-normal"
 					onClick={() => {
 						handleOpenModal();
 					}}

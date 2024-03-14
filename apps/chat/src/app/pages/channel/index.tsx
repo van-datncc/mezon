@@ -16,7 +16,7 @@ export default function ChannelLayout() {
 
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
+		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden" id="mainChat">
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div  className="flex flex-col flex-1 w-full h-full">
 					<div
@@ -39,7 +39,7 @@ export default function ChannelLayout() {
 					</div>
 				</div>
 				{isShow && (
-					<div className="w-[245px] bg-bgSurface flex text-[#84ADFF] relative">
+					<div className="w-[245px] bg-bgSurface flex text-[#84ADFF] relative" id="memberList">
 						<MemberList />
 					</div>
 				)}

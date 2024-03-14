@@ -40,8 +40,8 @@ const SettingDisplayRole = () => {
 
 	return (
 		<div className="w-full flex flex-col gap-y-5">
-			<div className="tracking-wide">Role name</div>
-			<input className="bg-black w-full p-[7px] border rounded-lg " type="text" value={nameRole} onChange={handleDisplayName} />
+			<div className="tracking-wide font-normal">Role name</div>
+			<input className="bg-black w-full p-[7px] font-normal border rounded-lg " type="text" value={nameRole} onChange={handleDisplayName} />
 		</div>
 	);
 };

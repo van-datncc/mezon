@@ -99,6 +99,9 @@ module.exports = {
 		animation: {
 			rotation: 'rotation 6s linear infinite',
 		},
+		screens:{
+			ssm:"430px",
+		},
 	},
 	plugins: [
 		plugin(function ({ addUtilities }) {

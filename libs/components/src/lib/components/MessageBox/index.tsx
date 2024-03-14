@@ -500,7 +500,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</div>
 			)}
 
-			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content m-4 mr-4 mb-4 bg-black rounded-md pr-2 relative">
+			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				{showEmojiSuggestion && (
 					<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
 						<p className=" text-center p-2">Emoji Matching: {syntax}</p>
@@ -547,33 +547,40 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				</label>
 
 				<div
-					className={`w-[96%] bg-black gap-3 relative`}
+					className={`w-full bg-black gap-3 flex items-center`}
 					onClick={() => {
 						editorRef.current!.focus();
 					}}
 				>
-					<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
-						<Editor
-							keyBindingFn={keyBindingFn}
-							handleKeyCommand={handleKeyCommand}
-							editorState={clearEditor ? EditorState.createEmpty() : editorState}
-							onChange={onChange}
-							plugins={plugins}
-							ref={editorRef}
-							handlePastedFiles={onPastedFiles}
-						/>
-						{showPlaceHolder && (
-							<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
-						)}
+					<div
+						className={`w-[96%] bg-black gap-3 relative`}
+						onClick={() => {
+							editorRef.current!.focus();
+						}}
+					>
+						<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
+							<Editor
+								keyBindingFn={keyBindingFn}
+								handleKeyCommand={handleKeyCommand}
+								editorState={clearEditor ? EditorState.createEmpty() : editorState}
+								onChange={onChange}
+								plugins={plugins}
+								ref={editorRef}
+								handlePastedFiles={onPastedFiles}
+							/>
+							{showPlaceHolder && (
+								<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
+							)}
+						</div>
 					</div>
 					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
-				</div>
 
-				<div className="flex flex-row h-full items-center gap-1 w-18 mb-3 relative">
-					<Icons.Gif />
-					<Icons.Help />
-					<div onClick={handleOpenEmoji} className="cursor-pointer">
-						<Icons.Smile defaultFill={`${isOpenEmojiMessBox ? '#FFFFFF' : '#AEAEAE'}`} />
+					<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
+						<Icons.Gif />
+						<Icons.Help />
+						<div onClick={handleOpenEmoji} className="cursor-pointer">
+							<Icons.Smile defaultFill={`${isOpenEmojiMessBox ? '#FFFFFF' : '#AEAEAE'}`} />
+						</div>
 					</div>
 				</div>
 			</div>

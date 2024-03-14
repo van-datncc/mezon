@@ -256,3 +256,10 @@ input:-webkit-autofill:active {
 		margin-bottom: 20px;
 	}
 }
+
+// css mainChat
+#mainChat:has(#memberList) {
+	[class='editorStyles_mentionSuggestions__-tu0h'] {
+		left: -50px !important;
+	}
+}
