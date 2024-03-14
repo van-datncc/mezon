@@ -1,4 +1,4 @@
-import { useAuth, useClans } from '@mezon/core';
+import { useAuth, useCategory, useClans } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
@@ -24,8 +24,10 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const { currentClan } = useClans();
-
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} channelID="" />);
+	const { categorizedChannels } = useCategory();
+	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
+	
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} channelID = {channelId || ''} />);
 	const onClose = () => {
 		setOpenCreateCate(false);
 	};
