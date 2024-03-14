@@ -27,7 +27,7 @@ export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : fa
 				await dispatch(
 					directActions.joinDirectMessage({
 						directMessageId: resPayload.channel_id,
-						channelName: resPayload.channel_lable,
+						channelName: resPayload.channel_label,
 						type: Number(resPayload.type),
 					}),
 				);

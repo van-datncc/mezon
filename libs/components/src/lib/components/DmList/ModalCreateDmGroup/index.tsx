@@ -43,7 +43,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 			await dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: resPayload.channel_id,
-					channelName: resPayload.channel_lable,
+					channelName: resPayload.channel_label,
 					type: Number(resPayload.type),
 				}),
 			);

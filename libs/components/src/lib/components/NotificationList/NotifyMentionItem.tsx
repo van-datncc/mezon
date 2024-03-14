@@ -50,7 +50,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					</div>
 					<div className="flex flex-col gap-1">
 						<div className="font-bold text-[16px] cursor-pointer flex gap-x-1">
-							# <p className=" hover:underline">{channelInfo?.channel_lable}</p>
+							# <p className=" hover:underline">{channelInfo?.channel_label}</p>
 						</div>
 						<div className="text-[10px] uppercase">
 							{clanInfo?.clan_name} {'>'} {channelInfo?.category_name}

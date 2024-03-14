@@ -45,11 +45,11 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink }: C
 					</div>
 					<p
 						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white' : ''}`}
-						title={channel.channel_lable && channel?.channel_lable.length > 20 ? channel?.channel_lable : undefined}
+						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
-						{channel.channel_lable && channel?.channel_lable.length > 20
-							? `${channel?.channel_lable.substring(0, 20)}...`
-							: channel?.channel_lable}
+						{channel.channel_label && channel?.channel_label.length > 20
+							? `${channel?.channel_label.substring(0, 20)}...`
+							: channel?.channel_label}
 					</p>
 				</span>
 			</Link>

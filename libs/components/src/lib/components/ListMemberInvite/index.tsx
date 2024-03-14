@@ -17,7 +17,7 @@ const ListMemberInvite = (props:ModalParam) => {
     const filteredListDMBySearch = useMemo(
 		() => {
 			return listDMInvite?.filter(dmGroup => {
-                return dmGroup.channel_lable?.toLowerCase().includes(searchTerm.toLowerCase());
+                return dmGroup.channel_label?.toLowerCase().includes(searchTerm.toLowerCase());
             });
 		},
 		[listDMInvite,searchTerm],

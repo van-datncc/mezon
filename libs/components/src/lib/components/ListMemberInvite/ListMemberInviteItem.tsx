@@ -47,7 +47,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
                         ) : (
                             <img src={dmGroup.channel_avatar} alt="" className="w-[40px] rounded-full" />
                         )}
-                        <p style={{ marginRight: 'auto' }} className='pl-[10px]'>{dmGroup.channel_lable}</p>
+                        <p style={{ marginRight: 'auto' }} className='pl-[10px]'>{dmGroup.channel_label}</p>
                         <button 
                             onClick={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
                             disabled={isInviteSent}   
