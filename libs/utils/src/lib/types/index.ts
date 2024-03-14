@@ -12,7 +12,7 @@ import {
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
-import { ApiChannelDescription } from '@mezon/mezon-js/api.gen';
+import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
 
@@ -21,6 +21,11 @@ export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 export type IClan = ApiClanDesc & {
 	id: string;
 };
+
+export type IInvite = ApiInviteUserRes & {
+	id: string;
+};
+
 export type IClanProfile = ApiClanProfile & {
 	id: string;
 };

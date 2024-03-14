@@ -1,10 +1,10 @@
 import { useAppNavigation, useClans } from '@mezon/core';
 import { selectAllAccount } from '@mezon/store';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
-import { handleUploadFile, useMezon } from '@mezon/transport';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -86,7 +86,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					<InputField
 						onChange={(e) => setNameClan(e.target.value)}
 						type="text"
-						className="bg-bgSurface mb-2 mt-4"
+						className="bg-bgSurface mb-2 mt-4 py-2"
 						placeholder={`${userProfile?.user?.username}'s clan`}
 					/>
 					<span className="text-[14px] text-contentTertiary">

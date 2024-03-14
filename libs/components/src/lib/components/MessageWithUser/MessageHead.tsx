@@ -20,7 +20,7 @@ const MessageHead = ({ user, message, isCombine, isReply }: IMessageHeadProps) =
 
 	return (
 		<div className="flex-row items-center w-full gap-4 flex">
-			<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer">{username}</div>
+			<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all">{username}</div>
 			<div className=" text-zinc-400 font-['Manrope'] text-[10px] cursor-default">{messageTime}</div>
 		</div>
 	);

@@ -19,13 +19,14 @@ const ImageComponent: React.FC<ImageProps> = ({ block, contentState, ...otherPro
 	const { src, onRemove } = contentState.getEntity(block.getEntityAt(0)).getData();
 
 	return (
-		<div className="cursor-pointer" onClick={() => onRemove()} {...elementProps}>
+		<div className="cursor-pointer"  {...elementProps}>
 			<img src={src} role="presentation" className="imageTextChat" alt="imageTextChat" />
 			<div
 				className="absolute top-0 right-0 bg-[#34383E] w-8 h-8 rounded hover:bg-slate-800"
-				style={{ display: 'flex', justifyContent: 'center' }}
+				style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+				onClick={() => onRemove()}
 			>
-				<button className="remove-icon">x</button>
+				<p className=''>x</p>
 			</div>
 		</div>
 	);

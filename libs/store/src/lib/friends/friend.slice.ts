@@ -79,7 +79,6 @@ export const sendRequestDeleteFriend = createAsyncThunk(
 export const sendRequestBlockFriend = createAsyncThunk('friends/requestBlockFriends', async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.blockFriends(mezon.session, ids, usernames);
-	console.log(response);
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}

@@ -84,6 +84,7 @@ const SettingPermissions = () => {
 									type="checkbox"
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => handlePermissionToggle(permission.id)}
+									className="cursor-pointer"
 								/>
 							</label>
 						</li>

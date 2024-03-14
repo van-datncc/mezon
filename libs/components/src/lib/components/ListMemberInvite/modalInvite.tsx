@@ -12,7 +12,6 @@ export type ModalParam = {
 }
 
 const ModalInvite = (props: ModalParam) => {
-    console.log("props.channelID: ", props.channelID);
     const [urlInvite, setUrlInvite] = useState('');
     const { currentClanId } = useClans();
     const { createLinkInviteUser } = useInvite();
@@ -22,7 +21,6 @@ const ModalInvite = (props: ModalParam) => {
 		confirmButton,
 
 	} = props;
-console.log("currentClanId: ", currentClanId);
 
     const handleOpenInvite = () => {
         createLinkInviteUser(currentClanId ?? '', props.channelID ?? '' , 10).then((res) => {
@@ -82,7 +80,17 @@ console.log("currentClanId: ", currentClanId);
         value={urlInvite}
         readOnly
       />
-      
+      <button
+        className="absolute right-0 bottom-0 mb-1 text-white font-semibold text-sm px-8 py-1.5 
+        shadow hover:text-fuchsia-500 outline-none focus:outline-none ease-linear transition-all duration-150 
+        bg-primary text-[16px] leading-6 rounded mr-[8px]"
+        onClick={() => {
+          handleCopyToClipboard(urlInvite); 
+          onClose(); 
+        }}
+      >
+        Copy
+      </button>
     </div>
     <p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] ">
       <span>Your invite link expires in 7 days </span>

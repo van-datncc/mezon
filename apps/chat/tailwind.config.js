@@ -58,7 +58,7 @@ module.exports = {
 			maxHeight: {
 				'4/5': '80%',
 				'9/10':"90%",
-				heightInBox:`calc(100vh - 170px)`,
+				heightInBox:`calc(100vh - 168px)`,
 			},
 
 			minHeight: {

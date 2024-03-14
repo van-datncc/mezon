@@ -2,17 +2,34 @@ import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Button, Modal } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectInviteById } from '@mezon/store';
+import { toast } from 'react-toastify';
 
 export default function InvitePage() {
-	const [openModal, setOpenModal] = useState(false);
-	const [clanName, setClanName] = useState('Mezon');
-	const [channelName, setChannelName] = useState('general');
-
 	const { inviteId: inviteIdParam } = useParams();
+	const selectInvite  = useSelector(selectInviteById(inviteIdParam || ''))
 	const navigate = useNavigate();
-	const { inviteUser, getLinkInvite } = useInvite();
+	const { inviteUser } = useInvite();
 
+	const clanName = useMemo(() => {
+		return selectInvite?.clan_name || '' 
+	}, [selectInvite]);
+	const channelName = useMemo(() => {
+		return selectInvite?.channel_name || ''
+	}, [selectInvite]);
+	const clanId = useMemo(() => {
+		return selectInvite?.clan_id || ''
+	}, [selectInvite]);
+	const channeId = useMemo(() => {
+		return selectInvite?.channel_id || ''
+	}, [selectInvite]);
+	const userJoined = useMemo(() => {
+		return selectInvite.user_joined
+	}, [selectInvite]);
+	
+	
 	const joinChannel = async () => {
 		if (inviteIdParam) {
 			inviteUser(inviteIdParam).then((res) => {
@@ -26,27 +43,23 @@ export default function InvitePage() {
 	const handleJoinChannel = () => {
 		console.log('Join Channel');
 		joinChannel();
-		setOpenModal(false);
 	};
 
 	const handleCancelJoin = () => {
 		navigate(`/chat/direct`);
-		setOpenModal(false);
 	};
-
+	
 	useEffect(() => {
-		if (inviteIdParam) {
-			getLinkInvite(inviteIdParam).then((res) => {
-				setClanName(res.clan_name ?? 'Mezon');
-				setChannelName(res.channel_name || '');
-				setOpenModal(true);
-			});
+		if (userJoined) {
+			navigate(`/chat/clans/${clanId}/channels/${channeId}`);
+			toast.info("You are already a member!")
 		}
 	}, []);
+
 	return (
 		<>
 			<div></div>
-			<Modal show={openModal} onClose={() => setOpenModal(false)} size={'md'}>
+			<Modal show={!userJoined} size={'md'}>
 				{/* <Modal.Header></Modal.Header> */}
 				<Modal.Body className="bg-bgDisable rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="flex flex-col justify-center items-center pb-24">

@@ -24,6 +24,7 @@ import { directReducer } from './direct/direct.slice';
 import { friendsReducer } from './friends/friend.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { notificationReducer } from './notification/notify.slice';
+import { inviteReducer } from './invite/invite.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -61,6 +62,7 @@ const reducer = {
 	direct: directReducer,
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
+	invite: inviteReducer,
 	isshow: IsShowReducer,
 	notification: notificationReducer
 };

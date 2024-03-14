@@ -27,6 +27,7 @@ import { loginLoader } from '../loaders/loginLoader';
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
+import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 
 const Login = loadable(() => import('../pages/login'));
 const Main = loadable(() => import('../pages/main'));
@@ -162,7 +163,8 @@ export const routes = createBrowserRouter([
 				children: [
 					{
 						path: ':inviteId',
-						// TODO: add loader
+						loader: inviteLoader,
+						shouldRevalidate: shouldRevalidateInvite,
 						element: <InvitePage />,
 					},
 				],

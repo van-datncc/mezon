@@ -122,63 +122,6 @@ export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_nam
 	}
 });
 
-export type CreateLinkInviteUser = {
-	channel_id: string;
-	clan_id: string;
-	expiry_time: number;
-};
-
-export const createLinkInviteUser = createAsyncThunk('clans/invite', async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			channel_id: channel_id,
-			clan_id: clan_id,
-			expiry_time: expiry_time,
-		};
-		const response = await mezon.client.createLinkInviteUser(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return response as ApiLinkInviteUser;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
-
-type InviteUser = {
-	inviteId: string;
-};
-
-export const inviteUser = createAsyncThunk('clans/inviteUser', async ({ inviteId }: InviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.inviteUser(mezon.session, inviteId);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return response as ApiInviteUserRes;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
-
-export const getLinkInvite = createAsyncThunk('clans/getLinkInvite', async ({ inviteId }: InviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));	
-		const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-
-		return response as ApiInviteUserRes;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
 
 export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -254,9 +197,6 @@ export const clansActions = {
 	createClan,
 	changeCurrentClan,
 	updateUser,
-	createLinkInviteUser,
-	inviteUser,
-	getLinkInvite,
 };
 
 /*

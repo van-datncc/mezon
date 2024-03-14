@@ -394,6 +394,9 @@ export const ThreadIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 	const handleClick = () => {
 		setFill(!isWhite);
 	};
+	const handleMouseLeave = () => {
+		console.log('out');
+	};
 
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
@@ -581,7 +584,7 @@ export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 		setFill(!isWhite);
 	};
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} cursor-pointer`} onClick={handleClick}>
 			<g id="Live area">
 				<path
 					id="Vector"
