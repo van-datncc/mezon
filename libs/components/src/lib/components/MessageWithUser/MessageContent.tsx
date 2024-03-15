@@ -3,6 +3,7 @@ import MessageLine from './MesageLine';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import { useMessageParser } from './useMessageParser';
+import MessageVideo from './MessageVideo';
 
 type IMessageContentProps = {
 	user?: IChannelMember | null;
@@ -18,6 +19,10 @@ const MessageContent = ({ user, message, isCombine }: IMessageContentProps) => {
 			return <MessageImage attachmentData={attachments[0]} />;
 		}
 
+		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('mp4') !== -1) {
+			return <MessageVideo attachmentData={attachments[0]} />;
+		}
+		
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
 			return <MessageLinkFile attachmentData={attachments[0]} />;
 		}
