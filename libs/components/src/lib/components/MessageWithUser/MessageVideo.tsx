@@ -10,11 +10,7 @@ export type MessageImage = {
 function MessageVideo({ attachmentData }: MessageImage) {
 	return (
 		<>	
-			<div className="">
-				<div className="">
 					<video src={attachmentData.url} controls={true} autoPlay={false} className="h-[400px]"></video>
-				</div>
-			</div>
 		</>
 	);
 }
