@@ -63,6 +63,7 @@ export default function ChannelMessages({ channelId, channelName, type, avatarDM
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}
 						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
+						myUser={userProfile?.user?.id}
 					/>
 				))}
 			</InfiniteScroll>

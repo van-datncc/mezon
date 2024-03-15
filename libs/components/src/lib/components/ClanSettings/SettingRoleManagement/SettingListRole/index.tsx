@@ -2,6 +2,7 @@ import { useRoles } from '@mezon/core';
 import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import * as Icons from '../../../Icons';
 type closeEditRole = {
 	handleClose: () => void;
 };
@@ -33,7 +34,10 @@ const SettingListRole = (props: closeEditRole) => {
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	return (
 		<div className="w-1/3 pr-3 flex flex-col">
-			<div className="font-semibold mb-4">
+			<div className="font-semibold mb-4 flex">
+				<div className="rotate-90 -ml-[10px]">
+					<Icons.ArrowDown defaultSize="size-7" />
+				</div>
 				<div className="cursor-pointer tracking-wide" onClick={() => props.handleClose()}>
 					BACK
 				</div>

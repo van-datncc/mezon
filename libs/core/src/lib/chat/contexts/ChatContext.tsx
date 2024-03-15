@@ -25,6 +25,9 @@ export type ChatContextValue = {
 	isOpenReply: boolean;
 	setIsOpenReply: React.Dispatch<React.SetStateAction<boolean>>;
 
+	isOpenEdit: boolean;
+	setIsOpenEdit: React.Dispatch<React.SetStateAction<boolean>>;
+
 	isOpenEmojiMessBox: boolean;
 	setIsOpenEmojiMessBox: React.Dispatch<React.SetStateAction<boolean>>;
 
@@ -51,6 +54,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
 	const [messageRef, setMessageRef] = React.useState<IMessageWithUser>();
 	const [isOpenReply, setIsOpenReply] = React.useState<boolean>(false);
+	const [isOpenEdit, setIsOpenEdit] = React.useState<boolean>(false);
 	const [isOpenEmojiMessBox, setIsOpenEmojiMessBox] = React.useState<boolean>(false);
 	const [emojiSelectedReacted, setEmojiSelectedReacted] = React.useState<string>('');
 	const [emojiSelectedMess, setEmojiSelectedMess] = React.useState<string>('');
@@ -65,6 +69,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setMessageRef,
 			isOpenReply,
 			setIsOpenReply,
+			isOpenEdit,
+			setIsOpenEdit,
 			isOpenEmojiMessBox,
 			setIsOpenEmojiMessBox,
 			emojiSelectedReacted,
@@ -85,6 +91,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setMessageRef,
 			isOpenReply,
 			setIsOpenReply,
+			isOpenEdit,
+			setIsOpenEdit,
 			isOpenEmojiMessBox,
 			setIsOpenEmojiMessBox,
 			emojiSelectedReacted,

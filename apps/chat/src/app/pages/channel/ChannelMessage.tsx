@@ -1,21 +1,21 @@
-import { EmojiPicker, Icons, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import {  ReactedOutsideOptional,  } from '@mezon/components';
+import { EmojiPicker, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
 	lastSeen?: boolean;
+	myUser?: string;
 };
 
 export function ChannelMessage(props: MessageProps) {
-	const { message, lastSeen, preMessage } = props;
+	const { message, lastSeen, preMessage, myUser } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 
@@ -39,8 +39,7 @@ export function ChannelMessage(props: MessageProps) {
 		return preMessage;
 	}, [preMessage]);
 
-	const { isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } =
-		useContext(ChatContext);
+	const { isOpenEmojiReacted, setIsOpenEmojiReacted, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const [isOpenReactEmoji, setIsOpenReactEmoji] = useState(false);
 	const [emojiPicker, setEmojiPicker] = useState<string>('');
 	const [reactionOutside, setReactionOutside] = useState<ReactedOutsideOptional>();
@@ -62,12 +61,24 @@ export function ChannelMessage(props: MessageProps) {
 			/>
 		);
 	}
-	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef } = useContext(ChatContext);
+	const { isOpenReply, setMessageRef, setIsOpenReply, messageRef, setIsOpenEdit, isOpenEdit } = useContext(ChatContext);
 
 	const handleClickReply = () => {
 		setIsOpenReply(true);
+		setIsOpenEdit(false);
 		setMessageRef(mess);
 	};
+
+	const handleClickEdit = () => {
+		setIsOpenEdit(true);
+		setIsOpenReply(false);
+		setMessageRef(mess);
+	};
+
+	const handleCancelEdit = () => {
+		setIsOpenEdit(false);
+	};
+
 	const { emojiPlaceActive, setEmojiPlaceActive, widthEmojiBar, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION);
@@ -78,24 +89,31 @@ export function ChannelMessage(props: MessageProps) {
 		event.stopPropagation();
 	};
 
-
-
 	return (
-		<div className="relative group hover:bg-gray-950/[.07]" >
+		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
 			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
 			{lastSeen && <UnreadMessageBreak />}
 
 			<div
-				className={`z-10 top-[-18px] absolute h-[30px] p-0.5 rounded-md right-4 w-24 flex flex-row bg-bgSecondary 
-				 ${(isOpenEmojiReacted && mess.id === messageRef?.id) || (isOpenEmojiReactedBottom && mess.id === messageRef?.id) ? 'block' : 'hidden'} group-hover:block`}
+				className={`chooseForText z-10 top-[-18px] absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary
+				 ${(isOpenEmojiReacted && mess.id === messageRef?.id) || (isOpenEmojiReactedBottom && mess.id === messageRef?.id) || (isOpenEdit && mess.id === messageRef?.id) ? '' : 'hidden group-hover:block'} `}
 			>
-				<div>
-					<div onClick={handleClickReact} className="h-full p-1 group cursor-pointer">
+				<div className="iconHover flex justify-between">
+					<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
 						<Icons.Smile defaultFill={`${isOpenEmojiReacted && mess.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'}`} />
 					</div>
 
-					<button onClick={handleClickReply} className="rotate-180 absolute left-8 top-1">
-						<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
+					{myUser === message.sender_id ? (
+						<button onClick={handleClickEdit} className="h-full p-1 cursor-pointer">
+							<Icons.PenEdit defaultFill={isOpenEdit && mess.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'} />
+						</button>
+					) : (
+						<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180">
+							<Icons.Reply defaultFill={isOpenReply ? '#FFFFFF' : '#AEAEAE'} />
+						</button>
+					)}
+					<button className="h-full p-1 cursor-pointer">
+						<Icons.ThreeDot />
 					</button>
 				</div>
 
@@ -107,6 +125,18 @@ export function ChannelMessage(props: MessageProps) {
 					</div>
 				)}
 			</div>
+			{isOpenEdit && mess.id === messageRef?.id && (
+				<div className="inputEdit relative left-[66px] top-[-30px]">
+					<input type="text" defaultValue={mess.content.t} className="w-[83%] h-10 bg-black rounded pl-4" />
+					<p className="absolute -bottom-4 text-xs">
+						Change content
+						<span className="text-blue-700 cursor-pointer" onClick={handleCancelEdit}>
+							{' '}
+							exit
+						</span>
+					</p>
+				</div>
+			)}
 		</div>
 	);
 }

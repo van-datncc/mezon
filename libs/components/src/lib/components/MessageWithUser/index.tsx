@@ -328,7 +328,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 						<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 						<div className="flex-col w-full flex justify-center items-start relative ">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
-							<div className="justify-start items-center inline-flex w-full">
+							<div className="justify-start items-center inline-flex w-full textChat">
 								<div
 									className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
 									style={{ wordBreak: 'break-word' }}
