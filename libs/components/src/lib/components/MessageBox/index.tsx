@@ -131,6 +131,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				urlFile = '/assets/images/pdficon.png';
 			} else if (attachment.filetype?.indexOf('text') !== -1) {
 				urlFile = '/assets/images/text.png';
+			} else if (attachment.filetype?.indexOf('vnd.openxmlformats-officedocument.presentationml.presentation') !== -1) {
+				urlFile = '/assets/images/pptfile.png';
+			} else if (attachment.filetype?.indexOf('mp4') !== -1) {
+				urlFile = '/assets/images/video.png';
 			}
 
 			const contentState = editorState.getCurrentContent();
