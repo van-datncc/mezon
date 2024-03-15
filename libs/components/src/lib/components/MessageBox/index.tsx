@@ -181,7 +181,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					return 'not-handled';
 				});
 
-			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+			// setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
 			return 'not-handled';
 		},
