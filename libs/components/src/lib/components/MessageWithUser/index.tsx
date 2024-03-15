@@ -290,6 +290,18 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		}
 	}, [, widthEmojiBar, widthMessageWithUser]);
 
+	const [isHoverSender, setIsHoverSender] = useState<boolean>(false);
+	const [isEmojiHover, setEmojiHover] = useState<string>('');
+	const getEmojiHover = (emojiParam: string) => {
+		setEmojiHover(emojiParam);
+		setIsHoverSender(true);
+	};
+
+	const removeEmojiHover = () => {
+		setIsHoverSender(true);
+		setEmojiHover('');
+	};
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -300,7 +312,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 				</div>
 			)}
 			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
-				<div className={`flex h-15 flex-col  overflow-x-hidden w-auto py-2 px-3`}>
+				<div className={`flex h-15 flex-col   w-auto py-2 px-3`}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 							<Icons.ReplyCorner />
@@ -324,7 +336,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 							</div>
 						</div>
 					)}
-					<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-y-hidden" ref={divMessageWithUser}>
+					<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible" ref={divMessageWithUser}>
 						<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={isReply} />
 						<div className="flex-col w-full flex justify-center items-start relative ">
 							<MessageHead message={message} user={user} isCombine={isCombine} isReply={isReply} />
@@ -354,8 +366,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 													{checkID && (
 														<div
 															className={` justify-center items-center relative
-													 ${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] '}
-													 rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
+													 		${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] '}
+													 		rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 															onClick={() =>
 																handleReactMessage(
 																	emoji.id,
@@ -366,12 +378,28 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 																	message.sender_id,
 																)
 															}
-															onMouseDown={(e) => e.preventDefault()}
+															onMouseDown={(e) => {
+																return e.preventDefault(), e.stopPropagation();
+															}}
+															onMouseEnter={() => {
+																return setIsHovered(true), getEmojiHover(emoji.emoji);
+															}}
+															onMouseLeave={() => removeEmojiHover()}
 														>
 															<span className=" relative left-[-10px]">{emoji.emoji}</span>
 															<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
 																<p>{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}</p>
 															</div>
+															{isHoverSender && emoji.emoji === isEmojiHover && (
+																<div
+																	onClick={(e) => e.stopPropagation()}
+																	className="absolute   bottom-7 left-0 w-[15rem] border h-[5rem]
+																 bg-[#313338] border-[#313338] rounded-sm"
+																>
+																	<p>{isEmojiHover}</p>
+																	<hr className="h-[0.1rem] bg-green-500 border-none"></hr>
+																</div>
+															)}
 														</div>
 													)}
 												</Fragment>
