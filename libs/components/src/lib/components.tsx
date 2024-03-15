@@ -21,6 +21,7 @@ export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessage } from './components/ReplyMessage';
+export { default as UserMentionList } from './components/UserMentionList';
 export { default as SettingAccount } from './components/SettingAccount';
 
 export * as Icons from './components/Icons';

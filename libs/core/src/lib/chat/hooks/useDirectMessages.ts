@@ -51,6 +51,10 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
+	const sendMessageTyping = React.useCallback(async () => {
+		dispatch(messagesActions.sendTypingUser({ channelId }));
+	}, [channelId, dispatch]);
+
 	return useMemo(
 		() => ({
 			client,
@@ -60,7 +64,8 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 			hasMoreMessage,
 			sendDirectMessage,
 			loadMoreMessage,
+			sendMessageTyping,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendDirectMessage, loadMoreMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendMessageTyping, sendDirectMessage, loadMoreMessage],
 	);
 }

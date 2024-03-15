@@ -96,7 +96,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setMentionData(mentionedUsers);
 	}, []);
 
-	const onConvertToFiles = (content: string) => {
+	const onConvertToFiles = useCallback((content: string) => {
 		if (content.length > 2000) {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
@@ -107,7 +107,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 
-			if (!client || !session || !currentClanId) {
+			if (!client || !session || !currentChannelId) {
 				throw new Error('Client is not initialized');
 			}
 			handleUploadFile(client, session, fullfilename, file).then((attachment) => {
@@ -115,7 +115,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			});
 			return;
 		}
-	};
+	},[attachmentData]);
 	const onSearchChange = ({ value }: any) => {
 		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
 	};
@@ -169,7 +169,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 
-			if (!client || !session || !currentClanId) {
+			if (!client || !session || !currentChannelId) {
 				throw new Error('Client is not initialized');
 			}
 			handleUploadFile(client, session, fullfilename, file)
@@ -181,7 +181,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					return 'not-handled';
 				});
 
-			setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
+			// setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
 			return 'not-handled';
 		},
@@ -469,7 +469,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const session = sessionRef.current;
 		const client = clientRef.current;
 		if (!file) return;
-		if (!client || !session || !currentClanId) {
+		if (!client || !session || !currentChannelId) {
 			throw new Error('Client or file is not initialized');
 		}
 

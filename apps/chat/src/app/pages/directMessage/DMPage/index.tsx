@@ -5,6 +5,7 @@ import { ChannelTypeEnum } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChanneMessages';
+import { ChannelTyping } from '../../channel/ChannelTyping';
 
 export default function DirectMessage() {
 	// TODO: move selector to store
@@ -39,7 +40,8 @@ export default function DirectMessage() {
 					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
 						{<ChannelMessages channelId={directId ?? ''} channelName={currentDmGroup?.channel_label} type='direct' avatarDM={currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.channel_avatar : '/assets/images/avatar-group.png'} />}
 					</div>
-					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto">
+					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
+						{directId && <ChannelTyping channelId={directId} />}
 						<DirectMessageBox directParamId={directId ?? ''} />
 					</div>
 				</div>
