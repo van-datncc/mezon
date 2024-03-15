@@ -815,16 +815,16 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export const ArrowDown: React.FC<IconProps> = () => {
+export const ArrowDown: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
 				<path
 					id="Vector"
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M14.5892 5.91075C14.9147 6.23619 14.9147 6.76382 14.5892 7.08926L9.58924 12.0893C9.2638 12.4147 8.73616 12.4147 8.41072 12.0893L3.41072 7.08926C3.08529 6.76382 3.08529 6.23619 3.41072 5.91075C3.73616 5.58531 4.2638 5.58531 4.58924 5.91075L8.99998 10.3215L13.4107 5.91075C13.7362 5.58531 14.2638 5.58531 14.5892 5.91075Z"
-					fill="#AEAEAE"
+					fill={defaultFill}
 				/>
 			</g>
 		</svg>
@@ -1206,6 +1206,17 @@ export const ReplyCorner: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defa
 	return (
 		<svg width="32" height="20" viewBox="0 0 32 10" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M1 9V6C1 3.23858 3.23858 1 6 1H31" stroke="#535353" strokeLinecap="round" />
+		</svg>
+	);
+};
+
+export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+			<path
+				fill={defaultFill}
+				d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"
+			></path>
 		</svg>
 	);
 };

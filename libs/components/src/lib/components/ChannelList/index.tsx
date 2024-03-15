@@ -80,11 +80,7 @@ function ChannelList() {
 									}}
 									className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
 								>
-									{!categoriesState[category.id] ? (
-										<Icons.ArrowDown defaultSize="text-[16px]" />
-									) : (
-										<Icons.ArrowRight defaultSize="text-[16px]" />
-									)}
+									{!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
 									{category.category_name}
 								</button>
 								<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
