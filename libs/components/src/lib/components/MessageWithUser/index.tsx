@@ -66,6 +66,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
+	console.log(dataEmojiFetch);
 
 	const processData = (dataEmoji: EmojiItemOptionals[], message: { channel_id: string; id: string }) => {
 		const result: EmojiDataOptionals[] = [];
