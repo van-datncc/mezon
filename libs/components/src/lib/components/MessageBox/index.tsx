@@ -214,6 +214,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const handleSend = useCallback(() => {
 		setIsOpenEmojiChatBoxSuggestion(false);
+		console.log(content);
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
@@ -253,6 +254,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const [showEmojiSuggestion, setIsOpenEmojiChatBoxSuggestion] = useState(false);
 
+	const onFocusEditorState = () => {
+		setTimeout(() => {
+			editorRef.current!.focus();
+		}, 0);
+	};
+
 	const moveSelectionToEnd = () => {
 		editorRef.current!.focus();
 		const editorContent = editorState.getCurrentContent();
@@ -266,27 +273,27 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 		setEditorState(updatedEditorState);
 	};
-	const [selectionToEnd, setSelectionToEnd] = useState(false);
 
+	const [selectionToEnd, setSelectionToEnd] = useState(false);
+	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive, isOpenEmojiMessBox, setMessageRef } =
+		useContext(ChatContext);
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
 			setIsOpenEmojiChatBoxSuggestion(false);
 		} else setShowPlaceHolder(false);
 
-		if (content.length >= 0) {
-			const editorContent = editorState.getCurrentContent();
-			const editorSelection = editorState.getSelection();
-			const updatedSelection = editorSelection.merge({
-				anchorKey: editorContent.getLastBlock().getKey(),
-				anchorOffset: editorContent.getLastBlock().getText().length,
-				focusKey: editorContent.getLastBlock().getKey(),
-				focusOffset: editorContent.getLastBlock().getText().length,
-			});
-			const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
-			setEditorState(updatedEditorState);
+		if (content.length === 1) {
+			moveSelectionToEnd();
 		}
-	}, [clearEditor, content, showEmojiSuggestion]);
+	}, [clearEditor, content, showEmojiSuggestion, emojiSelectedMess]);
+
+	useEffect(() => {
+		if (emojiSelectedMess) {
+			// onFocusEditorState();
+			moveSelectionToEnd();
+		}
+	}, [emojiSelectedMess]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -305,10 +312,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			return newEditorState;
 		});
+		// onFocusEditorState();
 	}
-
-	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive, isOpenEmojiMessBox, setMessageRef } =
-		useContext(ChatContext);
 
 	const handleOpenEmoji = (event: React.MouseEvent<HTMLDivElement>) => {
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
@@ -320,10 +325,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	useEffect(() => {
 		if (emojiSelectedMess && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR) {
 			setShowPlaceHolder(false);
-			handleEmojiClick(emojiSelectedMess);
-			setTimeout(() => {
-				editorRef.current!.focus();
-			}, 0);
+			if (emojiSelectedMess) {
+				handleEmojiClick(emojiSelectedMess);
+			}
 		}
 	}, [emojiSelectedMess]);
 
@@ -366,8 +370,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			selectionsToReplace.forEach((selectionState: SelectionState) => {
 				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '�️');
 			});
+			onFocusEditorState();
 			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
-
 			return newEditorState;
 		});
 	}
@@ -382,7 +386,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 		const matches = regexDetect.exec(inputValue)?.[0];
-
 		matches && setSyntax(matches);
 		const emojiPickerActive = matches?.startsWith(':');
 		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
@@ -423,6 +426,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				setTimeout(() => {
 					editorRef.current!.focus();
 				}, 0);
+
 				break;
 			case 'Escape':
 				setIsOpenEmojiChatBoxSuggestion(false);
