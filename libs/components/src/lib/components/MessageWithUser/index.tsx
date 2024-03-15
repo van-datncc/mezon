@@ -56,6 +56,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDataReactedFromSocket } = useChatReactionMessage({ currentChannelId });
 	const { reactionMessageAction } = useChatReactionMessage({ currentChannelId });
+
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -291,8 +292,9 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	}, [, widthEmojiBar, widthMessageWithUser]);
 
 	const [isHoverSender, setIsHoverSender] = useState<boolean>(false);
-	const [isEmojiHover, setEmojiHover] = useState<string>('');
-	const getEmojiHover = (emojiParam: string) => {
+	const [isEmojiHover, setEmojiHover] = useState<any>();
+	const getEmojiHover = (emojiParam: any) => {
+		console.log(emojiParam);
 		setEmojiHover(emojiParam);
 		setIsHoverSender(true);
 	};
@@ -301,6 +303,11 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		setIsHoverSender(true);
 		setEmojiHover('');
 	};
+
+	// const getSenderReaction = (senderId: string) => {
+	// 	const senderName = useSelector(selectMemberByUserId(senderId));
+	// 	return senderName;
+	// };
 
 	return (
 		<>
@@ -382,7 +389,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 																return e.preventDefault(), e.stopPropagation();
 															}}
 															onMouseEnter={() => {
-																return setIsHovered(true), getEmojiHover(emoji.emoji);
+																return setIsHovered(true), getEmojiHover(emoji);
 															}}
 															onMouseLeave={() => removeEmojiHover()}
 														>
@@ -390,14 +397,33 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 															<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
 																<p>{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}</p>
 															</div>
-															{isHoverSender && emoji.emoji === isEmojiHover && (
+															{isHoverSender && emoji === isEmojiHover && (
 																<div
 																	onClick={(e) => e.stopPropagation()}
-																	className="absolute   bottom-7 left-0 w-[15rem] border h-[5rem]
+																	className="absolute z-20  bottom-7 left-0 w-[15rem] border h-[5rem]
 																 bg-[#313338] border-[#313338] rounded-sm"
 																>
-																	<p>{isEmojiHover}</p>
-																	<hr className="h-[0.1rem] bg-green-500 border-none"></hr>
+																	<div className="flex flex-row items-center">
+																		<p>{isEmojiHover.emoji}</p>
+																		<p className="text-xs">
+																			{emoji.senders.reduce(
+																				(sum, item: SenderInfoOptionals) => sum + item.count,
+																				0,
+																			)}
+																		</p>
+																	</div>
+
+																	<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
+																	{isEmojiHover.senders.map((item: any, index: number) => {
+																		// const senderName = useSelector(selectMemberByUserId(item.id));
+																		// console.log(senderName);
+																		return (
+																			<div key={index} className="border m-1 flex flex-row  justify-evenly">
+																				<p className="text-xs">{}</p>
+																				<p className="text-xs">{item.count}</p>
+																			</div>
+																		);
+																	})}
 																</div>
 															)}
 														</div>
