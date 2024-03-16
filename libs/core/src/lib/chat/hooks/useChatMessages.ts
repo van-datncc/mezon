@@ -29,6 +29,10 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
+	const jumpToMessage = React.useCallback(async ( messageId: string) => {
+		dispatch(messagesActions.jumpToMessage({ messageId, channelId }));
+	}, [channelId, dispatch]);
+
 	return useMemo(
 		() => ({
 			client,
@@ -37,7 +41,8 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 			lastMessageId,
 			hasMoreMessage,
 			loadMoreMessage,
+			jumpToMessage,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage, jumpToMessage],
 	);
 }

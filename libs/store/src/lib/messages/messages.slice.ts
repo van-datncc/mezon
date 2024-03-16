@@ -138,11 +138,11 @@ export const fetchMessages = createAsyncThunk(
 	},
 );
 
-type loadMoreMess = {
+type LoadMoreMessArgs = {
 	channelId: string;
 };
 
-export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: loadMoreMess, thunkAPI) => {
+export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: LoadMoreMessArgs, thunkAPI) => {
 	try {
 		const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		await thunkAPI.dispatch(fetchMessages({ 
@@ -150,6 +150,24 @@ export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', asyn
 			noCache: false,
 			messageId: lastScrollMessageId,
 			direction: 3
+		}));
+	} catch (e) {
+		console.log(e);
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
+type JumpToMessageArgs = {
+	channelId: string;
+	messageId: string;
+};
+export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId }: JumpToMessageArgs, thunkAPI) => {
+	try {
+		await thunkAPI.dispatch(fetchMessages({ 
+			channelId: channelId, 
+			noCache: false,
+			messageId: messageId,
+			direction: 1
 		}));
 	} catch (e) {
 		console.log(e);
@@ -377,6 +395,7 @@ export const messagesActions = {
 	sendTypingUser,
 	loadMoreMessage,
 	updateReactionMessage,
+	jumpToMessage,
 };
 
 /*
