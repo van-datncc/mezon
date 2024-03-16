@@ -71,7 +71,6 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
-	console.log('dataEMJ', dataEmojiFetch);
 
 	const processData = (dataEmoji: EmojiItemOptionals[], message: { channel_id: string; id: string }) => {
 		const result: EmojiDataOptionals[] = [];
@@ -303,7 +302,6 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const [isHoverSender, setIsHoverSender] = useState<boolean>(false);
 	const [isEmojiHover, setEmojiHover] = useState<any>();
 	const getEmojiHover = (emojiParam: any) => {
-		console.log(emojiParam);
 		setEmojiHover(emojiParam);
 		setIsHoverSender(true);
 	};
