@@ -33,6 +33,8 @@ type SenderInfoOptionals = {
 	id: string;
 	count: number;
 	emojiIdList: string[];
+	name?: string;
+	avatar?: string;
 };
 
 type EmojiDataOptionals = {
@@ -48,6 +50,8 @@ type EmojiItemOptionals = {
 	sender_id: string;
 	emoji: string;
 	count: number;
+	sender_avatar: string;
+	sender_name: string;
 };
 
 function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyMention }: MessageWithUserProps) {
@@ -67,6 +71,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
+	console.log('dataEMJ', dataEmojiFetch);
 
 	const processData = (dataEmoji: EmojiItemOptionals[], message: { channel_id: string; id: string }) => {
 		const result: EmojiDataOptionals[] = [];
@@ -86,6 +91,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 							id: item.sender_id,
 							count: item.count || 1,
 							emojiIdList: [item.id],
+							name: item.sender_name,
+							avatar: item.sender_avatar,
 						});
 					}
 				} else {
@@ -97,6 +104,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 								id: item.sender_id,
 								count: item.count || 1,
 								emojiIdList: [item.id],
+								name: item.sender_name,
+								avatar: item.sender_avatar,
 							},
 						],
 						channelId: message.channel_id,
@@ -304,11 +313,17 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		setEmojiHover('');
 	};
 
-	// const getSenderReaction = (senderId: string) => {
-	// 	const senderName = useSelector(selectMemberByUserId(senderId));
-	// 	return senderName;
-	// };
-
+	type Props = {
+		id: string;
+	};
+	function AvatarComponent({ id }: Props) {
+		const user = useSelector(selectMemberByUserId(id));
+		return <img src={user?.user?.avatar_url} className="w-8 h-8 rounded-full border border-gray-500 " alt={user?.user?.avatar_url} />;
+	}
+	function NameComponent({ id }: Props) {
+		const user = useSelector(selectMemberByUserId(id));
+		return <p className="text-xs text-white">{user?.user?.username}</p>;
+	}
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -400,11 +415,11 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 															{isHoverSender && emoji === isEmojiHover && (
 																<div
 																	onClick={(e) => e.stopPropagation()}
-																	className="absolute z-20  bottom-7 left-0 w-[15rem] border h-[5rem]
-																 bg-[#313338] border-[#313338] rounded-sm"
+																	className="absolute z-20  bottom-7 left-0 w-[18rem] border
+																 bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem]"
 																>
-																	<div className="flex flex-row items-center">
-																		<p>{isEmojiHover.emoji}</p>
+																	<div className="flex flex-row items-center m-2">
+																		<div className="">{isEmojiHover.emoji}</div>
 																		<p className="text-xs">
 																			{emoji.senders.reduce(
 																				(sum, item: SenderInfoOptionals) => sum + item.count,
@@ -415,12 +430,17 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 																	<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
 																	{isEmojiHover.senders.map((item: any, index: number) => {
-																		// const senderName = useSelector(selectMemberByUserId(item.id));
-																		// console.log(senderName);
 																		return (
-																			<div key={index} className="border m-1 flex flex-row  justify-evenly">
-																				<p className="text-xs">{}</p>
-																				<p className="text-xs">{item.count}</p>
+																			<div
+																				key={index}
+																				className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative"
+																			>
+																				<AvatarComponent id={item.id} />
+																				<NameComponent id={item.id} />
+																				<p className="text-xs absolute right-5">{item.count}</p>
+																				{item.id === userId && (
+																					<a className="hover:underline text-blue-700 text-xs">remove</a>
+																				)}
 																			</div>
 																		);
 																	})}
