@@ -218,7 +218,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const handleSend = useCallback(() => {
 		setIsOpenEmojiChatBoxSuggestion(false);
-		console.log(content);
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
