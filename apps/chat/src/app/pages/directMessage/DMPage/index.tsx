@@ -13,9 +13,7 @@ export default function DirectMessage() {
 
 	const { clanId, directId, type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
-	const { navigate } = useAppNavigation();
-
-	const { messages } = useDirectMessages({ channelId: directId ?? '' });
+	const { navigate } = useAppNavigation();	
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -25,24 +23,26 @@ export default function DirectMessage() {
 		}
 	}, [defaultChannelId, navigate]);
 
+	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
+	const { messages } = useDirectMessages({ channelId: directId ?? '', mode: currentDmGroup?.user_id?.length === 1?4:3 });
+
 	useEffect(() => {
 		if (messagesContainerRef.current) {
 			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
 		}
 	}, [isSending, [], messages]);
 
-	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
 			<DmTopbar dmGroupId={directId} />
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full ">
 					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
-						{<ChannelMessages channelId={directId ?? ''} channelName={currentDmGroup?.channel_label} type='direct' avatarDM={currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.channel_avatar : '/assets/images/avatar-group.png'} />}
+						{<ChannelMessages channelId={directId ?? ''} channelLabel={currentDmGroup?.channel_label} type={currentDmGroup?.user_id?.length === 1?'DM':"GROUP"} avatarDM={currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.channel_avatar : '/assets/images/avatar-group.png'} />}
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
-						{directId && <ChannelTyping channelId={directId} />}
-						<DirectMessageBox directParamId={directId ?? ''} />
+						{directId && <ChannelTyping channelId={directId} channelLabel={''} mode={currentDmGroup?.user_id?.length === 1?4:3} />}
+						<DirectMessageBox directParamId={directId ?? ''} mode={currentDmGroup?.user_id?.length === 1?4:3} />
 					</div>
 				</div>
 				{Number(type) === ChannelTypeEnum.GROUP_CHAT && (

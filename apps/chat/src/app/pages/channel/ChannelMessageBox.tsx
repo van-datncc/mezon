@@ -9,12 +9,14 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/
 
 type ChannelMessageBoxProps = {
 	channelId: string;
+	channelLabel: string;
 	controlEmoji?: boolean;
 	clanId?: string;
+	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMessageBoxProps) {
-	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
+export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanId, mode }: ChannelMessageBoxProps) {
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
 
 	const handleSend = useCallback(
 		(

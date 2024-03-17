@@ -3,10 +3,12 @@ import { useMemo } from 'react';
 
 type ChannelTypingProps = {
 	channelId: string;
+	channelLabel: string;
+	mode: number;
 };
 
-export function ChannelTyping({ channelId }: ChannelTypingProps) {
-	const { typingUsers } = useChatTypings({ channelId });
+export function ChannelTyping({ channelId, channelLabel, mode }: ChannelTypingProps) {
+	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {

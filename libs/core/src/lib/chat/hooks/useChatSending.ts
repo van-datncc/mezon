@@ -7,9 +7,11 @@ import { useClans } from './useClans';
 
 export type UseChatSendingOptions = {
 	channelId: string;
+	channelLabel: string;
+	mode: number;
 };
 
-export function useChatSending({ channelId }: UseChatSendingOptions) {
+export function useChatSending({ channelId, channelLabel, mode }: UseChatSendingOptions) {
 	const { currentClanId } = useClans();
 	const dispatch = useAppDispatch();
 
@@ -30,14 +32,15 @@ export function useChatSending({ channelId }: UseChatSendingOptions) {
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeChatMessage(currentClanId, channel.id, content, mentions, attachments, references);
+			
+			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
+		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId }));
-	}, [channelId, dispatch]);
+		dispatch(messagesActions.sendTypingUser({ channelId, channelLabel, mode }));
+	}, [channelId, channelLabel, dispatch, mode]);
 
 	return useMemo(
 		() => ({

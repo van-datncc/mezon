@@ -73,7 +73,7 @@ export const getLinkInvite = createAsyncThunk('invite/getLinkInvite', async ({ i
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		return mapInviteToEntity(response,inviteId)
+		return mapInviteToEntity(response, inviteId)
 	} catch(error : any) {		
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);

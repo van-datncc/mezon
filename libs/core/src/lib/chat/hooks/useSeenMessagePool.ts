@@ -13,9 +13,10 @@ export function useSeenMessagePool() {
 
 	const initWorker = () => {
 		seenMessagePool.registerSeenMessageWorker((action) => {
-			dispatch(
+			dispatch(				
 				messagesActions.updateLastSeenMessage({
 					channelId: action.channelId,
+					channelLabel: action.channelLabel,
 					messageId: action.messageId,
 				}),
 			);
@@ -29,6 +30,7 @@ export function useSeenMessagePool() {
 	const markMessageAsSeen = (message: IMessage) => {
 		seenMessagePool.addSeenMessage({
 			channelId: message.channel_id || '',
+			channelLabel: message.channel_label,
 			messageId: message.id || '',
 			messageCreatedAt: message.creationTimeMs ? +message.creationTimeMs : 0,
 			messageSeenAt: +Date.now(),
