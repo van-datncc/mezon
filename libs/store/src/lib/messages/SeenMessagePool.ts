@@ -1,6 +1,7 @@
 type SeenMessagePayload = {
 	messageId: string;
 	channelId: string;
+	channelLabel: string;
 	messageCreatedAt: number;
 	messageSeenAt?: number;
 };

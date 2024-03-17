@@ -3,7 +3,8 @@ import { IChannel } from '@mezon/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import NotificationList from '../NotificationList';
-import { ChannelLable, SearchMessage } from './TopBarComponents';
+import { ChannelLabel, SearchMessage } from './TopBarComponents';
+
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
 };
@@ -12,7 +13,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	return (
 		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader">
 			<div className="justify-start items-center gap-1 flex">
-				<ChannelLable type={Number(channel?.type)} name={channel?.channel_label} isPrivate={channel?.channel_private} />
+				<ChannelLabel type={Number(channel?.type)} name={channel?.channel_label} isPrivate={channel?.channel_private} />
 			</div>
 
 			{/* Desktop buttons */}

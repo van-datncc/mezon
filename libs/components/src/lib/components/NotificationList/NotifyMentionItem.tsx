@@ -101,6 +101,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					isMessNotifyMention={true}
 					attachments={data.attachments}
 					mentions={data.mentions}
+					mode={2}
 				/>
 			</div>
 		</div>

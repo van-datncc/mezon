@@ -10,9 +10,10 @@ import { MentionData } from '@draft-js-plugins/mention';
 
 interface DirectIdProps {
 	directParamId: string;
+	mode: number;
 }
-export function DirectMessageBox({ directParamId }: DirectIdProps) {
-	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId });
+export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
+	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const handleSend = useCallback(

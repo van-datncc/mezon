@@ -12,10 +12,11 @@ type MessageProps = {
 	preMessage?: IMessageWithUser;
 	lastSeen?: boolean;
 	myUser?: string;
+	mode: number;
 };
 
 export function ChannelMessage(props: MessageProps) {
-	const { message, lastSeen, preMessage, myUser } = props;
+	const { message, lastSeen, preMessage, myUser, mode } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 
@@ -91,7 +92,7 @@ export function ChannelMessage(props: MessageProps) {
 
 	return (
 		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
-			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} />
+			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} mode={mode} />
 			{lastSeen && <UnreadMessageBreak />}
 
 			<div
