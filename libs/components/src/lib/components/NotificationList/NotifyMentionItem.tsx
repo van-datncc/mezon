@@ -1,4 +1,4 @@
-import { useNotification } from '@mezon/core';
+import { useChatMessages, useNotification } from '@mezon/core';
 import { INotification, selectChannelById, selectClanById, selectMemberClanByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -7,30 +7,49 @@ export type NotifyMentionProps = {
 	notify: INotification;
 };
 
-function parseObject(obj: any) {
-	const parsedObj = { ...obj };
-	for (let key in parsedObj) {
-		if (parsedObj.hasOwnProperty(key)) {
-			if (typeof parsedObj[key] === 'string') {
-				try {
-					parsedObj[key] = JSON.parse(parsedObj[key]);
-				} catch (error) {
-					continue;
-				}
-			} else if (typeof parsedObj[key] === 'object') {
-				parsedObj[key] = parseObject(parsedObj[key]);
-			}
-		}
+function parseObject(obj: any) {	
+	let attachments;
+	let mentions;
+	let reactions;
+	let references;
+	try {
+		attachments = JSON.parse(obj.attachments)
+	} catch(err) {
+		attachments = {}
 	}
+	try {
+		mentions = JSON.parse(obj.mentions)
+	} catch(err) {
+		mentions = {}
+	}
+	try {
+		references = JSON.parse(obj.references)
+	} catch(err) {
+		references = {}
+	}
+	try {
+		reactions = JSON.parse(obj.reactions)
+	} catch(err) {
+		reactions = {}
+	}
+	const parsedObj = { 
+		...obj,
+		attachments:attachments,
+		mentions:mentions,
+		reactions:reactions,
+		references:references,
+	};
 	return parsedObj;
 }
 
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
-	const { deleteNotify } = useNotification();
+	const { deleteNotify } = useNotification();	
 	const user = notify.sender_id ? useSelector(selectMemberClanByUserId(notify.sender_id)) : null;
 	const channelInfo = notify.content?.channel_id ? useSelector(selectChannelById(notify.content.channel_id)) : null;
 	const clanInfo = channelInfo?.clan_id ? useSelector(selectClanById(channelInfo.clan_id)) : null;
 	const data = parseObject(notify.content);
+	console.log("content", notify.content);
+	const { jumpToMessage } = useChatMessages({ channelId:data.channel_id });
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
 			<div className="flex justify-between">
@@ -61,6 +80,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					className="bg-bgTertiary mr-1 text-contentPrimary rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
 					onClick={() => {
 						deleteNotify(notify.id);
+						jumpToMessage(data.message_id);
 					}}
 				>
 					✕
@@ -68,8 +88,10 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 			</div>
 			<div className="bg-bgTertiary rounded-[8px] relative group">
 				<button
-					onClick={() => {}}
 					className="absolute py-1 px-2 bg-bgSecondary top-[10px] right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+					onClick={() => {
+						jumpToMessage(data.message_id);
+					}}					
 				>
 					Jump
 				</button>
@@ -77,7 +99,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					message={data as IMessageWithUser}
 					user={user}
 					isMessNotifyMention={true}
-					attachments={data.attachment}
+					attachments={data.attachments}
 					mentions={data.mentions}
 				/>
 			</div>
