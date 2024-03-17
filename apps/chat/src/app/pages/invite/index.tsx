@@ -17,7 +17,7 @@ export default function InvitePage() {
 		return selectInvite?.clan_name || '' 
 	}, [selectInvite]);
 	const channelName = useMemo(() => {
-		return selectInvite?.channel_name || ''
+		return selectInvite?.channel_label || ''
 	}, [selectInvite]);
 	const clanId = useMemo(() => {
 		return selectInvite?.clan_id || ''
