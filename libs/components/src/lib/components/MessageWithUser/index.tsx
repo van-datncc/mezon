@@ -71,11 +71,12 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	}, [message, preMessage]);
 
 	const [dataEmojiFetch] = useState<any>(message.reactions);
-
+	console.log('data', message);
 	const processData = (dataEmoji: EmojiItemOptionals[], message: { channel_id: string; id: string }) => {
 		const result: EmojiDataOptionals[] = [];
 
-		dataEmoji.length &&
+		dataEmoji &&
+			dataEmoji.length &&
 			dataEmoji.forEach((item: EmojiItemOptionals) => {
 				const existingEmoji = result.find((emojiItem: EmojiDataOptionals) => emojiItem.emoji === item.emoji);
 
@@ -117,7 +118,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	};
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }));
-
+	console.log('emojiData', emojiData);
+	console.log('dataFetch', dataEmojiFetch);
 	const handleReactMessage = async (id: string, channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
@@ -301,14 +303,20 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 	const [isHoverSender, setIsHoverSender] = useState<boolean>(false);
 	const [isEmojiHover, setEmojiHover] = useState<any>();
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 	const getEmojiHover = (emojiParam: any) => {
-		setEmojiHover(emojiParam);
+		clearTimeout(timeoutRef.current!);
 		setIsHoverSender(true);
+		setEmojiHover(emojiParam);
 	};
 
 	const removeEmojiHover = () => {
-		setIsHoverSender(true);
-		setEmojiHover('');
+		// setIsHoverSender(true);
+		setTimeout(() => {
+			setIsHoverSender(false);
+		}, 2000);
+		// setEmojiHover(null);
 	};
 
 	type Props = {
@@ -322,6 +330,27 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		const user = useSelector(selectMemberByUserId(id));
 		return <p className="text-xs text-white">{user?.user?.username}</p>;
 	}
+
+	const [countUpdated, setCountUpdated] = useState<number>(0);
+
+	const [countRemove, setCountRemove] = useState<number>(0);
+	// const [senderRemove, setSenderRemove] = useState<string>();
+	const [isRemove, setIsRemove] = useState<boolean>(false);
+
+	const removeEmojiSender = async (
+		id: string,
+		channelId: string,
+		messageId: string,
+		emoji: string,
+		message_sender_id: string,
+		countRemove: number,
+	) => {
+		setCountRemove(countRemove);
+		setIsRemove(true);
+		await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, true);
+	};
+	const countInnerHtml = useRef(null);
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -398,48 +427,73 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 																	message.sender_id,
 																)
 															}
-															onMouseDown={(e) => {
-																return e.preventDefault(), e.stopPropagation();
-															}}
-															onMouseEnter={() => {
-																return setIsHovered(true), getEmojiHover(emoji);
-															}}
-															onMouseLeave={() => removeEmojiHover()}
+															onMouseEnter={() => getEmojiHover(emoji)}
+															// onMouseLeave={() => removeEmojiHover()}
 														>
 															<span className=" relative left-[-10px]">{emoji.emoji}</span>
 															<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
-																<p>{emoji.senders.reduce((sum, item: SenderInfoOptionals) => sum + item.count, 0)}</p>
+																<p>
+																	{emoji.senders.reduce((sum, item: SenderInfoOptionals) => {
+																		return sum + item.count;
+																	}, 0)}
+																</p>
 															</div>
+
 															{isHoverSender && emoji === isEmojiHover && (
 																<div
 																	onClick={(e) => e.stopPropagation()}
-																	className="absolute z-20  bottom-7 left-0 w-[18rem] border
-																 bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem]"
+																	// onMouseEnter={() => getEmojiHover(emoji)}
+																	// onMouseLeave={() => removeEmojiHover()}
+																	className="absolute z-20  bottom-7 left-0 w-[18rem]
+															 		bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border border-green-400"
 																>
 																	<div className="flex flex-row items-center m-2">
 																		<div className="">{isEmojiHover.emoji}</div>
-																		<p className="text-xs">
-																			{emoji.senders.reduce(
-																				(sum, item: SenderInfoOptionals) => sum + item.count,
-																				0,
-																			)}
+																		<p>
+																			{emoji.senders.reduce((sum, item: SenderInfoOptionals) => {
+																				return sum + item.count;
+																			}, 0)}
 																		</p>
 																	</div>
 
 																	<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
 																	{isEmojiHover.senders.map((item: any, index: number) => {
 																		return (
-																			<div
-																				key={index}
-																				className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative"
-																			>
-																				<AvatarComponent id={item.id} />
-																				<NameComponent id={item.id} />
-																				<p className="text-xs absolute right-5">{item.count}</p>
-																				{item.id === userId && (
-																					<a className="hover:underline text-blue-700 text-xs">remove</a>
+																			<>
+																				{item.count > 0 && (
+																					<div
+																						// onMouseEnter={() => setSenderRemove(item.id ?? '')}
+																						key={item.id}
+																						className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative border border-red-600"
+																					>
+																						<AvatarComponent id={item.id} />
+																						<NameComponent id={item.id} />
+																						<p ref={countInnerHtml} className="text-xs absolute right-8">
+																							{item.count}
+																						</p>
+																						{item.id === userId && (
+																							<button
+																								onClick={(e: any) => {
+																									return (
+																										e.stopPropagation(),
+																										removeEmojiSender(
+																											'',
+																											currentChannelId ?? '',
+																											message.id,
+																											emoji.emoji,
+																											item.id,
+																											item.count,
+																										)
+																									);
+																								}}
+																								className="right-1 absolute"
+																							>
+																								<Icons.Close defaultSize="w-3 h-3" />
+																							</button>
+																						)}
+																					</div>
 																				)}
-																			</div>
+																			</>
 																		);
 																	})}
 																</div>
