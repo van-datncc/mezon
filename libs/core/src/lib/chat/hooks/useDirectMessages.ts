@@ -14,9 +14,10 @@ import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/
 
 export type UseDirectMessagesOptions = {
 	channelId: string;
+	mode: number;
 };
 
-export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
+export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions) {
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 
 	const client = clientRef.current;
@@ -42,9 +43,9 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('', channel.id, content, mentions, attachments, references);
+			await socket.writeChatMessage('DM', channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
 		},
-		[sessionRef, clientRef, socketRef, channelRef],
+		[sessionRef, clientRef, socketRef, channelRef, mode],
 	);
 
 	const loadMoreMessage = React.useCallback(async () => {
@@ -52,7 +53,7 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId }));
+		dispatch(messagesActions.sendTypingUser({ channelId: channelId, channelLabel: '', mode: mode}));
 	}, [channelId, dispatch]);
 
 	return useMemo(

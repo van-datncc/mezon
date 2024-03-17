@@ -24,15 +24,15 @@ export default function ChannelLayout() {
 						ref={messagesContainerRef}
 					>
 						{currentChanel ? (
-							<ChannelMessages channelId={currentChanel?.id} channelName={currentChanel.channel_label} type="channel" />
+							<ChannelMessages channelId={currentChanel?.id} channelLabel={currentChanel.channel_label} type="channel" />
 						) : (
 							<ChannelMessages.Skeleton />
 						)}
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
-						{currentChanel && <ChannelTyping channelId={currentChanel?.id} />}
+						{currentChanel && <ChannelTyping channelId={currentChanel?.id} channelLabel={currentChanel?.channel_label || ''} mode={2} />}
 						{currentChanel ? (
-							<ChannelMessageBox clanId={currentChanel.clan_id} channelId={currentChanel?.id} />
+							<ChannelMessageBox clanId={currentChanel?.clan_id} channelId={currentChanel?.id} channelLabel={currentChanel?.channel_label || ''} mode={2} />
 						) : (
 							<ChannelMessageBox.Skeleton />
 						)}

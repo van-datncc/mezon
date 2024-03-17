@@ -3,7 +3,7 @@ import * as Icons from '../../Icons';
 
 import { ChannelProps, ChannelStatusEnum, ChannelTypeEnum, ThreadNameProps } from 'libs/utils/src/lib/types/index';
 
-export const ChannelLable: React.FC<ChannelProps> = ({ isPrivate, type, name }) => {
+export const ChannelLabel: React.FC<ChannelProps> = ({ isPrivate, type, name }) => {
 	return (
 		<div className="flex flex-row items-center relative">
 			<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">

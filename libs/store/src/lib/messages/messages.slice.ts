@@ -127,6 +127,7 @@ export const fetchMessages = createAsyncThunk(
 			if (lastMessage) {
 				seenMessagePool.updateKnownSeenMessage({
 					channelId: lastMessage.channel_id || '',
+					channelLabel: lastMessage.channel_label,
 					messageId: lastMessage.id,
 					messageCreatedAt: lastMessage.creationTimeMs ? +lastMessage.creationTimeMs : 0,
 					messageSeenAt: 0,
@@ -138,11 +139,11 @@ export const fetchMessages = createAsyncThunk(
 	},
 );
 
-type loadMoreMess = {
+type LoadMoreMessArgs = {
 	channelId: string;
 };
 
-export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: loadMoreMess, thunkAPI) => {
+export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: LoadMoreMessArgs, thunkAPI) => {
 	try {
 		const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		await thunkAPI.dispatch(fetchMessages({ 
@@ -157,20 +158,39 @@ export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', asyn
 	}
 });
 
+type JumpToMessageArgs = {
+	channelId: string;
+	messageId: string;
+};
+export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId }: JumpToMessageArgs, thunkAPI) => {
+	try {
+		await thunkAPI.dispatch(fetchMessages({ 
+			channelId: channelId, 
+			noCache: false,
+			messageId: messageId,
+			direction: 1
+		}));
+	} catch (e) {
+		console.log(e);
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 type UpdateMessageArgs = {
 	channelId: string;
+	channelLabel: string;
 	messageId: string;
 };
 
 export const updateLastSeenMessage = createAsyncThunk(
 	'messages/updateLastSeenMessage',
-	async ({ channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
+	async ({ channelId, channelLabel, messageId }: UpdateMessageArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			// thunkAPI.dispatch(
 			//   messagesActions.setChannelLastMessage({ channelId, messageId }),
 			// );
-			await mezon.socketRef.current?.writeLastSeenMessage(channelId, messageId);
+			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, 2, messageId);
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -219,11 +239,13 @@ export const updateReactionMessage = createAsyncThunk(
 
 export type SendMessageArgs = {
 	channelId: string;
+	channelLabel: string;
+	mode: number;
 };
 
-export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ channelId }: SendMessageArgs, thunkAPI) => {
+export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ channelId, channelLabel, mode }: SendMessageArgs, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const ack = mezon.socketRef.current?.writeMessageTyping(channelId);
+	const ack = mezon.socketRef.current?.writeMessageTyping(channelId, channelLabel, mode);
 	return ack;
 });
 
@@ -377,6 +399,7 @@ export const messagesActions = {
 	sendTypingUser,
 	loadMoreMessage,
 	updateReactionMessage,
+	jumpToMessage,
 };
 
 /*

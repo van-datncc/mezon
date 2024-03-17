@@ -24,7 +24,7 @@ export function useSendInviteMessage() {
 				throw new Error('Client is not initialized');
 			}
 			
-			await socket.writeChatMessage('', channel_id, content, [], [], []);
+			await socket.writeChatMessage('DM', channel_id, '', 4, content, [], [], []);
 		},
 		[sessionRef, clientRef, socketRef],
 	);

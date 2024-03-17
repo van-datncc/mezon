@@ -27,6 +27,7 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	reactions?: Array<ApiMessageReaction>;
 	isMessNotifyMention?: boolean;
+	mode: number;
 };
 
 type SenderInfoOptionals = {
@@ -54,7 +55,7 @@ type EmojiItemOptionals = {
 	sender_name: string;
 };
 
-function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyMention }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyMention, mode }: MessageWithUserProps) {
 	const { messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -118,9 +119,8 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	};
 
 	const [emojiData, setEmojiData] = useState<EmojiDataOptionals[]>(processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }));
-	console.log('emojiData', emojiData);
-	console.log('dataFetch', dataEmojiFetch);
-	const handleReactMessage = async (id: string, channelId: string, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
+
+	const handleReactMessage = async (id: string, channelId: string, mode: number, messageId: string, emoji: string, userId: string, message_sender_id: string) => {
 		const existingEmojiIndex = emojiDataIncSocket?.findIndex((e: EmojiDataOptionals) => e.emoji === emoji) as number;
 		if (existingEmojiIndex !== -1) {
 			const userIndex = (emojiDataIncSocket &&
@@ -129,7 +129,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 				const updatedEmojiData = [...emojiDataIncSocket];
 				updatedEmojiData[existingEmojiIndex].senders[userIndex].count += 0;
 				setEmojiData(updatedEmojiData);
-				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
+				await reactionMessageAction(id, mode, messageId, emoji, message_sender_id, false);
 				setEmojiSelectedReacted('');
 				setMessageRef(undefined);
 			} else {
@@ -140,7 +140,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 					emojiIdList: [],
 				});
 				setEmojiData(updatedEmojiData);
-				await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
+				await reactionMessageAction(id, mode, messageId, emoji, message_sender_id, false);
 				setEmojiSelectedReacted('');
 				setMessageRef(undefined);
 			}
@@ -162,7 +162,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 					messageId: messageId,
 				},
 			]);
-			await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, false);
+			await reactionMessageAction(id, mode, messageId, emoji, message_sender_id, false);
 			setEmojiSelectedReacted('');
 			setMessageRef(undefined);
 		}
@@ -252,7 +252,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 	useEffect(() => {
 		if (messageRef?.id === message.id && emojiSelectedReacted)
-			handleReactMessage('', currentChannelId ?? '', messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
+			handleReactMessage('', currentChannelId ?? '', mode, messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
 	}, [messageRef?.id, emojiSelectedReacted]);
 
 	const { setEmojiSelectedReacted, setMessageRef, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom, setIsOpenEmojiMessBox } =
@@ -421,6 +421,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 																handleReactMessage(
 																	emoji.id,
 																	currentChannelId ?? '',
+																	mode,
 																	message.id,
 																	emoji.emoji,
 																	userId ?? '',

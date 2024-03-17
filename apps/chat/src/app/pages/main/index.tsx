@@ -48,7 +48,7 @@ function MyApp() {
 									alt={currentClan?.clan_name || ''}
 									placeholder="blur"
 									width={48}
-									blurDataURL={currentClan?.logo}
+									blurdataurl={currentClan?.logo}
 									className="min-w-12 min-h-12 object-cover"
 								/>
 							) : (
