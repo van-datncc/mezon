@@ -162,6 +162,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		retry(0);
 	}, [reconnect]);
 
+	const onerror = useCallback((event : unknown) => {
+		// TODO: handle error
+		console.log(event);
+	}, []);
+
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -211,6 +216,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socket.onchannelpresence = onchannelpresence;
 
 		socket.ondisconnect = ondisconnect;
+		
+		socket.onerror = onerror;
 
 		socket.onmessagetyping = onmessagetyping;
 
