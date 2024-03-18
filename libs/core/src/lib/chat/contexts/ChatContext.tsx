@@ -180,6 +180,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						messageId: event.message_id,
 						emoji: event.emoji,
 						userId: event.sender_id,
+						actionRemove: event?.action,
 					}),
 				);
 			}

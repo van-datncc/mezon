@@ -109,11 +109,11 @@ export const fetchMessages = createAsyncThunk(
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message_id));
 
 		let hasMore = currentHasMore;
-		if (currentLastLoadMessageId === messageId) {			
+		if (currentLastLoadMessageId === messageId) {
 			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
 		}
 
-		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length-1].id, hasMore } }));
+		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
 
 		if (response.last_seen_message_id) {
 			thunkAPI.dispatch(
@@ -146,12 +146,14 @@ type LoadMoreMessArgs = {
 export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', async ({ channelId }: LoadMoreMessArgs, thunkAPI) => {
 	try {
 		const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
-		await thunkAPI.dispatch(fetchMessages({ 
-			channelId: channelId, 
-			noCache: false,
-			messageId: lastScrollMessageId,
-			direction: 3
-		}));
+		await thunkAPI.dispatch(
+			fetchMessages({
+				channelId: channelId,
+				noCache: false,
+				messageId: lastScrollMessageId,
+				direction: 3,
+			}),
+		);
 	} catch (e) {
 		console.log(e);
 		return thunkAPI.rejectWithValue([]);
@@ -164,12 +166,14 @@ type JumpToMessageArgs = {
 };
 export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId }: JumpToMessageArgs, thunkAPI) => {
 	try {
-		await thunkAPI.dispatch(fetchMessages({ 
-			channelId: channelId, 
-			noCache: false,
-			messageId: messageId,
-			direction: 1
-		}));
+		await thunkAPI.dispatch(
+			fetchMessages({
+				channelId: channelId,
+				noCache: false,
+				messageId: messageId,
+				direction: 1,
+			}),
+		);
 	} catch (e) {
 		console.log(e);
 		return thunkAPI.rejectWithValue([]);
@@ -216,20 +220,21 @@ export const updateTypingUsers = createAsyncThunk(
 );
 
 export type UpdateReactionMessageArgs = {
-	id: string,
+	id: string;
 	channelId?: string;
 	messageId?: string;
 	emoji?: string;
 	userId?: string;
 	action_delete?: boolean;
+	actionRemove?: boolean;
 };
 
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
 
-	async ({ id, channelId, messageId, userId, emoji }: UpdateReactionMessageArgs, thunkAPI) => {
+	async ({ id, channelId, messageId, userId, emoji, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
-			await thunkAPI.dispatch(messagesActions.setReactionMessage({ id, channelId, messageId, userId, emoji }));
+			await thunkAPI.dispatch(messagesActions.setReactionMessage({ id, channelId, messageId, userId, emoji, actionRemove }));
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -267,7 +272,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
-	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '' },
+	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', actionRemove: false },
 });
 
 export type SetCursorChannelArgs = {
@@ -333,6 +338,7 @@ export const messagesSlice = createSlice({
 				messageId: action.payload.messageId,
 				userId: action.payload.userId,
 				emoji: action.payload.emoji,
+				actionRemove: action?.payload?.actionRemove,
 			};
 		},
 

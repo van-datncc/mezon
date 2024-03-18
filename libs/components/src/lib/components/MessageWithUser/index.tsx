@@ -1,7 +1,15 @@
 import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
-import { EmojiPlaces, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import {
+	ChannelTypeReactions,
+	EmojiPlaces,
+	IChannelMember,
+	IMessageWithUser,
+	TIME_COMBINE,
+	checkSameDay,
+	getTimeDifferenceInSeconds,
+} from '@mezon/utils';
 import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -121,8 +129,9 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 	const handleReactMessage = async (
 		id: string,
-		channelId: string,
 		mode: number,
+
+		channelId: string,
 		messageId: string,
 		emoji: string,
 		userId: string,
@@ -201,17 +210,56 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		return emojiDataArr;
 	};
 
+	const removeEmojiData = (emojiDataArr: EmojiDataOptionals[], emojiSocket: EmojiDataOptionals[]) => {
+		emojiSocket?.forEach((socketEmoji) => {
+			const existingEmojiIndex = emojiDataArr.findIndex(
+				(dataEmoji) =>
+					dataEmoji.emoji === socketEmoji.emoji &&
+					dataEmoji.channelId === socketEmoji.channelId &&
+					dataEmoji.messageId === socketEmoji.messageId,
+			);
+
+			if (existingEmojiIndex !== -1) {
+				const existingSenderIndex = emojiDataArr[existingEmojiIndex].senders.findIndex((sender) => sender.id === socketEmoji.senders[0].id);
+
+				if (existingSenderIndex !== -1) {
+					const countToRemove = socketEmoji.senders[0].count;
+					const remainingCount = emojiDataArr[existingEmojiIndex].senders[existingSenderIndex].count - countToRemove;
+
+					if (remainingCount <= 0) {
+						// Remove sender if count becomes zero or negative
+						emojiDataArr[existingEmojiIndex].senders.splice(existingSenderIndex, 1);
+					} else {
+						// Otherwise update the count
+						emojiDataArr[existingEmojiIndex].senders[existingSenderIndex].count = remainingCount;
+					}
+				}
+			}
+		});
+
+		return emojiDataArr;
+	};
+
 	const [emojiDataIncSocket, setEmojiDataIncSocket] = useState<EmojiDataOptionals[]>(
 		processData(dataEmojiFetch, { channel_id: message.channel_id, id: message.id }),
 	);
 	const [reactedConvert, setReactConvert] = useState<EmojiDataOptionals[]>([]);
+	const [countUpdated, setCountUpdated] = useState<number>(0);
+	const [countRemoved, setCountRemoved] = useState<number>(0);
+	const [emojiRemoved, setEmojiRemoved] = useState<string>('');
+	const [messEmojiRemovedId, setMessEmojiRemovedId] = useState<string>('');
+	const [channelEmojiRemovedId, setChannelEmojiRemoved] = useState<string>('');
+	const [senderRemoveId, setSenderRemoveId] = useState<string>();
+	const [isRemoved, setIsRemoved] = useState<boolean>(false);
+	const [emojiUpdateAfterRemove, setEmojiUpdateAfterRemove] = useState<EmojiDataOptionals[]>();
 	useEffect(() => {
 		if (
 			messageDataReactedFromSocket?.channelId &&
 			messageDataReactedFromSocket.messageId &&
 			messageDataReactedFromSocket.userId &&
 			messageDataReactedFromSocket.emoji !== '' &&
-			!isRemoved
+			// !isRemoved &&
+			!messageDataReactedFromSocket.actionRemove
 		) {
 			const reactDataArray: EmojiDataOptionals[] = [
 				{
@@ -231,11 +279,48 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 			setReactConvert(reactDataArray);
 			const updatedDataE = mergeEmojiData(emojiData, reactDataArray);
 			setEmojiDataIncSocket(updatedDataE);
+		} else if (
+			messageDataReactedFromSocket?.channelId &&
+			messageDataReactedFromSocket.messageId &&
+			messageDataReactedFromSocket.userId &&
+			messageDataReactedFromSocket.emoji !== '' &&
+			// isRemoved &&
+			messageDataReactedFromSocket.actionRemove
+		) {
+			console.log(countRemoved, emojiRemoved, messEmojiRemovedId, senderRemoveId);
+			const reactDataArray: EmojiDataOptionals[] = [
+				{
+					id: '',
+					emoji: emojiRemoved ?? '',
+					senders: [
+						{
+							id: senderRemoveId ?? '',
+							count: countRemoved,
+							emojiIdList: [],
+						},
+					],
+					channelId: channelEmojiRemovedId ?? '',
+					messageId: messEmojiRemovedId ?? '',
+				},
+			];
+			console.log(reactDataArray);
+			setReactConvert(reactDataArray);
+			const updatedDataE = removeEmojiData(emojiData, reactDataArray);
+			setEmojiUpdateAfterRemove(updatedDataE);
+			console.log('checked', updatedDataE);
+			// setEmojiDataIncSocket(updatedDataE);
 		}
 	}, [messageDataReactedFromSocket]);
 
-	const { emojiSelectedReacted } = useContext(ChatContext);
+	useEffect(() => {
+		if (emojiUpdateAfterRemove) {
+			setEmojiDataIncSocket(emojiUpdateAfterRemove);
+		}
+	}, [emojiUpdateAfterRemove]);
 
+	console.log('emojiDataIncSocket', emojiDataIncSocket);
+
+	const { emojiSelectedReacted } = useContext(ChatContext);
 	const [isReply, setIsReply] = useState<boolean>(true);
 	const [messageIdRef] = useState<string>((message.references && message?.references[0]?.message_ref_id) ?? '');
 	const getMessageRef = useSelector(selectMessageByMessageId(messageIdRef));
@@ -261,7 +346,15 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 	useEffect(() => {
 		if (messageRef?.id === message.id && emojiSelectedReacted)
-			handleReactMessage('', currentChannelId ?? '', mode, messageRef?.id ?? '', emojiSelectedReacted ?? '', userId ?? '', message.sender_id);
+			handleReactMessage(
+				'',
+				ChannelTypeReactions.CHANNEL_IN_CLAN,
+				currentChannelId ?? '',
+				messageRef?.id ?? '',
+				emojiSelectedReacted ?? '',
+				userId ?? '',
+				message.sender_id,
+			);
 	}, [messageRef?.id, emojiSelectedReacted]);
 
 	const { setEmojiSelectedReacted, setMessageRef, isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom, setIsOpenEmojiMessBox } =
@@ -322,11 +415,9 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	};
 
 	const removeEmojiHover = () => {
-		// setIsHoverSender(true);
 		setTimeout(() => {
 			setIsHoverSender(false);
-		}, 2000);
-		// setEmojiHover(null);
+		}, 500);
 	};
 
 	type Props = {
@@ -341,18 +432,9 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		return <p className="text-xs text-white">{user?.user?.username}</p>;
 	}
 
-	const [countUpdated, setCountUpdated] = useState<number>(0);
-
-	const [countRemoved, setCountRemoved] = useState<number>(0);
-	const [emojiRemoved, setEmojiRemoved] = useState<string>('');
-	const [messEmojiRemovedId, setMessEmojiRemovedId] = useState<string>('');
-	const [channelEmojiRemovedId, setChannelEmojiRemoved] = useState<number>(0);
-	// const [senderRemove, setSenderRemove] = useState<string>();
-	const [isRemoved, setIsRemoved] = useState<boolean>(false);
-
 	const removeEmojiSender = async (
 		id: string,
-		channelId: number,
+		channelId: string,
 		messageId: string,
 		emoji: string,
 		message_sender_id: string,
@@ -362,30 +444,16 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		setEmojiRemoved(emoji);
 		setMessEmojiRemovedId(messageId);
 		setChannelEmojiRemoved(channelId);
+		setSenderRemoveId(message_sender_id);
 		// setIsRemoved(true);
-		await reactionMessageAction(id, channelId, messageId, emoji, message_sender_id, true);
-		// setIsRemoved(false);
+		await reactionMessageAction('', ChannelTypeReactions.CHANNEL_IN_CLAN, messageId, emoji, message_sender_id, true);
 	};
-	const countInnerHtml = useRef<HTMLDivElement>(null);
 	const refCountEmojiIcon = useRef<HTMLDivElement>(null);
-
-	const [isOverZero, setisOverZero] = useState<boolean>(false);
-	// console.log('numberOverZero', numberOverZero);
-
-	useEffect(() => {
-		if (refCountEmojiIcon.current?.innerText === '0') {
-			setisOverZero(true);
-		}
-	}, [removeSenderBySenderId]);
-
-	console.log('first', countInnerHtml.current && countInnerHtml.current.innerHTML);
-	// console.log('count-R', countRemoved);
 
 	function removeSenderBySenderId(emojiData: EmojiDataOptionals, senderId: string) {
 		if (emojiData.senders) {
 			emojiData.senders = emojiData.senders.filter((sender) => sender.id !== senderId);
 		}
-		console.log('e', emojiData);
 		return emojiData;
 	}
 
@@ -448,21 +516,25 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 									emojiDataIncSocket
 										.filter((obj) => obj.messageId === message.id)
 										?.map((emoji: EmojiDataOptionals, index) => {
+											const totalSenderCount = emoji.senders.reduce((sum, sender) => sum + sender.count, 0);
+											const shouldHideEmoji = totalSenderCount === 0;
 											const userSender = emoji.senders.find((sender) => sender.id === userId);
 											const checkID = emoji.channelId === message.channel_id && emoji.messageId === message.id;
-
+											if (shouldHideEmoji) {
+												return null;
+											}
 											return (
 												<Fragment key={index}>
-													{checkID && (
+													{!shouldHideEmoji && checkID && (
 														<div
-															className={` justify-center items-center relative ${!isOverZero && 'flex'}
+															className={` justify-center items-center relative 
 													 		${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] '}
 													 		rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 															onClick={() =>
 																handleReactMessage(
 																	emoji.id,
+																	ChannelTypeReactions.CHANNEL_IN_CLAN,
 																	currentChannelId ?? '',
-																	mode,
 																	message.id,
 																	emoji.emoji,
 																	userId ?? '',
@@ -479,21 +551,20 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 															>
 																<p>
 																	{emoji.senders.reduce((sum, item: SenderInfoOptionals) => {
-																		// if (isRemoved && item.id === userId && emoji.emoji === emojiRemoved) {
-																		// 	return sum + item.count - countRemoved;
-																		// } else return sum + item.count;
 																		return sum + item.count;
 																	}, 0)}
 																</p>
 															</div>
 
-															{isHoverSender && emoji === isEmojiHover && (
+															{isHoverSender && emoji === isEmojiHover && emoji.messageId === message.id && (
 																<div
-																	onClick={(e) => e.stopPropagation()}
+																	// onMouseLeave={() => {
+																	// 	return removeEmojiHover(), setIsRemoved(false);
+																	// }}
 																	// onMouseEnter={() => getEmojiHover(emoji)}
-																	// onMouseLeave={() => removeEmojiHover()}
+																	onClick={(e) => e.stopPropagation()}
 																	className="absolute z-20  bottom-7 left-0 w-[18rem]
-															 		bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border border-green-400"
+															 		bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border border-green-500"
 																>
 																	<div className="flex flex-row items-center m-2">
 																		<div className="">{isEmojiHover.emoji}</div>
@@ -508,32 +579,16 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 																	<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
 																	{isEmojiHover.senders.map((item: any, index: number) => {
-																		// console.log('item', item);
-																		// console.log('emj', emoji);
 																		return (
 																			<>
 																				{item.count > 0 && (
 																					<div
-																						// onMouseEnter={() => setSenderRemove(item.id ?? '')}
 																						key={item.id}
-																						className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative border border-red-600"
+																						className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative "
 																					>
 																						<AvatarComponent id={item.id} />
 																						<NameComponent id={item.id} />
-																						<p ref={countInnerHtml} className="text-xs absolute right-8">
-																							{item.count}
-																						</p>
-
-																						{/* {emoji.senders.reduce((sum, item: SenderInfoOptionals) => {
-																							if (
-																								isRemoved &&
-																								item.id === userId &&
-																								emoji.emoji === emojiRemoved
-																							) {
-																								return sum + item.count - countRemoved;
-																							} else return item.count;
-																						}, 0)} */}
-
+																						<p className="text-xs absolute right-8">{item.count}</p>
 																						{item.id === userId && (
 																							<button
 																								onClick={(e: any) => {
@@ -541,7 +596,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 																										e.stopPropagation(),
 																										removeEmojiSender(
 																											'',
-																											Number(currentChannelId) ?? 0,
+																											currentChannelId ?? '',
 																											message.id,
 																											emoji.emoji,
 																											item.id,

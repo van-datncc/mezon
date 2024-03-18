@@ -9,9 +9,10 @@ type ChannelMessagesProps = {
 	type: string;
 	channelLabel?: string;
 	avatarDM?: string;
+	mode: number;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM }: ChannelMessagesProps) {
+export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -25,19 +26,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			containerRef.current.scrollTo({ top: 10, behavior: 'smooth' });
 		}
 	};
-
-	const mode = useMemo(() => {
-		if (type === 'channel') {
-			return 2;
-		} else if (type === 'DM') {
-			return 4;
-		} else if (type === "GROUP") {
-			return 3;
-		}
-
-		return 2;
-
-	},[type]);
 
 	useEffect(() => {
 		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
