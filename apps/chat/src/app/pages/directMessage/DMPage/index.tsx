@@ -4,7 +4,7 @@ import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent } from 
 import { ChannelTypeEnum } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import ChannelMessages from '../../channel/ChanneMessages';
+import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
 
 export default function DirectMessage() {

@@ -52,7 +52,7 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}
 				currentClanId={clanId}
-			/>
+			/>			
 		</div>
 	);
 }
