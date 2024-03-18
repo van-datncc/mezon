@@ -24,7 +24,7 @@ export default function ChannelLayout() {
 						ref={messagesContainerRef}
 					>
 						{currentChanel ? (
-							<ChannelMessages channelId={currentChanel?.id} channelLabel={currentChanel.channel_label} type="channel" />
+							<ChannelMessages channelId={currentChanel?.id} channelLabel={currentChanel.channel_label} type="CHANNEL" mode={2}/>
 						) : (
 							<ChannelMessages.Skeleton />
 						)}

@@ -18,7 +18,7 @@ const ClanLayout = () => {
 		<div className="flex-row bg-bgSurface flex grow">
 			<MezonPolicyProvider clanId={clanId}>
 				<div className="flex flex-col w-widthSideBar max-w-[272px] bg-bgSurface relative">
-					<ClanHeader name={currentClan?.clan_name} type="channel" bannerImage={currentClan?.banner} />
+					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList />
 					<FooterProfile
 						name={userProfile?.user?.username || ''}
