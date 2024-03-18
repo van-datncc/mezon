@@ -23,7 +23,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 			<div className="w-170px ">
 				<p className="text-[#84ADFF] font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
-					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 hover:text-white ${selectedButton === 'Account' ? 'bg-[#155EEF1A] text-white' : ''}`}
+					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 hover:text-white ${selectedButton === 'Account' ? 'bg-[#232E3B] text-white' : ''}`}
 					onClick={() => {
 						handleButtonClick('Account');
 						onItemClick && onItemClick('Account');
@@ -33,7 +33,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px] hover:text-white ${selectedButton === 'Profiles' ? 'bg-[#155EEF1A] text-white' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px] hover:text-white ${selectedButton === 'Profiles' ? 'bg-[#232E3B] text-white' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Profiles');
 						onItemClick && onItemClick('Profiles');
@@ -103,7 +103,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				<button className="p-2 text-[#AEAEAE] text-[15px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">Advanced</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE] text-[15px] ${selectedButton === 'Log Out' ? 'bg-[#155EEF1A]' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] hover:text-white`}
+					className={`p-2 text-[#AEAEAE] text-[15px] ${selectedButton === 'Log Out' ? 'bg-[#232E3B]' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] hover:text-white`}
 					onClick={() => {
 						handleButtonClick('Log Out');
 						handleOpenModal();

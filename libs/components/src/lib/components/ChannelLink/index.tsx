@@ -9,10 +9,12 @@ export type ChannelLinkProps = {
 	active?: boolean;
 	createInviteLink: (clanId: string, channelId: string) => void;
 	isPrivate?: number;
+	isUnReadChannel?: boolean;
 };
 
-function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink }: ChannelLinkProps) {
+function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
+	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
 	const classes = {
 		active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
@@ -44,7 +46,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink }: C
 						{isPrivate === undefined && channel.type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					</div>
 					<p
-						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white' : ''}`}
+						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white' : ''} ${isUnReadChannel ? '' : 'font-bold text-white'}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
