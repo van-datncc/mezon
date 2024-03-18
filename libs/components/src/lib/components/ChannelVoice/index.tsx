@@ -50,7 +50,8 @@ function ChannelVoice({ clanName, channelLabel, userName }: ChannelVoiceProps) {
                     startWithAudioMuted: true,
                     disableModeratorIndicator: true,
                     startScreenSharing: true,
-                    enableEmailInStats: false
+                    enableEmailInStats: false,
+                    prejoinPageEnabled: false
                 }}
                 interfaceConfigOverwrite = {{
                     DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
