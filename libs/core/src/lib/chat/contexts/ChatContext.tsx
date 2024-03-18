@@ -145,8 +145,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-	const ondisconnect = useCallback(() => {
+	const ondisconnect = useCallback((event: any) => {
 		// TODO: handle disconnect
+		console.log(event);
+	}, []);
+
+	const onerror = useCallback((event : any) => {
+		// TODO: handle error
+		console.log(event);
 	}, []);
 
 	const onmessagetyping = useCallback(
@@ -198,6 +204,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socket.onchannelpresence = onchannelpresence;
 
 		socket.ondisconnect = ondisconnect;
+		
+		socket.onerror = onerror;
 
 		socket.onmessagetyping = onmessagetyping;
 
