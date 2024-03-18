@@ -28,6 +28,8 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	isOpenCreateNewChannel?: boolean;
 	currentCategory: ICategory | null;
 	// newChannelCreatedId: string | undefined;
+	channelLastMessageId: Record<string, string>;
+	channelLastSeenMesageId: Record<string, string>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -64,7 +66,7 @@ export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ chann
 		if (!noFetchMembers) {
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
 		}
-		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));		
+		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.joinChatChannel(channelId, channel?.channel_label || '');
 		return channel;
@@ -107,6 +109,7 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	}
 
 	const channels = response.channeldesc.map(mapChannelToEntity);
+	console.log(channels);
 
 	return channels;
 });
@@ -117,6 +120,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	error: null,
 	isOpenCreateNewChannel: false,
 	currentCategory: null,
+	channelLastMessageId: {},
+	channelLastSeenMesageId: {},
 });
 
 export const channelsSlice = createSlice({
@@ -133,6 +138,15 @@ export const channelsSlice = createSlice({
 		},
 		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
+		},
+		setChannelLastMessageId: (state, action: PayloadAction<{ channelId: string; messageId: string }>) => {
+			const { channelId, messageId } = action.payload;
+			state.channelLastMessageId[channelId] = messageId;
+			console.log('dis', state.channelLastMessageId[channelId]);
+		},
+		setChannelLastSeenMessageId: (state, action: PayloadAction<string>) => {
+			console.log('setChannelLastSeenMessageId');
+			// state.setChannelLastSeenMessageId = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
