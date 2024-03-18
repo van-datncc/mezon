@@ -30,6 +30,7 @@ export type MezonContextValue = {
 	joinChatChannel: (channelId: string, type: string) => Promise<Channel>;
 	joinChatDirectMessage: (channelId: string, channelName?: string, channelType?: number) => Promise<Channel>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
+	reconnect: () => Promise<void>;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -160,6 +161,25 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[socketRef],
 	);
 
+	const reconnect = React.useCallback(async () => {
+		if (!clientRef.current) {
+			return;
+		}
+		
+		const session = sessionRef.current;
+		if (!session) {
+			return;
+		}
+	
+		if (!socketRef.current) {
+			return;
+		}
+
+		const session2 = await socketRef.current.connect(session, true);
+		sessionRef.current = session2;
+
+	}, [clientRef, sessionRef, socketRef]);
+
 	const addStatusFollow = React.useCallback(
 		async (userIds: string[]) => {
 			const socket = socketRef.current;
@@ -220,6 +240,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			addStatusFollow,
 			logOutMezon,
+			reconnect,
 		}),
 		[
 			clientRef,
@@ -236,6 +257,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			addStatusFollow,
 			logOutMezon,
+			reconnect,
 		],
 	);
 

@@ -66,6 +66,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						message={message}
 						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
 						myUser={userProfile?.user?.id}
+						channelId = {channelId}
+						channelLabel = {channelLabel || ''}
 					/>
 				))}
 			</InfiniteScroll>
