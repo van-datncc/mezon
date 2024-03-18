@@ -3,7 +3,7 @@ import { ChatContext } from '@mezon/core';
 import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
 import { useContext, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import ChannelMessages from './ChanneMessages';
+import ChannelMessages from './ChannelMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
 

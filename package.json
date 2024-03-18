@@ -115,7 +115,11 @@
 		"ts-node": "10.9.2",
 		"typescript": "~5.3.3",
 		"url-loader": "^4.1.1",
-		"webpack-bundle-analyzer": "^4.10.1"
+		"webpack-bundle-analyzer": "^4.10.1",
+        "@babel/preset-env": "^7.16.0",
+        "babel-loader": "^8.2.3",
+        "html-webpack-plugin": "^5.5.0",
+        "react-hot-loader": "^4.13.0"
 	},
 	"engines": {
 		"node": "18.x"

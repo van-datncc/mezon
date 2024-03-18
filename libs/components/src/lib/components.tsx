@@ -1,4 +1,5 @@
 export { default as ChannelLink } from './components/ChannelLink';
+export { default as ChannelVoice } from './components/ChannelVoice';
 export { default as ChannelList } from './components/ChannelList';
 export { default as ChannelTopbar } from './components/ChannelTopbar';
 export { default as ChatWelcome } from './components/ChatWelcome';

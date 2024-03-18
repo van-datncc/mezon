@@ -41,6 +41,9 @@
       ],
       "@mezon/utils": [
         "libs/utils/src/index.ts"
+      ],
+      "react": [
+        "./node_modules/@types/react"
       ]
     }
   },
