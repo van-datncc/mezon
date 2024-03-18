@@ -42,11 +42,35 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 		dispatch(messagesActions.sendTypingUser({ channelId, channelLabel, mode }));
 	}, [channelId, channelLabel, dispatch, mode]);
 
+	const EditSendMessage = React.useCallback(
+		async (content: string,messageId: string,) => {
+			const editMessage: IMessageSendPayload ={
+				t: content
+			}
+			const session = sessionRef.current;
+			const client = clientRef.current;
+			const socket = socketRef.current;
+			const channel = channelRef.current;
+
+			if (!client || !session || !socket || !channel || !currentClanId) {
+				throw new Error('Client is not initialized');
+			}
+			if (mode === 4) {
+				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
+			}else {
+				await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
+			}
+		},
+		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode],
+	);
+
+
 	return useMemo(
 		() => ({
 			sendMessage,
 			sendMessageTyping,
+			EditSendMessage
 		}),
-		[sendMessage, sendMessageTyping],
+		[sendMessage, sendMessageTyping, EditSendMessage],
 	);
 }
