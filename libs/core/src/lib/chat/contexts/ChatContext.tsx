@@ -110,7 +110,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		],
 	);
 
-	const { socketRef } = useMezon();
+	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
@@ -145,12 +145,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-	const ondisconnect = useCallback((event: any) => {
-		// TODO: handle disconnect
-		console.log(event);
-	}, []);
+	const ondisconnect = useCallback(() => {
+		const retry = (attempt: number) => {
+			console.log('Reconnecting', attempt);
+            const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
+            setTimeout(() => {
+				reconnect()
+					.then(() => {
+						console.log('Reconnected');
+					})
+					.catch(() => {
+						retry(attempt + 1);
+					});
+            }, delay);
+        };
+		retry(0);
+	}, [reconnect]);
 
-	const onerror = useCallback((event : any) => {
+	const onerror = useCallback((event : unknown) => {
 		// TODO: handle error
 		console.log(event);
 	}, []);
