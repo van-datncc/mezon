@@ -2,18 +2,18 @@ import { JitsiMeeting } from '@mezon/mezon-voice-react-sdk';
 
 
 export type ChannelVoiceProps = {
-	clanId?: string;
-	channelId: string;
+	clanName?: string;
+	channelLabel: string;
+    userName: string;
 };
 
-function ChannelVoice({ clanId, channelId }: ChannelVoiceProps) {	
+function ChannelVoice({ clanName, channelLabel, userName }: ChannelVoiceProps) {	
 
     const handleReadyToClose = () => {
-        /* eslint-disable-next-line no-alert */
-        alert('Ready to close...');
+        console.log('Ready to close...');
     };
 
-    const generateRoomName = () => `JitsiMeetRoomNo${Math.random() * 100}-${Date.now()}`;
+    const generateRoomName = () => clanName+"/"+channelLabel;
 
 	const handleApiReady = (externalApi : any) => {
 		console.log("externalApi", externalApi);
@@ -39,20 +39,29 @@ function ChannelVoice({ clanId, channelId }: ChannelVoiceProps) {
                 fontFamily: 'sans-serif',
                 textAlign: 'center'
             }}>
-                JitsiMeeting Demo App
+                Voice Channel App
             </h1>
             <JitsiMeeting
                 domain = { "meet.mezon.vn" }
                 roomName = { generateRoomName() }
                 spinner = { renderSpinner }
-                configOverwrite = {{
-                    subject: 'lalalala',
-                    hideConferenceSubject: false
-                }}
                 lang = 'en'
+                configOverwrite = {{
+                    startWithAudioMuted: true,
+                    disableModeratorIndicator: true,
+                    startScreenSharing: true,
+                    enableEmailInStats: false
+                }}
+                interfaceConfigOverwrite = {{
+                    DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+                }}
+                userInfo = {{
+                    displayName: userName,
+                    email: ''
+                }}                
+                getIFrameRef = { (iframeRef) => { iframeRef.style.height = '400px'; } }
                 onApiReady = { (externalApi: any) => handleApiReady(externalApi) }
-                onReadyToClose = { handleReadyToClose }
-                getIFrameRef = { handleJitsiIFrameRef1 } />
+                onReadyToClose = { handleReadyToClose } />
         </>
     );
 }

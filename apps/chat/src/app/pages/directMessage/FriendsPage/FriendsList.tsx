@@ -8,7 +8,7 @@ type ListFriendsProps = {
 const FriendList = ({ listFriendFilter }: ListFriendsProps) => {
     return (
         <>
-            <ChannelVoice channelId='' clanId='' />
+            <ChannelVoice channelLabel={'General'} clanName={'KOMU'} userName="Nguyen Tran Nhan" />
             {listFriendFilter.map((friend: FriendsEntity) => (
                 <FriendsListItem friend={friend} key={friend.id}/>
             ))}
