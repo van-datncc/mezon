@@ -19,10 +19,6 @@ function ChannelVoice({ clanName, channelLabel, userName }: ChannelVoiceProps) {
 		console.log("externalApi", externalApi);
 	}
 
-	const handleJitsiIFrameRef1 = () => {
-		console.log("handleJitsiIFrameRef1");
-	}
-
     const renderSpinner = () => (
         <div style = {{
             fontFamily: 'sans-serif',
@@ -50,7 +46,8 @@ function ChannelVoice({ clanName, channelLabel, userName }: ChannelVoiceProps) {
                     startWithAudioMuted: true,
                     disableModeratorIndicator: true,
                     startScreenSharing: true,
-                    enableEmailInStats: false
+                    enableEmailInStats: false,
+                    prejoinPageEnabled: false
                 }}
                 interfaceConfigOverwrite = {{
                     DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
