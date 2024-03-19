@@ -4,7 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useEffect, useMemo } from 'react';
+import { StrictMode, useEffect, useMemo } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
@@ -50,7 +50,7 @@ function AppWrapper() {
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 			<MezonContextProvider mezon={mezon} connect={true}>
-					<App />
+					<StrictMode><App /></StrictMode>
 					<ToastContainer
 						position="top-right"
 						autoClose={2200}

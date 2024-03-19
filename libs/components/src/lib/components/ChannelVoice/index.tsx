@@ -19,10 +19,6 @@ function ChannelVoice({ clanName, channelLabel, userName }: ChannelVoiceProps) {
 		console.log("externalApi", externalApi);
 	}
 
-	const handleJitsiIFrameRef1 = () => {
-		console.log("handleJitsiIFrameRef1");
-	}
-
     const renderSpinner = () => (
         <div style = {{
             fontFamily: 'sans-serif',
