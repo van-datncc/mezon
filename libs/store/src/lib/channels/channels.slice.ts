@@ -97,7 +97,6 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	}
 
 	const channels = response.channeldesc.map(mapChannelToEntity);
-	console.log(channels);
 
 	return channels;
 });
