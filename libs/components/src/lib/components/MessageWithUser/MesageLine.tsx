@@ -1,3 +1,4 @@
+import MarkdownFormatText from '../MarkdownFormatText';
 import { ILineMention, useMessageLine } from './useMessageLine';
 
 type MessageLineProps = {
@@ -14,7 +15,7 @@ const LineWithMention = ({ mention }: ILinePartWithMention) => {
 	const { matchedText, nonMatchText } = mention;
 	return (
 		<>
-			{nonMatchText && <span>{nonMatchText}</span>}
+			{nonMatchText && <MarkdownFormatText markdown={nonMatchText} />}
 			<MentionSpan text={matchedText} />
 		</>
 	);
