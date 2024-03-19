@@ -4,7 +4,7 @@ import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent } from 
 import { ChannelTypeEnum } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import ChannelMessages from '../../channel/ChanneMessages';
+import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
 
 export default function DirectMessage() {
@@ -38,7 +38,7 @@ export default function DirectMessage() {
 			<div className="flex h-heightWithoutTopBar flex-row ">
 				<div className="flex flex-col flex-1 w-full h-full ">
 					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
-						{<ChannelMessages channelId={directId ?? ''} channelLabel={currentDmGroup?.channel_label} type={currentDmGroup?.user_id?.length === 1?'DM':"GROUP"} avatarDM={currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.channel_avatar : '/assets/images/avatar-group.png'} />}
+						{<ChannelMessages channelId={directId ?? ''} channelLabel={currentDmGroup?.channel_label} type={currentDmGroup?.user_id?.length === 1?'DM':"GROUP"} mode={currentDmGroup?.user_id?.length === 1?4:3} avatarDM={currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.channel_avatar : '/assets/images/avatar-group.png'} />}
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
 						{directId && <ChannelTyping channelId={directId} channelLabel={''} mode={currentDmGroup?.user_id?.length === 1?4:3} />}

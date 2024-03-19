@@ -1,17 +1,18 @@
-import { ChatWelcome } from '@mezon/components';
 import { useAuth, useChatMessages } from '@mezon/core';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
+import { ChatWelcome } from '@mezon/components';
 
 type ChannelMessagesProps = {
 	channelId: string;
 	type: string;
 	channelLabel?: string;
 	avatarDM?: string;
+	mode: number;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM }: ChannelMessagesProps) {
+export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -25,19 +26,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			containerRef.current.scrollTo({ top: 10, behavior: 'smooth' });
 		}
 	};
-
-	const mode = useMemo(() => {
-		if (type === 'channel') {
-			return 2;
-		} else if (type === 'DM') {
-			return 4;
-		} else if (type === "GROUP") {
-			return 3;
-		}
-
-		return 2;
-
-	},[type]);
 
 	useEffect(() => {
 		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
@@ -70,7 +58,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 			>
-				{messages.map((message, i) => (
+				{messages.map((message, i) => (					
 					<ChannelMessage
 						mode={mode}
 						key={message.id}
@@ -78,6 +66,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						message={message}
 						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
 						myUser={userProfile?.user?.id}
+						channelId = {channelId}
+						channelLabel = {channelLabel || ''}
 					/>
 				))}
 			</InfiniteScroll>

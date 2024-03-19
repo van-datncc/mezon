@@ -1,19 +1,29 @@
-import { MemberList } from '@mezon/components';
-import { ChatContext } from '@mezon/core';
+import { ChannelVoice, MemberList } from '@mezon/components';
+import { ChatContext, useAuth, useClans } from '@mezon/core';
 import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
 import { useContext, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import ChannelMessages from './ChanneMessages';
+import ChannelMessages from './ChannelMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
 
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
-	const currentChanel = useSelector(selectCurrentChannel);
+	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
+	const { currentClan } = useClans();
+	const { userProfile } = useAuth();
 
-
+	const renderChannelMedia = () => {
+		if (currentChannel && currentChannel.type === 1) {
+			return <ChannelMessages channelId={currentChannel?.id} channelLabel={currentChannel.channel_label} type="CHANNEL" mode={2}/>
+		} else if (currentChannel && currentChannel?.type === 4) {
+			return <ChannelVoice channelLabel={currentChannel.channel_label || ''} clanName={currentClan?.clan_name} userName={userProfile?.user?.username || "unknown"} />
+		} else {
+			return <ChannelMessages.Skeleton />
+		}
+	}
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden" id="mainChat">
@@ -23,16 +33,12 @@ export default function ChannelLayout() {
 						className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 						ref={messagesContainerRef}
 					>
-						{currentChanel ? (
-							<ChannelMessages channelId={currentChanel?.id} channelLabel={currentChanel.channel_label} type="channel" />
-						) : (
-							<ChannelMessages.Skeleton />
-						)}
+						{renderChannelMedia()}						
 					</div>
 					<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
-						{currentChanel && <ChannelTyping channelId={currentChanel?.id} channelLabel={currentChanel?.channel_label || ''} mode={2} />}
-						{currentChanel ? (
-							<ChannelMessageBox clanId={currentChanel?.clan_id} channelId={currentChanel?.id} channelLabel={currentChanel?.channel_label || ''} mode={2} />
+						{currentChannel && <ChannelTyping channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />}
+						{currentChannel ? (
+							<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />
 						) : (
 							<ChannelMessageBox.Skeleton />
 						)}
