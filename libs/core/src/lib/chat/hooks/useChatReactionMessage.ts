@@ -22,7 +22,6 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			console.log(id, channel.id, channel.chanel_label, mode, messageId, emoji, count, message_sender_id, action_delete)
 			await socket.writeMessageReaction(id, channel.id, channel.chanel_label, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
