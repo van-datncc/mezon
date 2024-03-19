@@ -18,10 +18,10 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
                 <img className="h-[75px] w-[75px] rounded-full flex items-center justify-center" src={avatarDM} />
             )}
             <p className="text-xl md:text-3xl font-bold pt-1">
-                {type == "CHANNEL" ? "Welcome to #" : ""} {name}
+                {type === "CHANNEL" ? "Welcome to #" : ""} {name}
             </p>
             <p className="text-zinc-400 text-sm">
-                {type == "CHANNEL" ? `This is the start of the #${name} channel.` : `This is the start of your conversation with ${name}`}
+                {type === "CHANNEL" ? `This is the start of the #${name} channel.` : `This is the start of your conversation with ${name}`}
             </p>
 
         </div>

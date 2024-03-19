@@ -27,7 +27,7 @@ export type MezonContextValue = {
 	authenticateGoogle: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
-	joinChatChannel: (channelId: string, type: string) => Promise<Channel>;
+	joinChatChannel: (channelId: string) => Promise<Channel>;
 	joinChatDirectMessage: (channelId: string, channelName?: string, channelType?: number) => Promise<Channel>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
 	reconnect: () => Promise<void>;
@@ -146,14 +146,14 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const joinChatChannel = React.useCallback(
-		async (channelId: string, channelLabel: string) => {			
+		async (channelId: string) => {			
 			const socket = socketRef.current;
 
 			if (!socket) {
 				throw new Error('Socket is not initialized');
 			}
 
-			const join = await socket.joinChat(channelId, channelLabel, 2, 1, true, false);
+			const join = await socket.joinChat(channelId, '', 2, 1, true, false); // mode: 2 - channel, type: 1 - Text and voice
 
 			channelRef.current = join;
 			return join;
