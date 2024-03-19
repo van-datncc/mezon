@@ -214,3 +214,9 @@ export enum EmojiPlaces {
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REACTION_BOTTOM',
 	EMOJI_EDITOR = 'EMOJI_EDITOR',
 }
+
+export enum ChannelTypeReactions {
+	CHANNEL_IN_CLAN = 2,
+	DM_CHAT = 3,
+	GROUP_CHAT = 4,
+}

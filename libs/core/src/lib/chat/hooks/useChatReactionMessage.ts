@@ -13,7 +13,7 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 	const messageDataReactedFromSocket = useSelector(selectMessageReacted);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const reactionMessage = useCallback(
-		async (id: string, mode: number, messageId: string, emoji: string, message_sender_id: string, action_delete: boolean) => {
+		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -22,16 +22,16 @@ export function useChatReactionMessage({ currentChannelId }: UseMessageReactionO
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-
-			await socket.writeMessageReaction(id, channel.id, channel.chanel_label, mode, messageId, emoji, message_sender_id, action_delete);
+			console.log(id, channel.id, channel.chanel_label, mode, messageId, emoji, count, message_sender_id, action_delete)
+			await socket.writeMessageReaction(id, channel.id, channel.chanel_label, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
 	const reactionMessageAction = useCallback(
-		async (id: string, mode: number, messageId: string, emoji: string, message_sender_id: string, action_delete: boolean) => {
+		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
 			try {
-				await reactionMessage(id, mode, messageId, emoji, message_sender_id, action_delete);
+				await reactionMessage(id, mode, messageId, emoji, count, message_sender_id, action_delete);
 			} catch (error) {
 				console.error('Error reacting to message:', error);
 			}
