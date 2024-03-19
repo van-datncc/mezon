@@ -38,16 +38,28 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		<>
 			{renderAttachments()}
 			{newMessage !== "" ? (
-				<div>
-					{lineNew?.map((line: string, index: number) => {
-						return <MessageLine line={line} key={index} />;
-					})}
+				<div className='flex '>
+					<div>
+						{lineNew?.map((line: string, index: number) => {
+							return <MessageLine line={line} key={index} />;
+						})}
+					</div>
+					<p className='ml-[5px] opacity-50'>(edit)</p>
 				</div>
 			): (
-				<div>
-					{lines?.map((line: string, index: number) => {
-						return <MessageLine line={line} key={index} />;
-					})}
+				<div className='flex '>
+					<div>
+						{lines?.map((line: string, index: number) => {
+							return <MessageLine line={line} key={index} />;
+						})}
+					</div>
+					{message.update_time ? (
+						<div>
+							{message.create_time < message.update_time ? (
+								<p className='ml-[5px] opacity-50'>(edit)</p>
+							):(null)}
+						</div>
+					):(null)}
 				</div>
 			)}
 		</>

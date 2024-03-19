@@ -80,6 +80,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 		handleUrlInput(messageBreakline).then((attachment) => {
 			handleFinishUpload(attachment);
+		}).catch(() => {;
+			setContent(content + messageBreakline);
 		});
 
 		const mentionedUsers = [];
@@ -92,9 +94,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				});
 			}
 		}
-		setContent(content + messageBreakline);
 		setMentionData(mentionedUsers);
-	}, []);
+	}, [attachmentData]);
 
 	const onConvertToFiles = useCallback((content: string) => {
 		if (content.length > 2000) {
@@ -110,9 +111,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (!client || !session || !currentChannelId) {
 				throw new Error('Client is not initialized');
 			}
-			handleUploadFile(client, session, fullfilename, file).then((attachment) => {
-				handleFinishUpload(attachment);
-			});
+			handleUploadFile(client, session, fullfilename, file)
+				.then((attachment) => {
+					handleFinishUpload(attachment);
+					return 'handled';
+				})
+				.catch((err) => {
+					return 'not-handled';
+				});
 			return;
 		}
 	},[attachmentData]);

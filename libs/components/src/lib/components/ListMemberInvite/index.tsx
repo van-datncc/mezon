@@ -29,7 +29,7 @@ const ListMemberInvite = (props:ModalParam) => {
                 return dmGroup.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase());
             });
 		},
-		[listDMInvite,searchTerm],
+		[listUserInvite,searchTerm],
 	)
     
     const handleSend = (dmGroup : DirectEntity) => {
