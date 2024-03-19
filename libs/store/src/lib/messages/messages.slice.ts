@@ -224,6 +224,7 @@ export type UpdateReactionMessageArgs = {
 	channelId?: string;
 	messageId?: string;
 	emoji?: string;
+	count?: number;
 	userId?: string;
 	action_delete?: boolean;
 	actionRemove?: boolean;
@@ -232,9 +233,9 @@ export type UpdateReactionMessageArgs = {
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
 
-	async ({ id, channelId, messageId, userId, emoji, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
+	async ({ id, channelId, messageId, userId, emoji, count, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
-			await thunkAPI.dispatch(messagesActions.setReactionMessage({ id, channelId, messageId, userId, emoji, actionRemove }));
+			await thunkAPI.dispatch(messagesActions.setReactionMessage({ id, channelId, messageId, userId, emoji, count, actionRemove }));
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -272,7 +273,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
-	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', actionRemove: false },
+	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
 });
 
 export type SetCursorChannelArgs = {
@@ -338,6 +339,7 @@ export const messagesSlice = createSlice({
 				messageId: action.payload.messageId,
 				userId: action.payload.userId,
 				emoji: action.payload.emoji,
+				count: action.payload.count,
 				actionRemove: action?.payload?.actionRemove,
 			};
 		},
