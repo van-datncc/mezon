@@ -2,7 +2,7 @@ import { useAppNavigation, useAppParams } from '@mezon/core';
 import { selectDefaultChannelIdByClanId } from '@mezon/store';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import ChannelMessages from './ChanneMessages';
+import ChannelMessages from './ChannelMessages';
 
 export default function ChannelIndex() {
 	const { clanId } = useAppParams();

@@ -36,6 +36,7 @@ export type MessageWithUserProps = {
 	reactions?: Array<ApiMessageReaction>;
 	isMessNotifyMention?: boolean;
 	mode: number;
+	newMessage?: string;
 };
 
 type SenderInfoOptionals = {
@@ -63,7 +64,7 @@ type EmojiItemOptionals = {
 	sender_name: string;
 };
 
-function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyMention, mode }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyMention, mode, newMessage }: MessageWithUserProps) {
 	const { messageDate } = useMessageParser(message);
 	const { userId } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -494,7 +495,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 									className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
 									style={{ wordBreak: 'break-word' }}
 								>
-									<MessageContent message={message} user={user} isCombine={isCombine} />
+									<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage}/>
 								</div>
 							</div>
 							<div

@@ -41,6 +41,8 @@ function ChannelList() {
 		}, {} as CategoriesState),
 	);
 
+	// console.log('categorize', categorizedChannels);
+
 	const handleToggleCategory = (category: ICategoryChannel, setToTrue?: boolean) => {
 		if (setToTrue) {
 			setCategoriesState((prevState) => ({

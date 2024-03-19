@@ -36,22 +36,16 @@ const SettingListRole = (props: closeEditRole) => {
 		<div className="w-1/3 pr-3 flex flex-col">
 			<div className="font-semibold mb-4 flex">
 				<div className="rotate-90 -ml-[10px]">
-					<Icons.ArrowDown defaultSize="size-7" />
+					<Icons.ArrowDown defaultSize="size-5" />
 				</div>
-				<div className="cursor-pointer tracking-wide" onClick={() => props.handleClose()}>
+				<div className="cursor-pointer tracking-wide text-sm" onClick={() => props.handleClose()}>
 					BACK
 				</div>
 			</div>
 			<div className="overflow-y-scroll flex flex-col gap-y-2">
 				{clickedRole === 'New Role' ? (
 					<div>
-						<button
-							className={`block w-full py-2 px-4 rounded ${
-								clickedRole === 'New Role' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
-							} text-white font-bold`}
-						>
-							{nameRoleNew}
-						</button>
+						<button className={`block w-full py-2 px-4 rounded  bg-gray-500 hover:bg-gray-70 text-white font-bold`}>{nameRoleNew}</button>
 					</div>
 				) : (
 					activeRoles.map((role) => (
