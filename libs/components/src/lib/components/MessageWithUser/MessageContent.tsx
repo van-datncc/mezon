@@ -2,8 +2,8 @@ import { IChannelMember, IMessageWithUser } from '@mezon/utils';
 import MessageLine from './MesageLine';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
-import { useMessageParser } from './useMessageParser';
 import MessageVideo from './MessageVideo';
+import { useMessageParser } from './useMessageParser';
 
 type IMessageContentProps = {
 	user?: IChannelMember | null;
@@ -22,18 +22,15 @@ const MessageContent = ({ user, message, isCombine }: IMessageContentProps) => {
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('mp4') !== -1) {
 			return <MessageVideo attachmentData={attachments[0]} />;
 		}
-		
+
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
 			return <MessageLinkFile attachmentData={attachments[0]} />;
 		}
-	}	
+	};
 	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{renderAttachments()}
-			{lines?.map((line: string, index: number) => {
-				return <MessageLine line={line} key={index} />;
-			})}
+			<MessageLine line={lines as string} />
 		</>
 	);
 };
