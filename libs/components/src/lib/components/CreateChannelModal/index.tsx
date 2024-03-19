@@ -42,7 +42,7 @@ export const CreateNewChannelModal = () => {
 			setIsErrorName("Channel's name is required");
 			return;
 		}
-
+		
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId?.toString(),
 			type: channelType,
@@ -50,6 +50,7 @@ export const CreateNewChannelModal = () => {
 			channel_private: isPrivate,
 			category_id: currentCategory?.category_id,
 		};
+		console.log("body", body)
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
@@ -125,7 +126,7 @@ export const CreateNewChannelModal = () => {
 												error={isErrorType}
 											/>
 											<ChannelTypeComponent
-												disable={true}
+												disable={false}
 												type={ChannelTypeEnum.CHANNEL_VOICE}
 												onChange={onChangeChannelType}
 												error={isErrorType}

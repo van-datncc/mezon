@@ -34,18 +34,6 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
-function waitUntil<T>(condition: () => T | undefined, ms: number = 100): Promise<T> {
-	return new Promise((resolve) => {
-		const interval = setInterval(() => {
-			const result = condition();
-			if (result !== undefined && result !== null) {
-				clearInterval(interval);
-				resolve(result);
-			}
-		}, ms);
-	});
-}
-
 export interface ChannelsRootState {
 	[CHANNELS_FEATURE_KEY]: ChannelsState;
 }
@@ -68,7 +56,7 @@ export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ chann
 		}
 		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.joinChatChannel(channelId, channel?.channel_label || '');
+		await mezon.joinChatChannel(channelId);
 		return channel;
 	} catch (error) {
 		console.log(error);
