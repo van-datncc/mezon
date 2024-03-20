@@ -45,14 +45,16 @@ const SettingListRole = (props: closeEditRole) => {
 			<div className="overflow-y-scroll flex flex-col gap-y-2">
 				{clickedRole === 'New Role' ? (
 					<div>
-						<button className={`block w-full py-2 px-4 rounded  bg-gray-500 hover:bg-gray-70 text-white font-bold`}>{nameRoleNew}</button>
+						<button className={`block w-full py-2 px-4 rounded text-[15px] bg-gray-500 hover:bg-gray-70 text-white font-bold`}>
+							{nameRoleNew}
+						</button>
 					</div>
 				) : (
 					activeRoles.map((role) => (
 						<div key={role.id}>
 							<button
 								onClick={() => handleRoleClick(role.id)}
-								className={`w-full py-2 px-4 rounded ${
+								className={`w-full py-2 px-4 rounded text-[15px] ${
 									clickedRole === role.id ? 'bg-[#535353] font-bold hover:op' : 'bg-[#1E1E1E] hover:font-bold'
 								} text-white truncate`}
 							>

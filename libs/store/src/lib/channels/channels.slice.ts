@@ -1,5 +1,5 @@
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
-import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
+import { ICategory, IChannel, LoadingStatus, UnreadChannel } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { fetchCategories } from '../categories/categories.slice';
@@ -28,8 +28,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	isOpenCreateNewChannel?: boolean;
 	currentCategory: ICategory | null;
 	// newChannelCreatedId: string | undefined;
-	channelLastMessageId: Record<string, string>;
-	channelLastSeenMesageId: Record<string, string>;
+	arrayUnreadChannel: UnreadChannel[];
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -55,6 +54,7 @@ export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ chann
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
 		}
 		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+		// thunkAPI.dispatch(channelsActions.setChannelSeenLastSeenMessageId({ channelId, channelLastSeenMesageId: channel.last_message_id || '' }));
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.joinChatChannel(channelId);
 		return channel;
@@ -97,6 +97,7 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	}
 
 	const channels = response.channeldesc.map(mapChannelToEntity);
+	thunkAPI.dispatch(channelsActions.setArrayUnreadChannel(channels));
 
 	return channels;
 });
@@ -107,8 +108,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	error: null,
 	isOpenCreateNewChannel: false,
 	currentCategory: null,
-	channelLastMessageId: {},
-	channelLastSeenMesageId: {},
+	arrayUnreadChannel: [],
 });
 
 export const channelsSlice = createSlice({
@@ -126,14 +126,29 @@ export const channelsSlice = createSlice({
 		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
 		},
-		setChannelLastMessageId: (state, action: PayloadAction<{ channelId: string; messageId: string }>) => {
-			const { channelId, messageId } = action.payload;
-			state.channelLastMessageId[channelId] = messageId;
-			console.log('dis', state.channelLastMessageId[channelId]);
+		setArrayUnreadChannel: (state, action: PayloadAction<ApiChannelDescription[]>) => {
+			const channels = action.payload;
+			state.arrayUnreadChannel = channels.map((item) => ({
+				channelId: item.channel_id ?? '',
+				channelLastMessageId: item.last_message_id ?? '',
+				channelLastSeenMesageId: item.last_seen_message_id ?? '',
+			}));
 		},
-		setChannelLastSeenMessageId: (state, action: PayloadAction<string>) => {
-			console.log('setChannelLastSeenMessageId');
-			// state.setChannelLastSeenMessageId = action.payload;
+		setChannelLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastMessageId: string }>) => {
+			const { channelId, channelLastMessageId } = action.payload;
+			state.arrayUnreadChannel.forEach((item) => {
+				if (item.channelId === channelId) {
+					item.channelLastMessageId = channelLastMessageId;
+				}
+			});
+		},
+		setChannelSeenLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastSeenMesageId: string }>) => {
+			const { channelId, channelLastSeenMesageId } = action.payload;
+			state.arrayUnreadChannel.forEach((item) => {
+				if (item.channelId === channelId) {
+					item.channelLastSeenMesageId = channelLastSeenMesageId;
+				}
+			});
 		},
 	},
 	extraReducers: (builder) => {
@@ -233,6 +248,8 @@ export const selectChannelsEntities = createSelector(getChannelsState, selectEnt
 export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id] || null);
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
+
+export const selectArrayUnreadChannel = createSelector(getChannelsState, (state) => state.arrayUnreadChannel);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,
