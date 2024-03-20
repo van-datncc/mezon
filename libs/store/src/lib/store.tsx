@@ -17,14 +17,14 @@ import { messagesReducer } from './messages/messages.slice';
 // import { PermissionsUserReducer } from './permissionuser/permissionuser.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 // import { MembersRoleReducer } from './getlistmemberinrole/getListMembersInRole.slice';
+import { usersClanReducer } from './clanMembers/clan.members';
+import { directReducer } from './direct/direct.slice';
+import { friendsReducer } from './friends/friend.slice';
+import { inviteReducer } from './invite/invite.slice';
+import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
-import { directReducer } from './direct/direct.slice';
-import { friendsReducer } from './friends/friend.slice';
-import { usersClanReducer } from './clanMembers/clan.members';
-import { notificationReducer } from './notification/notify.slice';
-import { inviteReducer } from './invite/invite.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -42,8 +42,16 @@ const persistedClansReducer = persistReducer(
 	clansReducer,
 );
 
+const persistedAppReducer = persistReducer(
+	{
+		key: 'apps',
+		storage,
+	},
+	appReducer,
+);
+
 const reducer = {
-	app: appReducer,
+	app: persistedAppReducer,
 	account: accountReducer,
 	auth: persistedReducer,
 	clans: persistedClansReducer,
@@ -64,7 +72,7 @@ const reducer = {
 	policiesDefaultSlice: policiesDefaultReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
-	notification: notificationReducer
+	notification: notificationReducer,
 };
 
 let storeInstance = configureStore({
