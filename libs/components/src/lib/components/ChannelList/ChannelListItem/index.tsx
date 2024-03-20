@@ -1,5 +1,4 @@
-import { useChatMessages } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectArrayUnreadChannel, selectCurrentChannel } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -12,8 +11,8 @@ type ChannelListItemProp = {
 const ChannelListItem = (props: ChannelListItemProp) => {
 	// const dispatch = useDispatch();
 	const currentChanel = useSelector(selectCurrentChannel);
+	const arrayUnreadChannel = useSelector(selectArrayUnreadChannel);
 	const { channel } = props;
-	const { messages } = useChatMessages({ channelId: channel.id });
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
 	));
@@ -22,11 +21,16 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	};
 
 	useEffect(() => {
-		// dispatch(channelsActions.setChannelLastMessageId({ channelId: channel.id, messageId: channel.last_message_id || '' }));
-		// console.log('com', messages[0]?.id);
-		// console.log('com', channel);
-		// console.log(1);
-	}, [messages]);
+		console.log(arrayUnreadChannel);
+	}, [arrayUnreadChannel]);
+
+	const isUnReadChannel = (channelId: string) => {
+		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
+		if (channel && channel.channelLastMessageId === channel.channelLastSeenMesageId) {
+			return true;
+		}
+		return false;
+	};
 
 	return (
 		<ChannelLink
@@ -36,7 +40,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 			key={channel.id}
 			createInviteLink={handleOpenInvite}
 			isPrivate={channel.channel_private}
-			isUnReadChannel={channel.last_message_id === channel.last_seen_message_id}
+			isUnReadChannel={isUnReadChannel(channel.id)}
 		/>
 	);
 };

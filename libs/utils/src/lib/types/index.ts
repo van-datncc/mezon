@@ -215,6 +215,12 @@ export enum EmojiPlaces {
 	EMOJI_EDITOR = 'EMOJI_EDITOR',
 }
 
+export interface UnreadChannel {
+	channelId: string;
+	channelLastMessageId: string;
+	channelLastSeenMesageId: string;
+}
+
 export enum ChannelTypeReactions {
 	CHANNEL_IN_CLAN = 2,
 	DM_CHAT = 3,
