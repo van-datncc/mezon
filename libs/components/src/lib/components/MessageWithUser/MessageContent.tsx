@@ -1,10 +1,10 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useMemo } from 'react';
 import MessageLine from './MesageLine';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
-import { useMessageParser } from './useMessageParser';
 import MessageVideo from './MessageVideo';
-import { useMemo } from 'react';
+import { useMessageParser } from './useMessageParser';
 
 type IMessageContentProps = {
 	user?: IChannelMember | null;
@@ -14,10 +14,10 @@ type IMessageContentProps = {
 };
 
 const MessageContent = ({ user, message, isCombine, newMessage }: IMessageContentProps) => {
-	const lineNew =   useMemo(() => {
-        const values = newMessage?.split('\n');
-		return values
-	}, [newMessage]);   
+	const lineNew = useMemo(() => {
+		const values = newMessage?.split('\n');
+		return values;
+	}, [newMessage]);
 	const { attachments, lines } = useMessageParser(message);
 	const renderAttachments = () => {
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
@@ -28,26 +28,31 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('mp4') !== -1) {
 			return <MessageVideo attachmentData={attachments[0]} />;
 		}
-		
+
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
 			return <MessageLinkFile attachmentData={attachments[0]} />;
 		}
-	}	
+	};
 	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{renderAttachments()}
-			{newMessage !== "" ? (
-				<div>
-					{lineNew?.map((line: string, index: number) => {
-						return <MessageLine line={line} key={index} />;
-					})}
+			{newMessage !== '' ? (
+				<div className="flex ">
+					<div>
+						{lineNew?.map((line: string, index: number) => {
+							return <MessageLine line={line} key={index} />;
+						})}
+					</div>
+					<p className="ml-[5px] opacity-50">(edit)</p>
 				</div>
-			): (
-				<div>
-					{lines?.map((line: string, index: number) => {
-						return <MessageLine line={line} key={index} />;
-					})}
+			) : (
+				<div className="flex ">
+					<div>
+						<MessageLine line={lines as string} />
+					</div>
+					{message.update_time ? (
+						<div>{message.create_time < message.update_time ? <p className="ml-[5px] opacity-50">(edit)</p> : null}</div>
+					) : null}
 				</div>
 			)}
 		</>

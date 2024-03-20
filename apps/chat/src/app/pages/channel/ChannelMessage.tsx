@@ -118,7 +118,12 @@ export function ChannelMessage(props: MessageProps) {
 	);
 	const onchange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setEditMessage(e.target.value);
+		updateTextareaHeight(e.target);
 	};
+	const updateTextareaHeight = (textarea: HTMLTextAreaElement) => {
+		textarea.style.height = 'auto';
+		textarea.style.height = textarea.scrollHeight + 'px';
+	  };
 	
 	return (
 		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
@@ -158,16 +163,13 @@ export function ChannelMessage(props: MessageProps) {
 			</div>
 			{isOpenEdit && mess.id === messageRef?.id && (
 				<div className="inputEdit relative left-[66px] top-[-30px]">
-					<textarea defaultValue={editMessage} className="w-[83%] h-10 bg-black rounded pl-4"
+					<textarea defaultValue={editMessage} className="w-[83%] bg-black rounded pl-4"
 						onKeyDown={onSend} 
 						onChange={(e) => {onchange(e)}}
+						rows={editMessage?.split('\n').length}
 					></textarea>
 					<p className="absolute -bottom-4 text-xs">
-						Change content
-						<span className="text-blue-700 cursor-pointer" onClick={handleCancelEdit}>
-							{' '}
-							exit
-						</span>
+						escape to cancel • enter to save
 					</p>
 				</div>
 			)}

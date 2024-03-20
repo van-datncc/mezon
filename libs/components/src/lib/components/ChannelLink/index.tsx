@@ -46,7 +46,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						{isPrivate === undefined && channel.type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					</div>
 					<p
-						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white' : ''} ${isUnReadChannel ? '' : 'font-bold text-white'}`}
+						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white font-bold' : ''} ${isUnReadChannel ? '' : 'font-bold text-white'}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
@@ -56,7 +56,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				</span>
 			</Link>
 			<AddPerson
-				className={`absolute ml-auto w-4 h-4  top-[6px] right-3 group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} cursor-pointer`}
+				className={`absolute ml-auto w-4 h-4  top-[6px] right-3 hidden group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} cursor-pointer`}
 				onClick={handleCreateLinkInvite}
 			/>
 		</div>
