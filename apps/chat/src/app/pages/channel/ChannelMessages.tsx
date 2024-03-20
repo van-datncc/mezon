@@ -20,18 +20,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const fetchData = () => {
 		loadMoreMessage();
 	};
-
-	const goBottom = () => {
-		if (containerRef.current !== null) {
-			containerRef.current.scrollTo({ top: 10, behavior: 'smooth' });
-		}
-	};
-
-	useEffect(() => {
-		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
-			goBottom();
-		}
-	}, [messages[0]]);
+	
 
 	return (
 		<div
@@ -60,7 +49,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			>
 				{messages.map((message, i) => (					
 					<ChannelMessage
-						mode={mode}
+												mode={mode}
 						key={message.id}
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}

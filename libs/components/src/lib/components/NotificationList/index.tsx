@@ -1,4 +1,4 @@
-import { useNotification } from '@mezon/core';
+import { useCategory, useChannels, useNotification } from '@mezon/core';
 import { Dropdown } from 'flowbite-react';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useState } from 'react';
@@ -19,6 +19,9 @@ function NotificationList() {
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
+	const { channels } = useChannels();
+	const notificationItem = notification.filter(item => item.code !== -9 && channels.some(channel => channel.channel_id === item.content.channel_id));
+	const notifyMentionItem = notification.filter(item => item.code === -9 && channels.some(channel => channel.channel_id === item.content.channel_id));
 
 	return (
 		<Dropdown
@@ -56,8 +59,7 @@ function NotificationList() {
 			</div>
 			{currentTabNotify === 'individual' && (
 				<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
-					{notification
-						.filter((item) => item.code !== -9)
+					{notificationItem
 						.map((notify: INotification) => (
 							<NotificationItem notify={notify} key={notify.id} />
 						))}
@@ -65,8 +67,7 @@ function NotificationList() {
 			)}
 			{currentTabNotify === 'mention' && (
 				<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
-					{notification
-						.filter((item) => item.code === -9)
+					{notifyMentionItem
 						.map((notify: INotification) => (
 							<NotifyMentionItem notify={notify} key={notify.id} />
 						))}
