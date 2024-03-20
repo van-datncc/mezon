@@ -1,59 +1,43 @@
-
-import JitsiMeetJS from '@mezon/lib-jitsi-meet/dist/esm/JitsiMeetJS'
+import { connectToMeetServer, createAndJoinRoom, createTracksAndAddToRoom } from "@mezon/transport";
+import JitsiConnection from "@mezon/lib-jitsi-meet/dist/esm/JitsiConnection";
+import JitsiMeetJS from "@mezon/lib-jitsi-meet/dist/esm/JitsiMeetJS";
+import JitsiLocalTrack from "@mezon/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLocalTrack";
 
 export type ChannelVoiceProps = {
-	clanName?: string;
-	channelLabel: string;
-    userName: string;
-    jwt: string;
+  clanName?: string;
+  channelLabel: string;
+  userName: string;
+  jwt: string;
 };
 
-function ChannelVoice({ clanName, channelLabel, userName, jwt }: ChannelVoiceProps) {    
+function ChannelVoice({ clanName, channelLabel, userName, jwt }: ChannelVoiceProps) { 
+    let videoTracks: JitsiLocalTrack[];
+    let audioTracks: JitsiLocalTrack[];
+    function connect() {
+        const roomName = clanName+"/"+channelLabel;
+        connectToMeetServer(roomName).then((connection) => {
+            return createAndJoinRoom(connection as JitsiConnection, roomName);
+        })
+        .then(room => {
+            room.on(JitsiMeetJS.events.conference.TRACK_ADDED, track => addTrack(track));
+            createTracksAndAddToRoom(room);
+        })
+        .catch(error => console.error(error));
+    }
 
-    const options = {
-        hosts: {
-          domain: 'meet.mezon.vn',
-          muc: 'conference.meet.mezon.vn', // MUC domain
-        },
-        serviceUrl: 'https://meet.mezon.vn/http-bind', // BOSH server
-      };
+    function addTrack(track: JitsiLocalTrack) {
+        if (track.getType() === 'video') {
+            videoTracks.push(track);
+        } else if (track.getType() === 'audio') {
+            audioTracks.push(track);
+        } 
+    }
 
-    const initJitsi = () => {
-        const connection = new JitsiMeetJS.JitsiConnection("mezon", "token", options);
-      
-        connection.addEventListener(
-          JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-          onConnectionSuccess
-        );
-        connection.addEventListener(
-          JitsiMeetJS.events.connection.CONNECTION_FAILED,
-          onConnectionFailed
-        );
-        connection.addEventListener(
-          JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-          disconnect
-        );
-      
-        connection.connect(options);
-    };
-    
-    const onConnectionSuccess = () => {
-        console.log('Connection Established Successfully!');
-    };
-    
-    const onConnectionFailed = () => {
-        console.error('Connection Failed!');
-    };
-    
-    const disconnect = () => {
-        console.log('Disconnected!');
-    };
-
-    initJitsi()
+    connect();
 
     return (
         <div className="space-y-2 px-4 mb-4 mt-[250px]" >            
-            
+          
         </div>
     ); 
 }
