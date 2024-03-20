@@ -251,6 +251,8 @@ export const selectCurrentChannelId = createSelector(getChannelsState, (state) =
 
 export const selectArrayUnreadChannel = createSelector(getChannelsState, (state) => state.arrayUnreadChannel);
 
+export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
+
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,
 );
