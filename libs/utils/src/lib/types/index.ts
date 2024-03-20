@@ -12,7 +12,6 @@ import {
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
-
 import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
@@ -213,3 +212,9 @@ export interface UnreadChannel {
 	channelLastSeenMesageId: string;
 }
 
+export enum TabNamePopup {
+	NONE ='NONE',
+	GIFS = 'GIFS',
+	STICKERS = 'STICKER',
+	EMOJI = 'EMOJI',
+}

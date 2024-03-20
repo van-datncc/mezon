@@ -24,6 +24,7 @@ export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessage } from './components/ReplyMessage';
 export { default as UserMentionList } from './components/UserMentionList';
 export { default as SettingAccount } from './components/SettingAccount';
+export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis';
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

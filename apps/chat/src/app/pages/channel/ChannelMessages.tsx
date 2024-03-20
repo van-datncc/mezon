@@ -1,8 +1,9 @@
-import { useAuth, useChatMessages } from '@mezon/core';
-import { useEffect, useRef } from 'react';
+import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
+import { ChatContext, useAuth, useChatMessages } from '@mezon/core';
+import { TabNamePopup } from '@mezon/utils';
+import { useContext, useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
-import { ChatWelcome } from '@mezon/components';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -33,8 +34,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		}
 	}, [messages[0]]);
 
+	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
+
 	return (
 		<div
+			onClick={(e) => {
+				e.stopPropagation();
+				setActiveTab(TabNamePopup.NONE);
+				setIsOpenEmojiMessBox(false);
+				setIsOpenEmojiReacted(false);
+				setIsOpenEmojiReactedBottom(false);
+			}}
+			className=" relative"
 			id="scrollLoading"
 			ref={containerRef}
 			style={{
@@ -58,7 +69,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 			>
-				{messages.map((message, i) => (					
+				{messages.map((message, i) => (
 					<ChannelMessage
 						mode={mode}
 						key={message.id}
@@ -66,11 +77,21 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						message={message}
 						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
 						myUser={userProfile?.user?.id}
-						channelId = {channelId}
-						channelLabel = {channelLabel || ''}
+						channelId={channelId}
+						channelLabel={channelLabel || ''}
 					/>
 				))}
 			</InfiniteScroll>
+			{activeTab !== TabNamePopup.NONE && (
+				<div
+					className="absolute bottom-2 right-2 z-10"
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)}
 		</div>
 	);
 }

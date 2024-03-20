@@ -5,7 +5,7 @@ import data from '@emoji-mart/data';
 import { ChatContext, useChatMessages } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { EmojiPlaces, IMessageSendPayload } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload, TabNamePopup } from '@mezon/utils';
 import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
@@ -206,7 +206,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					return 'not-handled';
 				});
 
-			// setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
 
 			return 'not-handled';
 		},
@@ -322,7 +321,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		if (emojiSelectedMess) {
-			// onFocusEditorState();
 			moveSelectionToEnd();
 		}
 	}, [emojiSelectedMess]);
@@ -344,12 +342,24 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			return newEditorState;
 		});
-		// onFocusEditorState();
 	}
+	const { activeTab, setActiveTab } = useContext(ChatContext);
+
+	const handleOpenGifs = (event: React.MouseEvent<HTMLDivElement>) => {
+		setActiveTab(TabNamePopup.GIFS);
+		// setIsOpenPopupGifStickerEmoj(!isOpenPopupGifStickerEmoj);
+		event.stopPropagation();
+	};
+
+	const handleOpenStickers = (event: React.MouseEvent<HTMLDivElement>) => {
+		setActiveTab(TabNamePopup.STICKERS);
+		setMessageRef(undefined);
+		event.stopPropagation();
+	};
 
 	const handleOpenEmoji = (event: React.MouseEvent<HTMLDivElement>) => {
+		setActiveTab(TabNamePopup.EMOJI);
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
-		setIsOpenEmojiMessBox(!isOpenEmojiMessBox);
 		setMessageRef(undefined);
 		event.stopPropagation();
 	};
@@ -528,13 +538,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 	return (
 		<div className="relative">
-			{isOpenEmojiMessBox && (
-				<div className="w-full relative">
-					<div className="scale-75 transform right-5 mt-0 z-10 top-[-25rem] absolute">
-						<EmojiPicker messageEmoji={undefined} emojiAction={EmojiPlaces.EMOJI_EDITOR} />
-					</div>
-				</div>
-			)}
+
 
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				{showEmojiSuggestion && (
@@ -612,10 +616,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 
 					<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
-						<Icons.Gif />
-						<Icons.Help />
+						<div onClick={handleOpenGifs} className="cursor-pointer">
+							<Icons.Gif defaultFill={`${activeTab === TabNamePopup.GIFS ? '#FFFFFF' : '#AEAEAE'}`} />
+						</div>
+
+						<div onClick={handleOpenStickers} className="cursor-pointer">
+							<Icons.Sticker defaultFill={`${activeTab === TabNamePopup.STICKERS ? '#FFFFFF' : '#AEAEAE'}`} />
+						</div>
+
 						<div onClick={handleOpenEmoji} className="cursor-pointer">
-							<Icons.Smile defaultFill={`${isOpenEmojiMessBox ? '#FFFFFF' : '#AEAEAE'}`} />
+							<Icons.Smile defaultFill={`${activeTab === TabNamePopup.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
 						</div>
 					</div>
 				</div>
