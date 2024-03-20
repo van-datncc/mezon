@@ -11,7 +11,6 @@ import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
-import EmojiPicker from '../EmojiPicker';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
@@ -205,7 +204,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					return 'not-handled';
 				});
 
-
 			return 'not-handled';
 		},
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
@@ -333,6 +331,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
 	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
+	const { heightEditor, setHeightEditor } = useContext(ChatContext);
+
+	useEffect(() => {
+		setHeightEditor(editorHeight ?? 50);
+	}, [editorHeight]);
+
 
 	function handleEmojiClick(clickedEmoji: string) {
 		setEditorState((prevEditorState) => {
@@ -346,7 +350,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const handleOpenGifs = (event: React.MouseEvent<HTMLDivElement>) => {
 		setActiveTab(TabNamePopup.GIFS);
-		// setIsOpenPopupGifStickerEmoj(!isOpenPopupGifStickerEmoj);
 		event.stopPropagation();
 	};
 
@@ -537,8 +540,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 	return (
 		<div className="relative">
-
-
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				{showEmojiSuggestion && (
 					<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">

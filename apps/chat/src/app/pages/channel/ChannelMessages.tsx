@@ -1,7 +1,7 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { ChatContext, useAuth, useChatMessages } from '@mezon/core';
 import { TabNamePopup } from '@mezon/utils';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -17,6 +17,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const containerRef = useRef<HTMLDivElement>(null);
+	const { heightEditor } = useContext(ChatContext);
+
 
 	const fetchData = () => {
 		loadMoreMessage();
@@ -35,6 +37,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [messages[0]]);
 
 	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
+
+	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
+
+	useEffect(() => {
+		setPopupClass(`fixed right-[1rem] bottom-[${heightEditor + 20}px] z-10`);
+	}, [heightEditor]);
+
 
 	return (
 		<div
@@ -84,7 +93,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			</InfiniteScroll>
 			{activeTab !== TabNamePopup.NONE && (
 				<div
-					className="absolute bottom-2 right-2 z-10"
+					className={popupClass}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}

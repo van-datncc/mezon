@@ -48,11 +48,14 @@ export type ChatContextValue = {
 	widthEmojiBar: number;
 	setWidthEmojiBar: React.Dispatch<React.SetStateAction<number>>;
 
-	isOpenPopupGifStickerEmoj: boolean;
-	setIsOpenPopupGifStickerEmoj: React.Dispatch<React.SetStateAction<boolean>>;
+	// isOpenPopupGifStickerEmoj: boolean;
+	// setIsOpenPopupGifStickerEmoj: React.Dispatch<React.SetStateAction<boolean>>;
 
 	activeTab: string;
 	setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+
+	heightEditor: number;
+	setHeightEditor: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -68,8 +71,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom] = React.useState<boolean>(false);
 	const [emojiPlaceActive, setEmojiPlaceActive] = React.useState<string>('');
 	const [widthEmojiBar, setWidthEmojiBar] = React.useState<number>(0);
-	const [isOpenPopupGifStickerEmoj, setIsOpenPopupGifStickerEmoj] = React.useState<boolean>(false);
 	const [activeTab, setActiveTab] = React.useState<string>(TabNamePopup.NONE);
+	const [heightEditor, setHeightEditor] = React.useState<number>(50);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -93,10 +96,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setWidthEmojiBar,
 			isOpenEmojiReactedBottom,
 			setIsOpenEmojiReactedBottom,
-			isOpenPopupGifStickerEmoj,
-			setIsOpenPopupGifStickerEmoj,
 			activeTab,
 			setActiveTab,
+			heightEditor,
+			setHeightEditor,
 		}),
 		[
 			messageRef,
@@ -119,10 +122,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setWidthEmojiBar,
 			isOpenEmojiReactedBottom,
 			setIsOpenEmojiReactedBottom,
-			isOpenPopupGifStickerEmoj,
-			setIsOpenPopupGifStickerEmoj,
 			activeTab,
 			setActiveTab,
+			heightEditor,
+			setHeightEditor,
 		],
 	);
 
