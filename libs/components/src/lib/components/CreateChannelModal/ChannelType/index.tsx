@@ -1,6 +1,6 @@
-import { ChannelTypeEnum } from '@mezon/utils';
 import React from 'react';
 import * as Icons from '../../Icons';
+import { ChannelType } from '@mezon/mezon-js';
 
 interface ChannelTypeProps {
 	type: number;
@@ -10,33 +10,33 @@ interface ChannelTypeProps {
 }
 
 const iconMap = {
-	[ChannelTypeEnum.CHANNEL_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelTypeEnum.CHANNEL_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
-	[ChannelTypeEnum.FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
-	[ChannelTypeEnum.ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
 	// 2 lines below only get index
-	[ChannelTypeEnum.DM_CHAT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelTypeEnum.GROUP_CHAT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+	[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 };
 
 const labelMap = {
-	[ChannelTypeEnum.CHANNEL_TEXT]: 'Text',
-	[ChannelTypeEnum.CHANNEL_VOICE]: 'Voice',
-	[ChannelTypeEnum.FORUM]: 'Forum',
-	[ChannelTypeEnum.ANNOUNCEMENT]: 'Announcement',
+	[ChannelType.CHANNEL_TYPE_TEXT]: 'Text',
+	[ChannelType.CHANNEL_TYPE_VOICE]: 'Voice',
+	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
+	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Announcement',
 	// 2 lines below only get index
-	[ChannelTypeEnum.DM_CHAT]: '',
-	[ChannelTypeEnum.GROUP_CHAT]: '',
+	[ChannelType.CHANNEL_TYPE_DM]: '',
+	[ChannelType.CHANNEL_TYPE_GROUP]: '',
 };
 
 const descriptionMap = {
-	[ChannelTypeEnum.CHANNEL_TEXT]: 'Send messages, images, GIFs, emoji, opinions, and puns',
-	[ChannelTypeEnum.CHANNEL_VOICE]: 'Hang out together with voice, video, and screen share',
-	[ChannelTypeEnum.FORUM]: 'Create a space for organized discussions',
-	[ChannelTypeEnum.ANNOUNCEMENT]: 'Important updates for people in and out of the server',
+	[ChannelType.CHANNEL_TYPE_TEXT]: 'Send messages, images, GIFs, emoji, opinions, and puns',
+	[ChannelType.CHANNEL_TYPE_VOICE]: 'Hang out together with voice, video, and screen share',
+	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
+	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Important updates for people in and out of the server',
 	// 2 lines below only get index
-	[ChannelTypeEnum.DM_CHAT]: '',
-	[ChannelTypeEnum.GROUP_CHAT]: '',
+	[ChannelType.CHANNEL_TYPE_DM]: '',
+	[ChannelType.CHANNEL_TYPE_GROUP]: '',
 };
 
 export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChange, error, disable }) => {
@@ -48,13 +48,13 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 		<div
 			className={`Frame403 self-stretch px-2 py-2 bg-[#1E1E1E] rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'hover:bg-[#2E2E2E]'}  ${error ? 'border border-red-500' : ' border border-[#1E1E1E]'}`}
 		>
-			<div className="ChannelChat w-6 h-6 relative">{iconMap[type as ChannelTypeEnum]}</div>
+			<div className="ChannelChat w-6 h-6 relative">{iconMap[type as ChannelType]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
 				<div className="Text self-stretch text-stone-300 text-sm font-bold font-['Manrope'] leading-normal text-[10px]">
-					<p>{labelMap[type as ChannelTypeEnum]}</p>
+					<p>{labelMap[type as ChannelType]}</p>
 				</div>
 				<div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal font-['Manrope'] leading-[18.20px] text-[10px] w-widthChannelTypeText">
-					<p className="one-line">{descriptionMap[type as ChannelTypeEnum]}</p>
+					<p className="one-line">{descriptionMap[type as ChannelType]}</p>
 				</div>
 			</div>
 			<div className={`RadioButton p-0.5 justify-start items-start flex `}>

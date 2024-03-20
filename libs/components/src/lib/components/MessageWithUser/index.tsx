@@ -2,7 +2,6 @@ import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import {
-	ChannelTypeReactions,
 	EmojiPlaces,
 	IChannelMember,
 	IMessageWithUser,
@@ -19,6 +18,7 @@ import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
+import { ChannelStreamMode } from '@mezon/mezon-js';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -327,7 +327,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		if (messageRef?.id === message.id && emojiSelectedReacted)
 			handleReactMessage(
 				'',
-				ChannelTypeReactions.CHANNEL_IN_CLAN,
+				ChannelStreamMode.STREAM_MODE_CHANNEL,
 				currentChannelId ?? '',
 				messageRef?.id ?? '',
 				emojiSelectedReacted ?? '',
@@ -411,7 +411,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		message_sender_id: string,
 		countRemoved: number,
 	) => {
-		await reactionMessageAction('', ChannelTypeReactions.CHANNEL_IN_CLAN, messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessageAction('', ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 	function removeSenderBySenderId(emojiData: EmojiDataOptionals, senderId: string) {
 		if (emojiData.senders) {
@@ -496,7 +496,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 															onClick={() =>
 																handleReactMessage(
 																	emoji.id,
-																	ChannelTypeReactions.CHANNEL_IN_CLAN,
+																	ChannelStreamMode.STREAM_MODE_CHANNEL,
 																	currentChannelId ?? '',
 																	message.id,
 																	emoji.emoji,
@@ -522,7 +522,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 
 															{isHoverSender && emoji === isEmojiHover && emoji.messageId === message.id && (
 																<div
-                                  onMouseLeave={()=>{setIsHoverSender(false)}}
+                                  									onMouseLeave={()=>{setIsHoverSender(false)}}
 																	onClick={(e) => e.stopPropagation()}
 																	className="absolute z-20  bottom-7 left-0 w-[18rem]
 															 		bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border"

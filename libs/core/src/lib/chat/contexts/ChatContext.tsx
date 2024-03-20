@@ -10,7 +10,7 @@ import {
 	MessageTypingEvent,
 	Notification,
 	StatusPresenceEvent,
-} from 'vendors/mezon-js/packages/mezon-js/dist';
+} from '@mezon/mezon-js';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 

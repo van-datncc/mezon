@@ -1,4 +1,4 @@
-import { ChannelTypeEnum } from '@mezon/utils';
+import { ChannelType } from '@mezon/mezon-js';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
 
@@ -16,13 +16,13 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 	};
 
 	const iconMap = {
-		[ChannelTypeEnum.CHANNEL_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-		[ChannelTypeEnum.CHANNEL_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
-		[ChannelTypeEnum.FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
-		[ChannelTypeEnum.ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: <Icons.Announcement defaultSize="w-6 h-6" />,
 		// 2 lines below only get index
-		[ChannelTypeEnum.DM_CHAT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-		[ChannelTypeEnum.GROUP_CHAT]: <Icons.Speaker defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
+		[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Speaker defaultSize="w-6 h-6" />,
 	};
 
 	return (
@@ -32,7 +32,7 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 				<div
 					className={`InputContainer self-stretch h-11 px-4 py-3 bg-neutral-950 rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
 				>
-					{type === -1 ? [] : iconMap[type as ChannelTypeEnum]}
+					{type === -1 ? [] : iconMap[type as ChannelType]}
 					<div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">
 						<input
 							className="Input grow shrink basis-0 h-10 outline-none bg-neutral-950 text-neutral-200 text-sm font-normal font-['Manrope'] placeholder-[#AEAEAE]"

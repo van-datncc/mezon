@@ -1,8 +1,9 @@
 import { useAppNavigation } from '@mezon/core';
-import { ChannelStatusEnum, ChannelTypeEnum, IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Link } from 'react-router-dom';
 import * as Icons from '../Icons';
 import { AddPerson } from '../Icons';
+import { ChannelType } from '@mezon/mezon-js';
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -36,14 +37,14 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
-						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelTypeEnum.CHANNEL_VOICE && (
+						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
 							<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 						)}
-						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelTypeEnum.CHANNEL_TEXT && (
+						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
 							<Icons.HashtagLocked defaultSize="w-5 h-5 " />
 						)}
-						{isPrivate === undefined && channel.type === ChannelTypeEnum.CHANNEL_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
-						{isPrivate === undefined && channel.type === ChannelTypeEnum.CHANNEL_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
+						{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
+						{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					</div>
 					<p
 						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white font-bold' : ''} ${isUnReadChannel ? '' : 'font-bold text-white'}`}

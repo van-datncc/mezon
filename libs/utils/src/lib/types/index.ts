@@ -1,4 +1,4 @@
-import { ChannelMessage } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelType } from '@mezon/mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -11,6 +11,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
+
 
 import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
@@ -179,20 +180,11 @@ export enum ChannelStatusEnum {
 	isPrivate = 1,
 }
 
-export enum ChannelTypeEnum {
-	CHANNEL_TEXT = 1,
-	DM_CHAT = 2,
-	GROUP_CHAT = 3,
-	CHANNEL_VOICE = 4,
-	FORUM = 5,
-	ANNOUNCEMENT = 6,
-}
-
 export interface ChannelProps {
 	name?: string;
 	isPrivate?: ChannelStatusEnum;
 	categories?: Record<string, CategoryProps>;
-	type: ChannelTypeEnum;
+	type: ChannelType;
 }
 
 export interface CategoryProps {
@@ -221,8 +213,3 @@ export interface UnreadChannel {
 	channelLastSeenMesageId: string;
 }
 
-export enum ChannelTypeReactions {
-	CHANNEL_IN_CLAN = 2,
-	DM_CHAT = 3,
-	GROUP_CHAT = 4,
-}

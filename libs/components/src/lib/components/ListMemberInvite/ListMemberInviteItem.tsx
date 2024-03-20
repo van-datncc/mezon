@@ -2,6 +2,7 @@ import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { DirectEntity, UsersClanEntity } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
+import { ChannelType } from '@mezon/mezon-js';
 
 type ItemPorp = {
 	url: string;
@@ -19,7 +20,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			mezon.joinChatDirectMessage(response.channel_id, '', 2);
+			mezon.joinChatDirectMessage(response.channel_id, '', ChannelType.CHANNEL_TYPE_DM);
 			sendInviteMessage(url, response.channel_id);
 		}
 	};
