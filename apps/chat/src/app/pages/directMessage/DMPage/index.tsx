@@ -1,11 +1,11 @@
 import { DirectMessageBox, DmTopbar, MemberListGroupChat } from '@mezon/components';
 import { useAppNavigation, useAppParams, useDirectMessages } from '@mezon/core';
 import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent } from '@mezon/store';
-import { ChannelTypeEnum } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
+import { ChannelType } from '@mezon/mezon-js';
 
 export default function DirectMessage() {
 	// TODO: move selector to store
@@ -45,7 +45,7 @@ export default function DirectMessage() {
 						<DirectMessageBox directParamId={directId ?? ''} mode={currentDmGroup?.user_id?.length === 1?4:3} />
 					</div>
 				</div>
-				{Number(type) === ChannelTypeEnum.GROUP_CHAT && (
+				{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
 					<div className="w-[268px] bg-bgSurface  lg:flex hidden">
 						<MemberListGroupChat directMessageId={directId} />
 					</div>
