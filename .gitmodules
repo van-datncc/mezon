@@ -1,6 +1,3 @@
 [submodule "vendors/mezon-js"]
 	path = vendors/mezon-js
 	url = git@github.com:nccasia/mezon-js.git
-[submodule "vendors/mezon-voice-react-sdk"]
-	path = vendors/mezon-voice-react-sdk
-	url = git@github.com:nccasia/mezon-voice-react-sdk.git
