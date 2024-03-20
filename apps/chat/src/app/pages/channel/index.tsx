@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import ChannelMessages from './ChannelMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
+import { useMezon } from '@mezon/transport';
 
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
@@ -14,12 +15,13 @@ export default function ChannelLayout() {
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
+	const { sessionRef } = useMezon();
 
 	const renderChannelMedia = () => {
 		if (currentChannel && currentChannel.type === 1) {
 			return <ChannelMessages channelId={currentChannel?.id} channelLabel={currentChannel.channel_label} type="CHANNEL" mode={2}/>
 		} else if (currentChannel && currentChannel?.type === 4) {
-			return <ChannelVoice channelLabel={currentChannel.channel_label || ''} clanName={currentClan?.clan_name} userName={userProfile?.user?.username || "unknown"} />
+			return <ChannelVoice jwt={sessionRef.current?.token || ''} channelLabel={currentChannel.channel_label || ''} clanName={currentClan?.clan_name} userName={userProfile?.user?.username || "unknown"} />
 		} else {
 			return <ChannelMessages.Skeleton />
 		}
