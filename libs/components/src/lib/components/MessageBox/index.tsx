@@ -36,7 +36,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const currentChanel = useSelector(selectCurrentChannel);
 	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
-	console.log(currentChanel);
 
 	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());

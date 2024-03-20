@@ -22,7 +22,7 @@ function FooterProfile({ name, status, avatar, openSetting }: FooterProfileProps
 			<div className="flex items-center gap-2 iconHover bgHover">
 				<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 iconRed" />
 				<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80" />
-				<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80" onClick={openSetting} />
+				<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 text-[#AEAEAE]" onClick={openSetting} />
 			</div>
 		</button>
 	);

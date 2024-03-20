@@ -10,6 +10,8 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
+    "allowJs": true,    
+    "checkJs": false,
     "lib": [
       "es2020",
       "dom"
@@ -41,6 +43,9 @@
       ],
       "@mezon/utils": [
         "libs/utils/src/index.ts"
+      ],
+      "@mezon/lib-jitsi-meet": [
+        "./node_modules/@mezon/lib-jitsi-meet/types"
       ],
       "react": [
         "./node_modules/@types/react"
