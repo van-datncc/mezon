@@ -1,4 +1,4 @@
-import { useChatMessages, useNotification } from '@mezon/core';
+import { useAppNavigation, useChatMessages, useClans, useNotification } from '@mezon/core';
 import { INotification, selectChannelById, selectClanById, selectMemberClanByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -44,24 +44,29 @@ function parseObject(obj: any) {
 
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const { deleteNotify } = useNotification();	
-	const user = notify.sender_id ? useSelector(selectMemberClanByUserId(notify.sender_id)) : null;
-	const channelInfo = notify.content?.channel_id ? useSelector(selectChannelById(notify.content.channel_id)) : null;
-	const clanInfo = channelInfo?.clan_id ? useSelector(selectClanById(channelInfo.clan_id)) : null;
+	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
+	const { currentClan } = useClans();
+	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
-	console.log("content", notify.content);
-	const { jumpToMessage } = useChatMessages({ channelId:data.channel_id });
+	const {toMessageChannel , navigate} = useAppNavigation();
+
+	const { jumpToMessage } = useChatMessages({ channelId:data.channel_id, clanId: currentClan?.id });
+	const jump = async (messId : string) => {
+		await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
+		jumpToMessage(data.message_id);
+	}
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
 			<div className="flex justify-between">
 				<div className="flex flex-row items-center gap-2">
 					<div>
-						{clanInfo?.logo ? (
-							<img src={clanInfo.logo} className="rounded-full size-10 object-cover" />
+						{currentClan?.logo ? (
+							<img src={currentClan.logo} className="rounded-full size-10 object-cover" />
 						) : (
 							<div>
-								{clanInfo?.clan_name && (
+								{currentClan?.clan_name && (
 									<div className="w-[45px] h-[45px] bg-bgDisable flex justify-center items-center text-contentSecondary text-[20px] rounded-xl">
-										{clanInfo.clan_name.charAt(0).toUpperCase()}
+										{currentClan.clan_name.charAt(0).toUpperCase()}
 									</div>
 								)}
 							</div>
@@ -72,7 +77,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 							# <p className=" hover:underline">{channelInfo?.channel_label}</p>
 						</div>
 						<div className="text-[10px] uppercase">
-							{clanInfo?.clan_name} {'>'} {channelInfo?.category_name}
+							{currentClan?.clan_name} {'>'} {channelInfo?.category_name}
 						</div>
 					</div>
 				</div>
@@ -88,9 +93,9 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 			</div>
 			<div className="bg-bgTertiary rounded-[8px] relative group">
 				<button
-					className="absolute py-1 px-2 bg-bgSecondary top-[10px] right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+					className="absolute py-1 px-2 bg-bgSecondary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 					onClick={() => {
-						jumpToMessage(data.message_id);
+						jump(data.message_id);
 					}}					
 				>
 					Jump
