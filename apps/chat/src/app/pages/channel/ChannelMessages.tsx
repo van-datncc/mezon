@@ -19,7 +19,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { heightEditor } = useContext(ChatContext);
 
-
 	const fetchData = () => {
 		loadMoreMessage();
 	};
@@ -36,14 +35,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		}
 	}, [messages[0]]);
 
-	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom } = useContext(ChatContext);
+	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom, setValueInput } =
+		useContext(ChatContext);
 
 	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
 
 	useEffect(() => {
 		setPopupClass(`fixed right-[1rem] bottom-[${heightEditor + 20}px] z-10`);
 	}, [heightEditor]);
-
 
 	return (
 		<div
@@ -53,6 +52,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				setIsOpenEmojiMessBox(false);
 				setIsOpenEmojiReacted(false);
 				setIsOpenEmojiReactedBottom(false);
+				setValueInput('');
 			}}
 			className=" relative"
 			id="scrollLoading"

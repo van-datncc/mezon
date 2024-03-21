@@ -48,14 +48,14 @@ export type ChatContextValue = {
 	widthEmojiBar: number;
 	setWidthEmojiBar: React.Dispatch<React.SetStateAction<number>>;
 
-	// isOpenPopupGifStickerEmoj: boolean;
-	// setIsOpenPopupGifStickerEmoj: React.Dispatch<React.SetStateAction<boolean>>;
-
 	activeTab: string;
 	setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 
 	heightEditor: number;
 	setHeightEditor: React.Dispatch<React.SetStateAction<number>>;
+
+	valueInput: string;
+	setValueInput: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -73,6 +73,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [widthEmojiBar, setWidthEmojiBar] = React.useState<number>(0);
 	const [activeTab, setActiveTab] = React.useState<string>(TabNamePopup.NONE);
 	const [heightEditor, setHeightEditor] = React.useState<number>(50);
+	const [valueInput, setValueInput] = React.useState<string>('');
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -100,6 +101,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setActiveTab,
 			heightEditor,
 			setHeightEditor,
+			valueInput,
+			setValueInput,
 		}),
 		[
 			messageRef,
@@ -126,6 +129,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setActiveTab,
 			heightEditor,
 			setHeightEditor,
+			valueInput,
+			setValueInput,
 		],
 	);
 

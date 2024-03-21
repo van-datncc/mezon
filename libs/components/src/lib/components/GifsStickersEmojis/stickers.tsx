@@ -67,7 +67,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 	const [selectedType, setSelectedType] = useState('');
 	const [selectImage, setSelectImage] = useState<any>(images);
 	const handleClickImage = (imageUrl: string) => {
-		handleSend({ t: '' }, [], [{ url: imageUrl, height: 20, width: 20 }], []);
+		handleSend({ t: '' }, [], [{ url: imageUrl, height: 40, width: 40, filetype: 'image/gif' }], []);
 	};
 
 	const handleClickAvt = (type: string) => {

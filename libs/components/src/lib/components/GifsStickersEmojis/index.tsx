@@ -3,8 +3,9 @@ import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../components';
 import EmojiPicker from '../EmojiPicker';
+import GiphyComp from './gifs/gifs';
+import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
 
 const GifStickerEmojiPopup = () => {
@@ -38,22 +39,15 @@ const GifStickerEmojiPopup = () => {
 						Emoji
 					</button>
 				</div>
-				<div
-					className={`transition-all duration-300 h-8 pl-4 pr-2 py-3 bg-[#1E1F22] relative rounded items-center inline-flex w-[97%] m-2 text-center`}
-				>
-					<input
-						type="text"
-						placeholder="Search"
-						className="text-[#AEAEAE] font-['Manrope'] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
-					/>
-					<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-[#1E1F22] top-1/4 transform -translate-y-1/2 m-2 cursor-pointer">
-						<Icons.Search />
-					</div>
-				</div>
+				<InputSearch />
 			</div>
 
 			<div className="w-full h-fit">
-				{activeTab === TabNamePopup.GIFS && <div>Gifs content goes here</div>}
+				{activeTab === TabNamePopup.GIFS && (
+					<div>
+						<GiphyComp channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+					</div>
+				)}
 
 				{activeTab === TabNamePopup.STICKERS && (
 					<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={2} />
