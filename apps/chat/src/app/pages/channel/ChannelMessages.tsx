@@ -1,5 +1,5 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { ChatContext, useAuth, useChatMessages } from '@mezon/core';
+import { ChatContext, getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
 import { TabNamePopup } from '@mezon/utils';
 import { useContext, useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -22,18 +22,23 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const fetchData = () => {
 		loadMoreMessage();
 	};
+	const messageid = getJumpToMessageId();
 
-	const goBottom = () => {
-		if (containerRef.current !== null) {
-			containerRef.current.scrollTo({ top: 10, behavior: 'smooth' });
-		}
-	};
+	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {
-		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
-			goBottom();
+		let timeoutId: NodeJS.Timeout | null = null;
+		if (messageid) {
+			timeoutId = setTimeout(() => {
+				jumpToMessage(messageid);
+			}, 1000);
 		}
-	}, [messages[0]]);
+		return () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+		};
+	}, [messageid, jumpToMessage]);
 
 	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom, setValueInput } =
 		useContext(ChatContext);
