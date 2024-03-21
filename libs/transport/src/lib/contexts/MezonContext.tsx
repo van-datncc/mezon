@@ -2,12 +2,16 @@ import { Channel, ChannelStreamMode, ChannelType, Client, Session, Socket, Statu
 import { WebSocketAdapterPb } from "@mezon/mezon-js-protobuf"
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
-import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
+import { CreateMezonClientOptions, CreateVoiceClientOptions, createClient as createMezonClient } from '../mezon';
+import JitsiConnection from 'vendors/lib-jitsi-meet/dist/esm/JitsiConnection';
+import JitsiMeetJS from 'vendors/lib-jitsi-meet/dist/esm/JitsiMeetJS';
+import options from '../voice/options/config';
 
 type MezonContextProviderProps = {
 	children: React.ReactNode;
 	mezon: CreateMezonClientOptions;
 	connect?: boolean;
+	voiceOpt: CreateVoiceClientOptions;
 };
 
 type Sessionlike = {
@@ -21,6 +25,8 @@ export type MezonContextValue = {
 	sessionRef: React.MutableRefObject<Session | null>;
 	socketRef: React.MutableRefObject<Socket | null>;
 	channelRef: React.MutableRefObject<Channel | null>;
+	voiceConnRef: React.MutableRefObject<JitsiConnection | null>;
+	createVoiceConnection: () => Promise<JitsiConnection>,
 	createClient: () => Promise<Client>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
@@ -35,11 +41,73 @@ export type MezonContextValue = {
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
-const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect }) => {
+const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect, voiceOpt }) => {
 	const clientRef = React.useRef<Client | null>(null);
 	const sessionRef = React.useRef<Session | null>(null);
 	const socketRef = React.useRef<Socket | null>(null);
 	const channelRef = React.useRef<Channel | null>(null);
+	const voiceConnRef = React.useRef<JitsiConnection | null>(null);
+
+	const onConnectionSuccess = () => {
+		console.log("onConnectionSuccess");
+	}
+
+	const onConnectionFailed = () => {
+		console.log("onConnectionFailed");
+	}
+
+	const onDisconnect = () => {
+		console.log("onDisconnect");
+	}
+
+	const createVoiceConnection = useCallback(async () => {
+		const optionsWithRoom = { 
+			...options,
+			serviceUrl: options.serviceUrl + `?room=${voiceOpt.roomName}`,
+		};
+
+		JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+		const initOptions = {
+			disableAudioLevels: true
+		};
+
+		JitsiMeetJS.init(initOptions);
+
+		const connection = new JitsiMeetJS.JitsiConnection(voiceOpt.appID, voiceOpt.token, optionsWithRoom);
+
+		connection.addEventListener(
+			JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
+			onConnectionSuccess);
+		connection.addEventListener(
+			JitsiMeetJS.events.connection.CONNECTION_FAILED,
+			onConnectionFailed);
+		connection.addEventListener(
+			JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
+			onDisconnect);
+		
+		connection.connect(optionsWithRoom);
+		
+		voiceConnRef.current = connection;
+		return connection;
+	}, [voiceOpt])
+
+	/**
+	 * This function is called when we disconnect.
+	 */
+	const voiceDisconnect = useCallback(async () => {
+		console.log('disconnect!');
+		if (voiceConnRef && voiceConnRef.current) {
+			voiceConnRef.current.removeEventListener(
+				JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
+				onConnectionSuccess);
+			voiceConnRef.current.removeEventListener(
+				JitsiMeetJS.events.connection.CONNECTION_FAILED,
+				onConnectionFailed);
+			voiceConnRef.current.removeEventListener(
+				JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
+				onDisconnect);
+		}
+	}, []);
 
 	const createSocket = useCallback(async () => {
 		if (!clientRef.current) {
@@ -74,6 +142,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
 
+			await createVoiceConnection();
+
 			return session;
 		},
 		[clientRef, socketRef],
@@ -96,6 +166,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
+
+			await createVoiceConnection();
 
 			return session;
 		},
@@ -120,6 +192,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
 			sessionRef.current = session;
+
+			await createVoiceConnection();
+
 			return session;
 		},
 		[clientRef],
@@ -195,6 +270,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	// TODO: use same function for joinChatChannel and joinChatDirectMessage
+
 	const joinChatDirectMessage = React.useCallback(
 		async (channelId: string, channelLabel?: string | undefined, channelType?: number | undefined) => {
 			const socket = socketRef.current;
@@ -226,6 +302,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			sessionRef,
 			socketRef,
 			channelRef,
+			voiceConnRef,
+			createVoiceConnection,
 			createClient,
 			authenticateDevice,
 			authenticateEmail,
@@ -237,12 +315,15 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			addStatusFollow,
 			logOutMezon,
 			reconnect,
+			voiceDisconnect,
 		}),
 		[
 			clientRef,
 			sessionRef,
 			socketRef,
 			channelRef,
+			voiceConnRef,
+			createVoiceConnection,
 			createClient,
 			authenticateDevice,
 			authenticateEmail,
@@ -254,6 +335,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			addStatusFollow,
 			logOutMezon,
 			reconnect,
+			voiceDisconnect,
 		],
 	);
 

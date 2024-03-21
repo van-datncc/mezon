@@ -1,5 +1,5 @@
 import { MezonStoreProvider, initStore } from '@mezon/store';
-import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { CreateMezonClientOptions, CreateVoiceClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
@@ -22,6 +22,11 @@ const mezon: CreateMezonClientOptions = {
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
 
+const voiceopt: CreateVoiceClientOptions = {
+	appID: "MEZON",
+	roomName: "General",
+	token: "token",
+}
 
 export function App() {
 	const mezon = useMezon();
@@ -49,7 +54,7 @@ function AppWrapper() {
 
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-			<MezonContextProvider mezon={mezon} connect={true}>
+			<MezonContextProvider mezon={mezon} connect={true} voiceOpt={voiceopt}>
 					<StrictMode><App /></StrictMode>
 					<ToastContainer
 						position="top-right"

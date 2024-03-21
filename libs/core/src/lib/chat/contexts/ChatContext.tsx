@@ -19,7 +19,6 @@ type ChatContextProviderProps = {
 };
 
 export type ChatContextValue = {
-	// TODO: add your context value here
 	messageRef: IMessageWithUser | undefined;
 	setMessageRef: React.Dispatch<React.SetStateAction<IMessageWithUser | undefined>>;
 	isOpenReply: boolean;
