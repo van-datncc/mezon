@@ -4,3 +4,6 @@
 [submodule "vendors/lib-jitsi-meet"]
 	path = vendors/lib-jitsi-meet
 	url = git@github.com:nccasia/lib-jitsi-meet.git
+[submodule "lib-jitsi-meet"]
+	path = lib-jitsi-meet
+	url = git@github.com:nccasia/lib-jitsi-meet.git
