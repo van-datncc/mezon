@@ -7,6 +7,14 @@ export type CreateMezonClientOptions = {
 	key: string;
 };
 
+export type CreateVoiceClientOptions = {
+	appID: string,
+	roomName: string,
+	token: string,
+}
+
+export type VoiceConnectionCBFunction = () => void;
+
 let clientInstance: Client;
 
 export function getClient() {
@@ -21,3 +29,4 @@ export function createClient(options: CreateMezonClientOptions) {
 
 	return client;
 }
+

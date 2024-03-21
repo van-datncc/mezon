@@ -1,5 +1,5 @@
 import { MezonStoreProvider, initStore } from '@mezon/store';
-import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { CreateMezonClientOptions, CreateVoiceClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
@@ -21,7 +21,6 @@ const mezon: CreateMezonClientOptions = {
 	key: process.env.NX_CHAT_APP_API_KEY as string,
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
-
 
 export function App() {
 	const mezon = useMezon();

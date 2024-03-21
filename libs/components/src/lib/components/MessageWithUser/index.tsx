@@ -381,7 +381,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		} else {
 			setClassName('ml-10');
 		}
-	}, [, widthEmojiBar, widthMessageWithUser]);
+	}, [ widthEmojiBar, widthMessageWithUser]);
 
 	const [isHoverSender, setIsHoverSender] = useState<boolean>(false);
 	const [isEmojiHover, setEmojiHover] = useState<any>();
