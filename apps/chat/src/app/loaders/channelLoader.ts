@@ -1,14 +1,21 @@
-import { channelsActions, getStoreAsync } from '@mezon/store';
+import { setJumpToMessageId } from '@mezon/core';
+import { channelsActions, getStoreAsync, messagesActions } from '@mezon/store';
 import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
 
-export const channelLoader: LoaderFunction = async ({ params }) => {
+export const channelLoader: LoaderFunction = async ({ params, request }) => {
 	const { channelId } = params;
+	const messageId = new URL(request.url).searchParams.get('messageId');
 
 	const store = await getStoreAsync();
 	if (!channelId) {
 		throw new Error('Channel ID null');
 	}
 
+	if (messageId) {
+		setJumpToMessageId(messageId);
+	}
+	
+	store.dispatch(messagesActions.jumpToMessage({ messageId: messageId || '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChanel({ channelId, noFetchMembers: false }));
 	return null;
 };

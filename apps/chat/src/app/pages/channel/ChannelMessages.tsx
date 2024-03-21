@@ -1,4 +1,4 @@
-import { useAuth, useChatMessages } from '@mezon/core';
+import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
 import { useEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
@@ -20,18 +20,23 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const fetchData = () => {
 		loadMoreMessage();
 	};
-
-	const goBottom = () => {
-		if (containerRef.current !== null) {
-			containerRef.current.scrollTo({ top: 10, behavior: 'smooth' });
-		}
-	};
+	const messageid = getJumpToMessageId();
+	
+	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {
-		if (messages.length > 0 && messages[0].user?.id === userProfile?.user?.id) {
-			goBottom();
+		let timeoutId: NodeJS.Timeout | null = null;
+		if (messageid) {
+			timeoutId = setTimeout(() => {
+				jumpToMessage(messageid);
+			}, 1000);
 		}
-	}, [messages[0]]);
+		return () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+		};
+	}, [messageid, jumpToMessage]);
 
 	return (
 		<div
