@@ -22,12 +22,6 @@ const mezon: CreateMezonClientOptions = {
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
 
-const voiceopt: CreateVoiceClientOptions = {
-	appID: "MEZON",
-	roomName: "General",
-	token: "token",
-}
-
 export function App() {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
@@ -54,7 +48,7 @@ function AppWrapper() {
 
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-			<MezonContextProvider mezon={mezon} connect={true} voiceOpt={voiceopt}>
+			<MezonContextProvider mezon={mezon} connect={true}>
 					<StrictMode><App /></StrictMode>
 					<ToastContainer
 						position="top-right"

@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { selectCurrentChannel } from "@mezon/store";
 import { useMezon } from "@mezon/transport";
 import React, { useCallback } from "react";
-import { useSelector } from "react-redux";
 import JitsiConference from "vendors/lib-jitsi-meet/dist/esm/JitsiConference";
 import JitsiMeetJS from "vendors/lib-jitsi-meet/dist/esm/JitsiMeetJS";
-import { useClans } from "../hooks/useClans";
 import JitsiRemoteTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiRemoteTrack";
 import JitsiLocalTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLocalTrack";
 import { JitsiConferenceErrors } from "vendors/lib-jitsi-meet/dist/esm/JitsiConferenceErrors";
@@ -17,12 +13,17 @@ type VoiceContextProviderProps = {
 
 export type VoiceContextValue = {
 	isVideo: boolean;
-	voiceRoomRef: React.MutableRefObject<JitsiConference | null>,
-	localTracks:  React.MutableRefObject<JitsiLocalTrack[] | null>,
-	remoteTracks: React.MutableRefObject<JitsiRemoteTrack[] | null>,
-	attachLocalTrackElement: HTMLElement | undefined,
-	attachRemoteTrackElement: HTMLElement | undefined,
-	createVoiceRoom: () => Promise<JitsiConference>,
+	voiceRoomRef: React.MutableRefObject<JitsiConference | null>;
+	localTracks:  React.MutableRefObject<JitsiLocalTrack[] | null>;
+	remoteTracks: React.MutableRefObject<JitsiRemoteTrack[] | null>;
+	attachLocalTrackElement: HTMLElement | undefined;
+	setAttachRemoteTrackElement: React.Dispatch<React.SetStateAction<HTMLElement | undefined>>;
+	setAttachLocalTrackElement: React.Dispatch<React.SetStateAction<HTMLElement | undefined>>;
+	attachRemoteTrackElement: HTMLElement | undefined;
+	createVoiceRoom: (roomName: string) => Promise<JitsiConference>;
+	switchVideo: () => void;
+	changeAudioOutput: (selected: any) => void;
+	createLocalTrack: () => void;
 };
 
 const VoiceContext = React.createContext<VoiceContextValue>({} as VoiceContextValue);
@@ -37,36 +38,39 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 	
 	const { voiceConnRef } = useMezon();
-	const currentChannel = useSelector(selectCurrentChannel);
-	const { currentClan } = useClans();
-
-	let roomName = "unknow";
-	if (currentClan && currentClan.clan_name && currentChannel && currentChannel.channel_label) {
-		roomName = currentClan?.clan_name?.replace(" ", "-") + currentChannel?.channel_label?.replace(" ", "-");
-	}
-
-	const createVoiceRoom = useCallback(async () => {
+	
+	const createVoiceRoom = useCallback(async (roomName: string) => {
 		if (!voiceConnRef.current) {
 			throw new Error('voice connection not init');
 		}
-		voiceRoomRef.current = voiceConnRef.current.initJitsiConference(roomName, {});	
+
+		console.log("roomName", roomName);
+		
+		voiceRoomRef.current = voiceConnRef.current.initJitsiConference(roomName,  {
+			enableLayerSuspension: false,
+			p2p: {
+				enabled: false,
+				enableUnifiedOnChrome: true,
+				preferredCodec: 'VP9',
+				disableH264: true,
+			},
+			e2eping: { pingInterval: -1 }
+		});	
 		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
 		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
-		voiceRoomRef.current.on(
-			JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
-			voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
 		voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
 		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged);
-		voiceRoomRef.current.on(
-			JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
-			voiceRoomRef.current.on(
-			JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
-			voiceRoomRef.current.on(
-			JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
 		voiceRoomRef.current.join("password");
 
+		console.log("roomName2", roomName);
+
 		return voiceRoomRef.current;
-	}, [roomName, voiceConnRef])
+	}, [voiceConnRef])
 
 	const switchVideo = useCallback(async () => {
 		setIsVideo(!isVideo);
@@ -218,11 +222,13 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		console.log(`${voiceRoomRef.current?.getPhoneNumber()} - ${voiceRoomRef.current?.getPhonePin()}`);
 	}, []);
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const onTrackAudioLevelChanged = useCallback((audioLevel: number) => {
 		console.log(`Audio Level remote: ${audioLevel}`);
 		
 	}, [])
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const onTrackAudioOuputChanged = useCallback((deviceId: number) => {
 		console.log(`track audio output device was changed to ${deviceId}`)		
 	}, [])
@@ -243,9 +249,24 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			createVoiceRoom,
 			switchVideo,
 			changeAudioOutput,
-			createLocalTrack
+			createLocalTrack,
+			setAttachRemoteTrackElement,
+			setAttachLocalTrackElement,
 		}),
-		[localTracks, remoteTracks, attachLocalTrackElement, createVoiceRoom, switchVideo, changeAudioOutput, createLocalTrack],
+		[
+			voiceRoomRef,
+			localTracks,
+			remoteTracks,
+			attachLocalTrackElement,
+			attachRemoteTrackElement,
+			isVideo,
+			createVoiceRoom,
+			switchVideo,
+			changeAudioOutput,
+			createLocalTrack,
+			setAttachRemoteTrackElement,
+			setAttachLocalTrackElement,
+		],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;

@@ -2,16 +2,19 @@ import { Channel, ChannelStreamMode, ChannelType, Client, Session, Socket, Statu
 import { WebSocketAdapterPb } from "@mezon/mezon-js-protobuf"
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
-import { CreateMezonClientOptions, CreateVoiceClientOptions, createClient as createMezonClient } from '../mezon';
+import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
 import JitsiConnection from 'vendors/lib-jitsi-meet/dist/esm/JitsiConnection';
 import JitsiMeetJS from 'vendors/lib-jitsi-meet/dist/esm/JitsiMeetJS';
 import options from '../voice/options/config';
+import JitsiConference from 'vendors/lib-jitsi-meet/dist/esm/JitsiConference';
+import JitsiLocalTrack from 'vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLocalTrack';
+import JitsiRemoteTrack from 'vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiRemoteTrack';
+import { JitsiConferenceErrors } from 'vendors/lib-jitsi-meet/dist/esm/JitsiConferenceErrors';
 
 type MezonContextProviderProps = {
 	children: React.ReactNode;
 	mezon: CreateMezonClientOptions;
 	connect?: boolean;
-	voiceOpt: CreateVoiceClientOptions;
 };
 
 type Sessionlike = {
@@ -26,7 +29,7 @@ export type MezonContextValue = {
 	socketRef: React.MutableRefObject<Socket | null>;
 	channelRef: React.MutableRefObject<Channel | null>;
 	voiceConnRef: React.MutableRefObject<JitsiConnection | null>;
-	createVoiceConnection: () => Promise<JitsiConnection>,
+	createVoiceConnection: (roomName: string, token: string) => Promise<JitsiConnection>,
 	createClient: () => Promise<Client>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
@@ -37,33 +40,66 @@ export type MezonContextValue = {
 	joinChatDirectMessage: (channelId: string, channelName?: string, channelType?: number) => Promise<Channel>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
 	reconnect: () => Promise<void>;
+	createVoiceRoom: (roomName: string) => Promise<JitsiConference>;
+	createLocalTrack: () => void;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
 
-const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect, voiceOpt }) => {
+const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect }) => {
 	const clientRef = React.useRef<Client | null>(null);
 	const sessionRef = React.useRef<Session | null>(null);
 	const socketRef = React.useRef<Socket | null>(null);
 	const channelRef = React.useRef<Channel | null>(null);
 	const voiceConnRef = React.useRef<JitsiConnection | null>(null);
+	const voiceRoomRef = React.useRef<JitsiConference | null>(null);
+	const localTracks = React.useRef<JitsiLocalTrack[]>(null);
+	//const remoteTracks = React.useRef<JitsiRemoteTrack[]>(null);
 
-	const onConnectionSuccess = () => {
-		console.log("onConnectionSuccess");
-	}
+	const createVoiceRoom = useCallback(async (roomName: string) => {
+		if (!voiceConnRef.current) {
+			throw new Error('voice connection not init');
+		}
+		
+		voiceRoomRef.current = voiceConnRef.current.initJitsiConference(roomName, {});	
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
+		voiceRoomRef.current.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
+		voiceRoomRef.current.join("password");
 
-	const onConnectionFailed = () => {
-		console.log("onConnectionFailed");
-	}
+		return voiceRoomRef.current;
+	}, [voiceConnRef])
 
-	const onDisconnect = () => {
-		console.log("onDisconnect");
-	}
+	const createLocalTrack = useCallback(() => {				
+		JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video' ] })
+		.then(onLocalTracks)
+		.catch(error => {
+			throw error;
+		});
 
-	const createVoiceConnection = useCallback(async () => {
+		if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
+			JitsiMeetJS.mediaDevices.enumerateDevices(devices => {
+			const audioOutputDevices
+				= devices.filter(d => d.kind === 'audiooutput');
+
+			if (audioOutputDevices.length > 1) {
+				console.log('#audioOutputSelect');
+
+				console.log('#audioOutputSelectWrapper');
+			}
+		});
+		}
+	}, []);
+
+	const createVoiceConnection = useCallback(async (jwt: string) => {
 		const optionsWithRoom = { 
 			...options,
-			serviceUrl: options.serviceUrl + `?room=${voiceOpt.roomName}`,
 		};
 
 		JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
@@ -73,7 +109,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 		JitsiMeetJS.init(initOptions);
 
-		const connection = new JitsiMeetJS.JitsiConnection(voiceOpt.appID, voiceOpt.token, optionsWithRoom);
+		const connection = new JitsiMeetJS.JitsiConnection("mezon", jwt, optionsWithRoom);
 
 		connection.addEventListener(
 			JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
@@ -83,13 +119,13 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			onConnectionFailed);
 		connection.addEventListener(
 			JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-			onDisconnect);
+			onDisconnect);	
 		
 		connection.connect(optionsWithRoom);
 		
 		voiceConnRef.current = connection;
 		return connection;
-	}, [voiceOpt])
+	}, [])
 
 	/**
 	 * This function is called when we disconnect.
@@ -142,7 +178,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
 
-			await createVoiceConnection();
+			await createVoiceConnection(session.token);
 
 			return session;
 		},
@@ -167,7 +203,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
 
-			await createVoiceConnection();
+			await createVoiceConnection(session.token);
 
 			return session;
 		},
@@ -180,6 +216,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 		socketRef.current = null;
 		sessionRef.current = null;
+
+		voiceDisconnect();
+		voiceConnRef.current = null;
+		
 	}, [socketRef]);
 
 	const authenticateDevice = useCallback(
@@ -193,7 +233,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
 			sessionRef.current = session;
 
-			await createVoiceConnection();
+			await createVoiceConnection(session.token);
 
 			return session;
 		},
@@ -214,6 +254,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session2 = await socketRef.current.connect(newSession, true);
 			sessionRef.current = session2;
+
+			await createVoiceConnection(session.token);
 
 			return newSession;
 		},
@@ -296,6 +338,131 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[socketRef],
 	);
 
+	const onConnectionSuccess = () => {
+		console.log("onConnectionSuccess");
+	}
+
+	const onConnectionFailed = () => {
+		console.log("onConnectionFailed");
+	}
+
+	const onDisconnect = () => {
+		console.log("onDisconnect");
+	}
+
+	const onLocalTracks = useCallback((tracks: JitsiLocalTrack[] | JitsiConferenceErrors) => {
+		if (!localTracks || !localTracks.current) {
+			return "local track is not init";
+		}
+/*		
+		localTracks.current = tracks;
+		for (let i = 0; i < localTracks.current.length; i++) {
+			localTracks.current[i].addEventListener(
+				JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, onTrackAudioLevelChanged);
+			localTracks[i].addEventListener(
+				JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, onTrackMuteChanged);
+			localTracks[i].addEventListener(
+				JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, onLocalTrackStoped);
+			localTracks[i].addEventListener(
+				JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED,
+				deviceId =>
+					console.log(
+						`track audio output device was changed to ${deviceId}`));
+			if (localTracks[i].getType() === 'video') {
+				console.log(`<video autoplay='1' id='localVideo${i}' />`);
+				localTracks.current[i].attach(attachLocalTrackElement);
+			} else {
+				console.log(`<audio autoplay='1' muted='true' id='localAudio${i}' />`);
+				localTracks.current[i].attach(attachLocalTrackElement);
+			}
+			if (isJoined) {
+				voiceRoomRef.current.addTrack(localTracks[i]);
+			}
+		}
+*/		
+	}, []);
+
+	const onRemoteTrackRemoved = useCallback((track: JitsiRemoteTrack) => {
+		console.log("onRemoteTrackRemoved");
+	}, []);
+
+	const onRemoteTrackAdded = useCallback((track: JitsiRemoteTrack) => {
+		if (track.isLocal()) {
+			return;
+		}
+/*
+		const participant = track.getParticipantId();
+	
+		if (!remoteTracks || !remoteTracks[participant]) {
+			remoteTracks[participant] = [];
+		}
+		const idx = remoteTracks[participant].push(track);
+	
+		track.addEventListener(
+			JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, onTrackAudioLevelChanged);
+		track.addEventListener(
+			JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, onTrackMuteChanged);
+		track.addEventListener(
+			JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, onLocalTrackStoped);
+		track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, onTrackAudioOuputChanged);
+		const id = participant + track.getType() + idx;
+	
+		if (track.getType() === 'video') {
+			console.log(`<video autoplay='1' id='${participant}video${idx}' />`);
+		} else {
+			console.log(`<audio autoplay='1' id='${participant}audio${idx}' />`);
+		}
+		if (attachTrackElement) {
+			track.attach(attachTrackElement);
+		}
+*/		
+	}, []);
+	
+	const onConferenceJoined = useCallback(() => {
+		
+	}, []);
+	
+	const onUserJoined = useCallback((id: any) => {
+		console.log('user join');
+		//remoteTracks[id] = [];
+	}, []);
+
+	const onUserLeft = useCallback((id: any) => {
+		console.log('user join', id);
+	}, []);
+
+	const onTrackMuteChanged = useCallback((track: JitsiRemoteTrack) => {
+		console.log('onTrackMuteChanged');
+	}, []);
+
+	const onDisplayNameChanged = useCallback((userID: string, displayName: string) => {
+		console.log(`${userID} - ${displayName}`);
+	}, []);
+
+	const onAudioLevelChanged = useCallback((userID: string, audioLevel: string) => {
+		console.log(`${userID} - ${audioLevel}`);
+	}, []);
+
+	const onPhoneNumberChanged = useCallback(() => {
+		console.log(`${voiceRoomRef.current?.getPhoneNumber()} - ${voiceRoomRef.current?.getPhonePin()}`);
+	}, []);
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const onTrackAudioLevelChanged = useCallback((audioLevel: number) => {
+		console.log(`Audio Level remote: ${audioLevel}`);
+		
+	}, [])
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const onTrackAudioOuputChanged = useCallback((deviceId: number) => {
+		console.log(`track audio output device was changed to ${deviceId}`)		
+	}, [])
+	
+
+	const onLocalTrackStoped = useCallback(() => {
+		console.log('remote track stoped')
+	}, [])
+
 	const value = React.useMemo<MezonContextValue>(
 		() => ({
 			clientRef,
@@ -316,6 +483,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			logOutMezon,
 			reconnect,
 			voiceDisconnect,
+			createVoiceRoom,
+			createLocalTrack,
 		}),
 		[
 			clientRef,
@@ -336,6 +505,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			logOutMezon,
 			reconnect,
 			voiceDisconnect,
+			createVoiceRoom,
+			createLocalTrack,
 		],
 	);
 

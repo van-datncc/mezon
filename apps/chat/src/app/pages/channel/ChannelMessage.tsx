@@ -2,7 +2,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { EmojiPicker, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage, useChatSending } from '@mezon/core';
-import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
+import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';

@@ -1,7 +1,5 @@
-import { MentionData } from '@draft-js-plugins/mention';
 import { MessageBox, ReplyMessage, UserMentionList } from '@mezon/components';
-import { ChatContext, useChannelMembers, useChatSending } from '@mezon/core';
-import { ChannelMembersEntity } from '@mezon/store';
+import { ChatContext, useChatSending } from '@mezon/core';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback, useContext, useEffect } from 'react';
 import { useThrottledCallback } from 'use-debounce';
