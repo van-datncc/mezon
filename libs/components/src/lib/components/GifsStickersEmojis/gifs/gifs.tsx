@@ -1,10 +1,10 @@
 import { ChatContext, useChatSending } from '@mezon/core';
 import { IMessageSendPayload, TabNamePopup } from '@mezon/utils';
 import axios from 'axios';
+import { Loading } from 'libs/ui/src/lib/Loading';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
-import Loader from './loader';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
@@ -70,7 +70,7 @@ function GiphyComp({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 
 	const renderGifs = () => {
 		if (isLoading) {
-			return <Loader />;
+			return <Loading classProps="w-10 h-10" />;
 		}
 		return (
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">

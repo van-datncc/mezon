@@ -1,7 +1,7 @@
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
 import { ChatContext } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import Picker, { EmojiClickData, Theme } from 'emoji-picker-react';
+
 import { useContext } from 'react';
 
 export type EmojiPickerOptions = {
@@ -11,7 +11,7 @@ export type EmojiPickerOptions = {
 	emojiAction?: EmojiPlaces;
 };
 
-function EmojiPicker(props: EmojiPickerOptions) {
+function EmojiPickerComp(props: EmojiPickerOptions) {
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const { isOpenEmojiReacted, setIsOpenEmojiReacted } = useContext(ChatContext);
 	const {
@@ -26,23 +26,24 @@ function EmojiPicker(props: EmojiPickerOptions) {
 		setIsOpenEmojiReactedBottom,
 	} = useContext(ChatContext);
 
-	const handleEmojiSelect = (emoji: any, event: React.MouseEvent<HTMLDivElement>) => {
-		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
-			setEmojiSelectedReacted(emoji.native);
-			setIsOpenEmojiReacted(false);
-			setIsOpenEmojiReactedBottom(false);
-			event.stopPropagation();
-		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
-			setEmojiSelectedMess(emoji.native);
-			event.stopPropagation();
-			setIsOpenEmojiMessBox(false);
-			setIsOpenEmojiReactedBottom(false);
-		}
+	const handleEmojiSelect = (emojiObject: EmojiClickData, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		console.log(emojiObject);
+		// if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
+		// 	setEmojiSelectedReacted(emojiData.emoji);
+		// 	setIsOpenEmojiReacted(false);
+		// 	setIsOpenEmojiReactedBottom(false);
+		// 	event.stopPropagation();
+		// } else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+		// 	setEmojiSelectedMess(emojiData.emoji);
+		// 	event.stopPropagation();
+		// 	setIsOpenEmojiMessBox(false);
+		// 	setIsOpenEmojiReactedBottom(false);
+		// }
 	};
 
 	return (
 		<>
-			<Picker
+			{/* <Picker
 				data={data}
 				onEmojiSelect={handleEmojiSelect}
 				theme="dark"
@@ -51,9 +52,11 @@ function EmojiPicker(props: EmojiPickerOptions) {
 					setIsOpenEmojiReacted(false);
 					setIsOpenEmojiReactedBottom(false);
 				}}
-			/>
+			/> */}
+
+			<Picker onEmojiClick={() => handleEmojiSelect} width={500} theme={Theme.DARK} height={458} />
 		</>
 	);
 }
 
-export default EmojiPicker;
+export default EmojiPickerComp;
