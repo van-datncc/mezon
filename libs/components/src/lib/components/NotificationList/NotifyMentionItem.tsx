@@ -1,5 +1,5 @@
 import { useAppNavigation, useChatMessages, useClans, useNotification } from '@mezon/core';
-import { INotification, selectChannelById, selectClanById, selectMemberClanByUserId } from '@mezon/store';
+import { INotification, messagesActions, selectChannelById, selectClanById, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
@@ -50,10 +50,8 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const data = parseObject(notify.content);
 	const {toMessageChannel , navigate} = useAppNavigation();
 
-	const { jumpToMessage } = useChatMessages({ channelId:data.channel_id, clanId: currentClan?.id });
 	const jump = async (messId : string) => {
 		await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
-		jumpToMessage(data.message_id);
 	}
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
@@ -85,7 +83,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					className="bg-bgTertiary mr-1 text-contentPrimary rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
 					onClick={() => {
 						deleteNotify(notify.id);
-						jumpToMessage(data.message_id);
 					}}
 				>
 					✕

@@ -12,10 +12,9 @@ import { useSelector } from 'react-redux';
 
 export type useMessagesOptions = {
 	channelId: string;
-	clanId?: string;
 };
 
-export function useChatMessages({ channelId, clanId }: useMessagesOptions) {
+export function useChatMessages({ channelId }: useMessagesOptions) {
 	const { clientRef } = useMezon();
 
 	const client = clientRef.current;
@@ -30,14 +29,6 @@ export function useChatMessages({ channelId, clanId }: useMessagesOptions) {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
-	const jumpToMessage = React.useCallback(async ( messageId: string) => {
-		await dispatch(messagesActions.jumpToMessage({ messageId, channelId }));
-		const messageElement = document.getElementById(messageId);
-		if (messageElement) {
-			messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-
-	}, [channelId, dispatch]);
 
 	return useMemo(
 		() => ({
@@ -47,8 +38,7 @@ export function useChatMessages({ channelId, clanId }: useMessagesOptions) {
 			lastMessageId,
 			hasMoreMessage,
 			loadMoreMessage,
-			jumpToMessage,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage, jumpToMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage],
 	);
 }
