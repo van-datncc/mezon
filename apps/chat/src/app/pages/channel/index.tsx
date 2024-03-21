@@ -41,6 +41,7 @@ export default function ChannelLayout() {
 						{currentChannel && <ChannelTyping channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />}
 						{currentChannel ? (
 							<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+
 						) : (
 							<ChannelMessageBox.Skeleton />
 						)}

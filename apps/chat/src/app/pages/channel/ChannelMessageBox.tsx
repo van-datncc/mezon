@@ -7,7 +7,7 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
-type ChannelMessageBoxProps = {
+export type ChannelMessageBoxProps = {
 	channelId: string;
 	channelLabel: string;
 	controlEmoji?: boolean;
