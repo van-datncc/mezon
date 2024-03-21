@@ -1,8 +1,3 @@
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { IMessageWithUser } from '@mezon/utils';
-import React, { useCallback, useEffect } from 'react';
-import { toast } from 'react-toastify';
 import {
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
@@ -11,6 +6,11 @@ import {
 	Notification,
 	StatusPresenceEvent,
 } from '@mezon/mezon-js';
+import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
+import { useMezon } from '@mezon/transport';
+import { IMessageWithUser, TabNamePopup } from '@mezon/utils';
+import React, { useCallback, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
@@ -46,6 +46,15 @@ export type ChatContextValue = {
 
 	widthEmojiBar: number;
 	setWidthEmojiBar: React.Dispatch<React.SetStateAction<number>>;
+
+	activeTab: string;
+	setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+
+	heightEditor: number;
+	setHeightEditor: React.Dispatch<React.SetStateAction<number>>;
+
+	valueInput: string;
+	setValueInput: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -61,6 +70,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom] = React.useState<boolean>(false);
 	const [emojiPlaceActive, setEmojiPlaceActive] = React.useState<string>('');
 	const [widthEmojiBar, setWidthEmojiBar] = React.useState<number>(0);
+	const [activeTab, setActiveTab] = React.useState<string>(TabNamePopup.NONE);
+	const [heightEditor, setHeightEditor] = React.useState<number>(50);
+	const [valueInput, setValueInput] = React.useState<string>('');
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -84,6 +96,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setWidthEmojiBar,
 			isOpenEmojiReactedBottom,
 			setIsOpenEmojiReactedBottom,
+			activeTab,
+			setActiveTab,
+			heightEditor,
+			setHeightEditor,
+			valueInput,
+			setValueInput,
 		}),
 		[
 			messageRef,
@@ -106,6 +124,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setWidthEmojiBar,
 			isOpenEmojiReactedBottom,
 			setIsOpenEmojiReactedBottom,
+			activeTab,
+			setActiveTab,
+			heightEditor,
+			setHeightEditor,
+			valueInput,
+			setValueInput,
 		],
 	);
 
@@ -147,8 +171,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const ondisconnect = useCallback(() => {
 		const retry = (attempt: number) => {
 			console.log('Reconnecting', attempt);
-            const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
-            setTimeout(() => {
+			const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
+			setTimeout(() => {
 				reconnect()
 					.then(() => {
 						console.log('Reconnected');
@@ -156,12 +180,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					.catch(() => {
 						retry(attempt + 1);
 					});
-            }, delay);
-        };
+			}, delay);
+		};
 		retry(0);
 	}, [reconnect]);
 
-	const onerror = useCallback((event : unknown) => {
+	const onerror = useCallback((event: unknown) => {
 		// TODO: handle error
 		console.log(event);
 	}, []);
@@ -217,7 +241,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socket.onchannelpresence = onchannelpresence;
 
 		socket.ondisconnect = ondisconnect;
-		
+
 		socket.onerror = onerror;
 
 		socket.onmessagetyping = onmessagetyping;
