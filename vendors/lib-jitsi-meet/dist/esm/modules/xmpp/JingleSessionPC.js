@@ -533,6 +533,7 @@ export default class JingleSessionPC extends JingleSession {
                 logger.info(`${this} onnegotiationneeded fired on ${this.peerconnection}`);
                 const workFunction = finishedCallback => {
                     this._renegotiate()
+                        .then(() => this.peerconnection.configureAudioSenderEncodings())
                         .then(() => finishedCallback(), error => finishedCallback(error));
                 };
                 this.modificationQueue.push(workFunction, error => {
@@ -987,7 +988,7 @@ export default class JingleSessionPC extends JingleSession {
             // Initiate a renegotiate for the codec setting to take effect.
             const workFunction = finishedCallback => {
                 this._renegotiate()
-                    .then(() => this.peerconnection.configureSenderVideoEncodings())
+                    .then(() => this.peerconnection.configureVideoSenderEncodings())
                     .then(() => {
                     logger.debug(`${this} setVideoCodecs task is done`);
                     return finishedCallback();
@@ -1806,15 +1807,19 @@ export default class JingleSessionPC extends JingleSession {
      * @returns {Promise}
      */
     setMediaTransferActive(active) {
+        const changed = this.peerconnection.audioTransferActive !== active
+            || this.peerconnection.videoTransferActive !== active;
+        if (!changed) {
+            return Promise.resolve();
+        }
         return this.peerconnection.tpcUtils.setMediaTransferActive(active)
             .then(() => {
             this.peerconnection.audioTransferActive = active;
             this.peerconnection.videoTransferActive = active;
-            // Reconfigure the video tracks so that only the correct encodings are active.
+            // Reconfigure the audio and video tracks so that only the correct encodings are active.
             const promises = [];
-            for (const track of this.rtc.getLocalVideoTracks()) {
-                promises.push(this.peerconnection.configureSenderVideoEncodings(track));
-            }
+            promises.push(this.peerconnection.configureVideoSenderEncodings());
+            promises.push(this.peerconnection.configureAudioSenderEncodings());
             return Promise.allSettled(promises);
         });
     }
@@ -1940,7 +1945,7 @@ export default class JingleSessionPC extends JingleSession {
             // Configure the video encodings after the track is unmuted. If the user joins the call muted and
             // unmutes it the first time, all the parameters need to be configured.
             if (track.isVideoTrack()) {
-                return this.peerconnection.configureSenderVideoEncodings(track);
+                return this.peerconnection.configureVideoSenderEncodings(track);
             }
         });
     }

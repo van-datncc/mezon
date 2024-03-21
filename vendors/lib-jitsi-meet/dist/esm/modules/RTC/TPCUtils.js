@@ -366,16 +366,19 @@ export class TPCUtils {
             .map(encoding => height / encoding.scaleResolutionDownBy)
             .map((frameHeight, idx) => {
             var _a;
+            let activeState = false;
+            // When video is suspended on the media session.
+            if (!this.pc.videoTransferActive) {
+                return activeState;
+            }
             // Single video stream.
             if (!this.pc.isSpatialScalabilityOn() || this._isRunningInFullSvcMode(codec)) {
                 const { active } = this._calculateActiveEncodingParams(localVideoTrack, codec, newHeight);
-                return idx === 0 ? active : false;
+                return idx === 0 ? active : activeState;
             }
-            // Multiple video streams.
-            let active = false;
             if (newHeight > 0) {
                 if (localVideoTrack.getVideoType() === VideoType.CAMERA) {
-                    active = frameHeight <= newHeight
+                    activeState = frameHeight <= newHeight
                         // Keep the LD stream enabled even when the LD stream's resolution is higher than of the
                         // requested resolution. This can happen when camera is captured at high resolutions like 4k
                         // but the requested resolution is 180. Since getParameters doesn't give us information about
@@ -386,11 +389,11 @@ export class TPCUtils {
                 else {
                     // For screenshare, keep the HD layer enabled always and the lower layers only for high fps
                     // screensharing.
-                    active = videoStreamEncodings[idx].scaleResolutionDownBy === SIM_LAYERS[2].scaleFactor
+                    activeState = videoStreamEncodings[idx].scaleResolutionDownBy === SIM_LAYERS[2].scaleFactor
                         || !this._isScreenshareBitrateCapped(localVideoTrack);
                 }
             }
-            return active;
+            return activeState;
         });
         return encodingsState;
     }
