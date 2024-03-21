@@ -249,7 +249,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setEditorState(() => EditorState.createEmpty());
 			setIsOpenReply(false);
 			dispatch(
-				channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
+				channelsActions.setChannelSeenLastSeenMessageId({
+					channelId: currentChanel?.id || '',
+					channelLastSeenMesageId: messages[0].id ? messages[0].id : '',
+				}),
 			);
 			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
 		} else {

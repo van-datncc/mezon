@@ -1,19 +1,29 @@
-import { useEffect, useRef, useState } from 'react';
-import * as Icons from '../../Icons';
-import { ChannelProps, ChannelStatusEnum, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from '@mezon/mezon-js';
+import { selectCurrentChannel } from '@mezon/store';
+import { ChannelProps, ChannelStatusEnum, ThreadNameProps } from '@mezon/utils';
+import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import * as Icons from '../../Icons';
 
-export const ChannelLabel: React.FC<ChannelProps> = ({ isPrivate, type, name }) => {
+export const ChannelLabel: React.FC<ChannelProps> = () => {
+	const currentChannel = useSelector(selectCurrentChannel);
+	const isPrivate = currentChannel?.channel_private;
+	const type = Number(currentChannel?.type);
+	const name = currentChannel?.channel_label;
 	return (
 		<div className="flex flex-row items-center relative">
 			<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">
-				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
-				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
+				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_VOICE && (
+					<Icons.SpeakerLocked defaultSize="w-6 h-6" />
+				)}
+				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_TEXT && (
+					<Icons.HashtagLocked defaultSize="w-6 h-6 " />
+				)}
 				{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
 				{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 
-			<p className="mb-0.5 text-zinc-400 font-thin font-['Manrope'] ml-7 mt-2">{name}</p>
+			<p className="mb-0.5 text-white font-thin font-['Manrope'] ml-7 mt-2 max-w-[200px] overflow-x-hidden text-ellipsis one-line">{name}</p>
 		</div>
 	);
 };

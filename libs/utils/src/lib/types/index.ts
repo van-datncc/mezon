@@ -12,7 +12,6 @@ import {
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
-
 import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
@@ -184,7 +183,7 @@ export interface ChannelProps {
 	name?: string;
 	isPrivate?: ChannelStatusEnum;
 	categories?: Record<string, CategoryProps>;
-	type: ChannelType;
+	type?: ChannelType;
 }
 
 export interface CategoryProps {
@@ -212,4 +211,3 @@ export interface UnreadChannel {
 	channelLastMessageId: string;
 	channelLastSeenMesageId: string;
 }
-

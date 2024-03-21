@@ -6,7 +6,7 @@ type MarkdownFormatTextProps = {
 };
 
 const MarkdownFormatText = ({ markdown }: MarkdownFormatTextProps) => {
-	return <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]} children={markdown} className="prose" />;
+	return <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]} children={markdown} className={`prose`} />;
 };
 
 export default MarkdownFormatText;
