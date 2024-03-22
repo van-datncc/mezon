@@ -478,11 +478,11 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	useEffect(() => {
 		setIsVisible(false); // Ẩn div trước khi thực hiện hiển thị sau
 		const timer = setTimeout(() => {
-		  setIsVisible(true); // Hiển thị div sau 1 giây
+			setIsVisible(true); // Hiển thị div sau 1 giây
 		}, 1000); // 1000 milliseconds = 1 giây
-	
+
 		return () => clearTimeout(timer);
-	  }, [isEmojiHover]); // Khi isEmojiHover thay đổi, useEffect sẽ được gọi lại
+	}, [isEmojiHover]); // Khi isEmojiHover thay đổi, useEffect sẽ được gọi lại
 
 	return (
 		<>
