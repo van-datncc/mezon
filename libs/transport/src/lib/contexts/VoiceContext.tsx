@@ -9,7 +9,7 @@ import options from "libs/transport/src/lib/voice/options/config";
 
 // typescript 
 type RenderLocalTrackFunction = (localTrack: JitsiLocalTrack[]) => void;
-type RenderRemoteTrackFunction = (localTrack: Map<string, JitsiRemoteTrack[]>) => void;
+type RenderRemoteTrackFunction = (localTrack: JitsiRemoteTrack) => void;
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -39,7 +39,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const remoteTracksRef = React.useRef<Map<string, JitsiRemoteTrack[]>>(new Map());
 	const isJoinedRef = React.useRef<boolean>(false);	
 	const [currentVoiceRoomName, setCurrentVoiceRoomName] = React.useState<string>("");
-	const [userDisplayName, setUserDisplayName] = React.useState<string>("");	
+	const [userDisplayName, setUserDisplayName] = React.useState<string>("");
 	const [renderLocalVideoTrack, setRenderLocalVideoTrack] = React.useState<RenderLocalTrackFunction>(
 		() => () => console.log('default')
 	);
@@ -117,12 +117,16 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		} else {
 			console.log(`<audio autoplay='1' id='${participant}audio${participant}' />`);
 		}
-		renderRemoteVideoTrack(remoteTracksRef.current);
+		renderRemoteVideoTrack(track);
 	}, [remoteTracksRef, renderRemoteVideoTrack]);
 	
 	const onConferenceJoined = useCallback(() => {
 		console.log("onConferenceJoined");
 		isJoinedRef.current = true;
+
+		localTracksRef.current.forEach((localTrack) => {
+			voiceRoomRef.current?.addTrack(localTrack);
+		});
 	}, [isJoinedRef]);
 	
 	const onUserJoined = useCallback((id: string) => {
