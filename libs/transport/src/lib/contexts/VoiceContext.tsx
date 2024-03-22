@@ -7,10 +7,6 @@ import { JitsiConferenceErrors } from "vendors/lib-jitsi-meet/dist/esm/JitsiConf
 import JitsiConnection from "vendors/lib-jitsi-meet/dist/esm/JitsiConnection";
 import options from "libs/transport/src/lib/voice/options/config";
 
-// typescript 
-type RenderLocalTrackFunction = (localTrack: JitsiLocalTrack[]) => void;
-type RenderRemoteTrackFunction = (localTrack: JitsiRemoteTrack) => void;
-
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
 };
@@ -19,15 +15,13 @@ export type VoiceContextValue = {
 	voiceConnRef: React.MutableRefObject<JitsiConnection | null>;
 	voiceRoomRef: React.MutableRefObject<JitsiConference | null>;
 	currentVoiceRoomName: string;
-	renderLocalVideoTrack: RenderLocalTrackFunction;
+	setTargetTrackNode: React.Dispatch<React.SetStateAction<HTMLMediaElement | undefined>>;
 	setCurrentVoiceRoomName: React.Dispatch<React.SetStateAction<string>>;
 	setUserDisplayName: React.Dispatch<React.SetStateAction<string>>;
 	changeAudioOutput: (selected: any) => void;
 	createLocalTrack: () => void;	
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
 	voiceDisconnect: () => void;
-	setRenderLocalVideoTrack: React.Dispatch<React.SetStateAction<RenderLocalTrackFunction>>;
-	setRenderRemoteVideoTrack: React.Dispatch<React.SetStateAction<RenderRemoteTrackFunction>>;
 };
 
 const VoiceContext = React.createContext<VoiceContextValue>({} as VoiceContextValue);
@@ -37,15 +31,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const voiceRoomRef = React.useRef<JitsiConference | null>(null);
 	const localTracksRef = React.useRef<JitsiLocalTrack[]>([]);
 	const remoteTracksRef = React.useRef<Map<string, JitsiRemoteTrack[]>>(new Map());
-	const isJoinedRef = React.useRef<boolean>(false);	
+	const [isJoinedConf, setIsJoinedConf] = React.useState<boolean>(false);	
 	const [currentVoiceRoomName, setCurrentVoiceRoomName] = React.useState<string>("");
 	const [userDisplayName, setUserDisplayName] = React.useState<string>("");
-	const [renderLocalVideoTrack, setRenderLocalVideoTrack] = React.useState<RenderLocalTrackFunction>(
-		() => () => console.log('default')
-	);
-	const [renderRemoteVideoTrack, setRenderRemoteVideoTrack] = React.useState<RenderRemoteTrackFunction>(
-		() => () => console.log('default')
-	);
+	const [targetTrackNode, setTargetTrackNode] = React.useState<HTMLMediaElement>();
+
 
 	const onConnectionFailed = useCallback(() => {
 		console.log("onConnectionFailed");
@@ -75,19 +65,27 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			
 			console.log("local track type", localtrack.getType());
 			if (localtrack.getType() === 'video') {
-				console.log(`<video autoplay='1' id='localVideo${i}' />`);				
-				//localtrack.attach(videoLocalTrackElement);				
+				const localVideoElem = document.createElement("video");
+				localVideoElem.id = 'localvideo'+i;
+				localVideoElem.autoplay = true;
+				localtrack.attach(localVideoElem);
+				targetTrackNode?.appendChild(localVideoElem);
 			} else {
-				console.log(`<audio autoplay='1' muted='true' id='localAudio${i}' />`);
-				//localtrack.attach(attachLocalTrackElement);
+				const localAudioElem = document.createElement("audio");
+				localAudioElem.id = 'localaudio'+i;
+				localAudioElem.autoplay = true;
+				localAudioElem.muted = true;
+				localtrack.attach(localAudioElem);
+				targetTrackNode?.appendChild(localAudioElem);
 			}
 
-			if (isJoinedRef && isJoinedRef.current && voiceRoomRef.current) {
-				voiceRoomRef.current.addTrack(localtrack);
+			if (isJoinedConf && voiceRoomRef.current) {
+				if(voiceRoomRef.current.getLocalAudioTrack() == null || localtrack.getType() === 'video') {
+					voiceRoomRef.current.addTrack(localtrack);
+				}				
 			}
 		}
-		renderLocalVideoTrack(localTracksRef.current);
-	}, [renderLocalVideoTrack]);
+	}, [isJoinedConf, targetTrackNode]);
 
 	const onRemoteTrackRemoved = useCallback((track: JitsiRemoteTrack) => {
 		console.log("onRemoteTrackRemoved");
@@ -100,7 +98,15 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 
 		const participant = track.getParticipantId();
-		if (remoteTracksRef && remoteTracksRef.current && remoteTracksRef.current.has(participant)) {
+		
+		if (remoteTracksRef && remoteTracksRef.current) {
+			const remoteTrack = remoteTracksRef.current.get(participant);
+			const filter = remoteTrack?.filter(item => item.getId() === track.getId());
+			console.log(remoteTrack);
+			if ((filter?.length as number) > 0) {
+				console.log("already in");
+				return; // already added
+			}
 			remoteTracksRef.current.get(participant)?.push(track);
 		}
 		
@@ -113,21 +119,29 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		track.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED, onTrackAudioOuputChanged);
 		
 		if (track.getType() === 'video') {
-			console.log(`<video autoplay='1' id='${participant}video${participant}' />`);
+			const remoteVideo = document.createElement("video");
+			remoteVideo.autoplay = true;
+			remoteVideo.id = 'remotevideo_' + participant;
+			track.attach(remoteVideo);
+			targetTrackNode?.appendChild(remoteVideo);
 		} else {
-			console.log(`<audio autoplay='1' id='${participant}audio${participant}' />`);
+			const localAudioElem = document.createElement("audio");
+			localAudioElem.id = 'remoteaudio_'+participant;
+			localAudioElem.autoplay = true;
+			localAudioElem.muted = true;
+			track.attach(localAudioElem);
+			targetTrackNode?.appendChild(localAudioElem);
 		}
-		renderRemoteVideoTrack(track);
-	}, [remoteTracksRef, renderRemoteVideoTrack]);
+	}, [remoteTracksRef, targetTrackNode]);
 	
 	const onConferenceJoined = useCallback(() => {
 		console.log("onConferenceJoined");
-		isJoinedRef.current = true;
+		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
 			voiceRoomRef.current?.addTrack(localTrack);
 		});
-	}, [isJoinedRef]);
+	}, [isJoinedConf]);
 	
 	const onUserJoined = useCallback((id: string) => {
 		console.log('user join', id);
@@ -165,7 +179,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	
 
 	const onLocalTrackStoped = useCallback((track: JitsiLocalTrack) => {
-		console.log('local track stoped', isJoinedRef.current)		
+		console.log('local track stoped')		
 	}, [])
 
 	const createLocalTrack = useCallback(() => {				
@@ -188,65 +202,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		});
 		}
 	}, [onLocalTracks]);
-	
-	const createVoiceConnection = useCallback(async (roomName: string, jwt: string) => {
-		if (!currentVoiceRoomName) {
-			return null; // init when the channel is set
-		}
-		const optionsWithRoom = { 
-			...options,
-			serviceUrl: options.serviceUrl + roomName,
-		};
 
-		console.log("options", optionsWithRoom);
-
-		JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
-		const initOptions = {
-			disableAudioLevels: true
-		};
-
-		JitsiMeetJS.init(initOptions);
-
-		const connection = new JitsiMeetJS.JitsiConnection("mezon", jwt, optionsWithRoom);
-
-		connection.addEventListener(
-			JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-			onConnectionSuccess);
-		connection.addEventListener(
-			JitsiMeetJS.events.connection.CONNECTION_FAILED,
-			onConnectionFailed);
-		connection.addEventListener(
-			JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-			onDisconnect);	
-		
-		connection.connect(optionsWithRoom);
-		
-		voiceConnRef.current = connection;
-
-		// get local video, audio
-		createLocalTrack();
-
-		return connection;
-	}, [currentVoiceRoomName, createLocalTrack])
-
-	/**
-	 * This function is called when we disconnect.
-	 */
-	const voiceDisconnect = useCallback(async () => {
-		console.log('disconnect!');
-		if (voiceConnRef && voiceConnRef.current) {
-			voiceConnRef.current.removeEventListener(
-				JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-				onConnectionSuccess);
-			voiceConnRef.current.removeEventListener(
-				JitsiMeetJS.events.connection.CONNECTION_FAILED,
-				onConnectionFailed);
-			voiceConnRef.current.removeEventListener(
-				JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-				onDisconnect);
-		}
-	}, []);
-	
 	const createVoiceRoom = useCallback(async () => {
 		console.log("room name", currentVoiceRoomName);
 		if (!voiceConnRef.current) {
@@ -283,12 +239,78 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceRoomRef.current.setDisplayName(userDisplayName);
 
 		return voiceRoomRef.current;
-	}, [currentVoiceRoomName, onRemoteTrackAdded])
+	}, [currentVoiceRoomName, onConferenceJoined, onRemoteTrackRemoved])
 	
 	const onConnectionSuccess = useCallback(() => {
 		console.log("onConnectionSuccess");
 		createVoiceRoom();		
 	}, [createVoiceRoom]);
+
+	const createVoiceConnection = useCallback(async (roomName: string, jwt: string) => {
+		if (!currentVoiceRoomName) {
+			return null; // init when the channel is set
+		}
+
+		if (voiceConnRef && voiceConnRef.current) {
+			return voiceConnRef.current;
+		}
+
+		const optionsWithRoom = { 
+			...options,
+			serviceUrl: options.serviceUrl + roomName,
+		};
+
+		console.log("options", optionsWithRoom);
+
+		JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
+		const initOptions = {
+			disableAudioLevels: true
+		};
+
+		JitsiMeetJS.init(initOptions);
+
+		const connection = new JitsiMeetJS.JitsiConnection("mezon", jwt, optionsWithRoom);
+
+		connection.addEventListener(
+			JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
+			onConnectionSuccess);
+		connection.addEventListener(
+			JitsiMeetJS.events.connection.CONNECTION_FAILED,
+			onConnectionFailed);
+		connection.addEventListener(
+			JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
+			onDisconnect);	
+		
+		connection.connect(optionsWithRoom);
+		
+		voiceConnRef.current = connection;
+
+		if (localTracksRef.current.length === 0) {
+			// get local video, audio
+			createLocalTrack();
+		}
+
+		return connection;
+	}, [currentVoiceRoomName, onConnectionSuccess, createLocalTrack])
+
+	/**
+	 * This function is called when we disconnect.
+	 */
+	const voiceDisconnect = useCallback(async () => {
+		console.log('disconnect!');
+		if (voiceConnRef && voiceConnRef.current) {
+			voiceConnRef.current.removeEventListener(
+				JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
+				onConnectionSuccess);
+			voiceConnRef.current.removeEventListener(
+				JitsiMeetJS.events.connection.CONNECTION_FAILED,
+				onConnectionFailed);
+			voiceConnRef.current.removeEventListener(
+				JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
+				onDisconnect);
+		}
+	}, []);
+
 	
 	/**
 	 *
@@ -303,26 +325,21 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			voiceConnRef,
 			voiceRoomRef,
 			currentVoiceRoomName,
-			renderLocalVideoTrack,
+			setTargetTrackNode,
 			setCurrentVoiceRoomName,
 			setUserDisplayName,
 			createVoiceConnection,
 			voiceDisconnect,
 			changeAudioOutput,
 			createLocalTrack,
-			setRenderLocalVideoTrack,
-			setRenderRemoteVideoTrack,
 		}),
 		[
 			voiceConnRef, 
 			voiceRoomRef, 
-			currentVoiceRoomName, 
-			renderLocalVideoTrack, 
+			currentVoiceRoomName,
 			createVoiceConnection, 
 			setCurrentVoiceRoomName, 
-			setUserDisplayName, 
-			setRenderLocalVideoTrack,
-			setRenderRemoteVideoTrack
+			setUserDisplayName,
 		],
 	);
 
