@@ -157,7 +157,6 @@ input:-webkit-autofill:active {
 	.public-DraftEditor-content {
 		div {
 			display: flex;
-			flex-direction: column;
 			div {
 				clear: both;
 				order: 2;
@@ -264,6 +263,6 @@ input:-webkit-autofill:active {
 	}
 }
 
-.prose *{
-  color: #ccc;
+.prose * {
+	color: #ccc;
 }
