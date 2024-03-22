@@ -1,5 +1,5 @@
 import { MezonStoreProvider, initStore } from '@mezon/store';
-import { CreateMezonClientOptions, CreateVoiceClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { routes } from './routes/index';
 import React from 'react';
+import { VoiceContextProvider } from '@mezon/core';
 
 const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
@@ -48,8 +49,11 @@ function AppWrapper() {
 
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-			<MezonContextProvider mezon={mezon} connect={true}>
-					<StrictMode><App /></StrictMode>
+			<VoiceContextProvider>
+				<MezonContextProvider mezon={mezon} connect={true}>				
+					<StrictMode>
+						<App />
+					</StrictMode>
 					<ToastContainer
 						position="top-right"
 						autoClose={2200}
@@ -61,8 +65,9 @@ function AppWrapper() {
 						draggable
 						pauseOnHover
 						theme="light"
-					/>
-			</MezonContextProvider>
+					/>				
+				</MezonContextProvider>
+			</VoiceContextProvider>	
 		</GoogleOAuthProvider>
 	);
 }
