@@ -1,4 +1,7 @@
 import { useMezonVoice } from "@mezon/transport";
+import { useCallback, useEffect } from "react";
+import JitsiLocalTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLocalTrack";
+import JitsiRemoteTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiRemoteTrack";
 
 export type ChannelVoiceProps = {
     clanName?: string;
@@ -8,18 +11,21 @@ export type ChannelVoiceProps = {
 };
 
 function ChannelVoice({ clanName, channelLabel, userName, jwt }: ChannelVoiceProps) {
-    const voicemezon = useMezonVoice();
+    const voice = useMezonVoice();
 
     const roomName = clanName?.replace(" ", "-")+"-"+channelLabel.replace(" ", "-")
-    if (roomName === "") {
-        throw new Error("room must not empty");
-    }
 
-    voicemezon.createVoiceRoom(roomName.toLowerCase());
-
+    useEffect(()=> {
+        voice.setCurrentVoiceRoomName(roomName.toLowerCase());
+        voice.setUserDisplayName(userName);
+        const targetNode = document.querySelector("#meet");
+        voice.setTargetTrackNode(targetNode as HTMLMediaElement);
+        voice.createVoiceConnection(roomName.toLowerCase(), jwt);
+    }, [voice]);
+    
     return (
-        <div className="space-y-2 px-4 mb-4 mt-[250px]" >            
-          
+        <div className="space-y-2 px-4 mb-4 mt-[250px]" >
+            <div id="meet"></div>
         </div>
     ); 
 }

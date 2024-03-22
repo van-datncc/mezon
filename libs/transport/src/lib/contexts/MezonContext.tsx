@@ -3,7 +3,6 @@ import { WebSocketAdapterPb } from "@mezon/mezon-js-protobuf"
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
-import { useMezonVoice } from '@mezon/transport';
 
 type MezonContextProviderProps = {
 	children: React.ReactNode;
@@ -42,8 +41,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	const socketRef = React.useRef<Socket | null>(null);
 	const channelRef = React.useRef<Channel | null>(null);
 
-	const voicemezon = useMezonVoice();
-
 	const createSocket = useCallback(async () => {
 		if (!clientRef.current) {
 			throw new Error('Mezon client not initialized');
@@ -77,8 +74,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
 
-			voicemezon.createVoiceConnection(session2.token);
-
 			return session;
 		},
 		[clientRef, socketRef],
@@ -102,8 +97,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session2 = await socketRef.current.connect(session, true);
 			sessionRef.current = session2;
 
-			voicemezon.createVoiceConnection(session2.token);
-
 			return session;
 		},
 		[clientRef, socketRef],
@@ -115,8 +108,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 		socketRef.current = null;
 		sessionRef.current = null;
-
-		voicemezon.voiceDisconnect();
 		
 	}, [socketRef]);
 
@@ -130,8 +121,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
 			sessionRef.current = session;
-
-			voicemezon.createVoiceConnection(session.token);
 
 			return session;
 		},
@@ -153,11 +142,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session2 = await socketRef.current.connect(newSession, true);
 			sessionRef.current = session2;
 
-			voicemezon.createVoiceConnection(session2.token);
-
 			return newSession;
 		},
-		[voicemezon],
+		[clientRef, socketRef],
 	);
 
 	const joinChatChannel = React.useCallback(
@@ -193,9 +180,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		const session2 = await socketRef.current.connect(session, true);
 		sessionRef.current = session2;
 
-		voicemezon.voiceDisconnect();
-		voicemezon.createVoiceConnection(session2.token);
-
 	}, [clientRef, sessionRef, socketRef]);
 
 	const addStatusFollow = React.useCallback(
@@ -213,7 +197,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	// TODO: use same function for joinChatChannel and joinChatDirectMessage
-
 	const joinChatDirectMessage = React.useCallback(
 		async (channelId: string, channelLabel?: string | undefined, channelType?: number | undefined) => {
 			const socket = socketRef.current;

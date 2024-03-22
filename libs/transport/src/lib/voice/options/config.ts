@@ -1,9 +1,11 @@
-const options = {
+const domain = "meet.mezon.vn";
+const options = {    
     hosts: {
-      domain: 'meet.mezon.vn',
-      muc: 'conference.meet.mezon.vn', // MUC domain
+      domain: domain,
+      muc: `conference.${domain}`,
+      focus: `focus.${domain}`
     },
-    serviceUrl: 'https://meet.mezon.vn/http-bind', // BOSH server
+    serviceUrl: `https://${domain}/http-bind?room=`,
 };
 
 export default options
