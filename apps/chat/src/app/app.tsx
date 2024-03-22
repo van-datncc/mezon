@@ -48,9 +48,9 @@ function AppWrapper() {
 	}, []);
 
 	return (
-		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>			
+			<MezonContextProvider mezon={mezon} connect={true}>				
 			<VoiceContextProvider>
-				<MezonContextProvider mezon={mezon} connect={true}>				
 					<StrictMode>
 						<App />
 					</StrictMode>
@@ -66,8 +66,8 @@ function AppWrapper() {
 						pauseOnHover
 						theme="light"
 					/>				
-				</MezonContextProvider>
-			</VoiceContextProvider>	
+				</VoiceContextProvider>	
+			</MezonContextProvider>
 		</GoogleOAuthProvider>
 	);
 }
