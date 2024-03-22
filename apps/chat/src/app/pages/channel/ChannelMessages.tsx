@@ -40,8 +40,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
-	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom, setValueInput } =
-		useContext(ChatContext);
+	const {
+		activeTab,
+		setActiveTab,
+		setIsOpenEmojiMessBox,
+		setIsOpenEmojiReacted,
+		setIsOpenEmojiReactedBottom,
+		setValueInput,
+	} = useContext(ChatContext);
 
 	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
 

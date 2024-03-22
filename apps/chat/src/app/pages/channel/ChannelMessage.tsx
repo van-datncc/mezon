@@ -1,6 +1,6 @@
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { EmojiPicker, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
+import { EmojiPickerComp, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage, useChatSending } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
@@ -157,9 +157,9 @@ export function ChannelMessage(props: MessageProps) {
 				</div>
 
 				{isOpenEmojiReacted && mess.id === messageRef?.id && (
-					<div className="w-fit absolute left-[-20rem] top-[-23rem] right-0">
+					<div className="w-fit fixed right-16 bottom-[6rem]">
 						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							<EmojiPickerComp messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 						</div>
 					</div>
 				)}

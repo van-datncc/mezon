@@ -1,6 +1,6 @@
 import { ChatContext } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import Picker, { EmojiClickData, Theme } from 'emoji-picker-react';
+import EmojiPicker, { EmojiClickData, EmojiStyle, Theme } from 'emoji-picker-react';
 
 import { useContext } from 'react';
 
@@ -24,23 +24,22 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 		setEmojiSelectedMess,
 		widthEmojiBar,
 		setIsOpenEmojiReactedBottom,
+		emojiSelectedMess,
 	} = useContext(ChatContext);
 
-	const handleEmojiSelect = (emojiObject: EmojiClickData, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		console.log(emojiObject);
-		// if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
-		// 	setEmojiSelectedReacted(emojiData.emoji);
-		// 	setIsOpenEmojiReacted(false);
-		// 	setIsOpenEmojiReactedBottom(false);
-		// 	event.stopPropagation();
-		// } else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
-		// 	setEmojiSelectedMess(emojiData.emoji);
-		// 	event.stopPropagation();
-		// 	setIsOpenEmojiMessBox(false);
-		// 	setIsOpenEmojiReactedBottom(false);
-		// }
+	const handleEmojiSelect = (emojiData: EmojiClickData, event: MouseEvent) => {
+		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
+			setEmojiSelectedReacted(emojiData.emoji);
+			setIsOpenEmojiReacted(false);
+			setIsOpenEmojiReactedBottom(false);
+			event.stopPropagation();
+		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+			setEmojiSelectedMess(emojiData.emoji);
+			event.stopPropagation();
+			setIsOpenEmojiMessBox(false);
+			setIsOpenEmojiReactedBottom(false);
+		}
 	};
-
 	return (
 		<>
 			{/* <Picker
@@ -53,8 +52,9 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 					setIsOpenEmojiReactedBottom(false);
 				}}
 			/> */}
-
-			<Picker onEmojiClick={() => handleEmojiSelect} width={500} theme={Theme.DARK} height={458} />
+			<div onClick={(event) => event.stopPropagation()} className="z-20">
+				<EmojiPicker onEmojiClick={handleEmojiSelect} width={500} theme={Theme.DARK} height={458} emojiStyle={EmojiStyle.NATIVE} />
+			</div>
 		</>
 	);
 }
