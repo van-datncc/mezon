@@ -7,13 +7,13 @@ dos2unix ./ssh/id_gh_ncc
 chmod 600 ./ssh/id_gh_ncc
 ssh-add ./ssh/id_gh_ncc
 
-# run npm install
-npm install
-
 # add git submodules
 echo "Adding git submodules"
 git submodule init
 git submodule update --recursive --remote --init
+
+# run npm install
+npm install
 
 # finish
 echo "Done"
