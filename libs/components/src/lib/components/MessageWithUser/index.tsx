@@ -1,14 +1,8 @@
 import { ChatContext, useAuth, useChatReactionMessage } from '@mezon/core';
+import { ChannelStreamMode } from '@mezon/mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageReaction, ApiMessageRef } from '@mezon/mezon-js/api.gen';
 import { selectCurrentChannelId, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
-import {
-	EmojiPlaces,
-	IChannelMember,
-	IMessageWithUser,
-	TIME_COMBINE,
-	checkSameDay,
-	getTimeDifferenceInSeconds,
-} from '@mezon/utils';
+import { EmojiPlaces, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -18,7 +12,6 @@ import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
-import { ChannelStreamMode } from '@mezon/mezon-js';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -344,6 +337,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const { setEmojiPlaceActive, emojiPlaceActive } = useContext(ChatContext);
 	const [divWidth, setDivWidth] = useState<number | null>(null);
 	const divRef = useRef<HTMLDivElement>(null);
+	const childRef = useRef<(HTMLDivElement | null)[]>([]);
 	const { widthEmojiBar, setWidthEmojiBar } = useContext(ChatContext);
 
 	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -389,6 +383,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 	const getEmojiHover = (emojiParam: any) => {
 		setIsHoverSender(true);
 		setEmojiHover(emojiParam);
+		setIsHideSmileButton(false);
 	};
 
 	type Props = {
@@ -411,6 +406,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		message_sender_id: string,
 		countRemoved: number,
 	) => {
+		setIsHideSmileButton(true);
 		await reactionMessageAction('', ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 	function removeSenderBySenderId(emojiData: EmojiDataOptionals, senderId: string) {
@@ -420,6 +416,23 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 		return emojiData;
 	}
 
+	const [isHideSmileButton, setIsHideSmileButton] = useState<boolean>(false);
+
+	const calculateDistance = (index: number, bannerWidth: number) => {
+		if (childRef.current && divMessageWithUser.current) {
+			const grandParentDivRect = divMessageWithUser.current.getBoundingClientRect();
+			const childDivRef = childRef.current[index];
+			if (childDivRef) {
+				const childDivRect = childDivRef.getBoundingClientRect();
+				const compare = childDivRect.right + bannerWidth > grandParentDivRect.right;
+				return compare;
+			} else {
+			}
+		}
+	};
+	const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
+		return senders.reduce((sum: number, item: SenderInfoOptionals) => sum + item.count, 0);
+	};
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -430,7 +443,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 				</div>
 			)}
 			<div className={`${isMessRef ? 'bg-[#26262b] rounded-sm ' : ''}`}>
-				<div className={`flex h-15 flex-col   w-auto py-2 px-3`}>
+				<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
 					{getSenderMessage && getMessageRef && message.references && message?.references?.length > 0 && (
 						<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 							<Icons.ReplyCorner />
@@ -479,6 +492,7 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 									emojiDataIncSocket
 										.filter((obj) => obj.messageId === message.id)
 										?.map((emoji: EmojiDataOptionals, index) => {
+											const isRightMargin = calculateDistance(index, 288);
 											const totalSenderCount = emoji.senders.reduce((sum, sender) => sum + sender.count, 0);
 											const shouldHideEmoji = Math.abs(totalSenderCount) === 0;
 											const userSender = emoji.senders.find((sender) => sender.id === userId);
@@ -487,11 +501,12 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 												return null;
 											}
 											return (
-												<Fragment key={emoji.id}>
+												<Fragment key={index}>
 													{checkID && (
 														<div
+															ref={(element) => (childRef.current[index] = element)}
 															className={` justify-center items-center relative 
-													 		${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338] '}
+													 		${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338]'}
 													 		rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 															onClick={() =>
 																handleReactMessage(
@@ -508,110 +523,119 @@ function MessageWithUser({ message, preMessage, attachments, user, isMessNotifyM
 															onMouseEnter={() => {
 																return getEmojiHover(emoji);
 															}}
+															onMouseLeave={() => {
+																setIsHoverSender(false);
+															}}
 														>
 															<span className=" relative left-[-10px] ">{emoji.emoji}</span>
 															<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
-																<p>
-																	{emoji.senders.reduce((sum, item: SenderInfoOptionals): number => {
-																		if (item.id === userId && emoji.emoji === emojiRemoved) {
-																			return sum + item.count;
-																		} else return sum + item.count;
-																	}, 0)}
-																</p>
+																<p>{calculateTotalCount(emoji.senders)}</p>
 															</div>
 
-															{isHoverSender && emoji === isEmojiHover && emoji.messageId === message.id && (
-																<div
-                                  									onMouseLeave={()=>{setIsHoverSender(false)}}
-																	onClick={(e) => e.stopPropagation()}
-																	className="absolute z-20  bottom-7 left-0 w-[18rem]
-															 		bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border"
-																>
-																	<div className="flex flex-row items-center m-2">
-																		<div className="">{isEmojiHover.emoji}</div>
-																		<p className='text-sm'>
-																			{emoji.senders.reduce((sum, item: SenderInfoOptionals): number => {
-																				if (item.id === userId && emoji.emoji === emojiRemoved) {
-																					return sum + item.count;
-																				} else return sum + item.count;
-																			}, 0)}
-																		</p>
-																		<button
-																			className="right-3 absolute"
-																			onClick={(e) => {
-																				e.stopPropagation();
-																				setIsHoverSender(false);
-																			}}
+															{!isHideSmileButton &&
+																emojiDataIncSocket.indexOf(emoji) === emojiDataIncSocket.length - 1 && (
+																	<div onMouseEnter={() => setIsHovered(true)} className="absolute w-4 h-4">
+																		<div className="bg-transparent w-8 flex flex-row items-center rounded-md cursor-pointer"></div>
+																		<div
+																			onClick={handleClickOpenEmojiBottom}
+																			className={`bg-[#313338] border-[#313338] w-8 border px-2 flex flex-row items-center rounded-md cursor-pointer ml-[2.5rem] h-6 absolute bottom-[-0.25rem]
+											 								${(isOpenEmojiReactedBottom && message.id === messageRef?.id) || isHovered ? 'block' : 'hidden'} `}
+																			onMouseEnter={() => setIsHoverSender(false)}
 																		>
-																			<Icons.Close defaultSize="w-3 h-3" />
-																		</button>
-																	</div>
+																			<Icons.Smile
+																				defaultSize="w-4 h-4"
+																				defaultFill={
+																					isOpenEmojiReactedBottom && message.id === messageRef?.id
+																						? '#FFFFFF'
+																						: '#AEAEAE'
+																				}
+																			/>
+																		</div>
 
-																	<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
-																	{isEmojiHover.senders.map((item: any, index: number) => {
-																		return (
-																			<>
-																				{item.count > 0 && (
-																					<div
-																						key={item.id}
-																						className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative "
-																					>
-																						<AvatarComponent id={item.id} />
-																						<NameComponent id={item.id} />
-																						<p className="text-xs absolute right-8">{item.count}</p>
-																						{item.id === userId && (
-																							<button
-																								onClick={(e: any) => {
-																									return (
-																										e.stopPropagation(),
-																										removeEmojiSender(
-																											'',
-																											currentChannelId ?? '',
-																											message.id,
-																											emoji.emoji,
-																											item.id,
-																											item.count,
-																										),
-																										removeSenderBySenderId(emoji, item.id)
-																									);
-																								}}
-																								className="right-1 absolute"
-																							>
-																								<Icons.Close defaultSize="w-3 h-3" />
-																							</button>
-																						)}
-																					</div>
-																				)}
-																			</>
-																		);
-																	})}
-																</div>
-															)}
+																		{isOpenEmojiReactedBottom && message.id === messageRef?.id && (
+																			<div
+																				className={`scale-75 transform ${calculateDistance(emojiDataIncSocket.length - 1, 373) ? 'ml-[-10rem]' : 'ml-10'} bottom-24 origin-left fixed z-50`}
+																			>
+																				<EmojiPicker
+																					messageEmoji={message}
+																					emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM}
+																				/>
+																			</div>
+																		)}
+																	</div>
+																)}
+
+															{isHoverSender &&
+																emoji.emoji === isEmojiHover.emoji &&
+																emoji.messageId === message.id && (
+																	<div
+																		onMouseLeave={() => {
+																			setIsHoverSender(false);
+																		}}
+																		onClick={(e) => e.stopPropagation()}
+																		className={`absolute z-20  bottom-7 w-[18rem] 
+															 		bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border ${isRightMargin ? 'right-0' : 'left-0'}`}
+																	>
+																		<div className="flex flex-row items-center m-2">
+																			<div className="">{isEmojiHover.emoji}</div>
+																			<p className="text-sm">{calculateTotalCount(emoji.senders)}</p>
+																			<button
+																				className="right-3 absolute"
+																				onClick={(e) => {
+																					e.stopPropagation();
+																					setIsHoverSender(false);
+																				}}
+																			>
+																				<Icons.Close defaultSize="w-3 h-3" />
+																			</button>
+																		</div>
+
+																		<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
+																		{isEmojiHover.senders.map((item: any, index: number) => {
+																			return (
+																				<Fragment key={index}>
+																					{item.count > 0 && (
+																						<div
+																							key={item.id}
+																							className="m-2 flex flex-row  justify-start mb-2 items-center gap-2 relative "
+																						>
+																							<AvatarComponent id={item.id} />
+																							<NameComponent id={item.id} />
+																							<p className="text-xs absolute right-8">{item.count}</p>
+																							{item.id === userId && (
+																								<button
+																									onClick={(e: any) => {
+																										return (
+																											e.stopPropagation(),
+																											removeEmojiSender(
+																												'',
+																												currentChannelId ?? '',
+																												message.id,
+																												emoji.emoji,
+																												item.id,
+																												item.count,
+																											),
+																											removeSenderBySenderId(emoji, item.id)
+																										);
+																									}}
+																									className="right-1 absolute"
+																								>
+																									<Icons.Close defaultSize="w-3 h-3" />
+																								</button>
+																							)}
+																						</div>
+																					)}
+																				</Fragment>
+																			);
+																		})}
+																		<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
+																	</div>
+																)}
 														</div>
 													)}
 												</Fragment>
 											);
 										})}
-								{emojiDataIncSocket && emojiDataIncSocket.length > 0 && (
-									<div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-										<div className="bg-transparent w-8 h-6  flex flex-row items-center rounded-md cursor-pointer absolute"></div>
-										<div
-											onClick={handleClickOpenEmojiBottom}
-											className={`absolute top-0 right-0 bg-[#313338] border-[#313338] w-8 border h-6 px-2 flex flex-row items-center rounded-md cursor-pointer
-											 ${(isOpenEmojiReactedBottom && message.id === messageRef?.id) || isHovered ? 'block' : 'hidden'} `}
-										>
-											<Icons.Smile
-												defaultSize="w-4 h-4"
-												defaultFill={isOpenEmojiReactedBottom && message.id === messageRef?.id ? '#FFFFFF' : '#AEAEAE'}
-											/>
-										</div>
-										{isOpenEmojiReactedBottom && message.id === messageRef?.id && (
-											<div className={`scale-75 transform ${className}  bottom-24 origin-left fixed z-50`}>
-												<EmojiPicker messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
-											</div>
-										)}
-									</div>
-								)}
 							</div>
 						</div>
 					</div>

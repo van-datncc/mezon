@@ -1,9 +1,11 @@
 import { ChatContext } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
-import EmojiPicker from '../EmojiPicker';
+// import EmojiPicker from '../EmojiPicker';
+import { EmojiClickData } from 'emoji-picker-react';
+import EmojiPickerComp from '../EmojiPicker';
 import GiphyComp from './gifs/gifs';
 import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
@@ -11,13 +13,13 @@ import ImageSquare from './stickers';
 const GifStickerEmojiPopup = () => {
 	const { activeTab, setActiveTab } = useContext(ChatContext);
 	const currentChannel = useSelector(selectCurrentChannel);
-
 	const handleTabClick = (tab: string) => {
 		setActiveTab(tab);
 	};
 
+
 	return (
-		<div className="flex flex-col items-center w-[500px] h-fit min-h-[500px] rounded-lg bg-[#151617]">
+		<div className="flex flex-col items-center w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222]">
 			<div className=" w-full">
 				<div className="flex justify-start flex-row w-full mt-2 border-b border-blue-500 pb-2">
 					<button
@@ -39,7 +41,7 @@ const GifStickerEmojiPopup = () => {
 						Emoji
 					</button>
 				</div>
-				<InputSearch />
+				{activeTab !== TabNamePopup.EMOJI && <InputSearch />}
 			</div>
 
 			<div className="w-full h-fit">
@@ -53,11 +55,7 @@ const GifStickerEmojiPopup = () => {
 					<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={2} />
 				)}
 
-				{activeTab === TabNamePopup.EMOJI && (
-					<div className="scale-75 transform right-5 mt-0 z-20 absolute">
-						<EmojiPicker messageEmoji={undefined} emojiAction={EmojiPlaces.EMOJI_EDITOR} />
-					</div>
-				)}
+				{activeTab === TabNamePopup.EMOJI && <EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />}
 			</div>
 		</div>
 	);
