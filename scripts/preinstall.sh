@@ -12,8 +12,5 @@ echo "Adding git submodules"
 git submodule init
 git submodule update --recursive --remote --init
 
-# run npm install
-npm install
-
 # finish
 echo "Done"
