@@ -6,6 +6,8 @@ import JitsiLocalTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLo
 import { JitsiConferenceErrors } from "vendors/lib-jitsi-meet/dist/esm/JitsiConferenceErrors";
 import JitsiConnection from "vendors/lib-jitsi-meet/dist/esm/JitsiConnection";
 import options from "libs/transport/src/lib/voice/options/config";
+import { useAuth } from "@mezon/core";
+import { useMezon } from "@mezon/transport";
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -36,6 +38,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [userDisplayName, setUserDisplayName] = React.useState<string>("");
 	const [targetTrackNode, setTargetTrackNode] = React.useState<HTMLMediaElement>();
 
+	const { userProfile } = useAuth();	
+	const { socketRef } = useMezon();
 
 	const onConnectionFailed = useCallback(() => {
 		console.log("onConnectionFailed");
@@ -141,11 +145,32 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		localTracksRef.current.forEach((localTrack) => {
 			voiceRoomRef.current?.addTrack(localTrack);
 		});
+
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceJoined(
+				"channel_id",
+				"channel_label",
+				"id",		
+				currentVoiceRoomName,
+				userProfile?.user?.username || "",
+				"",
+			)
+		}
 	}, [isJoinedConf]);
 	
 	const onUserJoined = useCallback((id: string) => {
 		console.log('user join', id);
 		remoteTracksRef.current.set(id, []);
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceJoined(
+				"channel_id",
+				"channel_label",				
+				currentVoiceRoomName,
+				id,
+				"get name from id",
+				"",
+			)
+		}	
 	}, []);
 
 	const onUserLeft = useCallback((id: string) => {

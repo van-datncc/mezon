@@ -1,7 +1,5 @@
-import { useMezonVoice } from "@mezon/transport";
-import { useCallback, useEffect } from "react";
-import JitsiLocalTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLocalTrack";
-import JitsiRemoteTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiRemoteTrack";
+import { useMezon, useMezonVoice } from "@mezon/transport";
+import { useEffect } from "react";
 
 export type ChannelVoiceProps = {
     clanName?: string;

@@ -1,21 +1,21 @@
-import { IUser, LoadingStatus } from '@mezon/utils';
+import { IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
-export const USERS_FEATURE_KEY = 'users';
+export const VOICE_FEATURE_KEY = 'voice';
 
 /*
  * Update these interfaces according to your requirements.
  */
-export interface UsersEntity extends IUser {
+export interface VoiceEntity extends IVoice {
 	id: string; // Primary ID
 }
 
-export interface UsersState extends EntityState<UsersEntity, string> {
+export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 }
 
-export const usersAdapter = createEntityAdapter<UsersEntity>();
+export const voiceAdapter = createEntityAdapter<VoiceEntity>();
 
 /**
  * Export an effect using createAsyncThunk from
@@ -34,7 +34,7 @@ export const usersAdapter = createEntityAdapter<UsersEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchUsers = createAsyncThunk<UsersEntity[]>('users/fetchStatus', async (_, thunkAPI) => {
+export const fetchVoice = createAsyncThunk<VoiceEntity[]>('voice/fetchStatus', async (_, thunkAPI) => {
 	/**
 	 * Replace this with your custom fetch call.
 	 * For example, `return myApi.getUserss()`;
@@ -43,29 +43,29 @@ export const fetchUsers = createAsyncThunk<UsersEntity[]>('users/fetchStatus', a
 	return Promise.resolve([]);
 });
 
-export const initialUsersState: UsersState = usersAdapter.getInitialState({
+export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 });
 
-export const usersSlice = createSlice({
-	name: USERS_FEATURE_KEY,
-	initialState: initialUsersState,
+export const voiceSlice = createSlice({
+	name: VOICE_FEATURE_KEY,
+	initialState: initialVoiceState,
 	reducers: {
-		add: usersAdapter.addOne,
-		remove: usersAdapter.removeOne,
+		add: voiceAdapter.addOne,
+		remove: voiceAdapter.removeOne,
 		// ...
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchUsers.pending, (state: UsersState) => {
+			.addCase(fetchVoice.pending, (state: VoiceState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchUsers.fulfilled, (state: UsersState, action: PayloadAction<UsersEntity[]>) => {
-				usersAdapter.setAll(state, action.payload);
+			.addCase(fetchVoice.fulfilled, (state: VoiceState, action: PayloadAction<VoiceEntity[]>) => {
+				voiceAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
-			.addCase(fetchUsers.rejected, (state: UsersState, action) => {
+			.addCase(fetchVoice.rejected, (state: VoiceState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -75,7 +75,7 @@ export const usersSlice = createSlice({
 /*
  * Export reducer for store configuration.
  */
-export const usersReducer = usersSlice.reducer;
+export const voiceReducer = voiceSlice.reducer;
 
 /*
  * Export action creators to be dispatched. For use with the `useDispatch` hook.
@@ -95,7 +95,7 @@ export const usersReducer = usersSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const usersActions = usersSlice.actions;
+export const voiceActions = voiceSlice.actions;
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -111,10 +111,10 @@ export const usersActions = usersSlice.actions;
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = usersAdapter.getSelectors();
+const { selectAll, selectEntities } = voiceAdapter.getSelectors();
 
-export const getUsersState = (rootState: { [USERS_FEATURE_KEY]: UsersState }): UsersState => rootState[USERS_FEATURE_KEY];
+export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): VoiceState => rootState[VOICE_FEATURE_KEY];
 
-export const selectAllUsers = createSelector(getUsersState, selectAll);
+export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
-export const selectUsersEntities = createSelector(getUsersState, selectEntities);
+export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
