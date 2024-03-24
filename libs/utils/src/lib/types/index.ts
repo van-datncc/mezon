@@ -135,6 +135,12 @@ export type IUser = {
 	avatarSm: string;
 };
 
+export type IVoice = {
+	participates: string,
+	roomName: string,
+	lastScreenshot: string,
+}
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;

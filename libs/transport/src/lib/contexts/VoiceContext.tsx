@@ -6,6 +6,9 @@ import JitsiLocalTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLo
 import { JitsiConferenceErrors } from "vendors/lib-jitsi-meet/dist/esm/JitsiConferenceErrors";
 import JitsiConnection from "vendors/lib-jitsi-meet/dist/esm/JitsiConnection";
 import options from "libs/transport/src/lib/voice/options/config";
+import { useAuth } from "@mezon/core";
+import { useMezon } from "@mezon/transport";
+import JitsiParticipant from "vendors/lib-jitsi-meet/dist/esm/JitsiParticipant";
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -18,6 +21,8 @@ export type VoiceContextValue = {
 	setTargetTrackNode: React.Dispatch<React.SetStateAction<HTMLMediaElement | undefined>>;
 	setCurrentVoiceRoomName: React.Dispatch<React.SetStateAction<string>>;
 	setUserDisplayName: React.Dispatch<React.SetStateAction<string>>;
+	setClanId: React.Dispatch<React.SetStateAction<string>>;
+	setClanName: React.Dispatch<React.SetStateAction<string>>;
 	changeAudioOutput: (selected: any) => void;
 	createLocalTrack: () => void;	
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
@@ -34,8 +39,12 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [isJoinedConf, setIsJoinedConf] = React.useState<boolean>(false);	
 	const [currentVoiceRoomName, setCurrentVoiceRoomName] = React.useState<string>("");
 	const [userDisplayName, setUserDisplayName] = React.useState<string>("");
+	const [clanId, setClanId] = React.useState<string>("");
+	const [clanName, setClanName] = React.useState<string>("");
 	const [targetTrackNode, setTargetTrackNode] = React.useState<HTMLMediaElement>();
 
+	//const { userProfile } = useAuth();
+	const { socketRef } = useMezon();
 
 	const onConnectionFailed = useCallback(() => {
 		console.log("onConnectionFailed");
@@ -134,21 +143,42 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 	}, [remoteTracksRef, targetTrackNode]);
 	
-	const onConferenceJoined = useCallback(() => {
-		console.log("onConferenceJoined");
+	const onConferenceJoined = useCallback((event: any) => {
+		console.log("onConferenceJoined clan info", event, clanId, clanName);
 		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
 			voiceRoomRef.current?.addTrack(localTrack);
 		});
-	}, [isJoinedConf]);
-	
-	const onUserJoined = useCallback((id: string) => {
-		console.log('user join', id);
-		remoteTracksRef.current.set(id, []);
-	}, []);
 
-	const onUserLeft = useCallback((id: string) => {
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceJoined(
+				clanId, // channel_id
+				clanName, // channel_label,
+				"", // id
+				userDisplayName,
+				currentVoiceRoomName,
+				"",
+			)
+		}
+	}, [clanId, clanName, socketRef, userDisplayName, currentVoiceRoomName]);
+	
+	const onUserJoined = useCallback((id: string, user: JitsiParticipant) => {
+		console.log('user join', id, user);
+		remoteTracksRef.current.set(id, []);
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceJoined(
+				clanId, //channel_id,
+				clanName, //channel_label,
+				user.getJid(),
+				user.getDisplayName(),		
+				currentVoiceRoomName,
+				"",
+			)
+		}	
+	}, [clanId, clanName, currentVoiceRoomName, socketRef]);
+
+	const onUserLeft = useCallback((id: string, user: JitsiParticipant) => {
 		console.log('user left', id);
 	}, []);
 
@@ -187,7 +217,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		.then((tracks) => {
 			onLocalTracks(tracks);
 		}).catch(error => {
-			throw error;
+			console.log("no local track", error);
 		});
 
 		if (JitsiMeetJS.mediaDevices.isDeviceChangeAvailable('output')) {
@@ -239,11 +269,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceRoomRef.current.setDisplayName(userDisplayName);
 
 		return voiceRoomRef.current;
-	}, [currentVoiceRoomName, onConferenceJoined, onRemoteTrackRemoved])
+	}, [currentVoiceRoomName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
 	
-	const onConnectionSuccess = useCallback(() => {
-		console.log("onConnectionSuccess");
-		createVoiceRoom();		
+	const onConnectionSuccess = useCallback((event: any) => {
+		console.log("onConnectionSuccess", event);
+		createVoiceRoom();
 	}, [createVoiceRoom]);
 
 	const createVoiceConnection = useCallback(async (roomName: string, jwt: string) => {
@@ -291,7 +321,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 
 		return connection;
-	}, [currentVoiceRoomName, onConnectionSuccess, createLocalTrack])
+	}, [currentVoiceRoomName, onConnectionSuccess, onConnectionFailed, onDisconnect, createLocalTrack])
 
 	/**
 	 * This function is called when we disconnect.
@@ -309,7 +339,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
 				onDisconnect);
 		}
-	}, []);
+	}, [onConnectionFailed, onConnectionSuccess, onDisconnect]);
 
 	
 	/**
@@ -328,19 +358,14 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			setTargetTrackNode,
 			setCurrentVoiceRoomName,
 			setUserDisplayName,
+			setClanId,
+			setClanName,
 			createVoiceConnection,
 			voiceDisconnect,
 			changeAudioOutput,
 			createLocalTrack,
 		}),
-		[
-			voiceConnRef, 
-			voiceRoomRef, 
-			currentVoiceRoomName,
-			createVoiceConnection, 
-			setCurrentVoiceRoomName, 
-			setUserDisplayName,
-		],
+		[currentVoiceRoomName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;
