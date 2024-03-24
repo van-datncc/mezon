@@ -5,8 +5,9 @@ import {
 	MessageTypingEvent,
 	Notification,
 	StatusPresenceEvent,
+	VoiceJoinedEvent,
 } from '@mezon/mezon-js';
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageWithUser, TabNamePopup } from '@mezon/utils';
 import React, { useCallback, useEffect } from 'react';
@@ -138,6 +139,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 
+	const onvoicejoined = useCallback(
+		(voice: VoiceJoinedEvent) => {
+			dispatch(voiceActions.add(voice));
+		}, [dispatch]
+	);
+
+	const onvoiceleaved = useCallback(
+		(voice: VoiceJoinedEvent) => {
+			dispatch(voiceActions.remove(voice.id));
+		}, [dispatch]
+	);
+
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
@@ -235,6 +248,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		if (!socket) {
 			return;
 		}
+
+		socket.onvoicejoined = onvoicejoined;
+
+		socket.onvoiceleaved = onvoiceleaved;
 
 		socket.onchannelmessage = onchannelmessage;
 

@@ -136,7 +136,9 @@ export type IUser = {
 };
 
 export type IVoice = {
-	participates: string,
+	clanId: string,
+	clanName: string,
+	participant: string,
 	roomName: string,
 	lastScreenshot: string,
 }
