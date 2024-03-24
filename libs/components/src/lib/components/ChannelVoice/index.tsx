@@ -2,13 +2,14 @@ import { useMezonVoice } from "@mezon/transport";
 import { useEffect } from "react";
 
 export type ChannelVoiceProps = {
-    clanName?: string;
+    clanId: string;
+    clanName: string;
     channelLabel: string;
     userName: string;
     jwt: string;
 };
 
-function ChannelVoice({ clanName, channelLabel, userName, jwt }: ChannelVoiceProps) {
+function ChannelVoice({ clanId, clanName, channelLabel, userName, jwt }: ChannelVoiceProps) {
     const voice = useMezonVoice();
 
     const roomName = clanName?.replace(" ", "-")+"-"+channelLabel.replace(" ", "-")
@@ -16,6 +17,8 @@ function ChannelVoice({ clanName, channelLabel, userName, jwt }: ChannelVoicePro
     useEffect(()=> {
         voice.setCurrentVoiceRoomName(roomName.toLowerCase());
         voice.setUserDisplayName(userName);
+        voice.setClanId(clanId);
+        voice.setClanName(clanName);
         const targetNode = document.querySelector("#meet");
         voice.setTargetTrackNode(targetNode as HTMLMediaElement);
         voice.createVoiceConnection(roomName.toLowerCase(), jwt);
