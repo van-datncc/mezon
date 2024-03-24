@@ -1,4 +1,4 @@
-import { useMezon, useMezonVoice } from "@mezon/transport";
+import { useMezonVoice } from "@mezon/transport";
 import { useEffect } from "react";
 
 export type ChannelVoiceProps = {
