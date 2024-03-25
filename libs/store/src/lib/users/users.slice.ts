@@ -1,4 +1,4 @@
-import { IThread, LoadingStatus } from '@mezon/utils';
+import { IUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const USERS_FEATURE_KEY = 'users';
@@ -6,7 +6,7 @@ export const USERS_FEATURE_KEY = 'users';
 /*
  * Update these interfaces according to your requirements.
  */
-export interface UsersEntity extends IThread {
+export interface UsersEntity extends IUser {
 	id: string; // Primary ID
 }
 

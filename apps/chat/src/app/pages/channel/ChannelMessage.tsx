@@ -1,8 +1,8 @@
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { EmojiPicker, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
+import { EmojiPickerComp, Icons, MessageWithUser, ReactedOutsideOptional, UnreadMessageBreak } from '@mezon/components';
 import { ChatContext, useChatMessage, useChatSending } from '@mezon/core';
-import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
+import { selectMemberByUserId } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -18,10 +18,10 @@ type MessageProps = {
 };
 
 export function ChannelMessage(props: MessageProps) {
-	const { message, lastSeen, preMessage, myUser, mode, channelId, channelLabel} = props;
+	const { message, lastSeen, preMessage, myUser, mode, channelId, channelLabel } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
-	const { EditSendMessage } = useChatSending({ channelId: channelId|| '', channelLabel: channelLabel|| '', mode });
+	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
@@ -36,8 +36,8 @@ export function ChannelMessage(props: MessageProps) {
 	}, [message]);
 
 	const [editMessage, setEditMessage] = useState(mess.content.t);
-	const [newMessage, setNewMessage] = useState('')
-	
+	const [newMessage, setNewMessage] = useState('');
+
 	const messPre = useMemo(() => {
 		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
 			return preMessage.content;
@@ -94,24 +94,21 @@ export function ChannelMessage(props: MessageProps) {
 		setMessageRef(mess);
 		event.stopPropagation();
 	};
-	
+
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			if (editMessage) {
-				handleSend(editMessage,message.id)
-				setNewMessage(editMessage)
-				handleCancelEdit()
+				handleSend(editMessage, message.id);
+				setNewMessage(editMessage);
+				handleCancelEdit();
 			}
 		}
 		if (e.key === 'Escape') {
-			handleCancelEdit()
+			handleCancelEdit();
 		}
 	};
-	  const handleSend = useCallback(
-		(
-			editMessage: string,
-			messageId: string
-		) => {
+	const handleSend = useCallback(
+		(editMessage: string, messageId: string) => {
 			EditSendMessage(editMessage, messageId);
 		},
 		[EditSendMessage],
@@ -123,11 +120,17 @@ export function ChannelMessage(props: MessageProps) {
 	const updateTextareaHeight = (textarea: HTMLTextAreaElement) => {
 		textarea.style.height = 'auto';
 		textarea.style.height = textarea.scrollHeight + 'px';
-	  };
-	
+	};
+
 	return (
 		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
-			<MessageWithUser message={mess as IMessageWithUser} preMessage={messPre as IMessageWithUser} user={user} mode={mode} newMessage={newMessage}/>
+			<MessageWithUser
+				message={mess as IMessageWithUser}
+				preMessage={messPre as IMessageWithUser}
+				user={user}
+				mode={mode}
+				newMessage={newMessage}
+			/>
 			{lastSeen && <UnreadMessageBreak />}
 
 			<div
@@ -154,23 +157,25 @@ export function ChannelMessage(props: MessageProps) {
 				</div>
 
 				{isOpenEmojiReacted && mess.id === messageRef?.id && (
-					<div className="w-fit absolute left-[-20rem] top-[-23rem] right-0">
+					<div className="w-fit fixed right-16 bottom-[6rem]">
 						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPicker messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							<EmojiPickerComp messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 						</div>
 					</div>
 				)}
 			</div>
 			{isOpenEdit && mess.id === messageRef?.id && (
 				<div className="inputEdit relative left-[66px] top-[-30px]">
-					<textarea defaultValue={editMessage} className="w-[83%] bg-black rounded pl-4"
-						onKeyDown={onSend} 
-						onChange={(e) => {onchange(e)}}
+					<textarea
+						defaultValue={editMessage}
+						className="w-[83%] bg-black rounded pl-4"
+						onKeyDown={onSend}
+						onChange={(e) => {
+							onchange(e);
+						}}
 						rows={editMessage?.split('\n').length}
 					></textarea>
-					<p className="absolute -bottom-4 text-xs">
-						escape to cancel • enter to save
-					</p>
+					<p className="absolute -bottom-4 text-xs">escape to cancel • enter to save</p>
 				</div>
 			)}
 		</div>

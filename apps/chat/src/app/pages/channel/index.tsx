@@ -21,7 +21,7 @@ export default function ChannelLayout() {
 		if (currentChannel && currentChannel.type === 1) {
 			return <ChannelMessages channelId={currentChannel?.id} channelLabel={currentChannel.channel_label} type="CHANNEL" mode={2}/>
 		} else if (currentChannel && currentChannel?.type === 4) {
-			return <ChannelVoice jwt={sessionRef.current?.token || ''} channelLabel={currentChannel.channel_label || ''} clanName={currentClan?.clan_name} userName={userProfile?.user?.username || "unknown"} />
+			return <ChannelVoice jwt={sessionRef.current?.token || ''} channelLabel={currentChannel.channel_label || ''} clanId={currentClan?.id || ""} clanName={currentClan?.clan_name || ""} userName={userProfile?.user?.username || "unknown"} />
 		} else {
 			return <ChannelMessages.Skeleton />
 		}
@@ -41,6 +41,7 @@ export default function ChannelLayout() {
 						{currentChannel && <ChannelTyping channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />}
 						{currentChannel ? (
 							<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+
 						) : (
 							<ChannelMessageBox.Skeleton />
 						)}

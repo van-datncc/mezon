@@ -20,7 +20,7 @@ export type MezonContextValue = {
 	clientRef: React.MutableRefObject<Client | null>;
 	sessionRef: React.MutableRefObject<Session | null>;
 	socketRef: React.MutableRefObject<Socket | null>;
-	channelRef: React.MutableRefObject<Channel | null>;
+	channelRef: React.MutableRefObject<Channel | null>;	
 	createClient: () => Promise<Client>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
@@ -30,7 +30,7 @@ export type MezonContextValue = {
 	joinChatChannel: (channelId: string) => Promise<Channel>;
 	joinChatDirectMessage: (channelId: string, channelName?: string, channelType?: number) => Promise<Channel>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
-	reconnect: () => Promise<void>;
+	reconnect: () => Promise<void>;	
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -108,6 +108,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 		socketRef.current = null;
 		sessionRef.current = null;
+		
 	}, [socketRef]);
 
 	const authenticateDevice = useCallback(
@@ -120,6 +121,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
 			sessionRef.current = session;
+
 			return session;
 		},
 		[clientRef],

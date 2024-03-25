@@ -12,6 +12,7 @@ import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { routes } from './routes/index';
 import React from 'react';
+import { VoiceContextProvider } from '@mezon/core';
 
 const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
 
@@ -21,7 +22,6 @@ const mezon: CreateMezonClientOptions = {
 	key: process.env.NX_CHAT_APP_API_KEY as string,
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
-
 
 export function App() {
 	const mezon = useMezon();
@@ -48,9 +48,12 @@ function AppWrapper() {
 	}, []);
 
 	return (
-		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-			<MezonContextProvider mezon={mezon} connect={true}>
-					<StrictMode><App /></StrictMode>
+		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>			
+			<MezonContextProvider mezon={mezon} connect={true}>				
+			<VoiceContextProvider>
+					<StrictMode>
+						<App />
+					</StrictMode>
 					<ToastContainer
 						position="top-right"
 						autoClose={2200}
@@ -62,7 +65,8 @@ function AppWrapper() {
 						draggable
 						pauseOnHover
 						theme="light"
-					/>
+					/>				
+				</VoiceContextProvider>	
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
 	);

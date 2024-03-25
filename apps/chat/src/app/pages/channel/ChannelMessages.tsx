@@ -1,8 +1,9 @@
-import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { useEffect, useRef } from 'react';
+import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
+import { ChatContext, getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
+import { TabNamePopup } from '@mezon/utils';
+import { useContext, useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
-import { ChatWelcome } from '@mezon/components';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -16,12 +17,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const containerRef = useRef<HTMLDivElement>(null);
+	const { heightEditor } = useContext(ChatContext);
 
 	const fetchData = () => {
 		loadMoreMessage();
 	};
 	const messageid = getJumpToMessageId();
-	
+
 	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {
@@ -38,8 +40,32 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
+	const {
+		activeTab,
+		setActiveTab,
+		setIsOpenEmojiMessBox,
+		setIsOpenEmojiReacted,
+		setIsOpenEmojiReactedBottom,
+		setValueInput,
+	} = useContext(ChatContext);
+
+	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
+
+	useEffect(() => {
+		setPopupClass(`fixed right-[1rem] bottom-[${heightEditor + 20}px] z-10`);
+	}, [heightEditor]);
+
 	return (
 		<div
+			onClick={(e) => {
+				e.stopPropagation();
+				setActiveTab(TabNamePopup.NONE);
+				setIsOpenEmojiMessBox(false);
+				setIsOpenEmojiReacted(false);
+				setIsOpenEmojiReactedBottom(false);
+				setValueInput('');
+			}}
+			className=" relative"
 			id="scrollLoading"
 			ref={containerRef}
 			style={{
@@ -63,7 +89,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 			>
-				{messages.map((message, i) => (					
+				{messages.map((message, i) => (
 					<ChannelMessage
 						mode={mode}
 						key={message.id}
@@ -71,11 +97,21 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						message={message}
 						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
 						myUser={userProfile?.user?.id}
-						channelId = {channelId}
-						channelLabel = {channelLabel || ''}
+						channelId={channelId}
+						channelLabel={channelLabel || ''}
 					/>
 				))}
 			</InfiniteScroll>
+			{activeTab !== TabNamePopup.NONE && (
+				<div
+					className={popupClass}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)}
 		</div>
 	);
 }
