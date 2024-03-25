@@ -136,12 +136,12 @@ export type IUser = {
 };
 
 export type IVoice = {
-	clanId: string,
-	clanName: string,
-	participant: string,
-	roomName: string,
-	lastScreenshot: string,
-}
+	clanId: string;
+	clanName: string;
+	participant: string;
+	roomName: string;
+	lastScreenshot: string;
+};
 
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
@@ -191,7 +191,7 @@ export interface ChannelProps {
 	name?: string;
 	isPrivate?: ChannelStatusEnum;
 	categories?: Record<string, CategoryProps>;
-	type: ChannelType;
+	type?: ChannelType;
 }
 
 export interface CategoryProps {
@@ -218,11 +218,4 @@ export interface UnreadChannel {
 	channelId: string;
 	channelLastMessageId: string;
 	channelLastSeenMesageId: string;
-}
-
-export enum TabNamePopup {
-	NONE ='NONE',
-	GIFS = 'GIFS',
-	STICKERS = 'STICKER',
-	EMOJI = 'EMOJI',
 }
