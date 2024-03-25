@@ -25,14 +25,6 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setChannelLabel(e.target.value);
 	};
 
-	useEffect(() => {
-		const textArea = textAreaRef.current;
-		if (textArea) {
-			textArea.style.height = 'auto';
-			textArea.style.height = textArea.scrollHeight + 'px';
-		}
-	}, [topic]);
-
 	const handleReset = () => {
 		setTopic(topicInit);
 		setChannelLabel(channelLabelInit);
@@ -42,6 +34,14 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setChannelLabelInit(channelLabel);
 		setTopicInit(topic);
 	};
+
+	useEffect(() => {
+		const textArea = textAreaRef.current;
+		if (textArea) {
+			textArea.style.height = 'auto';
+			textArea.style.height = textArea.scrollHeight + 'px';
+		}
+	}, [topic]);
 
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">

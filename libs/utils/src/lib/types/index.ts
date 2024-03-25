@@ -219,3 +219,10 @@ export interface UnreadChannel {
 	channelLastMessageId: string;
 	channelLastSeenMesageId: string;
 }
+
+export enum TabNamePopup {
+	NONE = 'NONE',
+	GIFS = 'GIFS',
+	STICKERS = 'STICKER',
+	EMOJI = 'EMOJI',
+}
