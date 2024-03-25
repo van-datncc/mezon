@@ -18,14 +18,15 @@ type VoiceContextProviderProps = {
 export type VoiceContextValue = {
 	voiceConnRef: React.MutableRefObject<JitsiConnection | null>;
 	voiceChannelRef: React.MutableRefObject<JitsiConference | null>;
-	currentVoiceRoomName: string;
+	voiceChannelName: string;
 	setTargetTrackNode: React.Dispatch<React.SetStateAction<HTMLMediaElement | undefined>>;
-	setCurrentVoiceRoomName: React.Dispatch<React.SetStateAction<string>>;
+	setVoiceChannelName: React.Dispatch<React.SetStateAction<string>>;
 	setUserDisplayName: React.Dispatch<React.SetStateAction<string>>;
+	setVoiceChannelId: React.Dispatch<React.SetStateAction<string>>;
 	setClanId: React.Dispatch<React.SetStateAction<string>>;
 	setClanName: React.Dispatch<React.SetStateAction<string>>;
 	changeAudioOutput: (selected: any) => void;
-	createLocalTrack: () => void;	
+	createLocalTrack: () => void;
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
 	voiceDisconnect: () => void;
 };
@@ -38,7 +39,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const localTracksRef = React.useRef<JitsiLocalTrack[]>([]);
 	const remoteTracksRef = React.useRef<Map<string, JitsiRemoteTrack[]>>(new Map());
 	const [isJoinedConf, setIsJoinedConf] = React.useState<boolean>(false);	
-	const [currentVoiceRoomName, setCurrentVoiceRoomName] = React.useState<string>("");
+	const [voiceChannelName, setVoiceChannelName] = React.useState<string>("");
+	const [voiceChannelId, setVoiceChannelId] = React.useState<string>("");
 	const [userDisplayName, setUserDisplayName] = React.useState<string>("");
 	const [clanId, setClanId] = React.useState<string>("");
 	const [clanName, setClanName] = React.useState<string>("");
@@ -161,7 +163,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [remoteTracksRef, targetTrackNode]);
 	
 	const onConferenceJoined = useCallback(() => {
-		console.log("onConferenceJoined clan info", clanId, clanName);
+		console.log("onConferenceJoined clan info", clanId, clanName, voiceChannelId, voiceChannelName);
 		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
@@ -170,30 +172,32 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
-				clanId, // channel_id
-				clanName, // channel_label,
 				voiceChannelRef.current?.myUserId() || '',
+				clanId,
+				clanName,
+				voiceChannelId,
+				voiceChannelName,
 				userDisplayName,
-				currentVoiceRoomName,
 				"",
 			)
 		}
-	}, [clanId, clanName, socketRef, userDisplayName, currentVoiceRoomName]);
+	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelName]);
 	
 	const onUserJoined = useCallback((id: string, user: JitsiParticipant) => {
 		console.log('user join', id, user);
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
-				clanId, //channel_id,
-				clanName, //channel_label,
 				user.getJid(),
-				user.getDisplayName(),		
-				currentVoiceRoomName,
+				clanId,
+				clanName,
+				voiceChannelId,				
+				voiceChannelName,
+				user.getDisplayName(),
 				"",
 			)
 		}	
-	}, [clanId, clanName, currentVoiceRoomName, socketRef]);
+	}, [clanId, clanName, voiceChannelName, voiceChannelId, socketRef]);
 
 	const onUserLeft = useCallback((id: string, user: JitsiParticipant) => {
 		console.log('user left', id);
@@ -251,7 +255,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [onLocalTracks]);
 
 	const createVoiceRoom = useCallback(async () => {
-		console.log("room name", currentVoiceRoomName);
+		console.log("room name", voiceChannelName);
 		if (!voiceConnRef.current) {
 			throw new Error('voice connection not init');
 		}
@@ -263,14 +267,14 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			}
 		};
 
-		console.log("room name", currentVoiceRoomName);
-		if (voiceChannelRef.current?.getName() === currentVoiceRoomName) {
+		console.log("room name", voiceChannelName);
+		if (voiceChannelRef.current?.getName() === voiceChannelName) {
 			console.log("already created");
 			return null;
 		}
 		
-		console.log("room name", currentVoiceRoomName);
-		voiceChannelRef.current = voiceConnRef.current.initJitsiConference(currentVoiceRoomName, confOptions);	
+		console.log("room name", voiceChannelName);
+		voiceChannelRef.current = voiceConnRef.current.initJitsiConference(voiceChannelName, confOptions);	
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
@@ -286,7 +290,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceChannelRef.current.setDisplayName(userDisplayName);
 
 		return voiceChannelRef.current;
-	}, [currentVoiceRoomName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
+	}, [voiceChannelName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
 	
 	const onConnectionSuccess = useCallback(() => {
 		console.log("onConnectionSuccess");
@@ -294,7 +298,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [createVoiceRoom]);
 
 	const createVoiceConnection = useCallback(async (roomName: string, jwt: string) => {
-		if (!currentVoiceRoomName) {
+		if (!voiceChannelName) {
 			return null; // init when the channel is set
 		}
 
@@ -338,7 +342,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 
 		return connection;
-	}, [currentVoiceRoomName, onConnectionSuccess, onConnectionFailed, onDisconnect, createLocalTrack])
+	}, [voiceChannelName, onConnectionSuccess, onConnectionFailed, onDisconnect, createLocalTrack])
 
 	/**
 	 * This function is called when we disconnect.
@@ -371,9 +375,10 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		() => ({
 			voiceConnRef,
 			voiceChannelRef,
-			currentVoiceRoomName,
+			voiceChannelName,
 			setTargetTrackNode,
-			setCurrentVoiceRoomName,
+			setVoiceChannelName,
+			setVoiceChannelId,
 			setUserDisplayName,
 			setClanId,
 			setClanName,
@@ -382,7 +387,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			changeAudioOutput,
 			createLocalTrack,
 		}),
-		[currentVoiceRoomName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack],
+		[voiceChannelName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;
