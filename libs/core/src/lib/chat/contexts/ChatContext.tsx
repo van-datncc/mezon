@@ -141,6 +141,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
+			console.log("VoiceJoinedEvent", voice);
 			dispatch(voiceActions.add(voice));
 		}, [dispatch]
 	);
