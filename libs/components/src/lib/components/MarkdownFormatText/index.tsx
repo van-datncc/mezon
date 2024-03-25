@@ -10,7 +10,7 @@ const MarkdownFormatText = ({ markdown }: MarkdownFormatTextProps) => {
 		<Markdown
 			remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
 			children={markdown}
-			className="prose prose-sm prose-ul:leading-[6px] prose-blockquote:leading-[6px] prose-ol:leading-[6px]"
+			className="prose prose-sm prose-ul:leading-[6px] prose-blockquote:leading-[6px] prose-ol:leading-[6px] prose-p:leading-[20px]"
 		/>
 	);
 };
