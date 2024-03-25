@@ -33,7 +33,6 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 						{channel.channel_label}
 					</p>
 				</div>
-
 				<button
 					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4 hover:text-white ${selectedButton === 'Overview' ? 'bg-[#232E3B] text-white' : ''}`}
 					onClick={() => {
