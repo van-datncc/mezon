@@ -18,7 +18,7 @@ jobs:
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
           chmod 777 ./scripts/preinstall.sh
-          npm install | true
+          npm install --no-package-lock | true
       - name: Build
         run: |
           echo "Build"
