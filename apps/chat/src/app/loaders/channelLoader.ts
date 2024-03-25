@@ -2,8 +2,7 @@ import { setJumpToMessageId } from '@mezon/core';
 import { channelsActions, getStoreAsync, messagesActions } from '@mezon/store';
 import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
 
-export const channelLoader: LoaderFunction = async ({ params, request }) => {
-	console.log("====", params);
+export const channelLoader: LoaderFunction = async ({ params, request }) => {	
 	const { channelId, clanId } = params;
 	const messageId = new URL(request.url).searchParams.get('messageId');
 
