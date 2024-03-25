@@ -26,7 +26,10 @@ function ChannelVoice({ clanId, clanName, channelLabel, userName, jwt }: Channel
     
     return (
         <div className="space-y-2 px-4 mb-4 mt-[250px]" >
-            <div id="meet"></div>
+            <div id="meet">
+                <div className="localTrack"></div>
+                <div className="remoteTrack"></div>
+            </div>            
         </div>
     ); 
 }

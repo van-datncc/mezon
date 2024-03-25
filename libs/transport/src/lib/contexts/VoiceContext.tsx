@@ -9,6 +9,7 @@ import options from "libs/transport/src/lib/voice/options/config";
 import { useAuth } from "@mezon/core";
 import { useMezon } from "@mezon/transport";
 import JitsiParticipant from "vendors/lib-jitsi-meet/dist/esm/JitsiParticipant";
+import JitsiTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiTrack";
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -56,9 +57,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceDisconnect();
 	}, []);
 
-	const onLocalTracks = useCallback((tracks: JitsiLocalTrack[] | JitsiConferenceErrors) => {
-		console.log("onLocalTracks");
-		
+	const onLocalTracks = useCallback((tracks: JitsiLocalTrack[] | JitsiConferenceErrors) => {		
 		localTracksRef.current = [...(tracks as JitsiLocalTrack[])];
 
 		for (let i = 0; i < localTracksRef.current.length; i++) {
@@ -78,14 +77,20 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				localVideoElem.id = 'localvideo'+i;
 				localVideoElem.autoplay = true;
 				localtrack.attach(localVideoElem);
-				targetTrackNode?.appendChild(localVideoElem);
+				const localTrack = targetTrackNode?.getElementsByClassName("localTrack");
+				if (localTrack !== undefined && localTrack?.length > 0) {
+					localTrack[0]?.appendChild(localVideoElem);
+				}
 			} else {
 				const localAudioElem = document.createElement("audio");
 				localAudioElem.id = 'localaudio'+i;
 				localAudioElem.autoplay = true;
 				localAudioElem.muted = true;
 				localtrack.attach(localAudioElem);
-				targetTrackNode?.appendChild(localAudioElem);
+				const localTrack = targetTrackNode?.getElementsByClassName("localTrack");
+				if (localTrack !== undefined && localTrack?.length > 0) {
+					localTrack[0]?.appendChild(localAudioElem);
+				}
 			}
 
 			if (isJoinedConf && voiceRoomRef.current) {
@@ -98,10 +103,15 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 	const onRemoteTrackRemoved = useCallback((track: JitsiRemoteTrack) => {
 		console.log("onRemoteTrackRemoved");
+		const participant = track.getParticipantId();
+		const index = remoteTracksRef.current.get(participant)?.indexOf(track);
+		if (index !== -1 && index !== undefined) {
+			remoteTracksRef.current.get(participant)?.splice(index, 1);
+		}
 	}, []);
 
 	const onRemoteTrackAdded = useCallback((track: JitsiRemoteTrack) => {
-		console.log("onRemoteTrackAdded");
+		console.log("onRemoteTrackAdded", track);
 		if (track.isLocal()) {
 			return;
 		}
@@ -111,7 +121,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		if (remoteTracksRef && remoteTracksRef.current) {
 			const remoteTrack = remoteTracksRef.current.get(participant);
 			const filter = remoteTrack?.filter(item => item.getId() === track.getId());
-			console.log(remoteTrack);
+			console.log(remoteTrack); // TODO: recheck this
 			if ((filter?.length as number) > 0) {
 				console.log("already in");
 				return; // already added
@@ -132,19 +142,26 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			remoteVideo.autoplay = true;
 			remoteVideo.id = 'remotevideo_' + participant;
 			track.attach(remoteVideo);
-			targetTrackNode?.appendChild(remoteVideo);
+
+			const remoteTrack = targetTrackNode?.getElementsByClassName("remoteTrack");
+			if (remoteTrack !== undefined && remoteTrack?.length > 0) {
+				remoteTrack[0]?.appendChild(remoteVideo);
+			}
 		} else {
-			const localAudioElem = document.createElement("audio");
-			localAudioElem.id = 'remoteaudio_'+participant;
-			localAudioElem.autoplay = true;
-			localAudioElem.muted = true;
-			track.attach(localAudioElem);
-			targetTrackNode?.appendChild(localAudioElem);
+			const remoteAudioElem = document.createElement("audio");
+			remoteAudioElem.id = 'remoteaudio_'+participant;
+			remoteAudioElem.autoplay = true;
+			remoteAudioElem.muted = true;
+			track.attach(remoteAudioElem);
+			const remoteTrack = targetTrackNode?.getElementsByClassName("remoteTrack");
+			if (remoteTrack !== undefined && remoteTrack?.length > 0) {
+				remoteTrack[0]?.appendChild(remoteAudioElem);
+			}
 		}
 	}, [remoteTracksRef, targetTrackNode]);
 	
-	const onConferenceJoined = useCallback((event: any) => {
-		console.log("onConferenceJoined clan info", event, clanId, clanName);
+	const onConferenceJoined = useCallback(() => {
+		console.log("onConferenceJoined clan info", clanId, clanName);
 		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
@@ -182,7 +199,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		console.log('user left', id);
 	}, []);
 
-	const onTrackMuteChanged = useCallback((track: JitsiRemoteTrack) => {
+	const onTrackMuteChanged = useCallback((track: JitsiTrack) => {
 		console.log('onTrackMuteChanged');
 	}, []);
 
@@ -271,8 +288,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		return voiceRoomRef.current;
 	}, [currentVoiceRoomName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
 	
-	const onConnectionSuccess = useCallback((event: any) => {
-		console.log("onConnectionSuccess", event);
+	const onConnectionSuccess = useCallback(() => {
+		console.log("onConnectionSuccess");
 		createVoiceRoom();
 	}, [createVoiceRoom]);
 
