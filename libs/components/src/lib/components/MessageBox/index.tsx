@@ -2,14 +2,15 @@ import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
-import { ChatContext } from '@mezon/core';
+import { ChatContext, useChatMessages } from '@mezon/core';
+import { channelsActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { EmojiPlaces, IMessageSendPayload } from '@mezon/utils';
-import { AtomicBlockUtils, ContentState, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
+import { EmojiPlaces, IMessageSendPayload, TabNamePopup } from '@mezon/utils';
+import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
-import EmojiPicker from '../EmojiPicker';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
@@ -31,6 +32,10 @@ export type MessageBoxProps = {
 init({ data });
 
 function MessageBox(props: MessageBoxProps): ReactElement {
+	const dispatch = useAppDispatch();
+	const currentChanel = useSelector(selectCurrentChannel);
+	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
+
 	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
@@ -61,67 +66,75 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(EditorState.createEmpty());
 	}, [currentChannelId, currentClanId]);
 
-	const onChange = useCallback((editorState: EditorState) => {
-		if (typeof onTyping === 'function') {
-			onTyping();
-		}
-		setClearEditor(false);
-		setEditorState(editorState);
-		const contentState = editorState.getCurrentContent();
-		const raw = convertToRaw(contentState);
-		// get message
-		const messageRaw = raw.blocks;
-		const messageContent = Object.values(messageRaw)
-			.filter((item) => item.text.trim() !== '')
-			.map((item) => item.text);
-		const messageBreakline = messageContent.join('\n').replace(/,/g, '');
-
-		onConvertToFiles(messageBreakline);
-
-		handleUrlInput(messageBreakline).then((attachment) => {
-			handleFinishUpload(attachment);
-		}).catch(() => {;
-			setContent(content + messageBreakline);
-		});
-
-		const mentionedUsers = [];
-		for (const key in raw.entityMap) {
-			const ent = raw.entityMap[key];
-			if (ent.type === 'mention') {
-				mentionedUsers.push({
-					user_id: ent.data.mention.id,
-					username: ent.data.mention.name,
-				});
+	const onChange = useCallback(
+		(editorState: EditorState) => {
+			if (typeof onTyping === 'function') {
+				onTyping();
 			}
-		}
-		setMentionData(mentionedUsers);
-	}, [attachmentData]);
+			setClearEditor(false);
+			setEditorState(editorState);
+			const contentState = editorState.getCurrentContent();
+			const raw = convertToRaw(contentState);
+			// get message
+			const messageRaw = raw.blocks;
+			const messageContent = Object.values(messageRaw)
+				.filter((item) => item.text.trim() !== '')
+				.map((item) => item.text);
+			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
 
-	const onConvertToFiles = useCallback((content: string) => {
-		if (content.length > 2000) {
-			const fileContent = new Blob([content], { type: 'text/plain' });
-			const now = Date.now();
-			const filename = now + '.txt';
-			const file = new File([fileContent], filename, { type: 'text/plain' });
-			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+			onConvertToFiles(messageBreakline);
 
-			const session = sessionRef.current;
-			const client = clientRef.current;
-
-			if (!client || !session || !currentChannelId) {
-				throw new Error('Client is not initialized');
-			}
-			handleUploadFile(client, session, fullfilename, file)
+			handleUrlInput(messageBreakline)
 				.then((attachment) => {
 					handleFinishUpload(attachment);
-					return 'handled';
 				})
-				.catch((err) => {
-					return 'not-handled';
+				.catch(() => {
+					setContent(content + messageBreakline);
 				});
-			return;
-		}
-	},[attachmentData]);
+
+			const mentionedUsers = [];
+			for (const key in raw.entityMap) {
+				const ent = raw.entityMap[key];
+				if (ent.type === 'mention') {
+					mentionedUsers.push({
+						user_id: ent.data.mention.id,
+						username: ent.data.mention.name,
+					});
+				}
+			}
+			setMentionData(mentionedUsers);
+		},
+		[attachmentData],
+	);
+
+	const onConvertToFiles = useCallback(
+		(content: string) => {
+			if (content.length > 2000) {
+				const fileContent = new Blob([content], { type: 'text/plain' });
+				const now = Date.now();
+				const filename = now + '.txt';
+				const file = new File([fileContent], filename, { type: 'text/plain' });
+				const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+
+				const session = sessionRef.current;
+				const client = clientRef.current;
+
+				if (!client || !session || !currentChannelId) {
+					throw new Error('Client is not initialized');
+				}
+				handleUploadFile(client, session, fullfilename, file)
+					.then((attachment) => {
+						handleFinishUpload(attachment);
+						return 'handled';
+					})
+					.catch((err) => {
+						return 'not-handled';
+					});
+				return;
+			}
+		},
+		[attachmentData],
+	);
 	const onSearchChange = ({ value }: any) => {
 		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
 	};
@@ -191,8 +204,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					return 'not-handled';
 				});
 
-			// setEditorState(() => EditorState.createWithContent(ContentState.createFromText('Uploading...')));
-
 			return 'not-handled';
 		},
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
@@ -234,6 +245,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setMentionData([]);
 			setEditorState(() => EditorState.createEmpty());
 			setIsOpenReply(false);
+			dispatch(
+				channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
+			);
+			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');
@@ -242,6 +257,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setSelectedItemIndex(0);
 			liRefs?.current[selectedItemIndex]?.focus();
 			setEditorState(() => EditorState.createEmpty());
+			dispatch(
+				channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
+			);
+			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastMessageId: messages[0].id }));
 		}
 	}, [content, onSend, mentionData, attachmentData]);
 
@@ -299,7 +318,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		if (emojiSelectedMess) {
-			// onFocusEditorState();
 			moveSelectionToEnd();
 		}
 	}, [emojiSelectedMess]);
@@ -313,6 +331,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
 	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
+	const { heightEditor, setHeightEditor } = useContext(ChatContext);
+
+	useEffect(() => {
+		setHeightEditor(editorHeight ?? 50);
+	}, [editorHeight]);
+
 
 	function handleEmojiClick(clickedEmoji: string) {
 		setEditorState((prevEditorState) => {
@@ -321,12 +345,23 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const newEditorState = EditorState.push(prevEditorState, newContentState, 'insert-characters');
 			return newEditorState;
 		});
-		// onFocusEditorState();
 	}
+	const { activeTab, setActiveTab } = useContext(ChatContext);
+
+	const handleOpenGifs = (event: React.MouseEvent<HTMLDivElement>) => {
+		setActiveTab(TabNamePopup.GIFS);
+		event.stopPropagation();
+	};
+
+	const handleOpenStickers = (event: React.MouseEvent<HTMLDivElement>) => {
+		setActiveTab(TabNamePopup.STICKERS);
+		setMessageRef(undefined);
+		event.stopPropagation();
+	};
 
 	const handleOpenEmoji = (event: React.MouseEvent<HTMLDivElement>) => {
+		setActiveTab(TabNamePopup.EMOJI);
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
-		setIsOpenEmojiMessBox(!isOpenEmojiMessBox);
 		setMessageRef(undefined);
 		event.stopPropagation();
 	};
@@ -505,14 +540,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 	return (
 		<div className="relative">
-			{isOpenEmojiMessBox && (
-				<div className="w-full relative">
-					<div className="scale-75 transform right-5 mt-0 z-10 top-[-25rem] absolute">
-						<EmojiPicker messageEmoji={undefined} emojiAction={EmojiPlaces.EMOJI_EDITOR} />
-					</div>
-				</div>
-			)}
-
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				{showEmojiSuggestion && (
 					<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
@@ -589,10 +616,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
 
 					<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
-						<Icons.Gif />
-						<Icons.Help />
+						<div onClick={handleOpenGifs} className="cursor-pointer">
+							<Icons.Gif defaultFill={`${activeTab === TabNamePopup.GIFS ? '#FFFFFF' : '#AEAEAE'}`} />
+						</div>
+
+						<div onClick={handleOpenStickers} className="cursor-pointer">
+							<Icons.Sticker defaultFill={`${activeTab === TabNamePopup.STICKERS ? '#FFFFFF' : '#AEAEAE'}`} />
+						</div>
+
 						<div onClick={handleOpenEmoji} className="cursor-pointer">
-							<Icons.Smile defaultFill={`${isOpenEmojiMessBox ? '#FFFFFF' : '#AEAEAE'}`} />
+							<Icons.Smile defaultFill={`${activeTab === TabNamePopup.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
 						</div>
 					</div>
 				</div>

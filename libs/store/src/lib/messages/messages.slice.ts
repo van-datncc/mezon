@@ -1,4 +1,4 @@
-import { ChannelMessage } from '@mezon/mezon-js/dist';
+import { ChannelMessage, ChannelStreamMode } from '@mezon/mezon-js';
 import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -194,7 +194,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 			// thunkAPI.dispatch(
 			//   messagesActions.setChannelLastMessage({ channelId, messageId }),
 			// );
-			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, 2, messageId);
+			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId);
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);

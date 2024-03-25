@@ -19,3 +19,4 @@ export * from './lib/users/users.slice';
 export * from './lib/clanMembers/clan.members';
 export * from './lib/notification/notify.slice';
 export * from './lib/invite/invite.slice';
+export * from './lib/voice/voice.slice';

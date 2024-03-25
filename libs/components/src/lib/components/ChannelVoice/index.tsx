@@ -1,66 +1,37 @@
-import { JitsiMeeting } from '@mezon/mezon-voice-react-sdk';
-import { useCallback, useState } from 'react';
-
+import { useMezonVoice } from "@mezon/transport";
+import { useEffect } from "react";
 
 export type ChannelVoiceProps = {
-	clanName?: string;
-	channelLabel: string;
+    clanId: string;
+    clanName: string;
+    channelLabel: string;
     userName: string;
+    jwt: string;
 };
 
-function ChannelVoice({ clanName, channelLabel, userName }: ChannelVoiceProps) {
+function ChannelVoice({ clanId, clanName, channelLabel, userName, jwt }: ChannelVoiceProps) {
+    const voice = useMezonVoice();
+
+    const roomName = clanName?.replace(" ", "-")+"-"+channelLabel.replace(" ", "-")
+
+    useEffect(()=> {
+        voice.setCurrentVoiceRoomName(roomName.toLowerCase());
+        voice.setUserDisplayName(userName);
+        voice.setClanId(clanId);
+        voice.setClanName(clanName);
+        const targetNode = document.querySelector("#meet");
+        voice.setTargetTrackNode(targetNode as HTMLMediaElement);
+        voice.createVoiceConnection(roomName.toLowerCase(), jwt);
+    }, [voice]);
     
-    const handleReadyToClose = () => {
-        console.log('Ready to close...');
-    };
-
-    const generateRoomName = () => {
-        console.log("====channelLabel", clanName+"/"+channelLabel);
-        return clanName+"/"+channelLabel;
-    }
-
-	const handleApiReady = (externalApi: any) => {
-		console.log("externalApi", externalApi);
-	}
-
-    const handleIFrameRef = (iframeRef: any) => {
-        iframeRef.style.height = "800px";
-    }
-
-    const renderSpinner = () => (
-        <div style = {{
-            fontFamily: 'sans-serif',
-            textAlign: 'center'
-        }}>
-            Loading..
-        </div>
-    );
-
-
     return (
-        <JitsiMeeting
-            domain = { "meet.mezon.vn" }
-            roomName = { generateRoomName() }
-            spinner = { renderSpinner }
-            lang = 'en'
-            configOverwrite = {{
-                startWithAudioMuted: true,
-                disableModeratorIndicator: true,
-                startScreenSharing: true,
-                enableEmailInStats: false,
-                prejoinPageEnabled: false
-            }}
-            interfaceConfigOverwrite = {{
-                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-            }}
-            userInfo = {{
-                displayName: userName,
-                email: ''
-            }}                
-            getIFrameRef = { handleIFrameRef }
-            onApiReady = { (externalApi: any) => handleApiReady(externalApi) }
-            onReadyToClose = { handleReadyToClose } />
-    );
+        <div className="space-y-2 px-4 mb-4 mt-[250px]" >
+            <div id="meet">
+                <div className="localTrack"></div>
+                <div className="remoteTrack"></div>
+            </div>            
+        </div>
+    ); 
 }
 
 export default ChannelVoice;

@@ -110,6 +110,11 @@ The application data flow is managed by some packages:
 -   We could group the data and logic into a custom hook to manage the data and logic of the component
 -   The component could use the custom hook to manage the data and logic of the component
 
+![Data Flow for voice](./docs/voice.svg)
+- voice context se co ham de tao room voice createVoiceConnection. 
+- Khi co nguoi join vao thi voicecontext se gui len chat server va chat server trigger onVoiceJoined (notify all) o mezon-js. 
+- Ben FE tao slice de luu va khi onVoiceJoined trigger va update so nguoi trong channel.
+
 ## Layouting
 
 how to layout the components and pages

@@ -3,7 +3,7 @@ import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ChannelPresenceEvent, StatusPresenceEvent } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { ChannelPresenceEvent, StatusPresenceEvent } from '@mezon/mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;

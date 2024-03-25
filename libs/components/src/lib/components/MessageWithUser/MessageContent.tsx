@@ -47,7 +47,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 				</div>
 			) : (
 				<div className="flex ">
-					<div>
+					<div id={message.id}>
 						<MessageLine line={lines as string} />
 					</div>
 					{message.update_time ? (

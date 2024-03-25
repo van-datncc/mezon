@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import ChannelMessages from './ChannelMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
+import { useMezon } from '@mezon/transport';
+import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
@@ -14,12 +16,13 @@ export default function ChannelLayout() {
 	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
+	const { sessionRef } = useMezon();
 
 	const renderChannelMedia = () => {
-		if (currentChannel && currentChannel.type === 1) {
-			return <ChannelMessages channelId={currentChannel?.id} channelLabel={currentChannel.channel_label} type="CHANNEL" mode={2}/>
-		} else if (currentChannel && currentChannel?.type === 4) {
-			return <ChannelVoice channelLabel={currentChannel.channel_label || ''} clanName={currentClan?.clan_name} userName={userProfile?.user?.username || "unknown"} />
+		if (currentChannel && currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			return <ChannelMessages channelId={currentChannel?.id} channelLabel={currentChannel.channel_label} type="CHANNEL" mode={ChannelStreamMode.STREAM_MODE_CHANNEL}/>
+		} else if (currentChannel && currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			return <ChannelVoice jwt={sessionRef.current?.token || ''} channelLabel={currentChannel.channel_label || ''} clanId={currentClan?.id || ""} clanName={currentClan?.clan_name || ""} userName={userProfile?.user?.username || "unknown"} />
 		} else {
 			return <ChannelMessages.Skeleton />
 		}
@@ -39,6 +42,7 @@ export default function ChannelLayout() {
 						{currentChannel && <ChannelTyping channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />}
 						{currentChannel ? (
 							<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+
 						) : (
 							<ChannelMessageBox.Skeleton />
 						)}

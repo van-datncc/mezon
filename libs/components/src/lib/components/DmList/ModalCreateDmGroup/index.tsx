@@ -1,9 +1,9 @@
 import { useAppNavigation, useFriends } from '@mezon/core';
 import { IFriend, directActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
-import { ChannelTypeEnum } from '@mezon/utils';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChannelType } from '@mezon/mezon-js';
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 interface ModalCreateDMProps {
 	onClose: () => void;
@@ -32,7 +32,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 
 	const handleCreateDM = async () => {
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-			type: length > 1 ? ChannelTypeEnum.GROUP_CHAT : ChannelTypeEnum.DM_CHAT,
+			type: length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
 			user_ids: selectedFriends,
 		};

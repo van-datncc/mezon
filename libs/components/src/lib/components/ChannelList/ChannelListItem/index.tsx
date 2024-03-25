@@ -1,7 +1,5 @@
-import { useChatMessages } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelLink from '../../ChannelLink';
@@ -10,10 +8,10 @@ type ChannelListItemProp = {
 	channel: IChannel;
 };
 const ChannelListItem = (props: ChannelListItemProp) => {
-	// const dispatch = useDispatch();
 	const currentChanel = useSelector(selectCurrentChannel);
+	const arrayUnreadChannel = useSelector(selectArrayUnreadChannel);
+	const entitiesChannel = useSelector(selectEntitiesChannel);
 	const { channel } = props;
-	const { messages } = useChatMessages({ channelId: channel.id });
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
 	));
@@ -21,12 +19,19 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 		openInviteChannelModal();
 	};
 
-	useEffect(() => {
-		// dispatch(channelsActions.setChannelLastMessageId({ channelId: channel.id, messageId: channel.last_message_id || '' }));
-		// console.log('com', messages[0]?.id);
-		// console.log('com', channel);
-		// console.log(1);
-	}, [messages]);
+	const isUnReadChannel = (channelId: string) => {
+		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
+		const checkTypeChannel = entitiesChannel[channelId];
+		if (checkTypeChannel && checkTypeChannel.type === 4) {
+			return true;
+		} else {
+			if (channel && channel.channelLastMessageId === channel.channelLastSeenMesageId) {
+				return true;
+			}
+		}
+
+		return false;
+	};
 
 	return (
 		<ChannelLink
@@ -36,7 +41,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 			key={channel.id}
 			createInviteLink={handleOpenInvite}
 			isPrivate={channel.channel_private}
-			isUnReadChannel={channel.last_message_id === channel.last_seen_message_id}
+			isUnReadChannel={isUnReadChannel(channel.id)}
 		/>
 	);
 };
