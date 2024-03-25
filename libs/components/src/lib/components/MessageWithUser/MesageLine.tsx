@@ -45,7 +45,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 		return <LineWithLink link={line} />;
 	}
 	return (
-		<div>
+		<div className="flex items-center ">
 			{mentions.map((mention, i) => {
 				return <LineWithMention key={i} mention={mention} />;
 			})}

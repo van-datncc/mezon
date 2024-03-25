@@ -13,7 +13,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	return (
 		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader">
 			<div className="justify-start items-center gap-1 flex">
-				<ChannelLabel type={Number(channel?.type)} name={channel?.channel_label} isPrivate={channel?.channel_private} />
+				<ChannelLabel />
 			</div>
 
 			{/* Desktop buttons */}

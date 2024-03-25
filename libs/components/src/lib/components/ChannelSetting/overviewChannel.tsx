@@ -1,3 +1,4 @@
+import { InputField, TextArea } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import ModalAskChangeChannel from './modalAskChangeChannel';
@@ -8,8 +9,8 @@ export type OverviewChannelProps = {
 
 const OverviewChannel = (props: OverviewChannelProps) => {
 	const { channel } = props;
-	const channelLabelInit = channel.channel_label;
-	const topicInit = '';
+	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label);
+	const [topicInit, setTopicInit] = useState('');
 
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
@@ -22,6 +23,16 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 
 	const handleDisplayChannelLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setChannelLabel(e.target.value);
+	};
+
+	const handleReset = () => {
+		setTopic(topicInit);
+		setChannelLabel(channelLabelInit);
+	};
+
+	const handleSave = () => {
+		setChannelLabelInit(channelLabel);
+		setTopicInit(topic);
 	};
 
 	useEffect(() => {
@@ -37,7 +48,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 			<div className="text-white text-[15px]">
 				<h3 className="mb-4 font-bold">Overview</h3>
 				<p className="uppercase mb-3">Channel name</p>
-				<input
+				<InputField
 					type="text"
 					placeholder={channelLabel}
 					value={channelLabel}
@@ -47,19 +58,18 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 				<hr className="border-t border-solid border-borderDefault my-10" />
 				<p className="uppercase mb-3">Channel Topic</p>
 				<div className="relative">
-					<textarea
+					<TextArea
 						placeholder="Let everyone know how to use this channel!"
 						className="resize-none h-auto min-h-[87px] w-full bg-black overflow-y-hidden outline-none py-2 pl-3 pr-5"
 						value={topic}
 						onChange={handleChangeTextArea}
 						rows={1}
-						ref={textAreaRef}
-					></textarea>
+						refTextArea={textAreaRef}
+					></TextArea>
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
-				<hr className="border-t border-solid border-borderDefault my-10" />
 			</div>
-			{(channelLabelInit !== channelLabel || topicInit !== topic) && <ModalAskChangeChannel />}
+			{(channelLabelInit !== channelLabel || topicInit !== topic) && <ModalAskChangeChannel onReset={handleReset} onSave={handleSave} />}
 		</div>
 	);
 };

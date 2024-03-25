@@ -58,12 +58,12 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 				<div className="w-full flex-grow">
 					<InputField
 						type="text"
-						className="rounded-[3px] w-full text-white border border-black px-4 py-2 focus:outline-none focus:border-white-500 bg-black"
+						className="text-[15px] rounded-[3px] w-full text-white border border-black px-4 py-2 focus:outline-none focus:border-white-500 bg-black"
 						placeholder="Search Roles"
 					/>
 				</div>
 				<button
-					className="bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[8px] px-[10px] text-nowrap"
+					className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[8px] px-[10px] text-nowrap"
 					onClick={() => {
 						dispatch(setSelectedRoleId('New Role'));
 						dispatch(setNameRoleNew('New Role'));
@@ -94,7 +94,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					<tbody className="bg-bgSecondary divide-y divide-gray-200">
 						{activeRoles.length === 0 ? (
 							<tr className="h-14">
-								<td className=" text-gray-300 text-center">
+								<td className=" text-gray-300 text-center text-[15px]">
 									<p>No Roles</p>
 								</td>
 							</tr>
@@ -103,7 +103,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								<tr key={role.id} className="h-14">
 									<td className="text-center ">
 										<p
-											className="break-all whitespace-break-spaces overflow-hidden line-clamp-2"
+											className="text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2"
 											onClick={() => {
 												handleCloseModal();
 											}}
@@ -111,13 +111,13 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 											{role.title}
 										</p>
 									</td>
-									<td className="  text-center">
+									<td className=" text-[15px] text-center">
 										<p>{role.role_user_list?.role_users?.length ?? 0}</p>
 									</td>
 									<td className="  flex h-14 justify-center items-center">
 										<div className="flex gap-x-1 ">
 											<p
-												className="cursor-pointer hover:bg-slate-800 p-2 rounded-sm"
+												className="text-[15px] cursor-pointer hover:bg-slate-800 p-2 rounded-sm"
 												onClick={() => {
 													props.handleOpen();
 													handleRoleClick(role.id);
@@ -126,7 +126,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 												Edit
 											</p>
 											<p
-												className="cursor-pointer hover:bg-slate-800 p-2 rounded-sm"
+												className="text-[15px] cursor-pointer hover:bg-slate-800 p-2 rounded-sm"
 												onClick={() => {
 													handleOpenModalDelete();
 													handleRoleClick(role.id);
