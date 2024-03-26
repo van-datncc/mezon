@@ -1,5 +1,5 @@
-import { useAppNavigation, useChatMessages, useClans, useNotification } from '@mezon/core';
-import { INotification, messagesActions, selectChannelById, selectClanById, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
+import { useAppNavigation, useClans, useNotification } from '@mezon/core';
+import { INotification, selectChannelById, selectMemberClanByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
@@ -7,52 +7,52 @@ export type NotifyMentionProps = {
 	notify: INotification;
 };
 
-function parseObject(obj: any) {	
+function parseObject(obj: any) {
 	let attachments;
 	let mentions;
 	let reactions;
 	let references;
 	try {
-		attachments = JSON.parse(obj.attachments)
-	} catch(err) {
-		attachments = {}
+		attachments = JSON.parse(obj.attachments);
+	} catch (err) {
+		attachments = {};
 	}
 	try {
-		mentions = JSON.parse(obj.mentions)
-	} catch(err) {
-		mentions = {}
+		mentions = JSON.parse(obj.mentions);
+	} catch (err) {
+		mentions = {};
 	}
 	try {
-		references = JSON.parse(obj.references)
-	} catch(err) {
-		references = {}
+		references = JSON.parse(obj.references);
+	} catch (err) {
+		references = {};
 	}
 	try {
-		reactions = JSON.parse(obj.reactions)
-	} catch(err) {
-		reactions = {}
+		reactions = JSON.parse(obj.reactions);
+	} catch (err) {
+		reactions = {};
 	}
-	const parsedObj = { 
+	const parsedObj = {
 		...obj,
-		attachments:attachments,
-		mentions:mentions,
-		reactions:reactions,
-		references:references,
+		attachments: attachments,
+		mentions: mentions,
+		reactions: reactions,
+		references: references,
 	};
 	return parsedObj;
 }
 
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
-	const { deleteNotify } = useNotification();	
+	const { deleteNotify } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const { currentClan } = useClans();
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
-	const {toMessageChannel , navigate} = useAppNavigation();
+	const { toMessageChannel, navigate } = useAppNavigation();
 
-	const jump = async (messId : string) => {
+	const jump = async (messId: string) => {
 		await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
-	}
+	};
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
 			<div className="flex justify-between">
@@ -93,7 +93,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					className="absolute py-1 px-2 bg-bgSecondary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 					onClick={() => {
 						jump(data.message_id);
-					}}					
+					}}
 				>
 					Jump
 				</button>

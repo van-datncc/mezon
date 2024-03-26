@@ -71,20 +71,18 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 					{!valueToggle && (
 						<div className="p-4 bg-[#0B0B0B]">
 							<div className="flex justify-between items-center pb-4">
-								<p className="uppercase font-bold text-sm">Who can access this channel?</p>
-								<button className="bg-[#155EEF] hover:bg-blue-500 px-4 py-2 rounded" onClick={openAddMemRoleModal}>
+								<p className="uppercase font-bold text-xs">Who can access this channel?</p>
+								<button className="bg-[#155EEF] hover:bg-blue-500 px-4 py-1 rounded" onClick={openAddMemRoleModal}>
 									Add members or roles
 								</button>
 							</div>
 							<hr className="border-t border-solid border-borderDefault" />
 							<div className="py-4">
-								<p className="uppercase font-bold text-sm">Rule</p>
-								<RolesComponent />
+								<RolesComponent tick={false} />
 							</div>
 							<hr className="border-t border-solid border-borderDefault" />
 							<div className="py-4">
-								<p className="uppercase font-bold text-sm">Members</p>
-								<MembersComponent />
+								<MembersComponent tick={false} />
 							</div>
 						</div>
 					)}
