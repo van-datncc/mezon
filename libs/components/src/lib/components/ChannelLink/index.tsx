@@ -13,9 +13,10 @@ export type ChannelLinkProps = {
 	createInviteLink: (clanId: string, channelId: string) => void;
 	isPrivate?: number;
 	isUnReadChannel?: boolean;
+	numberNotication?: number;
 };
 
-function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel }: ChannelLinkProps) {
+function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
@@ -80,6 +81,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				}}
 				channel={channel}
 			/>
+			{/* <p>{numberNotication}</p> */}
 		</div>
 	);
 }
