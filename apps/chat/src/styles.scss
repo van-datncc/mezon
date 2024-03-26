@@ -23,7 +23,11 @@
 }
 
 ::-webkit-scrollbar {
-	width: 5px;
+	width: 8px;
+}
+
+#channelList {
+	margin-right: 2px;
 }
 
 /* Track */
@@ -254,6 +258,11 @@ input:-webkit-autofill:active {
 	.infinite-scroll-component {
 		margin-bottom: 20px;
 	}
+}
+
+#scrollLoading::-webkit-scrollbar {
+	width: 12px;
+	padding-right: 5px;
 }
 
 // css mainChat
