@@ -6,10 +6,11 @@ import JitsiLocalTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLo
 import { JitsiConferenceErrors } from "vendors/lib-jitsi-meet/dist/esm/JitsiConferenceErrors";
 import JitsiConnection from "vendors/lib-jitsi-meet/dist/esm/JitsiConnection";
 import options from "libs/transport/src/lib/voice/options/config";
-import { useAuth } from "@mezon/core";
 import { useMezon } from "@mezon/transport";
 import JitsiParticipant from "vendors/lib-jitsi-meet/dist/esm/JitsiParticipant";
 import JitsiTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiTrack";
+import { VideoType } from "vendors/lib-jitsi-meet/dist/esm/service/RTC/VideoType";
+import { MediaType } from "vendors/lib-jitsi-meet/dist/esm/service/RTC/MediaType";
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -20,6 +21,7 @@ export type VoiceContextValue = {
 	voiceChannelRef: React.MutableRefObject<JitsiConference | null>;
 	voiceChannelName: string;
 	setTargetTrackNode: React.Dispatch<React.SetStateAction<HTMLMediaElement | undefined>>;
+	setScreenCanvasElement: React.Dispatch<React.SetStateAction<HTMLCanvasElement | undefined>>;
 	setVoiceChannelName: React.Dispatch<React.SetStateAction<string>>;
 	setUserDisplayName: React.Dispatch<React.SetStateAction<string>>;
 	setVoiceChannelId: React.Dispatch<React.SetStateAction<string>>;
@@ -28,6 +30,8 @@ export type VoiceContextValue = {
 	changeAudioOutput: (selected: any) => void;
 	createLocalTrack: () => void;
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
+	createScreenShare: () => void;
+	stopScreenShare: () => void;
 	voiceDisconnect: () => void;
 };
 
@@ -45,9 +49,100 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [clanId, setClanId] = React.useState<string>("");
 	const [clanName, setClanName] = React.useState<string>("");
 	const [targetTrackNode, setTargetTrackNode] = React.useState<HTMLMediaElement>();
+	const [screenCanvasElement, setScreenCanvasElement] = React.useState<HTMLCanvasElement>();
+	const [rafId, setRafId] = React.useState<number>();
 
-	//const { userProfile } = useAuth();
 	const { socketRef } = useMezon();
+
+	/**
+	 * Internal Polyfill to simulate
+	 * window.requestAnimationFrame
+	 * since the browser will kill canvas
+	 * drawing when tab is inactive
+	 */
+	const requestVideoFrame = useCallback((callback: any) => {
+		return window.setTimeout(function () {
+			callback(Date.now());
+		}, 1000 / 60); // 60 fps - just like requestAnimationFrame
+	}, []);
+
+	/**
+	 * Internal polyfill to simulate
+	 * window.cancelAnimationFrame
+	 */
+	const cancelVideoFrame = useCallback(() => {
+		clearTimeout(rafId);
+	}, [rafId]);
+
+	const makeComposite = useCallback((screenTrack: HTMLVideoElement) => {
+		if (screenTrack && screenCanvasElement) {
+			const screenCanvasCtx = screenCanvasElement.getContext("2d");
+			if (!screenCanvasCtx) {
+				return;
+			}
+
+			screenCanvasCtx.save();
+			screenCanvasElement.setAttribute("width", "800px");
+			screenCanvasElement.setAttribute("height", "600px");
+			screenCanvasCtx.clearRect(0, 0, 800, 600);
+			screenCanvasCtx.drawImage(screenTrack, 0, 0, screenTrack.videoWidth, screenTrack.videoHeight);
+			
+			const imageData = screenCanvasCtx.getImageData(
+				0,
+				0,
+				screenTrack.videoWidth,
+				screenTrack.videoHeight
+			); // this makes it work
+			screenCanvasCtx.putImageData(imageData, 0, 0); // properly on safari/webkit browsers too
+			screenCanvasCtx.restore();
+			setRafId(requestVideoFrame(makeComposite));
+		}
+	}, [screenCanvasElement, rafId]);
+
+	const onScreenShareTrack = useCallback((tracks: JitsiLocalTrack[] | JitsiConferenceErrors) => {
+		console.log("onShareScreenTrack");
+
+		const screenElem = document.createElement("video");
+		screenElem.id = "screenshare";
+		screenElem.width = 640;
+		screenElem.height = 480;
+		screenElem.autoplay = true;
+		targetTrackNode?.appendChild(screenElem);
+
+		(tracks[0] as JitsiLocalTrack).attach(screenElem);
+
+		makeComposite(screenElem)
+		screenElem.style.display = "none";
+
+		const fullVideoStream = screenCanvasElement?.captureStream();
+		if (fullVideoStream) {
+			const localOverlayStream = new MediaStream([...fullVideoStream.getVideoTracks()]);
+			const trackInfo = {
+                stream: localOverlayStream,
+                sourceType: 'canvas',
+                mediaType: MediaType.VIDEO,
+                videoType: VideoType.DESKTOP
+            };
+            const newTracks = JitsiMeetJS.createLocalTracksFromMediaStreams([ trackInfo ]);
+			newTracks.forEach((track) => {
+				voiceChannelRef.current?.addTrack(track);
+			})
+		}		
+	}, [makeComposite, screenCanvasElement, targetTrackNode]);
+
+	const createScreenShare = useCallback(() => {
+		JitsiMeetJS.createLocalTracks({
+            devices: ['desktop']
+        }).then((tracks) => {
+			onScreenShareTrack(tracks as JitsiLocalTrack[] | JitsiConferenceErrors);
+		}).catch(error => {
+			console.log("no local track", error);
+		});
+	}, [onScreenShareTrack]);
+
+	const stopScreenShare = useCallback(() => {
+		cancelVideoFrame();
+	}, [cancelVideoFrame]);
 
 	const onConnectionFailed = useCallback(() => {
 		console.log("onConnectionFailed");
@@ -388,6 +483,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			voiceChannelRef,
 			voiceChannelName,
 			setTargetTrackNode,
+			setScreenCanvasElement,
 			setVoiceChannelName,
 			setVoiceChannelId,
 			setUserDisplayName,
@@ -397,8 +493,10 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			voiceDisconnect,
 			changeAudioOutput,
 			createLocalTrack,
+			createScreenShare,
+			stopScreenShare,
 		}),
-		[voiceChannelName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack],
+		[voiceChannelName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack, createScreenShare],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;

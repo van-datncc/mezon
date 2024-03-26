@@ -1,4 +1,4 @@
-import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel } from '@mezon/store';
+import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel, selectMessageByMessageId } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -12,12 +12,16 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	const arrayUnreadChannel = useSelector(selectArrayUnreadChannel);
 	const entitiesChannel = useSelector(selectEntitiesChannel);
 	const { channel } = props;
+
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
 	));
 	const handleOpenInvite = () => {
 		openInviteChannelModal();
 	};
+
+	// console.log('messageLast', messageLast);
+	// console.log('messageLastSeen', messageLastSeen);
 
 	const isUnReadChannel = (channelId: string) => {
 		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
@@ -33,6 +37,14 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 		return false;
 	};
 
+	const useNotication = (channelId: string) => {
+		const channel = arrayUnreadChannel.find((item) => item.channelId === channelId);
+		const messageLast = useSelector(selectMessageByMessageId(channel?.channelLastMessageId || ''));
+		// console.log('mess', messageLast);
+		// console.log('channel', channel?.channelId);
+		return 2;
+	};
+
 	return (
 		<ChannelLink
 			clanId={channel?.clan_id}
@@ -42,6 +54,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 			createInviteLink={handleOpenInvite}
 			isPrivate={channel.channel_private}
 			isUnReadChannel={isUnReadChannel(channel.id)}
+			numberNotication={useNotication(channel.id)}
 		/>
 	);
 };
