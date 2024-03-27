@@ -1,5 +1,5 @@
 import { useMezonVoice } from "@mezon/transport";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export type ChannelVoiceProps = {
     clanId: string;
@@ -25,12 +25,17 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
         voice.setTargetTrackNode(targetNode as HTMLMediaElement);
         voice.createVoiceConnection(voiceChannelName.toLowerCase(), jwt);
     }, [voice]);
+
+    const startScreenShare = useCallback(() => {
+        voice.createScreenShare();
+    }, [voice]);
     
     return (
         <div className="space-y-2 px-4 mb-4 mt-[250px]" >
             <div id="meet">
                 <div className="localTrack"></div>
                 <div className="remoteTrack"></div>
+                <div><button onClick={startScreenShare}/></div>
             </div>            
         </div>
     ); 

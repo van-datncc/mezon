@@ -11,6 +11,7 @@ import JitsiParticipant from "vendors/lib-jitsi-meet/dist/esm/JitsiParticipant";
 import JitsiTrack from "vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiTrack";
 import { VideoType } from "vendors/lib-jitsi-meet/dist/esm/service/RTC/VideoType";
 import { MediaType } from "vendors/lib-jitsi-meet/dist/esm/service/RTC/MediaType";
+import CanvasFreeDrawing from "libs/utils/src/lib/freedraw";
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -115,13 +116,16 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 		makeComposite(screenElem)
 
-		if (screenCanvasElement && screenCanvasCtx) {
-			screenCanvasCtx.strokeStyle = "#913d88";
-			screenCanvasCtx.lineWidth = 2;
-			screenCanvasElement.onmousedown = startDrawing;
-			screenCanvasElement.onmouseup = stopDrawing;
-			screenCanvasElement.onmousemove = draw;
-		}
+		const screenCanvasDraw = new CanvasFreeDrawing({
+			canvas: screenCanvasElement as HTMLCanvasElement,
+			canvasCtx: screenCanvasCtx as CanvasRenderingContext2D,
+			width: screenElem.width,
+			height: screenElem.height,
+		});
+		
+		// set properties
+		screenCanvasDraw.setLineWidth(10); // in px
+		screenCanvasDraw.setStrokeColor([0, 0, 255]); // in RGB
 		
 		const fullVideoStream = screenCanvasElement?.captureStream();
 		if (fullVideoStream) {
@@ -476,20 +480,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				onDisconnect);
 		}
 	}, [onConnectionFailed, onConnectionSuccess, onDisconnect]);
-
-		
-	const startDrawing = useCallback((e: any) => {
-		console.log("startDrawing", e);
-	}, []);
-	
-	const draw = useCallback((e: any) => {
-		console.log("draw", e);
-	}, []);
-	
-	const stopDrawing = useCallback(() => {
-		console.log("stopDrawing");
-	}, []);
-
 	
 	/**
 	 *
