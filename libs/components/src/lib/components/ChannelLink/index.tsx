@@ -1,11 +1,12 @@
-import { useAppNavigation, useAuth, useClans } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useOnClickOutside } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
+import PanelChannel from '../PanelChannel';
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -16,6 +17,11 @@ export type ChannelLinkProps = {
 	numberNotication?: number;
 };
 
+export type Coords = {
+	mouseX: number;
+	mouseY: number;
+};
+
 function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
@@ -23,6 +29,13 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	const { currentClan } = useClans();
 
 	const [openSetting, setOpenSetting] = useState(false);
+	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+	});
+
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
@@ -41,8 +54,20 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');
 
+	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY + window.screenY;
+
+		if (event.button === 2) {
+			setCoords({ mouseX, mouseY });
+			setIsShowPanelChannel((s) => !s);
+		}
+	};
+
+	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+
 	return (
-		<div className="relative group">
+		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
 			<Link to={channelPath}>
 				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
@@ -82,6 +107,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				channel={channel}
 			/>
 			{/* <p>{numberNotication}</p> */}
+			{isShowPanelChannel && <PanelChannel coords={coords} />}
 		</div>
 	);
 }
