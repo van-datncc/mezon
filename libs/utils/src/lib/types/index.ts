@@ -144,6 +144,17 @@ export type IVoice = {
 	last_screenshot: string;
 };
 
+export type DataVoiceSocketOptinals = {
+	clanId?: string | undefined;
+	clanName?: string | undefined;
+	id?: string | undefined;
+	lastScreenshot?: string | undefined;
+	participant?: string | undefined;
+	userId?: string | undefined;
+	voiceChannelId?: string | undefined;
+	voiceChannelLable?: string | undefined;
+};
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;

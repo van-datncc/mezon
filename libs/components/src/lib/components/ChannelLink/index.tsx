@@ -81,7 +81,6 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				}}
 				channel={channel}
 			/>
-			{/* <p>{numberNotication}</p> */}
 		</div>
 	);
 }
