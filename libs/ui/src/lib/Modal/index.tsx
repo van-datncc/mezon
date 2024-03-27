@@ -37,7 +37,7 @@ const Modal = (props: ModalProps) => {
 							<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-[#151515] outline-none focus:outline-none h-full sm:h-auto">
 								<div className={`flex items-start justify-between pt-[20px] px-[20px]  border-solid border-borderDefault rounded-t`}>
 									<div>
-										<h3 className="text-[22px] font-semibold">{title}</h3>
+										<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
 									<button className="flex items-center justify-center opacity-50" onClick={onClose}>

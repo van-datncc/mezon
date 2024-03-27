@@ -65,13 +65,13 @@ const ModalInvite = (props: ModalParam) => {
   confirmButton={() => handleCopyToClipboard(urlInvite)}
   titleConfirm="Copy"
   subTitleBox="Send invite link to a friend"
-  classSubTitleBox="ml-[0px] mt-[16px]"
+  classSubTitleBox="ml-[0px] mt-[15px] cursor-default"
   borderBottomTitle="border-b "
 >
   <div>
     <ListMemberInvite url={urlInvite} channelID={props.channelID} />
     <div className="relative ">
-    <p className="pt-[20px] pb-[12px] text-[20px] mb-12px">
+    <p className="pt-[20px] pb-[12px] text-[20px] mb-12px cursor-default">
       <span>Or, send a server invite link to a friend</span>
     </p>
       <input
@@ -93,7 +93,7 @@ const ModalInvite = (props: ModalParam) => {
       </button>
     </div>
     <p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] ">
-      <span>Your invite link expires in 7 days </span>
+      <span className="cursor-default">Your invite link expires in 7 days </span>
       <a href="" className="text-blue-300">Edit invite link.</a>
     </p>
   </div>
