@@ -1,4 +1,3 @@
-import { ChannelType } from '@mezon/mezon-js';
 import { selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel, selectMessageByMessageId } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Fragment } from 'react';
@@ -6,7 +5,6 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelLink from '../../ChannelLink';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
-import UserListVoiceChannel from '../../UserListVoiceChannel';
 type ChannelListItemProp = {
 	channel: IChannel;
 };
@@ -57,9 +55,6 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 				isUnReadChannel={isUnReadChannel(channel.id)}
 				numberNotication={useNotication(channel.id)}
 			/>
-			{channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-				<UserListVoiceChannel channelID={channel.id} channelType={ChannelType.CHANNEL_TYPE_VOICE} />
-			)}
 		</Fragment>
 	);
 };

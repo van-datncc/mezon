@@ -7,15 +7,13 @@ import { useSelector } from 'react-redux';
 
 export type UserListVoiceChannelProps = {
 	channelID: string;
-	channelType: number | undefined;
 };
 
-function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelProps) {
+function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 	const voiceChannelMember = useSelector((state: RootState) => state.channelMembers.voiceChannelMember);
 	const { dataVoiceChannelMember, setDataVoiceChannelMember } = useContext(ChatContext);
 	const { userJoinedVoiceChannelList, setUserJoinedVoiceChannelList } = useContext(ChatContext);
 	const { userJoinedVoiceChannel, setUserJoinedVoiceChannel } = useContext(ChatContext);
-	
 
 	function filterDuplicateIds(arr: any) {
 		const uniqueIds = new Set();
@@ -50,7 +48,6 @@ function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelPr
 	};
 
 	const voiceMemberConverted = convertMemberToVoiceData();
-
 	function removeDuplicatesByUserIdAndVoiceChannelId(arr: any[]) {
 		const visitedEntries = new Set<string>();
 		let i = 0;
@@ -72,17 +69,23 @@ function UserListVoiceChannel({ channelID, channelType }: UserListVoiceChannelPr
 	}
 
 	useEffect(() => {
-		let arrCombine: DataVoiceSocketOptinals[] = voiceMemberConverted;
-		if (!voiceMemberConverted) {
-			arrCombine = [...(userJoinedVoiceChannelList ?? [])];
-		} else if (!userJoinedVoiceChannelList) {
-			arrCombine = [...(voiceMemberConverted ?? [])];
-		} else {
+		setDataVoiceChannelMember(voiceMemberConverted);
+	}, []);
+
+	useEffect(() => {
+		setDataVoiceChannelMember(voiceMemberConverted);
+		let arrCombine: DataVoiceSocketOptinals[] = [];
+		if (!voiceMemberConverted && userJoinedVoiceChannelList) {
+			arrCombine = [...userJoinedVoiceChannelList];
+		} else if (!userJoinedVoiceChannelList && voiceMemberConverted) {
+			arrCombine = [...voiceMemberConverted];
+		} else if (voiceMemberConverted && userJoinedVoiceChannelList) {
 			arrCombine = [...voiceMemberConverted, ...userJoinedVoiceChannelList];
 		}
 		removeDuplicatesByUserIdAndVoiceChannelId(arrCombine);
-		return setDataVoiceChannelMember(arrCombine);
-	}, [userJoinedVoiceChannel, channelID]);
+		console.log(arrCombine);
+		setDataVoiceChannelMember(arrCombine);
+	}, [userJoinedVoiceChannel]);
 
 	return (
 		<>
