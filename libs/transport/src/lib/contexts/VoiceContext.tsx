@@ -50,6 +50,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [clanName, setClanName] = React.useState<string>("");
 	const [targetTrackNode, setTargetTrackNode] = React.useState<HTMLMediaElement>();
 	const [screenCanvasElement, setScreenCanvasElement] = React.useState<HTMLCanvasElement>();
+	const [screenCanvasCtx, setScreenCanvasCtx] = React.useState<CanvasRenderingContext2D>();
 	const [rafId, setRafId] = React.useState<number>();
 
 	const { socketRef } = useMezon();
@@ -76,7 +77,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 	const makeComposite = useCallback((screenTrack: HTMLVideoElement) => {
 		if (screenTrack && screenCanvasElement) {
-			const screenCanvasCtx = screenCanvasElement.getContext("2d");
+			setScreenCanvasCtx(screenCanvasElement.getContext("2d") as CanvasRenderingContext2D);
 			if (!screenCanvasCtx) {
 				return;
 			}
@@ -110,10 +111,18 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		targetTrackNode?.appendChild(screenElem);
 
 		(tracks[0] as JitsiLocalTrack).attach(screenElem);
-
-		makeComposite(screenElem)
 		screenElem.style.display = "none";
 
+		makeComposite(screenElem)
+
+		if (screenCanvasElement && screenCanvasCtx) {
+			screenCanvasCtx.strokeStyle = "#913d88";
+			screenCanvasCtx.lineWidth = 2;
+			screenCanvasElement.onmousedown = startDrawing;
+			screenCanvasElement.onmouseup = stopDrawing;
+			screenCanvasElement.onmousemove = draw;
+		}
+		
 		const fullVideoStream = screenCanvasElement?.captureStream();
 		if (fullVideoStream) {
 			const localOverlayStream = new MediaStream([...fullVideoStream.getVideoTracks()]);
@@ -128,7 +137,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				voiceChannelRef.current?.addTrack(track);
 			})
 		}		
-	}, [makeComposite, screenCanvasElement, targetTrackNode]);
+	}, [makeComposite, screenCanvasCtx, screenCanvasElement, targetTrackNode]);
 
 	const createScreenShare = useCallback(() => {
 		JitsiMeetJS.createLocalTracks({
@@ -467,6 +476,19 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				onDisconnect);
 		}
 	}, [onConnectionFailed, onConnectionSuccess, onDisconnect]);
+
+		
+	const startDrawing = useCallback((e: any) => {
+		console.log("startDrawing", e);
+	}, []);
+	
+	const draw = useCallback((e: any) => {
+		console.log("draw", e);
+	}, []);
+	
+	const stopDrawing = useCallback(() => {
+		console.log("stopDrawing");
+	}, []);
 
 	
 	/**
