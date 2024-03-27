@@ -1,6 +1,7 @@
 import { useAccount } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
+import { Modal } from 'flowbite-react';
 import { useState } from 'react';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 // import * as Icons from '../../Icons';
@@ -24,19 +25,29 @@ const SettingRightUser = ({
 	const { updateUser } = useAccount();
 	const [flags, setFlags] = useState(true);
 	const [flagsRemoveAvartar, setFlagsRemoveAvartar] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
+
 	const handleUpdateUser = async () => {
 		if (userName || urlImage || displayName) {
 			await updateUser(userName, urlImage, displayName);
 		}
 	};
+
 	const handleFile = (e: any) => {
 		const file = e.target.files && e.target.files[0];
 		const fullfilename = file?.name;
+		const sizeImage = file?.size;
 		const session = sessionRef.current;
 		const client = clientRef.current;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+
+		if (sizeImage > 1000000) {
+			setOpenModal(true);
+			e.target.value = null;
+			return;
 		}
 		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
@@ -148,6 +159,19 @@ const SettingRightUser = ({
 					</div>
 				</div>
 			) : null}
+			<Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
+				<Modal.Body className="bg-red-500 rounded-lg">
+					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
+						<img
+							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
+							src="/assets/images/file-and-folder.png"
+							alt="file"
+						/>
+						<h3 className="text-white text-4xl font-bold">Your files are too powerful</h3>
+						<h4 className="text-white text-xl">Max file size is 1MB, please!</h4>
+					</div>
+				</Modal.Body>
+			</Modal>
 		</div>
 	);
 };
