@@ -64,14 +64,14 @@ function ChannelList() {
 	};
 
 	return (
-		<>
+		<div className="overflow-y-scroll h-[88%] scrollbar-thin " id='channelList'>
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />
 				<BrowseChannel />
 			</div>
 			<hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
-			<div className="overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ">
+			<div className="overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide pb-[8%]">
 				{categorizedChannels.map((category: ICategoryChannel) => (
 					<div key={category.id}>
 						{category.category_name && (
@@ -112,7 +112,7 @@ function ChannelList() {
 					</div>
 				))}
 			</div>
-		</>
+		</div>
 	);
 }
 
