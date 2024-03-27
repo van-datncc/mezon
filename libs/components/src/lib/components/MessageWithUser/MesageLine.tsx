@@ -11,16 +11,6 @@ type ILinePartWithMention = {
 	mention: ILineMention;
 };
 
-// const LineWithMention = ({ mention }: ILinePartWithMention) => {
-//     const { matchedText, nonMatchText } = mention;
-//     return (
-//         <>
-//             {nonMatchText && <MarkdownFormatText markdown={nonMatchText} />}
-//             <MentionSpan text={matchedText} />
-//         </>
-//     );
-// };
-
 const LineWithLink = ({ link }: { link: string }) => {
 	return (
 		<a href={link} className="text-blue-500">
@@ -56,14 +46,11 @@ const MessageLine = ({ line }: MessageLineProps) => {
 		},
 		{ matchedText: '', nonMatchText: '' },
 	);
-	console.log('transformedArray----', transformedObject);
 	return (
 		<div>
 			{transformedObject.matchedText && <span className="text-blue-500 cursor-pointer">{transformedObject.matchedText}</span>}
 			{transformedObject.nonMatchText && <span>{transformedObject.nonMatchText}</span>}
-            {/* {mentions.map((mention, i) => {
-                return <LineWithMention key={i} mention={mention} />;
-            })} */}
+           
     	</div>
 	);
 };
