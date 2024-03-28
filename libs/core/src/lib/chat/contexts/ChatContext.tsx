@@ -6,6 +6,7 @@ import {
 	Notification,
 	StatusPresenceEvent,
 	VoiceJoinedEvent,
+	VoiceLeavedEvent,
 } from '@mezon/mezon-js';
 import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -186,8 +187,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, []);
 
 	const onvoiceleaved = useCallback(
-		(voice: VoiceJoinedEvent) => {
-			console.log('onvoiceleaved', voice);
+		(voice: VoiceLeavedEvent) => {
+			console.log("onvoiceleaved", voice);
 			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],
