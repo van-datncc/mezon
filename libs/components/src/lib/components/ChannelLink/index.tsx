@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
+import UserListVoiceChannel from '../UserListVoiceChannel';
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;

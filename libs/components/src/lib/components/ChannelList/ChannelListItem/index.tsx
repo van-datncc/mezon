@@ -1,9 +1,12 @@
 import { selectArrayNotification, selectArrayUnreadChannel, selectCurrentChannel, selectEntitiesChannel } from '@mezon/store';
 import { IChannel, NotificationContent } from '@mezon/utils';
+import { Fragment } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { ChannelType } from 'vendors/mezon-js/packages/mezon-js/dist';
 import ChannelLink from '../../ChannelLink';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
+import UserListVoiceChannel from '../../UserListVoiceChannel';
 type ChannelListItemProp = {
 	channel: IChannel;
 };
@@ -52,16 +55,19 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	};
 
 	return (
-		<ChannelLink
-			clanId={channel?.clan_id}
-			channel={channel}
-			active={currentChanel?.id === channel.id}
-			key={channel.id}
-			createInviteLink={handleOpenInvite}
-			isPrivate={channel.channel_private}
-			isUnReadChannel={isUnReadChannel(channel.id)}
-			numberNotication={isNotication(channel.id)}
-		/>
+		<Fragment>
+			<ChannelLink
+				clanId={channel?.clan_id}
+				channel={channel}
+				active={currentChanel?.id === channel.id}
+				key={channel.id}
+				createInviteLink={handleOpenInvite}
+				isPrivate={channel.channel_private}
+				isUnReadChannel={isUnReadChannel(channel.id)}
+				numberNotication={isNotication(channel.id)}
+			/>
+			<UserListVoiceChannel channelID={channel.channel_id ?? ""}  />
+		</Fragment>
 	);
 };
 
