@@ -498,8 +498,9 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				userDisplayName,
 			)
 		}
-		localTracksRef.current.forEach(track => {
-			track.dispose();			
+		localTracksRef.current.forEach(track => {			
+			track.stopStream();
+			track.dispose();
 		})
 		voiceChannelRef.current?.leave();
 		voiceConnRef.current?.disconnect();
