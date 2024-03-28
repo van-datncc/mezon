@@ -10,6 +10,16 @@ type ILinePartWithMention = {
 	mention: ILineMention;
 };
 
+// const LineWithMention = ({ mention }: ILinePartWithMention) => {
+//     const { matchedText, nonMatchText } = mention;
+//     return (
+//         <>
+//             {nonMatchText && <MarkdownFormatText markdown={nonMatchText} />}
+//             <MentionSpan text={matchedText} />
+//         </>
+//     );
+// };
+
 const LineWithLink = ({ link }: { link: string }) => {
 	return (
 		<a href={link} className="text-blue-500">
@@ -36,20 +46,24 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	}
 	const transformedObject = mentions.reduce(
 		(accumulator: any, currentItem) => {
-			if (currentItem.matchedText !== '') {
-				accumulator.matchedText = currentItem.matchedText;
-			} else {
-				accumulator.nonMatchText = currentItem.nonMatchText;
+			if (currentItem.matchedText !== '' ) {
+				accumulator.matchedText += currentItem.matchedText;
+			}
+			 else {
+				accumulator.nonMatchText += currentItem.nonMatchText;
 			}
 			return accumulator;
 		},
 		{ matchedText: '', nonMatchText: '' },
 	);
+	console.log('transformedArray----', transformedObject);
 	return (
-		<div>
-			{transformedObject.matchedText && <span className="text-blue-500 cursor-pointer">{transformedObject.matchedText}</span>}
-			{transformedObject.nonMatchText && <span>{transformedObject.nonMatchText}</span>}
-		</div>
+		<div >
+			<MarkdownFormatText 
+				tagName={transformedObject.matchedText ? transformedObject.matchedText : ''}
+				markdown={transformedObject.nonMatchText}
+			/>
+    	</div>
 	);
 };
 
