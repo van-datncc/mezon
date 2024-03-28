@@ -107,7 +107,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				channel={channel}
 			/>
 			{/* <p>{numberNotication}</p> */}
-			{isShowPanelChannel && <PanelChannel coords={coords} />}
+			{isShowPanelChannel && <PanelChannel channel={channel} coords={coords} />}
 		</div>
 	);
 }
