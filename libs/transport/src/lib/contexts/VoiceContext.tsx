@@ -232,12 +232,10 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			return;
 		}
 
-		const participant = track.getParticipantId();
-		
+		const participant = track.getParticipantId();		
 		if (remoteTracksRef && remoteTracksRef.current) {
 			const remoteTrack = remoteTracksRef.current.get(participant);
 			const filter = remoteTrack?.filter(item => item.getId() === track.getId());
-			console.log(remoteTrack); // TODO: recheck this
 			if ((filter?.length as number) > 0) {
 				console.log("already in");
 				return; // already added
@@ -277,14 +275,13 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [remoteTracksRef, targetTrackNode]);
 	
 	const onConferenceJoined = useCallback(() => {
-		console.log("onConferenceJoined clan info", clanId, clanName, voiceChannelId, voiceChannelName);
 		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
 			voiceChannelRef.current?.addTrack(localTrack);
 		});
 		const myUserId = voiceChannelRef.current?.myUserId() || '';
-		console.log("myUserId", myUserId);
+		
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
 				myUserId,
@@ -299,7 +296,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelName]);
 	
 	const onUserJoined = useCallback((id: string, user: JitsiParticipant) => {
-		console.log('user join', id, user);
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
@@ -315,16 +311,12 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [clanId, clanName, voiceChannelName, voiceChannelId, socketRef]);
 
 	const onUserLeft = useCallback((id: string, user: JitsiParticipant) => {
-		console.log('user left', id, user);
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
-				id,
-				clanId,
-				clanName,
-				voiceChannelId,				
-				voiceChannelName,
-				user.getDisplayName(),
+				id,				
+				voiceChannelId,
+				false,
 			)
 		}	
 	}, [clanId, clanName, socketRef, voiceChannelId, voiceChannelName]);
@@ -381,7 +373,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [onLocalTracks]);
 
 	const createVoiceRoom = useCallback(async () => {
-		console.log("room name", voiceChannelName);
 		if (!voiceConnRef.current) {
 			throw new Error('voice connection not init');
 		}
@@ -393,13 +384,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			}
 		};
 
-		console.log("room name", voiceChannelName);
 		if (voiceChannelRef.current?.getName() === voiceChannelName) {
 			console.log("already created");
 			return null;
 		}
 		
-		console.log("room name", voiceChannelName);
 		voiceChannelRef.current = voiceConnRef.current.initJitsiConference(voiceChannelName, confOptions);	
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
@@ -419,7 +408,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [voiceChannelName, onAudioLevelChanged, onConferenceJoined, onDisplayNameChanged, onPhoneNumberChanged, onRemoteTrackAdded, onRemoteTrackRemoved, onTrackMuteChanged, onUserJoined, onUserLeft, userDisplayName])
 	
 	const onConnectionSuccess = useCallback(() => {
-		console.log("onConnectionSuccess");
 		createVoiceRoom();
 	}, [createVoiceRoom]);
 
@@ -436,8 +424,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			...options,
 			serviceUrl: options.serviceUrl + roomName,
 		};
-
-		console.log("options", optionsWithRoom);
 
 		JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
 		const initOptions = {
@@ -492,12 +478,9 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		console.log("myUserId", myUserId);
 		if (myUserId && participantCount === 1 && socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
-				myUserId,
-				clanId,
-				clanName,
-				voiceChannelId,				
-				voiceChannelName,
-				userDisplayName,
+				myUserId,				
+				voiceChannelId,
+				true,
 			)
 		}
 		localTracksRef.current.forEach(track => {			
