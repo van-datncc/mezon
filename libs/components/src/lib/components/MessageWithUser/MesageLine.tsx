@@ -1,4 +1,3 @@
-import MarkdownFormatText from '../MarkdownFormatText';
 import { ILineMention, useMessageLine } from './useMessageLine';
 
 type MessageLineProps = {
@@ -50,8 +49,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 		<div>
 			{transformedObject.matchedText && <span className="text-blue-500 cursor-pointer">{transformedObject.matchedText}</span>}
 			{transformedObject.nonMatchText && <span>{transformedObject.nonMatchText}</span>}
-           
-    	</div>
+		</div>
 	);
 };
 
