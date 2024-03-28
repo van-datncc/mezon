@@ -48,10 +48,11 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	);
 	return (
 		<div>
-			{transformedObject.matchedText && <span className="text-blue-500 cursor-pointer">{transformedObject.matchedText}</span>}
-			{transformedObject.nonMatchText && <span>{transformedObject.nonMatchText}</span>}
-           
-    	</div>
+			<MarkdownFormatText
+				tagName={transformedObject.matchedText ? transformedObject.matchedText : ''}
+				markdown={transformedObject.nonMatchText}
+			/>
+		</div>
 	);
 };
 
