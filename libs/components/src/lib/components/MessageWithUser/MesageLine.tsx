@@ -1,4 +1,3 @@
-import MarkdownFormatText from '../MarkdownFormatText';
 import { ILineMention, useMessageLine } from './useMessageLine';
 
 type MessageLineProps = {
