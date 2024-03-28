@@ -498,7 +498,9 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				userDisplayName,
 			)
 		}
-
+		localTracksRef.current.forEach(track => {
+			track.dispose();			
+		})
 		voiceChannelRef.current?.leave();
 		voiceConnRef.current?.disconnect();
 	}, [clanId, clanName, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId, voiceChannelName]);
