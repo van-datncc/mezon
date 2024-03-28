@@ -34,6 +34,7 @@ export const fetchVoiceChannelMembers = createAsyncThunk('voice/fetchVoiceChanne
 		if (!response.voice_channel_users) {
 			return thunkAPI.rejectWithValue([]);
 		}
+
 		const members = response.voice_channel_users.map((channelRes) => {			
 			return {
 				user_id: channelRes.user_id || '',
@@ -46,7 +47,8 @@ export const fetchVoiceChannelMembers = createAsyncThunk('voice/fetchVoiceChanne
 				id: channelRes.jid || ""
 			};
 		});
-		thunkAPI.dispatch(voiceActions.addMany(members));		
+
+		thunkAPI.dispatch(voiceActions.addMany(members));
 		return response.voice_channel_users;
 	},
 );
@@ -72,8 +74,8 @@ export const voiceSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchVoiceChannelMembers.fulfilled, (state: VoiceState, action: PayloadAction<any>) => {
-				// channelMembersAdapter.addMany(state, action.payload);
-				state.voiceChannelMember = action.payload;
+				voiceAdapter.addMany(state, action.payload);
+				//state.voiceChannelMember = action.payload;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchVoiceChannelMembers.rejected, (state: VoiceState, action) => {
@@ -132,10 +134,6 @@ export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): V
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
-
-export const selectAllUserVoiceChannel = createSelector(getVoiceState, (state) => {
-	return state.voiceChannelMember;
-});
 
 export const selectVoiceChannelMembersByChannelId = (channelId?: string | null) =>
 	createSelector(selectVoiceEntities, (entities) => {

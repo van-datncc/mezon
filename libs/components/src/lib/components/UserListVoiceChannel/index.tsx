@@ -1,4 +1,4 @@
-import { selectAllUserVoiceChannel } from '@mezon/store';
+import { selectVoiceChannelMembersByChannelId } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { IChannelMember } from '@mezon/utils';
 import { Fragment } from 'react';
@@ -9,8 +9,8 @@ export type UserListVoiceChannelProps = {
 };
 
 function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
-	const voiceChannelMember = useSelector(selectAllUserVoiceChannel);
-	
+	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId('chah'));
+	console.log("================", voiceChannelMember);
 	return (
 		<>
 			{voiceChannelMember?.map((item: IChannelMember, index: number) => {
