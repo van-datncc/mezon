@@ -10,6 +10,11 @@ type PanelChannel = {
 	channel: IChannel;
 };
 
+const typeChannel = {
+	text: 1,
+	voice: 4,
+};
+
 const PanelChannel = ({ coords, channel }: PanelChannel) => {
 	const { userProfile } = useAuth();
 
@@ -25,7 +30,7 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 				<ItemPanel children="Invite People" />
 				<ItemPanel children="Copy link" />
 			</GroupPanels>
-			{channel.type === 4 && (
+			{channel.type === typeChannel.voice && (
 				<GroupPanels>
 					<ItemPanel children="Open Chat" />
 					<ItemPanel children="Hide Names" type="checkbox" />
@@ -51,7 +56,7 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 					<ItemPanel children="For 24 Hour" />
 					<ItemPanel children="Until I turn it back on" />
 				</Dropdown>
-				{channel.type === 1 && (
+				{channel.type === typeChannel.text && (
 					<Dropdown
 						trigger="hover"
 						dismissOnClick={false}
@@ -77,8 +82,8 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 				<GroupPanels>
 					<ItemPanel children="Edit Channel" />
 					<ItemPanel children="Duplicate Channel" />
-					{channel.type === 1 && <ItemPanel children="Create Text Channel" />}
-					{channel.type === 4 && <ItemPanel children="Create Voice Channel" />}
+					{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" />}
+					{channel.type === typeChannel.voice && <ItemPanel children="Create Voice Channel" />}
 					<ItemPanel children="Delete Channel" />
 				</GroupPanels>
 			)}
