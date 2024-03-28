@@ -283,10 +283,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		localTracksRef.current.forEach((localTrack) => {
 			voiceChannelRef.current?.addTrack(localTrack);
 		});
-
+		const myUserId = voiceChannelRef.current?.myUserId() || '';
+		console.log("myUserId", myUserId);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
-				voiceChannelRef.current?.myUserId() || '',
+				myUserId,
 				clanId,
 				clanName,
 				voiceChannelId,
@@ -302,7 +303,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(
-				user.getJid(),
+				id,
 				clanId,
 				clanName,
 				voiceChannelId,				
@@ -318,7 +319,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
-				user.getJid(),
+				id,
 				clanId,
 				clanName,
 				voiceChannelId,				
@@ -488,6 +489,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		
 		const participantCount = voiceChannelRef.current?.getParticipantCount();		
 		const myUserId = voiceChannelRef.current?.myUserId();
+		console.log("myUserId", myUserId);
 		if (myUserId && participantCount === 1 && socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
 				myUserId,
