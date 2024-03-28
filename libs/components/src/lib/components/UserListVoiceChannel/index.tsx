@@ -2,7 +2,7 @@ import { ChatContext } from '@mezon/core';
 import { RootState } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { DataVoiceSocketOptinals } from '@mezon/utils';
-import { Fragment, useContext, useEffect } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 export type UserListVoiceChannelProps = {
@@ -11,9 +11,9 @@ export type UserListVoiceChannelProps = {
 
 function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 	const voiceChannelMember = useSelector((state: RootState) => state.channelMembers.voiceChannelMember);
-	const { dataVoiceChannelMember, setDataVoiceChannelMember } = useContext(ChatContext);
 	const { userJoinedVoiceChannelList, setUserJoinedVoiceChannelList } = useContext(ChatContext);
 	const { userJoinedVoiceChannel, setUserJoinedVoiceChannel } = useContext(ChatContext);
+	const [voiceCombineUser, setVoiceCombineUser] = useState<DataVoiceSocketOptinals[]>([]);
 
 	function filterDuplicateIds(arr: any) {
 		const uniqueIds = new Set();
@@ -35,7 +35,7 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 			const newItem: any = {
 				clanId: '',
 				clanName: '',
-				id: item.id,
+				id: '',
 				lastScreenshot: '',
 				participant: item.user?.username,
 				userId: item.user?.id,
@@ -48,48 +48,27 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 	};
 
 	const voiceMemberConverted = convertMemberToVoiceData();
-	function removeDuplicatesByUserIdAndVoiceChannelId(arr: any[]) {
-		const visitedEntries = new Set<string>();
-		let i = 0;
-
-		while (i < arr.length) {
-			const entry = arr[i];
-			if (entry.userId !== undefined && entry.voiceChannelId !== undefined) {
-				const key = entry.userId + entry.voiceChannelId;
-				if (!visitedEntries.has(key)) {
-					visitedEntries.add(key);
-					i++;
-				} else {
-					arr.splice(i, 1);
-				}
-			} else {
-				arr.splice(i, 1);
-			}
-		}
-	}
 
 	useEffect(() => {
-		setDataVoiceChannelMember(voiceMemberConverted);
-	}, []);
+		const timeoutId = setTimeout(() => {
+			setVoiceCombineUser(voiceMemberConverted);
+		}, 100);
+
+		return () => clearTimeout(timeoutId);
+	});
+
 
 	useEffect(() => {
-		setDataVoiceChannelMember(voiceMemberConverted);
-		let arrCombine: DataVoiceSocketOptinals[] = [];
-		if (!voiceMemberConverted && userJoinedVoiceChannelList) {
-			arrCombine = [...userJoinedVoiceChannelList];
-		} else if (!userJoinedVoiceChannelList && voiceMemberConverted) {
-			arrCombine = [...voiceMemberConverted];
-		} else if (voiceMemberConverted && userJoinedVoiceChannelList) {
-			arrCombine = [...voiceMemberConverted, ...userJoinedVoiceChannelList];
+		setVoiceCombineUser(voiceMemberConverted);
+		if (userJoinedVoiceChannelList && userJoinedVoiceChannelList) {
+			const voiceUserCombineTemparay = [...voiceMemberConverted, ...userJoinedVoiceChannelList];
+			return setVoiceCombineUser(voiceUserCombineTemparay);
 		}
-		removeDuplicatesByUserIdAndVoiceChannelId(arrCombine);
-		console.log(arrCombine);
-		setDataVoiceChannelMember(arrCombine);
-	}, [userJoinedVoiceChannel]);
+	}, [userJoinedVoiceChannel, channelID]);
 
 	return (
 		<>
-			{dataVoiceChannelMember?.map((item: any, index: number) => {
+			{voiceCombineUser?.map((item: any, index: number) => {
 				if (item.voiceChannelId === channelID) {
 					return (
 						<Fragment key={index}>

@@ -62,9 +62,6 @@ export type ChatContextValue = {
 
 	userJoinedVoiceChannelList: DataVoiceSocketOptinals[] | undefined;
 	setUserJoinedVoiceChannelList: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[] | undefined>>;
-
-	dataVoiceChannelMember: DataVoiceSocketOptinals[] | undefined;
-	setDataVoiceChannelMember: React.Dispatch<React.SetStateAction<DataVoiceSocketOptinals[] | undefined>>;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -86,7 +83,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const [userJoinedVoiceChannel, setUserJoinedVoiceChannel] = React.useState<DataVoiceSocketOptinals | undefined>();
 	const [userJoinedVoiceChannelList, setUserJoinedVoiceChannelList] = React.useState<DataVoiceSocketOptinals[] | undefined>([]);
-	const [dataVoiceChannelMember, setDataVoiceChannelMember] = React.useState<DataVoiceSocketOptinals[] | undefined>([]);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
@@ -116,8 +112,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setHeightEditor,
 			valueInput,
 			setValueInput,
-			dataVoiceChannelMember,
-			setDataVoiceChannelMember,
 			userJoinedVoiceChannelList,
 			setUserJoinedVoiceChannelList,
 			userJoinedVoiceChannel,
@@ -150,8 +144,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setHeightEditor,
 			valueInput,
 			setValueInput,
-			dataVoiceChannelMember,
-			setDataVoiceChannelMember,
 			userJoinedVoiceChannelList,
 			setUserJoinedVoiceChannelList,
 			userJoinedVoiceChannel,
@@ -164,38 +156,38 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 
-	const onvoicejoined = useCallback(
-		(voice: VoiceJoinedEvent) => {
-		  if (voice) {
+	const onvoicejoined = useCallback((voice: VoiceJoinedEvent) => {
+		if (voice) {
 			setUserJoinedVoiceChannel({
-			  clanId: voice.clan_id,
-			  clanName: voice.clan_name,
-			  id: voice.id,
-			  lastScreenshot: voice.last_screenshot,
-			  participant: voice.participant,
-			  userId: voice.user_id,
-			  voiceChannelId: voice.voice_channel_id,
-			  voiceChannelLable: voice.voice_channel_label,
+				clanId: voice.clan_id,
+				clanName: voice.clan_name,
+				id: voice.id,
+				lastScreenshot: voice.last_screenshot,
+				participant: voice.participant,
+				userId: voice.user_id,
+				voiceChannelId: voice.voice_channel_id,
+				voiceChannelLable: voice.voice_channel_label,
 			});
-			
-			setUserJoinedVoiceChannelList((prevList) => [...(prevList || []), {
-			  clanId: voice.clan_id,
-			  clanName: voice.clan_name,
-			  id: voice.id,
-			  lastScreenshot: voice.last_screenshot,
-			  participant: voice.participant,
-			  userId: voice.user_id,
-			  voiceChannelId: voice.voice_channel_id,
-			  voiceChannelLable: voice.voice_channel_label,
-			}]);
-		  }
-		},
-		[]
-	  );
+
+			setUserJoinedVoiceChannelList((prevList) => [
+				...(prevList || []),
+				{
+					clanId: voice.clan_id,
+					clanName: voice.clan_name,
+					id: voice.id,
+					lastScreenshot: voice.last_screenshot,
+					participant: voice.participant,
+					userId: voice.user_id,
+					voiceChannelId: voice.voice_channel_id,
+					voiceChannelLable: voice.voice_channel_label,
+				},
+			]);
+		}
+	}, []);
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceJoinedEvent) => {
-			console.log("onvoiceleaved", voice);
+			console.log('onvoiceleaved', voice);
 			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],

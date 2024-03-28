@@ -282,44 +282,51 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		localTracksRef.current.forEach((localTrack) => {
 			voiceChannelRef.current?.addTrack(localTrack);
 		});
-
+		const myUserId = voiceChannelRef.current?.myUserId() || '';
+		console.log("myUserId", myUserId);
 		if (socketRef && socketRef.current) {
-			try {
-				socketRef.current.writeVoiceJoined(
-					voiceChannelRef.current?.myUserId() || '',
-					clanId,
-					clanName,
-					voiceChannelId,
-					voiceChannelName,
-					userDisplayName,
-					'',
-				);
-			} catch (error) {
-				console.error('Error writing voice joined:', error);
-			}
+			socketRef.current.writeVoiceJoined(
+				myUserId,
+				clanId,
+				clanName,
+				voiceChannelId,
+				voiceChannelName,
+				userDisplayName,
+				"",
+			)
 		}
-	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelId, voiceChannelName]);
+	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelName]);
+	
+	const onUserJoined = useCallback((id: string, user: JitsiParticipant) => {
+		console.log('user join', id, user);
+		remoteTracksRef.current.set(id, []);
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceJoined(
+				id,
+				clanId,
+				clanName,
+				voiceChannelId,				
+				voiceChannelName,
+				user.getDisplayName(),
+				"",
+			)
+		}	
+	}, [clanId, clanName, voiceChannelName, voiceChannelId, socketRef]);
 
-	const onUserJoined = useCallback(
-		(id: string, user: JitsiParticipant) => {
-			remoteTracksRef.current.set(id, []);
-			if (socketRef && socketRef.current) {
-				socketRef.current.writeVoiceJoined(user.getJid(), clanId, clanName, voiceChannelId, voiceChannelName, user.getDisplayName(), '');
-			}
-		},
-		[clanId, clanName, voiceChannelName, voiceChannelId, socketRef],
-	);
-
-	const onUserLeft = useCallback(
-		(id: string, user: JitsiParticipant) => {
-			console.log('user left', id, user);
-			remoteTracksRef.current.set(id, []);
-			if (socketRef && socketRef.current) {
-				socketRef.current.writeVoiceLeaved(user.getJid(), clanId, clanName, voiceChannelId, voiceChannelName, user.getDisplayName());
-			}
-		},
-		[clanId, clanName, socketRef, voiceChannelId, voiceChannelName],
-	);
+	const onUserLeft = useCallback((id: string, user: JitsiParticipant) => {
+		console.log('user left', id, user);
+		remoteTracksRef.current.set(id, []);
+		if (socketRef && socketRef.current) {
+			socketRef.current.writeVoiceLeaved(
+				id,
+				clanId,
+				clanName,
+				voiceChannelId,				
+				voiceChannelName,
+				user.getDisplayName(),
+			)
+		}	
+	}, [clanId, clanName, socketRef, voiceChannelId, voiceChannelName]);
 
 	const onTrackMuteChanged = useCallback((track: JitsiTrack) => {
 		console.log('onTrackMuteChanged');
@@ -482,6 +489,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		
 		const participantCount = voiceChannelRef.current?.getParticipantCount();		
 		const myUserId = voiceChannelRef.current?.myUserId();
+		console.log("myUserId", myUserId);
 		if (myUserId && participantCount === 1 && socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
 				myUserId,
@@ -492,7 +500,10 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				userDisplayName,
 			)
 		}
-
+		localTracksRef.current.forEach(track => {			
+			track.stopStream();
+			track.dispose();
+		})
 		voiceChannelRef.current?.leave();
 		voiceConnRef.current?.disconnect();
 	}, [clanId, clanName, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId, voiceChannelName]);

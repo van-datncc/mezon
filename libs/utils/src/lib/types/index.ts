@@ -4,6 +4,10 @@ import {
 	ApiCategoryDesc,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiMessageAttachment,
+	ApiMessageMention,
+	ApiMessageReaction,
+	ApiMessageRef,
 	ApiPermission,
 	ApiRole,
 	ApiUser,
@@ -228,8 +232,35 @@ export enum EmojiPlaces {
 
 export interface UnreadChannel {
 	channelId: string;
-	channelLastMessageId: string;
+	channelLastSentMessageId: string;
 	channelLastSeenMesageId: string;
+	timestamp: string;
+}
+
+export interface ContentNotificationChannel {
+	content: any;
+}
+
+export interface NotificationContent {
+	avatar?: string;
+	channel_id: string;
+	channel_label: string;
+	clan_id?: string;
+	code: number;
+	content: string;
+	create_time: string;
+	reactions?: Array<ApiMessageReaction>;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
+	referenced_message?: ChannelMessage;
+	id: string;
+	persistent?: boolean;
+	sender_id: string;
+	update_time?: { seconds: number };
+	user_id_one?: string;
+	user_id_two?: string;
+	username?: string;
 }
 
 export enum TabNamePopup {
