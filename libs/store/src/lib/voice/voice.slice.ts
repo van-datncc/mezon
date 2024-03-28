@@ -135,7 +135,7 @@ export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
 
-export const selectVoiceChannelMembersByChannelId = (channelId?: string | null) =>
+export const selectVoiceChannelMembersByChannelId = (channelId: string) =>
 	createSelector(selectVoiceEntities, (entities) => {
 		const voiceMembers = Object.values(entities);
 		return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);

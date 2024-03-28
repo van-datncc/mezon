@@ -41,7 +41,6 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
 	thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
 	thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
-	// thunkAPI.dispatch(PermissionsUserActions.fetchPermissionsUser({ clanId }));
 	thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
 	thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));

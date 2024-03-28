@@ -9,27 +9,25 @@ export type UserListVoiceChannelProps = {
 };
 
 function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
-	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId('chah'));
-	console.log("================", voiceChannelMember);
+	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(channelID));
+	
 	return (
 		<>
 			{voiceChannelMember?.map((item: IChannelMember, index: number) => {
-				if (item.channelId === channelID) {
-					return (
-						<Fragment key={index}>
-							<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
-								<div className="w-5 h-5 rounded-full scale-75">
-									<div className="w-8 h-8 mt-[-0.3rem]">
-										<AvatarComponent id={item.user?.id ?? ''} />
-									</div>
-								</div>
-								<div>
-									<NameComponent id={item.user?.id ?? ''} />
+				return (
+					<Fragment key={index}>
+						<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
+							<div className="w-5 h-5 rounded-full scale-75">
+								<div className="w-8 h-8 mt-[-0.3rem]">
+									<AvatarComponent id={item.user?.id ?? ''} />
 								</div>
 							</div>
-						</Fragment>
-					);
-				}
+							<div>
+								<NameComponent id={item.user?.id ?? ''} />
+							</div>
+						</div>
+					</Fragment>
+				);
 			})}
 		</>
 	);

@@ -14,9 +14,7 @@ import { channelsReducer } from './channels/channels.slice';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { messagesReducer } from './messages/messages.slice';
-// import { PermissionsUserReducer } from './permissionuser/permissionuser.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
-// import { MembersRoleReducer } from './getlistmemberinrole/getListMembersInRole.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { directReducer } from './direct/direct.slice';
 import { friendsReducer } from './friends/friend.slice';
@@ -25,6 +23,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
+import { voiceReducer } from './voice/voice.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -73,6 +72,7 @@ const reducer = {
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	notification: notificationReducer,
+	voice: voiceReducer,
 };
 
 let storeInstance = configureStore({
