@@ -21,7 +21,7 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 	return (
 		<div
 			style={{ left: coords.mouseX, top: coords.mouseY }}
-			className="fixed top-full bg-[#111214] rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
+			className="fixed top-full bg-[#323232] rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
 				<ItemPanel children="Mark As Read" />
@@ -47,7 +47,7 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 					)}
 					label=""
 					placement="right-start"
-					className="bg-[#111214] border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+					className="bg-[#323232] border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemPanel children="For 15 Minutes" />
 					<ItemPanel children="For 1 Hour" />
@@ -67,7 +67,7 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 						)}
 						label=""
 						placement="right-start"
-						className="bg-[#111214] border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+						className="bg-[#323232] border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 					>
 						<ItemPanel children="Use Category Default" type="radio" />
 						<ItemPanel children="All Messages" type="radio" />
