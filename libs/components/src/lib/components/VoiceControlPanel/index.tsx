@@ -2,7 +2,7 @@ import * as Icons from '../Icons';
 
 function VoiControlPanel() {
 	return (
-		<div className="p-[8px] absolute w-full bottom-[57px] bg-bgSurface border-borderDefault">
+		<div className="p-[8px] absolute w-full bottom-[57px] bg-bgSurface border-borderDefault ">
 			<div className="flex items-center gap-2 iconHover justify-between">
 				<div className="">
 					<div

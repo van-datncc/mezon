@@ -395,7 +395,7 @@ export function WifiIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function lookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
+export function lookBlankIcon(props: React.HTMLAttributes<SVGElement>){
 	return (
 		<svg viewBox="0 0 24 24" width="20">
 			<g clip-path="url(#__lottie_element_5917)">
