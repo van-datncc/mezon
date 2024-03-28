@@ -57,7 +57,7 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
                 <canvas id="canvas"></canvas>
                 <div className="localTrack"></div>
                 <div className="remoteTrack"></div> 
-                <video id="screenvideo" autoPlay width={460} height={640}/>               
+                <video id="screenvideo" autoPlay width={460} height={640}/>
             </div>            
         </div>
     ); 
