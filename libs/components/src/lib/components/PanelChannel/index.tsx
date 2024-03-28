@@ -13,7 +13,6 @@ type PanelChannel = {
 const PanelChannel = ({ coords, channel }: PanelChannel) => {
 	const { userProfile } = useAuth();
 
-	console.log('channel.category_id', channel.creator_id, userProfile?.user?.id);
 	return (
 		<div
 			style={{ left: coords.mouseX, top: coords.mouseY }}
