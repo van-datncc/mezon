@@ -140,23 +140,13 @@ export type IUser = {
 };
 
 export type IVoice = {
+	user_id: string;
 	clan_id: string;
 	clan_name: string;
 	participant: string;
 	voice_channel_id: string;
 	voice_channel_label: string;
-	last_screenshot: string;
-};
-
-export type DataVoiceSocketOptinals = {
-	clanId?: string | undefined;
-	clanName?: string | undefined;
-	id?: string | undefined;
-	lastScreenshot?: string | undefined;
-	participant?: string | undefined;
-	userId?: string | undefined;
-	voiceChannelId?: string | undefined;
-	voiceChannelLable?: string | undefined;
+	last_screenshot: string;  	
 };
 
 export interface CategoryNameProps {
