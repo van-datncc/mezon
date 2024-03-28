@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@mezon/store';
 import { ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 import { useClans } from './useClans';
+import { ChannelType } from '@mezon/mezon-js';
 
 export function useDMInvite(channelID?:string) {
 	const dispatch = useAppDispatch();
@@ -64,7 +65,7 @@ export function useDMInvite(channelID?:string) {
 
 	useEffect(() => {
 		if (channelID) {
-			dispatch(channelMembersActions.fetchChannelMembers({clanId: '', channelId:channelID || ''}));
+			dispatch(channelMembersActions.fetchChannelMembers({clanId: '', channelId:channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 		}
 	}, [channelID]);
 
