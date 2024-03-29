@@ -1,24 +1,9 @@
-import { ILineMention, useMessageLine } from './useMessageLine';
+import MarkdownFormatText from '../MarkdownFormatText';
+import { useMessageLine } from './useMessageLine';
 
 type MessageLineProps = {
 	line: string;
 };
-
-const MentionSpan = ({ text }: { text: string }) => <span className="text-blue-500 cursor-pointer">{text}</span>;
-
-type ILinePartWithMention = {
-	mention: ILineMention;
-};
-
-// const LineWithMention = ({ mention }: ILinePartWithMention) => {
-//     const { matchedText, nonMatchText } = mention;
-//     return (
-//         <>
-//             {nonMatchText && <MarkdownFormatText markdown={nonMatchText} />}
-//             <MentionSpan text={matchedText} />
-//         </>
-//     );
-// };
 
 const LineWithLink = ({ link }: { link: string }) => {
 	return (
@@ -46,10 +31,9 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	}
 	const transformedObject = mentions.reduce(
 		(accumulator: any, currentItem) => {
-			if (currentItem.matchedText !== '' ) {
+			if (currentItem.matchedText !== '') {
 				accumulator.matchedText += currentItem.matchedText;
-			}
-			 else {
+			} else {
 				accumulator.nonMatchText += currentItem.nonMatchText;
 			}
 			return accumulator;
@@ -58,12 +42,12 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	);
 	console.log('transformedArray----', transformedObject);
 	return (
-		<div >
-			<MarkdownFormatText 
+		<div>
+			<MarkdownFormatText
 				tagName={transformedObject.matchedText ? transformedObject.matchedText : ''}
 				markdown={transformedObject.nonMatchText}
 			/>
-    	</div>
+		</div>
 	);
 };
 
