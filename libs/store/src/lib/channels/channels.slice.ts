@@ -139,7 +139,7 @@ export const channelsSlice = createSlice({
 				timestamp: item.last_seen_message?.timestamp ?? '',
 			}));
 		},
-		setChannelLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastSentMessageId: string }>) => {
+		setChannelLastSentMessageId: (state, action: PayloadAction<{ channelId: string; channelLastSentMessageId: string }>) => {
 			const { channelId, channelLastSentMessageId } = action.payload;
 			state.arrayUnreadChannel.forEach((item) => {
 				if (item.channelId === channelId) {
@@ -147,7 +147,7 @@ export const channelsSlice = createSlice({
 				}
 			});
 		},
-		setChannelSeenLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastSeenMesageId: string }>) => {
+		setChannelLastSeenMessageId: (state, action: PayloadAction<{ channelId: string; channelLastSeenMesageId: string }>) => {
 			const { channelId, channelLastSeenMesageId } = action.payload;
 			state.arrayUnreadChannel.forEach((item) => {
 				if (item.channelId === channelId) {
