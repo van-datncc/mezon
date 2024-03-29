@@ -21,7 +21,6 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 	};
 	return (
 		<>
-
 			<div onClick={(event) => event.stopPropagation()} className="z-20">
 				<EmojiPicker suggestedEmojisMode={SuggestionMode.FREQUENT} onEmojiClick={handleEmojiSelect} width={500} theme={Theme.DARK} height={458} emojiStyle={EmojiStyle.NATIVE} />
 			</div>

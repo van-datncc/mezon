@@ -21,7 +21,6 @@ export type MessageWithUserProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;	
 	user?: IChannelMember | null;
-	reactions?: Array<ApiMessageReaction>;
 	isMessNotifyMention?: boolean;
 	mode: number;
 	newMessage?: string;

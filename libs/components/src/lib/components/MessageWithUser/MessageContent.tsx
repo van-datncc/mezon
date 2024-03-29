@@ -1,5 +1,4 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import { useMemo } from 'react';
 import MessageLine from './MesageLine';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
@@ -14,10 +13,7 @@ type IMessageContentProps = {
 };
 
 const MessageContent = ({ user, message, isCombine, newMessage }: IMessageContentProps) => {
-	const lineNew = useMemo(() => {
-		const values = newMessage?.split('\n');
-		return values;
-	}, [newMessage]);
+
 	const { attachments, lines } = useMessageParser(message);
 	const renderAttachments = () => {
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
@@ -38,10 +34,8 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 			{renderAttachments()}
 			{newMessage !== '' ? (
 				<div className="flex ">
-					<div>
-						{lineNew?.map((line: string, index: number) => {
-							return <MessageLine line={line} key={index} />;
-						})}
+					<div id={message.id}>
+						<MessageLine line={newMessage as string} />
 					</div>
 					<p className="ml-[5px] opacity-50">(edit)</p>
 				</div>

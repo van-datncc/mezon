@@ -233,12 +233,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setMentionData([]);
 			setEditorState(() => EditorState.createEmpty());
 			dispatch(
-				channelsActions.setChannelSeenLastSeenMessageId({
+				channelsActions.setChannelLastSeenMessageId({
 					channelId: currentChanel?.id || '',
 					channelLastSeenMesageId: messages[0].id ? messages[0].id : '',
 				}),
 			);
-			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }));
+			dispatch(channelsActions.setChannelLastSentMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }));
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');
@@ -249,10 +249,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setEditorState(() => EditorState.createEmpty());
 			if (messages.length > 0) {
 				dispatch(
-					channelsActions.setChannelSeenLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
+					channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
 				);
 				dispatch(
-					channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }),
+					channelsActions.setChannelLastSentMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }),
 				);
 				const notificationLength = arrayNotication.length;
 				const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
@@ -526,7 +526,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							editorRef.current!.focus();
 						}}
 					>
-						<div id="editor" className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}>
+						<div
+							id="editor"
+							className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}
+							style={{ wordBreak: 'break-word' }}
+						>
 							<Editor
 								keyBindingFn={keyBindingFn}
 								handleKeyCommand={handleKeyCommand}

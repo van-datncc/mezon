@@ -69,7 +69,9 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{(channelLabelInit !== channelLabel || topicInit !== topic) && <ModalAskChangeChannel onReset={handleReset} onSave={handleSave} />}
+			{(channelLabelInit !== channelLabel || topicInit !== topic) && (
+				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
+			)}
 		</div>
 	);
 };

@@ -331,15 +331,14 @@ input:-webkit-autofill:active {
 }
 
 .prose ul li {
-	position: relative;
-	margin-top: 5px;
+	margin-bottom: 0;
 	padding-top: 10px;
 	padding-bottom: 5px;
 }
 
 .prose ul li ul {
 	margin-bottom: 0;
-	margin-top: -10px;
+	margin-top: 0;
 }
 
 .pre {
@@ -353,14 +352,7 @@ input:-webkit-autofill:active {
 	z-index: 5;
 }
 
-.olProps {
-	line-height: 20px;
-}
-
-.olProps li {
-	line-height: 10px;
-}
-
-.liProps {
-	line-height: 10px;
+blockquote span {
+  display: inline-block;
+  line-height: 20px;
 }

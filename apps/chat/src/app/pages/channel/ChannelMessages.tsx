@@ -61,9 +61,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		const notificationLength = arrayNotication.length;
 		const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
 		const timestamp = notification.update_time?.seconds || '';
-		const channelId = notification.channel_id;
+		const channelIdNotification = notification.channel_id;
 		if (position && position >= 0) {
-			dispatch(channelsActions.setTimestamp({ channelId, timestamp: String(timestamp) }));
+			dispatch(channelsActions.setTimestamp({ channelId: channelIdNotification, timestamp: String(timestamp) }));
+			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId, channelLastSeenMesageId: messages[0].id }));
+			dispatch(channelsActions.setChannelLastSentMessageId({ channelId, channelLastSentMessageId: messages[0].id }));
 		}
 	}, [arrayNotication, dispatch, position]);
 
