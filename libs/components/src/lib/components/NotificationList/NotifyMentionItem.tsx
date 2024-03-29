@@ -1,5 +1,5 @@
-import { useAppNavigation, useClans, useNotification } from '@mezon/core';
-import { INotification, selectChannelById, selectMemberClanByUserId } from '@mezon/store';
+import { useAppNavigation, useClans, useJumpToMessage, useNotification } from '@mezon/core';
+import { INotification, selectChannelById, selectCurrentChannelId, selectMemberClanByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
@@ -49,9 +49,16 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
 	const { toMessageChannel, navigate } = useAppNavigation();
-
+	const { jumpToMessage } = useJumpToMessage();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	
+	const messageContent = JSON.parse(data.content);
 	const jump = async (messId: string) => {
-		await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
+		if (currentChannelId === data.channel_id) {
+			jumpToMessage(messId)
+		} else {
+			await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
+		}
 	};
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
@@ -104,6 +111,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					attachments={data.attachments}
 					mentions={data.mentions}
 					mode={2}
+					newMessage={messageContent.t}
 				/>
 			</div>
 		</div>
