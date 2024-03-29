@@ -1,4 +1,5 @@
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
+import remarkGFM from 'remark-gfm';
 import PreClass from './PreClass';
 
 type MarkdownFormatTextProps = {
@@ -6,30 +7,30 @@ type MarkdownFormatTextProps = {
 	tagName?: string;
 };
 
-const MarkdownFormatText = ({ markdown,tagName }: MarkdownFormatTextProps) => {
+const MarkdownFormatText = ({ markdown, tagName }: MarkdownFormatTextProps) => {
+	const startsWithTripleBackticks = markdown.startsWith('```');
+	const endsWithNoTripleBackticks = !markdown.endsWith('```');
+	const onlyBackticks = /^```$/.test(markdown);
+
 	return (
-		<article className=" prose prose-pre:w-[600px] prose-sm prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px]">
+		<article className=" prose prose-pre:w-[600px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px]">
 			{tagName && (
-				<span style={{color:'#3297ff'}} className='cursor-pointer'>
+				<span style={{ color: '#3297ff' }} className="cursor-pointer">
 					{tagName}
 				</span>
 			)}
-			<Markdown
-				children={markdown}
-				options={{
-					overrides: {
-						pre: {
-							component: PreClass,
-						},
-						li: {
-							props: 'liProps',
-						},
-						ol: {
-							props: 'olProps',
-						},
-					},
-				}}
-			/>
+			{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
+				<span>{markdown}</span>
+			) : (
+				<Markdown
+					children={markdown}
+					remarkPlugins={[remarkGFM]}
+					components={{
+						pre: PreClass,
+						p: 'span',
+					}}
+				/>
+			)}
 		</article>
 	);
 };
