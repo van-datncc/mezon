@@ -40,7 +40,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 		},
 		{ matchedText: '', nonMatchText: '' },
 	);
-	console.log('transformedArray----', transformedObject);
+	
 	return (
 		<div>
 			<MarkdownFormatText

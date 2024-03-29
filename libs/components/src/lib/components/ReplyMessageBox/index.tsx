@@ -1,16 +1,16 @@
-import { ChatContext } from '@mezon/core';
-import { selectMemberByUserId } from '@mezon/store';
-import { useContext } from 'react';
+import { selectMemberByUserId, selectReference } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
+import { useState } from 'react';
 
-function ReplyMessage() {
-	const { messageRef, isOpenReply, setMessageRef, setIsOpenReply } = useContext(ChatContext);
-	const getSenderMessage = useSelector(selectMemberByUserId(messageRef?.sender_id ?? ''));
+
+function ReplyMessageBox() {
+	const refMessage = useSelector(selectReference);
+	const getSenderMessage = useSelector(selectMemberByUserId(refMessage?.sender_id ?? ''));
+	const [isOpenReply, setIsOpenReply] = useState<boolean>(false);
 
 	const handleRemoveReply = () => {
 		setIsOpenReply(false);
-		setMessageRef(undefined);
 	};
 
 	return (
@@ -29,4 +29,4 @@ function ReplyMessage() {
 	);
 }
 
-export default ReplyMessage;
+export default ReplyMessageBox;

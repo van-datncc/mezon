@@ -10,7 +10,6 @@ import {
 } from '@mezon/mezon-js';
 import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageWithUser, TabNamePopup } from '@mezon/utils';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -20,120 +19,16 @@ type ChatContextProviderProps = {
 	children: React.ReactNode;
 };
 
-export type ChatContextValue = {
-	messageRef: IMessageWithUser | undefined;
-	setMessageRef: React.Dispatch<React.SetStateAction<IMessageWithUser | undefined>>;
-	isOpenReply: boolean;
-	setIsOpenReply: React.Dispatch<React.SetStateAction<boolean>>;
-
-	isOpenEdit: boolean;
-	setIsOpenEdit: React.Dispatch<React.SetStateAction<boolean>>;
-
-	isOpenEmojiMessBox: boolean;
-	setIsOpenEmojiMessBox: React.Dispatch<React.SetStateAction<boolean>>;
-
-	emojiSelectedReacted: string;
-	setEmojiSelectedReacted: React.Dispatch<React.SetStateAction<string>>;
-
-	emojiSelectedMess: string;
-	setEmojiSelectedMess: React.Dispatch<React.SetStateAction<string>>;
-
-	isOpenEmojiReacted: boolean;
-	setIsOpenEmojiReacted: React.Dispatch<React.SetStateAction<boolean>>;
-	isOpenEmojiReactedBottom: boolean;
-	setIsOpenEmojiReactedBottom: React.Dispatch<React.SetStateAction<boolean>>;
-
-	emojiPlaceActive: string;
-	setEmojiPlaceActive: React.Dispatch<React.SetStateAction<string>>;
-
-	widthEmojiBar: number;
-	setWidthEmojiBar: React.Dispatch<React.SetStateAction<number>>;
-
-	activeTab: string;
-	setActiveTab: React.Dispatch<React.SetStateAction<string>>;
-
-	heightEditor: number;
-	setHeightEditor: React.Dispatch<React.SetStateAction<number>>;
-
-	valueInput: string;
-	setValueInput: React.Dispatch<React.SetStateAction<string>>;
-};
+export type ChatContextValue = object;
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
-const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const [messageRef, setMessageRef] = React.useState<IMessageWithUser>();
-	const [isOpenReply, setIsOpenReply] = React.useState<boolean>(false);
-	const [isOpenEdit, setIsOpenEdit] = React.useState<boolean>(false);
-	const [isOpenEmojiMessBox, setIsOpenEmojiMessBox] = React.useState<boolean>(false);
-	const [emojiSelectedReacted, setEmojiSelectedReacted] = React.useState<string>('');
-	const [emojiSelectedMess, setEmojiSelectedMess] = React.useState<string>('');
-	const [isOpenEmojiReacted, setIsOpenEmojiReacted] = React.useState<boolean>(false);
-	const [isOpenEmojiReactedBottom, setIsOpenEmojiReactedBottom] = React.useState<boolean>(false);
-	const [emojiPlaceActive, setEmojiPlaceActive] = React.useState<string>('');
-	const [widthEmojiBar, setWidthEmojiBar] = React.useState<number>(0);
-	const [activeTab, setActiveTab] = React.useState<string>(TabNamePopup.NONE);
-	const [heightEditor, setHeightEditor] = React.useState<number>(50);
-	const [valueInput, setValueInput] = React.useState<string>('');
+const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {	
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
-			messageRef,
-			setMessageRef,
-			isOpenReply,
-			setIsOpenReply,
-			isOpenEdit,
-			setIsOpenEdit,
-			isOpenEmojiMessBox,
-			setIsOpenEmojiMessBox,
-			emojiSelectedReacted,
-			setEmojiSelectedReacted,
-			isOpenEmojiReacted,
-			setIsOpenEmojiReacted,
-			emojiPlaceActive,
-			setEmojiPlaceActive,
-			emojiSelectedMess,
-			setEmojiSelectedMess,
-			widthEmojiBar,
-			setWidthEmojiBar,
-			isOpenEmojiReactedBottom,
-			setIsOpenEmojiReactedBottom,
-			activeTab,
-			setActiveTab,
-			heightEditor,
-			setHeightEditor,
-			valueInput,
-			setValueInput,
-		}),
-		[
-			messageRef,
-			setMessageRef,
-			isOpenReply,
-			setIsOpenReply,
-			isOpenEdit,
-			setIsOpenEdit,
-			isOpenEmojiMessBox,
-			setIsOpenEmojiMessBox,
-			emojiSelectedReacted,
-			setEmojiSelectedReacted,
-			isOpenEmojiReacted,
-			setIsOpenEmojiReacted,
-			emojiPlaceActive,
-			setEmojiPlaceActive,
-			emojiSelectedMess,
-			setEmojiSelectedMess,
-			widthEmojiBar,
-			setWidthEmojiBar,
-			isOpenEmojiReactedBottom,
-			setIsOpenEmojiReactedBottom,
-			activeTab,
-			setActiveTab,
-			heightEditor,
-			setHeightEditor,
-			valueInput,
-			setValueInput,
-		],
-	);
+			// add logic code
+		}),[]);
 
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
@@ -189,13 +84,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		const retry = (attempt: number) => {
 			console.log('Reconnecting', attempt);
 			const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
-			setTimeout(() => {
+			const timeoutId = setTimeout(() => {
 				reconnect()
 					.then(() => {
 						console.log('Reconnected');
 					})
 					.catch(() => {
 						retry(attempt + 1);
+						if (attempt > 5) { // max retry is 5
+							clearTimeout(timeoutId);
+						}
 					});
 			}, delay);
 		};
@@ -209,16 +107,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const event = e as any;
-			if (event && event.sender_id === userId) {
+			if (e && e.sender_id === userId) {
 				return;
 			}
 
 			dispatch(
 				messagesActions.updateTypingUsers({
-					channelId: event.channel_id,
-					userId: event.sender_id,
+					channelId: e.channel_id,
+					userId: e.sender_id,
 					isTyping: true,
 				}),
 			);
@@ -228,18 +124,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const event = e as any;
-			if (event) {
+			if (e) {
 				dispatch(
 					messagesActions.updateReactionMessage({
-						id: event.id,
-						channelId: event.channel_id,
-						messageId: event.message_id,
-						emoji: event.emoji,
-						count: event.count,
-						userId: event.sender_id,
-						actionRemove: event?.action,
+						id: e.id,
+						channelId: e.channel_id,
+						messageId: e.message_id,
+						emoji: e.emoji,
+						count: e.count,
+						userId: e.sender_id,
+						actionRemove: e.action,
 					}),
 				);
 			}
@@ -280,7 +174,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onstatuspresence = () => {};
 			socket.ondisconnect = () => {};
 		};
-	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef]);
+	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef, onvoicejoined, onvoiceleaved, onerror]);
 
 	useEffect(() => {
 		initWorker();

@@ -1,34 +1,34 @@
-import { ChatContext, useAppParams } from '@mezon/core';
+import { useAppParams } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-// import EmojiPicker from '../EmojiPicker';
-import { EmojiClickData } from 'emoji-picker-react';
 import EmojiPickerComp from '../EmojiPicker';
-import GiphyComp from './gifs/gifs';
+import GiphyComp from './gifs/GiphyComp';
 import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
-import { ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+
+
 const GifStickerEmojiPopup = () => {
-	const { activeTab, setActiveTab } = useContext(ChatContext);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { type } = useAppParams();
 	const [ mod, setMod] = useState(0);
+	const [activeTab, setActiveTab] = useState<string>("");
+
 	useEffect(()=>{
-		if (type === "2") {
+		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
 			setMod(ChannelStreamMode.STREAM_MODE_GROUP)
-		} else if (type === "3"){
+		} else if (Number(type) === ChannelType.CHANNEL_TYPE_DM) {
 			setMod(ChannelStreamMode.STREAM_MODE_DM)
 		} else {
 			setMod(ChannelStreamMode.STREAM_MODE_CHANNEL)
 		}
 	},[type])
+
 	const handleTabClick = (tab: string) => {
 		setActiveTab(tab);
 	};
-
-
 
 	return (
 		<div className="flex flex-col items-center w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222]">
@@ -59,7 +59,7 @@ const GifStickerEmojiPopup = () => {
 			<div className="w-full h-fit">
 				{activeTab === TabNamePopup.GIFS && (
 					<div>
-						<GiphyComp channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
+						<GiphyComp activeTab={TabNamePopup.EMOJI} channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
 					</div>
 				)}
 

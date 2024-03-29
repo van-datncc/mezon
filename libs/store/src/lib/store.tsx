@@ -24,6 +24,7 @@ import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from '.
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { referencesReducer } from './messages/references.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -73,6 +74,7 @@ const reducer = {
 	isshow: IsShowReducer,
 	notification: notificationReducer,
 	voice: voiceReducer,
+	references: referencesReducer,
 };
 
 let storeInstance = configureStore({

@@ -2,18 +2,20 @@ import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
-import { ChatContext, useChatMessages } from '@mezon/core';
-import { channelsActions, selectArrayNotification, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { useChatMessages } from '@mezon/core';
+import { channelsActions, selectArrayNotification, selectCurrentChannel, selectReference, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { EmojiPlaces, IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
+import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
 import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { SearchIndex, init } from 'emoji-mart';
-import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
+import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
+import EmojiSuggestion from '../EmojiPicker/EmojiSuggestion';
 
 export type MessageBoxProps = {
 	onSend: (
@@ -37,14 +39,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const arrayNotication = useSelector(selectArrayNotification);
 	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
 
-	const { onSend, onTyping, listMentions, isOpenEmojiPropOutside, currentChannelId, currentClanId } = props;
+	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
 	const [suggestions, setSuggestions] = useState(listMentions);
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
-	const [referenceData, setReferencesData] = useState<ApiMessageRef[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 	const [open, setOpen] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
@@ -217,35 +218,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
-	const { messageRef, isOpenReply, setIsOpenReply } = useContext(ChatContext);
-
-	useEffect(() => {
-		if (messageRef) {
-			setReferencesData([
-				{
-					message_id: '',
-					message_ref_id: messageRef.id,
-					ref_type: 0,
-					message_sender_id: messageRef.sender_id,
-					has_attachment: (messageRef.attachments?.length as number) > 0,
-					content: JSON.stringify(messageRef.content),
-				},
-			]);
-		}
-	}, [messageRef]);
+	const refMessage = useSelector(selectReference);
 
 	const handleSend = useCallback(() => {
 		setIsOpenEmojiChatBoxSuggestion(false);
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
-		if (isOpenReply) {
-			onSend({ t: content }, mentionData, attachmentData, referenceData);
+
+		if (refMessage) {
+			onSend({ t: content }, mentionData, attachmentData, refMessage.references);
 			setContent('');
 			setAttachmentData([]);
 			setMentionData([]);
 			setEditorState(() => EditorState.createEmpty());
-			setIsOpenReply(false);
 			dispatch(
 				channelsActions.setChannelSeenLastSeenMessageId({
 					channelId: currentChanel?.id || '',
@@ -315,8 +301,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	};
 
 	const [selectionToEnd, setSelectionToEnd] = useState(false);
-	const { setIsOpenEmojiMessBox, setEmojiPlaceActive, emojiSelectedMess, emojiPlaceActive, isOpenEmojiMessBox, setMessageRef } =
-		useContext(ChatContext);
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
@@ -326,13 +310,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		if (content.length === 1) {
 			moveSelectionToEnd();
 		}
-	}, [clearEditor, content, showEmojiSuggestion, emojiSelectedMess]);
+	}, [clearEditor, content, showEmojiSuggestion]);
 
 	useEffect(() => {
-		if (emojiSelectedMess) {
-			moveSelectionToEnd();
-		}
-	}, [emojiSelectedMess]);
+		moveSelectionToEnd();
+	}, []);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -343,10 +325,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const editorHeight = editorDiv?.clientHeight;
 	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
 	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
-	const { heightEditor, setHeightEditor } = useContext(ChatContext);
 
 	useEffect(() => {
-		setHeightEditor(editorHeight ?? 50);
+		//setHeightEditor(editorHeight ?? 50);
 	}, [editorHeight]);
 
 	function handleEmojiClick(clickedEmoji: string) {
@@ -357,34 +338,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return newEditorState;
 		});
 	}
-	const { activeTab, setActiveTab } = useContext(ChatContext);
-
-	const handleOpenGifs = (event: React.MouseEvent<HTMLDivElement>) => {
-		setActiveTab(TabNamePopup.GIFS);
-		event.stopPropagation();
-	};
-
-	const handleOpenStickers = (event: React.MouseEvent<HTMLDivElement>) => {
-		setActiveTab(TabNamePopup.STICKERS);
-		setMessageRef(undefined);
-		event.stopPropagation();
-	};
-
-	const handleOpenEmoji = (event: React.MouseEvent<HTMLDivElement>) => {
-		setActiveTab(TabNamePopup.EMOJI);
-		setEmojiPlaceActive(EmojiPlaces.EMOJI_EDITOR);
-		setMessageRef(undefined);
-		event.stopPropagation();
-	};
-
-	useEffect(() => {
-		if (emojiSelectedMess && emojiPlaceActive === EmojiPlaces.EMOJI_EDITOR) {
-			setShowPlaceHolder(false);
-			if (emojiSelectedMess) {
-				handleEmojiClick(emojiSelectedMess);
-			}
-		}
-	}, [emojiSelectedMess]);
 
 	const [emojiResult, setEmojiResult] = useState<string[]>([]);
 	function clickEmojiSuggestion(emoji: string, index: number) {
@@ -533,12 +486,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	};
 
-	useEffect(() => {
-		if (isOpenReply) {
-			editorRef.current!.focus();
-		}
-	}, [isOpenReply]);
-
 	const editorElement = document.getElementById('editor');
 	useEffect(() => {
 		const hasFigure = editorElement?.querySelector('figure');
@@ -552,43 +499,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative">
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
-				{showEmojiSuggestion && (
-					<div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
-						<p className=" text-center p-2">Emoji Matching: {syntax}</p>
-						<div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
-							<ul
-								ref={ulRef}
-								className="w-full flex flex-col"
-								onKeyDown={(e) => {
-									if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-										e.preventDefault();
-									}
-								}}
-							>
-								{emojiResult?.map((emoji: any, index: number) => (
-									<li
-										ref={(el) => (liRefs.current[index] = el)}
-										key={emoji.shortcodes}
-										onKeyDown={(e) => handleKeyPress(e, emoji.native)}
-										onClick={() => clickEmojiSuggestion(emoji.native, index)}
-										className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
-											selectedItemIndex === index ? 'selected-item' : ''
-										}`}
-										tabIndex={0}
-									>
-										{emoji.native} {emoji.shortcodes}
-									</li>
-								))}
-							</ul>
-						</div>
-					</div>
-				)}
+				<EmojiSuggestion emojiResult={emojiResult} syntax={syntax} selectedItemIndex={selectedItemIndex} />
 				<label>
 					<input
 						id="preview_img"
 						type="file"
 						onChange={(e) => {
-							handleFile(e), (e.target.value = '');
+							//handleFile(e), (e.target.value = '');
 						}}
 						className="block w-full hidden"
 					/>
@@ -625,20 +542,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						</div>
 					</div>
 					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
-
-					<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
-						<div onClick={handleOpenGifs} className="cursor-pointer">
-							<Icons.Gif defaultFill={`${activeTab === TabNamePopup.GIFS ? '#FFFFFF' : '#AEAEAE'}`} />
-						</div>
-
-						<div onClick={handleOpenStickers} className="cursor-pointer">
-							<Icons.Sticker defaultFill={`${activeTab === TabNamePopup.STICKERS ? '#FFFFFF' : '#AEAEAE'}`} />
-						</div>
-
-						<div onClick={handleOpenEmoji} className="cursor-pointer">
-							<Icons.Smile defaultFill={`${activeTab === TabNamePopup.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
-						</div>
-					</div>
+					<GifStickerEmojiButtons activeTab={TabNamePopup.NONE} />
 				</div>
 			</div>
 		</div>

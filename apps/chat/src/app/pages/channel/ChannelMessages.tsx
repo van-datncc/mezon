@@ -1,8 +1,8 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { ChatContext, getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
+import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
 import { channelsActions, selectArrayNotification, useAppDispatch } from '@mezon/store';
 import { NotificationContent, TabNamePopup } from '@mezon/utils';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
@@ -20,8 +20,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const containerRef = useRef<HTMLDivElement>(null);
-	const { heightEditor } = useContext(ChatContext);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
+	const [heightEditor, setHeightEditor] = useState(30);
+	const [activeGifsStickerEmojiTab, setActiveGifsStickerEmojiTab] = useState<TabNamePopup>();
+
 	const arrayNotication = useSelector(selectArrayNotification);
 
 	const fetchData = () => {
@@ -45,9 +47,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
-	const { activeTab, setActiveTab, setIsOpenEmojiMessBox, setIsOpenEmojiReacted, setIsOpenEmojiReactedBottom, setValueInput } =
-		useContext(ChatContext);
-
 	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
 
 	useEffect(() => {
@@ -66,17 +65,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		if (position && position >= 0) {
 			dispatch(channelsActions.setTimestamp({ channelId, timestamp: String(timestamp) }));
 		}
-	}, [position]);
+	}, [arrayNotication, dispatch, position]);
 
 	return (
 		<div
 			onClick={(e) => {
 				e.stopPropagation();
-				setActiveTab(TabNamePopup.NONE);
-				setIsOpenEmojiMessBox(false);
-				setIsOpenEmojiReacted(false);
-				setIsOpenEmojiReactedBottom(false);
-				setValueInput('');
+				setActiveGifsStickerEmojiTab(TabNamePopup.NONE);
 			}}
 			className=" relative"
 			id="scrollLoading"
@@ -110,13 +105,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}
 						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
-						myUser={userProfile?.user?.id}
 						channelId={channelId}
 						channelLabel={channelLabel || ''}
 					/>
 				))}
 			</InfiniteScroll>
-			{activeTab !== TabNamePopup.NONE && (
+			{activeGifsStickerEmojiTab !== TabNamePopup.NONE && (
 				<div
 					className={popupClass}
 					onClick={(e) => {
