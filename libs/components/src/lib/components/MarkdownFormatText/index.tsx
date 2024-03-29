@@ -10,6 +10,7 @@ type MarkdownFormatTextProps = {
 const MarkdownFormatText = ({ markdown, tagName }: MarkdownFormatTextProps) => {
 	const startsWithTripleBackticks = markdown.startsWith('```');
 	const endsWithNoTripleBackticks = !markdown.endsWith('```');
+	const onlyBackticks = /^```$/.test(markdown);
 
 	return (
 		<article className=" prose prose-pre:w-[600px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px]">
@@ -18,7 +19,7 @@ const MarkdownFormatText = ({ markdown, tagName }: MarkdownFormatTextProps) => {
 					{tagName}
 				</span>
 			)}
-			{(startsWithTripleBackticks && endsWithNoTripleBackticks) || startsWithTripleBackticks ? (
+			{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 				<span>{markdown}</span>
 			) : (
 				<Markdown
