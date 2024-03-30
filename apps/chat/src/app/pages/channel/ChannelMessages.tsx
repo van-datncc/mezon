@@ -1,6 +1,6 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { channelsActions, selectArrayNotification, useAppDispatch } from '@mezon/store';
+import { channelsActions, emojiActions, selectActiceGifsStickerEmojiTab, selectArrayNotification, useAppDispatch } from '@mezon/store';
 import { NotificationContent, TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -17,13 +17,13 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const { userProfile } = useAuth();
-	const dispatch = useAppDispatch();
+	
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [heightEditor, setHeightEditor] = useState(30);
-	const [activeGifsStickerEmojiTab, setActiveGifsStickerEmojiTab] = useState<TabNamePopup>();
+	const activeGifsStickerEmojiTab = useSelector(selectActiceGifsStickerEmojiTab);
 
+	const dispatch = useAppDispatch();
 	const arrayNotication = useSelector(selectArrayNotification);
 
 	const fetchData = () => {
@@ -73,7 +73,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		<div
 			onClick={(e) => {
 				e.stopPropagation();
-				setActiveGifsStickerEmojiTab(TabNamePopup.NONE);
+				dispatch(emojiActions.setActiveGifsStickerEmojiTab(TabNamePopup.NONE));
 			}}
 			className=" relative"
 			id="scrollLoading"

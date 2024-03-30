@@ -1,4 +1,4 @@
-import { TabNamePopup } from '@mezon/utils';
+import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 
 export const EMOJI_FEATURE_KEY = 'emoji';
@@ -13,8 +13,14 @@ export interface EmojiEntity {
 export interface EmojiState extends EntityState<EmojiEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	emojiPopupState: boolean; // close | open
 	activeGifsStickerEmojiTab: TabNamePopup;
+	emojiPopupState: boolean; // close | open
+	emojiPlaceActive: EmojiPlaces;
+	emojiReactedBottomState: boolean;
+	emojiMessBoxState: boolean;
+	emojiReactedState: boolean;
+	emojiOpenEditState: boolean;
+	messageReplyState: boolean;
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
@@ -47,9 +53,15 @@ export const fetchEmoji = createAsyncThunk<EmojiEntity[]>('emoji/fetchStatus', a
 
 export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null,	
+	activeGifsStickerEmojiTab: TabNamePopup.NONE,
 	emojiPopupState: false,
-	activeGifsStickerEmojiTab: TabNamePopup.NONE
+	emojiPlaceActive: EmojiPlaces.EMOJI_REACTION,
+	emojiReactedBottomState: false,
+	emojiMessBoxState: false,
+	emojiReactedState: false,
+	emojiOpenEditState: false,
+	messageReplyState: false,
 });
 
 export const emojiSlice = createSlice({
@@ -64,6 +76,24 @@ export const emojiSlice = createSlice({
 		setActiveGifsStickerEmojiTab(state, action) {
 			state.activeGifsStickerEmojiTab = action.payload;
 		},
+		setEmojiPlaceActive(state, action) {
+			state.emojiPlaceActive = action.payload;
+		},
+		setEmojiReactedBottomState(state, action) {
+			state.emojiReactedBottomState = action.payload;
+		},
+		setEmojiMessBoxState(state, action) {
+			state.emojiMessBoxState = action.payload;
+		},
+		setEmojiReactedState(state, action) {
+			state.emojiReactedState = action.payload;
+		},
+		setEmojiOpenEditState(state, action) {
+			state.emojiOpenEditState = action.payload;
+		},
+		setMessageReplyState(state, action) {
+			state.messageReplyState = action.payload;
+		}
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -131,4 +161,16 @@ export const selectEmojiEntities = createSelector(getEmojiState, selectEntities)
 
 export const selectEmojiState = createSelector(getEmojiState, (state: EmojiState) => state.emojiPopupState);
 
+export const selectEmojiMessBoxState = createSelector(getEmojiState, (state: EmojiState) => state.emojiMessBoxState);
+
+export const selectEmojiOpenEditState = createSelector(getEmojiState, (state: EmojiState) => state.emojiOpenEditState);
+
+export const selectEmojiPlaceActive = createSelector(getEmojiState, (state: EmojiState) => state.emojiPlaceActive);
+
+export const selectEmojiReactedBottomState = createSelector(getEmojiState, (state: EmojiState) => state.emojiReactedBottomState);
+
+export const selectEmojiReactedState = createSelector(getEmojiState, (state: EmojiState) => state.emojiReactedState);
+
 export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (state: EmojiState) => state.activeGifsStickerEmojiTab);
+
+export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
