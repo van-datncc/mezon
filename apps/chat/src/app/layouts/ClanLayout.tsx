@@ -1,4 +1,4 @@
-import { ChannelList, ChannelTopbar, FooterProfile, ClanHeader } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans } from '@mezon/core';
 import { useState } from 'react';
 import { Outlet, useLoaderData } from 'react-router-dom';
@@ -27,7 +27,7 @@ const ClanLayout = () => {
 						openSetting={handleOpenCreate}
 					/>
 				</div>
-				<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden">
+				<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-visible">
 					<ChannelTopbar channel={undefined} />
 					<div className="flex h-heightWithoutTopBar flex-row">
 						<Outlet />

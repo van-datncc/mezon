@@ -1,9 +1,13 @@
+import { useOnClickOutside } from '@mezon/core';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import NotificationList from '../NotificationList';
 import { ChannelLabel, SearchMessage } from './TopBarComponents';
+import Threads from './TopBarComponents/Threads';
 
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
@@ -20,7 +24,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
 					<div className="pr-[70px] hidden ssm:flex">
-						<div className="justify-start items-center gap-[15px] flex iconHover">
+						<div className="relative justify-start items-center gap-[15px] flex iconHover">
 							<ThreadButton />
 							<MuteButton />
 							<PinButton />
@@ -44,10 +48,24 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 }
 
 function ThreadButton() {
+	const [isShowThread, setIsShowThread] = useState<boolean>(false);
+	const threadRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowThreads = () => {
+		setIsShowThread(!isShowThread);
+	};
+
+	useOnClickOutside(threadRef, () => setIsShowThread(false));
+
 	return (
-		<button>
-			<Icons.ThreadIcon />
-		</button>
+		<div className="relative" ref={threadRef}>
+			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
+				<button onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.ThreadIcon />
+				</button>
+			</Tooltip>
+			{isShowThread && <Threads setIsShowThread={setIsShowThread} />}
+		</div>
 	);
 }
 
@@ -71,14 +89,6 @@ function ThreeDotButton() {
 	return (
 		<button>
 			<Icons.ThreeDot />
-		</button>
-	);
-}
-
-function InboxButton() {
-	return (
-		<button>
-			<Icons.Inbox />
 		</button>
 	);
 }
