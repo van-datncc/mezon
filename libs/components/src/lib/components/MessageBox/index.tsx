@@ -1,13 +1,12 @@
 import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
-import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
+import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import { useChatMessages } from '@mezon/core';
 import { channelsActions, referencesActions, selectArrayNotification, selectCurrentChannel, selectReference, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
-import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
-import { SearchIndex, init } from 'emoji-mart';
+import { AtomicBlockUtils, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
@@ -16,6 +15,8 @@ import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 import EmojiSuggestion from '../EmojiPicker/EmojiSuggestion';
+import FileSelectionButton from './FileSelectionButton';
+import MentionSuggestionWrapper from './MentionSuggestionWrapper';
 
 export type MessageBoxProps = {
 	onSend: (
@@ -31,8 +32,6 @@ export type MessageBoxProps = {
 	currentClanId?: string;
 };
 
-init({ data });
-
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const currentChanel = useSelector(selectCurrentChannel);
@@ -41,15 +40,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
-	const [suggestions, setSuggestions] = useState(listMentions);
+	
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-	const [open, setOpen] = useState(false);
+
 	const { sessionRef, clientRef } = useMezon();
 
+	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
 	const mentionPlugin = useRef(
 		createMentionPlugin({
 			entityMutability: 'IMMUTABLE',
@@ -60,8 +60,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}),
 	);
 
-	const { MentionSuggestions } = mentionPlugin.current;
-	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
 	const plugins = [mentionPlugin.current, imagePlugin];
 	//clear Editor after navigate channel
 	useEffect(() => {
@@ -137,13 +135,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		},
 		[attachmentData],
 	);
-	const onSearchChange = ({ value }: any) => {
-		setSuggestions(defaultSuggestionsFilter(value, listMentions || []) as any);
-	};
-
-	const onOpenChange = useCallback((_open: boolean) => {
-		setOpen(_open);
-	}, []);
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
@@ -163,7 +154,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				src: urlFile,
 				height: '20px',
 				width: 'auto',
-				onRemove: () => handleRemove(),
+				onRemove: () => handleEditorRemove(),
 			});
 			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 
@@ -211,7 +202,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
 	);
 
-	const handleRemove = () => {
+	const handleEditorRemove = () => {
 		const currentContentState = editorState.getCurrentContent();
 		const newContentState = Modifier.applyEntity(currentContentState, editorState.getSelection(), null);
 		const newEditorState = EditorState.push(editorState, newContentState, 'apply-entity');
@@ -301,7 +292,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(updatedEditorState);
 	};
 
-	const [selectionToEnd, setSelectionToEnd] = useState(false);
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
@@ -340,153 +330,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 	}
 
-	const [emojiResult, setEmojiResult] = useState<string[]>([]);
-	function clickEmojiSuggestion(emoji: string, index: number) {
-		setSelectedItemIndex(index);
-		handleEmojiClick(emoji);
-		setEditorState((prevEditorState) => {
-			const currentContentState = prevEditorState.getCurrentContent();
-			const raw = convertToRaw(currentContentState);
-			const messageRaw = raw.blocks;
-			const emojiPicker = messageRaw[0].text.toString();
-			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
-			const lastEmoji = emojiArray[0]?.slice(syntax.length);
-			const blockMap = editorState.getCurrentContent().getBlockMap();
-			const selectionsToReplace: SelectionState[] = [];
-			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
-				const text = contentBlock?.getText() || '';
-				let matchArr, start, end;
-				while ((matchArr = regex.exec(text)) !== null) {
-					start = matchArr.index;
-					end = start + matchArr[0].length;
-					callback(start, end);
-				}
-			};
-
-			blockMap.forEach((contentBlock) => {
-				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
-					const blockKey = contentBlock?.getKey();
-					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
-						anchorOffset: start,
-						focusOffset: end,
-					});
-
-					selectionsToReplace.push(blockSelection);
-				});
-			});
-			let contentState = editorState.getCurrentContent();
-			selectionsToReplace.forEach((selectionState: SelectionState) => {
-				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '�️');
-			});
-			onFocusEditorState();
-			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
-			return newEditorState;
-		});
-	}
-
-	const [syntax, setSyntax] = useState<string>('');
-	const regexDetect = /:[^\s]{2,}/;
-	const handleDetectEmoji = async (value: string) => {
-		const inputValue = value;
-		if (!regexDetect.test(inputValue)) {
-			setEmojiResult([]);
-			setIsOpenEmojiChatBoxSuggestion(false);
-			return;
-		}
-		const matches = regexDetect.exec(inputValue)?.[0];
-		matches && setSyntax(matches);
-		const emojiPickerActive = matches?.startsWith(':');
-		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
-		const emojiSearch = emojiPickerActive ? inputValue.slice(Number(lastEmojiIdx)) : null;
-		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
-		let emojiResults = (await SearchIndex.search(emojiSearch)) || [];
-		if (emojiResults.length === 0) {
-			emojiResults = await SearchIndex.search(emojiSearchWithOutPrefix);
-		}
-
-		const results =
-			emojiResults.map((emoji: any) => {
-				return emoji.skins[0];
-			}) || [];
-		if (results) {
-			setShowPlaceHolder(false);
-			setEmojiResult(results);
-			moveSelectionToEnd();
-		}
-	};
-
-	const handleKeyPress = (e: React.KeyboardEvent, native: string) => {
-		switch (e.key) {
-			case 'ArrowUp':
-				e.preventDefault();
-				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex - 1));
-				liRefs?.current[selectedItemIndex]?.focus();
-				setClicked(!clicked);
-				break;
-			case 'ArrowDown':
-				e.preventDefault();
-				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex + 1));
-				liRefs?.current[selectedItemIndex]?.focus();
-				setClicked(!clicked);
-				break;
-			case 'Enter':
-				clickEmojiSuggestion(native as string, selectedItemIndex);
-				setTimeout(() => {
-					editorRef.current!.focus();
-				}, 0);
-
-				break;
-			case 'Escape':
-				setIsOpenEmojiChatBoxSuggestion(false);
-				setEmojiResult([]);
-				break;
-			case 'Backscape':
-				setIsOpenEmojiChatBoxSuggestion(false);
-				setTimeout(() => {
-					editorRef.current!.focus();
-				}, 0);
-				moveSelectionToEnd();
-				break;
-			default:
-				editorRef.current!.focus();
-				setSelectionToEnd(!selectionToEnd);
-				break;
-		}
-	};
-
-	const [selectedItemIndex, setSelectedItemIndex] = useState(0);
-	const liRefs = useRef<(HTMLLIElement | null)[]>([]);
-	const ulRef = useRef<HTMLUListElement | null>(null);
-	const [clicked, setClicked] = useState<boolean>(false);
-	useEffect(() => {
-		if (liRefs.current[selectedItemIndex]) {
-			liRefs?.current[selectedItemIndex]?.focus();
-		}
-
-		emojiResult.length > 0 ? setIsOpenEmojiChatBoxSuggestion(true) : setIsOpenEmojiChatBoxSuggestion(false);
-	}, [showEmojiSuggestion, emojiResult, syntax]);
-
-	useEffect(() => {
-		handleDetectEmoji(content);
-		liRefs?.current[selectedItemIndex]?.focus();
-	}, [content]);
-
-	const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files && e.target.files[0];
-		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;
-		const session = sessionRef.current;
-		const client = clientRef.current;
-		if (!file) return;
-		if (!client || !session || !currentChannelId) {
-			throw new Error('Client or file is not initialized');
-		}
-
-		handleUploadFile(client, session, fullfilename, file).then((attachment) => {
-			handleFinishUpload(attachment);
-		});
-	};
-
 	const editorElement = document.getElementById('editor');
 	useEffect(() => {
 		const hasFigure = editorElement?.querySelector('figure');
@@ -500,20 +343,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative">
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
-				<EmojiSuggestion emojiResult={emojiResult} syntax={syntax} selectedItemIndex={selectedItemIndex} />
-				<label>
-					<input
-						id="preview_img"
-						type="file"
-						onChange={(e) => {
-							//handleFile(e), (e.target.value = '');
-						}}
-						className="block w-full hidden"
-					/>
-					<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb-2 cursor-pointer">
-						<Icons.AddCircle />
-					</div>
-				</label>
+				<EmojiSuggestion onFocusEditorState={onFocusEditorState} handleEmojiClick={handleEmojiClick} />
+				<FileSelectionButton onFinishUpload={handleFinishUpload}/>
 
 				<div
 					className={`w-full bg-black gap-3 flex items-center`}
@@ -546,7 +377,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							)}
 						</div>
 					</div>
-					<MentionSuggestions open={open} onOpenChange={onOpenChange} onSearchChange={onSearchChange} suggestions={suggestions || []} />
+					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
 					<GifStickerEmojiButtons activeTab={TabNamePopup.NONE} />
 				</div>
 			</div>
