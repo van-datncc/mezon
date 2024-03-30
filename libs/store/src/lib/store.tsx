@@ -25,6 +25,7 @@ import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { referencesReducer } from './messages/references.slice';
+import { emojiReducer } from './emoji/emoji.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -75,6 +76,7 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	references: referencesReducer,
+	emoji: emojiReducer,
 };
 
 let storeInstance = configureStore({

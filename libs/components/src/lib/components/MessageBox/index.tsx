@@ -3,7 +3,7 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import { useChatMessages } from '@mezon/core';
-import { channelsActions, selectArrayNotification, selectCurrentChannel, selectReference, useAppDispatch } from '@mezon/store';
+import { channelsActions, referencesActions, selectArrayNotification, selectCurrentChannel, selectReference, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
 import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
@@ -232,6 +232,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setAttachmentData([]);
 			setMentionData([]);
 			setEditorState(() => EditorState.createEmpty());
+			dispatch(referencesActions.setReference(null));
 			dispatch(
 				channelsActions.setChannelLastSeenMessageId({
 					channelId: currentChanel?.id || '',
