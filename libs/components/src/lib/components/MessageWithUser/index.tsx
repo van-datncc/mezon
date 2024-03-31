@@ -7,7 +7,7 @@ import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import { useMessageParser } from './useMessageParser';
 import MessageReply from './MesageReply';
-import MessageReaction from './MesageReaction';
+import MessageReaction from './MessageReaction';
 import MessageAttachment from './MesageAttachment';
 import { selectCurrentChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';

@@ -8,7 +8,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from '@mezon/mezon-js';
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { channelMembersActions, emojiActions, friendsActions, mapMessageChannelToEntity, mapReactionToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -125,17 +125,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
 			if (e) {
-				dispatch(
-					messagesActions.updateReactionMessage({
-						id: e.id,
-						channelId: e.channel_id,
-						messageId: e.message_id,
-						emoji: e.emoji,
-						count: e.count,
-						userId: e.sender_id,
-						actionRemove: e.action,
-					}),
-				);
+				dispatch(emojiActions.updateReactionMessage(mapReactionToEntity(e)));
 			}
 		},
 		[dispatch],

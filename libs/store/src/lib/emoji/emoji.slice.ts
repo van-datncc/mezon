@@ -1,7 +1,13 @@
 import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { MessageReactionEvent } from '@mezon/mezon-js';
 
 export const EMOJI_FEATURE_KEY = 'emoji';
+
+//TODO: do not convert here, use the mapReactionToEntity
+export const mapReactionToEntity = (reaction: MessageReactionEvent) => {
+	return reaction;
+}
 
 /*
  * Update these interfaces according to your requirements.
@@ -9,6 +15,17 @@ export const EMOJI_FEATURE_KEY = 'emoji';
 export interface EmojiEntity {
 	id: string;
 }
+
+export type UpdateReactionMessageArgs = {
+	id: string;
+	channelId?: string;
+	messageId?: string;
+	emoji?: string;
+	count?: number;
+	userId?: string;
+	action_delete?: boolean;
+	actionRemove?: boolean;
+};
 
 export interface EmojiState extends EntityState<EmojiEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
@@ -24,6 +41,7 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiChatBoxSuggestionSate: boolean;
 	emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
+	reactionMessageData: UpdateReactionMessageArgs;
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
@@ -54,6 +72,20 @@ export const fetchEmoji = createAsyncThunk<EmojiEntity[]>('emoji/fetchStatus', a
 	return Promise.resolve([]);
 });
 
+
+export const updateReactionMessage = createAsyncThunk(
+	'messages/updateReactionMessage',
+
+	async ({ id, channelId, messageId, userId, emoji, count, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(emojiActions.setReactionMessage({ id, channelId, messageId, userId, emoji, count, actionRemove }));
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
+
 export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,	
@@ -68,6 +100,7 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	emojiChatBoxSuggestionSate: false,
 	emojiSelectedReacted: '',
 	emojiSelectedMess: false,
+	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
 });
 
 export const emojiSlice = createSlice({
@@ -105,7 +138,18 @@ export const emojiSlice = createSlice({
 		},
 		setEmojiSelectedReacted(state, action) {
 			state.emojiSelectedReacted = action.payload;
-		}
+		},
+		setReactionMessage: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
+			state.reactionMessageData = {
+				id: action.payload.id,
+				channelId: action.payload.channelId,
+				messageId: action.payload.messageId,
+				userId: action.payload.userId,
+				emoji: action.payload.emoji,
+				count: action.payload.count,
+				actionRemove: action?.payload?.actionRemove,
+			};
+		},
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -147,7 +191,10 @@ export const emojiReducer = emojiSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const emojiActions = emojiSlice.actions;
+export const emojiActions = {
+	...emojiSlice.actions,
+	updateReactionMessage,
+}
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -192,3 +239,5 @@ export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (s
 export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
 
 export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedMess);
+
+export const selectMessageReacted = createSelector(getEmojiState, (state) => state.reactionMessageData);
