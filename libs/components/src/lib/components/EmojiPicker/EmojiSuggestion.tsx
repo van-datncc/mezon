@@ -1,25 +1,117 @@
-import { selectEmojiState } from "@mezon/store";
-import { useCallback } from "react";
+import { emojiActions, selectEmojiState, useAppDispatch } from "@mezon/store";
+import { SearchIndex } from "emoji-mart";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 export type EmojiSuggestionOptions = {
-	emojiResult: string[];
-    syntax: string;
-    selectedItemIndex: number;
-    //ulRef: HTMLUListElement;
+	content: string;
+    handleEmojiClick: (emoji: string) => void;
+	onEditorStateChange: (regexEmoji: RegExp, syntax: string) => void;
+	onEmojiResult: (es: string[]) => void;
+	onFocusEditorState: () => void;
+	moveSelectionToEnd: () => void;
 };
 
-function EmojiSuggestion({ emojiResult, syntax, selectedItemIndex }: EmojiSuggestionOptions) {
+function EmojiSuggestion({content, handleEmojiClick, onEditorStateChange, onEmojiResult, onFocusEditorState, moveSelectionToEnd }: EmojiSuggestionOptions) {
 
     const emojiPopupState = useSelector(selectEmojiState);
+    const dispatch = useAppDispatch();
+
+    const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+	const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+	const ulRef = useRef<HTMLUListElement | null>(null);
+	const [clicked, setClicked] = useState<boolean>(false);
+    const [selectionToEnd, setSelectionToEnd] = useState(false);
+
+    const setIsOpenEmojiChatBoxSuggestion = useCallback((state: boolean) => {
+        dispatch(emojiActions.setEmojiChatBoxSuggestionSate(state));
+    }, [dispatch]);
     
-    const handleKeyPress = useCallback(() => {
+	useEffect(() => {
+		if (liRefs.current[selectedItemIndex]) {
+			liRefs?.current[selectedItemIndex]?.focus();
+		}
 
-    }, []);
+		emojiResult.length > 0 ? setIsOpenEmojiChatBoxSuggestion(true) : setIsOpenEmojiChatBoxSuggestion(false);
+	}, [selectedItemIndex, setIsOpenEmojiChatBoxSuggestion]);
+    
+    const [emojiResult, setEmojiResult] = useState<string[]>([]);
+	function clickEmojiSuggestion(emoji: string, index: number) {
+		setSelectedItemIndex(index);
+		handleEmojiClick(emoji);
+		onEditorStateChange(/:[^\s]+(?=$|[\p{Emoji}])/gu, syntax);
+	}
 
-    const clickEmojiSuggestion = useCallback(() => {
+	const [syntax, setSyntax] = useState<string>('');
+	const regexDetect = /:[^\s]{2,}/;
+	const handleDetectEmoji = async (value: string) => {
+		const inputValue = value;
+		if (!regexDetect.test(inputValue)) {
+			setEmojiResult([]);
+			setIsOpenEmojiChatBoxSuggestion(false);
+			return;
+		}
+		const matches = regexDetect.exec(inputValue)?.[0];
+		matches && setSyntax(matches);
+		const emojiPickerActive = matches?.startsWith(':');
+		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
+		const emojiSearch = emojiPickerActive ? inputValue.slice(Number(lastEmojiIdx)) : null;
+		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
+		let emojiResults = (await SearchIndex.search(emojiSearch)) || [];
+		if (emojiResults.length === 0) {
+			emojiResults = await SearchIndex.search(emojiSearchWithOutPrefix);
+		}
 
-    }, []);
+		const results =
+			emojiResults.map((emoji: any) => {
+				return emoji.skins[0];
+			}) || [];
+		if (results) {
+			setEmojiResult(results);
+			onEmojiResult(results);
+		}
+	};
+
+	const handleKeyPress = (e: React.KeyboardEvent, native: string) => {
+		switch (e.key) {
+			case 'ArrowUp':
+				e.preventDefault();
+				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex - 1));
+				liRefs?.current[selectedItemIndex]?.focus();
+				setClicked(!clicked);
+				break;
+			case 'ArrowDown':
+				e.preventDefault();
+				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex + 1));
+				liRefs?.current[selectedItemIndex]?.focus();
+				setClicked(!clicked);
+				break;
+			case 'Enter':
+				clickEmojiSuggestion(native as string, selectedItemIndex);
+				onFocusEditorState();
+
+				break;
+			case 'Escape':
+				setIsOpenEmojiChatBoxSuggestion(false);
+				setEmojiResult([]);
+				break;
+			case 'Backscape':
+				setIsOpenEmojiChatBoxSuggestion(false);
+				onFocusEditorState();
+				moveSelectionToEnd();
+				break;
+			default:
+				onFocusEditorState();
+				setSelectionToEnd(!selectionToEnd);
+				break;
+		}
+	};
+
+	useEffect(() => {
+		handleDetectEmoji(content);
+		liRefs?.current[selectedItemIndex]?.focus();
+	}, [content]);
+
 
     return (
         <div>
@@ -28,7 +120,7 @@ function EmojiSuggestion({ emojiResult, syntax, selectedItemIndex }: EmojiSugges
                 <p className=" text-center p-2">Emoji Matching: {syntax}</p>
                 <div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
                     <ul
-                        //ref={ulRef}
+                        ref={ulRef}
                         className="w-full flex flex-col"
                         onKeyDown={(e) => {
                             if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
@@ -38,7 +130,7 @@ function EmojiSuggestion({ emojiResult, syntax, selectedItemIndex }: EmojiSugges
                     >
                         {emojiResult?.map((emoji: any, index: number) => (
                             <li
-                                //ref={(el) => (liRefs.current[index] = el)}
+                                ref={(el) => (liRefs.current[index] = el)}
                                 key={emoji.shortcodes}
                                 onKeyDown={(e) => handleKeyPress } //(e, emoji.native)}
                                 onClick={() => clickEmojiSuggestion }//(emoji.native, index)}

@@ -21,12 +21,9 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiReactedState: boolean;
 	emojiOpenEditState: boolean;
 	messageReplyState: boolean;
-<<<<<<< Updated upstream
-=======
 	emojiChatBoxSuggestionSate: boolean;
 	emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
->>>>>>> Stashed changes
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
@@ -68,12 +65,9 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	emojiReactedState: false,
 	emojiOpenEditState: false,
 	messageReplyState: false,
-<<<<<<< Updated upstream
-=======
 	emojiChatBoxSuggestionSate: false,
 	emojiSelectedReacted: '',
 	emojiSelectedMess: false,
->>>>>>> Stashed changes
 });
 
 export const emojiSlice = createSlice({
@@ -105,6 +99,12 @@ export const emojiSlice = createSlice({
 		},
 		setMessageReplyState(state, action) {
 			state.messageReplyState = action.payload;
+		},
+		setEmojiChatBoxSuggestionSate(state, action) {
+			state.emojiChatBoxSuggestionSate = action.payload;
+		},
+		setEmojiSelectedReacted(state, action) {
+			state.emojiSelectedReacted = action.payload;
 		}
 		// ...
 	},
@@ -185,9 +185,6 @@ export const selectEmojiReactedState = createSelector(getEmojiState, (state: Emo
 
 export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (state: EmojiState) => state.activeGifsStickerEmojiTab);
 
-<<<<<<< Updated upstream
-export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
-=======
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 
 export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (state: EmojiState) => state.emojiChatBoxSuggestionSate);
@@ -195,4 +192,3 @@ export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (s
 export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
 
 export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedMess);
->>>>>>> Stashed changes
