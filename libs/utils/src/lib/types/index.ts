@@ -259,3 +259,16 @@ export enum TabNamePopup {
 	STICKERS = 'STICKER',
 	EMOJI = 'EMOJI',
 }
+
+export type IEmoji = {
+	id: string;
+	name: string;
+	keywords: string[];
+	skins: {
+		unified: string;
+		native: string;
+		shortcodes: string;
+	}[];
+	version: number;
+	search: string;
+};

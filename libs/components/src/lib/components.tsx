@@ -27,6 +27,8 @@ export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserMentionList } from './components/UserMentionList';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
+export { default as EmojiListSuggestion } from './components/EmojiPicker/EmojiSuggestion';
+
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';

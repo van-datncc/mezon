@@ -1,6 +1,9 @@
-import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
+import { EmojiPlaces, IEmoji, TabNamePopup } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { MessageReactionEvent } from '@mezon/mezon-js';
+import emojisMetaData from 'libs/assets/src/assets/dataEmoji/metaDataEmojis.json';
+
+
 
 export const EMOJI_FEATURE_KEY = 'emoji';
 
@@ -31,17 +34,25 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	activeGifsStickerEmojiTab: TabNamePopup;
-	emojiPopupState: boolean; // close | open
+	// emojiPopupState: boolean; // close | open
 	emojiPlaceActive: EmojiPlaces;
 	emojiReactedBottomState: boolean;
 	emojiMessBoxState: boolean;
 	emojiReactedState: boolean;
 	emojiOpenEditState: boolean;
 	messageReplyState: boolean;
-	emojiChatBoxSuggestionSate: boolean;
+	// emojiChatBoxSuggestionSate: boolean;
 	emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
 	reactionMessageData: UpdateReactionMessageArgs;
+
+	//
+	emojisData?: {
+		[key: string]: IEmoji | any;
+	};
+	emojiPicked: string;
+	isEmojiListShowed: boolean;
+	isFocusEditor: boolean;
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
@@ -90,17 +101,23 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,	
 	activeGifsStickerEmojiTab: TabNamePopup.NONE,
-	emojiPopupState: false,
+	// emojiPopupState: false,
 	emojiPlaceActive: EmojiPlaces.EMOJI_REACTION,
 	emojiReactedBottomState: false,
 	emojiMessBoxState: false,
 	emojiReactedState: false,
 	emojiOpenEditState: false,
 	messageReplyState: false,
-	emojiChatBoxSuggestionSate: false,
+	// emojiChatBoxSuggestionSate: false,
 	emojiSelectedReacted: '',
 	emojiSelectedMess: false,
 	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
+
+	emojisData: emojisMetaData.emojis,
+	emojiPicked: '',
+	isEmojiListShowed: false,
+	isFocusEditor: false,
+	
 });
 
 export const emojiSlice = createSlice({
@@ -109,9 +126,9 @@ export const emojiSlice = createSlice({
 	reducers: {
 		add: emojiAdapter.addOne,
 		remove: emojiAdapter.removeOne,
-		setEmojiPopupState(state, action) {
-			state.emojiPopupState = action.payload;
-		},
+		// setEmojiPopupState(state, action) {
+		// 	state.emojiPopupState = action.payload;
+		// },
 		setActiveGifsStickerEmojiTab(state, action) {
 			state.activeGifsStickerEmojiTab = action.payload;
 		},
@@ -133,9 +150,9 @@ export const emojiSlice = createSlice({
 		setMessageReplyState(state, action) {
 			state.messageReplyState = action.payload;
 		},
-		setEmojiChatBoxSuggestionSate(state, action) {
-			state.emojiChatBoxSuggestionSate = action.payload;
-		},
+		// setEmojiChatBoxSuggestionSate(state, action) {
+		// 	state.emojiChatBoxSuggestionSate = action.payload;
+		// },
 		setEmojiSelectedReacted(state, action) {
 			state.emojiSelectedReacted = action.payload;
 		},
@@ -151,6 +168,15 @@ export const emojiSlice = createSlice({
 			};
 		},
 		// ...
+		setEmojiPicked: (state, action: PayloadAction<string>) => {
+			state.emojiPicked = action.payload;
+		},
+		setStatusEmojiList: (state, action: PayloadAction<boolean>) => {
+			state.isEmojiListShowed = action.payload;
+		},
+		setIsFocusEditor: (state, action: PayloadAction<boolean>) => {
+			state.isFocusEditor = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -218,7 +244,7 @@ export const selectAllEmoji = createSelector(getEmojiState, selectAll);
 
 export const selectEmojiEntities = createSelector(getEmojiState, selectEntities);
 
-export const selectEmojiState = createSelector(getEmojiState, (state: EmojiState) => state.emojiPopupState);
+// export const selectEmojiState = createSelector(getEmojiState, (state: EmojiState) => state.emojiPopupState);
 
 export const selectEmojiMessBoxState = createSelector(getEmojiState, (state: EmojiState) => state.emojiMessBoxState);
 
@@ -234,10 +260,19 @@ export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (st
 
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 
-export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (state: EmojiState) => state.emojiChatBoxSuggestionSate);
+// export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (state: EmojiState) => state.emojiChatBoxSuggestionSate);
 
 export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
 
 export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedMess);
 
 export const selectMessageReacted = createSelector(getEmojiState, (state) => state.reactionMessageData);
+
+////
+export const selectEmojisData = createSelector(getEmojiState, (emojisState) => emojisState.emojisData);
+
+export const selectEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.emojiPicked);
+
+export const getEmojiListStatus = createSelector(getEmojiState, (emojisState) => emojisState.isEmojiListShowed);
+
+export const getIsFocusEditor = createSelector(getEmojiState, (emojisState) => emojisState.isFocusEditor);
