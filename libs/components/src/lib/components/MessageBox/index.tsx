@@ -3,7 +3,7 @@ import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData, defaultSuggestionsFilter } from '@draft-js-plugins/mention';
 import data from '@emoji-mart/data';
 import { useChatMessages } from '@mezon/core';
-import { channelsActions, referencesActions, selectArrayNotification, selectCurrentChannel, selectReference, useAppDispatch } from '@mezon/store';
+import { channelsActions, referencesActions, selectArrayNotification, selectCurrentChannel, selectEmojiSelectedMess, selectReference, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
 import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
@@ -287,7 +287,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}, 0);
 	};
 
-	const moveSelectionToEnd = () => {
+	const moveSelectionToEnd = useCallback(() => {
 		editorRef.current!.focus();
 		const editorContent = editorState.getCurrentContent();
 		const editorSelection = editorState.getSelection();
@@ -299,9 +299,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 		setEditorState(updatedEditorState);
-	};
+	}, [editorState]);
 
-	const [selectionToEnd, setSelectionToEnd] = useState(false);
+	const emojiSelectedMess = useSelector(selectEmojiSelectedMess);
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
@@ -314,8 +314,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [clearEditor, content, showEmojiSuggestion]);
 
 	useEffect(() => {
-		moveSelectionToEnd();
-	}, []);
+		if(emojiSelectedMess) {
+			moveSelectionToEnd();
+		}
+	}, [emojiSelectedMess, moveSelectionToEnd]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
