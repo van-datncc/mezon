@@ -3,7 +3,7 @@ import { ChannelMembersEntity, RootState } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import {MessageBox, ReplyMessage, UserMentionList} from '@mezon/components';
+import {MessageBox, UserMentionList} from '@mezon/components';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useThrottledCallback } from 'use-debounce';
 import { MentionData } from '@draft-js-plugins/mention';
@@ -38,7 +38,6 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 
 	return (
 		<div>
-			<ReplyMessage />
 			<MessageBox 
 				onSend={handleSend} 
 				currentChannelId={directParamId} 

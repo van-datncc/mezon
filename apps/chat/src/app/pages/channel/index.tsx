@@ -1,7 +1,7 @@
 import { ChannelVoice, MemberList } from '@mezon/components';
-import { ChatContext, useAuth, useClans } from '@mezon/core';
+import { useAuth, useClans } from '@mezon/core';
 import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
-import { useContext, useRef } from 'react';
+import { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChannelMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -13,7 +13,6 @@ export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const { isOpenEmojiMessBox, setIsOpenEmojiMessBox } = useContext(ChatContext);
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const { sessionRef } = useMezon();

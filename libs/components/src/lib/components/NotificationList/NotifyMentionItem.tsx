@@ -61,6 +61,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 			await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
 		}
 	};
+	
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
 			<div className="flex justify-between">
@@ -109,8 +110,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					message={data as IMessageWithUser}
 					user={user}
 					isMessNotifyMention={true}
-					attachments={data.attachments}
-					mentions={data.mentions}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					newMessage={messageContent.t}
 				/>

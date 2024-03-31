@@ -40,6 +40,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 		},
 		{ matchedText: '', nonMatchText: '' },
 	);
+	
 	return (
 		<div>
 			<MarkdownFormatText

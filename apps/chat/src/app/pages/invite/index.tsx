@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 export default function InvitePage() {
 	const { inviteId: inviteIdParam } = useParams();
-	const selectInvite  = useSelector(selectInviteById(inviteIdParam || ''))
+	const selectInvite  = useSelector(selectInviteById(inviteIdParam || ''));
 	const navigate = useNavigate();
 	const { inviteUser } = useInvite();
 
