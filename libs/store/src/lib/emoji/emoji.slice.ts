@@ -22,6 +22,7 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiOpenEditState: boolean;
 	messageReplyState: boolean;
 	emojiChatBoxSuggestionSate: boolean;
+	emojiSelectedReacted: string;
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
@@ -64,6 +65,7 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	emojiOpenEditState: false,
 	messageReplyState: false,
 	emojiChatBoxSuggestionSate: false,
+	emojiSelectedReacted: '',
 });
 
 export const emojiSlice = createSlice({
@@ -98,6 +100,9 @@ export const emojiSlice = createSlice({
 		},
 		setEmojiChatBoxSuggestionSate(state, action) {
 			state.emojiChatBoxSuggestionSate = action.payload;
+		},
+		setEmojiSelectedReacted(state, action) {
+			state.emojiSelectedReacted = action.payload;
 		}
 		// ...
 	},
@@ -181,3 +186,5 @@ export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (st
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 
 export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (state: EmojiState) => state.emojiChatBoxSuggestionSate);
+
+export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
