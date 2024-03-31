@@ -1,13 +1,16 @@
-import { handleUploadFile } from "@mezon/transport";
-import { Icons } from "react-toastify";
+import { handleUploadFile, useMezon } from "@mezon/transport";
+import * as Icons from '../Icons';
 import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/api.gen";
 
 export type FileSelectionButtonProps = {
+    currentClanId: string;
+    currentChannelId: string;
 	onFinishUpload: (attachment: ApiMessageAttachment) => void
 }
 
-function FileSelectionButton({ onFinishUpload} : FileSelectionButtonProps) {
-
+function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload} : FileSelectionButtonProps) {
+    const { sessionRef, clientRef } = useMezon();
+    
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files && e.target.files[0];
 		const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + file?.name;

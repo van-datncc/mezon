@@ -32,6 +32,7 @@ export type MessageBoxProps = {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
+	const { sessionRef, clientRef } = useMezon();
 	const dispatch = useAppDispatch();
 	const currentChanel = useSelector(selectCurrentChannel);
 	const arrayNotication = useSelector(selectArrayNotification);
@@ -44,9 +45,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
-	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-
-	const { sessionRef, clientRef } = useMezon();
+	const [showPlaceHolder, setShowPlaceHolder] = useState(false);	
 
 	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
 	const mentionPlugin = useRef(
@@ -65,26 +64,27 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(EditorState.createEmpty());
 	}, [currentChannelId, currentClanId]);
 
-	const onEditorStateChange = useCallback(() => {
+	const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
+		const text = contentBlock?.getText() || '';
+		let matchArr, start, end;
+		while ((matchArr = regex.exec(text)) !== null) {
+			start = matchArr.index;
+			end = start + matchArr[0].length;
+			callback(start, end);
+		}
+	};
+
+	const onEditorStateChange = useCallback((regexEmoji: RegExp, syntax: string) => {
 		setEditorState((prevEditorState) => {
 			const currentContentState = prevEditorState.getCurrentContent();
 			const raw = convertToRaw(currentContentState);
 			const messageRaw = raw.blocks;
 			const emojiPicker = messageRaw[0].text.toString();
-			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		
 			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
 			const lastEmoji = emojiArray[0]?.slice(syntax.length);
 			const blockMap = editorState.getCurrentContent().getBlockMap();
 			const selectionsToReplace: SelectionState[] = [];
-			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
-				const text = contentBlock?.getText() || '';
-				let matchArr, start, end;
-				while ((matchArr = regex.exec(text)) !== null) {
-					start = matchArr.index;
-					end = start + matchArr[0].length;
-					callback(start, end);
-				}
-			};
 
 			blockMap.forEach((contentBlock) => {
 				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
@@ -277,8 +277,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setContent('');
 			setAttachmentData([]);
 			setClearEditor(true);
-			setSelectedItemIndex(0);
-			liRefs?.current[selectedItemIndex]?.focus();
 			setEditorState(() => EditorState.createEmpty());
 			if (messages.length > 0) {
 				dispatch(
@@ -397,8 +395,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					onEmojiResult={onEmojiResult}
 					handleEmojiClick={handleEmojiClick}
 					moveSelectionToEnd={moveSelectionToEnd} />
-					
-				<FileSelectionButton onFinishUpload={handleFinishUpload}/>
+
+				<FileSelectionButton 
+					currentClanId={currentClanId || ''}
+					currentChannelId={currentChannelId || ''}
+					onFinishUpload={handleFinishUpload}/>
 
 				<div
 					className={`w-full bg-black gap-3 flex items-center`}
@@ -408,9 +409,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				>
 					<div
 						className={`w-[96%] bg-black gap-3 relative`}
-						onClick={() => {
-							editorRef.current!.focus();
-						}}
+						onClick={onFocusEditorState}
 					>
 						<div
 							id="editor"

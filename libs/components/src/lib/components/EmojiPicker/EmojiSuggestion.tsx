@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 export type EmojiSuggestionOptions = {
 	content: string;
     handleEmojiClick: (emoji: string) => void;
-	onEditorStateChange: () => void;
+	onEditorStateChange: (regexEmoji: RegExp, syntax: string) => void;
 	onEmojiResult: (es: string[]) => void;
 	onFocusEditorState: () => void;
 	moveSelectionToEnd: () => void;
@@ -39,7 +39,7 @@ function EmojiSuggestion({content, handleEmojiClick, onEditorStateChange, onEmoj
 	function clickEmojiSuggestion(emoji: string, index: number) {
 		setSelectedItemIndex(index);
 		handleEmojiClick(emoji);
-		onEditorStateChange();
+		onEditorStateChange(/:[^\s]+(?=$|[\p{Emoji}])/gu, syntax);
 	}
 
 	const [syntax, setSyntax] = useState<string>('');
