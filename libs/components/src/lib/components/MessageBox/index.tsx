@@ -1,12 +1,11 @@
 import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
-import data from '@emoji-mart/data';
 import { useChatMessages } from '@mezon/core';
 import { channelsActions, referencesActions, selectArrayNotification, selectCurrentChannel, selectReference, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
-import { AtomicBlockUtils, EditorState, Modifier, convertToRaw } from 'draft-js';
+import { AtomicBlockUtils, EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
@@ -65,6 +64,48 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	useEffect(() => {
 		setEditorState(EditorState.createEmpty());
 	}, [currentChannelId, currentClanId]);
+
+	const onEditorStateChange = useCallback(() => {
+		setEditorState((prevEditorState) => {
+			const currentContentState = prevEditorState.getCurrentContent();
+			const raw = convertToRaw(currentContentState);
+			const messageRaw = raw.blocks;
+			const emojiPicker = messageRaw[0].text.toString();
+			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
+			const lastEmoji = emojiArray[0]?.slice(syntax.length);
+			const blockMap = editorState.getCurrentContent().getBlockMap();
+			const selectionsToReplace: SelectionState[] = [];
+			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
+				const text = contentBlock?.getText() || '';
+				let matchArr, start, end;
+				while ((matchArr = regex.exec(text)) !== null) {
+					start = matchArr.index;
+					end = start + matchArr[0].length;
+					callback(start, end);
+				}
+			};
+
+			blockMap.forEach((contentBlock) => {
+				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
+					const blockKey = contentBlock?.getKey();
+					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
+						anchorOffset: start,
+						focusOffset: end,
+					});
+
+					selectionsToReplace.push(blockSelection);
+				});
+			});
+			let contentState = editorState.getCurrentContent();
+			selectionsToReplace.forEach((selectionState: SelectionState) => {
+				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '�️');
+			});
+			onFocusEditorState();
+			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
+			return newEditorState;
+		});
+	}, [editorState]);
 
 	const onChange = useCallback(
 		(editorState: EditorState) => {
@@ -278,7 +319,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}, 0);
 	};
 
-	const moveSelectionToEnd = () => {
+	const moveSelectionToEnd = useCallback(() => {
 		editorRef.current!.focus();
 		const editorContent = editorState.getCurrentContent();
 		const editorSelection = editorState.getSelection();
@@ -290,7 +331,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		});
 		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 		setEditorState(updatedEditorState);
-	};
+	}, [editorState]);
+
+	
+	const onEmojiResult = useCallback((es: string[]) => {
+		setShowPlaceHolder(false);
+		moveSelectionToEnd();
+	}, [moveSelectionToEnd]);
 
 	useEffect(() => {
 		if (content.length === 0) {
@@ -305,7 +352,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	useEffect(() => {
 		moveSelectionToEnd();
-	}, []);
+	}, [moveSelectionToEnd]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -343,7 +390,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative">
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
-				<EmojiSuggestion onFocusEditorState={onFocusEditorState} handleEmojiClick={handleEmojiClick} />
+				<EmojiSuggestion
+					content={content}
+					onEditorStateChange={onEditorStateChange} 
+					onFocusEditorState={onFocusEditorState} 
+					onEmojiResult={onEmojiResult}
+					handleEmojiClick={handleEmojiClick}
+					moveSelectionToEnd={moveSelectionToEnd} />
+					
 				<FileSelectionButton onFinishUpload={handleFinishUpload}/>
 
 				<div

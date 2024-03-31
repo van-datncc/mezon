@@ -4,11 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 export type EmojiSuggestionOptions = {
+	content: string;
     handleEmojiClick: (emoji: string) => void;
-    onFocusEditorState: () => void;
+	onEditorStateChange: () => void;
+	onEmojiResult: (es: string[]) => void;
+	onFocusEditorState: () => void;
+	moveSelectionToEnd: () => void;
 };
 
-function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggestionOptions) {
+function EmojiSuggestion({content, handleEmojiClick, onEditorStateChange, onEmojiResult, onFocusEditorState, moveSelectionToEnd }: EmojiSuggestionOptions) {
 
     const emojiPopupState = useSelector(selectEmojiState);
     const dispatch = useAppDispatch();
@@ -35,45 +39,7 @@ function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggesti
 	function clickEmojiSuggestion(emoji: string, index: number) {
 		setSelectedItemIndex(index);
 		handleEmojiClick(emoji);
-		setEditorState((prevEditorState) => {
-			const currentContentState = prevEditorState.getCurrentContent();
-			const raw = convertToRaw(currentContentState);
-			const messageRaw = raw.blocks;
-			const emojiPicker = messageRaw[0].text.toString();
-			const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-			const emojiArray = Array.from(emojiPicker.matchAll(regexEmoji), (match) => match[0]);
-			const lastEmoji = emojiArray[0]?.slice(syntax.length);
-			const blockMap = editorState.getCurrentContent().getBlockMap();
-			const selectionsToReplace: SelectionState[] = [];
-			const findWithRegex = (regex: RegExp, contentBlock: Draft.ContentBlock | undefined, callback: (start: number, end: number) => void) => {
-				const text = contentBlock?.getText() || '';
-				let matchArr, start, end;
-				while ((matchArr = regex.exec(text)) !== null) {
-					start = matchArr.index;
-					end = start + matchArr[0].length;
-					callback(start, end);
-				}
-			};
-
-			blockMap.forEach((contentBlock) => {
-				findWithRegex(regexEmoji, contentBlock, (start: number, end: number) => {
-					const blockKey = contentBlock?.getKey();
-					const blockSelection = SelectionState.createEmpty(blockKey ?? '').merge({
-						anchorOffset: start,
-						focusOffset: end,
-					});
-
-					selectionsToReplace.push(blockSelection);
-				});
-			});
-			let contentState = editorState.getCurrentContent();
-			selectionsToReplace.forEach((selectionState: SelectionState) => {
-				contentState = Modifier.replaceText(contentState, selectionState, lastEmoji ?? '�️');
-			});
-			onFocusEditorState();
-			const newEditorState = EditorState.push(prevEditorState, contentState, 'insert-characters');
-			return newEditorState;
-		});
+		onEditorStateChange();
 	}
 
 	const [syntax, setSyntax] = useState<string>('');
@@ -101,10 +67,8 @@ function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggesti
 				return emoji.skins[0];
 			}) || [];
 		if (results) {
-			setShowPlaceHolder(false);
-            dispatch(emojiActions.set)
 			setEmojiResult(results);
-			moveSelectionToEnd();
+			onEmojiResult(results);
 		}
 	};
 
@@ -124,9 +88,7 @@ function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggesti
 				break;
 			case 'Enter':
 				clickEmojiSuggestion(native as string, selectedItemIndex);
-				setTimeout(() => {
-					editorRef.current!.focus();
-				}, 0);
+				onFocusEditorState();
 
 				break;
 			case 'Escape':
@@ -135,13 +97,11 @@ function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggesti
 				break;
 			case 'Backscape':
 				setIsOpenEmojiChatBoxSuggestion(false);
-				setTimeout(() => {
-					editorRef.current!.focus();
-				}, 0);
+				onFocusEditorState();
 				moveSelectionToEnd();
 				break;
 			default:
-				editorRef.current!.focus();
+				onFocusEditorState();
 				setSelectionToEnd(!selectionToEnd);
 				break;
 		}
@@ -160,7 +120,7 @@ function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggesti
                 <p className=" text-center p-2">Emoji Matching: {syntax}</p>
                 <div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
                     <ul
-                        //ref={ulRef}
+                        ref={ulRef}
                         className="w-full flex flex-col"
                         onKeyDown={(e) => {
                             if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
@@ -170,7 +130,7 @@ function EmojiSuggestion({ handleEmojiClick, onFocusEditorState }: EmojiSuggesti
                     >
                         {emojiResult?.map((emoji: any, index: number) => (
                             <li
-                                //ref={(el) => (liRefs.current[index] = el)}
+                                ref={(el) => (liRefs.current[index] = el)}
                                 key={emoji.shortcodes}
                                 onKeyDown={(e) => handleKeyPress } //(e, emoji.native)}
                                 onClick={() => clickEmojiSuggestion }//(emoji.native, index)}
