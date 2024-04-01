@@ -74,6 +74,7 @@ export type IChannel = ApiChannelDescription & {
 export type IChannelMember = ChannelUserListChannelUser & {
 	id: string;
 	channelId?: string;
+	user_id?: string; // use on VoiceChannelList
 };
 
 export type IThread = {
@@ -146,7 +147,7 @@ export type IVoice = {
 	participant: string;
 	voice_channel_id: string;
 	voice_channel_label: string;
-	last_screenshot: string;  	
+	last_screenshot: string;
 };
 
 export interface CategoryNameProps {
@@ -261,7 +262,7 @@ export enum TabNamePopup {
 }
 
 export type IEmoji = {
-	id: string;
+	id?: string;
 	name: string;
 	keywords: string[];
 	skins: {
@@ -269,7 +270,38 @@ export type IEmoji = {
 		native: string;
 		shortcodes: string;
 	}[];
-	version: number;
-	search: string;
+	version?: number;
+	search?: string;
 };
 
+
+export type IEmoticons = {
+	[key: string]: string;
+};
+
+export type INatives = {
+	[key: string]: string;
+};
+
+export type ICategoryEmoji = {
+	id: string;
+	emojis: string[];
+};
+
+export type IMetaDataEmojis = {
+	id?:string;
+	aliases: {
+		[key: string]: string;
+	};
+	categories: ICategoryEmoji[];
+	emojis: {
+		[key: string]: IEmoji;
+	};
+	emoticons: IEmoticons;
+	natives: INatives;
+	originalCategories: ICategoryEmoji[];
+	sheet: {
+		cols: number;
+		rows: number;
+	};
+};

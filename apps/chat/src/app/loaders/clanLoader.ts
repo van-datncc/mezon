@@ -1,4 +1,4 @@
-import { clansActions, emojiActions, getStoreAsync } from '@mezon/store';
+import { clansActions, getStoreAsync } from '@mezon/store';
 import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
 
 export type ClanLoaderData = {
@@ -12,13 +12,10 @@ export const clanLoader: LoaderFunction = async ({ params }) => {
 		throw new Error('Server ID null');
 	}
 	store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
-	store.dispatch(emojiActions.fetchEmoji())
 	return {
 		clanId,
 	} as ClanLoaderData;
 };
-
-
 
 export const shouldRevalidateServer: ShouldRevalidateFunction = (ctx) => {
 	const { currentParams, nextParams } = ctx;
