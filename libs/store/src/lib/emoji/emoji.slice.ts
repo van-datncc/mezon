@@ -54,7 +54,6 @@ export const emojiAdapter = createEntityAdapter<EmojiEntity>();
 export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
 	try {
 		const response = await axios.get(`${process.env.NX_CHAT_APP_CDN_META_DATA_EMOJI}`);
-		console.log(response);
 		return response.data;
 	} catch (error) {
 		const errorMessage = (error as Error).message;
