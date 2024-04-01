@@ -302,6 +302,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				dispatch(channelsActions.setTimestamp({ channelId: currentChanel?.id || '', timestamp: String(timestamp) }));
 			}
 		}
+		clearSuggestionEmojiAfterSendMessage();
 	}, [content, onSend, mentionData, attachmentData]);
 
 	function keyBindingFn(e: React.KeyboardEvent<Element>) {
@@ -329,20 +330,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState((prevState) => EditorState.moveSelectionToEnd(prevState));
 	};
 
-	const moveSelectionToEnd = useCallback(() => {
-		editorRef.current!.focus();
-		// const editorContent = editorState.getCurrentContent();
-		// const editorSelection = editorState.getSelection();
-		// const updatedSelection = editorSelection.merge({
-		// 	anchorKey: editorContent.getLastBlock().getKey(),
-		// 	anchorOffset: editorContent.getLastBlock().getText().length,
-		// 	focusKey: editorContent.getLastBlock().getKey(),
-		// 	focusOffset: editorContent.getLastBlock().getText().length,
-		// });
-		// const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
-		// setEditorState(updatedEditorState);
-		// setEditorState((prevState) => EditorState.moveSelectionToEnd(prevState));
-	}, [editorState]);
+	// const moveSelectionToEnd = useCallback(() => {
+	// editorRef.current!.focus();
+	// const editorContent = editorState.getCurrentContent();
+	// const editorSelection = editorState.getSelection();
+	// const updatedSelection = editorSelection.merge({
+	// 	anchorKey: editorContent.getLastBlock().getKey(),
+	// 	anchorOffset: editorContent.getLastBlock().getText().length,
+	// 	focusKey: editorContent.getLastBlock().getKey(),
+	// 	focusOffset: editorContent.getLastBlock().getText().length,
+	// });
+	// const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+	// setEditorState(updatedEditorState);
+	// setEditorState((prevState) => EditorState.moveSelectionToEnd(prevState));
+	// }, [editorState]);
 
 	const emojiSelectedMess = useSelector(selectEmojiSelectedMess);
 
@@ -364,11 +365,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	// 	}
 	// }, [clearEditor, content]);
 
-	useEffect(() => {
-		if (emojiSelectedMess) {
-			moveSelectionToEnd();
-		}
-	}, [emojiSelectedMess, moveSelectionToEnd]);
+	// useEffect(() => {
+	// 	if (emojiSelectedMess) {
+	// 		moveSelectionToEnd();
+	// 	}
+	// }, [emojiSelectedMess, moveSelectionToEnd]);
 
 	useEffect(() => {
 		const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -403,7 +404,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	//newSuggestionEmoji
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const [valueSearchEmoji, setValueSearchEmoji] = useState<string>();
-	const { statusEmojiList, emojiPicked, isFocusEditor } = useEmojis();
+	const { statusEmojiList, emojiPicked, isFocusEditor, setisOpenEmojiState, setEmojiSuggestion } = useEmojis();
 
 	useEffect(() => {
 		clickEmojiSuggestion();
@@ -425,7 +426,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [isFocusEditor, content]);
 
+	const clearSuggestionEmojiAfterSendMessage = () => {
+		setisOpenEmojiState(false);
+		setEmojiSuggestion('');
+	};
+
 	function clickEmojiSuggestion() {
+		console.log('emojiPicked', emojiPicked);
 		if (!emojiPicked) {
 			return;
 		}

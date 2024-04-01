@@ -55,6 +55,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	useEffect(() => {
 		const detectedEmoji = handleSearchSyntaxEmoji(valueInput);
+		console.log('detectSearch', detectedEmoji);
 		const emojiSearchWithOutPrefix = detectedEmoji && detectedEmoji[0];
 
 		if (emojiSearchWithOutPrefix && emojiSearchWithOutPrefix.length >= 2) {
@@ -105,7 +106,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	return (
 		<>
-			{statusEmojiList && (
+			{statusEmojiList && valueInput !== '' && (
 				<div className="bg-[#2B2D31] p-3 mb-2 rounded-lg h-fit absolute bottom-10 w-full duration-100 outline-none" tabIndex={0} ref={ref}>
 					<div className="mb-2 font-manrope text-xs font-semibold text-[#B1B5BC]">
 						<p>Emoji Matching: {inputCorrect}</p>
