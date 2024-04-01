@@ -4,16 +4,10 @@ import { Ref, forwardRef, useEffect, useRef, useState } from 'react';
 
 type EmojiSuggestionList = {
 	valueInput: string;
-	isOpen?: boolean;
 };
 
 const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList, ref: Ref<HTMLDivElement>) => {
-	const { emojis, 
-		setEmojiSuggestion, 
-		setIsEmojiListShowed, 
-		isEmojiListShowed, 
-		setIsFocusEditorStatus, 
-		setTextToSearchEmojiSuggesion } =
+	const { emojis, setEmojiSuggestion, setIsEmojiListShowed, isEmojiListShowed, setIsFocusEditorStatus, setTextToSearchEmojiSuggesion } =
 		useEmojis();
 	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 	const [inputCorrect, setInputCorrect] = useState<string>('');
@@ -92,7 +86,6 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 			}
 		} else {
 			setIsEmojiListShowed(false);
-			// setIsFocusEditorStatus(true);
 		}
 	}, [suggestions]);
 
