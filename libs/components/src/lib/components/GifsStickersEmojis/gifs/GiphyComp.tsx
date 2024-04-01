@@ -1,12 +1,13 @@
-import { ChatContext, useChatSending } from '@mezon/core';
+import { useChatSending } from '@mezon/core';
 import { IMessageSendPayload, TabNamePopup } from '@mezon/utils';
 import axios from 'axios';
 import { Loading } from 'libs/ui/src/lib/Loading';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 
 type ChannelMessageBoxProps = {
+	activeTab: TabNamePopup;
 	channelId: string;
 	channelLabel: string;
 	controlEmoji?: boolean;
@@ -14,7 +15,7 @@ type ChannelMessageBoxProps = {
 	mode: number;
 };
 
-function GiphyComp({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
+function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const [data, setData] = useState([]);
 	// const [search, setSearch] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
@@ -26,8 +27,8 @@ function GiphyComp({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 	const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const { valueInput, activeTab } = useContext(ChatContext);
 	const [valueSearchGif, setValueSearchGif] = useState('');
+	const [valueInput, setValueInput] = useState<string>('');
 
 	const handleSend = useCallback(
 		(

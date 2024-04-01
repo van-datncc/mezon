@@ -55,7 +55,6 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
-	reactionMessageData?: UpdateReactionMessageArgs;
 }
 
 export interface MessagesRootState {
@@ -217,30 +216,6 @@ export const updateTypingUsers = createAsyncThunk(
 	},
 );
 
-export type UpdateReactionMessageArgs = {
-	id: string;
-	channelId?: string;
-	messageId?: string;
-	emoji?: string;
-	count?: number;
-	userId?: string;
-	action_delete?: boolean;
-	actionRemove?: boolean;
-};
-
-export const updateReactionMessage = createAsyncThunk(
-	'messages/updateReactionMessage',
-
-	async ({ id, channelId, messageId, userId, emoji, count, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
-		try {
-			await thunkAPI.dispatch(messagesActions.setReactionMessage({ id, channelId, messageId, userId, emoji, count, actionRemove }));
-		} catch (e) {
-			console.log(e);
-			return thunkAPI.rejectWithValue([]);
-		}
-	},
-);
-
 export type SendMessageArgs = {
 	channelId: string;
 	channelLabel: string;
@@ -271,7 +246,6 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
-	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
 });
 
 export type SetCursorChannelArgs = {
@@ -327,18 +301,6 @@ export const messagesSlice = createSlice({
 					timeAt: Date.now(),
 					userId: action.payload.userId,
 				},
-			};
-		},
-
-		setReactionMessage: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
-			state.reactionMessageData = {
-				id: action.payload.id,
-				channelId: action.payload.channelId,
-				messageId: action.payload.messageId,
-				userId: action.payload.userId,
-				emoji: action.payload.emoji,
-				count: action.payload.count,
-				actionRemove: action?.payload?.actionRemove,
 			};
 		},
 
@@ -404,7 +366,6 @@ export const messagesActions = {
 	updateTypingUsers,
 	sendTypingUser,
 	loadMoreMessage,
-	updateReactionMessage,
 	jumpToMessage,
 };
 
@@ -500,7 +461,6 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
 		return param && param[channelId] && param[channelId].lastLoadMessageId;
 	});
-export const selectMessageReacted = createSelector(getMessagesState, (state) => state.reactionMessageData);
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);

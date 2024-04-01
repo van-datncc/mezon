@@ -1,15 +1,8 @@
-import { ChatContext } from '@mezon/core';
-import { TabNamePopup } from '@mezon/utils';
-import { useContext } from 'react';
 import { Icons } from '../../components';
 
 export const InputSearch: React.FC = () => {
-	const { activeTab, setActiveTab, valueInput, setValueInput } = useContext(ChatContext);
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (activeTab === TabNamePopup.GIFS) {
-			const value = e.target.value;
-			setValueInput(value);
-		}
+		
 	};
 
 	return (
