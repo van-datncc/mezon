@@ -8,16 +8,13 @@ type EmojiSuggestionList = {
 };
 
 const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList, ref: Ref<HTMLDivElement>) => {
-	const {
-		emojis,
-		setEmojiSuggestion,
-		setIsEmojiListShowed,
-		isEmojiListShowed,
-		setIsFocusEditorStatus,
-		isFocusEditor,
-		textToSearchEmojiSuggestion,
-		setTextToSearchEmojiSuggesion,
-	} = useEmojis();
+	const { emojis, 
+		setEmojiSuggestion, 
+		setIsEmojiListShowed, 
+		isEmojiListShowed, 
+		setIsFocusEditorStatus, 
+		setTextToSearchEmojiSuggesion } =
+		useEmojis();
 	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 	const [inputCorrect, setInputCorrect] = useState<string>('');
 	const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -114,7 +111,6 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 				pickEmoji(suggestions[selectedIndex]);
 				break;
 			default:
-				console.log('default');
 				e.preventDefault();
 				setIsFocusEditorStatus(true);
 				break;

@@ -332,7 +332,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [editorState]);
 
-	//newSuggestionEmoji
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const {
 		isEmojiListShowed,
@@ -360,7 +359,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			emojiListRef.current && emojiListRef.current.focus();
 		} else {
 			onFocusEditorState();
-			// moveSelectionToEnd();
 		}
 	}, [isEmojiListShowed, textToSearchEmojiSuggestion]);
 
