@@ -8,7 +8,16 @@ type EmojiSuggestionList = {
 };
 
 const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList, ref: Ref<HTMLDivElement>) => {
-	const { emojis, setEmojiSuggestion, setisOpenEmojiState, statusEmojiList, setIsFocusEditorStatus } = useEmojis();
+	const {
+		emojis,
+		setEmojiSuggestion,
+		setIsEmojiListShowed,
+		isEmojiListShowed,
+		setIsFocusEditorStatus,
+		isFocusEditor,
+		textToSearchEmojiSuggestion,
+		setTextToSearchEmojiSuggesion,
+	} = useEmojis();
 	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 	const [inputCorrect, setInputCorrect] = useState<string>('');
 	const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -16,7 +25,9 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	const pickEmoji = (emoji: IEmoji) => {
 		setEmojiSuggestion(emoji.skins[0].native);
-		setisOpenEmojiState(false);
+
+		setIsEmojiListShowed(false);
+		setTextToSearchEmojiSuggesion('');
 	};
 
 	const searchEmojiByShortcode = (shortcode: string) => {
@@ -54,8 +65,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 	}
 
 	useEffect(() => {
-		const detectedEmoji = handleSearchSyntaxEmoji(valueInput);
-		console.log('detectSearch', detectedEmoji);
+		const detectedEmoji = handleSearchSyntaxEmoji(valueInput.toString());
 		const emojiSearchWithOutPrefix = detectedEmoji && detectedEmoji[0];
 
 		if (emojiSearchWithOutPrefix && emojiSearchWithOutPrefix.length >= 2) {
@@ -65,23 +75,29 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	useEffect(() => {
 		const emojiSuggestions = searchEmojiByShortcode(inputCorrect);
+		setIsEmojiListShowed(true);
 		setSuggestions(emojiSuggestions ?? []);
-		console.log('i', inputCorrect);
 	}, [inputCorrect]);
 
 	useEffect(() => {
-		if (inputCorrect && suggestions.length > 0) {
+		if (suggestions.length === 0) {
+			setIsFocusEditorStatus(true);
+		}
+	}, [suggestions]);
+
+	useEffect(() => {
+		if (isEmojiListShowed) {
 			if (ulRef.current) {
 				const liElement = ulRef.current.children[selectedIndex] as HTMLLIElement | null;
 				if (liElement) {
 					liElement.focus();
 				}
 			}
-			setisOpenEmojiState(true);
 		} else {
-			setisOpenEmojiState(false);
+			setIsEmojiListShowed(false);
+			// setIsFocusEditorStatus(true);
 		}
-	}, [inputCorrect, suggestions.length, ulRef]);
+	}, [suggestions]);
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>, index: number) => {
 		switch (e.key) {
@@ -99,6 +115,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 				break;
 			default:
 				console.log('default');
+				e.preventDefault();
 				setIsFocusEditorStatus(true);
 				break;
 		}
@@ -106,7 +123,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	return (
 		<>
-			{statusEmojiList && valueInput !== '' && (
+			{isEmojiListShowed && valueInput !== '' && suggestions.length > 0 && (
 				<div className="bg-[#2B2D31] p-3 mb-2 rounded-lg h-fit absolute bottom-10 w-full duration-100 outline-none" tabIndex={0} ref={ref}>
 					<div className="mb-2 font-manrope text-xs font-semibold text-[#B1B5BC]">
 						<p>Emoji Matching: {inputCorrect}</p>

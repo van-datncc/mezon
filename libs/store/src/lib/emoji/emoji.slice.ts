@@ -53,6 +53,7 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiPicked: string;
 	isEmojiListShowed: boolean;
 	isFocusEditor: boolean;
+	textToSearchEmojiSuggestion:string
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
@@ -117,7 +118,7 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	emojiPicked: '',
 	isEmojiListShowed: false,
 	isFocusEditor: false,
-	
+	textToSearchEmojiSuggestion:''
 });
 
 export const emojiSlice = createSlice({
@@ -150,9 +151,7 @@ export const emojiSlice = createSlice({
 		setMessageReplyState(state, action) {
 			state.messageReplyState = action.payload;
 		},
-		// setEmojiChatBoxSuggestionSate(state, action) {
-		// 	state.emojiChatBoxSuggestionSate = action.payload;
-		// },
+
 		setEmojiSelectedReacted(state, action) {
 			state.emojiSelectedReacted = action.payload;
 		},
@@ -176,6 +175,9 @@ export const emojiSlice = createSlice({
 		},
 		setIsFocusEditor: (state, action: PayloadAction<boolean>) => {
 			state.isFocusEditor = action.payload;
+		},
+		setTextToSearchEmojiSuggestion: (state, action: PayloadAction<string>) => {
+			state.textToSearchEmojiSuggestion = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -276,3 +278,7 @@ export const selectEmojiSuggestion = createSelector(getEmojiState, (emojisState)
 export const getEmojiListStatus = createSelector(getEmojiState, (emojisState) => emojisState.isEmojiListShowed);
 
 export const getIsFocusEditor = createSelector(getEmojiState, (emojisState) => emojisState.isFocusEditor);
+
+export const getTextToSearchEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
+
+
