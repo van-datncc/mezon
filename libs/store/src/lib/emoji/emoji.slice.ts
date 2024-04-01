@@ -34,14 +34,12 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	activeGifsStickerEmojiTab: TabNamePopup;
-	// emojiPopupState: boolean; // close | open
 	emojiPlaceActive: EmojiPlaces;
 	emojiReactedBottomState: boolean;
 	emojiMessBoxState: boolean;
 	emojiReactedState: boolean;
 	emojiOpenEditState: boolean;
 	messageReplyState: boolean;
-	// emojiChatBoxSuggestionSate: boolean;
 	emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
 	reactionMessageData: UpdateReactionMessageArgs;
@@ -109,7 +107,6 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	emojiReactedState: false,
 	emojiOpenEditState: false,
 	messageReplyState: false,
-	// emojiChatBoxSuggestionSate: false,
 	emojiSelectedReacted: '',
 	emojiSelectedMess: false,
 	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
@@ -127,9 +124,7 @@ export const emojiSlice = createSlice({
 	reducers: {
 		add: emojiAdapter.addOne,
 		remove: emojiAdapter.removeOne,
-		// setEmojiPopupState(state, action) {
-		// 	state.emojiPopupState = action.payload;
-		// },
+
 		setActiveGifsStickerEmojiTab(state, action) {
 			state.activeGifsStickerEmojiTab = action.payload;
 		},
@@ -246,7 +241,6 @@ export const selectAllEmoji = createSelector(getEmojiState, selectAll);
 
 export const selectEmojiEntities = createSelector(getEmojiState, selectEntities);
 
-// export const selectEmojiState = createSelector(getEmojiState, (state: EmojiState) => state.emojiPopupState);
 
 export const selectEmojiMessBoxState = createSelector(getEmojiState, (state: EmojiState) => state.emojiMessBoxState);
 
@@ -262,7 +256,6 @@ export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (st
 
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 
-// export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (state: EmojiState) => state.emojiChatBoxSuggestionSate);
 
 export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
 
