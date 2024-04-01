@@ -3,15 +3,15 @@ import {
 	getEmojiListStatus,
 	getIsFocusEditor,
 	getTextToSearchEmojiSuggestion,
+	selectAllEmoji,
 	selectEmojiSuggestion,
-	selectEmojisData,
 	useAppDispatch,
 } from '@mezon/store';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useEmojis() {
-	const emojis = useSelector(selectEmojisData);
+	const emojis = useSelector(selectAllEmoji)[1];
 	const isEmojiListShowed = useSelector(getEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const isFocusEditor = useSelector(getIsFocusEditor);

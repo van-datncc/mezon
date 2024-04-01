@@ -272,3 +272,4 @@ export type IEmoji = {
 	version: number;
 	search: string;
 };
+
