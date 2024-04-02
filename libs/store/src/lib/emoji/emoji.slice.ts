@@ -1,18 +1,19 @@
-import { EmojiPlaces, TabNamePopup } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { MessageReactionEvent } from '@mezon/mezon-js';
+import { EmojiPlaces, IEmoji, TabNamePopup } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 export const EMOJI_FEATURE_KEY = 'emoji';
 
 //TODO: do not convert here, use the mapReactionToEntity
 export const mapReactionToEntity = (reaction: MessageReactionEvent) => {
 	return reaction;
-}
+};
 
 /*
  * Update these interfaces according to your requirements.
  */
-export interface EmojiEntity {
+export interface EmojiEntity extends IEmoji {
 	id: string;
 }
 
@@ -31,47 +32,34 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	activeGifsStickerEmojiTab: TabNamePopup;
-	emojiPopupState: boolean; // close | open
 	emojiPlaceActive: EmojiPlaces;
 	emojiReactedBottomState: boolean;
 	emojiMessBoxState: boolean;
 	emojiReactedState: boolean;
 	emojiOpenEditState: boolean;
 	messageReplyState: boolean;
-	emojiChatBoxSuggestionSate: boolean;
 	emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
 	reactionMessageData: UpdateReactionMessageArgs;
+
+
+	emojiPicked: string;
+	isEmojiListShowed: boolean;
+	isFocusEditor: boolean;
+	textToSearchEmojiSuggestion: string;
 }
 
 export const emojiAdapter = createEntityAdapter<EmojiEntity>();
 
-/**
- * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(fetchEmoji())
- * }, [dispatch]);
- * ```
- */
-export const fetchEmoji = createAsyncThunk<EmojiEntity[]>('emoji/fetchStatus', async (_, thunkAPI) => {
-	/**
-	 * Replace this with your custom fetch call.
-	 * For example, `return myApi.getEmojis()`;
-	 * Right now we just return an empty array.
-	 */
-	return Promise.resolve([]);
+export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
+	try {
+		const response = await axios.get(`${process.env.NX_CHAT_APP_CDN_META_DATA_EMOJI}`);
+		return response.data;
+	} catch (error) {
+		const errorMessage = (error as Error).message;
+		return thunkAPI.rejectWithValue(errorMessage);
+	}
 });
-
 
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
@@ -88,19 +76,22 @@ export const updateReactionMessage = createAsyncThunk(
 
 export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,	
+	error: null,
 	activeGifsStickerEmojiTab: TabNamePopup.NONE,
-	emojiPopupState: false,
 	emojiPlaceActive: EmojiPlaces.EMOJI_REACTION,
 	emojiReactedBottomState: false,
 	emojiMessBoxState: false,
 	emojiReactedState: false,
 	emojiOpenEditState: false,
 	messageReplyState: false,
-	emojiChatBoxSuggestionSate: false,
 	emojiSelectedReacted: '',
 	emojiSelectedMess: false,
 	reactionMessageData: { id: '', channelId: '', messageId: '', userId: '', emoji: '', count: 0, actionRemove: false },
+
+	emojiPicked: '',
+	isEmojiListShowed: false,
+	isFocusEditor: false,
+	textToSearchEmojiSuggestion: '',
 });
 
 export const emojiSlice = createSlice({
@@ -109,9 +100,7 @@ export const emojiSlice = createSlice({
 	reducers: {
 		add: emojiAdapter.addOne,
 		remove: emojiAdapter.removeOne,
-		setEmojiPopupState(state, action) {
-			state.emojiPopupState = action.payload;
-		},
+
 		setActiveGifsStickerEmojiTab(state, action) {
 			state.activeGifsStickerEmojiTab = action.payload;
 		},
@@ -133,9 +122,7 @@ export const emojiSlice = createSlice({
 		setMessageReplyState(state, action) {
 			state.messageReplyState = action.payload;
 		},
-		setEmojiChatBoxSuggestionSate(state, action) {
-			state.emojiChatBoxSuggestionSate = action.payload;
-		},
+
 		setEmojiSelectedReacted(state, action) {
 			state.emojiSelectedReacted = action.payload;
 		},
@@ -151,6 +138,18 @@ export const emojiSlice = createSlice({
 			};
 		},
 		// ...
+		setEmojiPicked: (state, action: PayloadAction<string>) => {
+			state.emojiPicked = action.payload;
+		},
+		setStatusEmojiList: (state, action: PayloadAction<boolean>) => {
+			state.isEmojiListShowed = action.payload;
+		},
+		setIsFocusEditor: (state, action: PayloadAction<boolean>) => {
+			state.isFocusEditor = action.payload;
+		},
+		setTextToSearchEmojiSuggestion: (state, action: PayloadAction<string>) => {
+			state.textToSearchEmojiSuggestion = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -168,48 +167,14 @@ export const emojiSlice = createSlice({
 	},
 });
 
-/*
- * Export reducer for store configuration.
- */
 export const emojiReducer = emojiSlice.reducer;
 
-/*
- * Export action creators to be dispatched. For use with the `useDispatch` hook.
- *
- * e.g.
- * ```
- * import React, { useEffect } from 'react';
- * import { useDispatch } from 'react-redux';
- *
- * // ...
- *
- * const dispatch = useDispatch();
- * useEffect(() => {
- *   dispatch(emojiActions.add({ id: 1 }))
- * }, [dispatch]);
- * ```
- *
- * See: https://react-redux.js.org/next/api/hooks#usedispatch
- */
 export const emojiActions = {
 	...emojiSlice.actions,
+	fetchEmoji,
 	updateReactionMessage,
-}
+};
 
-/*
- * Export selectors to query state. For use with the `useSelector` hook.
- *
- * e.g.
- * ```
- * import { useSelector } from 'react-redux';
- *
- * // ...
- *
- * const entities = useSelector(selectAllEmoji);
- * ```
- *
- * See: https://react-redux.js.org/next/api/hooks#useselector
- */
 const { selectAll, selectEntities } = emojiAdapter.getSelectors();
 
 export const getEmojiState = (rootState: { [EMOJI_FEATURE_KEY]: EmojiState }): EmojiState => rootState[EMOJI_FEATURE_KEY];
@@ -217,8 +182,6 @@ export const getEmojiState = (rootState: { [EMOJI_FEATURE_KEY]: EmojiState }): E
 export const selectAllEmoji = createSelector(getEmojiState, selectAll);
 
 export const selectEmojiEntities = createSelector(getEmojiState, selectEntities);
-
-export const selectEmojiState = createSelector(getEmojiState, (state: EmojiState) => state.emojiPopupState);
 
 export const selectEmojiMessBoxState = createSelector(getEmojiState, (state: EmojiState) => state.emojiMessBoxState);
 
@@ -234,10 +197,18 @@ export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (st
 
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 
-export const selectEmojiChatBoxSuggestionSate = createSelector(getEmojiState, (state: EmojiState) => state.emojiChatBoxSuggestionSate);
-
 export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
 
 export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedMess);
 
 export const selectMessageReacted = createSelector(getEmojiState, (state) => state.reactionMessageData);
+
+////
+
+export const selectEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.emojiPicked);
+
+export const getEmojiListStatus = createSelector(getEmojiState, (emojisState) => emojisState.isEmojiListShowed);
+
+export const getIsFocusEditor = createSelector(getEmojiState, (emojisState) => emojisState.isFocusEditor);
+
+export const getTextToSearchEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
