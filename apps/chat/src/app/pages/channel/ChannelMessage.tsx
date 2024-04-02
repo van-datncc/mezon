@@ -99,12 +99,12 @@ export function ChannelMessage(props: MessageProps) {
 				{mess.id === refMessage?.id && (
 					<div className="w-fit fixed right-16 bottom-[6rem]">
 						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPickerComp messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							<EmojiPickerComp messageEmoji={mess} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 						</div>
 					</div>
 				)}
 			</div>
-			{ emojiReactedState && mess.id === refMessage?.id && (
+			{ emojiOpenEditState && mess.id === refMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-30px]">
 					<textarea
 						defaultValue={editMessage}
