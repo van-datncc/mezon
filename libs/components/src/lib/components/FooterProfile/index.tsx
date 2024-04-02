@@ -1,6 +1,5 @@
 import { ChannelType } from '@mezon/mezon-js';
-import { selectCurrentChannel } from '@mezon/store';
-import { useSelector } from 'react-redux';
+import { ChannelsEntity } from '@mezon/store';
 import { HeadPhoneICon, MicIcon, SettingProfile } from '../Icons';
 import MemberProfile from '../MemberProfile';
 import VoiceControlPanel from '../VoiceControlPanel';
@@ -10,14 +9,13 @@ export type FooterProfileProps = {
 	status?: boolean;
 	avatar: string;
 	openSetting: () => void;
+	channelCurrent?: ChannelsEntity | null;
 };
 
-function FooterProfile({ name, status, avatar, openSetting }: FooterProfileProps) {
-	const currentChannel = useSelector(selectCurrentChannel);
-
+function FooterProfile({ name, status, avatar, openSetting, channelCurrent }: FooterProfileProps) {
 	return (
 		<div>
-			{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && <VoiceControlPanel channel={currentChannel} />}
+			{channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
 				className="flex items-center justify-between border-t-2
 			 border-borderDefault px-4 py-2 font-title text-[15px] 

@@ -1,15 +1,12 @@
 import { ChannelType } from '@mezon/mezon-js';
-import { selectCurrentChannel } from '@mezon/store';
-import { ChannelProps, ChannelStatusEnum, ThreadNameProps } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import * as Icons from '../../Icons';
 
-export const ChannelLabel: React.FC<ChannelProps> = () => {
-	const currentChannel = useSelector(selectCurrentChannel);
-	const isPrivate = currentChannel?.channel_private;
-	const type = Number(currentChannel?.type);
-	const name = currentChannel?.channel_label;
+export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined }) => {
+	const isPrivate = channel?.channel_private;
+	const type = Number(channel?.type);
+	const name = channel?.channel_label;
 	return (
 		<div className="flex flex-row items-center relative">
 			<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">
