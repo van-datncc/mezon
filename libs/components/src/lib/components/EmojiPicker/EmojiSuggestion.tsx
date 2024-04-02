@@ -1,153 +1,144 @@
-import { emojiActions, selectEmojiState, useAppDispatch } from "@mezon/store";
-import { SearchIndex } from "emoji-mart";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEmojis } from '@mezon/core';
+import { IEmoji } from '@mezon/utils';
+import { Ref, forwardRef, useEffect, useRef, useState } from 'react';
 
-export type EmojiSuggestionOptions = {
-	content: string;
-    handleEmojiClick: (emoji: string) => void;
-	onEditorStateChange: (regexEmoji: RegExp, syntax: string) => void;
-	onEmojiResult: (es: string[]) => void;
-	onFocusEditorState: () => void;
-	moveSelectionToEnd: () => void;
+type EmojiSuggestionList = {
+	valueInput: string;
 };
 
-function EmojiSuggestion({content, handleEmojiClick, onEditorStateChange, onEmojiResult, onFocusEditorState, moveSelectionToEnd }: EmojiSuggestionOptions) {
+const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList, ref: Ref<HTMLDivElement>) => {
+	const { emojis, setEmojiSuggestion, setIsEmojiListShowed, isEmojiListShowed, setIsFocusEditorStatus, setTextToSearchEmojiSuggesion } =
+		useEmojis();
+	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
+	const [inputCorrect, setInputCorrect] = useState<string>('');
+	const [selectedIndex, setSelectedIndex] = useState<number>(0);
+	const ulRef = useRef<HTMLUListElement>(null);
 
-    const emojiPopupState = useSelector(selectEmojiState);
-    const dispatch = useAppDispatch();
+	const pickEmoji = (emoji: IEmoji) => {
+		setEmojiSuggestion(emoji.skins[0].native);
 
-    const [selectedItemIndex, setSelectedItemIndex] = useState(0);
-	const liRefs = useRef<(HTMLLIElement | null)[]>([]);
-	const ulRef = useRef<HTMLUListElement | null>(null);
-	const [clicked, setClicked] = useState<boolean>(false);
-    const [selectionToEnd, setSelectionToEnd] = useState(false);
-
-    const setIsOpenEmojiChatBoxSuggestion = useCallback((state: boolean) => {
-        dispatch(emojiActions.setEmojiChatBoxSuggestionSate(state));
-    }, [dispatch]);
-    
-	useEffect(() => {
-		if (liRefs.current[selectedItemIndex]) {
-			liRefs?.current[selectedItemIndex]?.focus();
-		}
-
-		emojiResult.length > 0 ? setIsOpenEmojiChatBoxSuggestion(true) : setIsOpenEmojiChatBoxSuggestion(false);
-	}, [selectedItemIndex, setIsOpenEmojiChatBoxSuggestion]);
-    
-    const [emojiResult, setEmojiResult] = useState<string[]>([]);
-	function clickEmojiSuggestion(emoji: string, index: number) {
-		setSelectedItemIndex(index);
-		handleEmojiClick(emoji);
-		onEditorStateChange(/:[^\s]+(?=$|[\p{Emoji}])/gu, syntax);
-	}
-
-	const [syntax, setSyntax] = useState<string>('');
-	const regexDetect = /:[^\s]{2,}/;
-	const handleDetectEmoji = async (value: string) => {
-		const inputValue = value;
-		if (!regexDetect.test(inputValue)) {
-			setEmojiResult([]);
-			setIsOpenEmojiChatBoxSuggestion(false);
-			return;
-		}
-		const matches = regexDetect.exec(inputValue)?.[0];
-		matches && setSyntax(matches);
-		const emojiPickerActive = matches?.startsWith(':');
-		const lastEmojiIdx = emojiPickerActive ? inputValue.lastIndexOf(':') : null;
-		const emojiSearch = emojiPickerActive ? inputValue.slice(Number(lastEmojiIdx)) : null;
-		const emojiSearchWithOutPrefix = emojiSearch?.slice(1);
-		let emojiResults = (await SearchIndex.search(emojiSearch)) || [];
-		if (emojiResults.length === 0) {
-			emojiResults = await SearchIndex.search(emojiSearchWithOutPrefix);
-		}
-
-		const results =
-			emojiResults.map((emoji: any) => {
-				return emoji.skins[0];
-			}) || [];
-		if (results) {
-			setEmojiResult(results);
-			onEmojiResult(results);
-		}
+		setIsEmojiListShowed(false);
+		setTextToSearchEmojiSuggesion('');
 	};
 
-	const handleKeyPress = (e: React.KeyboardEvent, native: string) => {
+	const searchEmojiByShortcode = (shortcode: string) => {
+		const matchedEmojis: IEmoji[] = [];
+		if (emojis) {
+			for (const [key, emoji] of Object.entries(emojis)) {
+				if (emoji.skins[0]?.shortcodes?.includes(shortcode)) {
+					matchedEmojis.push(emoji);
+				}
+			}
+		}
+		return matchedEmojis;
+	};
+
+	function handleSearchSyntaxEmoji(text: string) {
+		const regexSyntaxEmoji = /:([^\s:]+)(?:\s|$)/g;
+		const regexSyntaxEmojiEndWithColon = /:([^\s:]+):/g;
+
+		const matches = text.match(regexSyntaxEmoji);
+		if (matches) {
+			return matches.map((match) => match.slice(1));
+		} else {
+			const matchesEndWithColon = text.match(regexSyntaxEmojiEndWithColon);
+			if (matchesEndWithColon) {
+				const result = matchesEndWithColon.map((match) => match)[0];
+				const searching = searchEmojiByShortcode(result);
+				if (searching.length > 0) {
+					const emojiFound = searching[0].skins[0].native;
+					setEmojiSuggestion(emojiFound);
+				}
+				return;
+			}
+		}
+		return [];
+	}
+
+	useEffect(() => {
+		const detectedEmoji = handleSearchSyntaxEmoji(valueInput.toString());
+		const emojiSearchWithOutPrefix = detectedEmoji && detectedEmoji[0];
+
+		if (emojiSearchWithOutPrefix && emojiSearchWithOutPrefix.length >= 2) {
+			setInputCorrect(emojiSearchWithOutPrefix);
+		}
+	}, [valueInput]);
+
+	useEffect(() => {
+		const emojiSuggestions = searchEmojiByShortcode(inputCorrect);
+		setIsEmojiListShowed(true);
+		setSuggestions(emojiSuggestions ?? []);
+	}, [inputCorrect]);
+
+	useEffect(() => {
+		if (suggestions.length === 0) {
+			setIsFocusEditorStatus(true);
+		}
+	}, [suggestions]);
+
+	useEffect(() => {
+		if (isEmojiListShowed) {
+			if (ulRef.current) {
+				const liElement = ulRef.current.children[selectedIndex] as HTMLLIElement | null;
+				if (liElement) {
+					liElement.focus();
+				}
+			}
+		} else {
+			setIsEmojiListShowed(false);
+		}
+	}, [suggestions]);
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>, index: number) => {
 		switch (e.key) {
 			case 'ArrowUp':
 				e.preventDefault();
-				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex - 1));
-				liRefs?.current[selectedItemIndex]?.focus();
-				setClicked(!clicked);
+				setSelectedIndex((prevIndex) => (prevIndex === 0 ? suggestions.length - 1 : prevIndex - 1));
 				break;
 			case 'ArrowDown':
 				e.preventDefault();
-				setSelectedItemIndex((prevIndex) => Math.min(liRefs.current.length - 1, prevIndex + 1));
-				liRefs?.current[selectedItemIndex]?.focus();
-				setClicked(!clicked);
+				setSelectedIndex((prevIndex) => (prevIndex === suggestions.length - 1 ? 0 : prevIndex + 1));
 				break;
 			case 'Enter':
-				clickEmojiSuggestion(native as string, selectedItemIndex);
-				onFocusEditorState();
-
-				break;
-			case 'Escape':
-				setIsOpenEmojiChatBoxSuggestion(false);
-				setEmojiResult([]);
-				break;
-			case 'Backscape':
-				setIsOpenEmojiChatBoxSuggestion(false);
-				onFocusEditorState();
-				moveSelectionToEnd();
+				e.preventDefault();
+				pickEmoji(suggestions[selectedIndex]);
 				break;
 			default:
-				onFocusEditorState();
-				setSelectionToEnd(!selectionToEnd);
+				e.preventDefault();
+				setIsFocusEditorStatus(true);
 				break;
 		}
 	};
 
-	useEffect(() => {
-		handleDetectEmoji(content);
-		liRefs?.current[selectedItemIndex]?.focus();
-	}, [content]);
+	return (
+		<>
+			{isEmojiListShowed && valueInput !== '' && suggestions.length > 0 && (
+				<div className="bg-[#2B2D31] p-3 mb-2 rounded-lg h-fit absolute bottom-10 w-full duration-100 outline-none" tabIndex={0} ref={ref}>
+					<div className="mb-2 font-manrope text-xs font-semibold text-[#B1B5BC]">
+						<p>Emoji Matching: {inputCorrect}</p>
+					</div>
+					<div className="w-full max-h-[20rem] h-fit overflow-y-scroll bg-[#2B2D31] hide-scrollbar">
+						<ul ref={ulRef} tabIndex={0}>
+							{suggestions.map((emoji: IEmoji, index) => (
+								<li
+									key={emoji.id}
+									className={`cursor-pointer hover:bg-[#35373C] hover:rounded-sm flex justify-start items-center outline-none ${
+										index === selectedIndex ? 'bg-[#35373C]' : ''
+									}`}
+									onKeyDown={(e) => handleKeyDown(e, index)}
+									tabIndex={0}
+									onClick={() => pickEmoji(emoji)}
+								>
+									<span className="text-xl w-10 ml-1">{emoji.skins[0].native}</span>
+									<span className="text-xs font-manrope">{emoji.skins[0].shortcodes}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+			)}
+		</>
+	);
+});
 
-
-    return (
-        <div>
-            { emojiPopupState && (
-            <div tabIndex={1} id="content" className="absolute bottom-[150%] bg-black rounded w-[400px] flex justify-center flex-col">
-                <p className=" text-center p-2">Emoji Matching: {syntax}</p>
-                <div className={`${emojiResult?.length > 0} ? 'p-2' : '' w-[100%] h-[400px] overflow-y-auto hide-scrollbar`}>
-                    <ul
-                        ref={ulRef}
-                        className="w-full flex flex-col"
-                        onKeyDown={(e) => {
-                            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                                e.preventDefault();
-                            }
-                        }}
-                    >
-                        {emojiResult?.map((emoji: any, index: number) => (
-                            <li
-                                ref={(el) => (liRefs.current[index] = el)}
-                                key={emoji.shortcodes}
-                                onKeyDown={(e) => handleKeyPress } //(e, emoji.native)}
-                                onClick={() => clickEmojiSuggestion }//(emoji.native, index)}
-                                className={`hover:bg-gray-900 p-2 cursor-pointer focus:bg-gray-900 focus:outline-none focus:p-2 ${
-                                    selectedItemIndex === index ? 'selected-item' : ''
-                                }`}
-                                tabIndex={0}
-                            >
-                                {emoji.native} {emoji.shortcodes}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-            )} 
-        </div>   
-    );
-}
-
-export default EmojiSuggestion;
+export default EmojiListSuggestion;
