@@ -1,3 +1,4 @@
+import { useThreads } from '@mezon/core';
 import { Button } from 'flowbite-react';
 import * as Icons from '../../../Icons';
 import GroupThreads from './GroupThreads';
@@ -9,6 +10,12 @@ type ThreadsProps = {
 };
 
 const Threads = ({ setIsShowThread }: ThreadsProps) => {
+	const { setIsShowCreateThread } = useThreads();
+
+	const handleCreateThread = () => {
+		setIsShowCreateThread(true);
+		setIsShowThread(false);
+	};
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
@@ -19,7 +26,11 @@ const Threads = ({ setIsShowThread }: ThreadsProps) => {
 					</div>
 					<SearchThread />
 					<div className="flex flex-row items-center gap-4">
-						<Button size="sm" className="h-6 rounded focus:ring-transparent bg-[#004EEB] hover:!bg-[#0040C1]">
+						<Button
+							onClick={handleCreateThread}
+							size="sm"
+							className="h-6 rounded focus:ring-transparent bg-[#004EEB] hover:!bg-[#0040C1]"
+						>
 							Create
 						</Button>
 						<button onClick={() => setIsShowThread(false)}>

@@ -1,5 +1,5 @@
-import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useAuth, useClans } from '@mezon/core';
+import { ChannelList, ChannelTopbar, ClanHeader, CreateThread, FooterProfile } from '@mezon/components';
+import { MezonPolicyProvider, useAuth, useClans, useThreads } from '@mezon/core';
 import { useState } from 'react';
 import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
@@ -9,15 +9,19 @@ const ClanLayout = () => {
 	const { clanId } = useLoaderData() as ClanLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
+
+	const { isShowCreateThread } = useThreads();
+
 	const [openSetting, setOpenSetting] = useState(false);
+
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
 
 	return (
-		<div className="flex-row bg-bgSurface flex grow">
+		<div className="flex flex-row flex-1 bg-bgSurface">
 			<MezonPolicyProvider clanId={clanId}>
-				<div className="flex flex-col w-widthSideBar max-w-[272px] bg-bgSurface relative">
+				<div className="flex flex-col max-w-[272px] bg-bgSurface relative">
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList />
 					<FooterProfile
@@ -27,12 +31,20 @@ const ClanLayout = () => {
 						openSetting={handleOpenCreate}
 					/>
 				</div>
-				<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-visible">
+				<div className="flex flex-col flex-1 bg-bgSecondary h-[100%] overflow-visible rounded-r-lg">
 					<ChannelTopbar channel={undefined} />
 					<div className="flex h-heightWithoutTopBar flex-row">
 						<Outlet />
 					</div>
 				</div>
+				{isShowCreateThread && (
+					<>
+						<div className="w-2 cursor-ew-resize bg-[#000]" />
+						<div className="w-[480px] bg-[#151515] rounded-l-lg">
+							<CreateThread />
+						</div>
+					</>
+				)}
 				<Setting
 					open={openSetting}
 					onClose={() => {

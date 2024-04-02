@@ -13,6 +13,7 @@ export interface ThreadsEntity extends IThread {
 export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	isShowCreateThread?: boolean;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -46,6 +47,7 @@ export const fetchThreads = createAsyncThunk<ThreadsEntity[]>('threads/fetchStat
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	isShowCreateThread: false,
 });
 
 export const threadsSlice = createSlice({
@@ -54,6 +56,9 @@ export const threadsSlice = createSlice({
 	reducers: {
 		add: threadsAdapter.addOne,
 		remove: threadsAdapter.removeOne,
+		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<boolean>) => {
+			state.isShowCreateThread = action.payload;
+		},
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -95,7 +100,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = threadsSlice.actions;
+export const threadsActions = { ...threadsSlice.actions };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -118,3 +123,5 @@ export const getThreadsState = (rootState: { [THREADS_FEATURE_KEY]: ThreadsState
 export const selectAllThreads = createSelector(getThreadsState, selectAll);
 
 export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);
+
+export const selectIsShowCreateThread = createSelector(getThreadsState, (state) => state.isShowCreateThread);

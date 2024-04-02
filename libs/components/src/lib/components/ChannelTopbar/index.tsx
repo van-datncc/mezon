@@ -23,7 +23,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			{/* Desktop buttons */}
 			<div className=" items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
-					<div className="pr-[70px] hidden ssm:flex">
+					<div className="hidden ssm:flex">
 						<div className="relative justify-start items-center gap-[15px] flex iconHover">
 							<ThreadButton />
 							<MuteButton />
@@ -32,14 +32,14 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 							<ThreeDotButton />
 						</div>
 						<SearchMessage />
-					</div>
 
-					<div
-						className="gap-4 iconHover absolute flex  w-[82px] h-8 justify-center items-center  bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)] left-[345px] ssm:left-auto ssm:right-0"
-						id="inBox"
-					>
-						<NotificationList />
-						<HelpButton />
+						<div
+							className="gap-4 iconHover relative flex items-center  w-[82px] h-8 justify-center  bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)] left-[345px] ssm:left-auto ssm:right-0"
+							id="inBox"
+						>
+							<InboxButton />
+							<HelpButton />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -58,7 +58,7 @@ function ThreadButton() {
 	useOnClickOutside(threadRef, () => setIsShowThread(false));
 
 	return (
-		<div className="relative" ref={threadRef}>
+		<div className="relative leading-5" ref={threadRef}>
 			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
 				<button onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon />
@@ -90,6 +90,25 @@ function ThreeDotButton() {
 		<button>
 			<Icons.ThreeDot />
 		</button>
+	);
+}
+
+function InboxButton() {
+	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
+	const inboxRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowInbox = () => {
+		setIsShowInbox(!isShowInbox);
+	};
+
+	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
+	return (
+		<div className="relative leading-5" ref={inboxRef}>
+			<button onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
+				<Icons.Inbox />
+			</button>
+			{isShowInbox && <NotificationList />}
+		</div>
 	);
 }
 

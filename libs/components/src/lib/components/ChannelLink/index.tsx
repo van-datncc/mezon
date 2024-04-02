@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useClans, useOnClickOutside } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
@@ -27,6 +27,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
+	const { setIsShowCreateThread } = useThreads();
 
 	const [openSetting, setOpenSetting] = useState(false);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -67,7 +68,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
+		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} className="relative group">
 			<Link to={channelPath}>
 				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
