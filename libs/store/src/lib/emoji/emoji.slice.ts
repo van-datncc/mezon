@@ -138,9 +138,7 @@ export const emojiSlice = createSlice({
 		},
 
 		setDataReactionFromServe(state, action) {
-			console.log(action.payload)
 			state.reactionDataServerAndSocket = action.payload
-			console.log(state.reactionDataServerAndSocket);
 		},
 
 		// ...

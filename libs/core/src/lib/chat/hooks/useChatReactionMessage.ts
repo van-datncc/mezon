@@ -58,7 +58,6 @@ export function useChatReactionMessage() {
 	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
 
 	function combineEmojiActions(data: any[]): EmojiDataOptionals[] {
-		console.log(data);
 		const processedItems: Record<string, EmojiDataOptionals> = {};
 		data.forEach((item) => {
 			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
@@ -101,7 +100,6 @@ export function useChatReactionMessage() {
 	
 
 	const dataReactionCombine = combineEmojiActions(dataReactionServerAndSocket);
-	console.log(dataReactionCombine);
 
 	const setMessageRef = useCallback(
 		(state: any) => {

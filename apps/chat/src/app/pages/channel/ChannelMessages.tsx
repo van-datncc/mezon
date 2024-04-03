@@ -77,8 +77,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
     message.reactions.forEach((reaction) => {
         const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
 		const existingItem = processedItems[key];
-		console.log(existingItem);
-		console.log(key);
+
         if (!processedItems[key]) {
             processedItems[key] = {
                 id: reaction.id,
@@ -99,7 +98,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
             const existingItem = processedItems[key];
 		
-			console.log(existingItem);
             if (existingItem.senders.length > 0) {
                 existingItem.senders[0].count = reaction.count;
             }
@@ -110,7 +108,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 });
 
 
-	console.log(emojiDataArray);
 
 	useEffect(() => {
 		dispatch(emojiActions.setDataReactionFromServe(emojiDataArray));
