@@ -314,9 +314,9 @@ export type EmojiDataOptionals = {
 };
 
 export type SenderInfoOptionals = {
-	sender_id: string | undefined;
+	sender_id?: string | undefined;
 	count: number | undefined;
-	// emojiIdList: string[] | undefined;
-	// sender_name?: string | undefined;
-	// avatar?: string | undefined;
+	emojiIdList?: string[] | undefined;
+	sender_name?: string | undefined;
+	avatar?: string | undefined;
 };

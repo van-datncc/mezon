@@ -51,6 +51,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		return message.attachments;
 	}, [message.attachments]);
 
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (

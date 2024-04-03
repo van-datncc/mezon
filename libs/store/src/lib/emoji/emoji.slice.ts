@@ -34,7 +34,6 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiReactedState: boolean;
 	emojiOpenEditState: boolean;
 	messageReplyState: boolean;
-	// emojiSelectedReacted: string;
 	emojiSelectedMess: boolean;
 	reactionMessageData: EmojiDataOptionals;
 
@@ -131,49 +130,17 @@ export const emojiSlice = createSlice({
 			state.reactionMessageData = {
 				id: action.payload.id ?? '',
 				emoji: action.payload.emoji ?? '',
-				senders: [{ sender_id: action.payload.sender_id || '', count: 1 }],
+				senders: [{ sender_id: action.payload.sender_id || '', count: 1, emojiIdList: [], sender_name: '', avatar: '' }],
 				channel_id: action.payload.channel_id ?? '',
 				message_id: action.payload.message_id ?? '',
 			};
 			state.reactionDataServerAndSocket.push(state.reactionMessageData);
 		},
 
-
 		setDataReactionFromServe(state, action) {
-			console.log(action.payload.dataEmojiFetch);
-			const { payload } = action;
-			if(payload.dataEmojiFetch === null) return
-			const dataReactConvertInterface = payload.dataEmojiFetch.reduce((acc: any, cur: any) => {
-				const existingEmoji = acc.find((item: any) => item.emoji === cur.emoji);
-				if (existingEmoji) {
-					const senderInfo = {
-						sender_id: cur.sender_id,
-						count: cur.count,
-						// emojiIdList: [],
-						// sender_name: '',
-						// avatar: '',
-					};
-					existingEmoji.senders.push(senderInfo);
-				} else {
-					acc.push({
-						id: '',
-						emoji: cur.emoji,
-						senders: [
-							{
-								sender_id: cur.sender_id,
-								count: cur.count,
-								// emojiIdList: [],
-								// sender_name: '',
-								// avatar: '',
-							},
-						],
-						channel_id: payload.message.channel_id,
-						message_id: payload.message.id,
-					});
-				}
-				return acc;
-			}, []);
-			state.reactionDataServerAndSocket = dataReactConvertInterface;
+			console.log(action.payload)
+			state.reactionDataServerAndSocket = action.payload
+			console.log(state.reactionDataServerAndSocket);
 		},
 
 		// ...
@@ -237,7 +204,6 @@ export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (st
 
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
 
-// export const selectEmojiSelectedReacted = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedReacted);
 
 export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedMess);
 
@@ -254,4 +220,3 @@ export const getEmojiListStatus = createSelector(getEmojiState, (emojisState) =>
 export const getIsFocusEditor = createSelector(getEmojiState, (emojisState) => emojisState.isFocusEditor);
 
 export const getTextToSearchEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
-

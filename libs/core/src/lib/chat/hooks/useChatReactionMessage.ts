@@ -33,7 +33,7 @@ export function useChatReactionMessage() {
 			const client = clientRef.current;
 			const socket = socketRef.current;
 			const channel = channelRef.current;
-
+			console.log(id, mode, messageId, emoji, count, message_sender_id, action_delete);
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
@@ -58,19 +58,21 @@ export function useChatReactionMessage() {
 	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
 
 	function combineEmojiActions(data: any[]): EmojiDataOptionals[] {
+		console.log(data);
 		const processedItems: Record<string, EmojiDataOptionals> = {};
-
 		data.forEach((item) => {
 			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
-
 			if (!processedItems[key]) {
 				processedItems[key] = {
 					id: item.id,
 					emoji: item.emoji,
 					senders: [
 						{
-							sender_id: item.senders[0].sender_id,
-							count: item.senders[0].count,
+							sender_id: item.senders[0]?.sender_id ?? "",
+							count: item.senders[0]?.count ?? 0,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
 						},
 					],
 					channel_id: item.channel_id,
@@ -78,23 +80,28 @@ export function useChatReactionMessage() {
 				};
 			} else {
 				const existingItem = processedItems[key];
-				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0].sender_id);
-
+				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
+	
 				if (senderIndex !== -1) {
-					existingItem.senders[senderIndex].count += item.senders[0].count;
+					existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
 				} else {
 					existingItem.senders.push({
-						sender_id: item.senders[0].sender_id,
-						count: item.senders[0].count,
+						sender_id: item.senders[0]?.sender_id ?? "",
+						count: item.senders[0]?.count ?? 0,
+						emojiIdList: [],
+						sender_name: '',
+						avatar: '',
 					});
 				}
 			}
 		});
-
+	
 		return Object.values(processedItems);
 	}
+	
 
 	const dataReactionCombine = combineEmojiActions(dataReactionServerAndSocket);
+	console.log(dataReactionCombine);
 
 	const setMessageRef = useCallback(
 		(state: any) => {

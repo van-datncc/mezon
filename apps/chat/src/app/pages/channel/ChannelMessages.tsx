@@ -1,7 +1,7 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage } from '@mezon/core';
 import { channelsActions, emojiActions, selectActiceGifsStickerEmojiTab, selectArrayNotification, useAppDispatch } from '@mezon/store';
-import { NotificationContent, TabNamePopup } from '@mezon/utils';
+import { EmojiDataOptionals, NotificationContent, TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSelector } from 'react-redux';
@@ -17,7 +17,7 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [heightEditor, setHeightEditor] = useState(30);
@@ -68,6 +68,54 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			dispatch(channelsActions.setChannelLastSentMessageId({ channelId, channelLastSentMessageId: messages[0].id }));
 		}
 	}, [arrayNotication, dispatch, position]);
+	const emojiDataArray: EmojiDataOptionals[] = messages.flatMap((message) => {
+    if (!message.reactions) return [];
+
+    const processedItems: Record<string, EmojiDataOptionals> = {};
+
+
+    message.reactions.forEach((reaction) => {
+        const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+		const existingItem = processedItems[key];
+		console.log(existingItem);
+		console.log(key);
+        if (!processedItems[key]) {
+            processedItems[key] = {
+                id: reaction.id,
+                emoji: reaction.emoji,
+                senders: [
+                    {
+                        sender_id: reaction.sender_id,
+                        count: reaction.count,
+                        emojiIdList: [],
+                        sender_name: '',
+                        avatar: '',
+                    },
+                ],
+                channel_id: message.channel_id,
+                message_id: message.id,
+            };
+        } else {
+
+            const existingItem = processedItems[key];
+		
+			console.log(existingItem);
+            if (existingItem.senders.length > 0) {
+                existingItem.senders[0].count = reaction.count;
+            }
+        }
+    });
+
+    return Object.values(processedItems);
+});
+
+
+	console.log(emojiDataArray);
+
+	useEffect(() => {
+		dispatch(emojiActions.setDataReactionFromServe(emojiDataArray));
+	}, [emojiDataArray]);
+
 	return (
 		<div
 			onClick={(e) => {
@@ -99,18 +147,17 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
 			>
-								{messages.map((message, i) => { console.log("message",message); return (
-									
-									<ChannelMessage
-										mode={mode}
-										key={message.id}
-										lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-										message={message}
-										preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
-										channelId={channelId}
-										channelLabel={channelLabel || ''}
-									/>
-								) } )}
+				{messages.map((message, i) => (
+					<ChannelMessage
+						mode={mode}
+						key={message.id}
+						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+						message={message}
+						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
+						channelId={channelId}
+						channelLabel={channelLabel || ''}
+					/>
+				))}
 			</InfiniteScroll>
 			{activeGifsStickerEmojiTab !== TabNamePopup.NONE && (
 				<div

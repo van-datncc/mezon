@@ -6,12 +6,14 @@ export type EmojiPickerOptions = {
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
+	emojiExist?:string
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
 	const { reactionMessageAction } = useChatReactionMessage();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
+			
 			await reactionMessageAction(
 				'',
 				props.mode ?? 2,

@@ -86,6 +86,7 @@ export function ChannelMessage(props: MessageProps) {
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
+	
 
 	return (
 		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
@@ -96,6 +97,7 @@ export function ChannelMessage(props: MessageProps) {
 				mode={mode}
 				newMessage={newMessage}
 			/>
+			
 			{lastSeen && <UnreadMessageBreak />}
 
 			<div
@@ -107,7 +109,7 @@ export function ChannelMessage(props: MessageProps) {
 				{mess.id === refMessage?.id && (
 					<div className="w-fit fixed right-16 bottom-[6rem]">
 						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPickerComp messageEmoji={mess} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							<EmojiPickerComp messageEmoji={refMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 						</div>
 					</div>
 				)}
