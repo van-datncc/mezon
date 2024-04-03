@@ -50,16 +50,16 @@ export function handleUploadFile(client: Client, session: Session,
 
 export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
     return new Promise<ApiMessageAttachment>((resolve, reject) => {
-        // limit url within 512
         if (isValidUrl(url) && url.length < 512) {
-            fetch(url, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
+			fetch(url, { method: 'HEAD' })
+			.then(response => {
+				if (response.ok) {
+						const now = Date.now();
                         const contentSize = response.headers.get('Content-Length');
                         const contentType = response.headers.get('Content-Type');
                         if (contentType) {
                             resolve({
-                                filename: url,
+                                filename: now + contentType,
                                 url: url,
                                 filetype: contentType,
                                 size: Number(contentSize),

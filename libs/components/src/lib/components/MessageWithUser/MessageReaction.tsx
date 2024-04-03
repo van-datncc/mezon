@@ -1,10 +1,13 @@
-import { useChatReactionMessage } from '@mezon/core';
 import { ChannelStreamMode } from '@mezon/mezon-js';
-import { useAppDispatch } from '@mezon/store';
-import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals } from '@mezon/utils';
 import { Fragment, useRef, useState } from 'react';
 import { EmojiPickerComp, Icons } from '../../components';
+import { useAuth, useChatReactionMessage } from '@mezon/core';
+import { emojiActions, referencesActions, selectEmojiReactedBottomState, selectReference, useAppDispatch } from '@mezon/store';
+import { AvatarComponent, NameComponent } from '@mezon/ui';
+import { useCallback, useEffect  } from 'react';
+import { useSelector } from 'react-redux';
+import EmojiPicker from '../EmojiPicker';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
@@ -99,7 +102,6 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 			{dataReactionCombine
 				.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
 				?.map((emoji: EmojiDataOptionals, index: number) => {
-					// console.log('emoji', emoji);
 					const isRightMargin = calculateDistance(index, 288);
 					const totalSenderCount = emoji.senders.reduce((sum: number, sender: SenderInfoOptionals) => sum + (sender.count ?? 0), 0);
 					const shouldHideEmoji = Math.abs(totalSenderCount) === 0;

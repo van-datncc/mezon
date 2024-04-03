@@ -1,6 +1,6 @@
+import { ChannelType } from '@mezon/mezon-js';
 import { IChannelMember, IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType } from '@mezon/mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 
 export const VOICE_FEATURE_KEY = 'voice';
@@ -14,8 +14,10 @@ export interface VoiceEntity extends IVoice {
 
 export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
-	error?: string | null;	
+	error?: string | null;
 	voiceChannelMember: IChannelMember[];
+	showVideo: boolean;
+	showScreen: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -26,7 +28,8 @@ type fetchVoiceChannelMembersPayload = {
 	channelType: ChannelType;
 };
 
-export const fetchVoiceChannelMembers = createAsyncThunk('voice/fetchVoiceChannelMembers',
+export const fetchVoiceChannelMembers = createAsyncThunk(
+	'voice/fetchVoiceChannelMembers',
 	async ({ clanId, channelId, channelType }: fetchVoiceChannelMembersPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
@@ -35,28 +38,31 @@ export const fetchVoiceChannelMembers = createAsyncThunk('voice/fetchVoiceChanne
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		const members = response.voice_channel_users.map((channelRes) => {			
+		const members = response.voice_channel_users.map((channelRes) => {
 			return {
 				user_id: channelRes.user_id || '',
-				clan_id: clanId,			
+				clan_id: clanId,
 				voice_channel_id: channelRes.channel_id || '',
-				clan_name: "",
-				participant: "",
-				voice_channel_label: "",
-				last_screenshot: "",
-				id: channelRes.jid || ""
+				clan_name: '',
+				participant: '',
+				voice_channel_label: '',
+				last_screenshot: '',
+				id: channelRes.jid || '',
 			};
 		});
 
 		thunkAPI.dispatch(voiceActions.addMany(members));
-		return response.voice_channel_users;
+		const voices = response.voice_channel_users;
+		return voices;
 	},
 );
 
 export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,	
+	error: null,
 	voiceChannelMember: [],
+	showVideo: false,
+	showScreen: false,
 });
 
 export const voiceSlice = createSlice({
@@ -66,6 +72,9 @@ export const voiceSlice = createSlice({
 		add: voiceAdapter.addOne,
 		addMany: voiceAdapter.addMany,
 		remove: voiceAdapter.removeOne,
+		setShowScreen: (state, action: PayloadAction<boolean>) => {
+			state.showScreen = action.payload;
+		},
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -111,7 +120,7 @@ export const voiceReducer = voiceSlice.reducer;
 export const voiceActions = {
 	...voiceSlice.actions,
 	fetchVoiceChannelMembers,
-}
+};
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -134,6 +143,8 @@ export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): V
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceEntities = createSelector(getVoiceState, selectEntities);
+
+export const selectShowScreen = createSelector(getVoiceState, (state) => state.showScreen);
 
 export const selectVoiceChannelMembersByChannelId = (channelId: string) =>
 	createSelector(selectVoiceEntities, (entities) => {

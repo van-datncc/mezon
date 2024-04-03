@@ -60,8 +60,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	useEffect(() => {
 		const notificationLength = arrayNotication.length;
 		const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
-		const timestamp = notification.update_time?.seconds || '';
-		const channelIdNotification = notification.channel_id;
+		const timestamp = notification?.update_time?.seconds || '';
+
+		const channelIdNotification = notification?.channel_id;
 		if (position && position >= 0) {
 			dispatch(channelsActions.setTimestamp({ channelId: channelIdNotification, timestamp: String(timestamp) }));
 			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId, channelLastSeenMesageId: messages[0].id }));
