@@ -6,10 +6,9 @@ import {
 	// selectEmojiSelectedReacted,
 	selectMessageReacted,
 	selectReference,
-	updateReactionMessage
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EmojiPlaces } from '@mezon/utils';
+import { EmojiDataOptionals, EmojiPlaces } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -56,16 +55,46 @@ export function useChatReactionMessage() {
 
 	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
 	const refMessage = useSelector(selectReference);
-	const dataReactionCombine = useSelector(getDataReactionCombine);
+	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
 
-	// const emojiSelectedReacted = useSelector(selectEmojiSelectedReacted);
+	function combineEmojiActions(data: any[]): EmojiDataOptionals[] {
+		const processedItems: Record<string, EmojiDataOptionals> = {};
 
-	// const setEmojiSelectedReacted = useCallback(
-	// 	(state: string) => {
-	// 		dispatch(emojiActions.setEmojiSelectedReacted(state));
-	// 	},
-	// 	[dispatch],
-	// );
+		data.forEach((item) => {
+			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
+
+			if (!processedItems[key]) {
+				processedItems[key] = {
+					id: item.id,
+					emoji: item.emoji,
+					senders: [
+						{
+							sender_id: item.senders[0].sender_id,
+							count: item.senders[0].count,
+						},
+					],
+					channel_id: item.channel_id,
+					message_id: item.message_id,
+				};
+			} else {
+				const existingItem = processedItems[key];
+				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0].sender_id);
+
+				if (senderIndex !== -1) {
+					existingItem.senders[senderIndex].count += item.senders[0].count;
+				} else {
+					existingItem.senders.push({
+						sender_id: item.senders[0].sender_id,
+						count: item.senders[0].count,
+					});
+				}
+			}
+		});
+
+		return Object.values(processedItems);
+	}
+
+	const dataReactionCombine = combineEmojiActions(dataReactionServerAndSocket);
 
 	const setMessageRef = useCallback(
 		(state: any) => {
@@ -102,37 +131,12 @@ export function useChatReactionMessage() {
 		[dispatch],
 	);
 
-	// const updateEmojiData = useCallback(
-	// 	(
-	// 		id: string,
-	// 		channelId: string,
-	// 		messageId: string,
-	// 		userId: string,
-	// 		emoji: string,
-	// 		count: number,
-	// 		actionRemove: boolean
-	// 	) => {
-	// 		dispatch(updateReactionMessage({
-	// 				id: id
-	// 				channelId: channelId,
-	// 				messageId: messageId,
-	// 				userId: userId,
-	// 				emoji: emoji,
-	// 				count: count,
-	// 				actionRemove: actionRemove
-	// 			})
-	// 		);
-	// 	},
-	// 	[dispatch]
-	// );
-
 	return useMemo(
 		() => ({
 			userId,
 			reactionMessage,
 			reactionMessageAction,
 			messageDataReactedFromSocket,
-			// setEmojiSelectedReacted,
 			setMessageRef,
 			setIsOpenEmojiReacted,
 			setIsOpenEmojiMessBox,
@@ -140,16 +144,13 @@ export function useChatReactionMessage() {
 			setIsOpenEmojiReactedBottom,
 			isOpenEmojiReactedBottom,
 			refMessage,
-			dataReactionCombine
-			// emojiSelectedReacted,
-			// updateEmojiData,
+			dataReactionCombine,
 		}),
 		[
 			userId,
 			reactionMessage,
 			reactionMessageAction,
 			messageDataReactedFromSocket,
-			// setEmojiSelectedReacted,
 			setMessageRef,
 			setIsOpenEmojiReacted,
 			setIsOpenEmojiMessBox,
@@ -157,9 +158,8 @@ export function useChatReactionMessage() {
 			setIsOpenEmojiReactedBottom,
 			isOpenEmojiReactedBottom,
 			refMessage,
-			dataReactionCombine
-			// emojiSelectedReacted,
-			// updateEmojiData,
+			dataReactionCombine,
+			dataReactionCombine,
 		],
 	);
 }

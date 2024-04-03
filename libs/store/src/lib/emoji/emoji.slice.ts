@@ -9,11 +9,6 @@ export const mapReactionToEntity = (reaction: UpdateReactionMessageArgs) => {
 	return reaction;
 };
 
-// export const mapReactionDataFromServeToEntity = (dataReaction: DataReactionServer) => {
-// 	console.log(dataReaction);
-// 	return dataReaction;
-// };
-
 export interface EmojiEntity extends IEmoji {
 	id: string;
 }
@@ -43,7 +38,7 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	emojiSelectedMess: boolean;
 	reactionMessageData: EmojiDataOptionals;
 
-	reactionDataCombineServerAndSocket: EmojiDataOptionals[];
+	reactionDataServerAndSocket: EmojiDataOptionals[];
 
 	// Emoji Suggestion state
 	emojiPicked: string;
@@ -77,19 +72,6 @@ export const updateReactionMessage = createAsyncThunk(
 	},
 );
 
-// export const updateDataReactionServer = createAsyncThunk(
-// 	'messages/updateDataReactionServer',
-
-// 	async ({ id, channel_id, message_id, sender_id, emoji, count, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
-// 		try {
-// 			await thunkAPI.dispatch(emojiActions.setReactionMessage({ id, channel_id, message_id, sender_id, emoji, count, actionRemove }));
-// 		} catch (e) {
-// 			console.log(e);
-// 			return thunkAPI.rejectWithValue([]);
-// 		}
-// 	},
-// );
-
 export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
@@ -100,7 +82,6 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	emojiReactedState: false,
 	emojiOpenEditState: false,
 	messageReplyState: false,
-	// emojiSelectedReacted: '',
 	emojiSelectedMess: false,
 	reactionMessageData: {
 		id: '',
@@ -109,36 +90,13 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 		channel_id: '',
 		message_id: '',
 	},
-	reactionDataCombineServerAndSocket: [],
+	reactionDataServerAndSocket: [],
 
 	emojiPicked: '',
 	isEmojiListShowed: false,
 	isFocusEditor: false,
 	textToSearchEmojiSuggestion: '',
 });
-
-function addOrUpdateEmoji(ip: any, newEmoji: any) {
-	// Tìm kiếm xem có emoji và message_id trùng khớp không
-	const existingEmojiIndex = ip.findIndex((emoji: any) => emoji.emoji === newEmoji.emoji && emoji.message_id === newEmoji.message_id);
-
-	// Nếu tìm thấy phần tử trùng khớp, kiểm tra cả sender_id
-	if (existingEmojiIndex !== -1) {
-		const existingSenderIndex = ip[existingEmojiIndex].senders.findIndex((sender: any) => sender.sender_id === newEmoji.senders[0].sender_id);
-
-		// Nếu tìm thấy sender_id trùng khớp, tăng giá trị count lên 1
-		if (existingSenderIndex !== -1) {
-			ip[existingEmojiIndex].senders[existingSenderIndex].count++;
-		} else {
-			// Nếu không tìm thấy sender_id trùng khớp, thêm sender mới vào mảng senders
-			ip[existingEmojiIndex].senders.push(newEmoji.senders[0]);
-		}
-	} else {
-		// Nếu không tìm thấy emoji và message_id trùng khớp, thêm emoji mới vào mảng ip
-		ip.push(newEmoji);
-	}
-
-	return ip;
-}
 
 export const emojiSlice = createSlice({
 	name: EMOJI_FEATURE_KEY,
@@ -169,32 +127,31 @@ export const emojiSlice = createSlice({
 			state.messageReplyState = action.payload;
 		},
 
-		// setEmojiSelectedReacted(state, action) {
-		// 	state.emojiSelectedReacted = action.payload;
-		// },
 		setReactionMessage: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
 			state.reactionMessageData = {
 				id: action.payload.id ?? '',
 				emoji: action.payload.emoji ?? '',
-				senders: [{ sender_id: action.payload.sender_id || '', count: 1, emojiIdList: [], sender_name: '', avatar: '' }],
+				senders: [{ sender_id: action.payload.sender_id || '', count: 1 }],
 				channel_id: action.payload.channel_id ?? '',
 				message_id: action.payload.message_id ?? '',
 			};
-			state.reactionDataCombineServerAndSocket.push(state.reactionMessageData);
-			addOrUpdateEmoji(state.reactionMessageData, state.reactionDataCombineServerAndSocket);
+			state.reactionDataServerAndSocket.push(state.reactionMessageData);
 		},
 
+
 		setDataReactionFromServe(state, action) {
+			console.log(action.payload.dataEmojiFetch);
 			const { payload } = action;
+			if(payload.dataEmojiFetch === null) return
 			const dataReactConvertInterface = payload.dataEmojiFetch.reduce((acc: any, cur: any) => {
 				const existingEmoji = acc.find((item: any) => item.emoji === cur.emoji);
 				if (existingEmoji) {
 					const senderInfo = {
 						sender_id: cur.sender_id,
 						count: cur.count,
-						emojiIdList: [],
-						sender_name: '',
-						avatar: '',
+						// emojiIdList: [],
+						// sender_name: '',
+						// avatar: '',
 					};
 					existingEmoji.senders.push(senderInfo);
 				} else {
@@ -205,9 +162,9 @@ export const emojiSlice = createSlice({
 							{
 								sender_id: cur.sender_id,
 								count: cur.count,
-								emojiIdList: [],
-								sender_name: '',
-								avatar: '',
+								// emojiIdList: [],
+								// sender_name: '',
+								// avatar: '',
 							},
 						],
 						channel_id: payload.message.channel_id,
@@ -216,8 +173,7 @@ export const emojiSlice = createSlice({
 				}
 				return acc;
 			}, []);
-			state.reactionDataCombineServerAndSocket = dataReactConvertInterface;
-			console.log(state.reactionDataCombineServerAndSocket);
+			state.reactionDataServerAndSocket = dataReactConvertInterface;
 		},
 
 		// ...
@@ -287,9 +243,9 @@ export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: Emo
 
 export const selectMessageReacted = createSelector(getEmojiState, (state) => state.reactionMessageData);
 
-export const getDataReactionCombine = createSelector(getEmojiState, (state) => state.reactionDataCombineServerAndSocket);
+export const getDataReactionCombine = createSelector(getEmojiState, (state) => state.reactionDataServerAndSocket);
 
-////
+//// Suggestions Emoji
 
 export const selectEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.emojiPicked);
 
@@ -299,50 +255,3 @@ export const getIsFocusEditor = createSelector(getEmojiState, (emojisState) => e
 
 export const getTextToSearchEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
 
-const ip = [
-	{
-		id: '',
-		emoji: '😛',
-		senders: [
-			{
-				sender_id: '1769551280650326016',
-				count: 1,
-				emojiIdList: [],
-				sender_name: '',
-				avatar: '',
-			},
-		],
-		channel_id: '1768925123173158912',
-		message_id: '1772872129285459968',
-	},
-	{
-		id: '',
-		emoji: '😂',
-		senders: [
-			{
-				sender_id: '1769551280650326016',
-				count: 1,
-				emojiIdList: [],
-				sender_name: '',
-				avatar: '',
-			},
-		],
-		channel_id: '1768925123173158912',
-		message_id: '1772872129285459968',
-	},
-	{
-		id: '',
-		emoji: '💯',
-		senders: [
-			{
-				sender_id: '1768931753772191744',
-				count: 1,
-				emojiIdList: [],
-				sender_name: '',
-				avatar: '',
-			},
-		],
-		channel_id: '1768925123173158912',
-		message_id: '1772872129285459968',
-	},
-];

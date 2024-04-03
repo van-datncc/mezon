@@ -86,7 +86,6 @@ export function ChannelMessage(props: MessageProps) {
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
-	console.log(mess);
 
 	return (
 		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">

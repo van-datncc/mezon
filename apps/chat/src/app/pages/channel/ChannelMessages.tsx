@@ -68,7 +68,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			dispatch(channelsActions.setChannelLastSentMessageId({ channelId, channelLastSentMessageId: messages[0].id }));
 		}
 	}, [arrayNotication, dispatch, position]);
-
 	return (
 		<div
 			onClick={(e) => {
@@ -100,17 +99,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
 			>
-				{messages.map((message, i) => (
-					<ChannelMessage
-						mode={mode}
-						key={message.id}
-						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-						message={message}
-						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
-						channelId={channelId}
-						channelLabel={channelLabel || ''}
-					/>
-				))}
+								{messages.map((message, i) => { console.log("message",message); return (
+									
+									<ChannelMessage
+										mode={mode}
+										key={message.id}
+										lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+										message={message}
+										preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
+										channelId={channelId}
+										channelLabel={channelLabel || ''}
+									/>
+								) } )}
 			</InfiniteScroll>
 			{activeGifsStickerEmojiTab !== TabNamePopup.NONE && (
 				<div

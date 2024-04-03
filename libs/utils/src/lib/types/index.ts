@@ -305,33 +305,18 @@ export type IMetaDataEmojis = {
 	};
 };
 
-// export type SenderInfoOptionals = {
-// 	sender_id: string;
-// 	count: number;
-// 	emojiIdList: string[];
-// 	name?: string;
-// 	avatar?: string;
-// };
-
 export type EmojiDataOptionals = {
 	id: string | undefined;
 	emoji: string | undefined;
-	senders: [
-		{
-			sender_id: string | undefined;
-			count: number | undefined;
-			emojiIdList: string[] | undefined;
-			sender_name?: string | undefined;
-			avatar?: string | undefined;
-		},
-	];
+	senders: SenderInfoOptionals[];
 	channel_id?: string | undefined;
 	message_id?: string | undefined;
 };
 
-export type DataReactionServer = {
-	id: string;
-	count: number;
-	emoji: string;
-	sender_id: string;
-}[];
+export type SenderInfoOptionals = {
+	sender_id: string | undefined;
+	count: number | undefined;
+	// emojiIdList: string[] | undefined;
+	// sender_name?: string | undefined;
+	// avatar?: string | undefined;
+};
