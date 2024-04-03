@@ -14,7 +14,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageAction(
 				'',
-				props.mode ?? 0,
+				props.mode ?? 2,
 				props.messageEmoji?.id ?? '',
 				emojiData.emoji,
 				1,

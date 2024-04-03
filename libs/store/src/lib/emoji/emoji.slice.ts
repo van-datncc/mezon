@@ -117,6 +117,29 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	textToSearchEmojiSuggestion: '',
 });
 
+function addOrUpdateEmoji(ip: any, newEmoji: any) {
+	// Tìm kiếm xem có emoji và message_id trùng khớp không
+	const existingEmojiIndex = ip.findIndex((emoji: any) => emoji.emoji === newEmoji.emoji && emoji.message_id === newEmoji.message_id);
+
+	// Nếu tìm thấy phần tử trùng khớp, kiểm tra cả sender_id
+	if (existingEmojiIndex !== -1) {
+		const existingSenderIndex = ip[existingEmojiIndex].senders.findIndex((sender: any) => sender.sender_id === newEmoji.senders[0].sender_id);
+
+		// Nếu tìm thấy sender_id trùng khớp, tăng giá trị count lên 1
+		if (existingSenderIndex !== -1) {
+			ip[existingEmojiIndex].senders[existingSenderIndex].count++;
+		} else {
+			// Nếu không tìm thấy sender_id trùng khớp, thêm sender mới vào mảng senders
+			ip[existingEmojiIndex].senders.push(newEmoji.senders[0]);
+		}
+	} else {
+		// Nếu không tìm thấy emoji và message_id trùng khớp, thêm emoji mới vào mảng ip
+		ip.push(newEmoji);
+	}
+
+	return ip;
+}
+
 export const emojiSlice = createSlice({
 	name: EMOJI_FEATURE_KEY,
 	initialState: initialEmojiState,
@@ -158,10 +181,10 @@ export const emojiSlice = createSlice({
 				message_id: action.payload.message_id ?? '',
 			};
 			state.reactionDataCombineServerAndSocket.push(state.reactionMessageData);
+			addOrUpdateEmoji(state.reactionMessageData, state.reactionDataCombineServerAndSocket);
 		},
 
 		setDataReactionFromServe(state, action) {
-			console.log(action);
 			const { payload } = action;
 			const dataReactConvertInterface = payload.dataEmojiFetch.reduce((acc: any, cur: any) => {
 				const existingEmoji = acc.find((item: any) => item.emoji === cur.emoji);
@@ -194,6 +217,7 @@ export const emojiSlice = createSlice({
 				return acc;
 			}, []);
 			state.reactionDataCombineServerAndSocket = dataReactConvertInterface;
+			console.log(state.reactionDataCombineServerAndSocket);
 		},
 
 		// ...
@@ -274,3 +298,51 @@ export const getEmojiListStatus = createSelector(getEmojiState, (emojisState) =>
 export const getIsFocusEditor = createSelector(getEmojiState, (emojisState) => emojisState.isFocusEditor);
 
 export const getTextToSearchEmojiSuggestion = createSelector(getEmojiState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
+
+const ip = [
+	{
+		id: '',
+		emoji: '😛',
+		senders: [
+			{
+				sender_id: '1769551280650326016',
+				count: 1,
+				emojiIdList: [],
+				sender_name: '',
+				avatar: '',
+			},
+		],
+		channel_id: '1768925123173158912',
+		message_id: '1772872129285459968',
+	},
+	{
+		id: '',
+		emoji: '😂',
+		senders: [
+			{
+				sender_id: '1769551280650326016',
+				count: 1,
+				emojiIdList: [],
+				sender_name: '',
+				avatar: '',
+			},
+		],
+		channel_id: '1768925123173158912',
+		message_id: '1772872129285459968',
+	},
+	{
+		id: '',
+		emoji: '💯',
+		senders: [
+			{
+				sender_id: '1768931753772191744',
+				count: 1,
+				emojiIdList: [],
+				sender_name: '',
+				avatar: '',
+			},
+		],
+		channel_id: '1768925123173158912',
+		message_id: '1772872129285459968',
+	},
+];

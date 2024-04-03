@@ -76,24 +76,25 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
 									</div>
 								</div>
-								<div
-									ref={divRef}
-									onMouseDown={(e) => e.preventDefault()}
-									onMouseEnter={() => {
-										return setIsHovered(true);
-									}}
-									onMouseLeave={() => setIsHovered(false)}
-									// className="flex justify-start flex-row w-full gap-2 flex-wrap border pr-8 relative"
-								>
-									<MessageReaction
-										currentChannelId={currentChannelId || ''}
-										message={message}
-										mode={mode}
-										grandParentDivRect={divMessageWithUser.current?.getBoundingClientRect()}
-									/>
-								</div>
+
 								<MessageAttachment attachments={attachments} />
 							</div>
+						</div>
+						<div
+							ref={divRef}
+							onMouseDown={(e) => e.preventDefault()}
+							onMouseEnter={() => {
+								return setIsHovered(true);
+							}}
+							onMouseLeave={() => setIsHovered(false)}
+							className="flex justify-start flex-row w-full gap-2 flex-wrap pr-8 relative"
+						>
+							<MessageReaction
+								currentChannelId={currentChannelId || ''}
+								message={message}
+								mode={mode}
+								grandParentDivRect={divMessageWithUser.current?.getBoundingClientRect()}
+							/>
 						</div>
 						{message && !isMessNotifyMention && (
 							<div

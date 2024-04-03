@@ -292,7 +292,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 	// }, [messageDataReactedFromSocket]);
 
 	return (
-		<div>
+		<div className="flex flex-row gap-2 whitespace-pre-wrap">
 			{dataReactionCombine
 				// .filter((obj: any) => obj.messageId === message.id)
 				?.map((emoji: any, index: number) => {
@@ -313,11 +313,11 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 					// 	return null;
 					// }
 					return (
-						<Fragment key={index}>
+						<div key={index}>
 							{checkID && (
 								<div
 									ref={(element) => (childRef.current[index] = element)}
-									className={` justify-center items-center relative 
+									className={` justify-center items-center relative
 									${userSender && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 									// onClick={() =>
@@ -435,7 +435,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 									)}
 								</div>
 							)}
-						</Fragment>
+						</div>
 					);
 				})}
 		</div>
