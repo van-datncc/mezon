@@ -1,10 +1,11 @@
 import {
 	emojiActions,
 	getDataReactionCombine,
+	getGrandParentWidthState,
 	referencesActions,
+	selectEmojiOpenEditState,
 	selectEmojiReactedBottomState,
-	// selectEmojiSelectedReacted,
-	selectMessageReacted,
+	selectEmojiReactedState,
 	selectReference,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -21,8 +22,12 @@ export type UseMessageReactionOption = {
 export function useChatReactionMessage() {
 	const { currentClanId } = useClans();
 	const dispatch = useDispatch();
-
-	const messageDataReactedFromSocket = useSelector(selectMessageReacted);
+	const emojiReactedState = useSelector(selectEmojiReactedState);
+	const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
+	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
+	const refMessage = useSelector(selectReference);
+	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
+	const grandParentWidth = useSelector(getGrandParentWidthState);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -41,13 +46,9 @@ export function useChatReactionMessage() {
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
-	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
-	const refMessage = useSelector(selectReference);
-	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
-	const reactionDataSocket = useSelector(selectMessageReacted);
-
-	function updateOrRemoveEmojiReaction(data: any[]): EmojiDataOptionals[] {
+	const updateEmojiReactionData = (data: any[]) => {
 		const dataItemReaction: Record<string, EmojiDataOptionals> = {};
+
 		data.forEach((item) => {
 			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
 			if (!dataItemReaction[key]) {
@@ -83,38 +84,10 @@ export function useChatReactionMessage() {
 				}
 			}
 		});
-		console.log('data-2', dataItemReaction);
-		if (reactionDataSocket.action) {
-			const itemReactionKey = `${reactionDataSocket.emoji}_${reactionDataSocket.channel_id}_${reactionDataSocket.message_id}`;
-			const itemReactionSender = reactionDataSocket.senders[0].sender_id;
-			const removeDataReaction = (data: Record<string, EmojiDataOptionals>, keyToRemove: string, senderId: string) => {
-				console.log('data', data);
-				console.log('keyToRemove', keyToRemove);
-				console.log('sender', senderId);
-				if (keyToRemove in data) {
-					const item = data[keyToRemove];
-					console.log('item', item);
-					const updatedSenders = item.senders.filter((sender) => sender.sender_id !== senderId);
-					// Kiểm tra nếu không còn người gửi nào nữa, thì xóa item
-					if (updatedSenders.length === 0) {
-						delete data[keyToRemove];
-					} else {
-						// Cập nhật senders với danh sách senders đã lọc
-						data[keyToRemove].senders = updatedSenders;
-					}
-				}
-				return Object.values(data);
-			};
+		return Object.values(dataItemReaction);
+	};
 
-			const newDataItemReaction = removeDataReaction(dataItemReaction, itemReactionKey, itemReactionSender ?? '');
-			console.log(newDataItemReaction);
-			return newDataItemReaction;
-		} else {
-			return Object.values(dataItemReaction);
-		}
-	}
-
-	const dataReactionCombine = updateOrRemoveEmojiReaction(dataReactionServerAndSocket);
+	const dataReactionCombine = updateEmojiReactionData(dataReactionServerAndSocket);
 
 	const setMessageRef = useCallback(
 		(state: any) => {
@@ -151,11 +124,17 @@ export function useChatReactionMessage() {
 		[dispatch],
 	);
 
+	const setGrandParentWidthAction = useCallback(
+		(state: number) => {
+			dispatch(emojiActions.setGrandParentWidthState(state));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			userId,
 			reactionMessage,
-			messageDataReactedFromSocket,
 			setMessageRef,
 			setIsOpenEmojiReacted,
 			setIsOpenEmojiMessBox,
@@ -164,11 +143,14 @@ export function useChatReactionMessage() {
 			isOpenEmojiReactedBottom,
 			refMessage,
 			dataReactionCombine,
+			emojiReactedState,
+			emojiOpenEditState,
+			grandParentWidth,
+			setGrandParentWidthAction
 		}),
 		[
 			userId,
 			reactionMessage,
-			messageDataReactedFromSocket,
 			setMessageRef,
 			setIsOpenEmojiReacted,
 			setIsOpenEmojiMessBox,
@@ -177,6 +159,10 @@ export function useChatReactionMessage() {
 			isOpenEmojiReactedBottom,
 			refMessage,
 			dataReactionCombine,
+			emojiReactedState,
+			emojiOpenEditState,
+			grandParentWidth,
+			setGrandParentWidthAction
 		],
 	);
 }

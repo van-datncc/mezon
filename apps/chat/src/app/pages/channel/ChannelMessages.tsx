@@ -69,46 +69,42 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			dispatch(channelsActions.setChannelLastSentMessageId({ channelId, channelLastSentMessageId: messages[0].id }));
 		}
 	}, [arrayNotication, dispatch, position]);
+
 	const emojiDataArray: EmojiDataOptionals[] = messages.flatMap((message) => {
-    if (!message.reactions) return [];
+		if (!message.reactions) return [];
 
-    const processedItems: Record<string, EmojiDataOptionals> = {};
+		const emojiDataItems: Record<string, EmojiDataOptionals> = {};
 
+		message.reactions.forEach((reaction) => {
+			const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+			const existingItem = emojiDataItems[key];
 
-    message.reactions.forEach((reaction) => {
-        const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
-		const existingItem = processedItems[key];
+			if (!emojiDataItems[key]) {
+				emojiDataItems[key] = {
+					id: reaction.id,
+					emoji: reaction.emoji,
+					senders: [
+						{
+							sender_id: reaction.sender_id,
+							count: reaction.count,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
+						},
+					],
+					channel_id: message.channel_id,
+					message_id: message.id,
+				};
+			} else {
+				const existingItem = emojiDataItems[key];
 
-        if (!processedItems[key]) {
-            processedItems[key] = {
-                id: reaction.id,
-                emoji: reaction.emoji,
-                senders: [
-                    {
-                        sender_id: reaction.sender_id,
-                        count: reaction.count,
-                        emojiIdList: [],
-                        sender_name: '',
-                        avatar: '',
-                    },
-                ],
-                channel_id: message.channel_id,
-                message_id: message.id,
-            };
-        } else {
-
-            const existingItem = processedItems[key];
-		
-            if (existingItem.senders.length > 0) {
-                existingItem.senders[0].count = reaction.count;
-            }
-        }
-    });
-
-    return Object.values(processedItems);
-});
-
-
+				if (existingItem.senders.length > 0) {
+					existingItem.senders[0].count = reaction.count;
+				}
+			}
+		});
+		return Object.values(emojiDataItems);
+	});
 
 	useEffect(() => {
 		dispatch(emojiActions.setDataReactionFromServe(emojiDataArray));

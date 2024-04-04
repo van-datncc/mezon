@@ -1,21 +1,18 @@
 import { useChatReactionMessage } from '@mezon/core';
 import { ChannelStreamMode } from '@mezon/mezon-js';
-import { useAppDispatch } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals } from '@mezon/utils';
 import { Fragment, useRef, useState } from 'react';
-import { EmojiPickerComp, Icons } from '../../components';
+import { Icons } from '../../components';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
 	currentChannelId: string;
-	grandParentDivRect: any;
 	mode: number;
 };
 
 // TODO: refactor component for message lines
-const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }: MessageReactionProps) => {
-	const dispatch = useAppDispatch();
+const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionProps) => {
 	const [isHideSmileButton, setIsHideSmileButton] = useState<boolean>(false);
 	const {
 		userId,
@@ -28,25 +25,23 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 		isOpenEmojiReactedBottom,
 		refMessage,
 		dataReactionCombine,
+		grandParentWidth,
 	} = useChatReactionMessage();
 
 	const calculateDistance = (index: number, bannerWidth: number) => {
-		if (childRef.current && grandParentDivRect) {
+		if (childRef.current && grandParentWidth) {
 			const childDivRef = childRef.current[index];
 			if (childDivRef) {
 				const childDivRect = childDivRef.getBoundingClientRect();
-				const compare = childDivRect.right + bannerWidth > grandParentDivRect.right;
+				const compare = childDivRect.right + bannerWidth > grandParentWidth;
 				return compare;
 			}
 		}
 	};
 
-	const [countRemove, setCountRemove] = useState(0);
-
-	const removeEmojiSender = async (messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
-		setCountRemove(countRemoved);
+	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		setIsHideSmileButton(true);
-		await reactionMessage('', mode, messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessage(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const hideSenderOnPanel = (emojiData: EmojiDataOptionals, senderId: string) => {
@@ -65,7 +60,6 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 		message_sender_id: string,
 		action_delete: boolean,
 	) {
-		setCountRemove(0);
 		await reactionMessage('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
 	}
 
@@ -77,11 +71,11 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 	const childRef = useRef<(HTMLDivElement | null)[]>([]);
 
 	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
-		setIsOpenEmojiReacted(false);
+		setIsOpenEmojiReacted(true);
 		setIsOpenEmojiMessBox(false);
 		setMessageRef(message);
 		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
-		setIsOpenEmojiReactedBottom(true);
+		setIsOpenEmojiReactedBottom(false);
 		event.stopPropagation();
 	};
 
@@ -93,12 +87,14 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 		setIsHideSmileButton(false);
 	};
 
+	const PANEL_SENDER_WIDTH = 288;
+
 	return (
-		<div className="flex flex-row gap-2 whitespace-pre-wrap ml-14">
+		<div className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14">
 			{dataReactionCombine
 				.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
 				?.map((emoji: EmojiDataOptionals, index: number) => {
-					const isRightMargin = calculateDistance(index, 288);
+					const isRightMargin = calculateDistance(index, PANEL_SENDER_WIDTH);
 					const totalSenderCount = emoji.senders.reduce((sum: number, sender: SenderInfoOptionals) => sum + (sender.count ?? 0), 0);
 					const shouldHideEmoji = Math.abs(totalSenderCount) === 0;
 					const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
@@ -152,14 +148,6 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 													defaultFill={isOpenEmojiReactedBottom && message.id === refMessage?.id ? '#FFFFFF' : '#AEAEAE'}
 												/>
 											</div>
-
-											{isOpenEmojiReactedBottom && message.id === refMessage?.id && (
-												<div
-													className={`scale-75 transform ${calculateDistance(dataReactionCombine.length - 1, 373) ? 'ml-[-10rem]' : 'ml-10'} bottom-24 origin-left fixed z-50`}
-												>
-													<EmojiPickerComp messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
-												</div>
-											)}
 										</div>
 									)}
 
@@ -169,7 +157,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 												setIsHoverSender(false);
 											}}
 											onClick={(e) => e.stopPropagation()}
-											className={`absolute z-20  bottom-7 w-[18rem] 
+											className={`absolute z-20  bottom-7 w-[18rem]
 											bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] border ${isRightMargin ? 'right-0' : 'left-0'}`}
 										>
 											<div className="flex flex-row items-center m-2">
@@ -204,6 +192,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 																			return (
 																				e.stopPropagation(),
 																				removeEmojiSender(
+																					emoji.id ?? '',
 																					message.id,
 																					emoji.emoji ?? '',
 																					item.sender_id ?? '',

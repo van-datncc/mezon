@@ -10,7 +10,7 @@ export type EmojiPickerOptions = {
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
-	const { reactionMessage } = useChatReactionMessage();
+	const { reactionMessage,setIsOpenEmojiReacted,setIsOpenEmojiReactedBottom } = useChatReactionMessage();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			
@@ -24,6 +24,8 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 				false,
 			);
 			event.stopPropagation();
+			setIsOpenEmojiReacted(false)
+			setIsOpenEmojiReactedBottom(false)
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
 			event.stopPropagation();
 		}
