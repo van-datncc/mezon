@@ -6,7 +6,7 @@ import { useChatMessages, useEmojis } from '@mezon/core';
 import {
 	channelsActions,
 	referencesActions,
-	selectArrayNotification,
+	selectNotificationMentions,
 	selectCurrentChannel,
 	selectEmojiSelectedMess,
 	selectReference,
@@ -42,9 +42,6 @@ export type MessageBoxProps = {
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const dispatch = useAppDispatch();
-	const currentChanel = useSelector(selectCurrentChannel);
-	const arrayNotication = useSelector(selectArrayNotification);
-	const { messages } = useChatMessages({ channelId: currentChanel?.id || '' });
 
 	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -229,31 +226,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			setMentionData([]);
 			setEditorState(() => EditorState.createEmpty());
 			dispatch(referencesActions.setReference(null));
-			dispatch(
-				channelsActions.setChannelLastSeenMessageId({
-					channelId: currentChanel?.id || '',
-					channelLastSeenMesageId: messages[0].id ? messages[0].id : '',
-				}),
-			);
-			dispatch(channelsActions.setChannelLastSentMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }));
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');
 			setAttachmentData([]);
 			setClearEditor(true);
 			setEditorState(() => EditorState.createEmpty());
-			if (messages.length > 0) {
-				dispatch(
-					channelsActions.setChannelLastSeenMessageId({ channelId: currentChanel?.id || '', channelLastSeenMesageId: messages[0].id }),
-				);
-				dispatch(
-					channelsActions.setChannelLastSentMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }),
-				);
-				const notificationLength = arrayNotication.length;
-				const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
-				const timestamp = notification.update_time?.seconds || '';
-				dispatch(channelsActions.setTimestamp({ channelId: currentChanel?.id || '', timestamp: String(timestamp) }));
-			}
 		}
 		clearSuggestionEmojiAfterSendMessage();
 	}, [content, onSend, mentionData, attachmentData]);

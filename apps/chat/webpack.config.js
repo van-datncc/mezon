@@ -1,5 +1,6 @@
 const { composePlugins, withNx } = require('@nx/webpack');
 const { withReact } = require('@nx/react');
+const { merge } = require('webpack-merge');
 
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
@@ -17,12 +18,17 @@ module.exports = composePlugins(
   (config) => {
     // Update the webpack config as needed here.
     // e.g. `config.plugins.push(new MyPlugin())`
+    config.plugins = config.plugins || [];
     config.plugins.push(new NodePolyfillPlugin());
+
+    config.resolve = config.resolve || {};
     config.resolve.fallback = { "fs": false };
     config.loader = {
       test: /plugin\.css$/,
       loaders: ['style-loader', 'css'],
     }
-    return config;
+    return merge(config, {
+      ignoreWarnings: [/Failed to parse source map/]
+    });
   },
 );

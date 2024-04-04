@@ -10,6 +10,7 @@ import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
+// TODO: implement useClipboard hook
 export const unsecuredCopyToClipboard = (text: string) => {
 	const textArea = document.createElement('textarea');
 	textArea.value = text;

@@ -8,7 +8,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from '@mezon/mezon-js';
-import { channelMembersActions, emojiActions, friendsActions, mapMessageChannelToEntity, mapReactionToEntity, messagesActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { channelMembersActions, channelsActions, emojiActions, friendsActions, mapMessageChannelToEntity, mapNotificationToEntity, mapReactionToEntity, messagesActions, notificationActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -23,12 +23,12 @@ export type ChatContextValue = object;
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
-const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {	
+const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
 			// add logic code
-		}),[]);
+		}), []);
 
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
@@ -53,6 +53,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
+			const timestamp = Date.now() / 1000;
+			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 		},
 		[dispatch],
 	);
@@ -73,6 +75,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		(notification: Notification) => {
+			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			if (notification.code === -2 || notification.code === -3) {
 				dispatch(friendsActions.fetchListFriends());
 				toast.info(notification.subject);
@@ -158,11 +161,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socket.onstatuspresence = onstatuspresence;
 
 		return () => {
-			socket.onchannelmessage = () => {};
-			socket.onchannelpresence = () => {};
-			socket.onnotification = () => {};
-			socket.onstatuspresence = () => {};
-			socket.ondisconnect = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onchannelmessage = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onchannelpresence = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onnotification = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstatuspresence = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.ondisconnect = () => { };
 		};
 	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef, onvoicejoined, onvoiceleaved, onerror]);
 
