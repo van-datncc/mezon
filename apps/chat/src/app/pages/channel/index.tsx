@@ -1,13 +1,23 @@
 import { ChannelVoice, MemberList } from '@mezon/components';
 import { useAuth, useClans } from '@mezon/core';
-import { selectCurrentChannel, selectIsShowMemberList } from '@mezon/store';
-import { useRef } from 'react';
+import { channelsActions, selectCurrentChannel, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChannelMessages';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+
+// TODO: move this to core
+function useChannelSeen(channelId: string) {
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		const timestamp = Date.now() / 1000;
+		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
+	}, [channelId, dispatch]);
+}
 
 export default function ChannelLayout() {
 	const isShow = useSelector(selectIsShowMemberList);
@@ -16,6 +26,8 @@ export default function ChannelLayout() {
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const { sessionRef } = useMezon();
+
+	useChannelSeen(currentChannel?.id || '');
 
 	const renderChannelMedia = () => {
 		if (currentChannel && currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT) {

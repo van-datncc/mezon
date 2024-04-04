@@ -7,6 +7,8 @@ import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
+import cls from 'classnames';
+
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -82,7 +84,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					</div>
 					<p
-						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white font-bold' : ''} ${isUnReadChannel ? '' : 'font-bold text-white'}`}
+						className={cls({
+							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
+							'font-bold text-white': active || isUnReadChannel,
+						})}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
