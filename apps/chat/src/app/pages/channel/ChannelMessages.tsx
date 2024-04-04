@@ -1,5 +1,5 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { getJumpToMessageId, useAuth, useChatMessages, useJumpToMessage } from '@mezon/core';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage } from '@mezon/core';
 import { channelsActions, emojiActions, selectActiceGifsStickerEmojiTab, selectArrayNotification, useAppDispatch } from '@mezon/store';
 import { NotificationContent, TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
@@ -17,7 +17,7 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [heightEditor, setHeightEditor] = useState(30);
@@ -60,8 +60,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	useEffect(() => {
 		const notificationLength = arrayNotication.length;
 		const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
-		const timestamp = notification.update_time?.seconds || '';
-		const channelIdNotification = notification.channel_id;
+		const timestamp = notification?.update_time?.seconds || '';
+
+		const channelIdNotification = notification?.channel_id;
 		if (position && position >= 0) {
 			dispatch(channelsActions.setTimestamp({ channelId: channelIdNotification, timestamp: String(timestamp) }));
 			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId, channelLastSeenMesageId: messages[0].id }));
