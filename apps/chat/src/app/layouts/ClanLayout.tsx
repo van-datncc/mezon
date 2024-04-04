@@ -1,9 +1,10 @@
-import { ChannelList, ChannelTopbar, ClanHeader, CreateThread, FooterProfile } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans, useThreads } from '@mezon/core';
 import { useState } from 'react';
 import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
 import Setting from '../pages/setting';
+import ThreadsMain from '../pages/thread';
 
 const ClanLayout = () => {
 	const { clanId } = useLoaderData() as ClanLoaderData;
@@ -41,7 +42,7 @@ const ClanLayout = () => {
 					<>
 						<div className="w-2 cursor-ew-resize bg-[#000]" />
 						<div className="w-[480px] bg-[#151515] rounded-l-lg">
-							<CreateThread />
+							<ThreadsMain />
 						</div>
 					</>
 				)}

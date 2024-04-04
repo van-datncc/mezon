@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import NotificationList from '../NotificationList';
 import { ChannelLabel, SearchMessage } from './TopBarComponents';
-import Threads from './TopBarComponents/Threads';
+import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
@@ -64,7 +64,7 @@ function ThreadButton() {
 					<Icons.ThreadIcon />
 				</button>
 			</Tooltip>
-			{isShowThread && <Threads setIsShowThread={setIsShowThread} />}
+			{isShowThread && <ThreadModal setIsShowThread={setIsShowThread} />}
 		</div>
 	);
 }

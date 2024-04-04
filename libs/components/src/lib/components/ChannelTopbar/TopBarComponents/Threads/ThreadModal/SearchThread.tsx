@@ -1,4 +1,4 @@
-import * as Icons from '../../../Icons';
+import * as Icons from '../../../../Icons';
 
 const SearchThread = () => {
 	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {

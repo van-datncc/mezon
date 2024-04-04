@@ -1,7 +1,10 @@
 export { default as ChannelLink } from './components/ChannelLink';
 export { default as ChannelList } from './components/ChannelList';
 export { default as ChannelTopbar } from './components/ChannelTopbar';
-export { default as CreateThread } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread';
+export { default as MessageTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/MessageTextField';
+export { default as ThreadBox } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadBox';
+export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
+export { default as ThreadNameTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadNameTextField';
 export { default as ChannelVoice } from './components/ChannelVoice';
 export { default as ChatWelcome } from './components/ChatWelcome';
 export { default as ClanHeader } from './components/ClanHeader';

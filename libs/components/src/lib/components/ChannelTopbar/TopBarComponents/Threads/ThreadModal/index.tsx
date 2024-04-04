@@ -1,6 +1,10 @@
-import { useThreads } from '@mezon/core';
+import { useAppNavigation, useThreads } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
 import { Button } from 'flowbite-react';
-import * as Icons from '../../../Icons';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import * as Icons from '../../../../Icons';
+import EmptyThread from './EmptyThread';
 import GroupThreads from './GroupThreads';
 import SearchThread from './SearchThread';
 import ThreadItem from './ThreadItem';
@@ -9,13 +13,20 @@ type ThreadsProps = {
 	setIsShowThread: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Threads = ({ setIsShowThread }: ThreadsProps) => {
-	const { setIsShowCreateThread } = useThreads();
+const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
+	const navigate = useNavigate();
+	const { toChannelPage } = useAppNavigation();
+	const { setIsShowCreateThread, threadChannel } = useThreads();
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	const handleCreateThread = () => {
+		if (currentChannel && currentChannel?.parrent_id !== '0') {
+			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
+		}
 		setIsShowCreateThread(true);
 		setIsShowThread(false);
 	};
+
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
@@ -39,27 +50,16 @@ const Threads = ({ setIsShowThread }: ThreadsProps) => {
 					</div>
 				</div>
 				<div className="flex flex-col bg-[#323232] px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
-					{/* Threads list here */}
 					<GroupThreads title="2 joined threads">
-						<ThreadItem />
-						<ThreadItem />
-						<ThreadItem />
-						<ThreadItem />
+						{threadChannel.map((thread) => (
+							<ThreadItem thread={thread} key={thread.id} setIsShowThread={setIsShowThread} />
+						))}
 					</GroupThreads>
-					<GroupThreads title="6 other active threads">
-						<ThreadItem />
-						<ThreadItem />
-					</GroupThreads>
-					<GroupThreads title="other threads">
-						<ThreadItem />
-						<ThreadItem />
-						<ThreadItem />
-					</GroupThreads>
-					{/* <EmptyThread /> */}
+					{threadChannel.length === 0 && <EmptyThread onClick={handleCreateThread} />}
 				</div>
 			</div>
 		</div>
 	);
 };
 
-export default Threads;
+export default ThreadModal;

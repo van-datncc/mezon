@@ -1,3 +1,4 @@
+import { ApiChannelDescription } from '@mezon/mezon-js/dist/api.gen';
 import { IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -14,6 +15,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowCreateThread?: boolean;
+	currentThread?: ApiChannelDescription;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -58,6 +60,9 @@ export const threadsSlice = createSlice({
 		remove: threadsAdapter.removeOne,
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<boolean>) => {
 			state.isShowCreateThread = action.payload;
+		},
+		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
+			state.currentThread = action.payload;
 		},
 		// ...
 	},
@@ -119,6 +124,8 @@ export const threadsActions = { ...threadsSlice.actions };
 const { selectAll, selectEntities } = threadsAdapter.getSelectors();
 
 export const getThreadsState = (rootState: { [THREADS_FEATURE_KEY]: ThreadsState }): ThreadsState => rootState[THREADS_FEATURE_KEY];
+
+export const selectCurrentThread = createSelector(getThreadsState, (state) => state.currentThread);
 
 export const selectAllThreads = createSelector(getThreadsState, selectAll);
 
