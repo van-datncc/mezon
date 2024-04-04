@@ -1,6 +1,14 @@
-import { EmojiPickerComp, MessageWithUser, UnreadMessageBreak, ChannelMessageOpt } from '@mezon/components';
+import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage, useChatSending } from '@mezon/core';
-import { emojiActions, referencesActions, selectEmojiOpenEditState, selectEmojiReactedBottomState, selectEmojiReactedState, selectMemberByUserId, selectMessageReplyState, selectReference, useAppDispatch } from '@mezon/store';
+import {
+	emojiActions,
+	selectEmojiOpenEditState,
+	selectEmojiReactedBottomState,
+	selectEmojiReactedState,
+	selectMemberByUserId,
+	selectReference,
+	useAppDispatch,
+} from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -23,12 +31,12 @@ export function ChannelMessage(props: MessageProps) {
 	const dispatch = useAppDispatch();
 	const refMessage = useSelector(selectReference);
 	const emojiReactedState = useSelector(selectEmojiReactedState);
-    const emojiReactedBottomState = useSelector(selectEmojiReactedBottomState);
-    const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
+	const emojiReactedBottomState = useSelector(selectEmojiReactedBottomState);
+	const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
 
 	useEffect(() => {
 		markMessageAsSeen(message);
-	}, [markMessageAsSeen, message]);	
+	}, [markMessageAsSeen, message]);
 
 	const mess = useMemo(() => {
 		if (typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
@@ -39,7 +47,6 @@ export function ChannelMessage(props: MessageProps) {
 
 	const [editMessage, setEditMessage] = useState(mess.content.t);
 	const [newMessage, setNewMessage] = useState('');
-	
 
 	const messPre = useMemo(() => {
 		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
@@ -79,6 +86,8 @@ export function ChannelMessage(props: MessageProps) {
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
+	
+
 	return (
 		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
 			<MessageWithUser
@@ -88,6 +97,7 @@ export function ChannelMessage(props: MessageProps) {
 				mode={mode}
 				newMessage={newMessage}
 			/>
+			
 			{lastSeen && <UnreadMessageBreak />}
 
 			<div
@@ -99,12 +109,12 @@ export function ChannelMessage(props: MessageProps) {
 				{mess.id === refMessage?.id && (
 					<div className="w-fit fixed right-16 bottom-[6rem]">
 						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPickerComp messageEmoji={mess} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							<EmojiPickerComp messageEmoji={refMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 						</div>
 					</div>
 				)}
 			</div>
-			{ emojiReactedState && mess.id === refMessage?.id && (
+			{emojiOpenEditState && mess.id === refMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-30px]">
 					<textarea
 						defaultValue={editMessage}

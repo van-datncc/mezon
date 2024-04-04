@@ -1,7 +1,7 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage } from '@mezon/core';
 import { emojiActions, selectActiceGifsStickerEmojiTab, useAppDispatch } from '@mezon/store';
-import { TabNamePopup } from '@mezon/utils';
+import { EmojiDataOptionals, TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSelector } from 'react-redux';
@@ -55,6 +55,51 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
 	};
+
+	// TODO: move this to store
+	const emojiDataArray: EmojiDataOptionals[] = messages.flatMap((message) => {
+		if (!message.reactions) return [];
+
+		const processedItems: Record<string, EmojiDataOptionals> = {};
+
+		message.reactions.forEach((reaction) => {
+			const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+			const existingItem = processedItems[key];
+
+			if (!processedItems[key]) {
+				processedItems[key] = {
+					id: reaction.id,
+					emoji: reaction.emoji,
+					senders: [
+						{
+							sender_id: reaction.sender_id,
+							count: reaction.count,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
+						},
+					],
+					channel_id: message.channel_id,
+					message_id: message.id,
+				};
+			} else {
+
+				const existingItem = processedItems[key];
+
+				if (existingItem.senders.length > 0) {
+					existingItem.senders[0].count = reaction.count;
+				}
+			}
+		});
+
+		return Object.values(processedItems);
+	});
+
+
+
+	useEffect(() => {
+		dispatch(emojiActions.setDataReactionFromServe(emojiDataArray));
+	}, [emojiDataArray]);
 
 	return (
 		<div
