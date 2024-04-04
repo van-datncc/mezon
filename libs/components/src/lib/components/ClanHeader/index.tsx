@@ -55,9 +55,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					/>
 				</div>
 			) : (
-				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950 z-10`}>
+				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950 z-[1]`}>
 					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
-					<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2">
+					<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-[#030712]">
 						<p className="text-white text-lg font-bold">{name?.toLocaleUpperCase()}</p>
 						<Dropdown
 							label=""

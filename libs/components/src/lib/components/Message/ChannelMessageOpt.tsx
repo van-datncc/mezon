@@ -10,7 +10,6 @@ type ChannelMessageOptProps = {
 };
 
 export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
-
     const { userId } = useAuth()
     const dispatch = useAppDispatch();
 

@@ -33,8 +33,10 @@ export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
 
+export { default as MessageReaction } from './components/MessageWithUser/MessageReaction';
+
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
-export * from './components/MessageWithUser';
+// export * from './components/MessageWithUser';
 export * from './components/SettingProfile';

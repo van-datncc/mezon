@@ -352,8 +352,19 @@ input:-webkit-autofill:active {
 }
 
 blockquote span {
-  display: inline-block;
-  line-height: 20px;
+	display: inline-block;
+	line-height: 20px;
+}
+
+// css video
+#canvas {
+	border-radius: 10px;
+}
+
+#meet {
+	video {
+		border-radius: 10px;
+	}
 }
 
 .thread-scroll::-webkit-scrollbar-track{

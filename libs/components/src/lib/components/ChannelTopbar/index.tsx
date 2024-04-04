@@ -1,4 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
+import { ChannelType } from '@mezon/mezon-js';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -14,14 +15,17 @@ export type ChannelTopbarProps = {
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
+	const checkChannelType = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	return (
-		<div className="flex p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink h-heightHeader">
-			<div className="justify-start items-center gap-1 flex">
-				<ChannelLabel />
+		<div
+			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
+		>
+			<div className={`justify-start items-center gap-1 ${checkChannelType ? 'hidden group-hover:flex transition-all duration-300' : 'flex'}`}>
+				<ChannelLabel channel={channel} />
 			</div>
 
 			{/* Desktop buttons */}
-			<div className=" items-center h-full ml-auto flex">
+			<div className={`items-center h-full ml-auto ${checkChannelType ? 'hidden group-hover:flex transition-all duration-300' : 'flex'}`}>
 				<div className="justify-end items-center gap-2 flex">
 					<div className="hidden ssm:flex">
 						<div className="relative justify-start items-center gap-[15px] flex iconHover">
@@ -32,14 +36,13 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 							<ThreeDotButton />
 						</div>
 						<SearchMessage />
-
-						<div
-							className="gap-4 iconHover relative flex items-center  w-[82px] h-8 justify-center  bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)] left-[345px] ssm:left-auto ssm:right-0"
-							id="inBox"
-						>
-							<InboxButton />
-							<HelpButton />
-						</div>
+					</div>
+					<div
+						className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
+						id="inBox"
+					>
+						<NotificationList />
+						<HelpButton />
 					</div>
 				</div>
 			</div>
