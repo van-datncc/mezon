@@ -1,13 +1,10 @@
+import { useChatReactionMessage } from '@mezon/core';
 import { ChannelStreamMode } from '@mezon/mezon-js';
+import { useAppDispatch } from '@mezon/store';
+import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals } from '@mezon/utils';
 import { Fragment, useRef, useState } from 'react';
 import { EmojiPickerComp, Icons } from '../../components';
-import { useAuth, useChatReactionMessage } from '@mezon/core';
-import { emojiActions, referencesActions, selectEmojiReactedBottomState, selectReference, useAppDispatch } from '@mezon/store';
-import { AvatarComponent, NameComponent } from '@mezon/ui';
-import { useCallback, useEffect  } from 'react';
-import { useSelector } from 'react-redux';
-import EmojiPicker from '../EmojiPicker';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
@@ -22,8 +19,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 	const [isHideSmileButton, setIsHideSmileButton] = useState<boolean>(false);
 	const {
 		userId,
-		messageDataReactedFromSocket,
-		reactionMessageAction,
+		reactionMessage,
 		setIsOpenEmojiReacted,
 		setIsOpenEmojiMessBox,
 		setMessageRef,
@@ -50,7 +46,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 	const removeEmojiSender = async (messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		setCountRemove(countRemoved);
 		setIsHideSmileButton(true);
-		await reactionMessageAction('', mode, messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessage('', mode, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const hideSenderOnPanel = (emojiData: EmojiDataOptionals, senderId: string) => {
@@ -70,7 +66,7 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 		action_delete: boolean,
 	) {
 		setCountRemove(0);
-		await reactionMessageAction('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
+		await reactionMessage('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
 	}
 
 	const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
@@ -124,10 +120,8 @@ const MessageReaction = ({ currentChannelId, message, grandParentDivRect, mode }
 											emoji.id ?? '',
 											ChannelStreamMode.STREAM_MODE_CHANNEL,
 											message.id ?? '',
-
 											emoji.emoji ?? '',
 											1,
-
 											userId ?? '',
 											false,
 										)

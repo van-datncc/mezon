@@ -20,8 +20,7 @@ export type UpdateReactionMessageArgs = {
 	emoji?: string;
 	count?: number;
 	sender_id?: string;
-	action_delete?: boolean;
-	actionRemove?: boolean;
+	action?: boolean;
 };
 
 export interface EmojiState extends EntityState<EmojiEntity, string> {
@@ -36,7 +35,6 @@ export interface EmojiState extends EntityState<EmojiEntity, string> {
 	messageReplyState: boolean;
 	emojiSelectedMess: boolean;
 	reactionMessageData: EmojiDataOptionals;
-
 	reactionDataServerAndSocket: EmojiDataOptionals[];
 
 	// Emoji Suggestion state
@@ -61,9 +59,9 @@ export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, t
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
 
-	async ({ id, channel_id, message_id, sender_id, emoji, count, actionRemove }: UpdateReactionMessageArgs, thunkAPI) => {
+	async ({ id, channel_id, message_id, sender_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
-			await thunkAPI.dispatch(emojiActions.setReactionMessage({ id, channel_id, message_id, sender_id, emoji, count, actionRemove }));
+			await thunkAPI.dispatch(emojiActions.setReactionMessage({ id, channel_id, message_id, sender_id, emoji, count, action }));
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -83,6 +81,7 @@ export const initialEmojiState: EmojiState = emojiAdapter.getInitialState({
 	messageReplyState: false,
 	emojiSelectedMess: false,
 	reactionMessageData: {
+		action: undefined,
 		id: '',
 		emoji: '',
 		senders: [{ sender_id: '', count: 0, emojiIdList: [], sender_name: '', avatar: '' }],
@@ -128,17 +127,28 @@ export const emojiSlice = createSlice({
 
 		setReactionMessage: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
 			state.reactionMessageData = {
+				action: action.payload.action,
 				id: action.payload.id ?? '',
 				emoji: action.payload.emoji ?? '',
-				senders: [{ sender_id: action.payload.sender_id || '', count: 1, emojiIdList: [], sender_name: '', avatar: '' }],
+				senders: [
+					{
+						sender_id: action.payload.sender_id || '',
+						count: action.payload.action ? action.payload.count && action.payload.count : 1,
+						emojiIdList: [],
+						sender_name: '',
+						avatar: '',
+					},
+				],
 				channel_id: action.payload.channel_id ?? '',
 				message_id: action.payload.message_id ?? '',
 			};
-			state.reactionDataServerAndSocket.push(state.reactionMessageData);
+			if (!action.payload.action) {
+				state.reactionDataServerAndSocket.push(state.reactionMessageData);
+			} 
 		},
 
 		setDataReactionFromServe(state, action) {
-			state.reactionDataServerAndSocket = action.payload
+			state.reactionDataServerAndSocket = action.payload;
 		},
 
 		// ...
@@ -201,7 +211,6 @@ export const selectEmojiReactedState = createSelector(getEmojiState, (state: Emo
 export const selectActiceGifsStickerEmojiTab = createSelector(getEmojiState, (state: EmojiState) => state.activeGifsStickerEmojiTab);
 
 export const selectMessageReplyState = createSelector(getEmojiState, (state: EmojiState) => state.messageReplyState);
-
 
 export const selectEmojiSelectedMess = createSelector(getEmojiState, (state: EmojiState) => state.emojiSelectedMess);
 

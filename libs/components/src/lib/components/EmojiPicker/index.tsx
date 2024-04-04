@@ -10,11 +10,11 @@ export type EmojiPickerOptions = {
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
-	const { reactionMessageAction } = useChatReactionMessage();
+	const { reactionMessage } = useChatReactionMessage();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			
-			await reactionMessageAction(
+			await reactionMessage(
 				'',
 				props.mode ?? 2,
 				props.messageEmoji?.id ?? '',

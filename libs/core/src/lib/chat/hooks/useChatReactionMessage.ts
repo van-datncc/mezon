@@ -33,7 +33,6 @@ export function useChatReactionMessage() {
 			const client = clientRef.current;
 			const socket = socketRef.current;
 			const channel = channelRef.current;
-			console.log(id, mode, messageId, emoji, count, message_sender_id, action_delete);
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
@@ -42,32 +41,22 @@ export function useChatReactionMessage() {
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
 	);
 
-	const reactionMessageAction = useCallback(
-		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
-			try {
-				await reactionMessage(id, mode, messageId, emoji, count, message_sender_id, action_delete);
-			} catch (error) {
-				console.error('Error reacting to message:', error);
-			}
-		},
-		[reactionMessage],
-	);
-
 	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
 	const refMessage = useSelector(selectReference);
 	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
+	const reactionDataSocket = useSelector(selectMessageReacted);
 
-	function combineEmojiActions(data: any[]): EmojiDataOptionals[] {
-		const processedItems: Record<string, EmojiDataOptionals> = {};
+	function updateOrRemoveEmojiReaction(data: any[]): EmojiDataOptionals[] {
+		const dataItemReaction: Record<string, EmojiDataOptionals> = {};
 		data.forEach((item) => {
 			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
-			if (!processedItems[key]) {
-				processedItems[key] = {
+			if (!dataItemReaction[key]) {
+				dataItemReaction[key] = {
 					id: item.id,
 					emoji: item.emoji,
 					senders: [
 						{
-							sender_id: item.senders[0]?.sender_id ?? "",
+							sender_id: item.senders[0]?.sender_id ?? '',
 							count: item.senders[0]?.count ?? 0,
 							emojiIdList: [],
 							sender_name: '',
@@ -78,14 +67,14 @@ export function useChatReactionMessage() {
 					message_id: item.message_id,
 				};
 			} else {
-				const existingItem = processedItems[key];
+				const existingItem = dataItemReaction[key];
 				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
-	
+
 				if (senderIndex !== -1) {
 					existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
 				} else {
 					existingItem.senders.push({
-						sender_id: item.senders[0]?.sender_id ?? "",
+						sender_id: item.senders[0]?.sender_id ?? '',
 						count: item.senders[0]?.count ?? 0,
 						emojiIdList: [],
 						sender_name: '',
@@ -94,12 +83,38 @@ export function useChatReactionMessage() {
 				}
 			}
 		});
-	
-		return Object.values(processedItems);
-	}
-	
+		console.log('data-2', dataItemReaction);
+		if (reactionDataSocket.action) {
+			const itemReactionKey = `${reactionDataSocket.emoji}_${reactionDataSocket.channel_id}_${reactionDataSocket.message_id}`;
+			const itemReactionSender = reactionDataSocket.senders[0].sender_id;
+			const removeDataReaction = (data: Record<string, EmojiDataOptionals>, keyToRemove: string, senderId: string) => {
+				console.log('data', data);
+				console.log('keyToRemove', keyToRemove);
+				console.log('sender', senderId);
+				if (keyToRemove in data) {
+					const item = data[keyToRemove];
+					console.log('item', item);
+					const updatedSenders = item.senders.filter((sender) => sender.sender_id !== senderId);
+					// Kiểm tra nếu không còn người gửi nào nữa, thì xóa item
+					if (updatedSenders.length === 0) {
+						delete data[keyToRemove];
+					} else {
+						// Cập nhật senders với danh sách senders đã lọc
+						data[keyToRemove].senders = updatedSenders;
+					}
+				}
+				return Object.values(data);
+			};
 
-	const dataReactionCombine = combineEmojiActions(dataReactionServerAndSocket);
+			const newDataItemReaction = removeDataReaction(dataItemReaction, itemReactionKey, itemReactionSender ?? '');
+			console.log(newDataItemReaction);
+			return newDataItemReaction;
+		} else {
+			return Object.values(dataItemReaction);
+		}
+	}
+
+	const dataReactionCombine = updateOrRemoveEmojiReaction(dataReactionServerAndSocket);
 
 	const setMessageRef = useCallback(
 		(state: any) => {
@@ -140,7 +155,6 @@ export function useChatReactionMessage() {
 		() => ({
 			userId,
 			reactionMessage,
-			reactionMessageAction,
 			messageDataReactedFromSocket,
 			setMessageRef,
 			setIsOpenEmojiReacted,
@@ -154,7 +168,6 @@ export function useChatReactionMessage() {
 		[
 			userId,
 			reactionMessage,
-			reactionMessageAction,
 			messageDataReactedFromSocket,
 			setMessageRef,
 			setIsOpenEmojiReacted,
@@ -163,7 +176,6 @@ export function useChatReactionMessage() {
 			setIsOpenEmojiReactedBottom,
 			isOpenEmojiReactedBottom,
 			refMessage,
-			dataReactionCombine,
 			dataReactionCombine,
 		],
 	);
