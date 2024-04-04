@@ -1,59 +1,33 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "es2015",
-    "module": "esnext",
-    "allowJs": true,    
-    "checkJs": false,
-    "lib": [
-      "es2020",
-      "dom"
-    ],
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@mezon/assets": [
-        "libs/assets/src/index.ts"
-      ],
-      "@mezon/components": [
-        "libs/components/src/index.ts"
-      ],
-      "@mezon/core": [
-        "libs/core/src/index.ts"
-      ],
-      "@mezon/logger": [
-        "libs/logger/src/index.ts"
-      ],
-      "@mezon/store": [
-        "libs/store/src/index.ts"
-      ],
-      "@mezon/transport": [
-        "libs/transport/src/index.ts"
-      ],
-      "@mezon/ui": [
-        "libs/ui/src/index.ts"
-      ],
-      "@mezon/utils": [
-        "libs/utils/src/index.ts"
-      ],
-      "@mezon/lib-jitsi-meet": [
-        "./node_modules/@mezon/lib-jitsi-meet/types"
-      ],
-      "react": [
-        "./node_modules/@types/react"
-      ]
-    }
-  },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+	"compileOnSave": false,
+	"compilerOptions": {
+		"rootDir": ".",
+		"sourceMap": true,
+		"declaration": false,
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"importHelpers": true,
+		"target": "es2015",
+		"module": "esnext",
+		"allowJs": true,
+		"checkJs": false,
+		"lib": ["es2020", "dom"],
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@mezon/assets": ["libs/assets/src/index.ts"],
+			"@mezon/components": ["libs/components/src/index.ts"],
+			"@mezon/core": ["libs/core/src/index.ts"],
+			"@mezon/lib-jitsi-meet": ["./node_modules/@mezon/lib-jitsi-meet/types"],
+			"@mezon/logger": ["libs/logger/src/index.ts"],
+			"@mezon/store": ["libs/store/src/index.ts"],
+			"@mezon/transport": ["libs/transport/src/index.ts"],
+			"@mezon/ui": ["libs/ui/src/index.ts"],
+			"@mezon/utils": ["libs/utils/src/index.ts"],
+			"react": ["./node_modules/@types/react"]
+		}
+	},
+	"exclude": ["node_modules", "tmp"]
 }
