@@ -28,7 +28,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			<div className={`items-center h-full ml-auto ${checkChannelType ? 'hidden group-hover:flex transition-all duration-300' : 'flex'}`}>
 				<div className="justify-end items-center gap-2 flex">
 					<div className="hidden ssm:flex">
-						<div className="relative justify-start items-center gap-[15px] flex iconHover">
+						<div className="relative justify-start items-center gap-[15px] flex iconHover mr-2">
 							<ThreadButton />
 							<MuteButton />
 							<PinButton />
@@ -41,7 +41,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
 						id="inBox"
 					>
-						<NotificationList />
+						<InboxButton />
 						<HelpButton />
 					</div>
 				</div>

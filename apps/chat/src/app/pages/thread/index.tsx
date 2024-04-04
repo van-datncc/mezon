@@ -1,18 +1,8 @@
 import { ThreadBox, ThreadHeader } from '@mezon/components';
-import { useAppNavigation, useThreads } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useThreads } from '@mezon/core';
 
 const ThreadsMain = () => {
-	const { isShowCreateThread, currentThread, setIsShowCreateThread } = useThreads();
-	const currentChannel = useSelector(selectCurrentChannel);
-	const { toChannelPage } = useAppNavigation();
-	const navigate = useNavigate();
-
-	if (!isShowCreateThread) {
-		navigate(toChannelPage(currentChannel?.channel_id as string, currentChannel?.clan_id as string));
-	}
+	const { currentThread, setIsShowCreateThread } = useThreads();
 
 	return (
 		<div className="flex flex-col h-full">

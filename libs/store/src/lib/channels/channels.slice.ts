@@ -7,6 +7,7 @@ import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
+import { threadsActions } from '../threads/threads.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -75,6 +76,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+			thunkAPI.dispatch(threadsActions.setCurrentThread(response));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);

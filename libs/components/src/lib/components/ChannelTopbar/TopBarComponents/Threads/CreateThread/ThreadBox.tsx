@@ -1,32 +1,35 @@
 import { useAppNavigation, useThreads } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
-import { createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, threadsActions, useAppDispatch } from '@mezon/store';
+import { createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../../../../Icons';
-import MessageTextField from './MessageTextField';
 import ThreadMessage from './ThreadMessage';
 import ThreadNameTextField from './ThreadNameTextField';
 
+type ErrorProps = {
+	name: string;
+	message: string;
+};
+
 const ThreadBox = () => {
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const { toThreadPage } = useAppNavigation();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { toThreadPage } = useAppNavigation();
 
 	const { currentThread } = useThreads();
 
-	const [isErrorName, setIsErrorName] = useState<string>('');
+	const [isError, setIsError] = useState<ErrorProps>({ name: '', message: '' });
 	const [threadName, setThreadName] = useState('');
 	const [startMessage, setStartMessage] = useState('');
-	// const [currentThread, setCurrentThread] = useState<ApiChannelDescription | null>(null);
-	const navigate = useNavigate();
 
 	const handleThreadNameChange = (value: string) => {
-		setIsErrorName('');
+		setIsError((pre) => ({ ...pre, name: '' }));
 		setThreadName(value);
 	};
 
@@ -36,7 +39,12 @@ const ThreadBox = () => {
 	const handleKeySubmit = async (key: string) => {
 		if (key === 'Enter') {
 			if (threadName === '') {
-				setIsErrorName("Thread's name is required");
+				setIsError((pre) => ({ ...pre, name: `Thread's name is required` }));
+				return;
+			}
+
+			if (startMessage === '') {
+				setIsError((pre) => ({ ...pre, message: `Thread's message is required` }));
 				return;
 			}
 
@@ -50,7 +58,8 @@ const ThreadBox = () => {
 			const response = await dispatch(createNewChannel(body));
 			const newThread = response.payload as ApiChannelDescription;
 			if (newThread) {
-				dispatch(threadsActions.setCurrentThread(newThread));
+				setThreadName('');
+				setStartMessage('');
 				navigate(toThreadPage(newThread.parrent_id as string, newThread.clan_id as string, newThread.channel_id as string));
 			}
 		}
@@ -69,11 +78,23 @@ const ThreadBox = () => {
 						onKeyDown={handleKeySubmit}
 						onChange={handleThreadNameChange}
 						threadNameProps="Thread Name"
-						error={isErrorName}
+						placeholder="Enter Thread Name"
+						error={isError.name}
+						value={threadName}
+						className="h-10 p-[10px] bg-black text-base rounded placeholder:text-sm"
 					/>
 				)}
 			</div>
-			<MessageTextField onChange={handleChangeMessage} />
+			<div className="mb-6">
+				<ThreadNameTextField
+					onChange={handleChangeMessage}
+					onKeyDown={handleKeySubmit}
+					placeholder="Enter a message to start the conversation!"
+					error={isError.message}
+					value={startMessage}
+					className="w-full h-10 p-[10px] bg-[#26262B] text-base rounded placeholder:text-sm"
+				/>
+			</div>
 		</div>
 	);
 };

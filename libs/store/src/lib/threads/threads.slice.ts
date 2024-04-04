@@ -60,6 +60,7 @@ export const threadsSlice = createSlice({
 		remove: threadsAdapter.removeOne,
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<boolean>) => {
 			state.isShowCreateThread = action.payload;
+			state.currentThread = undefined;
 		},
 		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
 			state.currentThread = action.payload;

@@ -1,5 +1,8 @@
 type MessageTextFieldProps = {
+	placeholder?: string;
 	onChange: (value: string) => void;
+	onKeyDown: (key: string) => void;
+	error?: string;
 };
 
 const MessageTextField = ({ onChange }: MessageTextFieldProps) => {
