@@ -65,6 +65,10 @@ export type IRoleUsers = IRole & {
 	users: ApiUser[];
 };
 
+export type ChannelThreads = IChannel & {
+	threads: IChannel[];
+};
+
 export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
