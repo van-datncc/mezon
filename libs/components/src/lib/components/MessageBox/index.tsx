@@ -250,8 +250,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					channelsActions.setChannelLastSentMessageId({ channelId: currentChanel?.id || '', channelLastSentMessageId: messages[0].id }),
 				);
 				const notificationLength = arrayNotication.length;
-				const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
-				const timestamp = notification.update_time?.seconds || '';
+				const notification = arrayNotication[notificationLength - 1]?.content;
+				const timestamp = notification?.update_time?.seconds || '';
 				dispatch(channelsActions.setTimestamp({ channelId: currentChanel?.id || '', timestamp: String(timestamp) }));
 			}
 		}
