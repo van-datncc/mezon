@@ -1,7 +1,7 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { channelsActions, emojiActions, selectActiceGifsStickerEmojiTab, selectArrayNotification, useAppDispatch } from '@mezon/store';
-import { NotificationContent, TabNamePopup } from '@mezon/utils';
+import { emojiActions, selectActiceGifsStickerEmojiTab, useAppDispatch } from '@mezon/store';
+import { TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSelector } from 'react-redux';
@@ -24,7 +24,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const activeGifsStickerEmojiTab = useSelector(selectActiceGifsStickerEmojiTab);
 
 	const dispatch = useAppDispatch();
-	const arrayNotication = useSelector(selectArrayNotification);
 
 	const fetchData = () => {
 		loadMoreMessage();
@@ -56,19 +55,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
 	};
-
-	useEffect(() => {
-		const notificationLength = arrayNotication.length;
-		const notification = arrayNotication[notificationLength - 1]?.content as NotificationContent;
-		const timestamp = notification?.update_time?.seconds || '';
-
-		const channelIdNotification = notification?.channel_id;
-		if (position && position >= 0) {
-			dispatch(channelsActions.setTimestamp({ channelId: channelIdNotification, timestamp: String(timestamp) }));
-			dispatch(channelsActions.setChannelLastSeenMessageId({ channelId, channelLastSeenMesageId: messages[0].id }));
-			dispatch(channelsActions.setChannelLastSentMessageId({ channelId, channelLastSentMessageId: messages[0].id }));
-		}
-	}, [arrayNotication, dispatch, position]);
 
 	return (
 		<div

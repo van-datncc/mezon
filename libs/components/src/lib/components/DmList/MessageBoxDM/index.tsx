@@ -42,6 +42,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				onSend={handleSend} 
 				currentChannelId={directParamId} 
 				onTyping={handleTypingDebounced}
+				// TODO: useMemo for listMentions
 				listMentions={UserMentionList(directParamId)}
 			/>
 		</div>

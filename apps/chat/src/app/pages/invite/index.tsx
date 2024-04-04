@@ -26,7 +26,7 @@ export default function InvitePage() {
 		return selectInvite?.channel_id || ''
 	}, [selectInvite]);
 	const userJoined = useMemo(() => {
-		return selectInvite.user_joined
+		return selectInvite?.user_joined
 	}, [selectInvite]);
 	
 	

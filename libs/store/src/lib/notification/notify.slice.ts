@@ -1,13 +1,12 @@
 import { Notification } from '@mezon/mezon-js';
-import { ContentNotificationChannel, LoadingStatus } from '@mezon/utils';
+import { LoadingStatus, NotificationContent } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiNotification } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 
 export interface INotification extends Notification {
 	id: string;
-	content?: any;
+	content?: any | NotificationContent;
 }
 export interface NotificationEntity extends INotification {
 	id: string;
@@ -20,7 +19,6 @@ export const mapNotificationToEntity = (notifyRes: Notification): INotification 
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	arrayNotification: ContentNotificationChannel[];
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -32,7 +30,6 @@ export const fetchListNotification = createAsyncThunk('notification/fetchListNot
 		return thunkAPI.rejectWithValue([]);
 	}
 	const notifications = response.notifications.map(mapNotificationToEntity);
-	thunkAPI.dispatch(notificationActions.setArrayNotification(notifications));
 	return notifications;
 });
 
@@ -50,7 +47,6 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	loadingStatus: 'not loaded',
 	notificationMentions: [],
 	error: null,
-	arrayNotification: [],
 });
 
 export const notificationSlice = createSlice({
@@ -59,14 +55,6 @@ export const notificationSlice = createSlice({
 	reducers: {
 		add: notificationAdapter.addOne,
 		remove: notificationAdapter.removeOne,
-		setArrayNotification: (state, action: PayloadAction<ApiNotification[]>) => {
-			const notifications = action.payload;
-			state.arrayNotification = notifications
-				.filter((item) => item.code === -9)
-				.map((item) => ({
-					content: item.content,
-				}));
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -99,4 +87,25 @@ export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]: No
 
 export const selectAllNotification = createSelector(getNotificationState, selectAll);
 
-export const selectArrayNotification = createSelector(getNotificationState, (state) => state.arrayNotification);
+// TODO: Add enum for notification code
+export const selectNotificationByCode = (code: number) =>
+	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
+
+// Mention notification is code -9
+export const selectNotificationMentions = createSelector(selectAllNotification, (notifications) =>
+	notifications.filter((notification) => notification.code === -9),
+);
+
+export const selectNotificationMentionsByChannelId = (channelId: string, after = 0) =>
+	createSelector(selectNotificationMentions, (notifications) =>
+		notifications.filter(
+			(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+		),
+	);
+
+export const selectNotificationMentionCountByChannelId = (channelId: string, after = 0) =>
+	createSelector(selectNotificationMentions, (notifications) =>
+		notifications.filter(
+			(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+		).length,
+	);
