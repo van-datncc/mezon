@@ -32,6 +32,8 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 	};
 };
 
+
+
 export interface MessagesEntity extends IMessageWithUser {
 	id: string; // Primary ID
 }
@@ -191,7 +193,13 @@ export const updateLastSeenMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(channelId, channelLabel, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
+			await mezon.socketRef.current?.writeLastSeenMessage(
+				channelId,
+				channelLabel,
+				ChannelStreamMode.STREAM_MODE_CHANNEL,
+				messageId,
+				now.toString(),
+			);
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -403,6 +411,8 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 		const messages = Object.values(entities);
 		return messages.sort(orderMessageByDate).filter((message) => message && message.channel_id === channelId);
 	});
+
+
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
