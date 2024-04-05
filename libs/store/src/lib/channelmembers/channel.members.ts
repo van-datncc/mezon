@@ -29,6 +29,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 	followingUserIds?: string[];
 	onlineStatusUser: Record<string, boolean>;
 	toFollowUserIds: string[];
+	memberChannels?: ChannelUserListChannelUser[];
 }
 
 // TODO: remove channelId from the parameter
@@ -85,6 +86,7 @@ export const fetchChannelMembers = createAsyncThunk(
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
+		thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
 		thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
 		thunkAPI.dispatch(channelMembersActions.followUserStatus());
 		return members;
@@ -162,7 +164,7 @@ export const channelMembers = createSlice({
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
-			for (let i of action.payload) {
+			for (const i of action.payload) {
 				state.onlineStatusUser[i.userId] = i.status;
 			}
 		},
@@ -177,6 +179,9 @@ export const channelMembers = createSlice({
 			const newUsers = [...state.toFollowUserIds, ...action.payload];
 			state.toFollowUserIds = [...new Set(newUsers)];
 		},
+		setMemberChannels: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
+			state.memberChannels = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -190,7 +195,7 @@ export const channelMembers = createSlice({
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			});		
+			});
 	},
 });
 
@@ -277,6 +282,8 @@ export const selectMembersMap = (channelId?: string | null) =>
 		return retval;
 	});
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
+
+export const selectMemberChannels = createSelector(getChannelMembersState, (state) => state.memberChannels);
 
 export const selectMemberOnlineStatusById = (userId: string) =>
 	createSelector(selectMemberStatus, (status) => {

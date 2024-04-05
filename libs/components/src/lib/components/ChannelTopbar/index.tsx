@@ -61,7 +61,7 @@ function ThreadButton() {
 	useOnClickOutside(threadRef, () => setIsShowThread(false));
 
 	return (
-		<div className="relative leading-5" ref={threadRef}>
+		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
 				<button onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon />
@@ -106,7 +106,7 @@ function InboxButton() {
 
 	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
 	return (
-		<div className="relative leading-5" ref={inboxRef}>
+		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<button onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 				<Icons.Inbox />
 			</button>
