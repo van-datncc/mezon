@@ -2,9 +2,10 @@ import { ChannelType } from '@mezon/mezon-js';
 import { InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import * as Icons from '../../../Icons';
-import MembersComponent from '../PermissionsChannel/membersComponent';
 import RolesComponent from '../PermissionsChannel/rolesComponent';
-
+import { useDMInvite } from '@mezon/core';
+import { useState } from 'react';
+import { channelUsersActions, useAppDispatch } from '@mezon/store';
 interface AddMemRoleProps {
 	onClose: () => void;
 	channel: IChannel;
@@ -12,6 +13,29 @@ interface AddMemRoleProps {
 
 export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 	const isPrivate = channel.channel_private;
+	
+	const { listUserInvite } = useDMInvite(channel.id);
+	const listMembersNotInChannel = listUserInvite ? listUserInvite.map(member => member.user):[];
+	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+	const dispatch = useAppDispatch();
+	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, userId: string) => {
+        const isChecked = event.target.checked;
+        if (isChecked) {
+            setSelectedUserIds(prevIds => [...prevIds, userId]);
+        } else {
+            setSelectedUserIds(prevIds => prevIds.filter(id => id !== userId));
+        }
+    };
+	const handleAddMember = async () => {
+			onClose();
+			const body = {
+				channelId: channel.id,
+				channelType: channel.type,
+				userIds: selectedUserIds,
+			};
+			await dispatch(channelUsersActions.addChannelUsers(body));
+	};
+	
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
@@ -39,7 +63,23 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 						<RolesComponent tick={true} />
 					</div>
 					<div className="mt-2">
-						<MembersComponent tick={true} />
+						<p className="uppercase font-bold text-xs pb-4">Members</p>
+						<div>
+							{listMembersNotInChannel.map((user, index) => (
+								<div className={`flex justify-between py-2 rounded hover:bg-[#43444B] px-[6px]`} key={index}>
+									<div className="flex gap-x-2 items-center">
+										<input
+											type="checkbox"
+											value={user?.display_name}
+											onChange={(event) => handleCheckboxChange(event, user?.id || '')}
+											className="peer relative appearance-none w-5 h-5 border rounded-sm focus:outline-none checked:bg-gray-300"
+										/>
+										<img src={user?.avatar_url} alt={user?.display_name} className="size-6 object-cover rounded-full" />
+										<p className="text-sm">{user?.display_name}</p>
+									</div>
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 
@@ -53,7 +93,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 					</button>
 					<button
 						color="blue"
-						onClick={onClose}
+						onClick={handleAddMember}
 						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
 					>
 						Done
