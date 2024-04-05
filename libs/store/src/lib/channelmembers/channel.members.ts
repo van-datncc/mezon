@@ -66,11 +66,12 @@ type fetchChannelMembersPayload = {
 	channelId: string;
 	noCache?: boolean;
 	channelType: ChannelType;
+	repace?: boolean ; 
 };
 
 export const fetchChannelMembers = createAsyncThunk(
 	'channelMembers/fetchChannelMembers',
-	async ({ clanId, channelId, noCache, channelType }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noCache, channelType, repace = false }: fetchChannelMembersPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
@@ -81,7 +82,9 @@ export const fetchChannelMembers = createAsyncThunk(
 		if (!response.channel_users) {
 			return thunkAPI.rejectWithValue([]);
 		}
-
+		if (repace) {
+			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId))
+		}
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
@@ -161,6 +164,13 @@ export const channelMembers = createSlice({
 	reducers: {
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
+		removeUserByChannel: (state, action: PayloadAction<string>) => {
+			const channelId  = action.payload;
+			const updatedMembers = Object.values(state.entities).filter(member => {
+				return member.channelId !== channelId;
+			});
+			return channelMembersAdapter.setAll(state, updatedMembers);
+		},
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
 			for (let i of action.payload) {
 				state.onlineStatusUser[i.userId] = i.status;
