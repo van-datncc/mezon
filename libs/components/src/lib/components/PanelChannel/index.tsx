@@ -8,6 +8,8 @@ import ItemPanel from './ItemPanel';
 type PanelChannel = {
 	coords: Coords;
 	channel: IChannel;
+	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const typeChannel = {
@@ -15,8 +17,13 @@ const typeChannel = {
 	voice: 4,
 };
 
-const PanelChannel = ({ coords, channel }: PanelChannel) => {
+const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel }: PanelChannel) => {
 	const { userProfile } = useAuth();
+
+	const handleEditChannel = () => {
+		setOpenSetting(true);
+		setIsShowPanelChannel(false);
+	};
 
 	return (
 		<div
@@ -80,7 +87,7 @@ const PanelChannel = ({ coords, channel }: PanelChannel) => {
 			{/* Group panel creator */}
 			{channel.creator_id === userProfile?.user?.id && (
 				<GroupPanels>
-					<ItemPanel children="Edit Channel" />
+					<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
 					<ItemPanel children="Duplicate Channel" />
 					{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" />}
 					{channel.type === typeChannel.voice && <ItemPanel children="Create Voice Channel" />}

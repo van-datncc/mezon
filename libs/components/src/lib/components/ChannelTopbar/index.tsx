@@ -1,10 +1,14 @@
+import { useOnClickOutside } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import NotificationList from '../NotificationList';
 import { ChannelLabel, SearchMessage } from './TopBarComponents';
+import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
 	channel?: IChannel | null;
@@ -23,8 +27,8 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 			{/* Desktop buttons */}
 			<div className={`items-center h-full ml-auto ${checkChannelType ? 'hidden group-hover:flex transition-all duration-300' : 'flex'}`}>
 				<div className="justify-end items-center gap-2 flex">
-					<div className="pr-[70px] hidden ssm:flex">
-						<div className="justify-start items-center gap-[15px] flex iconHover">
+					<div className="hidden ssm:flex">
+						<div className="relative justify-start items-center gap-[15px] flex iconHover mr-2">
 							<ThreadButton />
 							<MuteButton />
 							<PinButton />
@@ -33,12 +37,11 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						</div>
 						<SearchMessage />
 					</div>
-
 					<div
-						className={`gap-4 iconHover absolute flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
+						className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
 						id="inBox"
 					>
-						<NotificationList />
+						<InboxButton />
 						<HelpButton />
 					</div>
 				</div>
@@ -48,10 +51,24 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 }
 
 function ThreadButton() {
+	const [isShowThread, setIsShowThread] = useState<boolean>(false);
+	const threadRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowThreads = () => {
+		setIsShowThread(!isShowThread);
+	};
+
+	useOnClickOutside(threadRef, () => setIsShowThread(false));
+
 	return (
-		<button>
-			<Icons.ThreadIcon />
-		</button>
+		<div className="relative leading-5" ref={threadRef}>
+			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
+				<button onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.ThreadIcon />
+				</button>
+			</Tooltip>
+			{isShowThread && <ThreadModal setIsShowThread={setIsShowThread} />}
+		</div>
 	);
 }
 
@@ -80,10 +97,21 @@ function ThreeDotButton() {
 }
 
 function InboxButton() {
+	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
+	const inboxRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowInbox = () => {
+		setIsShowInbox(!isShowInbox);
+	};
+
+	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
 	return (
-		<button>
-			<Icons.Inbox />
-		</button>
+		<div className="relative leading-5" ref={inboxRef}>
+			<button onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
+				<Icons.Inbox />
+			</button>
+			{isShowInbox && <NotificationList />}
+		</div>
 	);
 }
 

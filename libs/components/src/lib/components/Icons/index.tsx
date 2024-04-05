@@ -1573,20 +1573,16 @@ export const ArrowRight: React.FC<IconProps> = () => {
 
 export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
-			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
-			</g>
+		<svg width="12" height="36" viewBox="0 0 12 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#6A6A6A" stroke-width="1.5" stroke-linecap="round" />
 		</svg>
 	);
 };
 
 export const ShortCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
-			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
-			</g>
+		<svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1.5 1V7.66667C1.5 9.50762 2.99238 11 4.83333 11H11.5" stroke="#6A6A6A" stroke-width="1.5" stroke-linecap="round" />
 		</svg>
 	);
 };

@@ -1,13 +1,13 @@
 import { ChannelType } from '@mezon/mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
-import { ICategory, IChannel, LoadingStatus, UnreadChannel } from '@mezon/utils';
+import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
-import { INotification } from '../notification/notify.slice';
+import { threadsActions } from '../threads/threads.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -26,8 +26,8 @@ interface ChannelMeta {
 	id: string;
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
-  }
-  
+}
+
 const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
@@ -83,6 +83,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+			thunkAPI.dispatch(threadsActions.setCurrentThread(response));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);

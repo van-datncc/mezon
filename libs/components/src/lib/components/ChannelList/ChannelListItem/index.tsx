@@ -1,10 +1,11 @@
 import { selectCurrentChannel, selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store';
-import { IChannel } from '@mezon/utils';
+import { ChannelThreads } from '@mezon/utils';
 import { Fragment } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelLink from '../../ChannelLink';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
+import ThreadListChannel from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 
 // TODO: move this to core
@@ -16,7 +17,7 @@ function useChannelBadgeCount(channelId: string) {
 }
 
 type ChannelListItemProp = {
-	channel: IChannel;
+	channel: ChannelThreads;
 };
 
 const ChannelListItem = (props: ChannelListItemProp) => {
@@ -29,7 +30,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
 	));
-	
+
 	const handleOpenInvite = () => {
 		openInviteChannelModal();
 	};
@@ -46,7 +47,8 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 				isUnReadChannel={isUnReadChannel}
 				numberNotication={numberNotification}
 			/>
-			<UserListVoiceChannel channelID={channel.channel_id ?? ""} />
+			{channel.threads && <ThreadListChannel threads={channel.threads} />}
+			<UserListVoiceChannel channelID={channel.channel_id ?? ''} />
 		</Fragment>
 	);
 };
