@@ -216,6 +216,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						message_ref_id: refMessage.id,
 						ref_type: 0,
 						message_sender_id: refMessage.sender_id,
+						content: JSON.stringify(refMessage.content),
 						has_attachment: false,
 					},
 				]),
@@ -228,14 +229,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 
-
 		if (refMessage !== null && dataReferencesRefMess.length > 0) {
 			onSend({ t: content }, mentionData, attachmentData, dataReferencesRefMess);
 			setContent('');
 			setAttachmentData([]);
-			setMentionData([]);
+			setClearEditor(true);
 			setEditorState(() => EditorState.createEmpty());
-			// dispatch(referencesActions.setReference(null));
+			dispatch(referencesActions.setReferenceMessage(null));
+			dispatch(referencesActions.setDataReferences(null));
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');

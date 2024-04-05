@@ -1,5 +1,5 @@
 import { MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId, selectReferenceMessage } from '@mezon/store';
+import { selectCurrentChannelId, selectReplyMessageStatus } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { useEffect, useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -34,8 +34,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { setGrandParentWidthAction } = useChatReactionMessage();
-	const refMessage = useSelector(selectReferenceMessage);
-
+	const replyMessageStatus = useSelector(selectReplyMessageStatus);
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -56,7 +55,6 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [getWidthDivMessageWidth]);
 
-	console.log('messs', message);
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -71,9 +69,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
-							<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={false} />
+							<MessageAvatar user={user} message={message} isCombine={isCombine} replyMessageStatus={replyMessageStatus} />
 							<div className="flex-col w-full flex justify-center items-start relative ">
-								<MessageHead message={message} user={user} isCombine={isCombine} isReply={false} />
+								<MessageHead message={message} user={user} isCombine={isCombine} replyMessageStatus={replyMessageStatus} />
 								<div className="justify-start items-center inline-flex w-full textChat">
 									<div
 										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"

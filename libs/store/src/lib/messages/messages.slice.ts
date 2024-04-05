@@ -32,8 +32,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 	};
 };
 
-
-
 export interface MessagesEntity extends IMessageWithUser {
 	id: string; // Primary ID
 }
@@ -57,6 +55,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
+	replyMessageStatus?: boolean;
 }
 
 export interface MessagesRootState {
@@ -254,6 +253,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
+	replyMessageStatus: false,
 });
 
 export type SetCursorChannelArgs = {
@@ -284,6 +284,9 @@ export const messagesSlice = createSlice({
 					delete state.typingUsers[typingUserKey];
 				}
 			}
+		},
+		setReplyMessageStatus(state, action) {
+			state.replyMessageStatus = action.payload;
 		},
 		markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
 			messagesAdapter.updateOne(state, {
@@ -412,8 +415,6 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 		return messages.sort(orderMessageByDate).filter((message) => message && message.channel_id === channelId);
 	});
 
-
-
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
 		return messages.shift();
@@ -474,3 +475,5 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
+
+export const selectReplyMessageStatus = createSelector(getMessagesState, (state) => state.replyMessageStatus);

@@ -33,10 +33,19 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
-			
+			const wait = await socket.writeChatMessage(
+				currentClanId,
+				channel.id,
+				channel.chanel_label,
+				mode,
+				content,
+				mentions,
+				attachments,
+				references,
+			);
+
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }))
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, dispatch, channelId],
 	);
@@ -46,10 +55,10 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 	}, [channelId, channelLabel, dispatch, mode]);
 
 	const EditSendMessage = React.useCallback(
-		async (content: string,messageId: string,) => {
-			const editMessage: IMessageSendPayload ={
-				t: content
-			}
+		async (content: string, messageId: string) => {
+			const editMessage: IMessageSendPayload = {
+				t: content,
+			};
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -60,19 +69,18 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			}
 			if (mode === 4) {
 				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
-			}else {
+			} else {
 				await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
 			}
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, channelId, channelLabel],
 	);
 
-
 	return useMemo(
 		() => ({
 			sendMessage,
 			sendMessageTyping,
-			EditSendMessage
+			EditSendMessage,
 		}),
 		[sendMessage, sendMessageTyping, EditSendMessage],
 	);
