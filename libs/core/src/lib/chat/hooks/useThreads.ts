@@ -19,7 +19,6 @@ export function useThreads() {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isShowCreateThread = useSelector(selectIsShowCreateThread);
-	const currentChannel = useSelector(selectCurrentChannel);
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
