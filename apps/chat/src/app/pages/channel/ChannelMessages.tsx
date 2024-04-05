@@ -60,14 +60,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const emojiDataArray: EmojiDataOptionals[] = messages.flatMap((message) => {
 		if (!message.reactions) return [];
 
-		const processedItems: Record<string, EmojiDataOptionals> = {};
+		const emojiDataItems: Record<string, EmojiDataOptionals> = {};
 
 		message.reactions.forEach((reaction) => {
 			const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
-			const existingItem = processedItems[key];
+			const existingItem = emojiDataItems[key];
 
-			if (!processedItems[key]) {
-				processedItems[key] = {
+			if (!emojiDataItems[key]) {
+				emojiDataItems[key] = {
 					id: reaction.id,
 					emoji: reaction.emoji,
 					senders: [
@@ -83,19 +83,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					message_id: message.id,
 				};
 			} else {
-
-				const existingItem = processedItems[key];
+				const existingItem = emojiDataItems[key];
 
 				if (existingItem.senders.length > 0) {
 					existingItem.senders[0].count = reaction.count;
 				}
 			}
 		});
-
-		return Object.values(processedItems);
+		return Object.values(emojiDataItems);
 	});
-
-
 
 	useEffect(() => {
 		dispatch(emojiActions.setDataReactionFromServe(emojiDataArray));
