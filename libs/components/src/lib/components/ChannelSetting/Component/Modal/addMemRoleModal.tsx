@@ -3,9 +3,10 @@ import { InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import * as Icons from '../../../Icons';
 import RolesComponent from '../PermissionsChannel/rolesComponent';
-import { useDMInvite } from '@mezon/core';
-import { useState } from 'react';
-import { channelUsersActions, useAppDispatch } from '@mezon/store';
+import { useClans } from '@mezon/core';
+import { useMemo, useState } from 'react';
+import { channelUsersActions, selectMembersByChannelId, useAppDispatch } from '@mezon/store';
+import { useSelector } from 'react-redux';
 interface AddMemRoleProps {
 	onClose: () => void;
 	channel: IChannel;
@@ -14,7 +15,12 @@ interface AddMemRoleProps {
 export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 	const isPrivate = channel.channel_private;
 	
-	const { listUserInvite } = useDMInvite(channel.id);
+	const { usersClan } = useClans();
+	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
+	const listUserInvite = useMemo(() => {
+		const memberIds = rawMembers.map(member => member.user?.id);
+		return usersClan.filter(user => !memberIds.some(userId => userId === user.id));
+	}, [usersClan, rawMembers]);  
 	const listMembersNotInChannel = listUserInvite ? listUserInvite.map(member => member.user):[];
 	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 	const dispatch = useAppDispatch();
