@@ -6,6 +6,7 @@ export { default as ThreadBox } from './components/ChannelTopbar/TopBarComponent
 export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
 export { default as ThreadNameTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadNameTextField';
 export { default as ChannelVoice } from './components/ChannelVoice';
+export { default as ChannelVoiceOff } from './components/ChannelVoice/ChannelVoiceOff';
 export { default as ChatWelcome } from './components/ChatWelcome';
 export { default as ClanHeader } from './components/ClanHeader';
 export { default as ModalCreateClan } from './components/CreateClanModal';

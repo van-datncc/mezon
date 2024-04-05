@@ -357,24 +357,33 @@ blockquote span {
 }
 
 // css video
-#canvas {
-	border-radius: 10px;
-}
-
 #meet {
 	video {
 		border-radius: 10px;
+		background-color: black;
+	}
+
+	video {
+		width: 100%;
+		height: 100%;
+	}
+
+	.showScreen {
+		width: 80%;
+		margin: auto;
+		grid-column: span 5;
+		order: -1;
 	}
 }
 
-.thread-scroll::-webkit-scrollbar-track{
-  background: transparent;
+.thread-scroll::-webkit-scrollbar-track {
+	background: transparent;
 }
 
-.thread-scroll::-webkit-scrollbar-thumb{
-  background: transparent;
+.thread-scroll::-webkit-scrollbar-thumb {
+	background: transparent;
 }
 
-.thread-scroll:hover::-webkit-scrollbar-thumb{
-  background: #151515;
+.thread-scroll:hover::-webkit-scrollbar-thumb {
+	background: #151515;
 }

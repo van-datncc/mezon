@@ -1,5 +1,7 @@
 import { ChannelType } from '@mezon/mezon-js';
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { HeadPhoneICon, MicIcon, SettingProfile } from '../Icons';
 import MemberProfile from '../MemberProfile';
 import VoiceControlPanel from '../VoiceControlPanel';
@@ -13,9 +15,17 @@ export type FooterProfileProps = {
 };
 
 function FooterProfile({ name, status, avatar, openSetting, channelCurrent }: FooterProfileProps) {
+	const dispatch = useAppDispatch();
+	const showScreen = useSelector(selectStatusCall);
+	const checkTypeChannel = channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	useEffect(() => {
+		if (checkTypeChannel) {
+			dispatch(voiceActions.setStatusCall(checkTypeChannel));
+		}
+	}, [channelCurrent?.type]);
 	return (
 		<div>
-			{channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE && <VoiceControlPanel channelCurrent={channelCurrent} />}
+			{showScreen && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
 				className="flex items-center justify-between border-t-2
 			 border-borderDefault px-4 py-2 font-title text-[15px] 

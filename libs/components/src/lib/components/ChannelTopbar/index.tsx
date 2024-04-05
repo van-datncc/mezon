@@ -20,32 +20,52 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 		<div
 			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
 		>
-			<div className={`justify-start items-center gap-1 ${checkChannelType ? 'hidden group-hover:flex transition-all duration-300' : 'flex'}`}>
-				<ChannelLabel channel={channel} />
-			</div>
-
-			{/* Desktop buttons */}
-			<div className={`items-center h-full ml-auto ${checkChannelType ? 'hidden group-hover:flex transition-all duration-300' : 'flex'}`}>
-				<div className="justify-end items-center gap-2 flex">
-					<div className="hidden ssm:flex">
-						<div className="relative justify-start items-center gap-[15px] flex iconHover mr-2">
-							<ThreadButton />
-							<MuteButton />
-							<PinButton />
-							<ChannelListButton />
-							<ThreeDotButton />
+			{checkChannelType ? (
+				<>
+					<div className="justify-start items-center gap-1 hidden group-hover:flex">
+						<ChannelLabel channel={channel} />
+					</div>
+					<div className="items-center h-full ml-auto hidden group-hover:flex">
+						<div className="justify-end items-center gap-2 flex">
+							<div className="">
+								<div className="justify-start items-center gap-[15px] flex iconHover">
+									<Icons.AddMemberCall />
+									<Icons.Inbox />
+									<Icons.ThreeDot />
+									<Icons.BoxChatIcon />
+								</div>
+							</div>
 						</div>
-						<SearchMessage />
 					</div>
-					<div
-						className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
-						id="inBox"
-					>
-						<InboxButton />
-						<HelpButton />
+				</>
+			) : (
+				<>
+					<div className="justify-start items-center gap-1 flex">
+						<ChannelLabel channel={channel} />
 					</div>
-				</div>
-			</div>
+					<div className="items-center h-full ml-auto flex">
+						<div className="justify-end items-center gap-2 flex">
+							<div className="hidden ssm:flex">
+								<div className="relative justify-start items-center gap-[15px] flex iconHover mr-2">
+									<ThreadButton />
+									<MuteButton />
+									<PinButton />
+									<ChannelListButton />
+									<ThreeDotButton />
+								</div>
+								<SearchMessage />
+							</div>
+							<div
+								className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
+								id="inBox"
+							>
+								<InboxButton />
+								<HelpButton />
+							</div>
+						</div>
+					</div>
+				</>
+			)}
 		</div>
 	);
 }

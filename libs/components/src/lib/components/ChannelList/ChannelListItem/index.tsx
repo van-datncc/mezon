@@ -46,6 +46,7 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 				isPrivate={channel.channel_private}
 				isUnReadChannel={isUnReadChannel}
 				numberNotication={numberNotification}
+				channelType={channel?.type}
 			/>
 			{channel.threads && <ThreadListChannel threads={channel.threads} />}
 			<UserListVoiceChannel channelID={channel.channel_id ?? ''} />
