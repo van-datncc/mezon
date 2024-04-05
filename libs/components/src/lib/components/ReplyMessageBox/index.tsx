@@ -14,8 +14,6 @@ function ReplyMessageBox() {
 		dispatch(referencesActions.setDataReferences(null));
 	};
 
-	console.log(messageReplyState);
-
 	return (
 		<>
 			{refMessage && messageReplyState && (
