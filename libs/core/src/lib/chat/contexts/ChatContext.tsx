@@ -45,7 +45,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
-						dispatch(voiceActions.remove(voice.id));
+			console.log("VoiceLeavedEvent", voice);
+			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],
 	);
