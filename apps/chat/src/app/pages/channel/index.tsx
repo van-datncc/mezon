@@ -119,7 +119,7 @@ export default function ChannelLayout() {
 								<ChannelTyping
 									channelId={currentChannel?.id}
 									channelLabel={currentChannel?.channel_label || ''}
-									mode={ChannelType.CHANNEL_TYPE_GROUP}
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								/>
 							)}
 							{currentChannel ? (
@@ -127,7 +127,7 @@ export default function ChannelLayout() {
 									clanId={currentChannel?.clan_id}
 									channelId={currentChannel?.id}
 									channelLabel={currentChannel?.channel_label || ''}
-									mode={ChannelType.CHANNEL_TYPE_GROUP}
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								/>
 							) : (
 								<ChannelMessageBox.Skeleton />
