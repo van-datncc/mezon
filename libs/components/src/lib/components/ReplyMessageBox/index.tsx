@@ -1,20 +1,16 @@
-import { emojiActions, selectMemberByUserId, selectMessageReplyState, selectReference, useAppDispatch } from '@mezon/store';
+import { emojiActions, selectMemberByUserId, selectMessageReplyState, selectReferenceMessage, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
-import { useState } from 'react';
-
 
 function ReplyMessageBox() {
 	const dispatch = useAppDispatch();
-
-	const refMessage = useSelector(selectReference);
-	const getSenderMessage = useSelector(selectMemberByUserId(refMessage?.sender_id ?? ''));
-    const messageReplyState = useSelector(selectMessageReplyState); 
+	const refMessage = useSelector(selectReferenceMessage);
+	const getSenderMessage = useSelector(selectMemberByUserId(refMessage?.id ?? ''));
+	const messageReplyState = useSelector(selectMessageReplyState);
 
 	const handleRemoveReply = () => {
 		dispatch(emojiActions.setMessageReplyState(false));
 	};
-
 
 	return (
 		<>

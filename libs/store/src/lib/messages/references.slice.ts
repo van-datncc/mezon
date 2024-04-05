@@ -1,5 +1,6 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { IMessage, IMessageWithUser } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -14,6 +15,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	reference: IMessageWithUser | null;
+	dataReferences: ApiMessageRef[];
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -48,6 +50,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	loadingStatus: 'not loaded',
 	error: null,
 	reference: null,
+	dataReferences: [],
 });
 
 export const referencesSlice = createSlice({
@@ -56,8 +59,11 @@ export const referencesSlice = createSlice({
 	reducers: {
 		add: referencesAdapter.addOne,
 		remove: referencesAdapter.removeOne,
-		setReference(state, action) {
+		setReferenceMessage(state, action) {
 			state.reference = action.payload;
+		},
+		setDataReferences(state, action) {
+			state.dataReferences = action.payload;
 		},
 		// ...
 	},
@@ -124,4 +130,6 @@ export const selectAllReferences = createSelector(getReferencesState, selectAll)
 
 export const selectReferencesEntities = createSelector(getReferencesState, selectEntities);
 
-export const selectReference = createSelector(getReferencesState, (state: ReferencesState) => state.reference);
+export const selectReferenceMessage = createSelector(getReferencesState, (state: ReferencesState) => state.reference);
+
+export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);

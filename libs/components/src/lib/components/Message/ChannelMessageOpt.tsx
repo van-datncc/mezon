@@ -13,6 +13,8 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
     const { userId } = useAuth()
     const dispatch = useAppDispatch();
 
+
+    
     const emojiReactedState = useSelector(selectEmojiReactedState);
     const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
     const messageReplyState = useSelector(selectMessageReplyState); 
@@ -20,13 +22,13 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
     const handleClickReply = () => {
 		dispatch(emojiActions.setMessageReplyState(true));
 		dispatch(emojiActions.setEmojiOpenEditState(false));
-		dispatch(referencesActions.setReference(message));
+		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
 	const handleClickEdit = () => {
 		dispatch(emojiActions.setMessageReplyState(false));
 		dispatch(emojiActions.setEmojiOpenEditState(true));
-		dispatch(referencesActions.setReference(message));
+		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
     const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -34,7 +36,7 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 		dispatch(emojiActions.setEmojiReactedBottomState(false));
 		dispatch(emojiActions.setEmojiMessBoxState(false));
 		dispatch(emojiActions.setEmojiReactedState(true));
-		dispatch(referencesActions.setReference(message));
+		dispatch(referencesActions.setReferenceMessage(message));
 		event.stopPropagation();
 	};
 

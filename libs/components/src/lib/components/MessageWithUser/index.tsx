@@ -1,14 +1,14 @@
 import { MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId } from '@mezon/store';
+import { selectCurrentChannelId, selectReferenceMessage } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { useEffect, useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
-import MessageAttachment from './MesageAttachment';
-import MessageReply from './MesageReply';
+import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
+import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
 import { useChatReactionMessage } from '@mezon/core';
@@ -34,6 +34,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { setGrandParentWidthAction } = useChatReactionMessage();
+	const refMessage = useSelector(selectReferenceMessage);
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -55,6 +56,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [getWidthDivMessageWidth]);
 
+	console.log('messs', message);
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (

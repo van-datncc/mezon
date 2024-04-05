@@ -1,5 +1,5 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import MessageLine from './MesageLine';
+import MessageLine from './MessageLine';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
