@@ -34,7 +34,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 
 // TODO: remove channelId from the parameter
 export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
-	const id = channelRes.id ? channelRes.id : `${channelId}${channelRes.user?.id}`;
+	const id = `${channelId}${channelRes.user?.id}`;
 	return { ...channelRes, id: id || '', channelId };
 };
 
@@ -58,7 +58,9 @@ const fetchChannelMembersCached = memoize(
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
-		normalizer: (args) => args[2],
+		normalizer: (args) => {
+			return args[1] + args[2] + args[3];
+		},
 	},
 );
 
@@ -67,11 +69,12 @@ type fetchChannelMembersPayload = {
 	channelId: string;
 	noCache?: boolean;
 	channelType: ChannelType;
+	repace?: boolean;
 };
 
 export const fetchChannelMembers = createAsyncThunk(
 	'channelMembers/fetchChannelMembers',
-	async ({ clanId, channelId, noCache, channelType }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noCache, channelType, repace = false }: fetchChannelMembersPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
@@ -81,6 +84,9 @@ export const fetchChannelMembers = createAsyncThunk(
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
 		if (!response.channel_users) {
 			return thunkAPI.rejectWithValue([]);
+		}
+		if (repace) {
+			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 		}
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
@@ -162,6 +168,13 @@ export const channelMembers = createSlice({
 	reducers: {
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
+		removeUserByChannel: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			const updatedMembers = Object.values(state.entities).filter((member) => {
+				return member.channelId !== channelId;
+			});
+			return channelMembersAdapter.setAll(state, updatedMembers);
+		},
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
 			for (const i of action.payload) {
 				state.onlineStatusUser[i.userId] = i.status;

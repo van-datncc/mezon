@@ -9,8 +9,10 @@ const theme = 'dark';
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
-		requestForToken().then((token: string) => {
-			dispatch(fcmActions.registFcmDeviceToken(token));
+		requestForToken().then((token) => {
+			if (token) {
+				dispatch(fcmActions.registFcmDeviceToken(token as string));
+			}
         }).catch((error: Error) => {
             console.error("Error fetching token:", error);
         });

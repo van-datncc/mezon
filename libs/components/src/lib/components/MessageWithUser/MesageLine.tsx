@@ -30,7 +30,10 @@ const MessageLine = ({ line }: MessageLineProps) => {
 		return <LineWithLink link={line} />;
 	}
 	const transformedObject = mentions.reduce(
-		(accumulator: any, currentItem) => {
+		(accumulator: any, currentItem, currentIndex: number) => {
+			if (currentIndex === 0) {
+				accumulator.nonMatchTextFist += currentItem.nonMatchText;
+			}
 			if (currentItem.matchedText !== '') {
 				accumulator.matchedText += currentItem.matchedText;
 			} else {
@@ -38,14 +41,15 @@ const MessageLine = ({ line }: MessageLineProps) => {
 			}
 			return accumulator;
 		},
-		{ matchedText: '', nonMatchText: '' },
+		{ matchedText: '', nonMatchText: '', nonMatchTextFist: '' },
 	);
-	
+
 	return (
 		<div>
 			<MarkdownFormatText
 				tagName={transformedObject.matchedText ? transformedObject.matchedText : ''}
 				markdown={transformedObject.nonMatchText}
+				textFirst={transformedObject.nonMatchTextFist}
 			/>
 		</div>
 	);

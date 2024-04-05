@@ -310,6 +310,7 @@ export type IMetaDataEmojis = {
 };
 
 export type EmojiDataOptionals = {
+	action?: boolean | undefined;
 	id: string | undefined;
 	emoji: string | undefined;
 	senders: SenderInfoOptionals[];
