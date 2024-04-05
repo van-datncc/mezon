@@ -38,6 +38,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	isOpenCreateNewChannel?: boolean;
 	currentCategory: ICategory | null;
 	channelMetadata: EntityState<ChannelMeta, string>;
+	currentVoiceChannelId: string;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -134,6 +135,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	isOpenCreateNewChannel: false,
 	currentCategory: null,
 	channelMetadata: channelMetaAdapter.getInitialState(),
+	currentVoiceChannelId: '',
 });
 
 export const channelsSlice = createSlice({
@@ -144,6 +146,9 @@ export const channelsSlice = createSlice({
 		remove: channelsAdapter.removeOne,
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
+		},
+		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
+			state.currentVoiceChannelId = action.payload;
 		},
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
@@ -266,6 +271,8 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
 export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
+
+export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,
