@@ -1573,20 +1573,16 @@ export const ArrowRight: React.FC<IconProps> = () => {
 
 export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
-			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
-			</g>
+		<svg width="12" height="36" viewBox="0 0 12 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#6A6A6A" stroke-width="1.5" stroke-linecap="round" />
 		</svg>
 	);
 };
 
 export const ShortCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
-			<g id="LongCorner">
-				<path id="Vector" d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#535353" strokeWidth="1.5" strokeLinecap="round" />
-			</g>
+		<svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1.5 1V7.66667C1.5 9.50762 2.99238 11 4.83333 11H11.5" stroke="#6A6A6A" stroke-width="1.5" stroke-linecap="round" />
 		</svg>
 	);
 };
@@ -1932,6 +1928,41 @@ export const RightIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 				d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
 				clipRule="evenodd"
 			/>
+		</svg>
+	);
+};
+
+export const BoxChatIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setFill] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setFill(!isWhite);
+	};
+
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={defaultSize} onClick={handleClick}>
+			<path
+				fill={isWhite ? '#FFFFFF' : defaultFill}
+				d="M12 22a10 10 0 1 0-8.45-4.64c.13.19.11.44-.04.61l-2.06 2.37A1 1 0 0 0 2.2 22H12Z"
+			></path>
+		</svg>
+	);
+};
+
+export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setFill] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setFill(!isWhite);
+	};
+
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className={defaultSize} onClick={handleClick}>
+			<path d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z" fill={defaultFill}></path>
+			<path
+				d="M16.83 12.93c.26-.27.26-.75-.08-.92A9.5 9.5 0 0 0 12.47 11h-.94A9.53 9.53 0 0 0 2 20.53c0 .81.66 1.47 1.47 1.47h.22c.24 0 .44-.17.5-.4.29-1.12.84-2.17 1.32-2.91.14-.21.43-.1.4.15l-.26 2.61c-.02.3.2.55.5.55h7.64c.12 0 .17-.31.06-.36C12.82 21.14 12 20.22 12 19a3 3 0 0 1 3-3h.5a.5.5 0 0 0 .5-.5V15c0-.8.31-1.53.83-2.07ZM12 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+				fill={isWhite ? '#FFFFFF' : defaultFill}
+			></path>
 		</svg>
 	);
 };

@@ -1,13 +1,13 @@
 import { ChannelType } from '@mezon/mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
-import { ICategory, IChannel, LoadingStatus, UnreadChannel } from '@mezon/utils';
+import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
-import { INotification } from '../notification/notify.slice';
+import { threadsActions } from '../threads/threads.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -26,8 +26,8 @@ interface ChannelMeta {
 	id: string;
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
-  }
-  
+}
+
 const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
@@ -38,6 +38,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	isOpenCreateNewChannel?: boolean;
 	currentCategory: ICategory | null;
 	channelMetadata: EntityState<ChannelMeta, string>;
+	currentVoiceChannelId: string;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -67,7 +68,10 @@ export const joinChannel = createAsyncThunk(
 			}
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.joinChatChannel(channelId);
+
+			if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				await mezon.joinChatChannel(channelId);
+			}
 			return channel;
 		} catch (error) {
 			console.log(error);
@@ -83,6 +87,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+			thunkAPI.dispatch(threadsActions.setCurrentThread(response));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -130,6 +135,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	isOpenCreateNewChannel: false,
 	currentCategory: null,
 	channelMetadata: channelMetaAdapter.getInitialState(),
+	currentVoiceChannelId: '',
 });
 
 export const channelsSlice = createSlice({
@@ -140,6 +146,9 @@ export const channelsSlice = createSlice({
 		remove: channelsAdapter.removeOne,
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
+		},
+		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
+			state.currentVoiceChannelId = action.payload;
 		},
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
@@ -262,6 +271,8 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
 export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
+
+export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,

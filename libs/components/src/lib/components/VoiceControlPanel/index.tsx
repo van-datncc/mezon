@@ -1,11 +1,22 @@
-import { ChannelsEntity, selectCurrentClan, selectShowScreen, useAppDispatch, voiceActions } from '@mezon/store';
+import { useAppNavigation } from '@mezon/core';
+import {
+	ChannelsEntity,
+	channelsActions,
+	selectChannelById,
+	selectCurrentClan,
+	selectCurrentVoiceChannelId,
+	selectShowScreen,
+	useAppDispatch,
+	voiceActions,
+} from '@mezon/store';
 import { useMezonVoice } from '@mezon/transport';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import * as Icons from '../Icons';
 
 export type VoiceControlPanelProps = {
-	channelCurrent: ChannelsEntity;
+	channelCurrent: ChannelsEntity | null | undefined;
 };
 
 function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
@@ -13,6 +24,8 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const voice = useMezonVoice();
 	const showScreen = useSelector(selectShowScreen);
+	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
+	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
 
 	const startScreenShare = useCallback(() => {
 		voice.createScreenShare();
@@ -26,7 +39,13 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 
 	const leaveVoiceChannel = useCallback(() => {
 		voice.voiceDisconnect();
+		dispatch(voiceActions.setStatusCall(false));
+		dispatch(channelsActions.setCurrentVoiceChannelId(''));
 	}, [voice]);
+
+	const { toChannelPage } = useAppNavigation();
+	const channelPath = toChannelPage(currentVoiceChannelId, currentVoiceChannel?.clan_id || '');
+
 	return (
 		<div className="p-2 absolute w-full bottom-[57px] bg-bgSurface border-borderDefault ">
 			<div className="flex items-center gap-2 iconHover justify-between">
@@ -37,11 +56,12 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 							<div className="text-[14px] font-bold text-green-600 hover:underline">Voice Connected</div>
 						</button>
 					</div>
-					<a href="">
-						<div className="text-[12px] font-normal text-gray-400 hover:underline">
-							{channelCurrent.channel_label} / {currentClan?.clan_name}
-						</div>
-					</a>
+
+					<div className="text-[12px] font-normal text-gray-400 hover:underline">
+						<Link to={channelPath}>
+							{currentVoiceChannel?.channel_label}/ {currentClan?.clan_name}
+						</Link>
+					</div>
 				</div>
 				<div className="flex">
 					<button className="button w-[20px] h-[20px]">

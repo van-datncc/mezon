@@ -5,15 +5,17 @@ import PreClass from './PreClass';
 type MarkdownFormatTextProps = {
 	markdown: string;
 	tagName?: string;
+	textFirst?: string;
 };
 
-const MarkdownFormatText = ({ markdown, tagName }: MarkdownFormatTextProps) => {
+const MarkdownFormatText = ({ markdown, tagName, textFirst }: MarkdownFormatTextProps) => {
 	const startsWithTripleBackticks = markdown.startsWith('```');
 	const endsWithNoTripleBackticks = !markdown.endsWith('```');
 	const onlyBackticks = /^```$/.test(markdown);
 
 	return (
-		<article className=" prose prose-pre:w-[600px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px]">
+		<article className=" prose prose-pre:min-w-[500px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px]">
+			{textFirst && <span>{textFirst}</span>}
 			{tagName && (
 				<span style={{ color: '#3297ff' }} className="cursor-pointer">
 					{tagName}
