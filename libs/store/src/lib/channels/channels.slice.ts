@@ -67,7 +67,10 @@ export const joinChannel = createAsyncThunk(
 			}
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.joinChatChannel(channelId);
+
+			if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				await mezon.joinChatChannel(channelId);
+			}
 			return channel;
 		} catch (error) {
 			console.log(error);

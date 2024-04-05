@@ -149,5 +149,5 @@ export const selectShowScreen = createSelector(getVoiceState, (state) => state.s
 export const selectVoiceChannelMembersByChannelId = (channelId: string) =>
 	createSelector(selectVoiceEntities, (entities) => {
 		const voiceMembers = Object.values(entities);
-		return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
+				return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
 	});
