@@ -349,7 +349,6 @@ input:-webkit-autofill:active {
 	position: absolute;
 	top: 1rem;
 	right: 1rem;
-	z-index: 5;
 }
 
 blockquote span {
@@ -366,4 +365,16 @@ blockquote span {
 	video {
 		border-radius: 10px;
 	}
+}
+
+.thread-scroll::-webkit-scrollbar-track{
+  background: transparent;
+}
+
+.thread-scroll::-webkit-scrollbar-thumb{
+  background: transparent;
+}
+
+.thread-scroll:hover::-webkit-scrollbar-thumb{
+  background: #151515;
 }

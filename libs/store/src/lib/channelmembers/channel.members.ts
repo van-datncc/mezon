@@ -33,7 +33,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 
 // TODO: remove channelId from the parameter
 export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
-	const id = channelRes.id ? channelRes.id : `${channelId}${channelRes.user?.id}`;
+	const id = `${channelId}${channelRes.user?.id}`;
 	return { ...channelRes, id: id || '', channelId };
 };
 
@@ -57,7 +57,7 @@ const fetchChannelMembersCached = memoize(
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
-		normalizer: (args) => args[1],
+		normalizer: (args) => { return args[1] + args[2] + args[3]; }
 	},
 );
 
@@ -81,6 +81,7 @@ export const fetchChannelMembers = createAsyncThunk(
 		if (!response.channel_users) {
 			return thunkAPI.rejectWithValue([]);
 		}
+
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');

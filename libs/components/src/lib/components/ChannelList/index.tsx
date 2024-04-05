@@ -1,7 +1,7 @@
 import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { channelsActions, useAppDispatch } from '@mezon/store';
-import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
@@ -10,6 +10,7 @@ import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
+// TODO: implement useClipboard hook
 export const unsecuredCopyToClipboard = (text: string) => {
 	const textArea = document.createElement('textarea');
 	textArea.value = text;
@@ -41,8 +42,6 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 			return acc;
 		}, {} as CategoriesState),
 	);
-
-	// console.log('categorize', categorizedChannels);
 
 	const handleToggleCategory = (category: ICategoryChannel, setToTrue?: boolean) => {
 		if (setToTrue) {
@@ -112,7 +111,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 										return categoryIsOpen || channel?.unread;
 									})
 									.map((channel: IChannel, index: number) => {
-										return <ChannelListItem key={index} channel={channel} />;
+										return <ChannelListItem key={index} channel={channel as ChannelThreads} />;
 									})}
 							</div>
 						)}

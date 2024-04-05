@@ -1,4 +1,4 @@
-import { messagesActions, useAppDispatch } from '@mezon/store';
+import { channelsActions, messagesActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
@@ -34,8 +34,11 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			}
 
 			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
+			
+			const timestamp = Date.now() / 1000;
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }))
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode],
+		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, dispatch, channelId],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -61,7 +64,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
 			}
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode],
+		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, channelId, channelLabel],
 	);
 
 

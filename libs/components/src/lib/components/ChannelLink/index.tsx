@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useClans, useOnClickOutside } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
@@ -7,6 +7,8 @@ import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
+import cls from 'classnames';
+
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
@@ -22,11 +24,18 @@ export type Coords = {
 	mouseY: number;
 };
 
+export const classes = {
+	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
+	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-[#36373D]',
+	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-[#36373D]',
+};
+
 function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
+	const { setIsShowCreateThread } = useThreads();
 
 	const [openSetting, setOpenSetting] = useState(false);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -38,12 +47,6 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
-	};
-
-	const classes = {
-		active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
-		inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-[#36373D]',
-		inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-[#36373D]',
 	};
 
 	const { toChannelPage } = useAppNavigation();
@@ -67,7 +70,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
+		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} className="relative group">
 			<Link to={channelPath}>
 				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
@@ -82,7 +85,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					</div>
 					<p
-						className={`ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D] ${active ? 'text-white font-bold' : ''} ${isUnReadChannel ? '' : 'font-bold text-white'}`}
+						className={cls({
+							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
+							'font-bold text-white': active || isUnReadChannel,
+						})}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
@@ -141,7 +147,9 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				channel={channel}
 			/>
 			{/* <p>{numberNotication}</p> */}
-			{isShowPanelChannel && <PanelChannel channel={channel} coords={coords} />}
+			{isShowPanelChannel && (
+				<PanelChannel channel={channel} coords={coords} setOpenSetting={setOpenSetting} setIsShowPanelChannel={setIsShowPanelChannel} />
+			)}
 		</div>
 	);
 }

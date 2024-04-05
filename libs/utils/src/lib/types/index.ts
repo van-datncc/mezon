@@ -65,6 +65,10 @@ export type IRoleUsers = IRole & {
 	users: ApiUser[];
 };
 
+export type ChannelThreads = IChannel & {
+	threads: IChannel[];
+};
+
 export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
@@ -274,7 +278,6 @@ export type IEmoji = {
 	search?: string;
 };
 
-
 export type IEmoticons = {
 	[key: string]: string;
 };
@@ -289,7 +292,7 @@ export type ICategoryEmoji = {
 };
 
 export type IMetaDataEmojis = {
-	id?:string;
+	id?: string;
 	aliases: {
 		[key: string]: string;
 	};
@@ -304,4 +307,21 @@ export type IMetaDataEmojis = {
 		cols: number;
 		rows: number;
 	};
+};
+
+export type EmojiDataOptionals = {
+	action?: boolean | undefined;
+	id: string | undefined;
+	emoji: string | undefined;
+	senders: SenderInfoOptionals[];
+	channel_id?: string | undefined;
+	message_id?: string | undefined;
+};
+
+export type SenderInfoOptionals = {
+	sender_id?: string | undefined;
+	count: number | undefined;
+	emojiIdList?: string[] | undefined;
+	sender_name?: string | undefined;
+	avatar?: string | undefined;
 };
