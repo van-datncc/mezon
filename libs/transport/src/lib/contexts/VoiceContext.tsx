@@ -313,7 +313,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		remoteTracksRef.current.set(id, []);
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
-				id,				
+				id,
+				clanId,
 				voiceChannelId,
 				false,
 			)
@@ -475,10 +476,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		
 		const participantCount = voiceChannelRef.current?.getParticipantCount();		
 		const myUserId = voiceChannelRef.current?.myUserId();
-		console.log("myUserId", myUserId);
+		
 		if (myUserId && participantCount === 1 && socketRef && socketRef.current) {
 			socketRef.current.writeVoiceLeaved(
-				myUserId,				
+				myUserId,
+				clanId,
 				voiceChannelId,
 				true,
 			)
