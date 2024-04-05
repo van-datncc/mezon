@@ -285,7 +285,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(updatedEditorState);
 	}, [editorState]);
 
-	// const emojiSelectedMess = useSelector(selectEmojiSelectedMess);
 
 	useEffect(() => {
 		if (content.length === 0) {
