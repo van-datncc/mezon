@@ -116,14 +116,18 @@ export default function ChannelLayout() {
 					) : (
 						<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
 							{currentChannel && (
-								<ChannelTyping channelId={currentChannel?.id} channelLabel={currentChannel?.channel_label || ''} mode={2} />
+								<ChannelTyping
+									channelId={currentChannel?.id}
+									channelLabel={currentChannel?.channel_label || ''}
+									mode={ChannelType.CHANNEL_TYPE_GROUP}
+								/>
 							)}
 							{currentChannel ? (
 								<ChannelMessageBox
 									clanId={currentChannel?.clan_id}
 									channelId={currentChannel?.id}
 									channelLabel={currentChannel?.channel_label || ''}
-									mode={2}
+									mode={ChannelType.CHANNEL_TYPE_GROUP}
 								/>
 							) : (
 								<ChannelMessageBox.Skeleton />
