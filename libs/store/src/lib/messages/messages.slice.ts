@@ -1,8 +1,9 @@
 import { ChannelMessage, ChannelStreamMode } from '@mezon/mezon-js';
-import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { emojiActions } from '../emoji/emoji.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -107,6 +108,40 @@ export const fetchMessages = createAsyncThunk(
 		const currentLastLoadMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
+		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
+			if (!message.reactions) return [];
+			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
+			message.reactions.forEach((reaction) => {
+				const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+
+				if (!emojiDataItems[key]) {
+					emojiDataItems[key] = {
+						id: reaction.id,
+						emoji: reaction.emoji,
+						senders: [
+							{
+								sender_id: reaction.sender_id,
+								count: reaction.count,
+								emojiIdList: [],
+								sender_name: '',
+								avatar: '',
+							},
+						],
+						channel_id: message.channel_id,
+						message_id: message.id,
+					};
+				} else {
+					const existingItem = emojiDataItems[key];
+
+					if (existingItem.senders.length > 0) {
+						existingItem.senders[0].count = reaction.count;
+					}
+				}
+			});
+			return Object.values(emojiDataItems);
+		});
+
+		thunkAPI.dispatch(emojiActions.setDataReactionFromServe(reactionData));
 
 		let hasMore = currentHasMore;
 		if (currentLastLoadMessageId === messageId) {
