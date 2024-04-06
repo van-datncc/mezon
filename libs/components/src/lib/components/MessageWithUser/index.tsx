@@ -1,7 +1,7 @@
 import { MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId, selectReplyMessageStatus } from '@mezon/store';
+import { selecIdMessageReplied, selectCurrentChannelId, selectReplyMessageStatus } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -35,6 +35,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { setGrandParentWidthAction } = useChatReactionMessage();
 	const replyMessageStatus = useSelector(selectReplyMessageStatus);
+	const messageRefId = useSelector(selecIdMessageReplied);
+
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -55,6 +57,15 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [getWidthDivMessageWidth]);
 
+	const [messFocusReplied, setMessReplied] = useState(false);
+	useEffect(() => {
+		if (messageRefId && messageRefId === message.id) {
+			setMessReplied(true);
+		} else {
+			setMessReplied(false);
+		}
+	}, [messageRefId]);
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -65,7 +76,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				</div>
 			)}
 			<div>
-				<div className="bg-[#26262b] rounded-sm ">
+				<div className={`bg-[#26262b] rounded-sm ${messFocusReplied ? 'bg-[#393C48]' : 'bg-[#26262b]'} relative`}>
+					<div className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0`}></div>
 					<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>

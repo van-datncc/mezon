@@ -1574,7 +1574,7 @@ export const ArrowRight: React.FC<IconProps> = () => {
 export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg width="12" height="36" viewBox="0 0 12 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#6A6A6A" stroke-width="1.5" stroke-linecap="round" />
+			<path d="M1 1V31.6667C1 33.5076 2.49238 35 4.33333 35H11" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" />
 		</svg>
 	);
 };
@@ -1582,7 +1582,7 @@ export const LongCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 export const ShortCorner: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M1.5 1V7.66667C1.5 9.50762 2.99238 11 4.83333 11H11.5" stroke="#6A6A6A" stroke-width="1.5" stroke-linecap="round" />
+			<path d="M1.5 1V7.66667C1.5 9.50762 2.99238 11 4.83333 11H11.5" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" />
 		</svg>
 	);
 };
@@ -1848,6 +1848,30 @@ export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 				fill={defaultFill}
 				d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"
 			></path>
+		</svg>
+	);
+};
+
+export const ImageThumbnail: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg width="15px" height="15px" viewBox="-4 0 64 64" xmlns="http://www.w3.org/2000/svg">
+			<g fillRule="evenodd" clipRule="evenodd">
+				<path
+					d="M5.125.042c-2.801 0-5.072 2.273-5.072 5.074v53.841c0 2.803 2.271 5.073 5.072 5.073h45.775c2.801 0 5.074-2.271 5.074-5.073v-38.604l-18.904-20.311h-31.945z"
+					fill="#49C9A7"
+				/>
+
+				<path d="M55.977 20.352v1h-12.799s-6.312-1.26-6.129-6.707c0 0 .208 5.707 6.004 5.707h12.924z" fill="#000000" />
+
+				<path d="M37.074 0v14.561c0 1.656 1.104 5.791 6.104 5.791h12.799l-18.903-20.352z" opacity=".5" fill="#000000" />
+			</g>
+
+			<path
+				d="M10.119 53.739v-20.904h20.906v20.904h-20.906zm18.799-18.843h-16.691v12.6h16.691v-12.6zm-9.583 8.384l3.909-5.256 1.207 2.123 1.395-.434.984 5.631h-13.082l3.496-3.32 2.091 1.256zm-3.856-3.64c-.91 0-1.649-.688-1.649-1.538 0-.849.739-1.538 1.649-1.538.912 0 1.65.689 1.65 1.538 0 .85-.738 1.538-1.65 1.538z"
+				fillRule="evenodd"
+				clipRule="evenodd"
+				fill={defaultFill}
+			/>
 		</svg>
 	);
 };

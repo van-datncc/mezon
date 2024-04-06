@@ -42,9 +42,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
-
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-
 	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
 	const mentionPlugin = useRef(
 		createMentionPlugin({
@@ -208,7 +206,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const refMessage = useSelector(selectReferenceMessage);
 	const dataReferencesRefMess = useSelector(selectDataReferences);
 	useEffect(() => {
-		if (refMessage) {
+		if (refMessage && refMessage.attachments) {
 			dispatch(
 				referencesActions.setDataReferences([
 					{
@@ -217,7 +215,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						ref_type: 0,
 						message_sender_id: refMessage.sender_id,
 						content: JSON.stringify(refMessage.content),
-						has_attachment: false,
+						has_attachment: refMessage.attachments?.length > 0 ? true : false,
 					},
 				]),
 			);
@@ -284,7 +282,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
 		setEditorState(updatedEditorState);
 	}, [editorState]);
-
 
 	useEffect(() => {
 		if (content.length === 0) {

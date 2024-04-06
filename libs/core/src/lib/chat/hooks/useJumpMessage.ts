@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
 
 export type useJumpToMessagesOptions = {
 	channelId: string;
@@ -7,20 +7,18 @@ export type useJumpToMessagesOptions = {
 let messID: string | null = null;
 
 export function useJumpToMessage() {
-	const jumpToMessage = React.useCallback(async ( messageId: string | null = null) => {
+	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'start') => {
 		if (messageId) {
-			
 			const messageElement = document.getElementById(messageId);
 			if (messageElement) {
-				messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				messageElement.scrollIntoView({ behavior: 'smooth', block: positionToJump });
 			}
 			setJumpToMessageId(null);
 		}
-
 	}, []);
 	return useMemo(
 		() => ({
-			jumpToMessage
+			jumpToMessage,
 		}),
 		[jumpToMessage],
 	);
@@ -28,6 +26,6 @@ export function useJumpToMessage() {
 export function getJumpToMessageId() {
 	return messID;
 }
-export function setJumpToMessageId(messageID : string | null) {
+export function setJumpToMessageId(messageID: string | null) {
 	messID = messageID;
 }

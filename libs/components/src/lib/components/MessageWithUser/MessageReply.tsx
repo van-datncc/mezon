@@ -1,4 +1,4 @@
-import { messagesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { messagesActions, referencesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,7 +24,13 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 			setSenderId(messageReferenceUserId ?? '');
 			dispatch(messagesActions.setReplyMessageStatus(true));
 		}
-	}, []);
+	}, [message]);
+
+	const getIdMessageToJump = (idRefMessage: string) => {
+		if (idRefMessage) {
+			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+		}
+	};
 
 	return (
 		<div>
@@ -39,14 +45,27 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 								alt={senderMessage?.user && senderMessage.user?.avatar_url}
 							></img>
 						</div>
-						<p className="gap-1 flex flex-row items-center">
+
+						<div className="gap-1 flex flex-row items-center">
 							<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">
 								@{senderMessage.user?.username}{' '}
 							</span>
-							<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1">
-								{messageRefFetchFromServe.content && messageRefFetchFromServe.content.t}
-							</span>
-						</p>
+							{message.references[0].has_attachment ? (
+								<div className=" flex flex-row items-center">
+									<button
+										onClick={() => getIdMessageToJump(messageRefId)}
+										className="text-[13px] font-manrope pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-1"
+									>
+										Click to see attachment
+									</button>
+									<Icons.ImageThumbnail />
+								</div>
+							) : (
+								<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1">
+									{messageRefFetchFromServe.content && messageRefFetchFromServe.content.t}
+								</span>
+							)}
+						</div>
 					</div>
 				</div>
 			)}
