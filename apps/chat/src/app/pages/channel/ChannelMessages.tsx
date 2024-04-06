@@ -1,7 +1,7 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { emojiActions, selectActiceGifsStickerEmojiTab, useAppDispatch } from '@mezon/store';
-import { EmojiDataOptionals, TabNamePopup } from '@mezon/utils';
+import { emojiActions, selecIdMessageReplied, selectActiceGifsStickerEmojiTab, useAppDispatch } from '@mezon/store';
+import { TabNamePopup } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSelector } from 'react-redux';
@@ -22,22 +22,36 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [heightEditor, setHeightEditor] = useState(30);
 	const activeGifsStickerEmojiTab = useSelector(selectActiceGifsStickerEmojiTab);
+	const messageRefId = useSelector(selecIdMessageReplied);
 
 	const dispatch = useAppDispatch();
-
 	const fetchData = () => {
 		loadMoreMessage();
 	};
-	const messageid = getJumpToMessageId();
 
+	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
+	const [timeToJump, setTimeToJump] = useState(1000);
+	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+
+	useEffect(() => {
+		if (messageRefId) {
+			setMessageIdToJump(messageRefId);
+			setTimeToJump(0);
+			setPositionToJump('center');
+		} else {
+			setMessageIdToJump(getJumpToMessageId());
+			setTimeToJump(1000);
+			setPositionToJump('start');
+		}
+	}, [getJumpToMessageId, messageRefId]);
 	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout | null = null;
 		if (messageid) {
 			timeoutId = setTimeout(() => {
-				jumpToMessage(messageid);
-			}, 1000);
+				jumpToMessage(messageid, positionToJump);
+			}, timeToJump);
 		}
 		return () => {
 			if (timeoutId) {
@@ -55,47 +69,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
 	};
-
-	// TODO: move this to store
-	const emojiDataArray: EmojiDataOptionals[] = messages.flatMap((message) => {
-		if (!message.reactions) return [];
-
-		const emojiDataItems: Record<string, EmojiDataOptionals> = {};
-
-		message.reactions.forEach((reaction) => {
-			const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
-			const existingItem = emojiDataItems[key];
-
-			if (!emojiDataItems[key]) {
-				emojiDataItems[key] = {
-					id: reaction.id,
-					emoji: reaction.emoji,
-					senders: [
-						{
-							sender_id: reaction.sender_id,
-							count: reaction.count,
-							emojiIdList: [],
-							sender_name: '',
-							avatar: '',
-						},
-					],
-					channel_id: message.channel_id,
-					message_id: message.id,
-				};
-			} else {
-				const existingItem = emojiDataItems[key];
-
-				if (existingItem.senders.length > 0) {
-					existingItem.senders[0].count = reaction.count;
-				}
-			}
-		});
-		return Object.values(emojiDataItems);
-	});
-
-	useEffect(() => {
-		dispatch(emojiActions.setDataReactionFromServe(emojiDataArray));
-	}, [emojiDataArray]);
 
 	return (
 		<div

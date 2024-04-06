@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage, useChatReactionMessage, useChatSending } from '@mezon/core';
-import { emojiActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { emojiActions, selecIdMessageReplied, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,6 +19,7 @@ export function ChannelMessage(props: MessageProps) {
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
+	const messageRefId = useSelector(selecIdMessageReplied);
 
 	const dispatch = useAppDispatch();
 	const { refMessage, emojiReactedState, isOpenEmojiReactedBottom, emojiOpenEditState } = useChatReactionMessage();

@@ -1,14 +1,14 @@
 import { MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId } from '@mezon/store';
+import { selecIdMessageReplied, selectCurrentChannelId, selectReplyMessageStatus } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
-import MessageAttachment from './MesageAttachment';
-import MessageReply from './MesageReply';
+import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
+import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
 import { useChatReactionMessage } from '@mezon/core';
@@ -34,6 +34,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { setGrandParentWidthAction } = useChatReactionMessage();
+	const replyMessageStatus = useSelector(selectReplyMessageStatus);
+	const messageRefId = useSelector(selecIdMessageReplied);
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -55,6 +57,15 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [getWidthDivMessageWidth]);
 
+	const [messFocusReplied, setMessReplied] = useState(false);
+	useEffect(() => {
+		if (messageRefId && messageRefId === message.id) {
+			setMessReplied(true);
+		} else {
+			setMessReplied(false);
+		}
+	}, [messageRefId]);
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -65,13 +76,14 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				</div>
 			)}
 			<div>
-				<div className="bg-[#26262b] rounded-sm ">
+				<div className={`bg-[#26262b] rounded-sm ${messFocusReplied ? 'bg-[#393C48]' : 'bg-[#26262b]'} relative`}>
+					<div className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0`}></div>
 					<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
-							<MessageAvatar user={user} message={message} isCombine={isCombine} isReply={false} />
+							<MessageAvatar user={user} message={message} isCombine={isCombine} replyMessageStatus={replyMessageStatus} />
 							<div className="flex-col w-full flex justify-center items-start relative ">
-								<MessageHead message={message} user={user} isCombine={isCombine} isReply={false} />
+								<MessageHead message={message} user={user} isCombine={isCombine} replyMessageStatus={replyMessageStatus} />
 								<div className="justify-start items-center inline-flex w-full textChat">
 									<div
 										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"

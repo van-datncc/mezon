@@ -1,8 +1,9 @@
 import { ChannelMessage, ChannelStreamMode } from '@mezon/mezon-js';
-import { IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { emojiActions } from '../emoji/emoji.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -32,8 +33,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 	};
 };
 
-
-
 export interface MessagesEntity extends IMessageWithUser {
 	id: string; // Primary ID
 }
@@ -57,6 +56,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
+	replyMessageStatus?: boolean;
 }
 
 export interface MessagesRootState {
@@ -108,6 +108,40 @@ export const fetchMessages = createAsyncThunk(
 		const currentLastLoadMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
+		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
+			if (!message.reactions) return [];
+			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
+			message.reactions.forEach((reaction) => {
+				const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
+
+				if (!emojiDataItems[key]) {
+					emojiDataItems[key] = {
+						id: reaction.id,
+						emoji: reaction.emoji,
+						senders: [
+							{
+								sender_id: reaction.sender_id,
+								count: reaction.count,
+								emojiIdList: [],
+								sender_name: '',
+								avatar: '',
+							},
+						],
+						channel_id: message.channel_id,
+						message_id: message.id,
+					};
+				} else {
+					const existingItem = emojiDataItems[key];
+
+					if (existingItem.senders.length > 0) {
+						existingItem.senders[0].count = reaction.count;
+					}
+				}
+			});
+			return Object.values(emojiDataItems);
+		});
+
+		thunkAPI.dispatch(emojiActions.setDataReactionFromServe(reactionData));
 
 		let hasMore = currentHasMore;
 		if (currentLastLoadMessageId === messageId) {
@@ -254,6 +288,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
+	replyMessageStatus: false,
 });
 
 export type SetCursorChannelArgs = {
@@ -284,6 +319,9 @@ export const messagesSlice = createSlice({
 					delete state.typingUsers[typingUserKey];
 				}
 			}
+		},
+		setReplyMessageStatus(state, action) {
+			state.replyMessageStatus = action.payload;
 		},
 		markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
 			messagesAdapter.updateOne(state, {
@@ -412,8 +450,6 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 		return messages.sort(orderMessageByDate).filter((message) => message && message.channel_id === channelId);
 	});
 
-
-
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
 		return messages.shift();
@@ -474,3 +510,5 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
+
+export const selectReplyMessageStatus = createSelector(getMessagesState, (state) => state.replyMessageStatus);

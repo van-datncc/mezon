@@ -6,7 +6,7 @@ import {
 	selectEmojiOpenEditState,
 	selectEmojiReactedBottomState,
 	selectEmojiReactedState,
-	selectReference,
+	selectReferenceMessage,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EmojiDataOptionals, EmojiPlaces } from '@mezon/utils';
@@ -25,7 +25,7 @@ export function useChatReactionMessage() {
 	const emojiReactedState = useSelector(selectEmojiReactedState);
 	const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
 	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
-	const refMessage = useSelector(selectReference);
+	const refMessage = useSelector(selectReferenceMessage);
 	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
 	const grandParentWidth = useSelector(getGrandParentWidthState);
 
@@ -91,7 +91,7 @@ export function useChatReactionMessage() {
 
 	const setMessageRef = useCallback(
 		(state: any) => {
-			dispatch(referencesActions.setReference(state));
+			dispatch(referencesActions.setReferenceMessage(state));
 		},
 		[dispatch],
 	);
