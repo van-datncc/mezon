@@ -3,7 +3,6 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 
 export const EMOJI_FEATURE_KEY = 'emoji';
 
-//TODO: do not convert here, use the mapReactionToEntity
 export const mapReactionToEntity = (reaction: UpdateReactionMessageArgs) => {
 	return reaction;
 };
