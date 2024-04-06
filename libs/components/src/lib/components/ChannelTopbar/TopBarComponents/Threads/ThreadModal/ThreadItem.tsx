@@ -1,8 +1,9 @@
-import { useAppNavigation } from '@mezon/core';
-import { ChannelsEntity, selectMemberByUserId } from '@mezon/store';
+import { useAppNavigation, useChannelMembers } from '@mezon/core';
+import { ChannelType } from '@mezon/mezon-js';
+import { ChannelsEntity, channelMembersActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MessageLine from '../../../../MessageWithUser/MessageLine';
@@ -15,9 +16,12 @@ type ThreadItemProps = {
 
 const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
 	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
+
 	const { toChannelPage } = useAppNavigation();
 	const { avatarImg, username } = useMessageSender(user);
+	const { groupMembers, remainingMember } = useChannelMembers();
 
 	const timeMessage = useMemo(() => {
 		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp) {
@@ -31,6 +35,12 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 		setIsShowThread(false);
 	};
 
+	useEffect(() => {
+		dispatch(
+			channelMembersActions.fetchChannelMembers({ clanId: '', channelId: thread.channel_id || '', channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+		);
+	}, [dispatch, thread.channel_id]);
+
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
@@ -40,11 +50,13 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 				<div className="flex flex-col gap-1">
 					<p className="text-base font-semibold leading-5">{thread?.channel_label}</p>
 					{thread?.last_sent_message ? (
-						<div className="flex flex-row items-center">
+						<div className="flex flex-row items-center h-6">
 							<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
 							<span className="text-[#17AC86] text-sm font-semibold leading-4">{username}:&nbsp;</span>
-							<MessageLine line={JSON.parse(thread.last_sent_message.content).t} />
-							<span className="text-xs font-medium leading-4">•&nbsp;{timeMessage}</span>
+							<div className="overflow-hidden h-6 max-w-[140px]">
+								<MessageLine line={JSON.parse(thread.last_sent_message.content).t} />
+							</div>
+							<span className="text-xs font-medium leading-4 ml-2">•&nbsp;{timeMessage}</span>
 						</div>
 					) : (
 						<div className="flex flex-row items-center">
@@ -52,10 +64,10 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 						</div>
 					)}
 				</div>
-				<div>
-					<Avatar.Group className="flex gap-3">
-						<Avatar img={avatarImg} rounded size="xs" />
-						<Avatar.Counter total={99} className="h-6 w-6" />
+				<div className="w-[120px]">
+					<Avatar.Group className="flex gap-3 justify-end">
+						{groupMembers?.map((member) => <Avatar key={member.id} img={member.user?.avatar_url} rounded size="xs" />)}
+						{remainingMember && remainingMember.length > 0 && <Avatar.Counter total={remainingMember?.length} className="h-6 w-6" />}
 					</Avatar.Group>
 				</div>
 			</div>

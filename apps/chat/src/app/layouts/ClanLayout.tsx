@@ -1,18 +1,15 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useAppNavigation, useAuth, useClans, useThreads } from '@mezon/core';
+import { MezonPolicyProvider, useAuth, useClans, useThreads } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { selectCurrentChannel } from '@mezon/store';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet, useLoaderData, useNavigate } from 'react-router-dom';
+import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
 
 const ClanLayout = () => {
-	const { toChannelPage } = useAppNavigation();
-	const navigate = useNavigate();
-
 	const { clanId } = useLoaderData() as ClanLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
@@ -25,12 +22,6 @@ const ClanLayout = () => {
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
-
-	useEffect(() => {
-		if (!isShowCreateThread) {
-			navigate(toChannelPage(currentChannel?.channel_id as string, currentChannel?.clan_id as string), { replace: true });
-		}
-	}, [isShowCreateThread, currentChannel?.channel_id, currentChannel?.clan_id]);
 
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
