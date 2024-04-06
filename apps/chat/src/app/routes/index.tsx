@@ -1,6 +1,5 @@
-import { createBrowserRouter } from 'react-router-dom';
 import loadable from '@loadable/component';
-
+import { createBrowserRouter } from 'react-router-dom';
 
 // Layouts
 import AppLayout from '../layouts/AppLayout';
@@ -8,25 +7,27 @@ import GuessLayout from '../layouts/GuessLayout';
 import MainLayout from '../layouts/MainLayout';
 
 // Loaders
+import { appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
 import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
+import { clanLoader, shouldRevalidateServer } from '../loaders/clanLoader';
 import { directLoader } from '../loaders/directLoader';
 import { directMessageLoader } from '../loaders/directMessageLoader';
 import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
-import { clanLoader, shouldRevalidateServer } from '../loaders/clanLoader';
-import { appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 
-
+import { loginLoader } from '../loaders/loginLoader';
 import ChannelsRoutes from './ChannelsRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
-import { loginLoader } from '../loaders/loginLoader';
 
 // Pages
+import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
+import ThreadsMain from '../pages/thread';
 import ErrorRoutes from './ErrorRoutes';
 import InitialRoutes from './InititalRoutes';
 import ProtectedRoutes from './ProtectedRoutes';
+import ThreadsRoutes from './ThreadsRoutes';
 
 const Login = loadable(() => import('../pages/login'));
 const Main = loadable(() => import('../pages/main'));
@@ -108,6 +109,18 @@ export const routes = createBrowserRouter([
 																loader: channelLoader,
 																shouldRevalidate: shouldRevalidateChannel,
 																element: <ChannelMain />,
+																children: [
+																	{
+																		path: 'threads',
+																		element: <ThreadsRoutes />,
+																		children: [
+																			{
+																				path: ':threadId',
+																				element: <ThreadsMain />,
+																			},
+																		],
+																	},
+																],
 															},
 														],
 													},
@@ -162,7 +175,8 @@ export const routes = createBrowserRouter([
 				children: [
 					{
 						path: ':inviteId',
-						// TODO: add loader
+						loader: inviteLoader,
+						shouldRevalidate: shouldRevalidateInvite,
 						element: <InvitePage />,
 					},
 				],

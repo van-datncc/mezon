@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import { Friend } from 'vendors/mezon-js/packages/mezon-js/dist';
+import { Friend } from '@mezon/mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { channelMembersActions } from '../channelmembers/channel.members';
 export const FRIEND_FEATURE_KEY = 'friends';
@@ -68,7 +68,6 @@ export const sendRequestDeleteFriend = createAsyncThunk(
 	async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteFriends(mezon.session, ids, usernames);
-		console.log(response);
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
@@ -80,7 +79,6 @@ export const sendRequestDeleteFriend = createAsyncThunk(
 export const sendRequestBlockFriend = createAsyncThunk('friends/requestBlockFriends', async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.blockFriends(mezon.session, ids, usernames);
-	console.log(response);
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}

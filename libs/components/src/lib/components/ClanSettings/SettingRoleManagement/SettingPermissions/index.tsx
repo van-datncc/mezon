@@ -60,7 +60,7 @@ const SettingPermissions = () => {
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, selectedPermissions]);
+	}, [nameRole, selectedPermissions, activeRole]);
 
 	return (
 		<>
@@ -78,12 +78,13 @@ const SettingPermissions = () => {
 				<ul className="flex flex-col gap-y-[5px]">
 					{searchResults.map((permission) => (
 						<li key={permission.id} className="flex items-center justify-between">
-							<span>{permission.slug}</span>
+							<span className="font-normal">{permission.slug}</span>
 							<label>
 								<input
 									type="checkbox"
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => handlePermissionToggle(permission.id)}
+									className="cursor-pointer"
 								/>
 							</label>
 						</li>

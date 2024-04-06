@@ -6,21 +6,21 @@ type IMessageHeadProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
-	isReply?: boolean;
+	replyMessageStatus?: boolean;
 };
 
-const MessageHead = ({ user, message, isCombine, isReply }: IMessageHeadProps) => {
+const MessageHead = ({ user, message, isCombine, replyMessageStatus }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
-	if (isCombine && !isReply) {
+	if (isCombine && !replyMessageStatus) {
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		return <></>;
 	}
 
 	return (
 		<div className="flex-row items-center w-full gap-4 flex">
-			<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer">{username}</div>
+			<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all">{username}</div>
 			<div className=" text-zinc-400 font-['Manrope'] text-[10px] cursor-default">{messageTime}</div>
 		</div>
 	);

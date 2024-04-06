@@ -1,21 +1,20 @@
-import { MentionData } from '@draft-js-plugins/mention';
-import { MessageBox, ReplyMessage } from '@mezon/components';
-import { ChatContext, useChannelMembers, useChatSending } from '@mezon/core';
-import { ChannelMembersEntity } from '@mezon/store';
+import { MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { useChatSending } from '@mezon/core';
 import { IMessageSendPayload } from '@mezon/utils';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
-type ChannelMessageBoxProps = {
+export type ChannelMessageBoxProps = {
 	channelId: string;
+	channelLabel: string;
 	controlEmoji?: boolean;
 	clanId?: string;
+	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMessageBoxProps) {
-	const { sendMessage, sendMessageTyping } = useChatSending({ channelId });
-
+export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanId, mode }: ChannelMessageBoxProps) {
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -33,26 +32,13 @@ export function ChannelMessageBox({ channelId, controlEmoji, clanId }: ChannelMe
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-	const { members } = useChannelMembers({ channelId });
-	const userMentionRaw = members[0].users;
-	const newUserMentionList: MentionData[] = userMentionRaw?.map((item: ChannelMembersEntity) => ({
-		avatar: item?.user?.avatar_url ?? '',
-		name: item?.user?.username ?? '',
-		id: item?.user?.id ?? '',
-	}));
-
-	const { setIsOpenReply } = useContext(ChatContext);
-
-	useEffect(() => {
-		setIsOpenReply(false);
-	}, [channelId, clanId]);
 
 	return (
-		<div>
-			<ReplyMessage />
+		<div className="mx-4 relative">
+			<ReplyMessageBox />
 			<MessageBox
 				isOpenEmojiPropOutside={controlEmoji}
-				listMentions={newUserMentionList}
+				listMentions={UserMentionList(channelId)}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

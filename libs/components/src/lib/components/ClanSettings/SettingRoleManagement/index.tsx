@@ -52,6 +52,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 
 	const handleUpdateUser = async () => {
 		if (clickRole === 'New Role') {
+			props.handleClose();
 			await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
 		} else {
 			await updateRole(currentClan?.id ?? '', clickRole, nameRole, [], addPermissions, [], removePermissions);
@@ -73,9 +74,9 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 					<div className=" w-2/3">
 						<div className="font-semibold pl-3">
 							{clickRole === 'New Role' ? (
-								<div className="tracking-wide">NEW ROLE</div>
+								<div className="tracking-wide text-sm mb-4">NEW ROLE</div>
 							) : (
-								<div className="tracking-wide mb-4">EDIT ROLE</div>
+								<div className="tracking-wide mb-4 text-sm">EDIT ROLE</div>
 							)}
 							<SettingValueDisplayRole />
 						</div>

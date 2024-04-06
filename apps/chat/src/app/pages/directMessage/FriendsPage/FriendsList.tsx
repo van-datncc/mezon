@@ -4,9 +4,9 @@ import FriendsListItem from "./FriendsListItem"
 type ListFriendsProps = {
     listFriendFilter: FriendsEntity[]
 }
-const FriendList = ({ listFriendFilter }: ListFriendsProps) => {
+const FriendList = ({ listFriendFilter }: ListFriendsProps) => {        
     return (
-        <>
+        <>            
             {listFriendFilter.map((friend: FriendsEntity) => (
                 <FriendsListItem friend={friend} key={friend.id}/>
             ))}

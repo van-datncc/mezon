@@ -1,3 +1,4 @@
+import { ApiChannelDescription } from '@mezon/mezon-js/dist/api.gen';
 import { IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -13,6 +14,8 @@ export interface ThreadsEntity extends IThread {
 export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	isShowCreateThread?: boolean;
+	currentThread?: ApiChannelDescription;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -46,6 +49,7 @@ export const fetchThreads = createAsyncThunk<ThreadsEntity[]>('threads/fetchStat
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	isShowCreateThread: false,
 });
 
 export const threadsSlice = createSlice({
@@ -54,6 +58,13 @@ export const threadsSlice = createSlice({
 	reducers: {
 		add: threadsAdapter.addOne,
 		remove: threadsAdapter.removeOne,
+		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<boolean>) => {
+			state.isShowCreateThread = action.payload;
+			state.currentThread = undefined;
+		},
+		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
+			state.currentThread = action.payload;
+		},
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -95,7 +106,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = threadsSlice.actions;
+export const threadsActions = { ...threadsSlice.actions };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -115,6 +126,10 @@ const { selectAll, selectEntities } = threadsAdapter.getSelectors();
 
 export const getThreadsState = (rootState: { [THREADS_FEATURE_KEY]: ThreadsState }): ThreadsState => rootState[THREADS_FEATURE_KEY];
 
+export const selectCurrentThread = createSelector(getThreadsState, (state) => state.currentThread);
+
 export const selectAllThreads = createSelector(getThreadsState, selectAll);
 
 export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);
+
+export const selectIsShowCreateThread = createSelector(getThreadsState, (state) => state.isShowCreateThread);

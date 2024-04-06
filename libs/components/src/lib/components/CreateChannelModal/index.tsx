@@ -1,7 +1,6 @@
 import { useAppNavigation } from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
-import { ChannelTypeEnum } from 'libs/utils/src/lib/types/index';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +11,7 @@ import { ChannelNameTextField } from './ChannelNameTextField';
 import { ChannelStatusModal } from './ChannelStatus';
 import { ChannelTypeComponent } from './ChannelType';
 import { CreateChannelButton } from './CreateChannelButton';
+import { ChannelType } from '@mezon/mezon-js';
 
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
@@ -42,14 +42,15 @@ export const CreateNewChannelModal = () => {
 			setIsErrorName("Channel's name is required");
 			return;
 		}
-
+		
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId?.toString(),
 			type: channelType,
-			channel_lable: channelName,
+			channel_label: channelName,
 			channel_private: isPrivate,
 			category_id: currentCategory?.category_id,
 		};
+		
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
@@ -92,8 +93,7 @@ export const CreateNewChannelModal = () => {
 	return (
 		<>
 			{isOpenModal && (
-				<>
-					<div className="w-[100vw] h-[100vh] overflow-hidden absolute top-0 left-[-71px] z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+				<div className="w-[100vw] h-[100vh] overflow-hidden absolute top-0 left-[-71px] z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
 						<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] bg-[#151515] rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
 							<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
 								<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
@@ -120,25 +120,25 @@ export const CreateNewChannelModal = () => {
 										<ChannelLableModal labelProp="Choose channel's type:" />
 										<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex max-h-[200px] overflow-y-scroll max-xl:h-auto">
 											<ChannelTypeComponent
-												type={ChannelTypeEnum.CHANNEL_TEXT}
+												type={ChannelType.CHANNEL_TYPE_TEXT}
+												onChange={onChangeChannelType}
+												error={isErrorType}
+											/>
+											<ChannelTypeComponent
+												disable={false}
+												type={ChannelType.CHANNEL_TYPE_VOICE}
 												onChange={onChangeChannelType}
 												error={isErrorType}
 											/>
 											<ChannelTypeComponent
 												disable={true}
-												type={ChannelTypeEnum.CHANNEL_VOICE}
+												type={ChannelType.CHANNEL_TYPE_FORUM}
 												onChange={onChangeChannelType}
 												error={isErrorType}
 											/>
 											<ChannelTypeComponent
 												disable={true}
-												type={ChannelTypeEnum.FORUM}
-												onChange={onChangeChannelType}
-												error={isErrorType}
-											/>
-											<ChannelTypeComponent
-												disable={true}
-												type={ChannelTypeEnum.ANNOUNCEMENT}
+												type={ChannelType.CHANNEL_TYPE_ANNOUNCEMENT}
 												onChange={onChangeChannelType}
 												error={isErrorType}
 											/>
@@ -158,7 +158,6 @@ export const CreateNewChannelModal = () => {
 						{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
 						{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}
 					</div>
-				</>
 			)}
 		</>
 	);

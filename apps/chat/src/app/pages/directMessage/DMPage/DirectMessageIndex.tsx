@@ -1,7 +1,7 @@
 import { DmTopbar } from '@mezon/components';
 import { useAppNavigation, useAppParams } from '@mezon/core';
 import { useEffect } from 'react';
-import ChannelMessages from '../../channel/ChanneMessages';
+import ChannelMessages from '../../channel/ChannelMessages';
 
 export default function DirectMessageIndex() {
 	const { directId } = useAppParams();

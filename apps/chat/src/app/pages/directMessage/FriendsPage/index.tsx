@@ -106,7 +106,7 @@ export default function FriendsPage() {
 					))}
 				</div>
 				<button
-					className={`px-3 py-[6px] rounded-[4px]  ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
+					className={`px-3 py-[6px] rounded-[4px] transition-all duration-300 hover:bg-blue-500 ${openModalAddFriend ? 'text-primary font-bold' : 'bg-primary'} `}
 					onClick={handleOpenRequestFriend}
 					style={{ whiteSpace: 'nowrap' }}
 				>

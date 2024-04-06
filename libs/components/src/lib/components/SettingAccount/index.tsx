@@ -1,6 +1,6 @@
 const SettingAccount = () => {
 	return (
-		<div className="flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] min-w-[500px] 2xl:min-w-[900px]">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<p className="text-blue-500">not implemented</p>
 		</div>
 	);

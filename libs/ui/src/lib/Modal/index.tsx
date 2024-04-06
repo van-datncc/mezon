@@ -35,15 +35,13 @@ const Modal = (props: ModalProps) => {
 					<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 text-white">
 						<div className={`relative w-full max-w-[684px] sm:h-auto ${classNameBox}`}>
 							<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-[#151515] outline-none focus:outline-none h-full sm:h-auto">
-								<div
-									className={`flex items-start justify-between pt-[20px] px-[20px]  border-solid border-borderDefault rounded-t`}
-								>
+								<div className={`flex items-start justify-between pt-[20px] px-[20px]  border-solid border-borderDefault rounded-t`}>
 									<div>
-										<h3 className="text-[22px] font-semibold">{title}</h3>
+										<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
 									<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-										<span className="text-3xl leading-3">×</span>
+										<span className="text-5xl leading-3 hover:text-white">×</span>
 									</button>
 								</div>
 
@@ -52,10 +50,12 @@ const Modal = (props: ModalProps) => {
 									<div className="bg-[#323232] ounded-[5px] bg-transparent">{children}</div>
 								</div>
 								{/*footer*/}
-								{confirmButton && (
+								{confirmButton && title !== 'Invite friends to KOMU' && (
 									<div className="flex items-center p-[20px] pb-[32px] border-t border-solid border-borderDefault rounded-b justify-between">
 										<button
-											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-[16px] leading-6 rounded-lg"
+											className="text-contentBrandLight background-transparent font-semibold px-4 py-2 
+											text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all 
+											duration-150 text-[16px] leading-6 rounded-lg"
 											onClick={onClose}
 										>
 											Back

@@ -1,4 +1,4 @@
-import { useAuth, useClans } from '@mezon/core';
+import { useAuth, useCategory, useClans } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
@@ -24,8 +24,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const { currentClan } = useClans();
+	const { categorizedChannels } = useCategory();
+	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
 
-	const [openInviteClanModal, closeInviteClanModal] = useModal(() => <ModalInvite onClose={closeInviteClanModal} open={true} channelID="" />);
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
+	));
 	const onClose = () => {
 		setOpenCreateCate(false);
 	};
@@ -51,9 +55,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					/>
 				</div>
 			) : (
-				<div className={`${bannerImage ? 'h-[136px]' : 'h-[49px]'} relative`}>
+				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950 z-[1]`}>
 					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
-					<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2">
+					<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-[#030712]">
 						<p className="text-white text-lg font-bold">{name?.toLocaleUpperCase()}</p>
 						<Dropdown
 							label=""
@@ -61,7 +65,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 							dismissOnClick={true}
 							placement="bottom-end"
 							renderTrigger={() => (
-								<button className="w-6 h-8 relative flex flex-col justify-center">
+								<button className="w-6 h-8 relative flex flex-col justify-center iconHover">
 									<Icons.ArrowDown />
 								</button>
 							)}
@@ -111,21 +115,21 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					setOpenServerSettings(false);
 				}}
 			/>
-			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary" size="lg">
-				<div className="bg-[#313338] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
-					<div className="text-[19px] font-[500]">Create Category</div>
+			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary bg-opacity-80" size="lg">
+				<div className="bg-[#1E1E1E] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
+					<div className="text-[19px] font-bold uppercase">Create Category</div>
 					<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-						<span className="text-4xl">×</span>
+						<span className="text-4xl hover:text-white">×</span>
 					</button>
 				</div>
-				<Modal.Body className="bg-[#313338] px-6 py-4">
+				<Modal.Body className="bg-[#1E1E1E] px-6 py-4">
 					<div className="flex flex-col">
-						<span className="font-[600] text-[12px]">CATEGORY NAME</span>
+						<span className="font-[600] text-sm ">What is category's name?</span>
 						<InputField
 							type="text"
 							onChange={(e) => setNameCate(e.target.value)}
-							placeholder="New Category"
-							className="mb-6 py-[8px] bg-bgTertiary text-[14px]"
+							placeholder="Enter the category's name"
+							className="py-[8px] bg-black text-[14px] mt-2 mb-0 border-blue-600 border"
 							value={nameCate}
 						/>
 					</div>

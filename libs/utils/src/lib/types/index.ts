@@ -1,9 +1,13 @@
-import { ChannelMessage } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelType } from '@mezon/mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiMessageAttachment,
+	ApiMessageMention,
+	ApiMessageReaction,
+	ApiMessageRef,
 	ApiPermission,
 	ApiRole,
 	ApiUser,
@@ -12,9 +16,7 @@ import {
 	RoleUserListRoleUser,
 } from '@mezon/mezon-js/dist/api.gen';
 
-import {
-	ApiChannelDescription,
-} from '@mezon/mezon-js/api.gen';
+import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
 export * from './permissions';
 
@@ -23,6 +25,11 @@ export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 export type IClan = ApiClanDesc & {
 	id: string;
 };
+
+export type IInvite = ApiInviteUserRes & {
+	id: string;
+};
+
 export type IClanProfile = ApiClanProfile & {
 	id: string;
 };
@@ -58,6 +65,10 @@ export type IRoleUsers = IRole & {
 	users: ApiUser[];
 };
 
+export type ChannelThreads = IChannel & {
+	threads: IChannel[];
+};
+
 export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
@@ -67,6 +78,7 @@ export type IChannel = ApiChannelDescription & {
 export type IChannelMember = ChannelUserListChannelUser & {
 	id: string;
 	channelId?: string;
+	user_id?: string; // use on VoiceChannelList
 };
 
 export type IThread = {
@@ -132,6 +144,16 @@ export type IUser = {
 	avatarSm: string;
 };
 
+export type IVoice = {
+	user_id: string;
+	clan_id: string;
+	clan_name: string;
+	participant: string;
+	voice_channel_id: string;
+	voice_channel_label: string;
+	last_screenshot: string;
+};
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;
@@ -176,20 +198,11 @@ export enum ChannelStatusEnum {
 	isPrivate = 1,
 }
 
-export enum ChannelTypeEnum {
-	CHANNEL_TEXT = 1,
-	DM_CHAT = 2,
-	GROUP_CHAT = 3,
-	CHANNEL_VOICE = 4,
-	FORUM = 5,
-	ANNOUNCEMENT = 6,
-}
-
 export interface ChannelProps {
 	name?: string;
 	isPrivate?: ChannelStatusEnum;
 	categories?: Record<string, CategoryProps>;
-	type: ChannelTypeEnum;
+	type?: ChannelType;
 }
 
 export interface CategoryProps {
@@ -202,7 +215,113 @@ export interface ThreadProps {
 	name: string;
 }
 
-
 export interface IWithError {
-	error: string | Error; 
+	error: string | Error;
 }
+
+export enum EmojiPlaces {
+	EMOJI_REACTION = 'EMOJI_REACTION',
+	EMOJI_REACTION_BOTTOM = 'EMOJI_REACTION_BOTTOM',
+	EMOJI_EDITOR = 'EMOJI_EDITOR',
+}
+
+export interface UnreadChannel {
+	channelId: string;
+	channelLastSentMessageId: string;
+	channelLastSeenMesageId: string;
+	timestamp: string;
+}
+
+export interface ContentNotificationChannel {
+	content: any;
+}
+
+export interface NotificationContent {
+	avatar?: string;
+	channel_id: string;
+	channel_label: string;
+	clan_id?: string;
+	code: number;
+	content: string;
+	create_time: string;
+	reactions?: Array<ApiMessageReaction>;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
+	referenced_message?: ChannelMessage;
+	id: string;
+	persistent?: boolean;
+	sender_id: string;
+	update_time?: { seconds: number };
+	user_id_one?: string;
+	user_id_two?: string;
+	username?: string;
+}
+
+export enum TabNamePopup {
+	NONE = 'NONE',
+	GIFS = 'GIFS',
+	STICKERS = 'STICKER',
+	EMOJI = 'EMOJI',
+}
+
+export type IEmoji = {
+	id?: string;
+	name: string;
+	keywords: string[];
+	skins: {
+		unified: string;
+		native: string;
+		shortcodes: string;
+	}[];
+	version?: number;
+	search?: string;
+};
+
+export type IEmoticons = {
+	[key: string]: string;
+};
+
+export type INatives = {
+	[key: string]: string;
+};
+
+export type ICategoryEmoji = {
+	id: string;
+	emojis: string[];
+};
+
+export type IMetaDataEmojis = {
+	id?: string;
+	aliases: {
+		[key: string]: string;
+	};
+	categories: ICategoryEmoji[];
+	emojis: {
+		[key: string]: IEmoji;
+	};
+	emoticons: IEmoticons;
+	natives: INatives;
+	originalCategories: ICategoryEmoji[];
+	sheet: {
+		cols: number;
+		rows: number;
+	};
+};
+
+export type EmojiDataOptionals = {
+	action?: boolean | undefined;
+	id: string | undefined;
+	emoji: string | undefined;
+	senders: SenderInfoOptionals[];
+	channel_id?: string | undefined;
+	message_id?: string | undefined;
+};
+
+export type SenderInfoOptionals = {
+	sender_id?: string | undefined;
+	count: number | undefined;
+	emojiIdList?: string[] | undefined;
+	sender_name?: string | undefined;
+	avatar?: string | undefined;
+};

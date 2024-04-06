@@ -1,7 +1,8 @@
 import { directActions, selectAllDirectMessages, selectIsLoadDMData, useAppDispatch } from '@mezon/store';
-import { ChannelTypeEnum } from '@mezon/utils';
+
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { ChannelType } from '@mezon/mezon-js';
 import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
 type UseDirectParams = {
@@ -15,19 +16,19 @@ export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : fa
 
 	const createDirectMessageWithUser = useCallback(
 		async (userId: string) => {
-			const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-				type: ChannelTypeEnum.DM_CHAT,
+			const bodyCreateDm: ApiCreateChannelDescRequest = {
+				type: ChannelType.CHANNEL_TYPE_DM,
 				channel_private: 1,
 				user_ids: [userId],
 			};
-			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
+			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDm));
 			const resPayload = response.payload as ApiCreateChannelDescRequest;
 
 			if (resPayload.channel_id) {
 				await dispatch(
 					directActions.joinDirectMessage({
 						directMessageId: resPayload.channel_id,
-						channelName: resPayload.channel_lable,
+						channelName: resPayload.channel_label,
 						type: Number(resPayload.type),
 					}),
 				);

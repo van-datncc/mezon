@@ -2,6 +2,7 @@ import { useRoles } from '@mezon/core';
 import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import * as Icons from '../../../Icons';
 type closeEditRole = {
 	handleClose: () => void;
 };
@@ -33,19 +34,18 @@ const SettingListRole = (props: closeEditRole) => {
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	return (
 		<div className="w-1/3 pr-3 flex flex-col">
-			<div className="font-semibold mb-4">
-				<div className="cursor-pointer tracking-wide" onClick={() => props.handleClose()}>
+			<div className="font-semibold mb-4 flex">
+				<div className="rotate-90 -ml-[10px]">
+					<Icons.ArrowDown defaultSize="size-5" />
+				</div>
+				<div className="cursor-pointer tracking-wide text-sm" onClick={() => props.handleClose()}>
 					BACK
 				</div>
 			</div>
 			<div className="overflow-y-scroll flex flex-col gap-y-2">
 				{clickedRole === 'New Role' ? (
 					<div>
-						<button
-							className={`block w-full py-2 px-4 rounded ${
-								clickedRole === 'New Role' ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
-							} text-white font-bold`}
-						>
+						<button className={`block w-full py-2 px-4 rounded text-[15px] bg-gray-500 hover:bg-gray-70 text-white font-bold`}>
 							{nameRoleNew}
 						</button>
 					</div>
@@ -54,9 +54,9 @@ const SettingListRole = (props: closeEditRole) => {
 						<div key={role.id}>
 							<button
 								onClick={() => handleRoleClick(role.id)}
-								className={`w-full py-2 px-4 rounded ${
-									clickedRole === role.id ? 'bg-blue-700 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-700'
-								} text-white font-bold truncate`}
+								className={`w-full py-2 px-4 rounded text-[15px] ${
+									clickedRole === role.id ? 'bg-[#535353] font-bold hover:op' : 'bg-[#1E1E1E] hover:font-bold'
+								} text-white truncate`}
 							>
 								{role.title}
 							</button>

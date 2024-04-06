@@ -1,15 +1,16 @@
 import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
+import { ChannelType } from '@mezon/mezon-js';
 import { channelsActions, useAppDispatch } from '@mezon/store';
-import { EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
-
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
+// TODO: implement useClipboard hook
 export const unsecuredCopyToClipboard = (text: string) => {
 	const textArea = document.createElement('textarea');
 	textArea.value = text;
@@ -32,7 +33,7 @@ export const handleCopyToClipboard = (content: string) => {
 	}
 };
 
-function ChannelList() {
+function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 	const { categorizedChannels } = useCategory();
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
@@ -63,14 +64,20 @@ function ChannelList() {
 	};
 
 	return (
-		<>
+		<div
+			onContextMenu={(event) => event.preventDefault()}
+			className="overflow-y-scroll scrollbar-thin w-[100%] h-[100%] pb-[12%] "
+			id="channelList"
+		>
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />
 				<BrowseChannel />
 			</div>
 			<hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
-			<div className="overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ">
+			<div
+				className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ${channelCurrentType === ChannelType.CHANNEL_TYPE_VOICE ? 'pb-[110px]' : 'pb-[8%]'}`}
+			>
 				{categorizedChannels.map((category: ICategoryChannel) => (
 					<div key={category.id}>
 						{category.category_name && (
@@ -81,11 +88,7 @@ function ChannelList() {
 									}}
 									className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
 								>
-									{!categoriesState[category.id] ? (
-										<Icons.ArrowDown defaultSize="text-[16px]" />
-									) : (
-										<Icons.ArrowRight defaultSize="text-[16px]" />
-									)}
+									{!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
 									{category.category_name}
 								</button>
 								<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
@@ -108,14 +111,14 @@ function ChannelList() {
 										return categoryIsOpen || channel?.unread;
 									})
 									.map((channel: IChannel, index: number) => {
-										return <ChannelListItem key={index} channel={channel} />;
+										return <ChannelListItem key={index} channel={channel as ChannelThreads} />;
 									})}
 							</div>
 						)}
 					</div>
 				))}
 			</div>
-		</>
+		</div>
 	);
 }
 

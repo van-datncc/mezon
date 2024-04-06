@@ -29,6 +29,7 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
+
 	return useMemo(
 		() => ({
 			client,

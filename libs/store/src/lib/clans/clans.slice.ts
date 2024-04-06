@@ -1,15 +1,16 @@
-import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
-import { IClan, LoadingStatus, LIMIT_CLAN_ITEM } from '@mezon/utils';
+import { ApiClanDesc } from '@mezon/mezon-js/dist/api.gen';
+import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
-// import { PermissionsUserActions } from '../permissionuser/permissionuser.slice';
-import { rolesClanActions } from '../roleclan/roleclan.slice';
-import { policiesActions } from '../policies/policies.slice';
+import { ChannelType } from '@mezon/mezon-js';
 import { usersClanActions } from '../clanMembers/clan.members';
+import { policiesActions } from '../policies/policies.slice';
+import { rolesClanActions } from '../roleclan/roleclan.slice';
+import { voiceActions } from '../voice/voice.slice';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -40,13 +41,18 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
 	thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
 	thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
-	// thunkAPI.dispatch(PermissionsUserActions.fetchPermissionsUser({ clanId }));
 	thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId }));
 	thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermission());
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
+	thunkAPI.dispatch(voiceActions.fetchVoiceChannelMembers({
+			clanId: clanId ?? '',
+			channelId: '',
+			channelType: ChannelType.CHANNEL_TYPE_VOICE,
+		}),
+	);
 });
 
 export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
@@ -60,10 +66,10 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 
 		const clans = response.clandesc.map(mapClanToEntity);
 		return clans;
-	} catch(error : any) {		
+	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
-	}	
+	}
 });
 
 type CreatePayload = {
@@ -85,7 +91,7 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 			return thunkAPI.rejectWithValue([]);
 		}
 		return mapClanToEntity(response);
-	} catch(error : any) {		
+	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
@@ -98,7 +104,7 @@ type UpdateLinkUser = {
 };
 
 export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name }: UpdateLinkUser, thunkAPI) => {
-	try {	
+	try {
 		const mezon = ensureClient(getMezonCtx(thunkAPI));
 		const body = {
 			avatar_url: avatar_url || '',
@@ -116,65 +122,7 @@ export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_nam
 			thunkAPI.dispatch(getUserProfile());
 		}
 		return response as true;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
-
-export type CreateLinkInviteUser = {
-	channel_id: string;
-	clan_id: string;
-	expiry_time: number;
-};
-
-export const createLinkInviteUser = createAsyncThunk('clans/invite', async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			channel_id: channel_id,
-			clan_id: clan_id,
-			expiry_time: expiry_time,
-		};
-		const response = await mezon.client.createLinkInviteUser(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return response as ApiLinkInviteUser;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
-
-type InviteUser = {
-	inviteId: string;
-};
-
-export const inviteUser = createAsyncThunk('clans/inviteUser', async ({ inviteId }: InviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.inviteUser(mezon.session, inviteId);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return response as ApiInviteUserRes;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
-
-export const getLinkInvite = createAsyncThunk('clans/getLinkInvite', async ({ inviteId }: InviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));	
-		const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-
-		return response as ApiInviteUserRes;
-	} catch(error : any) {		
+	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
@@ -254,9 +202,6 @@ export const clansActions = {
 	createClan,
 	changeCurrentClan,
 	updateUser,
-	createLinkInviteUser,
-	inviteUser,
-	getLinkInvite,
 };
 
 /*

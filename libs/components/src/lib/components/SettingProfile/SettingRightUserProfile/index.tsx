@@ -1,8 +1,9 @@
 import { useAccount } from '@mezon/core';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
+import { Modal } from 'flowbite-react';
 import { useState } from 'react';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
-import { handleUploadFile, useMezon } from '@mezon/transport';
 // import * as Icons from '../../Icons';
 
 // import React, { useState, useEffect } from 'react';
@@ -24,19 +25,29 @@ const SettingRightUser = ({
 	const { updateUser } = useAccount();
 	const [flags, setFlags] = useState(true);
 	const [flagsRemoveAvartar, setFlagsRemoveAvartar] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
+
 	const handleUpdateUser = async () => {
 		if (userName || urlImage || displayName) {
 			await updateUser(userName, urlImage, displayName);
 		}
 	};
+
 	const handleFile = (e: any) => {
 		const file = e.target.files && e.target.files[0];
 		const fullfilename = file?.name;
+		const sizeImage = file?.size;
 		const session = sessionRef.current;
 		const client = clientRef.current;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+
+		if (sizeImage > 1000000) {
+			setOpenModal(true);
+			e.target.value = null;
+			return;
 		}
 		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
@@ -72,7 +83,7 @@ const SettingRightUser = ({
 		setUrlImage('');
 	};
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="text-white">
 				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 font-bold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
@@ -95,10 +106,10 @@ const SettingRightUser = ({
 					</div>
 					<div className="mt-8">
 						<p className="font-bold tracking-wide text-sm">AVATAR</p>
-						<div className="flex">
+						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
-									className="text-white w-[130px] bg-[#155EEF] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="text-white bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px] hover:font-bold"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -106,7 +117,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-[#1E1E1E] rounded-[4px] mt-[10px] p-[8px] pr-[10px] pl-[10px] ml-[20px] text-nowrap"
+								className="text-white bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px] hover:font-bold"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -123,12 +134,12 @@ const SettingRightUser = ({
 				// <div className="flex items-center w-1/2 h-[50px] mt-[-90px] bg-gray-500 rounded-[8px] z-10 fixed top-[890px] pl-[20px] pr-[20px]">
 				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform ">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p>Carefull - you have unsaved changes!</p>
+						<p className="text-[15px]">Carefull - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button
 							// className="ml-[450px] bg-gray-600 rounded-[8px] p-[8px]"
-							className="bg-gray-600 rounded-[4px] p-[8px]"
+							className="text-[15px] bg-gray-600 rounded-[4px] p-[8px]"
 							onClick={() => {
 								handleClose();
 							}}
@@ -138,7 +149,7 @@ const SettingRightUser = ({
 
 						<button
 							// className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
-							className="bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
+							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 							onClick={() => {
 								handleUpdateUser(), handlSaveClose();
 							}}
@@ -148,6 +159,19 @@ const SettingRightUser = ({
 					</div>
 				</div>
 			) : null}
+			<Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
+				<Modal.Body className="bg-red-500 rounded-lg">
+					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
+						<img
+							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
+							src="/assets/images/file-and-folder.png"
+							alt="file"
+						/>
+						<h3 className="text-white text-4xl font-bold">Your files are too powerful</h3>
+						<h4 className="text-white text-xl">Max file size is 1MB, please!</h4>
+					</div>
+				</Modal.Body>
+			</Modal>
 		</div>
 	);
 };

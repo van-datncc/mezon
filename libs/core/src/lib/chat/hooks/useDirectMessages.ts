@@ -14,9 +14,10 @@ import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/
 
 export type UseDirectMessagesOptions = {
 	channelId: string;
+	mode: number;
 };
 
-export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
+export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions) {
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 
 	const client = clientRef.current;
@@ -42,14 +43,18 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('', channel.id, content, mentions, attachments, references);
+			await socket.writeChatMessage('DM', channel.id, channel.chanel_label, mode, content, mentions, attachments, references);
 		},
-		[sessionRef, clientRef, socketRef, channelRef],
+		[sessionRef, clientRef, socketRef, channelRef, mode],
 	);
 
 	const loadMoreMessage = React.useCallback(async () => {
 		dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
+
+	const sendMessageTyping = React.useCallback(async () => {
+		dispatch(messagesActions.sendTypingUser({ channelId: channelId, channelLabel: '', mode: mode}));
+	}, [channelId, dispatch]);
 
 	return useMemo(
 		() => ({
@@ -60,7 +65,8 @@ export function useDirectMessages({ channelId }: UseDirectMessagesOptions) {
 			hasMoreMessage,
 			sendDirectMessage,
 			loadMoreMessage,
+			sendMessageTyping,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendDirectMessage, loadMoreMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendMessageTyping, sendDirectMessage, loadMoreMessage],
 	);
 }

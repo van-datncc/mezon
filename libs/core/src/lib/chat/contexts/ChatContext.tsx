@@ -1,8 +1,3 @@
-import { channelMembersActions, friendsActions, mapMessageChannelToEntity, messagesActions, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { IMessageWithUser } from '@mezon/utils';
-import React, { useCallback, useEffect } from 'react';
-import { toast } from 'react-toastify';
 import {
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
@@ -10,7 +5,13 @@ import {
 	MessageTypingEvent,
 	Notification,
 	StatusPresenceEvent,
-} from 'vendors/mezon-js/packages/mezon-js/dist';
+	VoiceJoinedEvent,
+	VoiceLeavedEvent,
+} from '@mezon/mezon-js';
+import { channelMembersActions, channelsActions, emojiActions, friendsActions, mapMessageChannelToEntity, mapNotificationToEntity, mapReactionToEntity, messagesActions, notificationActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { useMezon } from '@mezon/transport';
+import React, { useCallback, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
@@ -18,51 +19,43 @@ type ChatContextProviderProps = {
 	children: React.ReactNode;
 };
 
-export type ChatContextValue = {
-	// TODO: add your context value here
-	messageRef: IMessageWithUser | undefined;
-	setMessageRef: React.Dispatch<React.SetStateAction<IMessageWithUser | undefined>>;
-	isOpenReply: boolean;
-	setIsOpenReply: React.Dispatch<React.SetStateAction<boolean>>;
-
-	isOpenEmojiChatBox: boolean;
-	setIsOpenEmojiChatBox: React.Dispatch<React.SetStateAction<boolean>>;
-};
+export type ChatContextValue = object;
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const [messageRef, setMessageRef] = React.useState<IMessageWithUser>();
-	const [isOpenReply, setIsOpenReply] = React.useState<boolean>(false);
-	const [isOpenEmojiChatBox, setIsOpenEmojiChatBox] = React.useState<boolean>(false);
 
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
-			messageRef,
-			setMessageRef,
-			isOpenReply,
-			setIsOpenReply,
-			isOpenEmojiChatBox,
-			setIsOpenEmojiChatBox,
-		}),
-		[
-			messageRef,
-			setMessageRef,
-			isOpenReply,
-			setIsOpenReply,
-			isOpenEmojiChatBox,
-			setIsOpenEmojiChatBox,
-		],
-	);
+			// add logic code
+		}), []);
 
-	const { socketRef } = useMezon();
+	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 
+	const onvoicejoined = useCallback((voice: VoiceJoinedEvent) => {
+		if (voice) {
+			dispatch(voiceActions.add({
+				...voice,
+			}));
+		}
+	}, [dispatch]);
+
+	const onvoiceleaved = useCallback(
+		(voice: VoiceLeavedEvent) => {
+			console.log("VoiceLeavedEvent", voice);
+			dispatch(voiceActions.remove(voice.id));
+		},
+		[dispatch],
+	);
+
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
+			const timestamp = Date.now() / 1000;
+			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 		},
 		[dispatch],
 	);
@@ -83,6 +76,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		(notification: Notification) => {
+			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			if (notification.code === -2 || notification.code === -3) {
 				dispatch(friendsActions.fetchListFriends());
 				toast.info(notification.subject);
@@ -91,21 +85,40 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 	const ondisconnect = useCallback(() => {
-		// TODO: handle disconnect
+		const retry = (attempt: number) => {
+			console.log('Reconnecting', attempt);
+			const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
+			const timeoutId = setTimeout(() => {
+				reconnect()
+					.then(() => {
+						console.log('Reconnected');
+					})
+					.catch(() => {
+						retry(attempt + 1);
+						if (attempt > 5) { // max retry is 5
+							clearTimeout(timeoutId);
+						}
+					});
+			}, delay);
+		};
+		retry(0);
+	}, [reconnect]);
+
+	const onerror = useCallback((event: unknown) => {
+		// TODO: handle error
+		console.log(event);
 	}, []);
 
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const event = e as any;
-			if (event && event.sender_id === userId) {
+			if (e && e.sender_id === userId) {
 				return;
 			}
 
 			dispatch(
 				messagesActions.updateTypingUsers({
-					channelId: event.channel_id,
-					userId: event.sender_id,
+					channelId: e.channel_id,
+					userId: e.sender_id,
 					isTyping: true,
 				}),
 			);
@@ -115,17 +128,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const event = e as any;
-			if (event) {
-				dispatch(
-					messagesActions.updateReactionMessage({
-						channelId: event.channel_id,
-						messageId: event.message_id,
-						emoji: event.emoji,
-						userId: event.sender_id,
-					}),
-				);
+			if (e) {
+				dispatch(emojiActions.updateReactionMessage(mapReactionToEntity(e)));
 			}
 		},
 		[dispatch],
@@ -137,11 +141,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			return;
 		}
 
+		socket.onvoicejoined = onvoicejoined;
+
+		socket.onvoiceleaved = onvoiceleaved;
+
 		socket.onchannelmessage = onchannelmessage;
 
 		socket.onchannelpresence = onchannelpresence;
 
 		socket.ondisconnect = ondisconnect;
+
+		socket.onerror = onerror;
 
 		socket.onmessagetyping = onmessagetyping;
 
@@ -152,13 +162,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socket.onstatuspresence = onstatuspresence;
 
 		return () => {
-			socket.onchannelmessage = () => {};
-			socket.onchannelpresence = () => {};
-			socket.onnotification = () => {};
-			socket.onstatuspresence = () => {};
-			socket.ondisconnect = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onchannelmessage = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onchannelpresence = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onnotification = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstatuspresence = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.ondisconnect = () => { };
 		};
-	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef]);
+	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef, onvoicejoined, onvoiceleaved, onerror]);
 
 	useEffect(() => {
 		initWorker();

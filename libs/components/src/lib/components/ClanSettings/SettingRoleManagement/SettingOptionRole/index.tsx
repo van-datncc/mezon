@@ -20,7 +20,7 @@ const SettingValueDisplayRole = () => {
 		<>
 			<div className="w-full flex justify-between mb-5">
 				<button
-					className={`p-[5px] text-white  text-left transition duration-300 relative tracking-wider ${selectedButton === 'Display' ? 'shadow-md' : ''}`}
+					className={`p-[5px] text-white text-[15px] text-left transition duration-300 hover:bg-slate-800 rounded relative tracking-wider ${selectedButton === 'Display' ? 'shadow-md' : ''}`}
 					onClick={() => {
 						handleButtonClick('Display');
 						dispatch(toggleIsShowFalse());
@@ -31,7 +31,7 @@ const SettingValueDisplayRole = () => {
 				</button>
 
 				<button
-					className={`p-[5px] text-white  text-left transition duration-300 relative tracking-wider ${selectedButton === 'Permissions' ? 'shadow-md' : ''}`}
+					className={`p-[5px] text-white text-[15px] text-left transition duration-300 hover:bg-slate-800 rounded relative tracking-wider ${selectedButton === 'Permissions' ? 'shadow-md' : ''}`}
 					onClick={() => {
 						handleButtonClick('Permissions');
 						dispatch(toggleIsShowFalse());
@@ -41,7 +41,7 @@ const SettingValueDisplayRole = () => {
 					{selectedButton === 'Permissions' && <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-400" />}
 				</button>
 				<button
-					className={`p-[5px] text-white text-left transition duration-300 relative tracking-wider ${selectedButton === 'Manage Members' ? 'shadow-md' : ''}`}
+					className={`p-[5px] text-white text-[15px] text-left transition duration-300 hover:bg-slate-800 rounded relative tracking-wider ${selectedButton === 'Manage Members' ? 'shadow-md' : ''}`}
 					onClick={() => {
 						handleButtonClick('Manage Members');
 						dispatch(toggleIsShowFalse());

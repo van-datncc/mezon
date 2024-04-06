@@ -1,4 +1,4 @@
-import { Channel, Client, Session, Socket, Status } from '@mezon/mezon-js';
+import { Channel, ChannelStreamMode, ChannelType, Client, Session, Socket, Status } from '@mezon/mezon-js';
 import { WebSocketAdapterPb } from "@mezon/mezon-js-protobuf"
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
@@ -20,16 +20,17 @@ export type MezonContextValue = {
 	clientRef: React.MutableRefObject<Client | null>;
 	sessionRef: React.MutableRefObject<Session | null>;
 	socketRef: React.MutableRefObject<Socket | null>;
-	channelRef: React.MutableRefObject<Channel | null>;
+	channelRef: React.MutableRefObject<Channel | null>;	
 	createClient: () => Promise<Client>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
 	authenticateGoogle: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
-	joinChatChannel: (channelId: string, type: string) => Promise<Channel>;
+	joinChatChannel: (channelId: string) => Promise<Channel>;
 	joinChatDirectMessage: (channelId: string, channelName?: string, channelType?: number) => Promise<Channel>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
+	reconnect: () => Promise<void>;	
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -107,6 +108,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 		socketRef.current = null;
 		sessionRef.current = null;
+		
 	}, [socketRef]);
 
 	const authenticateDevice = useCallback(
@@ -119,6 +121,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
 			sessionRef.current = session;
+
 			return session;
 		},
 		[clientRef],
@@ -145,20 +148,39 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const joinChatChannel = React.useCallback(
-		async (channelId: string, channelName: string) => {			
+		async (channelId: string) => {			
 			const socket = socketRef.current;
 
 			if (!socket) {
 				throw new Error('Socket is not initialized');
 			}
 
-			const join = await socket.joinChat(channelId, channelName, 1, true, false);
+			const join = await socket.joinChat(channelId, '', ChannelStreamMode.STREAM_MODE_CHANNEL, ChannelType.CHANNEL_TYPE_TEXT, true, false); // mode: 2 - channel, type: 1 - Text and voice
 
 			channelRef.current = join;
 			return join;
 		},
 		[socketRef],
 	);
+
+	const reconnect = React.useCallback(async () => {
+		if (!clientRef.current) {
+			return;
+		}
+		
+		const session = sessionRef.current;
+		if (!session) {
+			return;
+		}
+	
+		if (!socketRef.current) {
+			return;
+		}
+
+		const session2 = await socketRef.current.connect(session, true);
+		sessionRef.current = session2;
+
+	}, [clientRef, sessionRef, socketRef]);
 
 	const addStatusFollow = React.useCallback(
 		async (userIds: string[]) => {
@@ -176,19 +198,21 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	// TODO: use same function for joinChatChannel and joinChatDirectMessage
 	const joinChatDirectMessage = React.useCallback(
-		async (channelId: string, channelName?: string | undefined, channelType?: number | undefined) => {
+		async (channelId: string, channelLabel?: string | undefined, channelType?: number | undefined) => {
 			const socket = socketRef.current;
 
 			if (!socket) {
 				throw new Error('Socket is not initialized');
 			}
 
-			// if (channelRef.current) {
-			//     await socket.leaveChat(channelRef.current.id);
-			//     channelRef.current = null;
-			// }
+			let mode = ChannelStreamMode.STREAM_MODE_CHANNEL; // channel
+			if (channelType === ChannelType.CHANNEL_TYPE_DM) { // DM
+				mode = ChannelStreamMode.STREAM_MODE_DM;
+			} else if (channelType === ChannelType.CHANNEL_TYPE_GROUP) { // GROUP
+				mode = ChannelStreamMode.STREAM_MODE_GROUP;
+			}
 
-			const join = await socket.joinChat(channelId, channelName ?? '', channelType ?? 0, true, false);
+			const join = await socket.joinChat(channelId, channelLabel ?? '', mode, channelType ?? 0, true, false);
 
 			if (join) {
 				channelRef.current = join;
@@ -214,6 +238,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			addStatusFollow,
 			logOutMezon,
+			reconnect,
 		}),
 		[
 			clientRef,
@@ -230,6 +255,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createSocket,
 			addStatusFollow,
 			logOutMezon,
+			reconnect,
 		],
 	);
 

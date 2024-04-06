@@ -1,3 +1,4 @@
+import { ChannelType } from '@mezon/mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
 import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
@@ -6,6 +7,7 @@ import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
+import { threadsActions } from '../threads/threads.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -20,6 +22,14 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	return { ...channelRes, id: channelRes.channel_id || '' };
 };
 
+interface ChannelMeta {
+	id: string;
+	lastSeenTimestamp: number;
+	lastSentTimestamp: number;
+}
+
+const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
+
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	loadingStatus: LoadingStatus;
 	socketStatus: LoadingStatus;
@@ -27,22 +37,11 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	currentChannelId?: string | null;
 	isOpenCreateNewChannel?: boolean;
 	currentCategory: ICategory | null;
-	// newChannelCreatedId: string | undefined;
+	channelMetadata: EntityState<ChannelMeta, string>;
+	currentVoiceChannelId: string;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
-
-function waitUntil<T>(condition: () => T | undefined, ms: number = 100): Promise<T> {
-	return new Promise((resolve) => {
-		const interval = setInterval(() => {
-			const result = condition();
-			if (result !== undefined && result !== null) {
-				clearInterval(interval);
-				resolve(result);
-			}
-		}, ms);
-	});
-}
 
 export interface ChannelsRootState {
 	[CHANNELS_FEATURE_KEY]: ChannelsState;
@@ -53,26 +52,32 @@ function getChannelsRootState(thunkAPI: GetThunkAPI<unknown>): ChannelsRootState
 }
 
 type fetchChannelMembersPayload = {
+	clanId: string;
 	channelId: string;
 	noFetchMembers?: boolean;
 };
 
-export const joinChanel = createAsyncThunk('channels/joinChanel', async ({ channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
-	try {
-		thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-		thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-		if (!noFetchMembers) {
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ channelId }));
+export const joinChannel = createAsyncThunk(
+	'channels/joinChannel',
+	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
+		try {
+			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
+			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+			if (!noFetchMembers) {
+				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+			}
+			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+
+			await mezon.joinChatChannel(channelId);
+
+			return channel;
+		} catch (error) {
+			console.log(error);
+			return thunkAPI.rejectWithValue([]);
 		}
-		const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));		
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.joinChatChannel(channelId, channel?.channel_lable || '');
-		return channel;
-	} catch (error) {
-		console.log(error);
-		return thunkAPI.rejectWithValue([]);
-	}
-});
+	},
+);
 
 export const createNewChannel = createAsyncThunk('channels/createNewChannel', async (body: ApiCreateChannelDescRequest, thunkAPI) => {
 	try {
@@ -81,6 +86,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
+			thunkAPI.dispatch(threadsActions.setCurrentThread(response));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -98,6 +104,14 @@ type fetchChannelsArgs = {
 	channelType?: number;
 };
 
+function extractChannelMeta(channel: ChannelsEntity): ChannelMeta {
+	return {
+		id: channel.id,
+		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp || 0),
+		lastSentTimestamp: Number(channel.last_sent_message?.timestamp || 0),
+	};
+}
+
 export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType = 1 }: fetchChannelsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', clanId, channelType);
@@ -107,6 +121,8 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	}
 
 	const channels = response.channeldesc.map(mapChannelToEntity);
+	const meta = channels.map((ch) => extractChannelMeta(ch));
+	thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
 
 	return channels;
 });
@@ -117,6 +133,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	error: null,
 	isOpenCreateNewChannel: false,
 	currentCategory: null,
+	channelMetadata: channelMetaAdapter.getInitialState(),
+	currentVoiceChannelId: '',
 });
 
 export const channelsSlice = createSlice({
@@ -128,11 +146,29 @@ export const channelsSlice = createSlice({
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
 		},
+		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
+			state.currentVoiceChannelId = action.payload;
+		},
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
 		},
 		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
+		},
+		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
+			const channel = state.channelMetadata.entities[action.payload.channelId];
+			if (channel) {
+				channel.lastSentTimestamp = action.payload.timestamp;
+			}
+		},
+		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
+			const channel = state.channelMetadata.entities[action.payload.channelId];
+			if (channel) {
+				channel.lastSeenTimestamp = action.payload.timestamp;
+			}
+		},
+		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMeta[]>) => {
+			state.channelMetadata = channelMetaAdapter.upsertMany(state.channelMetadata, action.payload);
 		},
 	},
 	extraReducers: (builder) => {
@@ -150,14 +186,14 @@ export const channelsSlice = createSlice({
 			});
 
 		builder
-			.addCase(joinChanel.rejected, (state: ChannelsState, action) => {
+			.addCase(joinChannel.rejected, (state: ChannelsState, action) => {
 				state.socketStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addCase(joinChanel.pending, (state: ChannelsState) => {
+			.addCase(joinChannel.pending, (state: ChannelsState) => {
 				state.socketStatus = 'loading';
 			})
-			.addCase(joinChanel.fulfilled, (state: ChannelsState) => {
+			.addCase(joinChannel.fulfilled, (state: ChannelsState) => {
 				state.socketStatus = 'loaded';
 			});
 		builder
@@ -203,7 +239,7 @@ export const { openCreateNewModalChannel } = channelsSlice.actions;
 export const channelsActions = {
 	...channelsSlice.actions,
 	fetchChannels,
-	joinChanel,
+	joinChannel,
 	createNewChannel,
 };
 
@@ -233,6 +269,10 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
+export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
+
+export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
+
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,
 );
@@ -242,3 +282,16 @@ export const selectChannelsByClanId = (clainId: string) =>
 
 export const selectDefaultChannelIdByClanId = (clainId: string) =>
 	createSelector(selectChannelsByClanId(clainId), (channels) => (channels.length > 0 ? channels[0].id : null));
+
+export const selectIsUnreadChannelById = (channelId: string) =>
+	createSelector(getChannelsState, (state) => {
+		const channel = state.channelMetadata.entities[channelId];
+		// unread last seen timestamp is less than last sent timestamp
+		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
+	});
+
+export const selectLastChannelTimestamp = (channelId: string) =>
+	createSelector(getChannelsState, (state) => {
+		const channel = state.channelMetadata.entities[channelId];
+		return channel?.lastSeenTimestamp || 0;
+	});

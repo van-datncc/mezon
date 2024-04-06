@@ -2,7 +2,7 @@ import { Session } from "vendors/mezon-js/packages/mezon-js/dist";
 import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/dist/api.gen";
 import { Client } from "@mezon/mezon-js";
 
-const isValidUrl = (urlString: string) => {
+export const isValidUrl = (urlString: string) => {
 	let url;
 	try { 
 		url =new URL(urlString); 
@@ -48,30 +48,34 @@ export function handleUploadFile(client: Client, session: Session,
 	});
 }
 
-export function handleUrlInput(url: string) : Promise<ApiMessageAttachment> {
-	return new Promise<ApiMessageAttachment>(function(resolve, reject) {
-		// limit url within 512
-		if (isValidUrl(url) === true && url.length < 512) {
-			try {
-				fetch(url, {method: 'HEAD'}).then(response => {
-					const contentSize = response.headers.get('Content-Length');
-					const contentType = response.headers.get('Content-Type');					
-					if (contentType) {
-						resolve({
-							filename: url,
-							url: url,
-							filetype: contentType,
-							size: Number(contentSize),
-							width: 0,
-							height: 0,
-						});
-					}
-				}).catch(e => {
-					reject({});
-				});
-			} catch(e) {
-				reject({});
-			}
-		}
-	});
+export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
+    return new Promise<ApiMessageAttachment>((resolve, reject) => {
+        if (isValidUrl(url) && url.length < 512) {
+			fetch(url, { method: 'HEAD' })
+			.then(response => {
+				if (response.ok) {
+						const now = Date.now();
+                        const contentSize = response.headers.get('Content-Length');
+                        const contentType = response.headers.get('Content-Type');
+                        if (contentType) {
+                            resolve({
+                                filename: now + contentType,
+                                url: url,
+                                filetype: contentType,
+                                size: Number(contentSize),
+                                width: 0,
+                                height: 0,
+                            });
+                        }
+                    } else {
+                        reject({});
+                    }
+                })
+                .catch(e => {
+                    reject({});
+                });
+        } else {
+            reject({});
+        }
+    });
 }

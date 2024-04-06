@@ -61,7 +61,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 						>
 							<div className="flex items-center gap-4 w-10/12">
 								{option.logo ? (
-									<img src={option.logo} width={40} height={40} className="rounded-full" />
+									<img src={option.logo} className="rounded-full size-10 object-cover" />
 								) : (
 									<div>
 										{option?.clan_name && (
@@ -71,14 +71,14 @@ const ModalListClans = (props: ModalListClansProps) => {
 										)}
 									</div>
 								)}
-								<span className="text-[16px]">{option.clan_name}</span>
+								<span className="text-[16px] one-line">{option.clan_name}</span>
 							</div>
 							{idSelectedClan === option.clan_id && <Tick />}
 						</div>
 					);
 				})}
 			</div>
-			<div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md cursor-pointer">
+			<div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-[#155EEF1A] ">
 				<div className="flex items-center gap-4 w-10/12" onClick={createClan}>
 					<img src={'/assets/images/icon-create-clan.svg'} alt={'logoMezon'} width={40} height={40} />
 					<span className="text-[16px]">Add Clan</span>

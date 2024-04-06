@@ -1,8 +1,6 @@
-import { useNotification } from '@mezon/core';
-import { Dropdown } from 'flowbite-react';
-import { INotification } from 'libs/store/src/lib/notification/notify.slice';
+import { useChannels, useNotification } from '@mezon/core';
+import { INotification } from '@mezon/store';
 import { useState } from 'react';
-import { ChannelMessage } from 'vendors/mezon-js/packages/mezon-js/dist';
 import * as Icons from '../Icons';
 import NotificationItem from './NotificationItem';
 import NotifyMentionItem from './NotifyMentionItem';
@@ -15,61 +13,59 @@ const tabDataNotify = [
 ];
 
 function NotificationList() {
-	const { notification, notifyMention } = useNotification();
+	const { notification } = useNotification();
 	const [currentTabNotify, setCurrentTabNotify] = useState('individual');
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
+	const { channels } = useChannels();
+	const notificationItem = notification.filter(
+		(item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
+	);
+	const notifyMentionItem = notification.filter(
+		(item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
+	);
 
 	return (
-		<Dropdown
-			label=""
-			className="bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-[8px] mt-1 w-1/2 min-w-[480px] max-w-[600px]"
-			dismissOnClick={true}
-			placement="bottom"
-			renderTrigger={() => (
-				<div>
-					<InboxButton />
+		<div className="absolute top-8 right-0 shadow z-[99999999]">
+			<div className="flex flex-col bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-lg mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
+				<div className="py-2 px-3 bg-bgPrimary">
+					<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
+						<InboxButton />
+						<div>Inbox </div>
+					</div>
+					<div className="flex flex-row gap-4 py-3">
+						{tabDataNotify.map((tab, index: number) => {
+							return (
+								<div key={index}>
+									<button
+										className={`px-2 py-[4px] rounded-[4px] font-[600] ${currentTabNotify === tab.value ? 'bg-bgTertiary text-contentPrimary font-[700]' : ''}`}
+										tabIndex={index}
+										onClick={() => handleChangeTab(tab.value)}
+									>
+										{tab.title}
+									</button>
+								</div>
+							);
+						})}
+					</div>
 				</div>
-			)}
-			theme={{}}
-		>
-			<div className="py-2 px-3 bg-bgPrimary">
-				<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
-					<InboxButton />
-					<div>InBox </div>
-				</div>
-				<div className="flex flex-row gap-4 py-3">
-					{tabDataNotify.map((tab, index: number) => {
-						return (
-							<div key={index}>
-								<button
-									className={`px-2 py-[4px] rounded-[4px] font-[600] ${currentTabNotify === tab.value ? 'bg-bgTertiary text-contentPrimary font-[700]' : ''}`}
-									tabIndex={index}
-									onClick={() => handleChangeTab(tab.value)}
-								>
-									{tab.title}
-								</button>
-							</div>
-						);
-					})}
-				</div>
+				{currentTabNotify === 'individual' && (
+					<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
+						{notificationItem.map((notify: INotification) => (
+							<NotificationItem notify={notify} key={notify.id} />
+						))}
+					</div>
+				)}
+				{currentTabNotify === 'mention' && (
+					<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
+						{notifyMentionItem.map((notify: INotification) => (
+							<NotifyMentionItem notify={notify} key={notify.id} />
+						))}
+					</div>
+				)}
 			</div>
-			{currentTabNotify === 'individual' && (
-				<div className="bg-bgSecondary flex flex-col max-w-[800px] overflow-y-auto max-h-heightInBox">
-					{notification.map((notify: INotification) => (
-						<NotificationItem notify={notify} key={notify.id} />
-					))}
-				</div>
-			)}
-			{currentTabNotify === 'mention' && (
-				<div className="bg-bgSecondary flex flex-col flex-col-reverse max-w-[600px] max-h-[600px] overflow-auto">
-					{notifyMention.map((notify: ChannelMessage) => (
-						<NotifyMentionItem notify={notify} key={notify.id} />
-					))}
-				</div>
-			)}
-		</Dropdown>
+		</div>
 	);
 }
 

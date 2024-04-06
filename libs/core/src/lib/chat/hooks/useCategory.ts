@@ -5,12 +5,12 @@ import { useSelector } from 'react-redux';
 import { useChannels } from './useChannels';
 
 export function useCategory() {
-	const { channels } = useChannels();
+	const { listChannels } = useChannels();
 	const categories = useSelector(selectAllCategories);
 
 	const categorizedChannels = React.useMemo(() => {
 		const results = categories.map((category) => {
-			const categoryChannels = channels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
+			const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
 			return {
 				...category,
 				channels: categoryChannels,
@@ -18,7 +18,7 @@ export function useCategory() {
 		});
 
 		return results as ICategoryChannel[];
-	}, [channels, categories]);
+	}, [listChannels, categories]);
 
 	return useMemo(
 		() => ({
