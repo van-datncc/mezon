@@ -29,6 +29,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 	followingUserIds?: string[];
 	onlineStatusUser: Record<string, boolean>;
 	toFollowUserIds: string[];
+	memberChannels?: ChannelUserListChannelUser[];
 }
 
 // TODO: remove channelId from the parameter
@@ -57,7 +58,9 @@ const fetchChannelMembersCached = memoize(
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
-		normalizer: (args) => { return args[1] + args[2] + args[3]; }
+		normalizer: (args) => {
+			return args[1] + args[2] + args[3];
+		},
 	},
 );
 
@@ -66,7 +69,7 @@ type fetchChannelMembersPayload = {
 	channelId: string;
 	noCache?: boolean;
 	channelType: ChannelType;
-	repace?: boolean ; 
+	repace?: boolean;
 };
 
 export const fetchChannelMembers = createAsyncThunk(
@@ -83,11 +86,12 @@ export const fetchChannelMembers = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 		if (repace) {
-			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId))
+			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 		}
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
+		thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
 		thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
 		thunkAPI.dispatch(channelMembersActions.followUserStatus());
 		return members;
@@ -165,14 +169,14 @@ export const channelMembers = createSlice({
 		add: channelMembersAdapter.addOne,
 		remove: channelMembersAdapter.removeOne,
 		removeUserByChannel: (state, action: PayloadAction<string>) => {
-			const channelId  = action.payload;
-			const updatedMembers = Object.values(state.entities).filter(member => {
+			const channelId = action.payload;
+			const updatedMembers = Object.values(state.entities).filter((member) => {
 				return member.channelId !== channelId;
 			});
 			return channelMembersAdapter.setAll(state, updatedMembers);
 		},
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
-			for (let i of action.payload) {
+			for (const i of action.payload) {
 				state.onlineStatusUser[i.userId] = i.status;
 			}
 		},
@@ -187,6 +191,9 @@ export const channelMembers = createSlice({
 			const newUsers = [...state.toFollowUserIds, ...action.payload];
 			state.toFollowUserIds = [...new Set(newUsers)];
 		},
+		setMemberChannels: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
+			state.memberChannels = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -200,7 +207,7 @@ export const channelMembers = createSlice({
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			});		
+			});
 	},
 });
 
@@ -287,6 +294,8 @@ export const selectMembersMap = (channelId?: string | null) =>
 		return retval;
 	});
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
+
+export const selectMemberChannels = createSelector(getChannelMembersState, (state) => state.memberChannels);
 
 export const selectMemberOnlineStatusById = (userId: string) =>
 	createSelector(selectMemberStatus, (status) => {
