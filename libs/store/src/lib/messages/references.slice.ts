@@ -16,8 +16,9 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	error?: string | null;
 	reference: IMessageWithUser | null;
 	dataReferences: ApiMessageRef[];
-	// hasAttachmentOnRef: boolean;
 	idMessageToJump: string;
+	openEditMessageState: boolean;
+	openReplyMessageState: boolean;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -31,8 +32,9 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	error: null,
 	reference: null,
 	dataReferences: [],
-	// hasAttachmentOnRef: false,
 	idMessageToJump: '',
+	openEditMessageState: false,
+	openReplyMessageState: false,
 });
 
 export const referencesSlice = createSlice({
@@ -51,7 +53,12 @@ export const referencesSlice = createSlice({
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
-		// ...
+		setOpenEditMessageState(state, action) {
+			state.openEditMessageState = action.payload;
+		},
+		setOpenReplyMessageState(state, action) {
+			state.openReplyMessageState = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -70,6 +77,7 @@ export const referencesSlice = createSlice({
 });
 
 export const referencesReducer = referencesSlice.reducer;
+
 export const referencesActions = referencesSlice.actions;
 
 const { selectAll, selectEntities } = referencesAdapter.getSelectors();
@@ -84,4 +92,8 @@ export const selectReferenceMessage = createSelector(getReferencesState, (state:
 
 export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);
 
-export const selecIdMessageReplied = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
+export const selectIdMessageReplied = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
+
+export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
+
+export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
