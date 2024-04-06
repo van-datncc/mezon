@@ -49,7 +49,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 			<MarkdownFormatText
 				tagName={transformedObject.matchedText ? transformedObject.matchedText : ''}
 				markdown={transformedObject.nonMatchText}
-				textFirst={transformedObject.nonMatchTextFist}
+				//textFirst={transformedObject.nonMatchTextFist}
 			/>
 		</div>
 	);
