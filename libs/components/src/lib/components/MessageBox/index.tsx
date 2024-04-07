@@ -367,11 +367,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const currentContentState = editorState.getCurrentContent();
 		const selectionState = editorState.getSelection();
 		const contentText = currentContentState.getPlainText();
-		const syntaxEmoji = findSyntaxEmoji(contentText);
-		if (!syntaxEmoji) {
-			return;
-		}
-
+		const syntaxEmoji = findSyntaxEmoji(contentText) ?? '';
 		const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
 		const newContentState = ContentState.createFromText(updatedContentText);
 		let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');

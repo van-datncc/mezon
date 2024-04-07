@@ -2,6 +2,7 @@ import { Icons } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
 import { referencesActions, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { useEffect } from 'react';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
@@ -9,7 +10,7 @@ type ChannelMessageOptProps = {
 
 export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 	const dispatch = useAppDispatch();
-	const { reactionActions, userId, reactionRightState } = useChatReaction();
+	const { reactionActions, userId, reactionRightState, reactionBottomState } = useChatReaction();
 	const { openEditMessageState, openReplyMessageState } = useReference();
 
 	const handleClickReply = () => {
@@ -30,9 +31,15 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 		dispatch(reactionActions.setReactionBottomState(false));
 		dispatch(reactionActions.setReactionRightState(true));
 		dispatch(referencesActions.setReferenceMessage(message));
-
 		event.stopPropagation();
 	};
+
+	// reset refMessage
+	useEffect(() => {
+		if (!openEditMessageState && !openEditMessageState && !reactionRightState && !reactionBottomState) {
+			dispatch(referencesActions.setReferenceMessage(null));
+		}
+	}, [openEditMessageState, openEditMessageState, reactionRightState, reactionBottomState]);
 
 	return (
 		<div className="iconHover flex justify-between">
