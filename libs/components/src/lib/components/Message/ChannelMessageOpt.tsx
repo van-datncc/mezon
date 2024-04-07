@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
-import { messagesActions, referencesActions, useAppDispatch } from '@mezon/store';
+import { referencesActions, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 
 type ChannelMessageOptProps = {
@@ -16,22 +16,20 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(messagesActions.setReplyMessageStatus(true));
 	};
 
 	const handleClickEdit = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(messagesActions.setReplyMessageStatus(false));
 	};
 
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
+		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
 		dispatch(reactionActions.setReactionRightState(true));
 		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(messagesActions.setReplyMessageStatus(false));
 
 		event.stopPropagation();
 	};

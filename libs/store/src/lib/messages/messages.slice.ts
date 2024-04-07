@@ -56,7 +56,6 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
-	replyMessageStatus?: boolean;
 }
 
 export interface MessagesRootState {
@@ -288,7 +287,6 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
-	replyMessageStatus: false,
 });
 
 export type SetCursorChannelArgs = {
@@ -320,9 +318,7 @@ export const messagesSlice = createSlice({
 				}
 			}
 		},
-		setReplyMessageStatus(state, action) {
-			state.replyMessageStatus = action.payload;
-		},
+
 		markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
 			messagesAdapter.updateOne(state, {
 				id: action.payload,
@@ -510,5 +506,3 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
-
-export const selectReplyMessageStatus = createSelector(getMessagesState, (state) => state.replyMessageStatus);
