@@ -130,7 +130,6 @@ export const reactionReducer = reactionSlice.reducer;
 
 export const reactionActions = {
 	...reactionSlice.actions,
-	// fetchEmoji,
 	updateReactionMessage,
 };
 
