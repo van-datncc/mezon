@@ -16,7 +16,6 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	const pickEmoji = (emoji: IEmoji) => {
 		setEmojiSuggestion(emoji.skins[0].native);
-
 		setIsEmojiListShowed(false);
 		setTextToSearchEmojiSuggesion('');
 	};

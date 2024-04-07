@@ -147,8 +147,8 @@ export const selectReactionBottomState = createSelector(getReactionState, (state
 
 export const selectReactionRightState = createSelector(getReactionState, (state: ReactionState) => state.reactionRightState);
 
-export const selectMessageReacted = createSelector(getReactionState, (state) => state.reactionDataSocket);
+export const selectMessageReacted = createSelector(getReactionState, (state: ReactionState) => state.reactionDataSocket);
 
-export const selectDataReactionCombine = createSelector(getReactionState, (state) => state.reactionDataServerAndSocket);
+export const selectDataReactionCombine = createSelector(getReactionState, (state: ReactionState) => state.reactionDataServerAndSocket);
 
-export const selectGrandParentWidthState = createSelector(getReactionState, (state) => state.grandParentWidthState);
+export const selectGrandParentWidthState = createSelector(getReactionState, (state: ReactionState) => state.grandParentWidthState);

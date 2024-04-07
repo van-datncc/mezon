@@ -23,6 +23,7 @@ export * from './lib/chat/hooks/useDirectMembers';
 export * from './lib/chat/hooks/useDirectMessages';
 export * from './lib/chat/hooks/useEmojiSuggestion';
 export * from './lib/chat/hooks/useFriends';
+export * from './lib/chat/hooks/useGifs';
 export * from './lib/chat/hooks/useGifsStickersEmojis';
 export * from './lib/chat/hooks/useInvite';
 export * from './lib/chat/hooks/useJumpMessage';

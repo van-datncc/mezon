@@ -1,11 +1,7 @@
-import { useChatSending } from '@mezon/core';
+import { useChatSending, useGifs } from '@mezon/core';
 import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
-import axios from 'axios';
-import { selectAllgifs } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { Loading } from 'libs/ui/src/lib/Loading';
 import { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useDebouncedCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 
 type ChannelMessageBoxProps = {
@@ -27,16 +23,34 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	const [itemsPerPage, setItemsPerPage] = useState(25);
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-	const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
 	const [valueSearchGif, setValueSearchGif] = useState('');
 	const [valueInput, setValueInput] = useState<string>('');
-	const dataGifs = useSelector(selectAllgifs);
-	console.log('data', dataGifs);
+
+	const { dataGifs, dataGifsSearch, loadingStatusGifs } = useGifs();
+	const [currentItems, setCurrentItems] = useState<any>();
 
 	useEffect(() => {
-		setData(dataGifs);
-	}, [dataGifs]);
+		if (data) {
+			setCurrentItems(data.slice(indexOfFirstItem, indexOfLastItem));
+		}
+	}, [data]);
+
+	useEffect(() => {
+		if (dataGifsSearch) {
+			console.log(dataGifsSearch);
+			setData(dataGifs);
+		} else {
+			setData(data);
+		}
+	}, [dataGifs, data]);
+
+	// useEffect(() => {
+	// 	console.log(valueSearchGif);
+	// 	if (valueSearchGif) {
+	// 		fetchGifsDataSearch(valueSearchGif);
+	// 	}
+	// }, [valueSearchGif]);
 
 	const handleSend = useCallback(
 		(
@@ -50,48 +64,26 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 		[sendMessage],
 	);
 
-	// const fetchData = useCallback(async () => {
-	// 	setIsError(false);
-	// 	setIsLoading(true);
-	// 	try {
-	// 		const results = await axios(`${process.env.NX_CHAT_APP_API_GIPHY_TRENDING}`, {
-	// 			params: {
-	// 				api_key: `${process.env.NX_CHAT_APP_API_GIPHY_KEY}`,
-	// 				limit: 30,
-	// 			},
-	// 		});
-	// 		setData(results.data.data);
-	// 	} catch (err) {
-	// 		setIsError(true);
-	// 		setTimeout(() => setIsError(false), 4000);
-	// 	}
-
-	// 	setIsLoading(false);
-	// }, []);
-
-	useEffect(() => {
-		setData(dataGifs);
-	}, []);
-
 	const handleClickGif = (giftUrl: string) => {
 		handleSend({ t: '' }, [], [{ url: giftUrl }], []);
 	};
 
 	const renderGifs = () => {
-		if (isLoading) {
+		if (loadingStatusGifs === 'loading') {
 			return <Loading classProps="w-10 h-10" />;
 		}
 		return (
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
-				{/* {currentItems.map((gif: any, index) => (
-					<div
-						key={gif.id}
-						className={`order-${index} overflow-hidden cursor-pointer`}
-						onClick={() => handleClickGif(gif.images.original.url)}
-					>
-						<img src={gif.images.fixed_height.url} className="w-full h-auto" />
-					</div>
-				))} */}
+				{currentItems &&
+					currentItems.map((gif: any, index: number) => (
+						<div
+							key={gif.id}
+							className={`order-${index} overflow-hidden cursor-pointer`}
+							onClick={() => handleClickGif(gif.images.original.url)}
+						>
+							<img src={gif.images.fixed_height.url} className="w-full h-auto" />
+						</div>
+					))}
 			</div>
 		);
 	};
@@ -106,49 +98,20 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 		}
 	};
 
-	const handleSubmit = async (value: string) => {
-		setIsError(false);
-		setIsLoading(true);
+	// const debouncedSetValueSearchGif = useDebouncedCallback((value) => {
+	// 	setValueSearchGif(value);
+	// }, 300);
 
-		try {
-			const results = await axios(`${process.env.NX_CHAT_APP_API_GIPHY_SEARCH}`, {
-				params: {
-					api_key: `${process.env.NX_CHAT_APP_API_GIPHY_KEY}`,
-					q: value,
-					limit: 30,
-				},
-			});
-			setData(results.data.data);
-		} catch (err) {
-			setIsError(true);
-			setTimeout(() => setIsError(false), 4000);
-		}
-
-		setIsLoading(false);
-	};
-
-	const debouncedSetValueSearchGif = useDebouncedCallback((value) => {
-		setValueSearchGif(value);
-		handleSubmit(valueSearchGif);
-	}, 300);
-
-	useEffect(() => {
-		if (activeTab === SubPanelName.GIFS && valueInput !== '') {
-			debouncedSetValueSearchGif(valueInput);
-		} else {
-			// fetchData();
-		}
-	}, [activeTab, valueInput, debouncedSetValueSearchGif, setValueSearchGif, valueSearchGif]);
-
-	// const pageSelected = (pageNumber: any) => {
-	// 	setCurrentPage(pageNumber);
-	// };
+	// useEffect(() => {
+	// 	if (activeTab === SubPanelName.GIFS && valueInput !== '') {
+	// 		debouncedSetValueSearchGif(valueInput);
+	// 	}
+	// }, [activeTab, valueInput, debouncedSetValueSearchGif, setValueSearchGif, valueSearchGif]);
 
 	return (
 		<>
 			{renderError()}
 			<div className="mx-2 flex justify-center h-[400px] overflow-y-scroll hide-scrollbar flex-wrap">{renderGifs()}</div>
-			{/* <Paginate pageSelected={pageSelected} currentPage={currentPage} itemsPerPage={itemsPerPage} totalItems={data.length} /> */}
 		</>
 	);
 }
