@@ -1,4 +1,5 @@
 import { Icons } from '@mezon/components';
+import { useGifsStickersEmoji } from '@mezon/core';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback } from 'react';
 
@@ -7,11 +8,31 @@ export type GifStickerEmojiButtonsProps = {
 };
 
 function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
-	const handleOpenGifs = useCallback(() => {}, []);
+	const { setSubPanelActive } = useGifsStickersEmoji();
 
-	const handleOpenStickers = useCallback(() => {}, []);
+	const handleOpenGifs = useCallback(
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			e.stopPropagation(); // Ngăn chặn sự lan truyền của sự kiện
+			setSubPanelActive(SubPanelName.GIFS);
+		},
+		[setSubPanelActive],
+	);
 
-	const handleOpenEmoji = useCallback(() => {}, []);
+	const handleOpenStickers = useCallback(
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			e.stopPropagation(); // Ngăn chặn sự lan truyền của sự kiện
+			setSubPanelActive(SubPanelName.STICKERS);
+		},
+		[setSubPanelActive],
+	);
+
+	const handleOpenEmoji = useCallback(
+		(e: React.MouseEvent<HTMLDivElement>) => {
+			e.stopPropagation(); // Ngăn chặn sự lan truyền của sự kiện
+			setSubPanelActive(SubPanelName.EMOJI);
+		},
+		[setSubPanelActive],
+	);
 
 	return (
 		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 relative">
