@@ -11,21 +11,26 @@ import { authReducer } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
 import { channelMembersReducer } from './channelmembers/channel.members';
 import { channelsReducer } from './channels/channels.slice';
+import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
-import { messagesReducer } from './messages/messages.slice';
-import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
-import { usersClanReducer } from './clanMembers/clan.members';
 import { directReducer } from './direct/direct.slice';
+import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice';
 import { friendsReducer } from './friends/friend.slice';
+import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
+import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
+import { stickersReducer } from './giftStickerEmojiPanel/stickers.slice';
 import { inviteReducer } from './invite/invite.slice';
+import { messagesReducer } from './messages/messages.slice';
+import { referencesReducer } from './messages/references.slice';
 import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
+import { reactionReducer } from './reactionMessage/reactionMessage.slice';
+
+import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
-import { referencesReducer } from './messages/references.slice';
-import { emojiReducer } from './emoji/emoji.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -76,7 +81,11 @@ const reducer = {
 	notification: notificationReducer,
 	voice: voiceReducer,
 	references: referencesReducer,
-	emoji: emojiReducer,
+	reaction: reactionReducer,
+	suggestionEmoji: emojiSuggestionReducer,
+	gifs: gifsReducer,
+	stickers: stickersReducer,
+	gifsStickersEmojis: gifsStickerEmojiReducer,
 };
 
 let storeInstance = configureStore({

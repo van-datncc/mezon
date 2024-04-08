@@ -1,4 +1,4 @@
-import { useEmojis } from '@mezon/core';
+import { useEmojiSuggestion } from '@mezon/core';
 import { IEmoji } from '@mezon/utils';
 import { Ref, forwardRef, useEffect, useRef, useState } from 'react';
 
@@ -8,7 +8,7 @@ type EmojiSuggestionList = {
 
 const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList, ref: Ref<HTMLDivElement>) => {
 	const { emojis, setEmojiSuggestion, setIsEmojiListShowed, isEmojiListShowed, setIsFocusEditorStatus, setTextToSearchEmojiSuggesion } =
-		useEmojis();
+		useEmojiSuggestion();
 	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 	const [inputCorrect, setInputCorrect] = useState<string>('');
 	const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -16,7 +16,6 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 
 	const pickEmoji = (emoji: IEmoji) => {
 		setEmojiSuggestion(emoji.skins[0].native);
-
 		setIsEmojiListShowed(false);
 		setTextToSearchEmojiSuggesion('');
 	};

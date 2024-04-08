@@ -18,6 +18,7 @@ import {
 
 import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
+export * from './gifTypes';
 export * from './permissions';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
@@ -258,7 +259,7 @@ export interface NotificationContent {
 	username?: string;
 }
 
-export enum TabNamePopup {
+export enum SubPanelName {
 	NONE = 'NONE',
 	GIFS = 'GIFS',
 	STICKERS = 'STICKER',

@@ -6,15 +6,14 @@ type IMessageAvatarProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
-	isReply?: boolean;
 };
 
-const MessageAvatar = ({ user, message, isCombine, isReply }: IMessageAvatarProps) => {
+const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user);
 
 	const { messageHour } = useMessageParser(message);
 
-	if ((!isReply && isCombine) || (!isReply && !user)) {
+	if ((message.references?.length === 0 && isCombine) || (message.references?.length === 0 && !user)) {
 		return (
 			<div className="w-10 flex items-center justify-center min-w-10">
 				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>

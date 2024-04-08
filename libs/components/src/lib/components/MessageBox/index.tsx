@@ -2,18 +2,10 @@ import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import { EmojiListSuggestion } from '@mezon/components';
-import { useChatMessages, useEmojis } from '@mezon/core';
-import {
-	channelsActions,
-	referencesActions,
-	selectNotificationMentions,
-	selectCurrentChannel,
-	selectEmojiSelectedMess,
-	selectReference,
-	useAppDispatch,
-} from '@mezon/store';
+import { useEmojiSuggestion } from '@mezon/core';
+import { referencesActions, selectDataReferences, selectReferenceMessage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, NotificationContent, TabNamePopup } from '@mezon/utils';
+import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -51,7 +43,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-
 	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
 	const mentionPlugin = useRef(
 		createMentionPlugin({
@@ -212,20 +203,38 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
-	const refMessage = useSelector(selectReference);
+	const refMessage = useSelector(selectReferenceMessage);
+	const dataReferencesRefMess = useSelector(selectDataReferences);
+	useEffect(() => {
+		if (refMessage && refMessage.attachments) {
+			dispatch(
+				referencesActions.setDataReferences([
+					{
+						message_id: '',
+						message_ref_id: refMessage.id,
+						ref_type: 0,
+						message_sender_id: refMessage.sender_id,
+						content: JSON.stringify(refMessage.content),
+						has_attachment: refMessage.attachments?.length > 0 ? true : false,
+					},
+				]),
+			);
+		}
+	}, [refMessage]);
 
 	const handleSend = useCallback(() => {
 		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			return;
 		}
 
-		if (refMessage) {
-			onSend({ t: content }, mentionData, attachmentData, refMessage.references);
+		if (refMessage !== null && dataReferencesRefMess.length > 0) {
+			onSend({ t: content }, mentionData, attachmentData, dataReferencesRefMess);
 			setContent('');
 			setAttachmentData([]);
-			setMentionData([]);
+			setClearEditor(true);
 			setEditorState(() => EditorState.createEmpty());
-			dispatch(referencesActions.setReference(null));
+			dispatch(referencesActions.setReferenceMessage(null));
+			dispatch(referencesActions.setDataReferences(null));
 		} else {
 			onSend({ t: content }, mentionData, attachmentData);
 			setContent('');
@@ -274,8 +283,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(updatedEditorState);
 	}, [editorState]);
 
-	const emojiSelectedMess = useSelector(selectEmojiSelectedMess);
-
 	useEffect(() => {
 		if (content.length === 0) {
 			setShowPlaceHolder(true);
@@ -319,7 +326,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
 		setIsFocusEditorStatus,
-	} = useEmojis();
+	} = useEmojiSuggestion();
 
 	useEffect(() => {
 		clickEmojiSuggestion();
@@ -360,11 +367,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		const currentContentState = editorState.getCurrentContent();
 		const selectionState = editorState.getSelection();
 		const contentText = currentContentState.getPlainText();
-		const syntaxEmoji = findSyntaxEmoji(contentText);
-		if (!syntaxEmoji) {
-			return;
-		}
-
+		const syntaxEmoji = findSyntaxEmoji(contentText) ?? '';
 		const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
 		const newContentState = ContentState.createFromText(updatedContentText);
 		let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
@@ -420,7 +423,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						</div>
 					</div>
 					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
-					<GifStickerEmojiButtons activeTab={TabNamePopup.NONE} />
+					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>
 			</div>
 		</div>

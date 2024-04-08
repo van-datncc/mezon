@@ -1,8 +1,10 @@
 import { RefObject, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 type Event = MouseEvent | TouchEvent;
 
 export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(ref: RefObject<T>, handler: (event: Event) => void) => {
+	const dispatch = useDispatch();
 	useEffect(() => {
 		const listener = (event: Event) => {
 			const el = ref?.current;
@@ -14,10 +16,9 @@ export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(ref: RefO
 
 		document.addEventListener('mousedown', listener);
 		document.addEventListener('touchstart', listener);
-
 		return () => {
 			document.removeEventListener('mousedown', listener);
 			document.removeEventListener('touchstart', listener);
 		};
-	}, [ref, handler]); // Reload only if ref or handler changes
+	}, [ref, handler, dispatch]); // Reload only if ref or handler changes
 };
