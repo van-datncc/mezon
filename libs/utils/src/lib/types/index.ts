@@ -326,7 +326,7 @@ export type SenderInfoOptionals = {
 	avatar?: string | undefined;
 };
 
-export type IGif = {
+export interface IGif  {
 	images: {
 		original: {
 			url: string;
