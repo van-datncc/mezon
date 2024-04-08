@@ -1,10 +1,11 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
 import { useAppNavigation, useFriends } from '@mezon/core';
-import { selectAllClans, selectCurrentClan } from '@mezon/store';
+import { gifsStickerEmojiActions, reactionActions, referencesActions, selectAllClans, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
+import { SubPanelName } from '@mezon/utils';
 import { useState } from 'react';
 import { useModal } from 'react-modal-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 
@@ -23,8 +24,16 @@ function MyApp() {
 
 	const { quantityPendingRequest } = useFriends();
 
+	const dispatch = useDispatch();
+	const handleClickOutside = () => {
+		dispatch(referencesActions.setIdMessageToJump(''));
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+		dispatch(reactionActions.setReactionRightState(false));
+		dispatch(reactionActions.setReactionBottomState(false));
+	};
+
 	return (
-		<div className="flex h-screen text-gray-100 overflow-hidden relative">
+		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
 			<div className="overflow-visible py-4 px-3 space-y-2 bg-bgPrimary scrollbar-hide">
 				<NavLink to="/chat/direct/friends">
 					<NavLinkComponent active={pathName.includes('direct')}>

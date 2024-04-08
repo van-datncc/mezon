@@ -1,8 +1,26 @@
+import { useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { SubPanelName } from '@mezon/utils';
+import { useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { Icons } from '../../components';
 
 export const InputSearch: React.FC = () => {
+	const { subPanelActive } = useGifsStickersEmoji();
+	const { fetchGifsDataSearch } = useGifs();
+	const [valueSearchGif, setValueSearchGif] = useState('');
+	const [valueInput, setValueInput] = useState<string>('');
+
+	const debouncedSetValueSearchGif = useDebouncedCallback((value) => {
+		setValueSearchGif(value);
+	}, 300);
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		
+		setValueInput(e.target.value.trim());
+		debouncedSetValueSearchGif(valueInput);
+		if (subPanelActive === SubPanelName.GIFS && valueInput !== '') {
+			console.log(valueSearchGif);
+			fetchGifsDataSearch(valueSearchGif);
+		}
 	};
 
 	return (

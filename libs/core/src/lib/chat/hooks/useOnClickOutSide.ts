@@ -1,4 +1,3 @@
-import { referencesActions } from '@mezon/store';
 import { RefObject, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -12,7 +11,6 @@ export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(ref: RefO
 			if (!el || el.contains((event?.target as Node) || null)) {
 				return;
 			}
-			dispatch(referencesActions.setIdMessageToJump(''));
 			handler(event); // Call the handler only if the click is outside of the element passed.
 		};
 

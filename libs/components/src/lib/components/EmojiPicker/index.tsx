@@ -1,4 +1,4 @@
-import { useChatReaction } from '@mezon/core';
+import { useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import { ChannelStreamMode } from '@mezon/mezon-js';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import EmojiPicker, { EmojiClickData, EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
@@ -12,6 +12,7 @@ export type EmojiPickerOptions = {
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
 	const { reactionMessageDispatch, setReactionRightState, setReactionBottomState } = useChatReaction();
+	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
@@ -27,6 +28,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 			setReactionRightState(false);
 			setReactionBottomState(false);
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
+			setEmojiSuggestion(emojiData.emoji);
 			event.stopPropagation();
 		}
 	};
