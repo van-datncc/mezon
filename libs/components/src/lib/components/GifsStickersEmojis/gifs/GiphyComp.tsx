@@ -15,8 +15,6 @@ type ChannelMessageBoxProps = {
 
 function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const [data, setData] = useState<any>();
-	// const [search, setSearch] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -24,9 +22,6 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const [valueSearchGif, setValueSearchGif] = useState('');
-	const [valueInput, setValueInput] = useState<string>('');
-
 	const { dataGifs, dataGifsSearch, loadingStatusGifs } = useGifs();
 	const [currentItems, setCurrentItems] = useState<any>();
 
@@ -44,13 +39,6 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 			setData(data);
 		}
 	}, [dataGifs, data]);
-
-	// useEffect(() => {
-	// 	console.log(valueSearchGif);
-	// 	if (valueSearchGif) {
-	// 		fetchGifsDataSearch(valueSearchGif);
-	// 	}
-	// }, [valueSearchGif]);
 
 	const handleSend = useCallback(
 		(
@@ -97,16 +85,6 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 			);
 		}
 	};
-
-	// const debouncedSetValueSearchGif = useDebouncedCallback((value) => {
-	// 	setValueSearchGif(value);
-	// }, 300);
-
-	// useEffect(() => {
-	// 	if (activeTab === SubPanelName.GIFS && valueInput !== '') {
-	// 		debouncedSetValueSearchGif(valueInput);
-	// 	}
-	// }, [activeTab, valueInput, debouncedSetValueSearchGif, setValueSearchGif, valueSearchGif]);
 
 	return (
 		<>

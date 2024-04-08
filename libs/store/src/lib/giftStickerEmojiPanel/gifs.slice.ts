@@ -3,7 +3,9 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 
 export const GIFS_FEATURE_KEY = 'gifs';
 
-export interface GifsEntity extends IGif {}
+export interface GifsEntity extends IGif {
+	id:string
+}
 
 export const gifsAdapter = createEntityAdapter<GifsEntity>();
 
