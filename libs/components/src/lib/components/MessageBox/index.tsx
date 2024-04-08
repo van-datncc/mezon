@@ -17,6 +17,10 @@ import ImageComponent from './ImageComponet';
 import MentionSuggestionWrapper from './MentionSuggestionWrapper';
 import editorStyles from './editorStyles.module.css';
 
+import { Mention, MentionsInput } from 'react-mentions';
+import mentionsInputStyle from './RmentionInputStyle';
+import mentionStyle from './RmentionStyle';
+
 export type MessageBoxProps = {
 	onSend: (
 		content: IMessageSendPayload,
@@ -261,11 +265,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const editorRef = useRef<Editor | null>(null);
 
-	const onFocusEditorState = () => {
-		setTimeout(() => {
-			editorRef.current!.focus();
-		}, 0);
-	};
+	// const onFocusEditorState = () => {
+	// 	setTimeout(() => {
+	// 		editorRef.current!.focus();
+	// 	}, 0);
+	// };
 
 	const moveSelectionToEnd = useCallback(() => {
 		setTimeout(() => {
@@ -293,10 +297,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [clearEditor, content]);
 
-	useEffect(() => {
-		const editorElement = document.querySelectorAll('[data-offset-key]');
-		editorElement[2].classList.add('break-all');
-	}, []);
+	// useEffect(() => {
+	// 	const editorElement = document.querySelectorAll('[data-offset-key]');
+	// 	editorElement[2].classList.add('break-all');
+	// }, []);
 
 	// please no delete
 	const editorDiv = document.getElementById('editor');
@@ -338,13 +342,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [content]);
 
-	useEffect(() => {
-		if (isEmojiListShowed) {
-			emojiListRef.current && emojiListRef.current.focus();
-		} else {
-			onFocusEditorState();
-		}
-	}, [isEmojiListShowed, textToSearchEmojiSuggestion]);
+	// useEffect(() => {
+	// 	if (isEmojiListShowed) {
+	// 		emojiListRef.current && emojiListRef.current.focus();
+	// 	} else {
+	// 		onFocusEditorState();
+	// 	}
+	// }, [isEmojiListShowed, textToSearchEmojiSuggestion]);
 
 	const clearSuggestionEmojiAfterSendMessage = () => {
 		setIsEmojiListShowed(false);
@@ -354,11 +358,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(() => EditorState.createEmpty());
 	};
 
-	useEffect(() => {
-		if (isFocusEditor) {
-			onFocusEditorState();
-		}
-	}, [isFocusEditor]);
+	// useEffect(() => {
+	// 	if (isFocusEditor) {
+	// 		onFocusEditorState();
+	// 	}
+	// }, [isFocusEditor]);
 
 	function clickEmojiSuggestion() {
 		if (!emojiPicked) {
@@ -373,7 +377,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
 		const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
 		setEditorState(updatedEditorState);
-		onFocusEditorState();
+		// onFocusEditorState();
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
@@ -384,6 +388,37 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 		return null;
 	}
+
+	type MentionsInputChangeEvent = {
+		target: {
+			value: string;
+		};
+	};
+	type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
+
+	const [valueM, setValueM] = useState('');
+
+	// Hàm xử lý thay đổi cho MentionsInput
+	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		setValueM(newValue);
+		console.log('getMention', mentions);
+	};
+	const users = [
+		{
+			id: 'isaac',
+			display: 'Isaac Newton',
+		},
+		{
+			id: 'sam',
+			display: 'Sam Victor',
+		},
+		{
+			id: 'emma',
+			display: 'emmanuel@nobody.com',
+		},
+	];
+
+	console.log(valueM);
 
 	return (
 		<div className="relative">
@@ -398,12 +433,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 				<div
 					className={`w-full bg-black gap-3 flex items-center`}
-					onClick={() => {
-						editorRef.current!.focus();
-					}}
+					// onClick={() => {
+					// 	editorRef.current!.focus();
+					// }}
 				>
-					<div className={`w-[96%] bg-black gap-3 relative`} onClick={onFocusEditorState}>
-						<div
+					<div className={`w-[96%] bg-black gap-3 relative`}>
+						{/* <div
 							id="editor"
 							className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}
 							style={{ wordBreak: 'break-word' }}
@@ -420,7 +455,17 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							{showPlaceHolder && (
 								<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
 							)}
-						</div>
+						</div> */}
+						<MentionsInput
+							placeholder="Write your thoughs here..."
+							value={valueM}
+							onChange={onChangeMentionInput}
+							style={mentionsInputStyle}
+							a11ySuggestionsListLabel={'Suggested mentions'}
+						>
+							<Mention style={mentionStyle} data={users} trigger="@" />
+							<Mention style={mentionStyle} data={users} trigger="#" />
+						</MentionsInput>
 					</div>
 					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
