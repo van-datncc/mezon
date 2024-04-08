@@ -1,11 +1,11 @@
 import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
-import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
-import { EmojiListSuggestion } from '@mezon/components';
+import createMentionPlugin from '@draft-js-plugins/mention';
+import { EmojiListSuggestion, MentionReactInput } from '@mezon/components';
 import { useEmojiSuggestion } from '@mezon/core';
 import { referencesActions, selectDataReferences, selectReferenceMessage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
+import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,12 +14,7 @@ import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 import ImageComponent from './ImageComponet';
-import MentionSuggestionWrapper from './MentionSuggestionWrapper';
 import editorStyles from './editorStyles.module.css';
-
-import { Mention, MentionsInput } from 'react-mentions';
-import mentionsInputStyle from './RmentionInputStyle';
-import mentionStyle from './RmentionStyle';
 
 export type MessageBoxProps = {
 	onSend: (
@@ -29,8 +24,8 @@ export type MessageBoxProps = {
 		references?: Array<ApiMessageRef>,
 	) => void;
 	onTyping?: () => void;
-	listMentions?: MentionData[] | undefined;
-	isOpenEmojiPropOutside?: boolean | undefined;
+	listMentions?: MentionDataProps[] | undefined;
+	// isOpenEmojiPropOutside?: boolean | undefined;
 	currentChannelId?: string;
 	currentClanId?: string;
 };
@@ -38,10 +33,8 @@ export type MessageBoxProps = {
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const dispatch = useAppDispatch();
-
 	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
 	const [editorState, setEditorState] = useState(EditorState.createEmpty());
-
 	const [clearEditor, setClearEditor] = useState(false);
 	const [content, setContent] = useState<string>('');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
@@ -389,37 +382,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		return null;
 	}
 
-	type MentionsInputChangeEvent = {
-		target: {
-			value: string;
-		};
-	};
-	type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
-
-	const [valueM, setValueM] = useState('');
-
-	// Hàm xử lý thay đổi cho MentionsInput
-	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		setValueM(newValue);
-		console.log('getMention', mentions);
-	};
-	const users = [
-		{
-			id: 'isaac',
-			display: 'Isaac Newton',
-		},
-		{
-			id: 'sam',
-			display: 'Sam Victor',
-		},
-		{
-			id: 'emma',
-			display: 'emmanuel@nobody.com',
-		},
-	];
-
-	console.log(valueM);
-
 	return (
 		<div className="relative">
 			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
@@ -456,18 +418,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 								<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
 							)}
 						</div> */}
-						<MentionsInput
-							placeholder="Write your thoughs here..."
-							value={valueM}
-							onChange={onChangeMentionInput}
-							style={mentionsInputStyle}
-							a11ySuggestionsListLabel={'Suggested mentions'}
-						>
-							<Mention style={mentionStyle} data={users} trigger="@" />
-							<Mention style={mentionStyle} data={users} trigger="#" />
-						</MentionsInput>
+						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} />
 					</div>
-					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
+					{/* <MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} /> */}
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>
 			</div>
