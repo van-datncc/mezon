@@ -102,25 +102,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-	const ondisconnect = useCallback(() => {
-		const retry = (attempt: number) => {
-			console.log('Reconnecting', attempt);
-			const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
-			const timeoutId = setTimeout(() => {
-				reconnect()
-					.then(() => {
-						console.log('Reconnected');
-					})
-					.catch(() => {
-						retry(attempt + 1);
-						if (attempt > 5) {
-							// max retry is 5
-							clearTimeout(timeoutId);
-						}
-					});
-			}, delay);
-		};
-		retry(0);
+	const ondisconnect = useCallback(() => {		
+		reconnect().catch(e => "trying to reconnect");
 	}, [reconnect]);
 
 	const onerror = useCallback((event: unknown) => {
