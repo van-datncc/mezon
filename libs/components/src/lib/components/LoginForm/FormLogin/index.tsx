@@ -144,9 +144,9 @@ function LoginForm(props: LoginFormProps) {
 						onClick={handleFormSubmit}
 						className="flex-col justify-start items-center flex w-full h-[48px] pt-3 pr-4 pb-3 pl-4 rounded-[4px] bg-[#155eef] "
 					>
-						<div className="w-fit h-fit font-manrope text-left text-base font-medium text-[#ffffff] leading-[150%]">
+						<div className="w-fit h-fit font-manrope text-left text-base font-medium text-[#ffffff] leading-[150%] flex justify-center">
 							{isLoading === 'loading' ? (
-								<Loading classProps="w-5 h-5 ml-2" />
+								<Loading  />
 							) : isLoading === 'loaded' ? (
 								'Login successful'
 							) : (

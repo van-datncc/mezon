@@ -1,5 +1,11 @@
 import { ThunkDispatch } from '@reduxjs/toolkit';
-import { gifsActions, selectAllgifs, selectGifsDataSearch, selectLoadingStatusGifs } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
+import {
+	gifsActions,
+	selectAllgifs,
+	selectGifsDataSearch,
+	selectLoadingStatusGifs,
+	selectValueInputSearch,
+} from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,11 +14,18 @@ export function useGifs() {
 	const dataGifs = useSelector(selectAllgifs);
 	const dataGifsSearch = useSelector(selectGifsDataSearch);
 	const loadingStatusGifs = useSelector(selectLoadingStatusGifs);
+	const valueInputToCheckHandleSearch = useSelector(selectValueInputSearch);
 
 	const fetchGifsDataSearch = useCallback(
 		(valueSearch: string) => {
-			console.log(valueSearch);
 			dispatch(gifsActions.fetchGifsDataSearch(valueSearch));
+		},
+		[dispatch],
+	);
+
+	const setValueInputSearch = useCallback(
+		(valueSearch: string) => {
+			dispatch(gifsActions.setValueInputSearch(valueSearch));
 		},
 		[dispatch],
 	);
@@ -23,7 +36,9 @@ export function useGifs() {
 			dataGifs,
 			dataGifsSearch,
 			loadingStatusGifs,
+			valueInputToCheckHandleSearch,
+			setValueInputSearch,
 		}),
-		[dataGifs, fetchGifsDataSearch, dataGifsSearch, loadingStatusGifs],
+		[dataGifs, fetchGifsDataSearch, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch, setValueInputSearch],
 	);
 }

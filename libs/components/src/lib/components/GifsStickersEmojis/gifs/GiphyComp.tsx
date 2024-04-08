@@ -15,8 +15,6 @@ type ChannelMessageBoxProps = {
 
 function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const [data, setData] = useState<any>();
-	// const [search, setSearch] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -24,10 +22,7 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const [valueSearchGif, setValueSearchGif] = useState('');
-	const [valueInput, setValueInput] = useState<string>('');
-
-	const { dataGifs, dataGifsSearch, loadingStatusGifs } = useGifs();
+	const { dataGifs, dataGifsSearch, loadingStatusGifs, setValueInputSearch, valueInputToCheckHandleSearch } = useGifs();
 	const [currentItems, setCurrentItems] = useState<any>();
 
 	useEffect(() => {
@@ -37,20 +32,12 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	}, [data]);
 
 	useEffect(() => {
-		if (dataGifsSearch) {
-			console.log(dataGifsSearch);
+		if (dataGifsSearch && valueInputToCheckHandleSearch !== '') {
+			setData(dataGifsSearch);
+		} else if(valueInputToCheckHandleSearch === '') {
 			setData(dataGifs);
-		} else {
-			setData(data);
 		}
-	}, [dataGifs, data]);
-
-	// useEffect(() => {
-	// 	console.log(valueSearchGif);
-	// 	if (valueSearchGif) {
-	// 		fetchGifsDataSearch(valueSearchGif);
-	// 	}
-	// }, [valueSearchGif]);
+	}, [dataGifs, dataGifsSearch, valueInputToCheckHandleSearch]);
 
 	const handleSend = useCallback(
 		(
@@ -70,7 +57,7 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 
 	const renderGifs = () => {
 		if (loadingStatusGifs === 'loading') {
-			return <Loading classProps="w-10 h-10" />;
+			return <Loading />;
 		}
 		return (
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
@@ -97,16 +84,6 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 			);
 		}
 	};
-
-	// const debouncedSetValueSearchGif = useDebouncedCallback((value) => {
-	// 	setValueSearchGif(value);
-	// }, 300);
-
-	// useEffect(() => {
-	// 	if (activeTab === SubPanelName.GIFS && valueInput !== '') {
-	// 		debouncedSetValueSearchGif(valueInput);
-	// 	}
-	// }, [activeTab, valueInput, debouncedSetValueSearchGif, setValueSearchGif, valueSearchGif]);
 
 	return (
 		<>

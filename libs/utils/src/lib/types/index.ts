@@ -18,7 +18,6 @@ import {
 
 import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
 
-export * from './gifTypes';
 export * from './permissions';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
@@ -325,4 +324,15 @@ export type SenderInfoOptionals = {
 	emojiIdList?: string[] | undefined;
 	sender_name?: string | undefined;
 	avatar?: string | undefined;
+};
+
+export interface IGif  {
+	images: {
+		original: {
+			url: string;
+		};
+		fixed_height: {
+			url: string;
+		};
+	};
 };
