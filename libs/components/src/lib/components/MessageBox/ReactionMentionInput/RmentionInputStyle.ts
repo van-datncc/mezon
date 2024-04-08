@@ -1,7 +1,7 @@
 export default {
 	control: {
 		backgroundColor: '#000',
-		fontSize: 14,
+		fontSize: 15,
 	},
 
 	'&multiLine': {
@@ -37,14 +37,22 @@ export default {
 	},
 
 	suggestions: {
+		control: {
+			marginBottom:'300px',
+			// marginBottom: '330px'
+		},
 		list: {
-			backgroundColor: '#26262B',
+			// backgroundColor: '#26262B',
 			border: '1px solid rgba(0,0,0,0.15)',
-			fontSize: 14,
+			fontSize: 15,
+			marginBottom:'300px',
+
 		},
 		item: {
 			padding: '5px 15px',
 			borderBottom: '1px solid rgba(0,0,0,0.15)',
+			marginBottom:'300px',
+
 			'&focused': {
 				backgroundColor: '#cee4e5',
 			},

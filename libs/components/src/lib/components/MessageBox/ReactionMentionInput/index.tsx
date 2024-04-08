@@ -1,7 +1,9 @@
 import { IMessageSendPayload, MentionDataProps } from '@mezon/utils';
-import { ReactElement, useState } from 'react';
+import { KeyboardEvent, ReactElement, useCallback, useEffect, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
+import { useReference } from '@mezon/core';
+import { referencesActions, useAppDispatch } from '@mezon/store';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -15,34 +17,87 @@ export type MentionReactInputProps = {
 	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionDataProps[] | undefined;
-	// isOpenEmojiPropOutside?: boolean | undefined;
-	// currentChannelId?: string;
-	// currentClanId?: string;
-	// onChange: OnChangeHandlerFunc;
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
-	const [valueMentionInput, setValueMentionInput] = useState('');
-	// const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-	// 	setValueM(newValue);
-	// 	console.log('getMention', mentions);
-	// };
+	const [valueTextInput, setValueTextInput] = useState('');
+	const [valueMentionInput, setValueMentionInput] = useState<MentionDataProps[]>([]);
+	const dispatch = useAppDispatch();
+	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
+	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+
+	useEffect(() => {
+		if (referenceMessage && referenceMessage.attachments) {
+			dispatch(
+				referencesActions.setDataReferences([
+					{
+						message_id: '',
+						message_ref_id: referenceMessage.id,
+						ref_type: 0,
+						message_sender_id: referenceMessage.sender_id,
+						content: JSON.stringify(referenceMessage.content),
+						has_attachment: referenceMessage.attachments?.length > 0 ? true : false,
+					},
+				]),
+			);
+		}
+	}, [referenceMessage]);
+
+	const KEY = { TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
+	const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): void => {
+		const { keyCode, shiftKey } = event;
+		switch (keyCode) {
+			case KEY.ENTER: {
+				if (shiftKey) {
+					return;
+				} else {
+					event.preventDefault();
+					handleSend();
+					return;
+				}
+			}
+			default: {
+				return;
+			}
+		}
+	};
+
+	const handleSend = useCallback(() => {
+		if (!valueTextInput.trim() && attachmentData.length === 0 && mentionData.length === 0) {
+			return;
+		}
+		if (referenceMessage !== null && dataReferences.length > 0) {
+			props.onSend({ t: valueTextInput }, mentionData, attachmentData, dataReferences);
+			setValueTextInput('');
+			setAttachmentData([]);
+			setReferenceMessage(null);
+			setDataReferences([]);
+		} else {
+			props.onSend({ t: valueTextInput }, mentionData, attachmentData);
+			setValueTextInput('');
+			setAttachmentData([]);
+		}
+	}, [valueTextInput, props.onSend, dataReferences, mentionData, attachmentData]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		setValueMentionInput(newValue);
-		console.log('New value:', newValue);
-		console.log('New newPlainTextValue:', newPlainTextValue);
-		console.log('New mentions:', mentions);
+		setValueTextInput(newValue);
+		setValueMentionInput(mentions);
+		if (typeof props.onTyping === 'function') {
+			props.onTyping();
+		}
 	};
 
 	return (
 		<div className="relative">
 			<MentionsInput
 				placeholder="Write your thoughs here..."
-				value={valueMentionInput}
+				value={valueTextInput}
 				onChange={onChangeMentionInput}
 				style={mentionsInputStyle}
 				a11ySuggestionsListLabel={'Suggested mentions'}
+				allowSpaceInQuery={true}
+				onKeyDown={onKeyDown}
 			>
 				<Mention style={mentionStyle} data={props.listMentions ?? []} trigger="@" />
 				<Mention style={mentionStyle} data={props.listMentions ?? []} trigger="#" />
@@ -52,6 +107,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 }
 
 export default MentionReactInput;
+
+// STILL DOING
 
 // const { sessionRef, clientRef } = useMezon();
 // const dispatch = useAppDispatch();
@@ -224,31 +281,31 @@ export default MentionReactInput;
 // 	setEditorState(newEditorState);
 // };
 
-// const refMessage = useSelector(selectReferenceMessage);
+// const referenceMessage = useSelector(selectReferenceMessage);
 // const dataReferencesRefMess = useSelector(selectDataReferences);
 // useEffect(() => {
-// 	if (refMessage && refMessage.attachments) {
+// 	if (referenceMessage && referenceMessage.attachments) {
 // 		dispatch(
 // 			referencesActions.setDataReferences([
 // 				{
 // 					message_id: '',
-// 					message_ref_id: refMessage.id,
+// 					message_ref_id: referenceMessage.id,
 // 					ref_type: 0,
-// 					message_sender_id: refMessage.sender_id,
-// 					content: JSON.stringify(refMessage.content),
-// 					has_attachment: refMessage.attachments?.length > 0 ? true : false,
+// 					message_sender_id: referenceMessage.sender_id,
+// 					content: JSON.stringify(referenceMessage.content),
+// 					has_attachment: referenceMessage.attachments?.length > 0 ? true : false,
 // 				},
 // 			]),
 // 		);
 // 	}
-// }, [refMessage]);
+// }, [referenceMessage]);
 
 // const handleSend = useCallback(() => {
 // 	if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 // 		return;
 // 	}
 
-// 	if (refMessage !== null && dataReferencesRefMess.length > 0) {
+// 	if (referenceMessage !== null && dataReferencesRefMess.length > 0) {
 // 		onSend({ t: content }, mentionData, attachmentData, dataReferencesRefMess);
 // 		setContent('');
 // 		setAttachmentData([]);

@@ -1,4 +1,4 @@
-import { MessageBox, ReplyMessageBox } from '@mezon/components';
+import { MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending } from '@mezon/core';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
@@ -32,27 +32,12 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-	const users = [
-		{
-			id: 'isaac',
-			display: 'Isaac Newton',
-		},
-		{
-			id: 'sam',
-			display: 'Sam Victor',
-		},
-		{
-			id: 'emma',
-			display: 'emmanuel@nobody.com',
-		},
-	];
+
 	return (
 		<div className="mx-4 relative">
 			<ReplyMessageBox />
 			<MessageBox
-				// isOpenEmojiPropOutside={controlEmoji}
-				// listMentions={UserMentionList(channelId)}
-				listMentions={users}
+				listMentions={UserMentionList(channelId)}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

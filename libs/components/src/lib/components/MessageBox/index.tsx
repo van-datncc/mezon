@@ -1,14 +1,12 @@
-import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin from '@draft-js-plugins/mention';
 import { EmojiListSuggestion, MentionReactInput } from '@mezon/components';
 import { useEmojiSuggestion } from '@mezon/core';
-import { referencesActions, selectDataReferences, selectReferenceMessage, useAppDispatch } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -25,7 +23,6 @@ export type MessageBoxProps = {
 	) => void;
 	onTyping?: () => void;
 	listMentions?: MentionDataProps[] | undefined;
-	// isOpenEmojiPropOutside?: boolean | undefined;
 	currentChannelId?: string;
 	currentClanId?: string;
 };
@@ -200,63 +197,63 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
-	const refMessage = useSelector(selectReferenceMessage);
-	const dataReferencesRefMess = useSelector(selectDataReferences);
-	useEffect(() => {
-		if (refMessage && refMessage.attachments) {
-			dispatch(
-				referencesActions.setDataReferences([
-					{
-						message_id: '',
-						message_ref_id: refMessage.id,
-						ref_type: 0,
-						message_sender_id: refMessage.sender_id,
-						content: JSON.stringify(refMessage.content),
-						has_attachment: refMessage.attachments?.length > 0 ? true : false,
-					},
-				]),
-			);
-		}
-	}, [refMessage]);
+	// const refMessage = useSelector(selectReferenceMessage);
+	// const dataReferencesRefMess = useSelector(selectDataReferences);
+	// useEffect(() => {
+	// 	if (refMessage && refMessage.attachments) {
+	// 		dispatch(
+	// 			referencesActions.setDataReferences([
+	// 				{
+	// 					message_id: '',
+	// 					message_ref_id: refMessage.id,
+	// 					ref_type: 0,
+	// 					message_sender_id: refMessage.sender_id,
+	// 					content: JSON.stringify(refMessage.content),
+	// 					has_attachment: refMessage.attachments?.length > 0 ? true : false,
+	// 				},
+	// 			]),
+	// 		);
+	// 	}
+	// }, [refMessage]);
 
-	const handleSend = useCallback(() => {
-		if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
-			return;
-		}
+	// const handleSend = useCallback(() => {
+	// 	if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
+	// 		return;
+	// 	}
 
-		if (refMessage !== null && dataReferencesRefMess.length > 0) {
-			onSend({ t: content }, mentionData, attachmentData, dataReferencesRefMess);
-			setContent('');
-			setAttachmentData([]);
-			setClearEditor(true);
-			setEditorState(() => EditorState.createEmpty());
-			dispatch(referencesActions.setReferenceMessage(null));
-			dispatch(referencesActions.setDataReferences(null));
-		} else {
-			onSend({ t: content }, mentionData, attachmentData);
-			setContent('');
-			setAttachmentData([]);
-			setClearEditor(true);
-			setEditorState(() => EditorState.createEmpty());
-		}
-		clearSuggestionEmojiAfterSendMessage();
-	}, [content, onSend, mentionData, attachmentData]);
+	// 	if (refMessage !== null && dataReferencesRefMess.length > 0) {
+	// 		onSend({ t: content }, mentionData, attachmentData, dataReferencesRefMess);
+	// 		setContent('');
+	// 		setAttachmentData([]);
+	// 		setClearEditor(true);
+	// 		setEditorState(() => EditorState.createEmpty());
+	// 		dispatch(referencesActions.setReferenceMessage(null));
+	// 		dispatch(referencesActions.setDataReferences(null));
+	// 	} else {
+	// 		onSend({ t: content }, mentionData, attachmentData);
+	// 		setContent('');
+	// 		setAttachmentData([]);
+	// 		setClearEditor(true);
+	// 		setEditorState(() => EditorState.createEmpty());
+	// 	}
+	// 	clearSuggestionEmojiAfterSendMessage();
+	// }, [content, onSend, mentionData, attachmentData]);
 
-	function keyBindingFn(e: React.KeyboardEvent<Element>) {
-		if (e.key === 'Enter' && !e.shiftKey) {
-			return 'onsend';
-		}
-	}
+	// function keyBindingFn(e: React.KeyboardEvent<Element>) {
+	// 	if (e.key === 'Enter' && !e.shiftKey) {
+	// 		return 'onsend';
+	// 	}
+	// }
 
-	function handleKeyCommand(command: string) {
-		if (command === 'onsend') {
-			handleSend();
-			return 'handled';
-		}
-		return 'not-handled';
-	}
+	// function handleKeyCommand(command: string) {
+	// 	if (command === 'onsend') {
+	// 		handleSend();
+	// 		return 'handled';
+	// 	}
+	// 	return 'not-handled';
+	// }
 
-	const editorRef = useRef<Editor | null>(null);
+	// const editorRef = useRef<Editor | null>(null);
 
 	// const onFocusEditorState = () => {
 	// 	setTimeout(() => {
@@ -264,31 +261,31 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	// 	}, 0);
 	// };
 
-	const moveSelectionToEnd = useCallback(() => {
-		setTimeout(() => {
-			editorRef.current!.focus();
-		}, 0);
-		const editorContent = editorState.getCurrentContent();
-		const editorSelection = editorState.getSelection();
-		const updatedSelection = editorSelection.merge({
-			anchorKey: editorContent.getLastBlock().getKey(),
-			anchorOffset: editorContent.getLastBlock().getText().length,
-			focusKey: editorContent.getLastBlock().getKey(),
-			focusOffset: editorContent.getLastBlock().getText().length,
-		});
-		const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
-		setEditorState(updatedEditorState);
-	}, [editorState]);
+	// const moveSelectionToEnd = useCallback(() => {
+	// 	setTimeout(() => {
+	// 		editorRef.current!.focus();
+	// 	}, 0);
+	// 	const editorContent = editorState.getCurrentContent();
+	// 	const editorSelection = editorState.getSelection();
+	// 	const updatedSelection = editorSelection.merge({
+	// 		anchorKey: editorContent.getLastBlock().getKey(),
+	// 		anchorOffset: editorContent.getLastBlock().getText().length,
+	// 		focusKey: editorContent.getLastBlock().getKey(),
+	// 		focusOffset: editorContent.getLastBlock().getText().length,
+	// 	});
+	// 	const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
+	// 	setEditorState(updatedEditorState);
+	// }, [editorState]);
 
-	useEffect(() => {
-		if (content.length === 0) {
-			setShowPlaceHolder(true);
-		} else setShowPlaceHolder(false);
+	// useEffect(() => {
+	// 	if (content.length === 0) {
+	// 		setShowPlaceHolder(true);
+	// 	} else setShowPlaceHolder(false);
 
-		if (content.length >= 1) {
-			moveSelectionToEnd();
-		}
-	}, [clearEditor, content]);
+	// 	if (content.length >= 1) {
+	// 		moveSelectionToEnd();
+	// 	}
+	// }, [clearEditor, content]);
 
 	// useEffect(() => {
 	// 	const editorElement = document.querySelectorAll('[data-offset-key]');
@@ -385,42 +382,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative">
 			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
-
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
 					currentChannelId={currentChannelId || ''}
 					onFinishUpload={handleFinishUpload}
 				/>
-
-				<div
-					className={`w-full bg-black gap-3 flex items-center`}
-					// onClick={() => {
-					// 	editorRef.current!.focus();
-					// }}
-				>
+				<div className={`w-full bg-black gap-3 flex items-center`}>
 					<div className={`w-[96%] bg-black gap-3 relative`}>
-						{/* <div
-							id="editor"
-							className={`p-[10px] items-center text-[15px] break-all min-w-full relative `}
-							style={{ wordBreak: 'break-word' }}
-						>
-							<Editor
-								keyBindingFn={keyBindingFn}
-								handleKeyCommand={handleKeyCommand}
-								editorState={clearEditor ? EditorState.createEmpty() : editorState}
-								onChange={onChange}
-								plugins={plugins}
-								ref={editorRef}
-								handlePastedFiles={onPastedFiles}
-							/>
-							{showPlaceHolder && (
-								<p className="absolute duration-300 text-gray-300 whitespace-nowrap top-2.5">Write your thoughs here...</p>
-							)}
-						</div> */}
 						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} />
 					</div>
-					{/* <MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} /> */}
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>
 			</div>
