@@ -1,4 +1,4 @@
-import { messagesActions, referencesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { referencesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,7 +22,7 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 			const messageReferenceUserId = message.references[0].message_sender_id;
 			setMessageId(messageReferenceId ?? '');
 			setSenderId(messageReferenceUserId ?? '');
-			dispatch(messagesActions.setReplyMessageStatus(true));
+			dispatch(referencesActions.setOpenReplyMessageState(true));
 		}
 	}, [message]);
 

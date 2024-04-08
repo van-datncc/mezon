@@ -6,14 +6,13 @@ type IMessageHeadProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
-	replyMessageStatus?: boolean;
 };
 
-const MessageHead = ({ user, message, isCombine, replyMessageStatus }: IMessageHeadProps) => {
+const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
-	if (isCombine && !replyMessageStatus) {
+	if (isCombine && message.references?.length === 0) {
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		return <></>;
 	}
