@@ -2,10 +2,10 @@ import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import { EmojiListSuggestion } from '@mezon/components';
-import { useEmojis } from '@mezon/core';
+import { useEmojiSuggestion } from '@mezon/core';
 import { referencesActions, selectDataReferences, selectReferenceMessage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, TabNamePopup } from '@mezon/utils';
+import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -326,7 +326,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
 		setIsFocusEditorStatus,
-	} = useEmojis();
+	} = useEmojiSuggestion();
 
 	useEffect(() => {
 		clickEmojiSuggestion();
@@ -427,7 +427,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						</div>
 					</div>
 					<MentionSuggestionWrapper mentionPlugin={mentionPlugin.current} listMentions={listMentions} />
-					<GifStickerEmojiButtons activeTab={TabNamePopup.NONE} />
+					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>
 			</div>
 		</div>

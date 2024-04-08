@@ -1,5 +1,5 @@
 import { MessageReaction } from '@mezon/components';
-import { selecIdMessageReplied, selectCurrentChannelId, selectReplyMessageStatus } from '@mezon/store';
+import { selectCurrentChannelId, selectIdMessageReplied, selectReplyMessageStatus } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -11,7 +11,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useChatReactionMessage } from '@mezon/core';
+import { useChatReaction } from '@mezon/core';
 import { useSelector } from 'react-redux';
 
 export type ReactedOutsideOptional = {
@@ -33,9 +33,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { setGrandParentWidthAction } = useChatReactionMessage();
+	const { setGrandParentWidthAction } = useChatReaction();
 	const replyMessageStatus = useSelector(selectReplyMessageStatus);
-	const messageRefId = useSelector(selecIdMessageReplied);
+	const messageRefId = useSelector(selectIdMessageReplied);
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);

@@ -1,9 +1,9 @@
 import { ChannelMessage, ChannelStreamMode } from '@mezon/mezon-js';
+import { reactionActions } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { emojiActions } from '../emoji/emoji.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -141,7 +141,7 @@ export const fetchMessages = createAsyncThunk(
 			return Object.values(emojiDataItems);
 		});
 
-		thunkAPI.dispatch(emojiActions.setDataReactionFromServe(reactionData));
+		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
 		let hasMore = currentHasMore;
 		if (currentLastLoadMessageId === messageId) {

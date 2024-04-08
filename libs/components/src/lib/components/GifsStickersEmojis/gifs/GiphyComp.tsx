@@ -1,13 +1,15 @@
 import { useChatSending } from '@mezon/core';
-import { IMessageSendPayload, TabNamePopup } from '@mezon/utils';
+import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import axios from 'axios';
+import { selectAllgifs } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { Loading } from 'libs/ui/src/lib/Loading';
 import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 
 type ChannelMessageBoxProps = {
-	activeTab: TabNamePopup;
+	activeTab: SubPanelName;
 	channelId: string;
 	channelLabel: string;
 	controlEmoji?: boolean;
@@ -16,7 +18,7 @@ type ChannelMessageBoxProps = {
 };
 
 function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const [data, setData] = useState([]);
+	const [data, setData] = useState<any>();
 	// const [search, setSearch] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
@@ -29,6 +31,12 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
 	const [valueSearchGif, setValueSearchGif] = useState('');
 	const [valueInput, setValueInput] = useState<string>('');
+	const dataGifs = useSelector(selectAllgifs);
+	console.log('data', dataGifs);
+
+	useEffect(() => {
+		setData(dataGifs);
+	}, [dataGifs]);
 
 	const handleSend = useCallback(
 		(
@@ -42,27 +50,27 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 		[sendMessage],
 	);
 
-	const fetchData = useCallback(async () => {
-		setIsError(false);
-		setIsLoading(true);
-		try {
-			const results = await axios(`${process.env.NX_CHAT_APP_API_GIPHY_TRENDING}`, {
-				params: {
-					api_key: `${process.env.NX_CHAT_APP_API_GIPHY_KEY}`,
-					limit: 30,
-				},
-			});
-			setData(results.data.data);
-		} catch (err) {
-			setIsError(true);
-			setTimeout(() => setIsError(false), 4000);
-		}
+	// const fetchData = useCallback(async () => {
+	// 	setIsError(false);
+	// 	setIsLoading(true);
+	// 	try {
+	// 		const results = await axios(`${process.env.NX_CHAT_APP_API_GIPHY_TRENDING}`, {
+	// 			params: {
+	// 				api_key: `${process.env.NX_CHAT_APP_API_GIPHY_KEY}`,
+	// 				limit: 30,
+	// 			},
+	// 		});
+	// 		setData(results.data.data);
+	// 	} catch (err) {
+	// 		setIsError(true);
+	// 		setTimeout(() => setIsError(false), 4000);
+	// 	}
 
-		setIsLoading(false);
-	}, []);
+	// 	setIsLoading(false);
+	// }, []);
 
 	useEffect(() => {
-		fetchData();
+		setData(dataGifs);
 	}, []);
 
 	const handleClickGif = (giftUrl: string) => {
@@ -75,7 +83,7 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 		}
 		return (
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
-				{currentItems.map((gif: any, index) => (
+				{/* {currentItems.map((gif: any, index) => (
 					<div
 						key={gif.id}
 						className={`order-${index} overflow-hidden cursor-pointer`}
@@ -83,7 +91,7 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 					>
 						<img src={gif.images.fixed_height.url} className="w-full h-auto" />
 					</div>
-				))}
+				))} */}
 			</div>
 		);
 	};
@@ -125,10 +133,10 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	}, 300);
 
 	useEffect(() => {
-		if (activeTab === TabNamePopup.GIFS && valueInput !== '') {
+		if (activeTab === SubPanelName.GIFS && valueInput !== '') {
 			debouncedSetValueSearchGif(valueInput);
 		} else {
-			fetchData();
+			// fetchData();
 		}
 	}, [activeTab, valueInput, debouncedSetValueSearchGif, setValueSearchGif, valueSearchGif]);
 

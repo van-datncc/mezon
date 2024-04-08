@@ -1,12 +1,10 @@
 import {
-	emojiActions,
-	getDataReactionCombine,
-	getGrandParentWidthState,
-	referencesActions,
-	selectEmojiOpenEditState,
-	selectEmojiReactedBottomState,
-	selectEmojiReactedState,
-	selectReferenceMessage,
+	reactionActions,
+	selectDataReactionCombine,
+	selectGrandParentWidthState,
+	selectReactionBottomState,
+	selectReactionPlaceActive,
+	selectReactionRightState,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EmojiDataOptionals, EmojiPlaces } from '@mezon/utils';
@@ -19,20 +17,19 @@ export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
 
-export function useChatReactionMessage() {
+export function useChatReaction() {
 	const { currentClanId } = useClans();
 	const dispatch = useDispatch();
-	const emojiReactedState = useSelector(selectEmojiReactedState);
-	const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
-	const isOpenEmojiReactedBottom = useSelector(selectEmojiReactedBottomState);
-	const refMessage = useSelector(selectReferenceMessage);
-	const dataReactionServerAndSocket = useSelector(getDataReactionCombine);
-	const grandParentWidth = useSelector(getGrandParentWidthState);
+	const reactionRightState = useSelector(selectReactionRightState);
+	const reactionBottomState = useSelector(selectReactionBottomState);
+	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
+	const grandParentWidth = useSelector(selectGrandParentWidthState);
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
 
-	const reactionMessage = useCallback(
+	const reactionMessageDispatch = useCallback(
 		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -89,80 +86,71 @@ export function useChatReactionMessage() {
 
 	const dataReactionCombine = updateEmojiReactionData(dataReactionServerAndSocket);
 
-	const setMessageRef = useCallback(
-		(state: any) => {
-			dispatch(referencesActions.setReferenceMessage(state));
+	const setDataReactionFromServe = useCallback(
+		(state: EmojiDataOptionals[]) => {
+			dispatch(reactionActions.setDataReactionFromServe(state));
 		},
 		[dispatch],
 	);
 
-	const setIsOpenEmojiReacted = useCallback(
-		(state: boolean) => {
-			dispatch(emojiActions.setEmojiReactedState(state));
-		},
-		[dispatch],
-	);
-
-	const setIsOpenEmojiMessBox = useCallback(
-		(state: boolean) => {
-			dispatch(emojiActions.setEmojiMessBoxState(state));
-		},
-		[dispatch],
-	);
-
-	const setEmojiPlaceActive = useCallback(
+	const setReactionPlaceActive = useCallback(
 		(state: EmojiPlaces) => {
-			dispatch(emojiActions.setEmojiPlaceActive(state));
+			dispatch(reactionActions.setDataReactionFromServe(state));
 		},
 		[dispatch],
 	);
 
-	const setIsOpenEmojiReactedBottom = useCallback(
+	const setReactionRightState = useCallback(
 		(state: boolean) => {
-			dispatch(emojiActions.setEmojiMessBoxState(state));
+			dispatch(reactionActions.setReactionRightState(state));
 		},
 		[dispatch],
 	);
-
+	const setReactionBottomState = useCallback(
+		(state: boolean) => {
+			dispatch(reactionActions.setReactionBottomState(state));
+		},
+		[dispatch],
+	);
 	const setGrandParentWidthAction = useCallback(
 		(state: number) => {
-			dispatch(emojiActions.setGrandParentWidthState(state));
+			dispatch(reactionActions.setGrandParentWidthState(state));
 		},
 		[dispatch],
 	);
 
 	return useMemo(
 		() => ({
+			reactionActions,
 			userId,
-			reactionMessage,
-			setMessageRef,
-			setIsOpenEmojiReacted,
-			setIsOpenEmojiMessBox,
-			setEmojiPlaceActive,
-			setIsOpenEmojiReactedBottom,
-			isOpenEmojiReactedBottom,
-			refMessage,
-			dataReactionCombine,
-			emojiReactedState,
-			emojiOpenEditState,
+			setDataReactionFromServe,
+			reactionMessageDispatch,
+			setReactionPlaceActive,
+			reactionPlaceActive,
+			reactionRightState,
+			reactionBottomState,
+			dataReactionServerAndSocket,
 			grandParentWidth,
-			setGrandParentWidthAction
+			dataReactionCombine,
+			setReactionRightState,
+			setReactionBottomState,
+			setGrandParentWidthAction,
 		}),
 		[
+			reactionActions,
 			userId,
-			reactionMessage,
-			setMessageRef,
-			setIsOpenEmojiReacted,
-			setIsOpenEmojiMessBox,
-			setEmojiPlaceActive,
-			setIsOpenEmojiReactedBottom,
-			isOpenEmojiReactedBottom,
-			refMessage,
-			dataReactionCombine,
-			emojiReactedState,
-			emojiOpenEditState,
+			setDataReactionFromServe,
+			reactionMessageDispatch,
+			setReactionPlaceActive,
+			reactionPlaceActive,
+			reactionRightState,
+			reactionBottomState,
+			dataReactionServerAndSocket,
 			grandParentWidth,
-			setGrandParentWidthAction
+			dataReactionCombine,
+			setReactionRightState,
+			setReactionBottomState,
+			setGrandParentWidthAction,
 		],
 	);
 }
