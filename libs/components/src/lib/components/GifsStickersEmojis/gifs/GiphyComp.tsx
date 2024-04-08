@@ -22,7 +22,7 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const { dataGifs, dataGifsSearch, loadingStatusGifs } = useGifs();
+	const { dataGifs, dataGifsSearch, loadingStatusGifs, setValueInputSearch, valueInputToCheckHandleSearch } = useGifs();
 	const [currentItems, setCurrentItems] = useState<any>();
 
 	useEffect(() => {
@@ -32,13 +32,12 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	}, [data]);
 
 	useEffect(() => {
-		if (dataGifsSearch) {
-			console.log(dataGifsSearch);
+		if (dataGifsSearch && valueInputToCheckHandleSearch !== '') {
+			setData(dataGifsSearch);
+		} else if(valueInputToCheckHandleSearch === '') {
 			setData(dataGifs);
-		} else {
-			setData(data);
 		}
-	}, [dataGifs, data]);
+	}, [dataGifs, dataGifsSearch, valueInputToCheckHandleSearch]);
 
 	const handleSend = useCallback(
 		(
@@ -58,7 +57,7 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 
 	const renderGifs = () => {
 		if (loadingStatusGifs === 'loading') {
-			return <Loading classProps="w-10 h-10" />;
+			return <Loading />;
 		}
 		return (
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">

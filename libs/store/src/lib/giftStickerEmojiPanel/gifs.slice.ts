@@ -13,17 +13,19 @@ export interface GifsState extends EntityState<GifsEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	dataGifsSearch: IGif[];
+	valueInputToCheckHandleSearchState?:string
 }
 export const initialGifsState: GifsState = {
 	...gifsAdapter.getInitialState(),
 	loadingStatus: 'not loaded',
 	error: null,
 	dataGifsSearch: [],
+	valueInputToCheckHandleSearchState: ''
 };
 
 export const fetchGifsData = createAsyncThunk<any>('gifs/fetchStatus', async (_, thunkAPI) => {
 	try {
-		const response = await fetch(`${process.env.NX_CHAT_APP_API_GIPHY_TRENDING}?api_key=${process.env.NX_CHAT_APP_API_GIPHY_KEY}&limit=${30}`);
+		const response = await fetch(`${process.env.NX_CHAT_APP_API_GIPHY_TRENDING}?api_key=${process.env.NX_CHAT_APP_API_GIPHY_KEY}&limit=${10}`);
 		if (!response.ok) {
 			throw new Error('Failed to fetch gifs data');
 		}
@@ -40,6 +42,9 @@ export const gifsSlice = createSlice({
 	reducers: {
 		add: gifsAdapter.addOne,
 		remove: gifsAdapter.removeOne,
+		setValueInputSearch: (state, action)=>{
+			state.valueInputToCheckHandleSearchState = action.payload
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -73,13 +78,12 @@ type FetchGifsDataSearchPayload = any;
 export const fetchGifsDataSearch = createAsyncThunk<FetchGifsDataSearchPayload, string>('gifs/fetchDataSearch', async (valueSearch, thunkAPI) => {
 	try {
 		const response = await fetch(
-			`${process.env.NX_CHAT_APP_API_GIPHY_SEARCH}?api_key=${process.env.NX_CHAT_APP_API_GIPHY_KEY}&limit=${30}&q=${valueSearch}`,
+			`${process.env.NX_CHAT_APP_API_GIPHY_SEARCH}?api_key=${process.env.NX_CHAT_APP_API_GIPHY_KEY}&limit=${10}&q=${valueSearch}`,
 		);
 		if (!response.ok) {
 			throw new Error('Failed to fetch gifs data search');
 		}
 		const data = await response.json();
-		console.log(data);
 		return data.data;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
@@ -105,3 +109,5 @@ export const selectGifsEntities = createSelector(getGifsState, selectEntities);
 export const selectGifsDataSearch = createSelector(getGifsState, (state: GifsState) => state.dataGifsSearch);
 
 export const selectLoadingStatusGifs = createSelector(getGifsState, (state: GifsState) => state.loadingStatus);
+
+export const selectValueInputSearch = createSelector(getGifsState, (state: GifsState) => state.valueInputToCheckHandleSearchState);
