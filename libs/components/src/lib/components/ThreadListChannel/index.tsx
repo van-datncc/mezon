@@ -10,7 +10,7 @@ const ThreadListChannel = ({ threads }: ThreadListChannelProps) => {
 		<div className="flex flex-col ml-6">
 			{threads.map((thread) => {
 				const isFirstThread = threads.indexOf(thread) === 0;
-				return <ThreadLink thread={thread} isFirstThread={isFirstThread} />;
+				return <ThreadLink key={thread.id} thread={thread} isFirstThread={isFirstThread} />;
 			})}
 		</div>
 	);
