@@ -14,6 +14,7 @@ import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
 
+
 export type MessageBoxProps = {
 	onSend: (
 		content: IMessageSendPayload,
@@ -390,7 +391,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				/>
 				<div className={`w-full bg-black gap-3 flex items-center`}>
 					<div className={`w-[96%] bg-black gap-3 relative`}>
-						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} />
+						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} onTyping={props.onTyping}/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>
@@ -415,7 +416,7 @@ MessageBox.Skeleton = () => {
 						className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
 					/>
 				</div>
-				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12">
+				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12 rounded-r-lg">
 					<Icons.Gif />
 					<Icons.Help />
 				</div>

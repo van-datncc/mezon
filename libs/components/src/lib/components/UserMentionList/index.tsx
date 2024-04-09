@@ -14,8 +14,9 @@ function UserMentionList(channelID: string): MentionDataProps[] {
 		const userMentionRaw = members[0].users;
 		return (
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
-				display: item?.user?.username ?? '',
 				id: item?.user?.id ?? '',
+				display: item?.user?.username ?? '',
+				avatarUrl: item?.user?.avatar_url ?? '',
 			})) ?? []
 		);
 	}, [members]);

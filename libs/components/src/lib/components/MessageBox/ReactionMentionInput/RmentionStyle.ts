@@ -1,3 +1,4 @@
 export default {
-  backgroundColor: '#272822',
-}
+	backgroundColor: '#3B416B',
+	borderRadius: '3px'
+};
