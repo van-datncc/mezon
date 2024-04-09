@@ -9,15 +9,16 @@ type MarkdownFormatTextProps = {
 
 const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	return (
-		<article className=" prose prose-pre:min-w-[500px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px]">
+		<article className="flex-wrap whitespace-pre-wrap prose prose-pre:min-w-[500px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px] flex flex-row gap-1">
 			{mentions.map((part, index) => {
 				const tagName = part.matchedText;
 				const markdown = part.nonMatchText.trim();
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
 				const onlyBackticks = /^```$/.test(markdown);
+
 				return (
-					<span key={index}>
+					<div className='flex flex-row gap-1'>
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (
@@ -31,11 +32,11 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							/>
 						)}
 						{tagName && (
-							<span style={{ color: '#3297ff' }} className="cursor-pointer">
+							<span style={{ color: '#3297ff ' }} className="cursor-pointer">
 								{tagName}
 							</span>
 						)}
-					</span>
+					</div>
 				);
 			})}
 		</article>

@@ -37,24 +37,16 @@ export default {
 	},
 
 	suggestions: {
-		control: {
-			marginBottom:'300px',
-			// marginBottom: '330px'
-		},
-		list: {
-			// backgroundColor: '#26262B',
-			border: '1px solid rgba(0,0,0,0.15)',
-			fontSize: 15,
-			marginBottom:'300px',
 
+		list: {
+			backgroundColor: '#272822',
+			fontSize: 15,
 		},
 		item: {
 			padding: '5px 15px',
 			borderBottom: '1px solid rgba(0,0,0,0.15)',
-			marginBottom:'300px',
-
 			'&focused': {
-				backgroundColor: '#cee4e5',
+				backgroundColor: '#41433A',
 			},
 		},
 	},

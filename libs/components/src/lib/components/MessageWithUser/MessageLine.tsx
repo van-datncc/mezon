@@ -29,7 +29,6 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	if (isLink(line)) {
 		return <LineWithLink link={line} />;
 	}
-
 	return (
 		<div>
 			<MarkdownFormatText mentions={mentions} />

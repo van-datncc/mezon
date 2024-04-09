@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 
 // TODO: refactor this to sender function
-const mentionRegex = /(@\S+?)\s/g;
+const mentionRegex = /(?<=(\s|^))@\S+(?=\s|$)/g
 
 export type ILineMention = {
     nonMatchText:  string;
@@ -29,6 +29,7 @@ export function useMessageLine(line: string): IMessageLine {
           nonMatchText = line.substring(lastIndex, startIndex);
           lastIndex = endIndex;
     
+
           return {
             nonMatchText,
             matchedText,

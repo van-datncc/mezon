@@ -1,4 +1,4 @@
-import { IMessageSendPayload, MentionDataProps } from '@mezon/utils';
+import { IMessageSendPayload, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
@@ -21,11 +21,11 @@ export type MentionReactInputProps = {
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [valueTextInput, setValueTextInput] = useState('');
-	const [valueMentionInput, setValueMentionInput] = useState<MentionDataProps[]>([]);
 	const dispatch = useAppDispatch();
 	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const [content, setContent] = useState('');
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -68,23 +68,34 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		}
 		if (referenceMessage !== null && dataReferences.length > 0) {
-			props.onSend({ t: valueTextInput }, mentionData, attachmentData, dataReferences);
+			props.onSend({ t: content }, mentionData, attachmentData, dataReferences);
 			setValueTextInput('');
 			setAttachmentData([]);
 			setReferenceMessage(null);
 			setDataReferences([]);
 		} else {
-			props.onSend({ t: valueTextInput }, mentionData, attachmentData);
+			props.onSend({ t: content }, mentionData, attachmentData);
 			setValueTextInput('');
 			setAttachmentData([]);
+			setMentionData([]);
 		}
 	}, [valueTextInput, props.onSend, dataReferences, mentionData, attachmentData]);
+	const mentionedUsers: UserMentionsOpt[] = [];
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		setValueTextInput(newValue);
-		setValueMentionInput(mentions);
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
+		}
+		setValueTextInput(newValue);
+		setContent(newPlainTextValue);
+		if (mentions.length > 0) {
+			for (const mention of mentions) {
+				mentionedUsers.push({
+					user_id: mention.id.toString() ?? '',
+					username: mention.display ?? '',
+				});
+			}
+			setMentionData(mentionedUsers);
 		}
 	};
 
@@ -95,11 +106,30 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput}
 				onChange={onChangeMentionInput}
 				style={mentionsInputStyle}
-				a11ySuggestionsListLabel={'Suggested mentions'}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
+				forceSuggestionsAboveCursor={true}
 			>
-				<Mention style={mentionStyle} data={props.listMentions ?? []} trigger="@" />
+				<Mention
+					style={mentionStyle}
+					data={props.listMentions ?? []}
+					trigger="@"
+					displayTransform={(id: any, display: any) => {
+						return `@${display}`;
+					}}
+					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
+						return (
+							<div className="flex flex-row items-center gap-2 ">
+								<img
+									src={(suggestion as any).avatarUrl}
+									alt={suggestion.display}
+									style={{ width: '30px', height: '30px', borderRadius: '50%' }}
+								/>
+								<span>{highlightedDisplay}</span>
+							</div>
+						);
+					}}
+				/>
 				<Mention style={mentionStyle} data={props.listMentions ?? []} trigger="#" />
 			</MentionsInput>
 		</div>
