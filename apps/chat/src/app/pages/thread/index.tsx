@@ -1,5 +1,6 @@
-import { ThreadBox, ThreadHeader } from '@mezon/components';
+import { ThreadHeader } from '@mezon/components';
 import { useThreads } from '@mezon/core';
+import ThreadBox from './ThreadBox';
 
 const ThreadsMain = () => {
 	const { currentThread, setIsShowCreateThread } = useThreads();

@@ -87,6 +87,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(threadsActions.setCurrentThread(response));
+			await mezon.joinChatThread(response.channel_id as string);
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);

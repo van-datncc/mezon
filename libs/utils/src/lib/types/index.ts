@@ -355,3 +355,7 @@ export type UserMentionsOpt = {
 	user_id: string | undefined;
 	username: string | undefined;
 };
+export enum ETypeMessage {
+	CHANNEL = 'CHANNEL',
+	THREAD = 'THREAD',
+}

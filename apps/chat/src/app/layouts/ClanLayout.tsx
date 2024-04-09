@@ -48,7 +48,7 @@ const ClanLayout = () => {
 				{isShowCreateThread && (
 					<>
 						<div className="w-2 cursor-ew-resize bg-[#000]" />
-						<div className="w-[480px] bg-[#151515] rounded-l-lg">
+						<div className="w-[480px] bg-[#1E1E1E] rounded-l-lg">
 							<ThreadsMain />
 						</div>
 					</>
