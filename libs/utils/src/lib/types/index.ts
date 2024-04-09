@@ -349,3 +349,8 @@ export type MentionsInputChangeEvent = {
 };
 
 export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
+
+export enum ETypeMessage {
+	CHANNEL = 'CHANNEL',
+	THREAD = 'THREAD',
+}

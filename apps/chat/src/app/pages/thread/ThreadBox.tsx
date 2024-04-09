@@ -3,7 +3,7 @@ import { useThreadMessage, useThreads } from '@mezon/core';
 import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { ETypeMessage, IMessageSendPayload } from '@mezon/utils';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -103,7 +103,7 @@ const ThreadBox = () => {
 						<ChannelMessages
 							channelId={thread?.id as string}
 							channelLabel={thread?.chanel_label}
-							type="THREAD"
+							type={ETypeMessage.THREAD}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						/>
 					</div>
