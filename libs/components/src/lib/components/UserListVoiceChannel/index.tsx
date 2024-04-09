@@ -12,6 +12,7 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(channelID));
 	
 	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{voiceChannelMember?.map((item: IChannelMember, index: number) => {
 				return (

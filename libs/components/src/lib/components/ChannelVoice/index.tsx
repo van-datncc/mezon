@@ -19,12 +19,7 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 
 	const voiceChannelName = clanName?.replace(' ', '-') + '-' + channelLabel.replace(' ', '-');
 
-	useEffect(() => {
-		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
-		voice.setVoiceChannelId(channelId);
-		voice.setUserDisplayName(userName);
-		voice.setClanId(clanId);
-		voice.setClanName(clanName);
+	useEffect(() => {		
 		const targetNode = document.getElementById('meet');
 		voice.setTargetTrackNode(targetNode as HTMLElement);
 
@@ -38,6 +33,7 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 		videoShareElem!.style.display = 'none';
 		voice.setScreenVideoElement(videoShareElem as HTMLVideoElement);
 		voice.createVoiceConnection(voiceChannelName.toLowerCase(), jwt);
+		
 	}, [voice]);
 
 	const handleClick = (event: any) => {
