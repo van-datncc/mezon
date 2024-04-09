@@ -23,7 +23,7 @@ const ThreadHeader = ({ currentThread, setIsShowCreateThread }: ThreadHeaderProp
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between px-4 h-[58px] border-b border-gray-800">
+		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[58px] border-b border-gray-800">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
 				<Icons.ThreadIcon />
 				<span className="text-base font-semibold">{currentThread ? currentThread.channel_label : 'New Thread'}</span>
