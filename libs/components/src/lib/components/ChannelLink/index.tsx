@@ -9,6 +9,7 @@ import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
+import { useMezon, useMezonVoice } from '@mezon/transport';
 
 export type ChannelLinkProps = {
 	clanId?: string;
@@ -34,10 +35,12 @@ export const classes = {
 
 function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
-	// const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
+	const { sessionRef } = useMezon();
 	const { setIsShowCreateThread } = useThreads();
+	const voice = useMezonVoice();
 
 	const [openSetting, setOpenSetting] = useState(false);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -72,9 +75,18 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	const dispatch = useAppDispatch();
+	const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 	const handleVoiChannel = (id: string) => {
+		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
+		voice.setVoiceChannelId(channel.id);
+		voice.setUserDisplayName(userProfile?.user?.username || '');
+		voice.setClanId(clanId || '');
+		voice.setClanName(currentClan?.clan_name || '');
+
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
 		dispatch(voiceActions.setStatusCall(true));
+		
+		voice.createVoiceConnection(voiceChannelName.toLowerCase(), sessionRef.current?.token || '');
 	};
 
 	return (
