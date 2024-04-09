@@ -3,6 +3,7 @@ const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
 const topBarHeight = '58px';
 const chatBoxHeight = '52px';
+const chatBoxHeightThread = '60px';
 const clanWidth = '72px';
 const channelListWidth = '272px';
 const memberWidth = '268px';
@@ -51,6 +52,7 @@ module.exports = {
       },
       height: {
         heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+        heightMessageViewChatThread: `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`,
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
         heightTopBar: topBarHeight,
         heightChatBox: chatBoxHeight,

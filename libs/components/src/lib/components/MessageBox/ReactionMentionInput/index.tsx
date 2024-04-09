@@ -16,6 +16,7 @@ export type MentionReactInputProps = {
 		references?: Array<ApiMessageRef>,
 	) => void;
 	onTyping?: () => void;
+	onCreateThread?: (key: string) => void;
 	listMentions?: MentionDataProps[] | undefined;
 };
 
@@ -45,7 +46,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [referenceMessage]);
 
 	const KEY = { TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
-	const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): void => {
+	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { keyCode, shiftKey } = event;
 		switch (keyCode) {
 			case KEY.ENTER: {
@@ -53,6 +54,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					return;
 				} else {
 					event.preventDefault();
+					if (typeof props.onCreateThread === 'function') {
+						await props.onCreateThread(event.key);
+						await handleSend();
+						return;
+					}
 					handleSend();
 					return;
 				}
