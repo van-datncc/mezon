@@ -25,6 +25,7 @@ export { default as MemberProfile } from './components/MemberProfile';
 export { default as Message } from './components/Message';
 export { default as ChannelMessageOpt } from './components/Message/ChannelMessageOpt';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
+export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput/index';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as ModalListClans } from './components/ModalListClans';

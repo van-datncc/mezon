@@ -326,7 +326,7 @@ export type SenderInfoOptionals = {
 	avatar?: string | undefined;
 };
 
-export interface IGif  {
+export interface IGif {
 	images: {
 		original: {
 			url: string;
@@ -335,4 +335,17 @@ export interface IGif  {
 			url: string;
 		};
 	};
+}
+
+export type MentionDataProps = {
+	id: string | number;
+	display?: string;
 };
+
+export type MentionsInputChangeEvent = {
+	target: {
+		value: string;
+	};
+};
+
+export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;

@@ -37,7 +37,6 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 		<div className="mx-4 relative">
 			<ReplyMessageBox />
 			<MessageBox
-				isOpenEmojiPropOutside={controlEmoji}
 				listMentions={UserMentionList(channelId)}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
