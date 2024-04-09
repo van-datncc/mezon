@@ -125,12 +125,17 @@ const ThreadBox = () => {
 						placeholder="Enter Thread Name"
 						error={isError.name}
 						value={threadName}
-						className="h-10 p-[10px] mb-4 bg-black text-base rounded-md placeholder:text-sm"
+						className="h-10 p-[10px] bg-black text-base rounded-md placeholder:text-sm"
 					/>
 				)}
 			</div>
 			<div className="flex-shrink-0 flex flex-col pb-4 px-4 bg-[#1E1E1E] h-auto relative">
-				<MentionReactInput onSend={handleSend} onTyping={handleTypingDebounced} listMentions={UserMentionList(thread?.id as string)} />
+				<MentionReactInput
+					onCreateThread={handleKeySubmit}
+					onSend={handleSend}
+					onTyping={handleTypingDebounced}
+					listMentions={UserMentionList(thread?.id as string)}
+				/>
 			</div>
 		</div>
 	);

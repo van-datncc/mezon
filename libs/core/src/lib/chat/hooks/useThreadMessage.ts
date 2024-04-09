@@ -42,7 +42,9 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId, channelLabel, mode }));
+		if (channelId && channelLabel) {
+			dispatch(messagesActions.sendTypingUser({ channelId, channelLabel, mode }));
+		}
 	}, [channelId, channelLabel, dispatch, mode]);
 
 	const EditSendMessage = React.useCallback(
