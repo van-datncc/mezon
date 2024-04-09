@@ -2,10 +2,10 @@ import { useMemberStatus } from '@mezon/core';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import { SearchMessage } from '../../ChannelTopbar/TopBarComponents';
 import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
-import NotificationList from '../../NotificationList';
 
 export type ChannelTopbarProps = {
 	dmGroupId?: string;
@@ -55,13 +55,12 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							</button>
 						</div>
 						<SearchMessage />
-						<div className="justify-start items-start gap-4 flex">
-							<button>
-								<NotificationList />
-							</button>
-							<button>
-								<Icons.Help />
-							</button>
+						<div
+							className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
+							id="inBox"
+						>
+							<InboxButton />
+							<HelpButton />
 						</div>
 					</div>
 				</div>

@@ -30,7 +30,7 @@ export type VoiceContextValue = {
 	setClanId: React.Dispatch<React.SetStateAction<string>>;
 	setClanName: React.Dispatch<React.SetStateAction<string>>;
 	changeAudioOutput: (selected: any) => void;
-	createLocalTrack: () => void;
+	createLocalTrack: (devices: string[]) => void;
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
 	createScreenShare: () => void;
 	stopScreenShare: () => void;
@@ -337,8 +337,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		console.log('local track stoped');
 	}, []);
 
-	const createLocalTrack = useCallback(() => {
-		JitsiMeetJS.createLocalTracks({ devices: ['audio', 'video'] })
+	const createLocalTrack = useCallback((devices: string[]) => {
+		JitsiMeetJS.createLocalTracks({ devices: devices })
 			.then((tracks) => {
 				onLocalTracks(tracks);
 			})
@@ -352,7 +352,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 				if (audioOutputDevices.length > 1) {
 					console.log('#audioOutputSelect');
-					console.log('#audioOutputSelectWrapper');
 				}
 			});
 		}
@@ -412,7 +411,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const createVoiceConnection = useCallback(
 		async (roomName: string, jwt: string) => {
 			if (!voiceChannelName) {
-				return null; // init when the channel is set
+				return null; // init when the channel is not set
 			}
 
 			if (voiceConnRef && voiceConnRef.current) {
@@ -443,7 +442,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 			if (localTracksRef.current.length === 0) {
 				// get local video, audio
-				createLocalTrack();
+				createLocalTrack(['audio']);
 			}
 
 			return connection;
