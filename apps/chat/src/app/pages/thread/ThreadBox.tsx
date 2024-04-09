@@ -29,21 +29,25 @@ const ThreadBox = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const sessionUser = useSelector((state: RootState) => state.auth.session);
 
+	const { threadRef } = useMezon();
+	const thread = threadRef.current;
 	const { currentThread } = useThreads();
+	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
+		channelId: thread?.id as string,
+		channelLabel: thread?.chanel_label as string,
+		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
+	});
 
 	const [isError, setIsError] = useState<ErrorProps>({ name: '', message: '' });
 	const [threadName, setThreadName] = useState('');
-	const [startMessage, setStartMessage] = useState('');
 
 	const handleThreadNameChange = (value: string) => {
 		setIsError((pre) => ({ ...pre, name: '' }));
 		setThreadName(value);
 	};
 
-	const handleChangeMessage = (event: string) => {
-		setStartMessage(event);
-	};
 	const handleKeySubmit = async (key: string) => {
 		if (key === 'Enter') {
 			if (threadName === '') {
@@ -62,20 +66,10 @@ const ThreadBox = () => {
 			const newThread = response.payload as ApiChannelDescription;
 			if (newThread) {
 				setThreadName('');
-				setStartMessage('');
 				navigate(toThreadPage(newThread.parrent_id as string, newThread.clan_id as string, newThread.channel_id as string));
 			}
 		}
 	};
-
-	const { threadRef } = useMezon();
-	const thread = threadRef.current;
-	const sessionUser = useSelector((state: RootState) => state.auth.session);
-	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
-		channelId: thread?.id as string,
-		channelLabel: thread?.chanel_label as string,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
-	});
 
 	const handleSend = useCallback(
 		(
