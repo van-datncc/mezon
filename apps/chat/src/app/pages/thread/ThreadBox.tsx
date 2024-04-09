@@ -1,12 +1,11 @@
 import { Icons, MentionReactInput, ThreadNameTextField, UserMentionList } from '@mezon/components';
-import { useAppNavigation, useThreadMessage, useThreads } from '@mezon/core';
+import { useThreadMessage, useThreads } from '@mezon/core';
 import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { useThrottledCallback } from 'use-debounce';
 import {
 	ApiChannelDescription,
@@ -24,8 +23,6 @@ type ErrorProps = {
 
 const ThreadBox = () => {
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const { toThreadPage } = useAppNavigation();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -66,7 +63,6 @@ const ThreadBox = () => {
 			const newThread = response.payload as ApiChannelDescription;
 			if (newThread) {
 				setThreadName('');
-				navigate(toThreadPage(newThread.parrent_id as string, newThread.clan_id as string, newThread.channel_id as string));
 			}
 		}
 	};
