@@ -3,8 +3,7 @@ import { useMemo, useState } from 'react';
 import * as Icons from '../../../Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
-import RolesComponent from './rolesComponent';
-import { selectMembersByChannelId } from '@mezon/store';
+import { selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useAuth } from '@mezon/core';
 import { channelUsersActions, useAppDispatch } from '@mezon/store';
@@ -18,7 +17,10 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
+	
 	const { userProfile } = useAuth();
+	const currentClanId = useSelector(selectCurrentClanId);
+	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
 	const dispatch = useAppDispatch();
 	const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValueToggle(!valueToggle);
@@ -37,8 +39,14 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	};
 	const listMembersInChannel = useMemo(() => {
 		if (!rawMembers) return [];
-		return rawMembers.map(member => member.user)
+		const filteredMembers = rawMembers.filter(member => member.userChannelId !== "0");
+		return filteredMembers.map(member => member.user)
 	}, [rawMembers]);
+
+	const listRolesInChannel = useMemo(() => {
+		if (!RolesChannel) return [];
+		return RolesChannel.filter((role) =>typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
+	}, [RolesChannel]);
 
 	const closeAddMemRoleModal = () => {
 		setShowAddMemRole(false);
@@ -55,6 +63,16 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 			};
 			await dispatch(channelUsersActions.removeChannelUsers(body));
 		}
+	}
+
+	const deleteRole = async (roleId: string) => {
+		const body = {
+			channelId: channel.id,
+			clanId: currentClanId || '',
+			roleId: roleId,
+			channelType: channel.type,
+		};
+		await dispatch(channelUsersActions.removeChannelRole(body));
 	}
 
 	return (
@@ -102,7 +120,25 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 								</div>
 								<hr className="border-t border-solid border-borderDefault" />
 								<div className="py-4">
-									<RolesComponent tick={false} />
+									<p className="uppercase font-bold text-xs pb-4">Roles</p>
+									<div>
+										{listRolesInChannel.map((role, index) => (
+											<div className={`flex justify-between py-2 rounded`} key={role.id}>
+												<div className="flex gap-x-2 items-center">
+													<Icons.RoleIcon defaultSize="w-[23px] h-5" />
+													<p className="text-sm">{role.title}</p>
+												</div>
+												<div className="flex items-center gap-x-2">
+													<p className="text-xs text-[#AEAEAE]">Role</p>
+													<div
+														onClick = {()=>deleteRole(role?.id||"")}
+													>
+														<Icons.EscIcon defaultSize="size-[15px] cursor-pointer" />
+													</div>
+												</div>
+											</div>
+										))}
+									</div>
 								</div>
 								<hr className="border-t border-solid border-borderDefault" />
 								<div className="py-4">
