@@ -1,4 +1,4 @@
-import { IMessageSendPayload, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
+import { IMessageSendPayload, MentionDataProps, UserMentionsOpt, threadError } from '@mezon/utils';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
@@ -73,18 +73,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleSend = useCallback(() => {
 		if (!valueTextInput.trim() && attachmentData.length === 0 && mentionData.length === 0) {
 			if (!nameThread.trim() && props.isThread && !currentThread) {
-				dispatch(threadsActions.setMessageThreadError('Starter Message is required'));
-				dispatch(threadsActions.setNameThreadError('Thread Name is required'));
+				dispatch(threadsActions.setMessageThreadError(threadError.message));
+				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
 			if (props.isThread && !currentThread) {
-				dispatch(threadsActions.setMessageThreadError('Starter Message is required'));
+				dispatch(threadsActions.setMessageThreadError(threadError.message));
 			}
 			return;
 		}
 
 		if (!nameThread.trim() && props.isThread && !currentThread) {
-			dispatch(threadsActions.setNameThreadError('Thread Name is required'));
+			dispatch(threadsActions.setNameThreadError(threadError.name));
 			return;
 		}
 

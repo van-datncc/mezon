@@ -1,5 +1,6 @@
 import { useThreads } from '@mezon/core';
 import { threadsActions, useAppDispatch } from '@mezon/store';
+import { threadError } from '@mezon/utils';
 import { KeyboardEvent, useCallback } from 'react';
 
 interface ThreadNameTextFieldProps {
@@ -26,7 +27,7 @@ const ThreadNameTextField = ({ label, error, placeholder, value, className, onCh
 		(event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
 			const element = event.target as HTMLInputElement;
 			if (!element.value.trim()) {
-				dispatch(threadsActions.setNameThreadError('Thread Name is required'));
+				dispatch(threadsActions.setNameThreadError(threadError.name));
 			}
 			onKeyDown(event);
 		},
