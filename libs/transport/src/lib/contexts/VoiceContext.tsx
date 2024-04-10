@@ -1,4 +1,3 @@
-import { disconnect } from 'process';
 import { useMezon } from '../hooks/useMezon';
 import options from 'libs/transport/src/lib/voice/options/config';
 import React, { useCallback } from 'react';
@@ -20,7 +19,6 @@ type VoiceContextProviderProps = {
 export type VoiceContextValue = {
 	voiceConnRef: React.MutableRefObject<JitsiConnection | null>;
 	voiceChannelRef: React.MutableRefObject<JitsiConference | null>;
-	voiceChannelName: string;
 	setTargetTrackNode: React.Dispatch<React.SetStateAction<HTMLElement | undefined>>;
 	setScreenVideoElement: React.Dispatch<React.SetStateAction<HTMLVideoElement | undefined>>;
 	setScreenCanvasElement: React.Dispatch<React.SetStateAction<HTMLCanvasElement | undefined>>;
@@ -299,7 +297,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		if (socketRef && socketRef.current) {
 			socketRef.current.writeVoiceJoined(myUserId, clanId, clanName, voiceChannelId, voiceChannelName, userDisplayName, '');
 		}
-	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelName]);
+	}, [clanId, clanName, socketRef, userDisplayName, voiceChannelId, voiceChannelName]);
 
 	const onUserJoined = useCallback(
 		(id: string, user: JitsiParticipant) => {
@@ -318,7 +316,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 				socketRef.current.writeVoiceLeaved(id, clanId, voiceChannelId, false);
 			}
 		},
-		[clanId, clanName, socketRef, voiceChannelId, voiceChannelName],
+		[clanId, socketRef, voiceChannelId],
 	);
 
 	const onTrackMuteChanged = useCallback((track: JitsiTrack) => {
@@ -395,10 +393,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		};
 
 		if (voiceChannelRef && voiceChannelRef.current && voiceChannelRef.current.getName() === voiceChannelName) {
-			console.log('already created');
-			return null;
+			console.log('this voice channel already created', voiceChannelName);
+			return voiceChannelRef.current;
 		}
 
+		console.log("createVoiceChannel with name", voiceChannelName);
 		voiceChannelRef.current = voiceConnRef.current.initJitsiConference(voiceChannelName, confOptions);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
@@ -430,19 +429,50 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	]);
 
 	const onConnectionSuccess = useCallback(() => {
-		console.log("prev name voice channel name", voiceChannelRef.current?.getName());
+		console.log("onConnectionSuccess voice channel name", voiceChannelRef.current?.getName());
 		if (voiceChannelRef.current?.getName()) {
 			leaveVoiceChannel();
 		}
 		createVoiceChannel();
 	}, [createVoiceChannel, leaveVoiceChannel]);
 
-	const createVoiceConnection = useCallback(
-		async (roomName: string, jwt: string) => {
-			console.log("createVoiceConnection", roomName);
+	/**
+	 * This function is called when we disconnect.
+	 */
+	const voiceDisconnect = useCallback(async () => {
+		console.log('disconnect to voice channel', voiceChannelRef.current?.getName());
+		const participantCount = voiceChannelRef.current?.getParticipantCount();
+		const myUserId = voiceChannelRef.current?.myUserId();
 
-			if (!voiceChannelName) {
-				return null; // init when the channel is not set
+		console.log("write", myUserId, participantCount, voiceChannelRef.current);
+
+		if (myUserId && participantCount === 1 && socketRef && socketRef.current) {
+			console.log("write to socket voice leaved");
+			socketRef.current.writeVoiceLeaved(myUserId, clanId, voiceChannelId, true);
+		}
+
+		if (voiceConnRef && voiceConnRef.current) {
+			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnect);
+		}
+		
+		localTracksRef.current.forEach((track) => {
+			track.stopStream();
+		});
+		voiceChannelRef.current?.leave();
+		voiceConnRef.current?.disconnect();
+
+		voiceChannelRef.current = null;
+		voiceConnRef.current = null;
+
+	}, [clanId, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId]);
+
+	const createVoiceConnection = useCallback(
+		async (vChannelName: string, jwt: string) => {
+			setVoiceChannelName(vChannelName);
+			if (vChannelName && vChannelName !== voiceChannelRef.current?.getName()) {
+				voiceDisconnect(); // reconnect to another channel
 			}
 
 			if (voiceConnRef && voiceConnRef.current) {
@@ -453,7 +483,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 			const optionsWithRoom = {
 				...options,
-				serviceUrl: options.serviceUrl + roomName,
+				serviceUrl: options.serviceUrl + vChannelName,
 			};
 
 			JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
@@ -480,34 +510,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 			return connection;
 		},
-		[voiceChannelName, onConnectionSuccess, onConnectionFailed, onDisconnect, createLocalTrack],
+		[onConnectionSuccess, onConnectionFailed, onDisconnect, voiceDisconnect, createLocalTrack],
 	);
-
-	/**
-	 * This function is called when we disconnect.
-	 */
-	const voiceDisconnect = useCallback(async () => {
-		console.log('disconnect!');
-		if (voiceConnRef && voiceConnRef.current) {
-			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
-			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
-			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnect);
-		}
-
-		const participantCount = voiceChannelRef.current?.getParticipantCount();
-		const myUserId = voiceChannelRef.current?.myUserId();
-
-		if (myUserId && participantCount === 1 && socketRef && socketRef.current) {
-			socketRef.current.writeVoiceLeaved(myUserId, clanId, voiceChannelId, true);
-		}
-		localTracksRef.current.forEach((track) => {
-			track.stopStream();
-			//track.dispose();
-		});
-		voiceChannelRef.current?.leave();
-		voiceConnRef.current?.disconnect();
-
-	}, [clanId, clanName, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId, voiceChannelName]);
 
 	/**
 	 *
@@ -522,7 +526,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		() => ({
 			voiceConnRef,
 			voiceChannelRef,
-			voiceChannelName,
 			setTargetTrackNode,
 			setScreenVideoElement,
 			setScreenCanvasElement,
@@ -542,17 +545,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			stopScreenShare,
 			attachMedia,
 		}),
-		[
-			voiceChannelName, 
-			createVoiceConnection, 
-			createVoiceChannel, 
-			leaveVoiceChannel, 
-			voiceDisconnect, 
-			changeAudioOutput, 
-			createLocalTrack, 
-			createScreenShare,
-			attachMedia,
-		],
+		[createVoiceConnection, createVoiceChannel, leaveVoiceChannel, voiceDisconnect, changeAudioOutput, createLocalTrack, createScreenShare, stopScreenShare, attachMedia],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;

@@ -4,7 +4,7 @@ import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import cls from 'classnames';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
@@ -74,18 +74,20 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 	const dispatch = useAppDispatch();
-	
-	const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
-	const handleVoiceChannel = (id: string) => {
+
+	useEffect(()=> {
+		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
 		voice.setVoiceChannelId(channel.id);
 		voice.setUserDisplayName(userProfile?.user?.username || '');
 		voice.setClanId(clanId || '');
 		voice.setClanName(currentClan?.clan_name || '');
-
+	}, [channel.channel_label, channel.id, clanId, currentClan?.clan_name, userProfile?.user?.username, voice]);
+			
+	const handleVoiceChannel = (id: string) => {		
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
 		dispatch(voiceActions.setStatusCall(true));
-
+		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 		voice.createVoiceConnection(voiceChannelName.toLowerCase(), sessionRef.current?.token || '');
 	};
 
