@@ -91,7 +91,6 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 				</div>
 				<div className="max-h-[270px] overflow-y-scroll hide-scrollbar">
 					<div>
-						{/* <RolesComponent tick={true} /> */}
 						<p className="uppercase font-bold text-xs pb-4">Roles</p>
 						<div>
 							{RolesNotAddChannel.map((role, index) => (
