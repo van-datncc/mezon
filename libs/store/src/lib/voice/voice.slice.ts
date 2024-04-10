@@ -19,6 +19,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	showCamera: boolean;
 	showScreen: boolean;
 	statusCall: boolean;
+	voiceConnectionState: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -65,6 +66,7 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	showCamera: false,
 	showScreen: false,
 	statusCall: false,
+	voiceConnectionState: false,
 });
 
 export const voiceSlice = createSlice({
@@ -80,8 +82,8 @@ export const voiceSlice = createSlice({
 		setStatusCall: (state, action: PayloadAction<boolean>) => {
 			state.statusCall = action.payload;
 		},
-		setShowCamera: (state, action: PayloadAction<boolean>) => {
-			state.showCamera = action.payload;
+		setVoiceConnectionState: (state, action: PayloadAction<boolean>) => {
+			state.voiceConnectionState = action.payload;
 		},
 		// ...
 	},
@@ -171,3 +173,5 @@ export const selectFriendVoiceChannel = (channelId: string, userId: string) =>
 	createSelector(selectVoiceChannelMembersByChannelId(channelId), (members) => {
 		return members.filter((member) => member.user_id !== userId);
 	});
+
+export const selectVoiceConnectionState = createSelector(getVoiceState, (state) => state.voiceConnectionState);
