@@ -78,6 +78,7 @@ export type IChannel = ApiChannelDescription & {
 export type IChannelMember = ChannelUserListChannelUser & {
 	id: string;
 	channelId?: string;
+	userChannelId?: string;
 	user_id?: string; // use on VoiceChannelList
 };
 
