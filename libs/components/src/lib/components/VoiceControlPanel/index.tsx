@@ -6,6 +6,7 @@ import {
 	selectCurrentClan,
 	selectCurrentVoiceChannelId,
 	selectShowScreen,
+	selectStatusCall,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
@@ -26,6 +27,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const showScreen = useSelector(selectShowScreen);
 	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
+	const statusCall = useSelector(selectStatusCall);
 
 	const startScreenShare = useCallback(() => {
 		voice.createScreenShare();
@@ -38,6 +40,11 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	}, [voice]);
 
 	const leaveVoiceChannel = useCallback(() => {
+		if (!statusCall) {
+			dispatch(voiceActions.setStatusCall(false));
+			return;
+		}
+		stopScreenShare();
 		voice.voiceDisconnect();
 		dispatch(voiceActions.setStatusCall(false));
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));

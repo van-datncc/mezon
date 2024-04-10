@@ -1,4 +1,5 @@
-import { useMezon } from '@mezon/transport';
+import { disconnect } from 'process';
+import { useMezon } from '../hooks/useMezon';
 import options from 'libs/transport/src/lib/voice/options/config';
 import React, { useCallback } from 'react';
 import JitsiConference from 'vendors/lib-jitsi-meet/dist/esm/JitsiConference';
@@ -32,9 +33,12 @@ export type VoiceContextValue = {
 	changeAudioOutput: (selected: any) => void;
 	createLocalTrack: (devices: string[]) => void;
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
+	createVoiceChannel: () => void;
+	leaveVoiceChannel: () => void;
 	createScreenShare: () => void;
 	stopScreenShare: () => void;
 	voiceDisconnect: () => void;
+	attachMedia: () => void;
 };
 
 const VoiceContext = React.createContext<VoiceContextValue>({} as VoiceContextValue);
@@ -115,15 +119,15 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			screenTrack.attach(screenVideoElement as HTMLVideoElement);
 
 			/*const screenCanvasDraw = new CanvasFreeDrawing({
-			canvas: screenCanvasElement as HTMLCanvasElement,
-			canvasCtx: screenCanvasCtx as CanvasRenderingContext2D,
-			width: screenElem.width,
-			height: screenElem.height,
-		});
+				canvas: screenCanvasElement as HTMLCanvasElement,
+				canvasCtx: screenCanvasCtx as CanvasRenderingContext2D,
+				width: screenElem.width,
+				height: screenElem.height,
+			});
 		
-		// set properties
-		screenCanvasDraw.setLineWidth(10); // in px
-		screenCanvasDraw.setStrokeColor([0, 0, 255]); // in RGB*/
+			// set properties
+			screenCanvasDraw.setLineWidth(10); // in px
+			screenCanvasDraw.setStrokeColor([0, 0, 255]); // in RGB*/
 
 			const fullVideoStream = screenCanvasElement?.captureStream();
 			if (fullVideoStream) {
@@ -142,6 +146,14 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		},
 		[makeComposite, screenCanvasElement, targetTrackNode],
 	);
+
+	const attachMedia = useCallback(() => {
+		remoteTracksRef.current.forEach((remoteTrack: JitsiRemoteTrack[], key: string) => {
+			if (targetTrackNode) {
+				remoteTrack[0].attach(targetTrackNode);
+			}
+		});
+	}, [targetTrackNode]);
 
 	const createScreenShare = useCallback(() => {
 		JitsiMeetJS.createLocalTracks({
@@ -357,7 +369,20 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 	}, [onLocalTracks]);
 
-	const createVoiceRoom = useCallback(async () => {
+	const leaveVoiceChannel = useCallback(async () => {
+		if (!voiceConnRef.current) {
+			return;
+		}
+
+		if (!voiceChannelRef.current) {
+			return;
+		}
+
+		await voiceChannelRef.current.leave();
+		
+	}, [voiceChannelRef, voiceConnRef])
+
+	const createVoiceChannel = useCallback(async () => {
 		if (!voiceConnRef.current) {
 			throw new Error('voice connection not init');
 		}
@@ -369,7 +394,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			},
 		};
 
-		if (voiceChannelRef.current?.getName() === voiceChannelName) {
+		if (voiceChannelRef && voiceChannelRef.current && voiceChannelRef.current.getName() === voiceChannelName) {
 			console.log('already created');
 			return null;
 		}
@@ -385,7 +410,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
 		voiceChannelRef.current.join('password');
-		voiceChannelRef.current.setReceiverVideoConstraint(720); // max 720
+		voiceChannelRef.current.setReceiverVideoConstraint(360); // max 720
 
 		voiceChannelRef.current.setDisplayName(userDisplayName);
 
@@ -405,16 +430,24 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	]);
 
 	const onConnectionSuccess = useCallback(() => {
-		createVoiceRoom();
-	}, [createVoiceRoom]);
+		console.log("prev name voice channel name", voiceChannelRef.current?.getName());
+		if (voiceChannelRef.current?.getName()) {
+			leaveVoiceChannel();
+		}
+		createVoiceChannel();
+	}, [createVoiceChannel, leaveVoiceChannel]);
 
 	const createVoiceConnection = useCallback(
 		async (roomName: string, jwt: string) => {
+			console.log("createVoiceConnection", roomName);
+
 			if (!voiceChannelName) {
 				return null; // init when the channel is not set
 			}
 
 			if (voiceConnRef && voiceConnRef.current) {
+				console.log("connection already establish");
+				onConnectionSuccess();
 				return voiceConnRef.current;
 			}
 
@@ -469,10 +502,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 		localTracksRef.current.forEach((track) => {
 			track.stopStream();
-			track.dispose();
+			//track.dispose();
 		});
 		voiceChannelRef.current?.leave();
 		voiceConnRef.current?.disconnect();
+
 	}, [clanId, clanName, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId, voiceChannelName]);
 
 	/**
@@ -499,13 +533,26 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			setClanId,
 			setClanName,
 			createVoiceConnection,
+			createVoiceChannel,
+			leaveVoiceChannel,
 			voiceDisconnect,
 			changeAudioOutput,
 			createLocalTrack,
 			createScreenShare,
 			stopScreenShare,
+			attachMedia,
 		}),
-		[voiceChannelName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack, createScreenShare],
+		[
+			voiceChannelName, 
+			createVoiceConnection, 
+			createVoiceChannel, 
+			leaveVoiceChannel, 
+			voiceDisconnect, 
+			changeAudioOutput, 
+			createLocalTrack, 
+			createScreenShare,
+			attachMedia,
+		],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;

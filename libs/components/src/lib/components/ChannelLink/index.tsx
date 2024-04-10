@@ -1,6 +1,7 @@
 import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
 import { ChannelType } from '@mezon/mezon-js';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import cls from 'classnames';
 import { useRef, useState } from 'react';
@@ -9,7 +10,6 @@ import SettingChannel from '../ChannelSetting';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
-import { useMezon, useMezonVoice } from '@mezon/transport';
 
 export type ChannelLinkProps = {
 	clanId?: string;
@@ -35,7 +35,7 @@ export const classes = {
 
 function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
 	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
-	
+
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
 	const { sessionRef } = useMezon();
@@ -73,10 +73,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
 	const dispatch = useAppDispatch();
+	
 	const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
-	const handleVoiChannel = (id: string) => {
+	const handleVoiceChannel = (id: string) => {
 		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
 		voice.setVoiceChannelId(channel.id);
 		voice.setUserDisplayName(userProfile?.user?.username || '');
@@ -85,14 +85,14 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
 		dispatch(voiceActions.setStatusCall(true));
-		
+
 		voice.createVoiceConnection(voiceChannelName.toLowerCase(), sessionRef.current?.token || '');
 	};
 
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
-				<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`} onClick={() => handleVoiChannel(channel.id)}>
+				<span className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`} onClick={() => handleVoiceChannel(channel.id)}>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
 						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
