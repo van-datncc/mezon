@@ -1,4 +1,5 @@
-import { useMezon } from '@mezon/transport';
+import { disconnect } from 'process';
+import { useMezon } from '../hooks/useMezon';
 import options from 'libs/transport/src/lib/voice/options/config';
 import React, { useCallback } from 'react';
 import JitsiConference from 'vendors/lib-jitsi-meet/dist/esm/JitsiConference';
@@ -60,8 +61,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [screenVideoElement, setScreenVideoElement] = React.useState<HTMLVideoElement>();
 
 	const { socketRef } = useMezon();
-
-	//const dispatch = useAppDispatch();
 
 	/**
 	 * Internal Polyfill to simulate
@@ -379,7 +378,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			return;
 		}
 
-		voiceChannelRef.current.leave();
+		await voiceChannelRef.current.leave();
 		
 	}, [voiceChannelRef, voiceConnRef])
 
@@ -395,7 +394,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			},
 		};
 
-		if (voiceChannelRef.current?.getName() === voiceChannelName) {
+		if (voiceChannelRef && voiceChannelRef.current && voiceChannelRef.current.getName() === voiceChannelName) {
 			console.log('already created');
 			return null;
 		}
@@ -411,7 +410,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
 		voiceChannelRef.current.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
 		voiceChannelRef.current.join('password');
-		voiceChannelRef.current.setReceiverVideoConstraint(720); // max 720
+		voiceChannelRef.current.setReceiverVideoConstraint(360); // max 720
 
 		voiceChannelRef.current.setDisplayName(userDisplayName);
 
@@ -430,19 +429,25 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		userDisplayName,
 	]);
 
-	const onConnectionSuccess = useCallback(() => {				
-		//leaveVoiceChannel();
+	const onConnectionSuccess = useCallback(() => {
+		console.log("prev name voice channel name", voiceChannelRef.current?.getName());
+		if (voiceChannelRef.current?.getName()) {
+			leaveVoiceChannel();
+		}
 		createVoiceChannel();
-	}, [createVoiceChannel]);
+	}, [createVoiceChannel, leaveVoiceChannel]);
 
 	const createVoiceConnection = useCallback(
 		async (roomName: string, jwt: string) => {
 			console.log("createVoiceConnection", roomName);
+
 			if (!voiceChannelName) {
 				return null; // init when the channel is not set
 			}
 
-			if (voiceConnRef && voiceConnRef.current) {	
+			if (voiceConnRef && voiceConnRef.current) {
+				console.log("connection already establish");
+				onConnectionSuccess();
 				return voiceConnRef.current;
 			}
 
@@ -502,7 +507,6 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceChannelRef.current?.leave();
 		voiceConnRef.current?.disconnect();
 
-		//dispatch(voiceActions.setVoiceConnectionState(false));
 	}, [clanId, clanName, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId, voiceChannelName]);
 
 	/**
