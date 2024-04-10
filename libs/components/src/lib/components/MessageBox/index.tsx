@@ -323,9 +323,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setIsFocusEditorStatus,
 	} = useEmojiSuggestion();
 
-	useEffect(() => {
-		clickEmojiSuggestion();
-	}, [emojiPicked]);
+	// useEffect(() => {
+	// 	clickEmojiSuggestion();
+	// }, [emojiPicked]);
 
 	useEffect(() => {
 		if (content) {
@@ -341,13 +341,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	// 	}
 	// }, [isEmojiListShowed, textToSearchEmojiSuggestion]);
 
-	const clearSuggestionEmojiAfterSendMessage = () => {
-		setIsEmojiListShowed(false);
-		setEmojiSuggestion('');
-		setTextToSearchEmojiSuggesion('');
-		setIsFocusEditorStatus(false);
-		setEditorState(() => EditorState.createEmpty());
-	};
+	// const clearSuggestionEmojiAfterSendMessage = () => {
+	// 	setIsEmojiListShowed(false);
+	// 	setEmojiSuggestion('');
+	// 	setTextToSearchEmojiSuggesion('');
+	// 	setIsFocusEditorStatus(false);
+	// 	setEditorState(() => EditorState.createEmpty());
+	// };
 
 	// useEffect(() => {
 	// 	if (isFocusEditor) {
@@ -355,34 +355,33 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	// 	}
 	// }, [isFocusEditor]);
 
-	function clickEmojiSuggestion() {
-		if (!emojiPicked) {
-			return;
-		}
-		const currentContentState = editorState.getCurrentContent();
-		const selectionState = editorState.getSelection();
-		const contentText = currentContentState.getPlainText();
-		const syntaxEmoji = findSyntaxEmoji(contentText) ?? '';
-		const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
-		const newContentState = ContentState.createFromText(updatedContentText);
-		let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
-		const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
-		setEditorState(updatedEditorState);
-		// onFocusEditorState();
-	}
+	// function clickEmojiSuggestion() {
+	// 	if (!emojiPicked) {
+	// 		return;
+	// 	}
+	// 	const currentContentState = editorState.getCurrentContent();
+	// 	const selectionState = editorState.getSelection();
+	// 	const contentText = currentContentState.getPlainText();
+	// 	const syntaxEmoji = findSyntaxEmoji(contentText) ?? '';
+	// 	const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
+	// 	const newContentState = ContentState.createFromText(updatedContentText);
+	// 	let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
+	// 	const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
+	// 	setEditorState(updatedEditorState);
+	// }
 
-	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
-		if (emojiArray.length > 0) {
-			return emojiArray[0];
-		}
-		return null;
-	}
+	// function findSyntaxEmoji(contentText: string): string | null {
+	// 	const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+	// 	const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
+	// 	if (emojiArray.length > 0) {
+	// 		return emojiArray[0];
+	// 	}
+	// 	return null;
+	// }
 
 	return (
 		<div className="relative">
-			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
+			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}

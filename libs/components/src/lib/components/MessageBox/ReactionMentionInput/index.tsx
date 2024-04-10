@@ -1,10 +1,10 @@
-import { IMessageSendPayload, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
-import { KeyboardEvent, ReactElement, useCallback, useEffect, useState } from 'react';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
-
-import { useReference } from '@mezon/core';
+import { EmojiListSuggestion } from '@mezon/components';
+import { useEmojiSuggestion, useReference } from '@mezon/core';
 import { referencesActions, useAppDispatch } from '@mezon/store';
+import { IMessageSendPayload, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
+import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 
@@ -105,8 +105,54 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
+	//emojiSuggestion
+
+	const emojiListRef = useRef<HTMLDivElement>(null);
+	const {
+		isEmojiListShowed,
+		emojiPicked,
+		isFocusEditor,
+		setIsEmojiListShowed,
+		setEmojiSuggestion,
+		textToSearchEmojiSuggestion,
+		setTextToSearchEmojiSuggesion,
+		setIsFocusEditorStatus,
+	} = useEmojiSuggestion();
+
+	useEffect(() => {
+		clickEmojiSuggestion();
+	}, [emojiPicked]);
+
+	useEffect(() => {
+		if (content) {
+			setTextToSearchEmojiSuggesion(content);
+		}
+	}, [content]);
+
+	function clickEmojiSuggestion() {
+		if (!emojiPicked) {
+			return;
+		}
+		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
+		const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
+		setValueTextInput(replaceSyntaxByEmoji);
+		console.log(content);
+		console.log(emojiPicked);
+		console.log(replaceSyntaxByEmoji);
+	}
+
+	function findSyntaxEmoji(contentText: string): string | null {
+		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
+		if (emojiArray.length > 0) {
+			return emojiArray[0];
+		}
+		return null;
+	}
+
 	return (
 		<div className="relative">
+			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
 			<MentionsInput
 				placeholder="Write your thoughs here..."
 				value={valueTextInput}
@@ -136,7 +182,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						);
 					}}
 				/>
-				<Mention style={mentionStyle} data={props.listMentions ?? []} trigger="#" />
 			</MentionsInput>
 		</div>
 	);
