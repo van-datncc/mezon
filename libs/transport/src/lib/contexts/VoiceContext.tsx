@@ -32,9 +32,12 @@ export type VoiceContextValue = {
 	changeAudioOutput: (selected: any) => void;
 	createLocalTrack: (devices: string[]) => void;
 	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
+	createVoiceChannel: () => void;
+	leaveVoiceChannel: () => void;
 	createScreenShare: () => void;
 	stopScreenShare: () => void;
 	voiceDisconnect: () => void;
+	attachMedia: () => void;
 };
 
 const VoiceContext = React.createContext<VoiceContextValue>({} as VoiceContextValue);
@@ -57,6 +60,8 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [screenVideoElement, setScreenVideoElement] = React.useState<HTMLVideoElement>();
 
 	const { socketRef } = useMezon();
+
+	//const dispatch = useAppDispatch();
 
 	/**
 	 * Internal Polyfill to simulate
@@ -115,15 +120,15 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			screenTrack.attach(screenVideoElement as HTMLVideoElement);
 
 			/*const screenCanvasDraw = new CanvasFreeDrawing({
-			canvas: screenCanvasElement as HTMLCanvasElement,
-			canvasCtx: screenCanvasCtx as CanvasRenderingContext2D,
-			width: screenElem.width,
-			height: screenElem.height,
-		});
+				canvas: screenCanvasElement as HTMLCanvasElement,
+				canvasCtx: screenCanvasCtx as CanvasRenderingContext2D,
+				width: screenElem.width,
+				height: screenElem.height,
+			});
 		
-		// set properties
-		screenCanvasDraw.setLineWidth(10); // in px
-		screenCanvasDraw.setStrokeColor([0, 0, 255]); // in RGB*/
+			// set properties
+			screenCanvasDraw.setLineWidth(10); // in px
+			screenCanvasDraw.setStrokeColor([0, 0, 255]); // in RGB*/
 
 			const fullVideoStream = screenCanvasElement?.captureStream();
 			if (fullVideoStream) {
@@ -142,6 +147,14 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		},
 		[makeComposite, screenCanvasElement, targetTrackNode],
 	);
+
+	const attachMedia = useCallback(() => {
+		remoteTracksRef.current.forEach((remoteTrack: JitsiRemoteTrack[], key: string) => {
+			if (targetTrackNode) {
+				remoteTrack[0].attach(targetTrackNode);
+			}
+		});
+	}, [targetTrackNode]);
 
 	const createScreenShare = useCallback(() => {
 		JitsiMeetJS.createLocalTracks({
@@ -357,7 +370,20 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 	}, [onLocalTracks]);
 
-	const createVoiceRoom = useCallback(async () => {
+	const leaveVoiceChannel = useCallback(async () => {
+		if (!voiceConnRef.current) {
+			return;
+		}
+
+		if (!voiceChannelRef.current) {
+			return;
+		}
+
+		voiceChannelRef.current.leave();
+		
+	}, [voiceChannelRef, voiceConnRef])
+
+	const createVoiceChannel = useCallback(async () => {
 		if (!voiceConnRef.current) {
 			throw new Error('voice connection not init');
 		}
@@ -404,17 +430,19 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		userDisplayName,
 	]);
 
-	const onConnectionSuccess = useCallback(() => {
-		createVoiceRoom();
-	}, [createVoiceRoom]);
+	const onConnectionSuccess = useCallback(() => {				
+		//leaveVoiceChannel();
+		createVoiceChannel();
+	}, [createVoiceChannel]);
 
 	const createVoiceConnection = useCallback(
 		async (roomName: string, jwt: string) => {
+			console.log("createVoiceConnection", roomName);
 			if (!voiceChannelName) {
 				return null; // init when the channel is not set
 			}
 
-			if (voiceConnRef && voiceConnRef.current) {
+			if (voiceConnRef && voiceConnRef.current) {	
 				return voiceConnRef.current;
 			}
 
@@ -469,10 +497,12 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		}
 		localTracksRef.current.forEach((track) => {
 			track.stopStream();
-			track.dispose();
+			//track.dispose();
 		});
 		voiceChannelRef.current?.leave();
 		voiceConnRef.current?.disconnect();
+
+		//dispatch(voiceActions.setVoiceConnectionState(false));
 	}, [clanId, clanName, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId, voiceChannelName]);
 
 	/**
@@ -499,13 +529,26 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			setClanId,
 			setClanName,
 			createVoiceConnection,
+			createVoiceChannel,
+			leaveVoiceChannel,
 			voiceDisconnect,
 			changeAudioOutput,
 			createLocalTrack,
 			createScreenShare,
 			stopScreenShare,
+			attachMedia,
 		}),
-		[voiceChannelName, createVoiceConnection, voiceDisconnect, changeAudioOutput, createLocalTrack, createScreenShare],
+		[
+			voiceChannelName, 
+			createVoiceConnection, 
+			createVoiceChannel, 
+			leaveVoiceChannel, 
+			voiceDisconnect, 
+			changeAudioOutput, 
+			createLocalTrack, 
+			createScreenShare,
+			attachMedia,
+		],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;

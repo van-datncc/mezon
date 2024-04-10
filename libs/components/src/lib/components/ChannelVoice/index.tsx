@@ -40,7 +40,8 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 		const videoShareElem = document.getElementById('screenvideo');
 		videoShareElem!.style.display = 'none';
 		voice.setScreenVideoElement(videoShareElem as HTMLVideoElement);
-		voice.createVoiceConnection(voiceChannelName.toLowerCase(), jwt);
+		voice.attachMedia();
+		
 	}, [voice]);
 
 	const handleClick = (event: any) => {

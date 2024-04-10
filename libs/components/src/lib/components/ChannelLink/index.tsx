@@ -73,8 +73,8 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
 	const dispatch = useAppDispatch();
+	
 	const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 	const handleVoiceChannel = (id: string) => {
 		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
