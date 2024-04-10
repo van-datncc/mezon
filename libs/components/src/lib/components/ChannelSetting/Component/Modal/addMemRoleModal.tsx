@@ -47,24 +47,24 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
     };
 	
 	const handleAddMember = async () => {
-			onClose();
-			if(selectedUserIds.length > 0){
-				const body = {
-					channelId: channel.id,
-					channelType: channel.type,
-					userIds: selectedUserIds,
-				};
-				await dispatch(channelUsersActions.addChannelUsers(body));
-			}
-			if (selectedRoleIds.length > 0) {
-				const body = {
-					clanId: currentClanId || '',
-					channelId: channel.id,
-					roleIds: selectedRoleIds,
-					channelType: channel.type,
-				};
-				await dispatch(channelUsersActions.addChannelRoles(body));
-			}
+		onClose();
+		if(selectedUserIds.length > 0){
+			const body = {
+				channelId: channel.id,
+				channelType: channel.type,
+				userIds: selectedUserIds,
+			};
+			await dispatch(channelUsersActions.addChannelUsers(body));
+		}
+		if (selectedRoleIds.length > 0) {
+			const body = {
+				clanId: currentClanId || '',
+				channelId: channel.id,
+				roleIds: selectedRoleIds,
+				channelType: channel.type,
+			};
+			await dispatch(channelUsersActions.addChannelRoles(body));
+		}
 	};
 	
 	return (

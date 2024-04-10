@@ -66,13 +66,13 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	}
 
 	const deleteRole = async (roleId: string) => {
-			const body = {
-				channelId: channel.id,
-				clanId: currentClanId || '',
-				roleId: roleId,
-				channelType: channel.type,
-			};
-			await dispatch(channelUsersActions.removeChannelRole(body));
+		const body = {
+			channelId: channel.id,
+			clanId: currentClanId || '',
+			roleId: roleId,
+			channelType: channel.type,
+		};
+		await dispatch(channelUsersActions.removeChannelRole(body));
 	}
 
 	return (
