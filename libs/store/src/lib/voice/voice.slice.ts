@@ -16,7 +16,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	voiceChannelMember: IChannelMember[];
-	showVideo: boolean;
+	showCamera: boolean;
 	showScreen: boolean;
 	statusCall: boolean;
 }
@@ -62,7 +62,7 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	voiceChannelMember: [],
-	showVideo: false,
+	showCamera: false,
 	showScreen: false,
 	statusCall: false,
 });
@@ -79,6 +79,9 @@ export const voiceSlice = createSlice({
 		},
 		setStatusCall: (state, action: PayloadAction<boolean>) => {
 			state.statusCall = action.payload;
+		},
+		setShowCamera: (state, action: PayloadAction<boolean>) => {
+			state.showCamera = action.payload;
 		},
 		// ...
 	},
@@ -156,5 +159,15 @@ export const selectStatusCall = createSelector(getVoiceState, (state) => state.s
 export const selectVoiceChannelMembersByChannelId = (channelId: string) =>
 	createSelector(selectVoiceEntities, (entities) => {
 		const voiceMembers = Object.values(entities);
-				return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
+		return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
+	});
+
+export const selectNumberMemberVoiceChannel = (channelId: string) =>
+	createSelector(selectVoiceChannelMembersByChannelId(channelId), (member) => {
+		return member.length;
+	});
+
+export const selectFriendVoiceChannel = (channelId: string, userId: string) =>
+	createSelector(selectVoiceChannelMembersByChannelId(channelId), (members) => {
+		return members.filter((member) => member.user_id !== userId);
 	});
