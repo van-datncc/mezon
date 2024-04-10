@@ -10,7 +10,6 @@ const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const handleNewMessage = (payload: any) => {
         if (typeof payload === 'object' && payload !== null) {
-			
             const parts = payload.notification.body.split('\n');
             const content = parts[1].split(': ')[1];
             toast.info(content);
