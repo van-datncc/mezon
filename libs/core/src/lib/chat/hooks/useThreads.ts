@@ -5,6 +5,8 @@ import {
 	selectCurrentChannelId,
 	selectCurrentThread,
 	selectIsShowCreateThread,
+	selectMessageThreadError,
+	selectNameThreadError,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -19,6 +21,8 @@ export function useThreads() {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isShowCreateThread = useSelector(selectIsShowCreateThread);
+	const nameThreadError = useSelector(selectNameThreadError);
+	const messageThreadError = useSelector(selectMessageThreadError);
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
@@ -44,6 +48,8 @@ export function useThreads() {
 		threadChannel,
 		currentThread,
 		isShowCreateThread,
+		nameThreadError,
+		messageThreadError,
 		setIsShowCreateThread,
 	};
 }
