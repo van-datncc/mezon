@@ -3,7 +3,8 @@ import {
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
 	selectEmojiSuggestion,
-	selectIsFocusEditor,
+	selectKeyCodeFromKeyBoardState,
+	selectPressAnyButtonState,
 	selectTextToSearchEmojiSuggestion,
 	useAppDispatch,
 } from '@mezon/store';
@@ -14,8 +15,9 @@ export function useEmojiSuggestion() {
 	const emojis = useSelector(selectAllEmojiSuggestion)[1];
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
-	const isFocusEditor = useSelector(selectIsFocusEditor);
+	const keyCodeFromKeyBoard = useSelector(selectKeyCodeFromKeyBoardState);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
+	const pressAnyButtonState = useSelector(selectPressAnyButtonState);
 
 	const dispatch = useAppDispatch();
 
@@ -33,9 +35,16 @@ export function useEmojiSuggestion() {
 		[dispatch],
 	);
 
-	const setIsFocusEditorStatus = useCallback(
-		(isFocus: boolean) => {
-			dispatch(emojiSuggestionActions.setIsFocusEditor(isFocus));
+	const setKeyCodeFromKeyBoardState = useCallback(
+		(keyCode: number) => {
+			dispatch(emojiSuggestionActions.setKeyCodeFromKeyBoardState(keyCode));
+		},
+		[dispatch],
+	);
+
+	const setKeyboardPressAnyButtonStatus = useCallback(
+		(isPress: boolean) => {
+			dispatch(emojiSuggestionActions.setKeyboardPressAnyButtonStatus(isPress));
 		},
 		[dispatch],
 	);
@@ -54,10 +63,12 @@ export function useEmojiSuggestion() {
 			setEmojiSuggestion,
 			setIsEmojiListShowed,
 			isEmojiListShowed,
-			setIsFocusEditorStatus,
-			isFocusEditor,
+			setKeyCodeFromKeyBoardState,
+			keyCodeFromKeyBoard,
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
+			setKeyboardPressAnyButtonStatus,
+			pressAnyButtonState,
 		}),
 		[
 			emojis,
@@ -65,10 +76,12 @@ export function useEmojiSuggestion() {
 			setEmojiSuggestion,
 			setIsEmojiListShowed,
 			isEmojiListShowed,
-			setIsFocusEditorStatus,
-			isFocusEditor,
+			setKeyCodeFromKeyBoardState,
+			keyCodeFromKeyBoard,
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
+			setKeyboardPressAnyButtonStatus,
+			pressAnyButtonState,
 		],
 	);
 }

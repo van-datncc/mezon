@@ -315,12 +315,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const {
 		isEmojiListShowed,
 		emojiPicked,
-		isFocusEditor,
+		// isFocusEditor,
 		setIsEmojiListShowed,
 		setEmojiSuggestion,
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
-		setIsFocusEditorStatus,
+		// setIsFocusEditorStatus,
 	} = useEmojiSuggestion();
 
 	// useEffect(() => {

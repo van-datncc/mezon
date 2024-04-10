@@ -69,6 +69,7 @@
 		"remark-gfm": "^4.0.0",
 		"sort-by": "^0.0.2",
 		"strophejs-plugin-stream-management": "^1.0.3",
+		"text-field-edit": "^4.1.1",
 		"tslib": "^2.6.2",
 		"use-debounce": "^10.0.0",
 		"webfontloader": "^1.6.28",

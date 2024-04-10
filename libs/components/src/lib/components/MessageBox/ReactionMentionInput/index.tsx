@@ -1,9 +1,10 @@
 import { EmojiListSuggestion } from '@mezon/components';
-import { useEmojiSuggestion, useReference } from '@mezon/core';
+import { useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { referencesActions, useAppDispatch } from '@mezon/store';
-import { IMessageSendPayload, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
+import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, UserMentionsOpt, focusToElement } from '@mezon/utils';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import textFieldEdit from 'text-field-edit';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -27,6 +28,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
 	const [content, setContent] = useState('');
+	const { setKeyboardPressAnyButtonStatus } = useEmojiSuggestion();
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -45,11 +47,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [referenceMessage]);
 
-	const KEY = { TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { keyCode, shiftKey } = event;
+		setKeyboardPressAnyButtonStatus(!pressAnyButtonState);
+		setKeyCodeFromKeyBoardState(keyCode);
 		switch (keyCode) {
-			case KEY.ENTER: {
+			case KEY_KEYBOARD.ENTER: {
 				if (shiftKey) {
 					return;
 				} else {
@@ -85,6 +88,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setAttachmentData([]);
 			setMentionData([]);
 		}
+		setIsEmojiListShowed(false);
 	}, [valueTextInput, props.onSend, dataReferences, mentionData, attachmentData]);
 	const mentionedUsers: UserMentionsOpt[] = [];
 
@@ -107,38 +111,54 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	//emojiSuggestion
 
-	const emojiListRef = useRef<HTMLDivElement>(null);
 	const {
 		isEmojiListShowed,
 		emojiPicked,
-		isFocusEditor,
+		keyCodeFromKeyBoard,
 		setIsEmojiListShowed,
 		setEmojiSuggestion,
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
-		setIsFocusEditorStatus,
+		setKeyCodeFromKeyBoardState,
+		pressAnyButtonState,
 	} = useEmojiSuggestion();
 
+	const editorRef = useRef<HTMLInputElement | null>(null);
+	const emojiListRef = useRef<HTMLDivElement>(null);
+	const { subPanelActive } = useGifsStickersEmoji();
 	useEffect(() => {
-		clickEmojiSuggestion();
+		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive) {
+			return focusToElement(editorRef);
+		}
+	}, [pressAnyButtonState, keyCodeFromKeyBoard, isEmojiListShowed, subPanelActive]);
+
+	useEffect(() => {
+		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
 
 	useEffect(() => {
 		if (content) {
 			setTextToSearchEmojiSuggesion(content);
 		}
+		if (content === '') {
+			setIsEmojiListShowed(false);
+		}
 	}, [content]);
 
-	function clickEmojiSuggestion() {
-		if (!emojiPicked) {
+	const input = document.querySelector('#editorReactMention') as HTMLElement | null;
+	function handleEventAfterEmojiPicked() {
+		if (!emojiPicked || !input) {
 			return;
 		}
 		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
-		const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
-		setValueTextInput(replaceSyntaxByEmoji);
-		console.log(content);
-		console.log(emojiPicked);
-		console.log(replaceSyntaxByEmoji);
+		if (syntaxEmoji === '') {
+			textFieldEdit.insert(input, emojiPicked);
+		} else {
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
+			setValueTextInput(replaceSyntaxByEmoji);
+			setContent(replaceSyntaxByEmoji);
+			focusToElement(editorRef);
+		}
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
@@ -154,6 +174,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		<div className="relative">
 			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
 			<MentionsInput
+				id="editorReactMention"
+				inputRef={editorRef}
 				placeholder="Write your thoughs here..."
 				value={valueTextInput}
 				onChange={onChangeMentionInput}
@@ -163,6 +185,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				forceSuggestionsAboveCursor={true}
 			>
 				<Mention
+					appendSpaceOnAdd={true}
 					style={mentionStyle}
 					data={props.listMentions ?? []}
 					trigger="@"
