@@ -1,4 +1,4 @@
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { ChannelsEntity, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';

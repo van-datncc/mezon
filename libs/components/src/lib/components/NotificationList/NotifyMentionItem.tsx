@@ -3,7 +3,7 @@ import { INotification, selectChannelById, selectCurrentChannelId, selectMemberC
 import { IMessageWithUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
-import { ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelStreamMode } from 'mezon-js';
 export type NotifyMentionProps = {
 	notify: INotification;
 };

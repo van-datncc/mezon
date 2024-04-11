@@ -4,7 +4,7 @@ import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, UserMentionsOpt, f
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import textFieldEdit from 'text-field-edit';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 import { useReference, useThreads } from '@mezon/core';
 import { referencesActions, threadsActions, useAppDispatch } from '@mezon/store';

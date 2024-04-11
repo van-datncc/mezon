@@ -1,6 +1,6 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans, useThreads } from '@mezon/core';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { selectCurrentChannel } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';

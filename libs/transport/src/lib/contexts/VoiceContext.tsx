@@ -1,16 +1,16 @@
 import { useMezon } from '../hooks/useMezon';
 import options from 'libs/transport/src/lib/voice/options/config';
 import React, { useCallback } from 'react';
-import JitsiConference from 'vendors/lib-jitsi-meet/dist/esm/JitsiConference';
-import { JitsiConferenceErrors } from 'vendors/lib-jitsi-meet/dist/esm/JitsiConferenceErrors';
-import JitsiConnection from 'vendors/lib-jitsi-meet/dist/esm/JitsiConnection';
-import JitsiMeetJS from 'vendors/lib-jitsi-meet/dist/esm/JitsiMeetJS';
-import JitsiParticipant from 'vendors/lib-jitsi-meet/dist/esm/JitsiParticipant';
-import JitsiLocalTrack from 'vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiLocalTrack';
-import JitsiRemoteTrack from 'vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiRemoteTrack';
-import JitsiTrack from 'vendors/lib-jitsi-meet/dist/esm/modules/RTC/JitsiTrack';
-import { MediaType } from 'vendors/lib-jitsi-meet/dist/esm/service/RTC/MediaType';
-import { VideoType } from 'vendors/lib-jitsi-meet/dist/esm/service/RTC/VideoType';
+import JitsiConference from 'lib-mezon-meet/dist/esm/JitsiConference';
+import { JitsiConferenceErrors } from 'lib-mezon-meet/dist/esm/JitsiConferenceErrors';
+import JitsiConnection from 'lib-mezon-meet/dist/esm/JitsiConnection';
+import JitsiMeetJS from 'lib-mezon-meet/dist/esm/JitsiMeetJS';
+import JitsiParticipant from 'lib-mezon-meet/dist/esm/JitsiParticipant';
+import JitsiLocalTrack from 'lib-mezon-meet/dist/esm/modules/RTC/JitsiLocalTrack';
+import JitsiRemoteTrack from 'lib-mezon-meet/dist/esm/modules/RTC/JitsiRemoteTrack';
+import JitsiTrack from 'lib-mezon-meet/dist/esm/modules/RTC/JitsiTrack';
+import { MediaType } from 'lib-mezon-meet/dist/esm/service/RTC/MediaType';
+import { VideoType } from 'lib-mezon-meet/dist/esm/service/RTC/VideoType';
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;

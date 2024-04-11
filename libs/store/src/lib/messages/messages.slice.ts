@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { reactionActions } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';

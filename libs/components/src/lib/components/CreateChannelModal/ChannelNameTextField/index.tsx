@@ -1,4 +1,4 @@
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
 

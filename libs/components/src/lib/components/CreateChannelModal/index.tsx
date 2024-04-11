@@ -4,14 +4,14 @@ import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import * as Icons from '../Icons';
 import { ChannelLableModal } from './ChannelLabel';
 import { ChannelNameTextField } from './ChannelNameTextField';
 import { ChannelStatusModal } from './ChannelStatus';
 import { ChannelTypeComponent } from './ChannelType';
 import { CreateChannelButton } from './CreateChannelButton';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();

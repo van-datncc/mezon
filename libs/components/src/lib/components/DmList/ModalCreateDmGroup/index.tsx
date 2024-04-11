@@ -3,8 +3,8 @@ import { IFriend, directActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChannelType } from '@mezon/mezon-js';
-import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ChannelType } from 'mezon-js';
+import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 interface ModalCreateDMProps {
 	onClose: () => void;
 	isOpen: boolean;
