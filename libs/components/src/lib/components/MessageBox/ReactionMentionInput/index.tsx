@@ -1,14 +1,21 @@
 import { EmojiListSuggestion } from '@mezon/components';
 import { useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
+import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import textFieldEdit from 'text-field-edit';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 import { useReference, useThreads } from '@mezon/core';
 import { referencesActions, threadsActions, useAppDispatch } from '@mezon/store';
+import { ChannelMembersEntity, ILineMention, UsersClanEntity, uniqueUsers } from '@mezon/utils';
+
+import { useChannelMembers, useClans } from '@mezon/core';
+import { ChannelsEntity, channelUsersActions, selectCurrentChannel } from '@mezon/store';
+import { useSelector } from 'react-redux';
 import { ThreadNameTextField } from '../../../components';
+import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
+import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 
@@ -18,7 +25,7 @@ export type MentionReactInputProps = {
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
-		value?: string,
+		value?: ThreadValue,
 	) => void;
 	onTyping?: () => void;
 	onCreateThread?: (key: string) => void;
@@ -36,7 +43,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { setKeyboardPressAnyButtonStatus } = useEmojiSuggestion();
 	const [nameThread, setNameThread] = useState('');
 
-	const { currentThread, messageThreadError } = useThreads();
+	const { currentThread, messageThreadError, isPrivate } = useThreads();
+	const currentChannel = useSelector(selectCurrentChannel);
+	const { mentions } = useMessageLine(content);
+	const { usersClan } = useClans();
+	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -93,20 +104,54 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 
 		if (referenceMessage !== null && dataReferences.length > 0) {
-			props.onSend({ t: content }, mentionData, attachmentData, dataReferences, nameThread);
+			props.onSend({ t: content }, mentionData, attachmentData, dataReferences, { nameThread, isPrivate });
+			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
 			setAttachmentData([]);
 			setReferenceMessage(null);
 			setDataReferences([]);
 			setNameThread('');
+			setContent('');
+			dispatch(threadsActions.setIsPrivate(0));
 		} else {
-			props.onSend({ t: content }, mentionData, attachmentData, undefined, nameThread);
+			props.onSend({ t: content }, mentionData, attachmentData, undefined, { nameThread, isPrivate });
+			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
 			setAttachmentData([]);
 			setNameThread('');
+			setContent('');
+			dispatch(threadsActions.setIsPrivate(0));
 		}
-		setIsEmojiListShowed(false);
-	}, [valueTextInput, attachmentData, mentionData, nameThread, currentThread, referenceMessage, dataReferences, props.onSend]);
+	}, [
+		valueTextInput,
+		attachmentData,
+		mentionData,
+		nameThread,
+		currentChannel,
+		currentThread,
+		mentions,
+		isPrivate,
+		content,
+		referenceMessage,
+		dataReferences,
+	]);
+
+	const addMemberToChannel = async (
+		currentChannel: ChannelsEntity | null,
+		mentions: ILineMention[],
+		userClans: UsersClanEntity[],
+		members: ChannelMembersEntity[],
+	) => {
+		const userIds = uniqueUsers(mentions, userClans, members);
+		const body = {
+			channelId: currentChannel?.channel_id as string,
+			channelType: currentChannel?.type,
+			userIds: userIds as string[],
+		};
+		if (userIds.length > 0) {
+			await dispatch(channelUsersActions.addChannelUsers(body));
+		}
+	};
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 
@@ -195,14 +240,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		<div className="relative">
 			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
 			{props.isThread && !currentThread && (
-				<ThreadNameTextField
-					onChange={handleChangeNameThread}
-					onKeyDown={onKeyDown}
-					value={nameThread}
-					label="Thread Name"
-					placeholder="Enter Thread Name"
-					className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
-				/>
+				<div>
+					<ThreadNameTextField
+						onChange={handleChangeNameThread}
+						onKeyDown={onKeyDown}
+						value={nameThread}
+						label="Thread Name"
+						placeholder="Enter Thread Name"
+						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
+					/>
+					<PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />
+				</div>
 			)}
 			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}
 			<MentionsInput

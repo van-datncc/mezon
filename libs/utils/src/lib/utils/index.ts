@@ -1,5 +1,6 @@
 import { differenceInSeconds, format, isSameDay, startOfDay, subDays } from 'date-fns';
 import { RefObject } from 'react';
+import { ChannelMembersEntity, ILineMention, UsersClanEntity } from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -53,10 +54,18 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 	}
 };
 
+export const uniqueUsers = (mentions: ILineMention[], userClans: UsersClanEntity[], userChannels: ChannelMembersEntity[]) => {
+	const userMentions = Array.from(new Set(mentions.map((user) => user.matchedText)));
 
+	const userMentionsFormat = userMentions.map((user) => user.substring(1));
 
+	const usersNotInChannels = userMentionsFormat.filter(
+		(username) => !userChannels.map((user) => user.user).some((user) => user?.username === username),
+	);
 
+	const userInClans = userClans.map((clan) => clan.user);
 
+	const userIds = userInClans.filter((user) => usersNotInChannels.includes(user?.username as string)).map((user) => user?.id as string);
 
-
-
+	return userIds;
+};

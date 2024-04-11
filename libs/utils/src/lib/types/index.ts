@@ -365,3 +365,28 @@ export type ThreadError = {
 	name: string;
 	message: string;
 };
+
+export type ThreadValue = {
+	nameThread: string;
+	isPrivate: number;
+};
+
+export type ILineMention = {
+	nonMatchText: string;
+	matchedText: string;
+	startIndex: number;
+	endIndex: number;
+};
+
+export type IMessageLine = {
+	mentions: ILineMention[];
+};
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
+}
+
+export interface ChannelMembersEntity extends IChannelMember {
+	id: string; // Primary ID
+	name?: string;
+}

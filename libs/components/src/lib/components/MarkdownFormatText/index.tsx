@@ -1,6 +1,6 @@
+import { ILineMention } from '@mezon/utils';
 import Markdown from 'react-markdown';
 import remarkGFM from 'remark-gfm';
-import { ILineMention } from '../MessageWithUser/useMessageLine';
 import PreClass from './PreClass';
 
 type MarkdownFormatTextProps = {
