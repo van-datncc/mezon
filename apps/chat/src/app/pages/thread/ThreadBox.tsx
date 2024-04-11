@@ -1,13 +1,13 @@
 import { Icons, MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage, useThreads } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeMessage, IMessageSendPayload, ThreadValue } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
-import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import ChannelMessages from '../channel/ChannelMessages';
 
 const ThreadBox = () => {
@@ -26,17 +26,20 @@ const ThreadBox = () => {
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
 
-	const createThread = async (value: ThreadValue) => {
-		const body: ApiCreateChannelDescRequest = {
-			clan_id: currentClanId?.toString(),
-			channel_label: value.nameThread,
-			channel_private: value.isPrivate,
-			parrent_id: currentChannelId as string,
-			category_id: currentChannel?.category_id,
-			type: ChannelType.CHANNEL_TYPE_TEXT,
-		};
-		await dispatch(createNewChannel(body));
-	};
+	const createThread = useCallback(
+		async (value: ThreadValue) => {
+			const body: ApiCreateChannelDescRequest = {
+				clan_id: currentClanId?.toString(),
+				channel_label: value.nameThread,
+				channel_private: value.isPrivate,
+				parrent_id: currentChannelId as string,
+				category_id: currentChannel?.category_id,
+				type: ChannelType.CHANNEL_TYPE_TEXT,
+			};
+			await dispatch(createNewChannel(body));
+		},
+		[currentChannel, currentChannelId, currentClanId, dispatch],
+	);
 
 	const handleSend = useCallback(
 		async (
@@ -55,7 +58,7 @@ const ThreadBox = () => {
 				console.error('Session is not available');
 			}
 		},
-		[sessionUser],
+		[createThread, sendMessageThread, sessionUser],
 	);
 
 	const handleTyping = useCallback(() => {
