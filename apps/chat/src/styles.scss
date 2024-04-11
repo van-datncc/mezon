@@ -375,22 +375,9 @@ blockquote span {
 		order: -1;
 	}
 
+	button.showScreen,
 	img.showScreen {
-		width: unset;
-	}
-
-	&.oneMember {
-		.showScreen {
-			grid-column: span 1;
-		}
-		video {
-			width: 60%;
-		}
-		.hasCanvas {
-			video {
-				width: 100%;
-			}
-		}
+		width: unset !important;
 	}
 }
 

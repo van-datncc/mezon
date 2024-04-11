@@ -4,6 +4,7 @@ import { useMezonVoice } from '@mezon/transport';
 import { IChannelMember } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import AddVoiceFriend from './ChannelVoiceOff/AddVoiceFriend';
 import ChannelMemberAvatar from './ChannelVoiceOff/ChannelMemberAvatar';
 
 export type ChannelVoiceProps = {
@@ -38,7 +39,6 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 		videoShareElem!.style.display = 'none';
 		voice.setScreenVideoElement(videoShareElem as HTMLVideoElement);
 		voice.attachMedia();
-		
 	}, [voice]);
 
 	const handleClick = (event: any) => {
@@ -78,15 +78,20 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 			</button>
 			<div
 				id="meet"
-				className={`grid items-stretch gap-[10px] p-[10px] ${classIdMeet} w-full`}
+				className={`grid items-stretch gap-[10px] p-[10px] ${classIdMeet} w-full min-h-[50%] ${isSelectScreen ? 'h-full' : 'h-fit'}`}
 				onClick={handleClick}
-				style={{ gridTemplateColumns: numberMember === 2 ? 'repeat(2, minmax(0, 1fr))' : '' }}
+				style={{
+					gridTemplateColumns: numberMember < 2 ? 'repeat(2, minmax(0, 1fr))' : '',
+					gridAutoRows: isSelectScreen ? '' : 'minmax(0, 1fr)',
+					gridTemplateRows: isSelectScreen ? '3fr 1fr' : '',
+				}}
 			>
 				<div className={`contents ${showScreen ? 'block' : 'hidden'}`}>
-					<canvas id="canvas" className="w-full bg-black rounded-[10px] h-full"></canvas>
+					<canvas id="canvas" className={`w-full bg-black rounded-[10px] h-full`}></canvas>
 				</div>
 				<div className={`localTrack contents`}>
 					<ChannelMemberAvatar userId={userProfile?.user?.id ?? ''} />
+					{numberMember < 2 && <AddVoiceFriend channelId={channelId} />}
 				</div>
 				<div className={`remoteTrack contents`}>
 					{friendVoiceChannel.map((user: IChannelMember, index: number) => {

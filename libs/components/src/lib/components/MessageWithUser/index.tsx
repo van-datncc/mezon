@@ -65,11 +65,10 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [messageRefId]);
 
-
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
+				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600] bg-[#26262B]">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
