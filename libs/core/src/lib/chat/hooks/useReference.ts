@@ -58,7 +58,7 @@ export function useReference() {
 	);
 
 	const setAttachmentData = useCallback(
-		(attachent: ApiMessageAttachment) => {
+		(attachent: ApiMessageAttachment | ApiMessageAttachment[]) => {
 			dispatch(referencesActions.setAttachmentData(attachent));
 		},
 		[dispatch],

@@ -1,9 +1,8 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
-import { useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
-import { ReactElement, useCallback } from 'react';
+import { Fragment, ReactElement, useCallback } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -25,9 +24,7 @@ export type MessageBoxProps = {
 
 function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
-	const dispatch = useAppDispatch();
-	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
-	// const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const { currentChannelId, currentClanId } = props;
 	const { attachmentDataRef, setAttachmentData } = useReference();
 
 	const onConvertToFiles = useCallback((content: string) => {
@@ -68,9 +65,17 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setAttachmentData(attachment);
 	}, []);
 
-	function removeAttachmentByUrl(attachments: ApiMessageAttachment[], urlToRemove: string): ApiMessageAttachment[] {
-		console.log('remove');
-		return attachments.filter((attachment) => attachment.url !== urlToRemove);
+	function removeAttachmentByUrl(urlToRemove: string) {
+		const removedAttachment: ApiMessageAttachment[] = attachmentDataRef.reduce(
+			(acc: ApiMessageAttachment[], attachment: ApiMessageAttachment) => {
+				if (attachment.url !== urlToRemove) {
+					acc.push(attachment);
+				}
+				return acc;
+			},
+			[],
+		);
+		setAttachmentData(removedAttachment);
 	}
 
 	const onPastedFiles = useCallback(
@@ -113,18 +118,20 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		},
 		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
 	);
-
 	return (
 		<div className="relative">
-			<div className="w-full gap-2 border flex flex-row h-fit overflow-x-scroll">
-				{attachmentDataRef.map((item, index) => {
-					return (
-						<>
-							<AttachmentPreviewThumbnail attachment={item} onRemove={() => removeAttachmentByUrl} />
-						</>
-					);
-				})}
-			</div>
+			{attachmentDataRef.length > 0 && (
+				<div className="w-full gap-2 flex flex-row h-fit mb-3 border justify-start">
+					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
+						return (
+							<Fragment key={index}>
+								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
+							</Fragment>
+						);
+					})}
+				</div>
+			)}
+
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}

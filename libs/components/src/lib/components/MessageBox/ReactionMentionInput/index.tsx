@@ -32,9 +32,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
-	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
-	const { setKeyboardPressAnyButtonStatus } = useEmojiSuggestion();
 	const [nameThread, setNameThread] = useState('');
 
 	const { currentThread, messageThreadError } = useThreads();
@@ -76,7 +75,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	const handleSend = useCallback(() => {
-		if (!valueTextInput.trim() && attachmentData.length === 0 && mentionData.length === 0) {
+		if (!valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
 			if (!nameThread.trim() && props.isThread && !currentThread) {
 				dispatch(threadsActions.setMessageThreadError(threadError.message));
 				dispatch(threadsActions.setNameThreadError(threadError.name));
@@ -94,20 +93,20 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 
 		if (referenceMessage !== null && dataReferences.length > 0) {
-			props.onSend({ t: content }, mentionData, attachmentData, dataReferences, nameThread);
+			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, nameThread);
 			setValueTextInput('');
 			setAttachmentData([]);
 			setReferenceMessage(null);
 			setDataReferences([]);
 			setNameThread('');
 		} else {
-			props.onSend({ t: content }, mentionData, attachmentData, undefined, nameThread);
+			props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, nameThread);
 			setValueTextInput('');
 			setAttachmentData([]);
 			setNameThread('');
 		}
 		setIsEmojiListShowed(false);
-	}, [valueTextInput, attachmentData, mentionData, nameThread, currentThread, referenceMessage, dataReferences, props.onSend]);
+	}, [valueTextInput, attachmentDataRef, mentionData, nameThread, currentThread, referenceMessage, dataReferences, props.onSend]);
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 

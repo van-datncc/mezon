@@ -62,7 +62,11 @@ export const referencesSlice = createSlice({
 			state.openReplyMessageState = action.payload;
 		},
 		setAttachmentData(state, action) {
-			state.attachmentDataRef.push(action.payload);
+			if (Array.isArray(action.payload)) {
+				state.attachmentDataRef = action.payload;
+			} else {
+				state.attachmentDataRef.push(action.payload);
+			}
 		},
 	},
 	extraReducers: (builder) => {
