@@ -8,27 +8,29 @@ import { toast } from 'react-toastify';
 const theme = 'dark';
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
-	useEffect(() => {
-		requestForToken().then((token) => {
-			if (token) {
-				dispatch(fcmActions.registFcmDeviceToken(token as string));
-			}
+	const handleNewMessage = (payload: any) => {
+        if (typeof payload === 'object' && payload !== null) {
+            const parts = payload.notification.body.split('\n');
+            const content = parts[1].split(': ')[1];
+            toast.info(content);
+        }
+        onMessageListener().then(handleNewMessage).catch((error: Error) => {
+            console.error('Error listening for messages:', error);
+        });
+    };
+
+    useEffect(() => {
+        onMessageListener().then(handleNewMessage).catch((error: Error) => {
+            console.error('Error listening for messages:', error);
+        });
+        requestForToken().then((token) => {
+            if (token) {
+                dispatch(fcmActions.registFcmDeviceToken(token as string));
+            }
         }).catch((error: Error) => {
             console.error("Error fetching token:", error);
         });
-	},[],);
-	useEffect(() => {
-		onMessageListener().then((payload: any) => {
-			if (typeof payload === 'object' && payload !== null) {
-					const content = JSON.parse(payload.notification.body).content
-					const contentT = JSON.parse(content).t	
-					toast.info(contentT)
-				}
-			
-		}).catch((error: Error) => {
-			console.error('Error listening for messages:', error);
-		});
-	}, []);
+    }, []);
 	return (
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">

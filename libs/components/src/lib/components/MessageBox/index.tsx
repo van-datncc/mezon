@@ -1,11 +1,11 @@
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin from '@draft-js-plugins/mention';
-import { EmojiListSuggestion, MentionReactInput } from '@mezon/components';
+import { MentionReactInput } from '@mezon/components';
 import { useEmojiSuggestion } from '@mezon/core';
 import { useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
-import { AtomicBlockUtils, ContentState, EditorState, Modifier, convertToRaw } from 'draft-js';
+import { AtomicBlockUtils, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
@@ -13,7 +13,6 @@ import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
-
 
 export type MessageBoxProps = {
 	onSend: (
@@ -198,101 +197,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		setEditorState(newEditorState);
 	};
 
-	// const refMessage = useSelector(selectReferenceMessage);
-	// const dataReferencesRefMess = useSelector(selectDataReferences);
-	// useEffect(() => {
-	// 	if (refMessage && refMessage.attachments) {
-	// 		dispatch(
-	// 			referencesActions.setDataReferences([
-	// 				{
-	// 					message_id: '',
-	// 					message_ref_id: refMessage.id,
-	// 					ref_type: 0,
-	// 					message_sender_id: refMessage.sender_id,
-	// 					content: JSON.stringify(refMessage.content),
-	// 					has_attachment: refMessage.attachments?.length > 0 ? true : false,
-	// 				},
-	// 			]),
-	// 		);
-	// 	}
-	// }, [refMessage]);
-
-	// const handleSend = useCallback(() => {
-	// 	if (!content.trim() && attachmentData.length === 0 && mentionData.length === 0) {
-	// 		return;
-	// 	}
-
-	// 	if (refMessage !== null && dataReferencesRefMess.length > 0) {
-	// 		onSend({ t: content }, mentionData, attachmentData, dataReferencesRefMess);
-	// 		setContent('');
-	// 		setAttachmentData([]);
-	// 		setClearEditor(true);
-	// 		setEditorState(() => EditorState.createEmpty());
-	// 		dispatch(referencesActions.setReferenceMessage(null));
-	// 		dispatch(referencesActions.setDataReferences(null));
-	// 	} else {
-	// 		onSend({ t: content }, mentionData, attachmentData);
-	// 		setContent('');
-	// 		setAttachmentData([]);
-	// 		setClearEditor(true);
-	// 		setEditorState(() => EditorState.createEmpty());
-	// 	}
-	// 	clearSuggestionEmojiAfterSendMessage();
-	// }, [content, onSend, mentionData, attachmentData]);
-
-	// function keyBindingFn(e: React.KeyboardEvent<Element>) {
-	// 	if (e.key === 'Enter' && !e.shiftKey) {
-	// 		return 'onsend';
-	// 	}
-	// }
-
-	// function handleKeyCommand(command: string) {
-	// 	if (command === 'onsend') {
-	// 		handleSend();
-	// 		return 'handled';
-	// 	}
-	// 	return 'not-handled';
-	// }
-
-	// const editorRef = useRef<Editor | null>(null);
-
-	// const onFocusEditorState = () => {
-	// 	setTimeout(() => {
-	// 		editorRef.current!.focus();
-	// 	}, 0);
-	// };
-
-	// const moveSelectionToEnd = useCallback(() => {
-	// 	setTimeout(() => {
-	// 		editorRef.current!.focus();
-	// 	}, 0);
-	// 	const editorContent = editorState.getCurrentContent();
-	// 	const editorSelection = editorState.getSelection();
-	// 	const updatedSelection = editorSelection.merge({
-	// 		anchorKey: editorContent.getLastBlock().getKey(),
-	// 		anchorOffset: editorContent.getLastBlock().getText().length,
-	// 		focusKey: editorContent.getLastBlock().getKey(),
-	// 		focusOffset: editorContent.getLastBlock().getText().length,
-	// 	});
-	// 	const updatedEditorState = EditorState.forceSelection(editorState, updatedSelection);
-	// 	setEditorState(updatedEditorState);
-	// }, [editorState]);
-
-	// useEffect(() => {
-	// 	if (content.length === 0) {
-	// 		setShowPlaceHolder(true);
-	// 	} else setShowPlaceHolder(false);
-
-	// 	if (content.length >= 1) {
-	// 		moveSelectionToEnd();
-	// 	}
-	// }, [clearEditor, content]);
-
-	// useEffect(() => {
-	// 	const editorElement = document.querySelectorAll('[data-offset-key]');
-	// 	editorElement[2].classList.add('break-all');
-	// }, []);
-
 	// please no delete
 	const editorDiv = document.getElementById('editor');
 	const editorHeight = editorDiv?.clientHeight;
@@ -312,20 +216,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, [editorState]);
 
 	const emojiListRef = useRef<HTMLDivElement>(null);
-	const {
-		isEmojiListShowed,
-		emojiPicked,
-		// isFocusEditor,
-		setIsEmojiListShowed,
-		setEmojiSuggestion,
-		textToSearchEmojiSuggestion,
-		setTextToSearchEmojiSuggesion,
-		// setIsFocusEditorStatus,
-	} = useEmojiSuggestion();
-
-	// useEffect(() => {
-	// 	clickEmojiSuggestion();
-	// }, [emojiPicked]);
+	const { setTextToSearchEmojiSuggesion } = useEmojiSuggestion();
 
 	useEffect(() => {
 		if (content) {
@@ -333,55 +224,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, [content]);
 
-	// useEffect(() => {
-	// 	if (isEmojiListShowed) {
-	// 		emojiListRef.current && emojiListRef.current.focus();
-	// 	} else {
-	// 		onFocusEditorState();
-	// 	}
-	// }, [isEmojiListShowed, textToSearchEmojiSuggestion]);
-
-	// const clearSuggestionEmojiAfterSendMessage = () => {
-	// 	setIsEmojiListShowed(false);
-	// 	setEmojiSuggestion('');
-	// 	setTextToSearchEmojiSuggesion('');
-	// 	setIsFocusEditorStatus(false);
-	// 	setEditorState(() => EditorState.createEmpty());
-	// };
-
-	// useEffect(() => {
-	// 	if (isFocusEditor) {
-	// 		onFocusEditorState();
-	// 	}
-	// }, [isFocusEditor]);
-
-	// function clickEmojiSuggestion() {
-	// 	if (!emojiPicked) {
-	// 		return;
-	// 	}
-	// 	const currentContentState = editorState.getCurrentContent();
-	// 	const selectionState = editorState.getSelection();
-	// 	const contentText = currentContentState.getPlainText();
-	// 	const syntaxEmoji = findSyntaxEmoji(contentText) ?? '';
-	// 	const updatedContentText = contentText.replace(syntaxEmoji, emojiPicked);
-	// 	const newContentState = ContentState.createFromText(updatedContentText);
-	// 	let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
-	// 	const updatedEditorState = EditorState.forceSelection(newEditorState, selectionState);
-	// 	setEditorState(updatedEditorState);
-	// }
-
-	// function findSyntaxEmoji(contentText: string): string | null {
-	// 	const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-	// 	const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
-	// 	if (emojiArray.length > 0) {
-	// 		return emojiArray[0];
-	// 	}
-	// 	return null;
-	// }
-
 	return (
 		<div className="relative">
-			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
@@ -390,7 +234,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				/>
 				<div className={`w-full bg-black gap-3 flex items-center`}>
 					<div className={`w-[96%] bg-black gap-3 relative`}>
-						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} onTyping={props.onTyping}/>
+						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} onTyping={props.onTyping} />
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>

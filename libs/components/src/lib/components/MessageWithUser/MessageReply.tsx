@@ -27,7 +27,7 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 	}, [message]);
 
 	const getIdMessageToJump = useCallback(
-		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement>) => {
+		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (idRefMessage) {
 				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
@@ -65,7 +65,10 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 									<Icons.ImageThumbnail />
 								</div>
 							) : (
-								<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1">
+								<span
+									onClick={(e) => getIdMessageToJump(messageRefId, e)}
+									className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1"
+								>
 									{messageRefFetchFromServe.content && messageRefFetchFromServe.content.t}
 								</span>
 							)}

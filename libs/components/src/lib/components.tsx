@@ -24,16 +24,16 @@ export { default as MemberProfile } from './components/MemberProfile';
 export { default as Message } from './components/Message';
 export { default as ChannelMessageOpt } from './components/Message/ChannelMessageOpt';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
-export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput/index';
+export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
+export { default as MessageReaction } from './components/MessageWithUser/MessageReaction';
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
-export { default as MessageReaction } from './components/MessageWithUser/MessageReaction';
 
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';
