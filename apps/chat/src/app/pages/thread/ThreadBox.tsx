@@ -3,7 +3,7 @@ import { useThreadMessage, useThreads } from '@mezon/core';
 import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
 import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ETypeMessage, IMessageSendPayload } from '@mezon/utils';
+import { ETypeMessage, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -19,17 +19,18 @@ const ThreadBox = () => {
 
 	const { threadRef } = useMezon();
 	const thread = threadRef.current;
-	const { currentThread } = useThreads();
+	const { currentThread, isPrivate } = useThreads();
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: thread?.id as string,
 		channelLabel: thread?.chanel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
 
-	const createThread = async (name: string) => {
+	const createThread = async (value: ThreadValue) => {
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId?.toString(),
-			channel_label: name,
+			channel_label: value.nameThread,
+			channel_private: value.isPrivate,
 			parrent_id: currentChannelId as string,
 			category_id: currentChannel?.category_id,
 			type: ChannelType.CHANNEL_TYPE_TEXT,
@@ -43,11 +44,11 @@ const ThreadBox = () => {
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
-			value?: string,
+			value?: ThreadValue,
 		) => {
 			if (sessionUser) {
 				if (value) {
-					await createThread(value as string);
+					await createThread(value);
 				}
 				await sendMessageThread(content, mentions, attachments, references);
 			} else {
@@ -67,8 +68,13 @@ const ThreadBox = () => {
 		<div className="flex flex-col flex-1 justify-end">
 			<div>
 				{!currentThread && (
-					<div className="flex items-center justify-center mx-4 w-16 h-16 bg-[#26262B] rounded-full pointer-events-none">
+					<div className="relative flex items-center justify-center mx-4 w-16 h-16 bg-[#26262B] rounded-full pointer-events-none">
 						<Icons.ThreadIcon defaultSize="w-7 h-7" />
+						{isPrivate === 1 && (
+							<div className="absolute right-4 bottom-4">
+								<Icons.Locked />
+							</div>
+						)}
 					</div>
 				)}
 

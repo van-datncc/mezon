@@ -1,4 +1,4 @@
-import { IMessageSendPayload, MentionDataProps, UserMentionsOpt, threadError } from '@mezon/utils';
+import { IMessageSendPayload, MentionDataProps, ThreadValue, UserMentionsOpt, threadError } from '@mezon/utils';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 
@@ -6,6 +6,7 @@ import { useReference, useThreads } from '@mezon/core';
 import { referencesActions, threadsActions, useAppDispatch } from '@mezon/store';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { ThreadNameTextField } from '../../../components';
+import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 
@@ -15,7 +16,7 @@ export type MentionReactInputProps = {
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
-		value?: string,
+		value?: ThreadValue,
 	) => void;
 	onTyping?: () => void;
 	onCreateThread?: (key: string) => void;
@@ -32,7 +33,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [content, setContent] = useState('');
 	const [nameThread, setNameThread] = useState('');
 
-	const { currentThread, messageThreadError } = useThreads();
+	const { currentThread, messageThreadError, isPrivate } = useThreads();
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -89,19 +90,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 
 		if (referenceMessage !== null && dataReferences.length > 0) {
-			props.onSend({ t: content }, mentionData, attachmentData, dataReferences, nameThread);
+			props.onSend({ t: content }, mentionData, attachmentData, dataReferences, { nameThread, isPrivate });
 			setValueTextInput('');
 			setAttachmentData([]);
 			setReferenceMessage(null);
 			setDataReferences([]);
 			setNameThread('');
+			dispatch(threadsActions.setIsPrivate(0));
 		} else {
-			props.onSend({ t: content }, mentionData, attachmentData, undefined, nameThread);
+			props.onSend({ t: content }, mentionData, attachmentData, undefined, { nameThread, isPrivate });
 			setValueTextInput('');
 			setAttachmentData([]);
 			setNameThread('');
+			dispatch(threadsActions.setIsPrivate(0));
 		}
-	}, [valueTextInput, attachmentData, mentionData, nameThread, currentThread, referenceMessage, dataReferences]);
+	}, [valueTextInput, attachmentData, mentionData, nameThread, currentThread, isPrivate, referenceMessage, dataReferences]);
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 
@@ -131,14 +134,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	return (
 		<div className="relative">
 			{props.isThread && !currentThread && (
-				<ThreadNameTextField
-					onChange={handleChangeNameThread}
-					onKeyDown={onKeyDown}
-					value={nameThread}
-					label="Thread Name"
-					placeholder="Enter Thread Name"
-					className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
-				/>
+				<div>
+					<ThreadNameTextField
+						onChange={handleChangeNameThread}
+						onKeyDown={onKeyDown}
+						value={nameThread}
+						label="Thread Name"
+						placeholder="Enter Thread Name"
+						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
+					/>
+					<PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />
+				</div>
 			)}
 			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}
 			<MentionsInput

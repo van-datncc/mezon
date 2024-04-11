@@ -365,3 +365,8 @@ export type ThreadError = {
 	name: string;
 	message: string;
 };
+
+export type ThreadValue = {
+	nameThread: string;
+	isPrivate: number;
+};
