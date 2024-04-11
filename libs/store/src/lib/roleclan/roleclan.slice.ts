@@ -1,9 +1,9 @@
-import { ApiRole, ApiRoleUserList, RoleUserListRoleUser } from 'mezon-js/api.gen';
+import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
-// import { MembersRoleActions } from '../getlistmemberinrole/getListMembersInRole.slice';
+
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
 
 /*
