@@ -70,7 +70,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			className=" relative"
+			className="bg-[#26262B] relative"
 			id="scrollLoading"
 			ref={containerRef}
 			style={{

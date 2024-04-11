@@ -18,7 +18,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 
 				return (
-					<div key={index} className="flex flex-row gap-1">
+					<div key={index} className="flex flex-row gap-1 lineText">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (

@@ -19,6 +19,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageToJump: string;
 	openEditMessageState: boolean;
 	openReplyMessageState: boolean;
+	openOptionMessageState: boolean;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -35,6 +36,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
+	openOptionMessageState: false,
 });
 
 export const referencesSlice = createSlice({
@@ -58,6 +60,9 @@ export const referencesSlice = createSlice({
 		},
 		setOpenReplyMessageState(state, action) {
 			state.openReplyMessageState = action.payload;
+		},
+		setOpenOptionMessageState(state, action) {
+			state.openOptionMessageState = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -97,3 +102,5 @@ export const selectIdMessageReplied = createSelector(getReferencesState, (state:
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
+
+export const selectOpenOptionMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openOptionMessageState);
