@@ -16,6 +16,8 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	error?: string | null;
 	isShowCreateThread?: boolean;
 	currentThread?: ApiChannelDescription;
+	nameThreadError?: string;
+	messageThreadError?: string;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -64,6 +66,12 @@ export const threadsSlice = createSlice({
 		},
 		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
 			state.currentThread = action.payload;
+		},
+		setNameThreadError: (state, action: PayloadAction<string>) => {
+			state.nameThreadError = action.payload;
+		},
+		setMessageThreadError: (state, action: PayloadAction<string>) => {
+			state.messageThreadError = action.payload;
 		},
 		// ...
 	},
@@ -133,3 +141,7 @@ export const selectAllThreads = createSelector(getThreadsState, selectAll);
 export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);
 
 export const selectIsShowCreateThread = createSelector(getThreadsState, (state) => state.isShowCreateThread);
+
+export const selectNameThreadError = createSelector(getThreadsState, (state) => state.nameThreadError);
+
+export const selectMessageThreadError = createSelector(getThreadsState, (state) => state.messageThreadError);

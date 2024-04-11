@@ -360,3 +360,8 @@ export enum ETypeMessage {
 	CHANNEL = 'CHANNEL',
 	THREAD = 'THREAD',
 }
+
+export type ThreadError = {
+	name: string;
+	message: string;
+};
