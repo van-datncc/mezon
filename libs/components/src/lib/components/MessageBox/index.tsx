@@ -1,15 +1,14 @@
-import { MentionReactInput } from '@mezon/components';
-import { useEmojiSuggestion } from '@mezon/core';
+import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
+import { useReference } from '@mezon/core';
 import { useAppDispatch } from '@mezon/store';
-import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 // import ImageComponent from './ImageComponet';
-import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
 	onSend: (
@@ -28,59 +27,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const dispatch = useAppDispatch();
 	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
-	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
-	const onConvertToFiles = useCallback(
-		(content: string) => {
-			if (content.length > 2000) {
-				const fileContent = new Blob([content], { type: 'text/plain' });
-				const now = Date.now();
-				const filename = now + '.txt';
-				const file = new File([fileContent], filename, { type: 'text/plain' });
-				const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+	// const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const { attachmentDataRef, setAttachmentData } = useReference();
 
-				const session = sessionRef.current;
-				const client = clientRef.current;
-
-				if (!client || !session || !currentChannelId) {
-					throw new Error('Client is not initialized');
-				}
-				handleUploadFile(client, session, fullfilename, file)
-					.then((attachment) => {
-						handleFinishUpload(attachment);
-						return 'handled';
-					})
-					.catch((err) => {
-						return 'not-handled';
-					});
-				return;
-			}
-		},
-		[attachmentData],
-	);
-
-	const handleFinishUpload = useCallback(
-		(attachment: ApiMessageAttachment) => {
-			let urlFile = attachment.url;
-			if (attachment.filetype?.indexOf('pdf') !== -1) {
-				urlFile = '/assets/images/pdficon.png';
-			} else if (attachment.filetype?.indexOf('text') !== -1) {
-				urlFile = '/assets/images/text.png';
-			} else if (attachment.filetype?.indexOf('vnd.openxmlformats-officedocument.presentationml.presentation') !== -1) {
-				urlFile = '/assets/images/pptfile.png';
-			} else if (attachment.filetype?.indexOf('mp4') !== -1) {
-				urlFile = '/assets/images/video.png';
-			}
-			attachmentData.push(attachment);
-			setAttachmentData(attachmentData);
-		},
-		[attachmentData],
-	);
-
-	const onPastedFiles = useCallback(
-		(files: Blob[]) => {
+	const onConvertToFiles = useCallback((content: string) => {
+		if (content.length > 2000) {
+			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
-			const filename = now + '.png';
-			const file = new File(files, filename, { type: 'image/png' });
+			const filename = now + '.txt';
+			const file = new File([fileContent], filename, { type: 'text/plain' });
 			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
 
 			const session = sessionRef.current;
@@ -97,24 +52,94 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				.catch((err) => {
 					return 'not-handled';
 				});
+			return;
+		}
+	}, []);
 
-			return 'not-handled';
+	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
+		let urlFile = attachment.url;
+		if (attachment.filetype?.indexOf('pdf') !== -1) {
+			urlFile = '/assets/images/pdficon.png';
+		} else if (attachment.filetype?.indexOf('text') !== -1) {
+			urlFile = '/assets/images/text.png';
+		} else if (attachment.filetype.indexOf('image/png') !== -1) {
+			urlFile === attachment.url;
+		}
+		setAttachmentData(attachment);
+	}, []);
+
+	function removeAttachmentByUrl(attachments: ApiMessageAttachment[], urlToRemove: string): ApiMessageAttachment[] {
+		console.log('remove');
+		return attachments.filter((attachment) => attachment.url !== urlToRemove);
+	}
+
+	const onPastedFiles = useCallback(
+		(event: React.ClipboardEvent<HTMLDivElement>) => {
+			const items = (event.clipboardData || (window as any).clipboardData).items;
+			const files: Blob[] = [];
+			if (items) {
+				for (let i = 0; i < items.length; i++) {
+					if (items[i].type.indexOf('image') !== -1) {
+						const file = items[i].getAsFile();
+						if (file) {
+							files.push(file);
+						}
+					}
+				}
+
+				if (files.length > 0) {
+					const blob = new Blob(files, { type: files[0].type });
+					const filename = Date.now() + '.png';
+					const file = new File([blob], filename, { type: blob.type });
+					const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
+					const session = sessionRef.current;
+					const client = clientRef.current;
+
+					if (!client || !session || !currentClanId) {
+						throw new Error('Client is not initialized');
+					}
+					handleUploadFile(client, session, fullfilename, file)
+						.then((attachment) => {
+							handleFinishUpload(attachment);
+							return 'handled';
+						})
+						.catch((err) => {
+							return 'not-handled';
+						});
+
+					return 'not-handled';
+				}
+			}
 		},
-		[attachmentData, clientRef,  currentChannelId, currentClanId,  sessionRef],
+		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
 	);
-
 
 	return (
 		<div className="relative">
+			<div className="w-full gap-2 border flex flex-row h-fit overflow-x-scroll">
+				{attachmentDataRef.map((item, index) => {
+					return (
+						<>
+							<AttachmentPreviewThumbnail attachment={item} onRemove={() => removeAttachmentByUrl} />
+						</>
+					);
+				})}
+			</div>
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
 					currentChannelId={currentChannelId || ''}
 					onFinishUpload={handleFinishUpload}
 				/>
-				<div className={`w-full bg-black gap-3 flex items-center`}>
+
+				<div className={`w-full bg-black gap-3 flex items-center rounded-e-md`}>
 					<div className={`w-[96%] bg-black gap-3 relative`}>
-						<MentionReactInput listMentions={props.listMentions} onSend={props.onSend} onTyping={props.onTyping} />
+						<MentionReactInput
+							handlePaste={onPastedFiles}
+							listMentions={props.listMentions}
+							onSend={props.onSend}
+							onTyping={props.onTyping}
+						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />
 				</div>

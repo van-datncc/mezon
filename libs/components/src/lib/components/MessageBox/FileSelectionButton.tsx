@@ -22,6 +22,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload} 
 		}
 
 		handleUploadFile(client, session, fullfilename, file).then((attachment) => {
+            console.log(attachment)
 			onFinishUpload(attachment);
 		});
 	};

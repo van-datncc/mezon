@@ -24,6 +24,7 @@ export type MentionReactInputProps = {
 	onCreateThread?: (key: string) => void;
 	listMentions?: MentionDataProps[] | undefined;
 	isThread?: boolean;
+	handlePaste?: any;
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
@@ -134,10 +135,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		emojiPicked,
 		keyCodeFromKeyBoard,
 		setIsEmojiListShowed,
-		setEmojiSuggestion,
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
-		setKeyCodeFromKeyBoardState,
 		pressAnyButtonState,
 	} = useEmojiSuggestion();
 
@@ -191,6 +190,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setNameThread(nameThread);
 	};
 
+
+
+
 	return (
 		<div className="relative">
 			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
@@ -206,6 +208,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			)}
 			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}
 			<MentionsInput
+				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."

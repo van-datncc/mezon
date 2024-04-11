@@ -1,5 +1,6 @@
 import {
 	referencesActions,
+	selectAttachmentData,
 	selectDataReferences,
 	selectIdMessageReplied,
 	selectOpenEditMessageState,
@@ -10,7 +11,7 @@ import {
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 
 export function useReference() {
 	const dispatch = useAppDispatch();
@@ -19,6 +20,7 @@ export function useReference() {
 	const idMessageReplied = useSelector(selectIdMessageReplied);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const attachmentDataRef = useSelector(selectAttachmentData);
 
 	const setReferenceMessage = useCallback(
 		(message: IMessageWithUser | null) => {
@@ -55,6 +57,13 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setAttachmentData = useCallback(
+		(attachent: ApiMessageAttachment) => {
+			dispatch(referencesActions.setAttachmentData(attachent));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			setReferenceMessage,
@@ -67,6 +76,8 @@ export function useReference() {
 			idMessageReplied,
 			openEditMessageState,
 			openReplyMessageState,
+			attachmentDataRef,
+			setAttachmentData,
 		}),
 		[
 			setReferenceMessage,
@@ -79,6 +90,8 @@ export function useReference() {
 			idMessageReplied,
 			openEditMessageState,
 			openReplyMessageState,
+			attachmentDataRef,
+			setAttachmentData,
 		],
 	);
 }
