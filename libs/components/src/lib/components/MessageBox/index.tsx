@@ -1,5 +1,3 @@
-import createImagePlugin from '@draft-js-plugins/image';
-import createMentionPlugin from '@draft-js-plugins/mention';
 import { MentionReactInput } from '@mezon/components';
 import { useEmojiSuggestion } from '@mezon/core';
 import { useAppDispatch } from '@mezon/store';
@@ -11,7 +9,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
-import ImageComponent from './ImageComponet';
+// import ImageComponent from './ImageComponet';
 import editorStyles from './editorStyles.module.css';
 
 export type MessageBoxProps = {
@@ -31,70 +29,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const dispatch = useAppDispatch();
 	const { onSend, onTyping, listMentions, currentChannelId, currentClanId } = props;
-	const [editorState, setEditorState] = useState(EditorState.createEmpty());
-	const [clearEditor, setClearEditor] = useState(false);
-	const [content, setContent] = useState<string>('');
-	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
-	const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-	const imagePlugin = createImagePlugin({ imageComponent: ImageComponent });
-	const mentionPlugin = useRef(
-		createMentionPlugin({
-			entityMutability: 'IMMUTABLE',
-			theme: editorStyles,
-			mentionPrefix: '@',
-			supportWhitespace: true,
-			mentionTrigger: '@',
-		}),
-	);
-
-	const plugins = [mentionPlugin.current, imagePlugin];
-	//clear Editor after navigate channel
-	useEffect(() => {
-		setEditorState(EditorState.createEmpty());
-	}, [currentChannelId, currentClanId]);
-
-	const onChange = useCallback(
-		(editorState: EditorState) => {
-			if (typeof onTyping === 'function') {
-				onTyping();
-			}
-			setClearEditor(false);
-			setEditorState(editorState);
-			const contentState = editorState.getCurrentContent();
-			const raw = convertToRaw(contentState);
-			// get message
-			const messageRaw = raw.blocks;
-			const messageContent = Object.values(messageRaw)
-				.filter((item) => item.text.trim() !== '')
-				.map((item) => item.text);
-			const messageBreakline = messageContent.join('\n').replace(/,/g, '');
-
-			onConvertToFiles(messageBreakline);
-
-			handleUrlInput(messageBreakline)
-				.then((attachment) => {
-					handleFinishUpload(attachment);
-				})
-				.catch(() => {
-					setContent(content + messageBreakline);
-				});
-
-			const mentionedUsers = [];
-			for (const key in raw.entityMap) {
-				const ent = raw.entityMap[key];
-				if (ent.type === 'mention') {
-					mentionedUsers.push({
-						user_id: ent.data.mention.id,
-						username: ent.data.mention.name,
-					});
-				}
-			}
-			setMentionData(mentionedUsers);
-		},
-		[attachmentData],
-	);
-
 	const onConvertToFiles = useCallback(
 		(content: string) => {
 			if (content.length > 2000) {
@@ -136,31 +71,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			} else if (attachment.filetype?.indexOf('mp4') !== -1) {
 				urlFile = '/assets/images/video.png';
 			}
-
-			const contentState = editorState.getCurrentContent();
-			const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', {
-				src: urlFile,
-				height: '20px',
-				width: 'auto',
-				onRemove: () => handleEditorRemove(),
-			});
-			const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-
-			const newEditorState = EditorState.push(editorState, contentStateWithEntity, 'insert-fragment');
-			const newEditorStateWithImage = EditorState.forceSelection(
-				newEditorState,
-				newEditorState.getSelection().merge({
-					anchorOffset: 0,
-					focusOffset: 0,
-				}),
-			);
-			const newStateWithImage = AtomicBlockUtils.insertAtomicBlock(newEditorStateWithImage, entityKey, ' ');
-			setEditorState(newStateWithImage);
-
 			attachmentData.push(attachment);
 			setAttachmentData(attachmentData);
 		},
-		[attachmentData, content, editorState],
+		[attachmentData],
 	);
 
 	const onPastedFiles = useCallback(
@@ -187,15 +101,9 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			return 'not-handled';
 		},
-		[attachmentData, clientRef, content, currentChannelId, currentClanId, editorState, sessionRef],
+		[attachmentData, clientRef,  currentChannelId, currentClanId,  sessionRef],
 	);
 
-	const handleEditorRemove = () => {
-		const currentContentState = editorState.getCurrentContent();
-		const newContentState = Modifier.applyEntity(currentContentState, editorState.getSelection(), null);
-		const newEditorState = EditorState.push(editorState, newContentState, 'apply-entity');
-		setEditorState(newEditorState);
-	};
 
 	// please no delete
 	const editorDiv = document.getElementById('editor');
@@ -204,25 +112,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
 	//
 
-	const editorElement = document.getElementById('editor');
-	useEffect(() => {
-		const hasFigure = editorElement?.querySelector('figure');
-		const firstChildHasBr = editorElement?.querySelector('br');
-		if (hasFigure) {
-			if (firstChildHasBr) {
-				firstChildHasBr.style.display = 'none';
-			}
-		}
-	}, [editorState]);
-
-	const emojiListRef = useRef<HTMLDivElement>(null);
-	const { setTextToSearchEmojiSuggesion } = useEmojiSuggestion();
-
-	useEffect(() => {
-		if (content) {
-			setTextToSearchEmojiSuggesion(content);
-		}
-	}, [content]);
 
 	return (
 		<div className="relative">
