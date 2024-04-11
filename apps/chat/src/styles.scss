@@ -249,6 +249,7 @@ input:-webkit-autofill:active {
 #scrollLoading {
 	.infinite-scroll-component {
 		margin-bottom: 20px;
+		overflow: visible !important;
 	}
 }
 
@@ -344,4 +345,15 @@ blockquote span {
 
 .thread-scroll:hover::-webkit-scrollbar-thumb {
 	background: #151515;
+}
+
+// css line text
+.lineText {
+	.pre {
+		white-space: break-spaces;
+		padding-right: 26px;
+		.icon {
+			right: 6px;
+		}
+	}
 }
