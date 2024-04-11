@@ -16,7 +16,7 @@ import SamuraiDojo0 from 'libs/assets/src/assets/stickers/SamuraiDojo/emojibest_
 import SamuraiDojo7 from 'libs/assets/src/assets/stickers/SamuraiDojo/emojibest_com_samorai__dojo_7.gif';
 import SamuraiDojo8 from 'libs/assets/src/assets/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif';
 import { useCallback, useEffect, useState } from 'react';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 type ChannelMessageBoxProps = {
 	channelId: string;

@@ -2,7 +2,7 @@ import { channelsActions, messagesActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useClans } from './useClans';
 
 export type UseChatSendingOptions = {

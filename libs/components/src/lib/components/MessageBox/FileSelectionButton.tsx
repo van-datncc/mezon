@@ -1,6 +1,6 @@
 import { handleUploadFile, useMezon } from "@mezon/transport";
 import * as Icons from '../Icons';
-import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/api.gen";
+import { ApiMessageAttachment } from "mezon-js/api.gen";
 
 export type FileSelectionButtonProps = {
     currentClanId: string;

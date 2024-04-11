@@ -1,4 +1,4 @@
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { IChannelMember, IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';

@@ -10,7 +10,7 @@ import {
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 
 export function useReference() {
 	const dispatch = useAppDispatch();

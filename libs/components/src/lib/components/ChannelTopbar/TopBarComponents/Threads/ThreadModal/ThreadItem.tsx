@@ -1,5 +1,5 @@
 import { useAppNavigation, useChannelMembers } from '@mezon/core';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { ChannelsEntity, channelMembersActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';

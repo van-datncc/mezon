@@ -1,4 +1,4 @@
-import { Client } from '@mezon/mezon-js';
+import { Client } from 'mezon-js';
 
 export type CreateMezonClientOptions = {
 	ssl: boolean;

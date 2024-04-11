@@ -1,4 +1,4 @@
-import { ApiPermission } from '@mezon/mezon-js/dist/api.gen';
+import { ApiPermission } from 'mezon-js/api.gen';
 import { IPermissionUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';

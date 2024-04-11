@@ -4,7 +4,7 @@ import { useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';

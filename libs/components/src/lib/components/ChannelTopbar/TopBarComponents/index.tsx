@@ -1,4 +1,4 @@
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../../Icons';

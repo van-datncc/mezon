@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
