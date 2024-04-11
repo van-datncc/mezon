@@ -104,14 +104,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 
 
-	// please no delete
-	const editorDiv = document.getElementById('editor');
-	const editorHeight = editorDiv?.clientHeight;
-	document.documentElement.style.setProperty('--editor-height', (editorHeight && editorHeight - 10) + 'px');
-	document.documentElement.style.setProperty('--bottom-emoji', (editorHeight && editorHeight + 25) + 'px');
-	//
-
-
 	return (
 		<div className="relative">
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
