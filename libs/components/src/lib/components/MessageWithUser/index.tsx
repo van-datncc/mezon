@@ -75,7 +75,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				</div>
 			)}
 			<div>
-				<div className={`bg-[#26262b] rounded-sm ${messFocusReplied ? 'bg-[#393C48]' : 'bg-[#26262b]'} relative`}>
+				<div className={`bg-[#26262b] rounded-sm ${messFocusReplied ? 'bg-[#33417a]' : 'bg-[#26262b]'} relative`}>
 					<div className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0`}></div>
 					<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
 						<MessageReply message={message} />

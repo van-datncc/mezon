@@ -18,7 +18,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 
 				return (
-					<div key={index} className='flex flex-row gap-1'>
+					<div key={index} className="flex flex-row gap-1">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (
@@ -32,7 +32,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							/>
 						)}
 						{tagName && (
-							<span style={{ color: '#3297ff ' }} className="cursor-pointer">
+							<span style={{ color: '#3297ff ' }} className="cursor-pointer whitespace-nowrap">
 								{tagName}
 							</span>
 						)}
