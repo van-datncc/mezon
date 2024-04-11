@@ -3,7 +3,6 @@ import { useEmojiSuggestion } from '@mezon/core';
 import { useAppDispatch } from '@mezon/store';
 import { handleUploadFile, handleUrlInput, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
-import { AtomicBlockUtils, EditorState, Modifier, convertToRaw } from 'draft-js';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
