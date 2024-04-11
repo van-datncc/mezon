@@ -1,5 +1,5 @@
 import { useChatReaction, useReference } from '@mezon/core';
-import { ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelStreamMode } from 'mezon-js';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals } from '@mezon/utils';
 import { Fragment, useRef, useState } from 'react';

@@ -11,17 +11,26 @@ type ChannelMessageOptProps = {
 export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 	const dispatch = useAppDispatch();
 	const { reactionActions, userId, reactionRightState, reactionBottomState } = useChatReaction();
-	const { openEditMessageState, openReplyMessageState } = useReference();
+	const { openEditMessageState, openReplyMessageState, openOptionMessageState } = useReference();
 
 	const handleClickReply = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
 	const handleClickEdit = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(referencesActions.setReferenceMessage(message));
+	};
+
+	const handleClickOption = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(!openOptionMessageState));
 		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
@@ -56,7 +65,7 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 					<Icons.Reply defaultFill={openReplyMessageState ? '#FFFFFF' : '#AEAEAE'} />
 				</button>
 			)}
-			<button className="h-full p-1 cursor-pointer">
+			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
 				<Icons.ThreeDot />
 			</button>
 		</div>

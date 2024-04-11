@@ -1,4 +1,4 @@
-import { ApiChannelDescription } from '@mezon/mezon-js/dist/api.gen';
+import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 

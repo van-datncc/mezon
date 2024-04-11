@@ -12,8 +12,9 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	error?: string | null;
 	emojiPicked: string;
 	emojiSuggestionListStatus: boolean;
-	isFocusEditor: boolean;
+	keyCodeFromKeyBoardState: number;
 	textToSearchEmojiSuggestion: string;
+	pressAnyButtonState: boolean;
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
@@ -39,8 +40,9 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	error: null,
 	emojiPicked: '',
 	emojiSuggestionListStatus: false,
-	isFocusEditor: false,
+	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
+	pressAnyButtonState: false,
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -57,8 +59,12 @@ export const emojiSuggestionSlice = createSlice({
 		setStatusSuggestionEmojiList: (state, action: PayloadAction<boolean>) => {
 			state.emojiSuggestionListStatus = action.payload;
 		},
-		setIsFocusEditor: (state, action: PayloadAction<boolean>) => {
-			state.isFocusEditor = action.payload;
+		setKeyCodeFromKeyBoardState: (state, action: PayloadAction<number>) => {
+			state.keyCodeFromKeyBoardState = action.payload;
+		},
+
+		setKeyboardPressAnyButtonStatus: (state, action: PayloadAction<boolean>) => {
+			state.pressAnyButtonState = action.payload;
 		},
 		setTextToSearchEmojiSuggestion: (state, action: PayloadAction<string>) => {
 			state.textToSearchEmojiSuggestion = action.payload;
@@ -100,6 +106,8 @@ export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (em
 
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 
-export const selectIsFocusEditor = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.isFocusEditor);
+export const selectKeyCodeFromKeyBoardState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.keyCodeFromKeyBoardState);
 
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
+
+export const selectPressAnyButtonState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.pressAnyButtonState);

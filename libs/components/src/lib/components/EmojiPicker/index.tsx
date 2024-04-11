@@ -1,6 +1,6 @@
-import { useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { ChannelStreamMode } from '@mezon/mezon-js';
-import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { ChannelStreamMode } from 'mezon-js';
+import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import EmojiPicker, { EmojiClickData, EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 
 export type EmojiPickerOptions = {
@@ -13,6 +13,7 @@ export type EmojiPickerOptions = {
 function EmojiPickerComp(props: EmojiPickerOptions) {
 	const { reactionMessageDispatch, setReactionRightState, setReactionBottomState } = useChatReaction();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
+	const { setSubPanelActive } = useGifsStickersEmoji();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
@@ -30,6 +31,8 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
 			setEmojiSuggestion(emojiData.emoji);
 			event.stopPropagation();
+			setSubPanelActive(SubPanelName.NONE);
+			
 		}
 	};
 

@@ -1,4 +1,4 @@
-import { ApiChannelDescription } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiChannelDescription } from 'mezon-js/api.gen';
 import * as Icons from '../../../../Icons';
 
 type ThreadHeaderProps = {

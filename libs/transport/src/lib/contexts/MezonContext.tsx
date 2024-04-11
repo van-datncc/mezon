@@ -1,5 +1,5 @@
-import { Channel, ChannelStreamMode, ChannelType, Client, Session, Socket, Status } from '@mezon/mezon-js';
-import { WebSocketAdapterPb } from '@mezon/mezon-js-protobuf';
+import { Channel, ChannelStreamMode, ChannelType, Client, Session, Socket, Status } from 'mezon-js';
+import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';

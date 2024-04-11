@@ -39,6 +39,7 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 
 	return {
 		members,
+		rawMembers,
 		groupMembers,
 		remainingMember,
 	};

@@ -1,6 +1,6 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import MessageLine from './MessageLine';
 import MessageImage from './MessageImage';
+import MessageLine from './MessageLine';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
 import { useMessageParser } from './useMessageParser';
@@ -13,7 +13,6 @@ type IMessageContentProps = {
 };
 
 const MessageContent = ({ user, message, isCombine, newMessage }: IMessageContentProps) => {
-
 	const { attachments, lines } = useMessageParser(message);
 	const renderAttachments = () => {
 		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
@@ -37,7 +36,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 					<div id={message.id}>
 						<MessageLine line={newMessage as string} />
 					</div>
-					<p className="ml-[5px] opacity-50">(edit)</p>
+					<p className="ml-[5px] opacity-50 text-[9px] self-center">(edit)</p>
 				</div>
 			) : (
 				<div className="flex ">
@@ -45,7 +44,9 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 						<MessageLine line={lines as string} />
 					</div>
 					{message.update_time ? (
-						<div>{message.create_time < message.update_time ? <p className="ml-[5px] opacity-50">(edit)</p> : null}</div>
+						<div className="self-center">
+							{message.create_time < message.update_time ? <p className="ml-[5px] opacity-50 text-[9px]">(edited)</p> : null}
+						</div>
 					) : null}
 				</div>
 			)}

@@ -1,4 +1,4 @@
-import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from '@mezon/mezon-js/dist/api.gen';
+import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from 'mezon-js/api.gen';
 import { IClan, IInvite, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';

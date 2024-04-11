@@ -24,7 +24,6 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 	const [classIdMeet, setClassIdMeet] = useState('');
 	const numberMember = useSelector(selectNumberMemberVoiceChannel(channelId));
 	const friendVoiceChannel = useSelector(selectFriendVoiceChannel(channelId, userProfile?.user?.id ?? ''));
-	const voiceChannelName = clanName?.replace(' ', '-') + '-' + channelLabel.replace(' ', '-');
 
 	useEffect(() => {
 		const targetNode = document.getElementById('meet');

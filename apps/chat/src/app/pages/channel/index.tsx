@@ -1,6 +1,6 @@
 import { ChannelVoice, ChannelVoiceOff, MemberList } from '@mezon/components';
 import { useAuth, useClans } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import {
 	channelsActions,
 	selectCurrentChannel,

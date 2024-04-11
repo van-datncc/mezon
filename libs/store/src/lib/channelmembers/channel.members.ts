@@ -1,5 +1,5 @@
-import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from '@mezon/mezon-js';
-import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
+import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';

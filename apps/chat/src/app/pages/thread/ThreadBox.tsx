@@ -1,13 +1,13 @@
 import { Icons, MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage, useThreads } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { RootState, createNewChannel, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ETypeMessage, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
-import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import ChannelMessages from '../channel/ChannelMessages';
 
 const ThreadBox = () => {

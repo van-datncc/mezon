@@ -21,7 +21,7 @@ export function ChannelMessage(props: MessageProps) {
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
 	const { reactionRightState, reactionBottomState } = useChatReaction();
-	const { referenceMessage, openEditMessageState } = useReference();
+	const { referenceMessage, openEditMessageState, openOptionMessageState } = useReference();
 
 	useEffect(() => {
 		markMessageAsSeen(message);
@@ -76,37 +76,28 @@ export function ChannelMessage(props: MessageProps) {
 	};
 
 	return (
-		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
+		<div className="fullBoxText relative group">
 			<MessageWithUser
 				message={mess as IMessageWithUser}
 				preMessage={messPre as IMessageWithUser}
 				user={user}
 				mode={mode}
 				newMessage={newMessage}
+				child={
+					<PopupMessage
+						reactionRightState={reactionRightState}
+						mess={mess as IMessageWithUser}
+						referenceMessage={referenceMessage}
+						reactionBottomState={reactionBottomState}
+						openEditMessageState={openEditMessageState}
+						openOptionMessageState={openOptionMessageState}
+						mode={mode}
+					/>
+				}
 			/>
 
 			{lastSeen && <UnreadMessageBreak />}
 
-			<div
-				className={`chooseForText z-10 top-[-18px] absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary
-				${
-					(reactionRightState && mess.id === referenceMessage?.id) ||
-					(reactionBottomState && mess.id === referenceMessage?.id) ||
-					(openEditMessageState && mess.id === referenceMessage?.id)
-						? ''
-						: 'hidden group-hover:block'
-				} `}
-			>
-				<ChannelMessageOpt message={mess} />
-
-				{mess.id === referenceMessage?.id && reactionRightState && (
-					<div className="w-fit fixed right-16 bottom-[6rem]">
-						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-						</div>
-					</div>
-				)}
-			</div>
 			{openEditMessageState && mess.id === referenceMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-30px]">
 					<textarea
@@ -132,3 +123,61 @@ ChannelMessage.Skeleton = () => {
 		</div>
 	);
 };
+
+function PopupMessage({
+	reactionRightState,
+	mess,
+	referenceMessage,
+	reactionBottomState,
+	openEditMessageState,
+	openOptionMessageState,
+	mode,
+	isCombine,
+}: {
+	reactionRightState: boolean;
+	mess: IMessageWithUser;
+	referenceMessage: IMessageWithUser | null;
+	reactionBottomState: boolean;
+	openEditMessageState: boolean;
+	openOptionMessageState: boolean;
+	mode: number;
+	isCombine?: boolean;
+}) {
+	return (
+		<div
+			className={`chooseForText z-10 absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary ${isCombine ? '-top-7' : '-top-6'}
+				${
+					(reactionRightState && mess.id === referenceMessage?.id) ||
+					(reactionBottomState && mess.id === referenceMessage?.id) ||
+					(openEditMessageState && mess.id === referenceMessage?.id) ||
+					(openOptionMessageState && mess.id === referenceMessage?.id)
+						? ''
+						: 'hidden group-hover:block'
+				} `}
+		>
+			<ChannelMessageOpt message={mess} />
+
+			{mess.id === referenceMessage?.id && reactionRightState && (
+				<div className="w-fit fixed right-16 bottom-[6rem]">
+					<div className="scale-75 transform mb-0 z-10">
+						<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+					</div>
+				</div>
+			)}
+			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption />}
+		</div>
+	);
+}
+
+function PopupOption() {
+	return (
+		<div className="bg-[#36373C] rounded-[10px] p-2 absolute right-8 -top-[150px] w-[180px] z-10">
+			<ul className="flex flex-col gap-1">
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Edit Message</li>
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Reply</li>
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Copy Text</li>
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-red-900">Delete Message</li>
+			</ul>
+		</div>
+	);
+}

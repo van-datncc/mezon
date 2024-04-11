@@ -3,9 +3,9 @@ import React, { useEffect, useMemo } from 'react';
 import { useDirect } from './useDirect';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@mezon/store';
-import { ApiLinkInviteUser } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiLinkInviteUser } from 'mezon-js/api.gen';
 import { useClans } from './useClans';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 
 export function useDMInvite(channelID?:string) {
 	const dispatch = useAppDispatch();

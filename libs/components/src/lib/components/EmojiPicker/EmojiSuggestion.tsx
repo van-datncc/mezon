@@ -1,14 +1,21 @@
 import { useEmojiSuggestion } from '@mezon/core';
-import { IEmoji } from '@mezon/utils';
+import { IEmoji, KEY_KEYBOARD } from '@mezon/utils';
 import { Ref, forwardRef, useEffect, useRef, useState } from 'react';
-
 type EmojiSuggestionList = {
 	valueInput: string;
 };
 
 const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList, ref: Ref<HTMLDivElement>) => {
-	const { emojis, setEmojiSuggestion, setIsEmojiListShowed, isEmojiListShowed, setIsFocusEditorStatus, setTextToSearchEmojiSuggesion } =
-		useEmojiSuggestion();
+	const {
+		emojis,
+		setEmojiSuggestion,
+		setIsEmojiListShowed,
+		isEmojiListShowed,
+		setKeyCodeFromKeyBoardState,
+		setTextToSearchEmojiSuggesion,
+		setKeyboardPressAnyButtonStatus,
+		pressAnyButtonState,
+	} = useEmojiSuggestion();
 	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 	const [inputCorrect, setInputCorrect] = useState<string>('');
 	const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -44,6 +51,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 			if (matchesEndWithColon) {
 				const result = matchesEndWithColon.map((match) => match)[0];
 				const searching = searchEmojiByShortcode(result);
+				setIsEmojiListShowed(false);
 				if (searching.length > 0) {
 					const emojiFound = searching[0].skins[0].native;
 					setEmojiSuggestion(emojiFound);
@@ -57,23 +65,22 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 	useEffect(() => {
 		const detectedEmoji = handleSearchSyntaxEmoji(valueInput.toString());
 		const emojiSearchWithOutPrefix = detectedEmoji && detectedEmoji[0];
-
-		if (emojiSearchWithOutPrefix && emojiSearchWithOutPrefix.length >= 2) {
+		if (emojiSearchWithOutPrefix) {
 			setInputCorrect(emojiSearchWithOutPrefix);
+		} else {
+			setIsEmojiListShowed(false);
 		}
 	}, [valueInput]);
 
 	useEffect(() => {
 		const emojiSuggestions = searchEmojiByShortcode(inputCorrect);
-		setIsEmojiListShowed(true);
-		setSuggestions(emojiSuggestions ?? []);
-	}, [inputCorrect]);
-
-	useEffect(() => {
-		if (suggestions.length === 0) {
-			setIsFocusEditorStatus(true);
+		if (emojiSuggestions) {
+			setIsEmojiListShowed(true);
+			setSuggestions(emojiSuggestions ?? []);
+		} else {
+			setSuggestions([]);
 		}
-	}, [suggestions]);
+	}, [inputCorrect]);
 
 	useEffect(() => {
 		if (isEmojiListShowed) {
@@ -83,28 +90,35 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 					liElement.focus();
 				}
 			}
-		} else {
+		}
+	}, [suggestions, pressAnyButtonState, valueInput]);
+
+	useEffect(() => {
+		if (suggestions.length === 0) {
 			setIsEmojiListShowed(false);
 		}
 	}, [suggestions]);
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>, index: number) => {
-		switch (e.key) {
-			case 'ArrowUp':
+		const { keyCode } = e;
+		switch (keyCode) {
+			case KEY_KEYBOARD.UP:
 				e.preventDefault();
+				e.stopPropagation();
 				setSelectedIndex((prevIndex) => (prevIndex === 0 ? suggestions.length - 1 : prevIndex - 1));
 				break;
-			case 'ArrowDown':
+			case KEY_KEYBOARD.DOWN:
 				e.preventDefault();
+				e.stopPropagation();
 				setSelectedIndex((prevIndex) => (prevIndex === suggestions.length - 1 ? 0 : prevIndex + 1));
 				break;
-			case 'Enter':
+			case KEY_KEYBOARD.ENTER:
 				e.preventDefault();
 				pickEmoji(suggestions[selectedIndex]);
 				break;
 			default:
-				e.preventDefault();
-				setIsFocusEditorStatus(true);
+				setKeyCodeFromKeyBoardState(keyCode);
+				setKeyboardPressAnyButtonStatus(!pressAnyButtonState);
 				break;
 		}
 	};

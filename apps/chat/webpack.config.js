@@ -23,10 +23,7 @@ module.exports = composePlugins(
 
     config.resolve = config.resolve || {};
     config.resolve.fallback = { "fs": false };
-    config.loader = {
-      test: /plugin\.css$/,
-      loaders: ['style-loader', 'css'],
-    }
+
     return merge(config, {
       ignoreWarnings: [/Failed to parse source map/]
     });
