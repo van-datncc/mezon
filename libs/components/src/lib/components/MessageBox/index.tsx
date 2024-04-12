@@ -54,14 +54,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
-		let urlFile = attachment.url;
-		if (attachment.filetype?.indexOf('pdf') !== -1) {
-			urlFile = '/assets/images/pdficon.png';
-		} else if (attachment.filetype?.indexOf('text') !== -1) {
-			urlFile = '/assets/images/text.png';
-		} else if (attachment.filetype.indexOf('image/png') !== -1) {
-			urlFile === attachment.url;
-		}
 		setAttachmentData(attachment);
 	}, []);
 
@@ -120,17 +112,15 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	return (
 		<div className="relative">
-			{attachmentDataRef.length > 0 && (
-				<div className="w-full gap-2 flex flex-row h-fit mb-3 border justify-start">
-					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
-						return (
-							<Fragment key={index}>
-								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
-							</Fragment>
-						);
-					})}
-				</div>
-			)}
+			<div className="w-full max-h-full flex overflow-x-auto gap-2 mb-3 whitespace-pre">
+				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
+					return (
+						<Fragment key={index}>
+							<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
+						</Fragment>
+					);
+				})}
+			</div>
 
 			<div className="flex flex-inline w-max-[97%] items-end gap-2 box-content mb-4 bg-black rounded-md relative">
 				<FileSelectionButton

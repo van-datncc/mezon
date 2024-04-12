@@ -28,7 +28,9 @@ export { default as AttachmentPreviewThumbnail } from './components/MessageBox/A
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
+export { default as MessageImage } from './components/MessageWithUser/MessageImage';
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction';
+export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
