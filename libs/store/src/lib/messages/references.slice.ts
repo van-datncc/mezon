@@ -1,6 +1,6 @@
 import { IMessage, IMessageWithUser } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -19,6 +19,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageToJump: string;
 	openEditMessageState: boolean;
 	openReplyMessageState: boolean;
+	attachmentDataRef: ApiMessageAttachment[];
 	openOptionMessageState: boolean;
 }
 
@@ -36,6 +37,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
+	attachmentDataRef: [],
 	openOptionMessageState: false,
 });
 
@@ -60,6 +62,13 @@ export const referencesSlice = createSlice({
 		},
 		setOpenReplyMessageState(state, action) {
 			state.openReplyMessageState = action.payload;
+		},
+		setAttachmentData(state, action) {
+			if (Array.isArray(action.payload)) {
+				state.attachmentDataRef = action.payload;
+			} else {
+				state.attachmentDataRef.push(action.payload);
+			}
 		},
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
@@ -102,5 +111,7 @@ export const selectIdMessageReplied = createSelector(getReferencesState, (state:
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
+
+export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
 
 export const selectOpenOptionMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openOptionMessageState);

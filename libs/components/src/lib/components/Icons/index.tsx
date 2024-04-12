@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+export * from './attachmentThumb';
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -1538,7 +1539,7 @@ export const EyeClose: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	);
 };
 
-export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
+export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill = '#535353' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area" clipPath="url(#clip0_403_3108)">
@@ -1547,7 +1548,7 @@ export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M0.307965 9.2689C-0.102981 9.66796 -0.102981 10.332 0.307966 10.7311L4.43105 14.7349C7.54126 17.755 12.4583 17.755 15.5685 14.7349L19.6915 10.7311C20.1025 10.332 20.1025 9.66796 19.6915 9.2689L15.5685 5.26514C12.4583 2.24495 7.54126 2.24495 4.43105 5.26514L0.307965 9.2689ZM9.99997 13.0001C11.6568 13.0001 13 11.6569 13 10.0001C13 8.3432 11.6568 7.00006 9.99997 7.00006C8.34312 7.00006 6.99997 8.3432 6.99997 10.0001C6.99997 11.6569 8.34312 13.0001 9.99997 13.0001Z"
-					fill="#535353"
+					fill={defaultFill}
 				/>
 			</g>
 			<defs>
@@ -2007,6 +2008,33 @@ export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 		</svg>
 	);
 };
+
+export const TrashIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			className="actionBarIcon__5c911"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill={defaultFill}
+				d="M14.25 1c.41 0 .75.34.75.75V3h5.25c.41 0 .75.34.75.75v.5c0 .41-.34.75-.75.75H3.75A.75.75 0 0 1 3 4.25v-.5c0-.41.34-.75.75-.75H9V1.75c0-.41.34-.75.75-.75h4.5Z"
+				className=""
+			></path>
+			<path
+				fill={defaultFill}
+				fillRule="evenodd"
+				d="M5.06 7a1 1 0 0 0-1 1.06l.76 12.13a3 3 0 0 0 3 2.81h8.36a3 3 0 0 0 3-2.81l.75-12.13a1 1 0 0 0-1-1.06H5.07ZM11 12a1 1 0 1 0-2 0v6a1 1 0 1 0 2 0v-6Zm3-1a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Z"
+				clipRule="evenodd"
+				className={defaultSize}
+			></path>
+		</svg>
+)}
 
 export const Locked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (

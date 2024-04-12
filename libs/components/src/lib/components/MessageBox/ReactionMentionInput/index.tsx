@@ -31,6 +31,7 @@ export type MentionReactInputProps = {
 	onCreateThread?: (key: string) => void;
 	listMentions?: MentionDataProps[] | undefined;
 	isThread?: boolean;
+	handlePaste?: any;
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
@@ -38,9 +39,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
-	const [attachmentData, setAttachmentData] = useState<ApiMessageAttachment[]>([]);
+	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
-	const { setKeyboardPressAnyButtonStatus } = useEmojiSuggestion();
 	const [nameThread, setNameThread] = useState('');
 
 	const { currentThread, messageThreadError, isPrivate } = useThreads();
@@ -86,7 +86,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	const handleSend = useCallback(() => {
-		if (!valueTextInput.trim() && attachmentData.length === 0 && mentionData.length === 0) {
+		if (!valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
 			if (!nameThread.trim() && props.isThread && !currentThread) {
 				dispatch(threadsActions.setMessageThreadError(threadError.message));
 				dispatch(threadsActions.setNameThreadError(threadError.name));
@@ -104,7 +104,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 
 		if (referenceMessage !== null && dataReferences.length > 0) {
-			props.onSend({ t: content }, mentionData, attachmentData, dataReferences, { nameThread, isPrivate });
+			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate });
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
 			setAttachmentData([]);
@@ -114,7 +114,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setContent('');
 			dispatch(threadsActions.setIsPrivate(0));
 		} else {
-			props.onSend({ t: content }, mentionData, attachmentData, undefined, { nameThread, isPrivate });
+			props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameThread, isPrivate });
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
 			setAttachmentData([]);
@@ -124,7 +124,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [
 		valueTextInput,
-		attachmentData,
+		attachmentDataRef,
 		mentionData,
 		nameThread,
 		currentChannel,
@@ -179,10 +179,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		emojiPicked,
 		keyCodeFromKeyBoard,
 		setIsEmojiListShowed,
-		setEmojiSuggestion,
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
-		setKeyCodeFromKeyBoardState,
 		pressAnyButtonState,
 	} = useEmojiSuggestion();
 
@@ -254,6 +252,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			)}
 			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}
 			<MentionsInput
+				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."

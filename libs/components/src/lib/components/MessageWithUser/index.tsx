@@ -100,7 +100,6 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
 									</div>
 								</div>
-
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>

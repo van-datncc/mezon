@@ -6,12 +6,7 @@ type MessageAttachmentProps = {
 
 // TODO: refactor component for message lines
 const MessageAttachment = ({ attachments }: MessageAttachmentProps) => {
-	
-	return (
-		<div>
-			
-		</div>
-	);
+	return <div></div>;
 };
 
 export default MessageAttachment;

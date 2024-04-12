@@ -19,6 +19,7 @@ import {
 import { ApiChannelDescription, ApiInviteUserRes } from 'mezon-js/api.gen';
 
 export * from './permissions';
+export * from './thumbnailPos';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 

@@ -1,4 +1,6 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useEffect, useState } from 'react';
+import { ApiMessageAttachment } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 import MessageImage from './MessageImage';
 import MessageLine from './MessageLine';
 import MessageLinkFile from './MessageLinkFile';
@@ -14,23 +16,69 @@ type IMessageContentProps = {
 
 const MessageContent = ({ user, message, isCombine, newMessage }: IMessageContentProps) => {
 	const { attachments, lines } = useMessageParser(message);
-	const renderAttachments = () => {
-		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') !== -1) {
-			// TODO: render multiple attachments
-			return <MessageImage attachmentData={attachments[0]} />;
-		}
+	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
+	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
+	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 
-		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('mp4') !== -1) {
-			return <MessageVideo attachmentData={attachments[0]} />;
-		}
+	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
+		const videos: ApiMessageAttachment[] = [];
+		const images: ApiMessageAttachment[] = [];
+		const documents: ApiMessageAttachment[] = [];
 
-		if (attachments && attachments.length > 0 && attachments[0].filetype?.indexOf('image') === -1) {
-			return <MessageLinkFile attachmentData={attachments[0]} />;
-		}
+		attachments.forEach((attachment) => {
+			if (attachment.filetype?.indexOf('video/mp4') !== -1) {
+				videos.push(attachment);
+			} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
+				images.push(attachment);
+			} else {
+				documents.push(attachment);
+			}
+		});
+
+		return { videos, images, documents };
 	};
+
+	useEffect(() => {
+		const { videos, images, documents } = classifyAttachments(attachments ?? []);
+		setVideos(videos);
+		setImages(images);
+		setDocuments(documents);
+	}, [attachments]);
+
+	const renderVideos = () => {
+		return (
+			<div className="flex flex-row justify-start flex-wrap w-full gap-x-2 mt-2">
+				{videos.map((video, index) => (
+					<div key={index} className="w-fit">
+						<MessageVideo attachmentData={video} />
+					</div>
+				))}
+			</div>
+		);
+	};
+	const renderImages = () => {
+		return (
+			<div className="flex flex-row justify-start flex-wrap w-full gap-x-2">
+				{images.map((image, index) => (
+					<div key={index} className="w-48 h-auto">
+						<MessageImage attachmentData={image} />
+					</div>
+				))}
+			</div>
+		);
+	};
+
+	const renderDocuments = () => {
+		return documents.map((document, index) => {
+			return <MessageLinkFile key={index} attachmentData={document} />;
+		});
+	};
+
 	return (
 		<>
-			{renderAttachments()}
+			{renderVideos()}
+			{renderImages()}
+			{renderDocuments()}
 			{newMessage !== '' ? (
 				<div className="flex ">
 					<div id={message.id}>

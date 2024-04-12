@@ -1,6 +1,4 @@
-import { Modal, ModalBody } from "flowbite-react";
-import { useState } from "react";
-import { ApiMessageAttachment } from "mezon-js/api.gen";
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export type MessageImage = {
 	content?: string;
@@ -9,8 +7,8 @@ export type MessageImage = {
 
 function MessageVideo({ attachmentData }: MessageImage) {
 	return (
-		<>	
-					<video src={attachmentData.url} controls={true} autoPlay={false} className="h-[400px]"></video>
+		<>
+			<video src={attachmentData.url} controls={true} autoPlay={false} className="h-[200px]"></video>
 		</>
 	);
 }
