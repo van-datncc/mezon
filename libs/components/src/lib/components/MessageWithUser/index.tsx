@@ -37,7 +37,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { setGrandParentWidthAction } = useChatReaction();
-	const { referenceMessage, openEditMessageState } = useReference();
+	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -60,8 +60,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	}, [getWidthDivMessageWidth]);
 
 	const propsChild = { isCombine };
-
 	const checkReplied = referenceMessage && referenceMessage.id === message.id;
+	const checkMessageTargetToMoved = idMessageReplied === message.id;
 
 	return (
 		<>
@@ -74,10 +74,10 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 			)}
 			<div className="relative">
 				<div
-					className={`bg-[#26262b] relative rounded-sm overflow-hidden ${checkReplied ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+					className={`bg-[#26262b] relative rounded-sm overflow-hidden ${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
 					<div
-						className={`${checkReplied ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
+						className={`${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
 						className={`flex h-15 flex-col w-auto px-3  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
