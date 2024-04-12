@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { ApiCreateCategoryDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import ClanSetting from '../ClanSettings/clanSettings';
 import * as Icons from '../Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';

@@ -1,6 +1,6 @@
+import { ILineMention } from '@mezon/utils';
 import Markdown from 'react-markdown';
 import remarkGFM from 'remark-gfm';
-import { ILineMention } from '../MessageWithUser/useMessageLine';
 import PreClass from './PreClass';
 
 type MarkdownFormatTextProps = {
@@ -18,7 +18,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 
 				return (
-					<div key={index} className="flex flex-row gap-1">
+					<div key={index} className="flex flex-row gap-1 lineText">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (

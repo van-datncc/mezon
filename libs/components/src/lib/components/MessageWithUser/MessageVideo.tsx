@@ -1,4 +1,4 @@
-import { ApiMessageAttachment } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export type MessageImage = {
 	content?: string;

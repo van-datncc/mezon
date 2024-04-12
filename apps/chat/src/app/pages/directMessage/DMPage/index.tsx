@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
-import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 
 export default function DirectMessage() {
 	// TODO: move selector to store

@@ -2,12 +2,11 @@ import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components
 import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
-// import ImageComponent from './ImageComponet';
 
 export type MessageBoxProps = {
 	onSend: (
@@ -112,7 +111,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	return (
 		<div className="relative">
-			<div className="w-full max-h-full flex overflow-x-auto gap-2 mb-3 whitespace-pre">
+			<div className="w-full max-h-full flex gap-2 mb-3">
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
 						<Fragment key={index}>

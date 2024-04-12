@@ -60,7 +60,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		return (
 			<div className="flex flex-row justify-start flex-wrap w-full gap-x-2">
 				{images.map((image, index) => (
-					<div key={index} className="w-fit">
+					<div key={index} className="w-48 h-auto">
 						<MessageImage attachmentData={image} />
 					</div>
 				))}
@@ -84,7 +84,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 					<div id={message.id}>
 						<MessageLine line={newMessage as string} />
 					</div>
-					<p className="ml-[5px] opacity-50">(edit)</p>
+					<p className="ml-[5px] opacity-50 text-[9px] self-center">(edit)</p>
 				</div>
 			) : (
 				<div className="flex ">
@@ -92,7 +92,9 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 						<MessageLine line={lines as string} />
 					</div>
 					{message.update_time ? (
-						<div>{message.create_time < message.update_time ? <p className="ml-[5px] opacity-50">(edit)</p> : null}</div>
+						<div className="self-center">
+							{message.create_time < message.update_time ? <p className="ml-[5px] opacity-50 text-[9px]">(edited)</p> : null}
+						</div>
 					) : null}
 				</div>
 			)}

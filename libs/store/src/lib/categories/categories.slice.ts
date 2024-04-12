@@ -1,4 +1,4 @@
-import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from '@mezon/mezon-js/dist/api.gen';
+import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { ICategory, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';

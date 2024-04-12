@@ -1,4 +1,4 @@
-import { ApiChannelDescription } from '@mezon/mezon-js/dist/api.gen';
+import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -18,6 +18,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	currentThread?: ApiChannelDescription;
 	nameThreadError?: string;
 	messageThreadError?: string;
+	isPrivate: number;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -52,6 +53,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	loadingStatus: 'not loaded',
 	error: null,
 	isShowCreateThread: false,
+	isPrivate: 0,
 });
 
 export const threadsSlice = createSlice({
@@ -72,6 +74,9 @@ export const threadsSlice = createSlice({
 		},
 		setMessageThreadError: (state, action: PayloadAction<string>) => {
 			state.messageThreadError = action.payload;
+		},
+		setIsPrivate: (state, action: PayloadAction<number>) => {
+			state.isPrivate = action.payload;
 		},
 		// ...
 	},
@@ -141,6 +146,8 @@ export const selectAllThreads = createSelector(getThreadsState, selectAll);
 export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);
 
 export const selectIsShowCreateThread = createSelector(getThreadsState, (state) => state.isShowCreateThread);
+
+export const selectIsPrivate = createSelector(getThreadsState, (state) => state.isPrivate);
 
 export const selectNameThreadError = createSelector(getThreadsState, (state) => state.nameThreadError);
 

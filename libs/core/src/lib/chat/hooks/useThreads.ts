@@ -4,6 +4,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentThread,
+	selectIsPrivate,
 	selectIsShowCreateThread,
 	selectMessageThreadError,
 	selectNameThreadError,
@@ -21,6 +22,7 @@ export function useThreads() {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isShowCreateThread = useSelector(selectIsShowCreateThread);
+	const isPrivate = useSelector(selectIsPrivate);
 	const nameThreadError = useSelector(selectNameThreadError);
 	const messageThreadError = useSelector(selectMessageThreadError);
 
@@ -48,6 +50,7 @@ export function useThreads() {
 		threadChannel,
 		currentThread,
 		isShowCreateThread,
+		isPrivate,
 		nameThreadError,
 		messageThreadError,
 		setIsShowCreateThread,

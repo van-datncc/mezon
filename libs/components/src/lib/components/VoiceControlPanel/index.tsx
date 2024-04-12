@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import {
 	ChannelsEntity,
 	channelsActions,

@@ -2,7 +2,7 @@ import { useChatSending, useGifs } from '@mezon/core';
 import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { Loading } from 'libs/ui/src/lib/Loading';
 import { useCallback, useEffect, useState } from 'react';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 type ChannelMessageBoxProps = {
 	activeTab: SubPanelName;

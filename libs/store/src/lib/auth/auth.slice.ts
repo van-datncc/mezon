@@ -1,4 +1,4 @@
-import { Session } from '@mezon/mezon-js';
+import { Session } from 'mezon-js';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';

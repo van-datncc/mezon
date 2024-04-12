@@ -3,7 +3,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelStreamMode } from 'mezon-js';
 
 
 export function useSendInviteMessage() {

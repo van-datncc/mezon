@@ -12,6 +12,7 @@ import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
 import { useChatReaction } from '@mezon/core';
+import React from 'react';
 import { useSelector } from 'react-redux';
 
 export type ReactedOutsideOptional = {
@@ -27,9 +28,10 @@ export type MessageWithUserProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	newMessage?: string;
+	child?: JSX.Element;
 };
 
-function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child }: MessageWithUserProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -65,19 +67,23 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [messageRefId]);
 
+	const propsChild = { isCombine };
+
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600] bg-[#26262B]">
+				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] bg-[#26262B] ">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div>
+			<div className="relative">
 				<div className={`bg-[#26262b] rounded-sm ${messFocusReplied ? 'bg-[#33417a]' : 'bg-[#26262b]'} relative`}>
-					<div className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0`}></div>
-					<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
+					<div
+						className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0 group-hover:bg-[#232323]`}
+					></div>
+					<div className={`flex h-15 flex-col w-auto px-3 group-hover:bg-[#232323] ${isCombine ? '' : 'pt-[2px] mt-[17px]'}`}>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
@@ -105,6 +111,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						)}
 					</div>
 				</div>
+				{child && React.isValidElement(child) && React.cloneElement(child, propsChild)}
 			</div>
 		</>
 	);

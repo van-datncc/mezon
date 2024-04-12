@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -14,9 +14,9 @@ import {
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
-} from '@mezon/mezon-js/dist/api.gen';
+} from 'mezon-js/api.gen';
 
-import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
+import { ApiChannelDescription, ApiInviteUserRes } from 'mezon-js/api.gen';
 
 export * from './permissions';
 export * from './thumbnailPos';
@@ -366,3 +366,28 @@ export type ThreadError = {
 	name: string;
 	message: string;
 };
+
+export type ThreadValue = {
+	nameThread: string;
+	isPrivate: number;
+};
+
+export type ILineMention = {
+	nonMatchText: string;
+	matchedText: string;
+	startIndex: number;
+	endIndex: number;
+};
+
+export type IMessageLine = {
+	mentions: ILineMention[];
+};
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
+}
+
+export interface ChannelMembersEntity extends IChannelMember {
+	id: string; // Primary ID
+	name?: string;
+}

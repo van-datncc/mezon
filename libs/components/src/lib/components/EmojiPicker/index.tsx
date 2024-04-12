@@ -1,5 +1,5 @@
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelStreamMode } from 'mezon-js';
 import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import EmojiPicker, { EmojiClickData, EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 

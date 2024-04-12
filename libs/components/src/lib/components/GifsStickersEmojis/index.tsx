@@ -1,5 +1,5 @@
 import { useAppParams, useChatReaction, useGifsStickersEmoji } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { useEffect, useState } from 'react';

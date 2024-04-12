@@ -7,7 +7,7 @@ import {
 	StatusPresenceEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
-} from '@mezon/mezon-js';
+} from 'mezon-js';
 import {
 	channelMembersActions,
 	channelsActions,

@@ -2,7 +2,7 @@ import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { DirectEntity, UsersClanEntity } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 
 type ItemPorp = {
 	url: string;

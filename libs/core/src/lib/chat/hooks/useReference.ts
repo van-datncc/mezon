@@ -4,14 +4,15 @@ import {
 	selectDataReferences,
 	selectIdMessageReplied,
 	selectOpenEditMessageState,
+	selectOpenOptionMessageState,
 	selectOpenReplyMessageState,
 	selectReferenceMessage,
 	useAppDispatch,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
+import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 
 export function useReference() {
 	const dispatch = useAppDispatch();
@@ -21,6 +22,7 @@ export function useReference() {
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const attachmentDataRef = useSelector(selectAttachmentData);
+	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 
 	const setReferenceMessage = useCallback(
 		(message: IMessageWithUser | null) => {
@@ -64,6 +66,13 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setOpenOptionMessageState = useCallback(
+		(status: boolean) => {
+			dispatch(referencesActions.setOpenOptionMessageState(status));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			setReferenceMessage,
@@ -71,6 +80,7 @@ export function useReference() {
 			setIdMessageToJump,
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
+			setOpenOptionMessageState,
 			referenceMessage,
 			dataReferences,
 			idMessageReplied,
@@ -78,6 +88,7 @@ export function useReference() {
 			openReplyMessageState,
 			attachmentDataRef,
 			setAttachmentData,
+			openOptionMessageState,
 		}),
 		[
 			setReferenceMessage,
@@ -85,6 +96,7 @@ export function useReference() {
 			setIdMessageToJump,
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
+			setOpenOptionMessageState,
 			referenceMessage,
 			dataReferences,
 			idMessageReplied,
@@ -92,6 +104,7 @@ export function useReference() {
 			openReplyMessageState,
 			attachmentDataRef,
 			setAttachmentData,
+			openOptionMessageState,
 		],
 	);
 }
