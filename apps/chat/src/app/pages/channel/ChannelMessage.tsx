@@ -145,7 +145,7 @@ function PopupMessage({
 }) {
 	return (
 		<div
-			className={`chooseForText z-10 absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary ${isCombine ? '-top-7' : '-top-6'}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary ${isCombine ? '-top-7' : '-top-[7px]'}
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -164,19 +164,54 @@ function PopupMessage({
 					</div>
 				</div>
 			)}
-			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption />}
+			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption message={mess} />}
 		</div>
 	);
 }
 
-function PopupOption() {
+function PopupOption({ message }: { message: IMessageWithUser }) {
+	const dispatch = useAppDispatch();
+	const { userId } = useChatReaction();
+	const handleClickEdit = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(referencesActions.setOpenEditMessageState(true));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const handleClickReply = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(true));
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const handleClickCopy = () => {
+		const tempInput = document.createElement('input');
+		tempInput.value = message.content.t || '';
+		document.body.appendChild(tempInput);
+		tempInput.select();
+		document.execCommand('copy');
+		document.body.removeChild(tempInput);
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const checkUser = userId === message.sender_id;
 	return (
-		<div className="bg-[#36373C] rounded-[10px] p-2 absolute right-8 -top-[150px] w-[180px] z-10">
+		<div className={`bg-[#36373C] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
 			<ul className="flex flex-col gap-1">
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Edit Message</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Reply</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Copy Text</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-red-900">Delete Message</li>
+				{checkUser && (
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit}>
+						Edit Message
+					</li>
+				)}
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply}>
+					Reply
+				</li>
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy}>
+					Copy Text
+				</li>
+				{checkUser && <li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-red-900">Delete Message</li>}
 			</ul>
 		</div>
 	);

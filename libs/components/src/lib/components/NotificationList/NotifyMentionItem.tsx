@@ -1,9 +1,9 @@
 import { useAppNavigation, useClans, useJumpToMessage, useNotification } from '@mezon/core';
-import { INotification, selectChannelById, selectCurrentChannelId, selectMemberClanByUserId, selectMessageByMessageId } from '@mezon/store';
+import { INotification, selectChannelById, selectCurrentChannelId, selectMemberClanByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
-import { ChannelStreamMode } from 'mezon-js';
 export type NotifyMentionProps = {
 	notify: INotification;
 };
@@ -52,23 +52,23 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const { toMessageChannel, navigate } = useAppNavigation();
 	const { jumpToMessage } = useJumpToMessage();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	
+
 	const messageContent = JSON.parse(data.content);
 	const jump = async (messId: string) => {
 		if (currentChannelId === data.channel_id) {
-			jumpToMessage(messId)
+			jumpToMessage(messId);
 		} else {
 			await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
 		}
 	};
-	
+
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
 			<div className="flex justify-between">
 				<div className="flex flex-row items-center gap-2">
 					<div>
 						{currentClan?.logo ? (
-							<img src={currentClan.logo} className="rounded-full size-10 object-cover" />
+							<img src={currentClan.logo} className="rounded-full size-10 object-cover" alt={currentClan.logo} />
 						) : (
 							<div>
 								{currentClan?.clan_name && (
@@ -112,6 +112,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					newMessage={messageContent.t}
+					isMention={true}
 				/>
 			</div>
 		</div>
