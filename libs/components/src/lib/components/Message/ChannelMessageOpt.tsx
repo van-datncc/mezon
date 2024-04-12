@@ -52,7 +52,7 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 	}, [openEditMessageState, openEditMessageState, reactionRightState, reactionBottomState]);
 
 	return (
-		<div className="iconHover flex justify-between">
+		<div className="iconHover flex justify-between  bg-[#232323] rounded">
 			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
 				<Icons.Smile />
 			</div>
