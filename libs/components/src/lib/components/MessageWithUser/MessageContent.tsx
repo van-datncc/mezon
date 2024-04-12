@@ -47,9 +47,9 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 
 	const renderVideos = () => {
 		return (
-			<div className="flex flex-row justify-start flex-wrap w-full gap-x-2 mt-2">
+			<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
 				{videos.map((video, index) => (
-					<div key={index} className="w-fit">
+					<div key={index} className="w-fit gap-y-2">
 						<MessageVideo attachmentData={video} />
 					</div>
 				))}

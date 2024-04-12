@@ -1,7 +1,7 @@
 import { MessageReaction } from '@mezon/components';
-import { selectCurrentChannelId, selectIdMessageReplied } from '@mezon/store';
+import { selectCurrentChannelId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -11,7 +11,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useChatReaction } from '@mezon/core';
+import { useChatReaction, useReference } from '@mezon/core';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
@@ -37,7 +37,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { setGrandParentWidthAction } = useChatReaction();
-	const messageRefId = useSelector(selectIdMessageReplied);
+	const { openReplyMessageState, referenceMessage } = useReference();
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -59,16 +59,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [getWidthDivMessageWidth]);
 
-	const [messFocusReplied, setMessReplied] = useState(false);
-	useEffect(() => {
-		if (messageRefId && messageRefId === message.id) {
-			setMessReplied(true);
-		} else {
-			setMessReplied(false);
-		}
-	}, [messageRefId]);
-
 	const propsChild = { isCombine };
+
+	const checkReplied = referenceMessage && referenceMessage.id === message.id;
 
 	return (
 		<>
@@ -80,12 +73,14 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				</div>
 			)}
 			<div className="relative">
-				<div className={`bg-[#26262b] relative rounded-sm overflow-hidden ${messFocusReplied ? 'bg-[#33417a]' : 'bg-[#26262b]'}`}>
+				<div
+					className={`bg-[#26262b] relative rounded-sm overflow-hidden ${checkReplied && openReplyMessageState ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+				>
 					<div
-						className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0 group-hover:bg-[#232323]`}
+						className={`${checkReplied && openReplyMessageState ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px] mt-[17px]'}`}
+						className={`flex h-15 flex-col w-auto px-3  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
@@ -94,7 +89,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<MessageHead message={message} user={user} isCombine={isCombine} />
 								<div className="justify-start items-center inline-flex w-full textChat">
 									<div
-										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
+										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text mt-[-1rem]"
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />

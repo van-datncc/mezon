@@ -147,7 +147,7 @@ function PopupMessage({
 }) {
 	return (
 		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary ${isCombine ? '-top-7' : '-top-[7px]'}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-7 ${isCombine ? '-top-[0px] right-5' : '-top-[0px] right-5'}
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
