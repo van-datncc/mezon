@@ -1,8 +1,9 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage, useChatReaction, useChatSending, useReference } from '@mezon/core';
-import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { messagesActions, referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
@@ -19,6 +20,7 @@ export function ChannelMessage(props: MessageProps) {
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
+	// const { DeleteSendMessage } = useDelet({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
 	const { reactionRightState, reactionBottomState } = useChatReaction();
 	const { referenceMessage, openEditMessageState, openOptionMessageState } = useReference();
@@ -99,10 +101,10 @@ export function ChannelMessage(props: MessageProps) {
 			{lastSeen && <UnreadMessageBreak />}
 
 			{openEditMessageState && mess.id === referenceMessage?.id && (
-				<div className="inputEdit relative left-[66px] top-[-30px]">
+				<div className="inputEdit relative left-[66px] top-[-21px]">
 					<textarea
 						defaultValue={editMessage}
-						className="w-[83%] bg-black rounded pl-4"
+						className="w-[83%] bg-black rounded p-[10px]"
 						onKeyDown={onSend}
 						onChange={(e) => {
 							onchange(e);
@@ -145,7 +147,7 @@ function PopupMessage({
 }) {
 	return (
 		<div
-			className={`chooseForText z-10 absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary ${isCombine ? '-top-7' : '-top-6'}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary ${isCombine ? '-top-7' : '-top-[7px]'}
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -164,19 +166,61 @@ function PopupMessage({
 					</div>
 				</div>
 			)}
-			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption />}
+			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption message={mess} />}
 		</div>
 	);
 }
 
-function PopupOption() {
+function PopupOption({ message }: { message: IMessageWithUser }) {
+	const dispatch = useAppDispatch();
+	const { userId } = useChatReaction();
+
+	const handleClickEdit = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(referencesActions.setOpenEditMessageState(true));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const handleClickReply = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(true));
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const handleClickCopy = () => {
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(referencesActions.setReferenceMessage(null));
+		dispatch(referencesActions.setDataReferences(null));
+	};
+
+	const handleClickDelete = () => {
+		dispatch(messagesActions.remove(message.id));
+	};
+
+	const checkUser = userId === message.sender_id;
 	return (
-		<div className="bg-[#36373C] rounded-[10px] p-2 absolute right-8 -top-[150px] w-[180px] z-10">
+		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
 			<ul className="flex flex-col gap-1">
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Edit Message</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Reply</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer">Copy Text</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-red-900">Delete Message</li>
+				{checkUser && (
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit}>
+						Edit Message
+					</li>
+				)}
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply}>
+					Reply
+				</li>
+				<CopyToClipboard text={message.content.t || ''}>
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy}>
+						Copy Text
+					</li>
+				</CopyToClipboard>
+
+				{checkUser && (
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-[#ff0000]" onClick={handleClickDelete}>
+						Delete Message
+					</li>
+				)}
 			</ul>
 		</div>
 	);

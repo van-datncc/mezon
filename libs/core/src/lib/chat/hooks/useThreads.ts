@@ -11,6 +11,7 @@ import {
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
+import { isGreaterOneMonth } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -45,6 +46,10 @@ export function useThreads() {
 		return threads;
 	}, [channels, currentChannel, currentChannelId]);
 
+	const threadChannelOld = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) > 30);
+
+	const threadChannelOnline = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) <= 30);
+
 	return {
 		threads,
 		threadChannel,
@@ -53,6 +58,8 @@ export function useThreads() {
 		isPrivate,
 		nameThreadError,
 		messageThreadError,
+		threadChannelOld,
+		threadChannelOnline,
 		setIsShowCreateThread,
 	};
 }
