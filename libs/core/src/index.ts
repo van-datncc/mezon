@@ -18,6 +18,7 @@ export * from './lib/chat/hooks/useChatTypings';
 export * from './lib/chat/hooks/useClanProfileSetting';
 export * from './lib/chat/hooks/useClans';
 export * from './lib/chat/hooks/useDMInvite';
+export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
 export * from './lib/chat/hooks/useDirectMessages';
