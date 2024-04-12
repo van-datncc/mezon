@@ -1,4 +1,4 @@
-import { differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, startOfDay, subDays } from 'date-fns';
+import { differenceInDays, differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, startOfDay, subDays } from 'date-fns';
 import { RefObject } from 'react';
 import { ChannelMembersEntity, ILineMention, UsersClanEntity } from '../types/index';
 
@@ -73,4 +73,11 @@ export const uniqueUsers = (mentions: ILineMention[], userClans: UsersClanEntity
 export const convertTimeMessage = (timestamp: string) => {
 	const textTime = formatDistanceToNowStrict(new Date(parseInt(timestamp) * 1000), { addSuffix: true });
 	return textTime;
+};
+
+export const isGreaterOneMonth = (timestamp: string) => {
+	const date = new Date(parseInt(timestamp) * 1000);
+	const now = new Date();
+	const result = differenceInDays(now, date);
+	return result;
 };
