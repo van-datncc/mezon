@@ -30,7 +30,6 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 	const handleClickOption = (e: any) => {
 		e.stopPropagation();
 		dispatch(referencesActions.setOpenReplyMessageState(false));
-		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenOptionMessageState(!openOptionMessageState));
 		dispatch(referencesActions.setReferenceMessage(message));
