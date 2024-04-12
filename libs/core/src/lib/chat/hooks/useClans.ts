@@ -59,15 +59,21 @@ export function useClans() {
 		[changeCurrentClan, dispatch],
 	);
 
+	const avatarClans = usersClan.map((user) => user.user?.avatar_url).slice(0, 5);
+
+	const remainingMember = usersClan.map((user) => user.user).slice(5);
+
 	return useMemo(
 		() => ({
 			clans,
 			currentClanId,
 			currentClan,
+			usersClan,
+			avatarClans,
+			remainingMember,
 			getUserClanProfile,
 			updateUserClanProfile,
 			createClans,
-			usersClan,
 		}),
 		[clans, usersClan, currentClanId, currentClan, getUserClanProfile, updateUserClanProfile, createClans],
 	);
