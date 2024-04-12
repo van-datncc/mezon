@@ -30,6 +30,7 @@ function MyApp() {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
 	};
 
 	return (
