@@ -1,6 +1,6 @@
 import { Icons, MessageImage, MessageVideo } from '@mezon/components';
 import React from 'react';
-import { ApiMessageAttachment } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size: string, pos?: string) => {
 	const fileType = attachment.filetype;

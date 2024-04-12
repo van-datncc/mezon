@@ -1,6 +1,6 @@
 import { RenderAttachmentThumbnail } from '@mezon/ui';
 import React from 'react';
-import { ApiMessageAttachment } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { Icons } from '../../components';
 
 interface ThumbnailProps {

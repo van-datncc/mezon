@@ -1,6 +1,6 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useEffect, useState } from 'react';
-import { ApiMessageAttachment } from 'vendors/mezon-js/packages/mezon-js/api.gen';
 import MessageImage from './MessageImage';
 import MessageLine from './MessageLine';
 import MessageLinkFile from './MessageLinkFile';
