@@ -1,4 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
+import { ChannelType } from 'mezon-js';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -6,11 +7,12 @@ import {
 	selectCurrentClan,
 	selectCurrentVoiceChannelId,
 	selectShowScreen,
+	selectStatusCall,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
 import { useMezonVoice } from '@mezon/transport';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import * as Icons from '../Icons';
@@ -26,6 +28,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const showScreen = useSelector(selectShowScreen);
 	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
+	const statusCall = useSelector(selectStatusCall);
 
 	const startScreenShare = useCallback(() => {
 		voice.createScreenShare();
@@ -38,13 +41,28 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	}, [voice]);
 
 	const leaveVoiceChannel = useCallback(() => {
+		if (!statusCall) {
+			dispatch(voiceActions.setStatusCall(false));
+			return;
+		}
+		stopScreenShare();
 		voice.voiceDisconnect();
 		dispatch(voiceActions.setStatusCall(false));
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));
 	}, [voice]);
 
+	const openCamera = useCallback(() => {
+		voice.createLocalTrack(['video']);
+	}, [voice]);
+
 	const { toChannelPage } = useAppNavigation();
 	const channelPath = toChannelPage(currentVoiceChannelId, currentVoiceChannel?.clan_id || '');
+
+	useEffect(() => {
+		if (channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			dispatch(channelsActions.setCurrentVoiceChannelId(channelCurrent.id));
+		}
+	}, []);
 
 	return (
 		<div className="p-2 absolute w-full bottom-[57px] bg-bgSurface border-borderDefault ">
@@ -75,7 +93,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 			<div className="actionButtons">
 				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
 					<div className="flex items-center">
-						<div className=" w-[18px] h-[20px]">
+						<div className=" w-[18px] h-[20px]" onClick={openCamera}>
 							<Icons.CameraIcon />
 						</div>
 					</div>

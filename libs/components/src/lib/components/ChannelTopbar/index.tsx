@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -51,7 +51,6 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 									<MuteButton />
 									<PinButton />
 									<ChannelListButton />
-									<ThreeDotButton />
 								</div>
 								<SearchMessage />
 							</div>
@@ -108,15 +107,7 @@ function PinButton() {
 	);
 }
 
-function ThreeDotButton() {
-	return (
-		<button>
-			<Icons.ThreeDot />
-		</button>
-	);
-}
-
-function InboxButton() {
+export function InboxButton() {
 	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 
@@ -135,7 +126,7 @@ function InboxButton() {
 	);
 }
 
-function HelpButton() {
+export function HelpButton() {
 	return (
 		<button>
 			<Icons.Help />

@@ -1,9 +1,9 @@
-import { ApiRole, ApiRoleUserList, RoleUserListRoleUser } from '@mezon/mezon-js/dist/api.gen';
+import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
-// import { MembersRoleActions } from '../getlistmemberinrole/getListMembersInRole.slice';
+
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
 
 /*
@@ -31,14 +31,19 @@ export const RolesClanAdapter = createEntityAdapter<RolesClanEntity>();
 
 type GetRolePayload = {
 	clanId?: string,
+	repace?: boolean,
+	channelId?: string,
 };
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
-	async ({ clanId }: GetRolePayload, thunkAPI) => {
+	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listRoles(mezon.session, 100,1,'',clanId);
 		if (!response.roles) {
 			return [];
+		}
+		if (repace) {
+			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId || ''));
 		}
 		return response.roles.map(mapRolesClanToEntity);
 	},
@@ -164,6 +169,13 @@ export const RolesClanSlice = createSlice({
 	reducers: {
 		add: RolesClanAdapter.addOne,
 		remove: RolesClanAdapter.removeOne,
+		removeRoleByChannel: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			const updatedRoles = Object.values(state.entities).filter((role) => {
+				return role.channel_id !== channelId;
+			});
+			return RolesClanAdapter.setAll(state, updatedRoles);
+		},
 		setCurrentRoleId: (state, action: PayloadAction<string>) => {
 			state.currentRoleId = action.payload;
 		},
@@ -282,6 +294,12 @@ export const selectAllRolesClan = createSelector(getRolesClanState, selectAll);
 export const selectCurrentRoleId = createSelector(getRolesClanState, (state) => state.currentRoleId);
 
 export const selectRolesClanEntities = createSelector(getRolesClanState, selectEntities);
+
+export const selectRolesByChannelId = (channelId?: string | null) =>
+	createSelector(selectRolesClanEntities, (entities) => {
+		const members = Object.values(entities);
+		return members.filter((role) => role && role.channel_id !== null && role.channel_id === channelId);
+	});
 
 export const selectCurrentRole = createSelector(selectRolesClanEntities, selectCurrentRoleId, (RolesClanEntities, RoleId) =>
 RoleId ? RolesClanEntities[RoleId] : null,);

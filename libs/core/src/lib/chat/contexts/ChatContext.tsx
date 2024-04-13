@@ -7,8 +7,20 @@ import {
 	StatusPresenceEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
-} from '@mezon/mezon-js';
-import { channelMembersActions, channelsActions, emojiActions, friendsActions, mapMessageChannelToEntity, mapNotificationToEntity, mapReactionToEntity, messagesActions, notificationActions, useAppDispatch, voiceActions } from '@mezon/store';
+} from 'mezon-js';
+import {
+	channelMembersActions,
+	channelsActions,
+	friendsActions,
+	mapMessageChannelToEntity,
+	mapNotificationToEntity,
+	mapReactionToEntity,
+	messagesActions,
+	notificationActions,
+	reactionActions,
+	useAppDispatch,
+	voiceActions,
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -24,28 +36,34 @@ export type ChatContextValue = object;
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
 			// add logic code
-		}), []);
+		}),
+		[],
+	);
 
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 
-	const onvoicejoined = useCallback((voice: VoiceJoinedEvent) => {
-		if (voice) {
-			dispatch(voiceActions.add({
-				...voice,
-			}));
-		}
-	}, [dispatch]);
+	const onvoicejoined = useCallback(
+		(voice: VoiceJoinedEvent) => {
+			if (voice) {
+				dispatch(
+					voiceActions.add({
+						...voice,
+					}),
+				);
+			}
+		},
+		[dispatch],
+	);
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
-			console.log("VoiceLeavedEvent", voice);
+			console.log('VoiceLeavedEvent', voice);
 			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],
@@ -84,24 +102,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-	const ondisconnect = useCallback(() => {
-		const retry = (attempt: number) => {
-			console.log('Reconnecting', attempt);
-			const delay = Math.min(100 * Math.pow(2, attempt), 30000); // Exponential backoff with maximum delay of 30 seconds
-			const timeoutId = setTimeout(() => {
-				reconnect()
-					.then(() => {
-						console.log('Reconnected');
-					})
-					.catch(() => {
-						retry(attempt + 1);
-						if (attempt > 5) { // max retry is 5
-							clearTimeout(timeoutId);
-						}
-					});
-			}, delay);
-		};
-		retry(0);
+	const ondisconnect = useCallback(() => {		
+		reconnect().catch(e => "trying to reconnect");
 	}, [reconnect]);
 
 	const onerror = useCallback((event: unknown) => {
@@ -129,7 +131,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
 			if (e) {
-				dispatch(emojiActions.updateReactionMessage(mapReactionToEntity(e)));
+				dispatch(reactionActions.updateReactionMessage(mapReactionToEntity(e)));
 			}
 		},
 		[dispatch],
@@ -163,17 +165,29 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 		};
-	}, [onchannelmessage, onchannelpresence, ondisconnect, onmessagetyping, onmessagereaction, onnotification, onstatuspresence, socketRef, onvoicejoined, onvoiceleaved, onerror]);
+	}, [
+		onchannelmessage,
+		onchannelpresence,
+		ondisconnect,
+		onmessagetyping,
+		onmessagereaction,
+		onnotification,
+		onstatuspresence,
+		socketRef,
+		onvoicejoined,
+		onvoiceleaved,
+		onerror,
+	]);
 
 	useEffect(() => {
 		initWorker();

@@ -1,6 +1,6 @@
 import { IMessage, IMessageWithUser } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -16,8 +16,11 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	error?: string | null;
 	reference: IMessageWithUser | null;
 	dataReferences: ApiMessageRef[];
-	// hasAttachmentOnRef: boolean;
 	idMessageToJump: string;
+	openEditMessageState: boolean;
+	openReplyMessageState: boolean;
+	attachmentDataRef: ApiMessageAttachment[];
+	openOptionMessageState: boolean;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -31,8 +34,11 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	error: null,
 	reference: null,
 	dataReferences: [],
-	// hasAttachmentOnRef: false,
 	idMessageToJump: '',
+	openEditMessageState: false,
+	openReplyMessageState: false,
+	attachmentDataRef: [],
+	openOptionMessageState: false,
 });
 
 export const referencesSlice = createSlice({
@@ -51,7 +57,22 @@ export const referencesSlice = createSlice({
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
-		// ...
+		setOpenEditMessageState(state, action) {
+			state.openEditMessageState = action.payload;
+		},
+		setOpenReplyMessageState(state, action) {
+			state.openReplyMessageState = action.payload;
+		},
+		setAttachmentData(state, action) {
+			if (Array.isArray(action.payload)) {
+				state.attachmentDataRef = action.payload;
+			} else {
+				state.attachmentDataRef.push(action.payload);
+			}
+		},
+		setOpenOptionMessageState(state, action) {
+			state.openOptionMessageState = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -70,6 +91,7 @@ export const referencesSlice = createSlice({
 });
 
 export const referencesReducer = referencesSlice.reducer;
+
 export const referencesActions = referencesSlice.actions;
 
 const { selectAll, selectEntities } = referencesAdapter.getSelectors();
@@ -84,4 +106,12 @@ export const selectReferenceMessage = createSelector(getReferencesState, (state:
 
 export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);
 
-export const selecIdMessageReplied = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
+export const selectIdMessageReplied = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
+
+export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
+
+export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
+
+export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
+
+export const selectOpenOptionMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openOptionMessageState);

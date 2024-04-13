@@ -2,8 +2,8 @@ import { directActions, selectAllDirectMessages, selectIsLoadDMData, useAppDispa
 
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelType } from '@mezon/mezon-js';
-import { ApiCreateChannelDescRequest } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ChannelType } from 'mezon-js';
+import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 
 type UseDirectParams = {
 	autoFetch: boolean, 

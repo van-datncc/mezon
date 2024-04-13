@@ -1,10 +1,8 @@
 import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage } from '@mezon/core';
-import { emojiActions, selecIdMessageReplied, selectActiceGifsStickerEmojiTab, useAppDispatch } from '@mezon/store';
-import { TabNamePopup } from '@mezon/utils';
+import { getJumpToMessageId, useChatMessages, useGifsStickersEmoji, useJumpToMessage, useReference } from '@mezon/core';
+import { SubPanelName } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -21,10 +19,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
 	const [heightEditor, setHeightEditor] = useState(30);
-	const activeGifsStickerEmojiTab = useSelector(selectActiceGifsStickerEmojiTab);
-	const messageRefId = useSelector(selecIdMessageReplied);
 
-	const dispatch = useAppDispatch();
+	const { idMessageReplied } = useReference();
+	const { subPanelActive } = useGifsStickersEmoji();
+
 	const fetchData = () => {
 		loadMoreMessage();
 	};
@@ -34,8 +32,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 
 	useEffect(() => {
-		if (messageRefId) {
-			setMessageIdToJump(messageRefId);
+		if (idMessageReplied) {
+			setMessageIdToJump(idMessageReplied);
 			setTimeToJump(0);
 			setPositionToJump('center');
 		} else {
@@ -43,7 +41,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			setTimeToJump(1000);
 			setPositionToJump('start');
 		}
-	}, [getJumpToMessageId, messageRefId]);
+	}, [getJumpToMessageId, idMessageReplied]);
 	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {
@@ -72,11 +70,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			onClick={(e) => {
-				e.stopPropagation();
-				dispatch(emojiActions.setActiveGifsStickerEmojiTab(TabNamePopup.NONE));
-			}}
-			className=" relative"
+			className="bg-[#26262B] relative"
 			id="scrollLoading"
 			ref={containerRef}
 			style={{
@@ -113,7 +107,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					/>
 				))}
 			</InfiniteScroll>
-			{activeGifsStickerEmojiTab !== TabNamePopup.NONE && (
+			{subPanelActive !== SubPanelName.NONE && (
 				<div
 					className={popupClass}
 					onClick={(e) => {

@@ -1,4 +1,4 @@
-import { ApiMessageAttachment } from "vendors/mezon-js/packages/mezon-js/api.gen";
+import { ApiMessageAttachment } from "mezon-js/api.gen";
 
 type MessageAttachmentProps = {
 	attachments: ApiMessageAttachment[] | undefined;
@@ -6,12 +6,7 @@ type MessageAttachmentProps = {
 
 // TODO: refactor component for message lines
 const MessageAttachment = ({ attachments }: MessageAttachmentProps) => {
-	
-	return (
-		<div>
-			
-		</div>
-	);
+	return <div></div>;
 };
 
 export default MessageAttachment;

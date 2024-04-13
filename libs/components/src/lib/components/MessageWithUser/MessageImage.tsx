@@ -1,6 +1,6 @@
 import { Modal, ModalBody } from 'flowbite-react';
 import { useState } from 'react';
-import { ApiMessageAttachment } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export type MessageImage = {
 	content?: string;
@@ -14,7 +14,7 @@ function MessageImage({ attachmentData }: MessageImage) {
 		<>
 			<div className="break-all">
 				<img
-					className={`max-w-[80%] max-h-[60vh] object-cover my-2 rounded ${!isDimensionsValid ? `cursor-pointer` : `cursor-default`}`}
+					className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid ? `cursor-pointer` : `cursor-default`}`}
 					src={attachmentData.url?.toString()}
 					alt={attachmentData.url}
 					onClick={() => {

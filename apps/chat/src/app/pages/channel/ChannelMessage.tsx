@@ -1,8 +1,9 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReactionMessage, useChatSending } from '@mezon/core';
-import { emojiActions, selecIdMessageReplied, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useReference } from '@mezon/core';
+import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 
 type MessageProps = {
@@ -19,10 +20,10 @@ export function ChannelMessage(props: MessageProps) {
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
-	const messageRefId = useSelector(selecIdMessageReplied);
-
+	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
-	const { refMessage, emojiReactedState, isOpenEmojiReactedBottom, emojiOpenEditState } = useChatReactionMessage();
+	const { reactionRightState, reactionBottomState } = useChatReaction();
+	const { referenceMessage, openEditMessageState, openOptionMessageState } = useReference();
 
 	useEffect(() => {
 		markMessageAsSeen(message);
@@ -46,7 +47,7 @@ export function ChannelMessage(props: MessageProps) {
 	}, [preMessage]);
 
 	const handleCancelEdit = () => {
-		dispatch(emojiActions.setEmojiOpenEditState(false));
+		dispatch(referencesActions.setOpenEditMessageState(false));
 	};
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
@@ -77,36 +78,34 @@ export function ChannelMessage(props: MessageProps) {
 	};
 
 	return (
-		<div className="fullBoxText relative group hover:bg-gray-950/[.07]">
+		<div className="fullBoxText relative group">
 			<MessageWithUser
 				message={mess as IMessageWithUser}
 				preMessage={messPre as IMessageWithUser}
 				user={user}
 				mode={mode}
 				newMessage={newMessage}
+				child={
+					<PopupMessage
+						reactionRightState={reactionRightState}
+						mess={mess as IMessageWithUser}
+						referenceMessage={referenceMessage}
+						reactionBottomState={reactionBottomState}
+						openEditMessageState={openEditMessageState}
+						openOptionMessageState={openOptionMessageState}
+						mode={mode}
+						deleteSendMessage={DeleteSendMessage}
+					/>
+				}
 			/>
 
 			{lastSeen && <UnreadMessageBreak />}
 
-			<div
-				className={`chooseForText z-10 top-[-18px] absolute h-8 p-0.5 rounded-md right-4 w-24 block bg-bgSecondary
-				${(emojiReactedState && mess.id === refMessage?.id) || (isOpenEmojiReactedBottom && mess.id === refMessage?.id) || (emojiOpenEditState && mess.id === refMessage?.id) ? '' : 'hidden group-hover:block'} `}
-			>
-				<ChannelMessageOpt message={mess} />
-
-				{mess.id === refMessage?.id && emojiReactedState && (
-					<div className="w-fit fixed right-16 bottom-[6rem]">
-						<div className="scale-75 transform mb-0 z-10">
-							<EmojiPickerComp messageEmoji={refMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-						</div>
-					</div>
-				)}
-			</div>
-			{emojiOpenEditState && mess.id === refMessage?.id && (
-				<div className="inputEdit relative left-[66px] top-[-30px]">
+			{openEditMessageState && mess.id === referenceMessage?.id && (
+				<div className="inputEdit relative left-[66px] top-[-21px]">
 					<textarea
 						defaultValue={editMessage}
-						className="w-[83%] bg-black rounded pl-4"
+						className="w-[83%] bg-black rounded p-[10px]"
 						onKeyDown={onSend}
 						onChange={(e) => {
 							onchange(e);
@@ -127,3 +126,105 @@ ChannelMessage.Skeleton = () => {
 		</div>
 	);
 };
+
+function PopupMessage({
+	reactionRightState,
+	mess,
+	referenceMessage,
+	reactionBottomState,
+	openEditMessageState,
+	openOptionMessageState,
+	mode,
+	isCombine,
+	deleteSendMessage,
+}: {
+	reactionRightState: boolean;
+	mess: IMessageWithUser;
+	referenceMessage: IMessageWithUser | null;
+	reactionBottomState: boolean;
+	openEditMessageState: boolean;
+	openOptionMessageState: boolean;
+	mode: number;
+	isCombine?: boolean;
+	deleteSendMessage: (messageId: string) => Promise<void>;
+}) {
+	return (
+		<div
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-7 ${isCombine ? '-top-[0px] right-5' : '-top-[0px] right-5'}
+				${
+					(reactionRightState && mess.id === referenceMessage?.id) ||
+					(reactionBottomState && mess.id === referenceMessage?.id) ||
+					(openEditMessageState && mess.id === referenceMessage?.id) ||
+					(openOptionMessageState && mess.id === referenceMessage?.id)
+						? ''
+						: 'hidden group-hover:block'
+				} `}
+		>
+			<ChannelMessageOpt message={mess} />
+
+			{mess.id === referenceMessage?.id && reactionRightState && (
+				<div className="w-fit fixed right-16 bottom-[6rem]">
+					<div className="scale-75 transform mb-0 z-10">
+						<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+					</div>
+				</div>
+			)}
+			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
+		</div>
+	);
+}
+
+function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser; deleteSendMessage: (messageId: string) => Promise<void> }) {
+	const dispatch = useAppDispatch();
+	const { userId } = useChatReaction();
+
+	const handleClickEdit = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(referencesActions.setOpenEditMessageState(true));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const handleClickReply = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(true));
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+	};
+
+	const handleClickCopy = () => {
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(referencesActions.setReferenceMessage(null));
+		dispatch(referencesActions.setDataReferences(null));
+	};
+
+	const handleClickDelete = () => {
+		deleteSendMessage(message.id);
+	};
+
+	const checkUser = userId === message.sender_id;
+	return (
+		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
+			<ul className="flex flex-col gap-1">
+				{checkUser && (
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit}>
+						Edit Message
+					</li>
+				)}
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply}>
+					Reply
+				</li>
+				<CopyToClipboard text={message.content.t || ''}>
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy}>
+						Copy Text
+					</li>
+				</CopyToClipboard>
+
+				{checkUser && (
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-[#ff0000]" onClick={handleClickDelete}>
+						Delete Message
+					</li>
+				)}
+			</ul>
+		</div>
+	);
+}

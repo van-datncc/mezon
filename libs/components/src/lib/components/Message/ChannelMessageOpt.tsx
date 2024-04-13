@@ -1,70 +1,72 @@
 import { Icons } from '@mezon/components';
-import { useAuth } from '@mezon/core';
-import {
-	emojiActions,
-	messagesActions,
-	referencesActions,
-	selectEmojiOpenEditState,
-	selectEmojiReactedState,
-	selectMessageReplyState,
-	useAppDispatch,
-} from '@mezon/store';
+import { useChatReaction, useReference } from '@mezon/core';
+import { referencesActions, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
 };
 
 export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
-	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
-
-	const emojiReactedState = useSelector(selectEmojiReactedState);
-	const emojiOpenEditState = useSelector(selectEmojiOpenEditState);
-	const messageReplyState = useSelector(selectMessageReplyState);
+	const { reactionActions, userId, reactionRightState, reactionBottomState } = useChatReaction();
+	const { openEditMessageState, openOptionMessageState } = useReference();
 
 	const handleClickReply = () => {
-		dispatch(emojiActions.setMessageReplyState(true));
-		dispatch(emojiActions.setEmojiOpenEditState(false));
+		dispatch(referencesActions.setOpenReplyMessageState(true));
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(messagesActions.setReplyMessageStatus(true));
 	};
 
 	const handleClickEdit = () => {
-		dispatch(emojiActions.setMessageReplyState(false));
-		dispatch(emojiActions.setEmojiOpenEditState(true));
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(reactionActions.setReactionRightState(false));
+		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(messagesActions.setReplyMessageStatus(false));
+	};
+
+	const handleClickOption = (e: any) => {
+		e.stopPropagation();
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(reactionActions.setReactionRightState(false));
+		dispatch(referencesActions.setOpenOptionMessageState(!openOptionMessageState));
+		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
-		dispatch(emojiActions.setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION));
-		dispatch(emojiActions.setEmojiReactedBottomState(false));
-		dispatch(emojiActions.setEmojiMessBoxState(false));
-		dispatch(emojiActions.setEmojiReactedState(true));
+		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(reactionActions.setReactionBottomState(false));
+		dispatch(reactionActions.setReactionRightState(!reactionRightState));
 		dispatch(referencesActions.setReferenceMessage(message));
-		dispatch(messagesActions.setReplyMessageStatus(false));
-
 		event.stopPropagation();
 	};
 
+	// reset refMessage
+	useEffect(() => {
+		if (!openEditMessageState && !openEditMessageState && !reactionRightState && !reactionBottomState) {
+			dispatch(referencesActions.setReferenceMessage(null));
+		}
+	}, [openEditMessageState, openEditMessageState, reactionRightState, reactionBottomState]);
+
 	return (
-		<div className="iconHover flex justify-between">
+		<div className="iconHover flex justify-between  bg-[#232323] rounded">
 			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
-				<Icons.Smile defaultFill={`${emojiReactedState ? '#FFFFFF' : '#AEAEAE'}`} />
+				<Icons.Smile />
 			</div>
 
 			{userId === message.sender_id ? (
 				<button onClick={handleClickEdit} className="h-full p-1 cursor-pointer">
-					<Icons.PenEdit defaultFill={emojiOpenEditState ? '#FFFFFF' : '#AEAEAE'} />
+					<Icons.PenEdit />
 				</button>
 			) : (
 				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180">
-					<Icons.Reply defaultFill={messageReplyState ? '#FFFFFF' : '#AEAEAE'} />
+					<Icons.Reply />
 				</button>
 			)}
-			<button className="h-full p-1 cursor-pointer">
+			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
 				<Icons.ThreeDot />
 			</button>
 		</div>

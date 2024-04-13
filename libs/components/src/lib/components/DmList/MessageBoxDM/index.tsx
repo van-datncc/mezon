@@ -1,12 +1,11 @@
-import { useChannelMembers, useDirectMessages } from '@mezon/core';
-import { ChannelMembersEntity, RootState } from '@mezon/store';
+import { MessageBox } from '@mezon/components';
+import { useDirectMessages } from '@mezon/core';
+import { RootState } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import {MessageBox, UserMentionList} from '@mezon/components';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
 import { useThrottledCallback } from 'use-debounce';
-import { MentionData } from '@draft-js-plugins/mention';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 interface DirectIdProps {
 	directParamId: string;
@@ -17,10 +16,12 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const handleSend = useCallback(
-		(content: IMessageSendPayload,
-			mentions?: Array<ApiMessageMention>, 
+		(
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>) => {
+			references?: Array<ApiMessageRef>,
+		) => {
 			if (sessionUser) {
 				sendDirectMessage(content, mentions, attachments, references);
 			} else {
@@ -38,12 +39,12 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 
 	return (
 		<div>
-			<MessageBox 
-				onSend={handleSend} 
-				currentChannelId={directParamId} 
+			<MessageBox
+				onSend={handleSend}
+				currentChannelId={directParamId}
 				onTyping={handleTypingDebounced}
 				// TODO: useMemo for listMentions
-				listMentions={UserMentionList(directParamId)}
+				// listMentions={UserMentionList(directParamId)}
 			/>
 		</div>
 	);

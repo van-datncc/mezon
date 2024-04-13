@@ -1,6 +1,6 @@
-import { messagesActions, referencesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { referencesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 
@@ -22,15 +22,19 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 			const messageReferenceUserId = message.references[0].message_sender_id;
 			setMessageId(messageReferenceId ?? '');
 			setSenderId(messageReferenceUserId ?? '');
-			dispatch(messagesActions.setReplyMessageStatus(true));
+			dispatch(referencesActions.setOpenReplyMessageState(true));
 		}
 	}, [message]);
 
-	const getIdMessageToJump = (idRefMessage: string) => {
-		if (idRefMessage) {
-			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
-		}
-	};
+	const getIdMessageToJump = useCallback(
+		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
+			e.stopPropagation();
+			if (idRefMessage) {
+				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			}
+		},
+		[dispatch],
+	);
 
 	return (
 		<div>
@@ -52,16 +56,19 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 							</span>
 							{message.references[0].has_attachment ? (
 								<div className=" flex flex-row items-center">
-									<button
-										onClick={() => getIdMessageToJump(messageRefId)}
+									<div
+										onClick={(e) => getIdMessageToJump(messageRefId, e)}
 										className="text-[13px] font-manrope pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-1"
 									>
 										Click to see attachment
-									</button>
+									</div>
 									<Icons.ImageThumbnail />
 								</div>
 							) : (
-								<span className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1">
+								<span
+									onClick={(e) => getIdMessageToJump(messageRefId, e)}
+									className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1"
+								>
 									{messageRefFetchFromServe.content && messageRefFetchFromServe.content.t}
 								</span>
 							)}

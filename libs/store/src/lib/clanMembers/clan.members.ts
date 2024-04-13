@@ -1,4 +1,4 @@
-import { ClanUserListClanUser } from '@mezon/mezon-js/dist/api.gen';
+import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';

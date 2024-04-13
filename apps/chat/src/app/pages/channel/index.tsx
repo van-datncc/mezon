@@ -1,6 +1,6 @@
 import { ChannelVoice, ChannelVoiceOff, MemberList } from '@mezon/components';
 import { useAuth, useClans } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from '@mezon/mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import {
 	channelsActions,
 	selectCurrentChannel,
@@ -52,6 +52,7 @@ export default function ChannelLayout() {
 	}, [voice]);
 
 	const leaveVoiceChannel = useCallback(() => {
+		stopScreenShare();
 		voice.voiceDisconnect();
 		dispatch(voiceActions.setStatusCall(false));
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));
@@ -136,7 +137,10 @@ export default function ChannelLayout() {
 					)}
 				</div>
 				{isShow && (
-					<div className="w-[245px] bg-bgSurface flex text-[#84ADFF] relative" id="memberList">
+					<div
+						className={`w-[245px] bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'}`}
+						id="memberList"
+					>
 						<MemberList />
 					</div>
 				)}

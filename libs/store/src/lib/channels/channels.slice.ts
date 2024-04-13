@@ -1,5 +1,5 @@
-import { ChannelType } from '@mezon/mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest } from '@mezon/mezon-js/dist/api.gen';
+import { ChannelType } from 'mezon-js';
+import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -87,6 +87,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(threadsActions.setCurrentThread(response));
+			await mezon.joinChatThread(response.channel_id as string);
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);

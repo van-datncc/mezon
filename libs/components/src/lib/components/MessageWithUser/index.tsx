@@ -1,7 +1,7 @@
 import { MessageReaction } from '@mezon/components';
-import { selecIdMessageReplied, selectCurrentChannelId, selectReplyMessageStatus } from '@mezon/store';
+import { selectCurrentChannelId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -11,7 +11,8 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useChatReactionMessage } from '@mezon/core';
+import { useChatReaction, useReference } from '@mezon/core';
+import React from 'react';
 import { useSelector } from 'react-redux';
 
 export type ReactedOutsideOptional = {
@@ -27,15 +28,16 @@ export type MessageWithUserProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	newMessage?: string;
+	child?: JSX.Element;
+	isMention?: boolean;
 };
 
-function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage }: MessageWithUserProps) {
+function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: MessageWithUserProps) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { setGrandParentWidthAction } = useChatReactionMessage();
-	const replyMessageStatus = useSelector(selectReplyMessageStatus);
-	const messageRefId = useSelector(selecIdMessageReplied);
+	const { setGrandParentWidthAction } = useChatReaction();
+	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -57,42 +59,42 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		}
 	}, [getWidthDivMessageWidth]);
 
-	const [messFocusReplied, setMessReplied] = useState(false);
-	useEffect(() => {
-		if (messageRefId && messageRefId === message.id) {
-			setMessReplied(true);
-		} else {
-			setMessReplied(false);
-		}
-	}, [messageRefId]);
+	const propsChild = { isCombine };
+	const checkReplied = referenceMessage && referenceMessage.id === message.id;
+	const checkMessageTargetToMoved = idMessageReplied === message.id;
 
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center py-3 text-zinc-400 text-[12px] font-[600]">
+				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] bg-[#26262B] ">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div>
-				<div className={`bg-[#26262b] rounded-sm ${messFocusReplied ? 'bg-[#393C48]' : 'bg-[#26262b]'} relative`}>
-					<div className={`${messFocusReplied ? ' bg-blue-500' : 'bg-[#26262b]'} absolute w-1 h-full left-0`}></div>
-					<div className={`flex h-15 flex-col   w-auto py-2 px-3 `}>
+			<div className="relative">
+				<div
+					className={`bg-[#26262b] relative rounded-sm overflow-hidden ${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+				>
+					<div
+						className={`${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
+					></div>
+					<div
+						className={`flex h-15 flex-col w-auto px-3  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
+					>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
-							<MessageAvatar user={user} message={message} isCombine={isCombine} replyMessageStatus={replyMessageStatus} />
+							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="flex-col w-full flex justify-center items-start relative ">
-								<MessageHead message={message} user={user} isCombine={isCombine} replyMessageStatus={replyMessageStatus} />
+								<MessageHead message={message} user={user} isCombine={isCombine} />
 								<div className="justify-start items-center inline-flex w-full textChat">
 									<div
-										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
+										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text mt-[-1rem]"
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
 									</div>
 								</div>
-
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
@@ -107,6 +109,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						)}
 					</div>
 				</div>
+				{child && React.isValidElement(child) && React.cloneElement(child, propsChild)}
 			</div>
 		</>
 	);

@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -14,11 +14,12 @@ import {
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
-} from '@mezon/mezon-js/dist/api.gen';
+} from 'mezon-js/api.gen';
 
-import { ApiChannelDescription, ApiInviteUserRes } from '@mezon/mezon-js/api.gen';
+import { ApiChannelDescription, ApiInviteUserRes } from 'mezon-js/api.gen';
 
 export * from './permissions';
+export * from './thumbnailPos';
 
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
@@ -78,6 +79,7 @@ export type IChannel = ApiChannelDescription & {
 export type IChannelMember = ChannelUserListChannelUser & {
 	id: string;
 	channelId?: string;
+	userChannelId?: string;
 	user_id?: string; // use on VoiceChannelList
 };
 
@@ -258,7 +260,7 @@ export interface NotificationContent {
 	username?: string;
 }
 
-export enum TabNamePopup {
+export enum SubPanelName {
 	NONE = 'NONE',
 	GIFS = 'GIFS',
 	STICKERS = 'STICKER',
@@ -325,3 +327,67 @@ export type SenderInfoOptionals = {
 	sender_name?: string | undefined;
 	avatar?: string | undefined;
 };
+
+export interface IGif {
+	images: {
+		original: {
+			url: string;
+		};
+		fixed_height: {
+			url: string;
+		};
+	};
+}
+
+export type MentionDataProps = {
+	id: string | number;
+	display?: string;
+	avatarUrl?: string;
+};
+
+export type MentionsInputChangeEvent = {
+	target: {
+		value: string;
+	};
+};
+
+export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
+
+export type UserMentionsOpt = {
+	user_id: string | undefined;
+	username: string | undefined;
+};
+export enum ETypeMessage {
+	CHANNEL = 'CHANNEL',
+	THREAD = 'THREAD',
+}
+
+export type ThreadError = {
+	name: string;
+	message: string;
+};
+
+export type ThreadValue = {
+	nameThread: string;
+	isPrivate: number;
+};
+
+export type ILineMention = {
+	nonMatchText: string;
+	matchedText: string;
+	startIndex: number;
+	endIndex: number;
+};
+
+export type IMessageLine = {
+	mentions: ILineMention[];
+};
+
+export interface UsersClanEntity extends IUsersClan {
+	id: string; // Primary ID
+}
+
+export interface ChannelMembersEntity extends IChannelMember {
+	id: string; // Primary ID
+	name?: string;
+}

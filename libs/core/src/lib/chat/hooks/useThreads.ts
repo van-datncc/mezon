@@ -4,10 +4,14 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentThread,
+	selectIsPrivate,
 	selectIsShowCreateThread,
+	selectMessageThreadError,
+	selectNameThreadError,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
+import { isGreaterOneMonth } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -19,6 +23,9 @@ export function useThreads() {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isShowCreateThread = useSelector(selectIsShowCreateThread);
+	const isPrivate = useSelector(selectIsPrivate);
+	const nameThreadError = useSelector(selectNameThreadError);
+	const messageThreadError = useSelector(selectMessageThreadError);
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean) => {
@@ -39,11 +46,20 @@ export function useThreads() {
 		return threads;
 	}, [channels, currentChannel, currentChannelId]);
 
+	const threadChannelOld = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) > 30);
+
+	const threadChannelOnline = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) <= 30);
+
 	return {
 		threads,
 		threadChannel,
 		currentThread,
 		isShowCreateThread,
+		isPrivate,
+		nameThreadError,
+		messageThreadError,
+		threadChannelOld,
+		threadChannelOnline,
 		setIsShowCreateThread,
 	};
 }

@@ -1,14 +1,37 @@
-import svgLoading from 'libs/assets/src/assets/svg/loading.svg';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-interface IconLoadingProps {
-	classProps: string;
+interface Props {
+	items: string[];
+	delayTime?: number;
 }
 
-export const Loading: React.FC<IconLoadingProps> = ({ classProps }) => {
+const DelayedDisplay: React.FC<Props> = ({ items, delayTime }) => {
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setIsLoading(false);
+			setCurrentIndex((currentIndex + 1) % items.length);
+		}, delayTime);
+
+		return () => clearTimeout(timer);
+	}, [currentIndex, delayTime, items.length]);
+
 	return (
-		<div className={classProps}>
-			<img src={svgLoading} alt="loading"></img>
-		</div>
+		<>
+			{isLoading ? null : (
+				<div className={`text-white flex flex-row items-center text-sm h-full`}>
+					<p className='text-[1rem]'>{items[currentIndex]}</p>
+				</div>
+			)}
+		</>
 	);
+};
+
+export const Loading: React.FC = () => {
+	const items = ['●', '● ●', '● ● ●']; 
+	const delayTime = 100; 
+
+	return <DelayedDisplay items={items} delayTime={delayTime} />;
 };

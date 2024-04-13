@@ -1,5 +1,5 @@
 import { useAppNavigation, useThreads } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { Button } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -14,17 +14,20 @@ type ThreadsProps = {
 };
 
 const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const { setIsShowCreateThread, threadChannel } = useThreads();
+	const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 
 	const handleCreateThread = () => {
 		if (currentChannel && currentChannel?.parrent_id !== '0') {
 			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
 		}
-		setIsShowCreateThread(true);
 		setIsShowThread(false);
+		setIsShowCreateThread(true);
+		dispatch(threadsActions.setNameThreadError(''));
+		dispatch(threadsActions.setMessageThreadError(''));
 	};
 
 	return (
@@ -40,7 +43,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						<Button
 							onClick={handleCreateThread}
 							size="sm"
-							className="h-6 rounded focus:ring-transparent bg-[#004EEB] hover:!bg-[#0040C1]"
+							className="h-6 rounded focus:ring-transparent bg-[#004EEB] hover:!bg-[#0040C1] items-center"
 						>
 							Create
 						</Button>
@@ -50,11 +53,20 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 					</div>
 				</div>
 				<div className="flex flex-col bg-[#323232] px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
-					<GroupThreads title="2 joined threads">
-						{threadChannel.map((thread) => (
-							<ThreadItem thread={thread} key={thread.id} setIsShowThread={setIsShowThread} />
-						))}
-					</GroupThreads>
+					{threadChannelOnline.length > 0 && (
+						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
+							{threadChannelOnline.map((thread) => (
+								<ThreadItem thread={thread} key={thread.id} setIsShowThread={setIsShowThread} />
+							))}
+						</GroupThreads>
+					)}
+					{threadChannelOld.length > 0 && (
+						<GroupThreads title="order threads">
+							{threadChannelOld.map((thread) => (
+								<ThreadItem thread={thread} key={thread.id} setIsShowThread={setIsShowThread} />
+							))}
+						</GroupThreads>
+					)}
 					{threadChannel.length === 0 && <EmptyThread onClick={handleCreateThread} />}
 				</div>
 			</div>

@@ -1,5 +1,5 @@
-import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from '@mezon/mezon-js';
-import { ChannelUserListChannelUser } from '@mezon/mezon-js/dist/api.gen';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
+import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -33,9 +33,9 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 }
 
 // TODO: remove channelId from the parameter
-export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string) => {
+export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser, channelId?: string, userChannelId?: string) => {
 	const id = `${channelId}${channelRes.user?.id}`;
-	return { ...channelRes, id: id || '', channelId };
+	return { ...channelRes, id: id || '', channelId, userChannelId };
 };
 
 export const mapUserIdToEntity = (userId: string, username: string) => {
@@ -88,7 +88,7 @@ export const fetchChannelMembers = createAsyncThunk(
 		if (repace) {
 			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 		}
-		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId));
+		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
 		thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));

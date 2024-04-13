@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+export * from './attachmentThumb';
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -1164,7 +1165,6 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defau
 };
 
 export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
 	const [isWhite, setFill] = useState<boolean>(false);
 
 	const handleClick = () => {
@@ -1431,19 +1431,24 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setFill] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setFill(!isWhite);
+	};
 	// TODO: remove state and handle click, pass fill as prop
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
 			<g id="live area" clipPath="url(#clip0_2253_934)">
 				<path
 					id="Vector"
 					d="M10 0C4.50797 0 0 4.50742 0 10C0 15.4926 4.50797 20 10 20C15.492 20 20 15.4926 20 10C20 4.50742 15.492 0 10 0ZM6.48438 4.72656C7.45367 4.72656 8.24219 5.51508 8.24219 6.48438C8.24219 6.80824 7.98012 7.07031 7.65625 7.07031C7.33238 7.07031 7.07031 6.80824 7.07031 6.48438C7.07031 6.16109 6.80711 5.89844 6.48438 5.89844C6.16164 5.89844 5.89844 6.16109 5.89844 6.48438C5.89844 6.80824 5.63637 7.07031 5.3125 7.07031C4.98863 7.07031 4.72656 6.80824 4.72656 6.48438C4.72656 5.51508 5.51508 4.72656 6.48438 4.72656ZM10 15.2734C7.09207 15.2734 4.72656 12.9079 4.72656 10C4.72656 9.67613 4.98863 9.41406 5.3125 9.41406C5.63637 9.41406 5.89844 9.67613 5.89844 10C5.89844 12.2614 7.73863 14.1016 10 14.1016C12.2614 14.1016 14.1016 12.2614 14.1016 10C14.1016 9.67613 14.3636 9.41406 14.6875 9.41406C15.0114 9.41406 15.2734 9.67613 15.2734 10C15.2734 12.9079 12.9079 15.2734 10 15.2734ZM14.6875 7.07031C14.3636 7.07031 14.1016 6.80824 14.1016 6.48438C14.1016 6.16109 13.8384 5.89844 13.5156 5.89844C13.1929 5.89844 12.9297 6.16109 12.9297 6.48438C12.9297 6.80824 12.6676 7.07031 12.3438 7.07031C12.0199 7.07031 11.7578 6.80824 11.7578 6.48438C11.7578 5.51508 12.5463 4.72656 13.5156 4.72656C14.4849 4.72656 15.2734 5.51508 15.2734 6.48438C15.2734 6.80824 15.0114 7.07031 14.6875 7.07031Z"
-					fill={defaultFill}
+					fill={isWhite ? '#FFFFFF' : defaultFill}
 				/>
 			</g>
 			<defs>
 				<clipPath id="clip0_2253_934">
-					<rect width="20" height="20" fill="white" />
+					<rect width="20" height="20" fill={isWhite ? '#FFFFFF' : defaultFill} />
 				</clipPath>
 			</defs>
 		</svg>
@@ -1534,7 +1539,7 @@ export const EyeClose: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	);
 };
 
-export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
+export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill = '#535353' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area" clipPath="url(#clip0_403_3108)">
@@ -1543,7 +1548,7 @@ export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M0.307965 9.2689C-0.102981 9.66796 -0.102981 10.332 0.307966 10.7311L4.43105 14.7349C7.54126 17.755 12.4583 17.755 15.5685 14.7349L19.6915 10.7311C20.1025 10.332 20.1025 9.66796 19.6915 9.2689L15.5685 5.26514C12.4583 2.24495 7.54126 2.24495 4.43105 5.26514L0.307965 9.2689ZM9.99997 13.0001C11.6568 13.0001 13 11.6569 13 10.0001C13 8.3432 11.6568 7.00006 9.99997 7.00006C8.34312 7.00006 6.99997 8.3432 6.99997 10.0001C6.99997 11.6569 8.34312 13.0001 9.99997 13.0001Z"
-					fill="#535353"
+					fill={defaultFill}
 				/>
 			</g>
 			<defs>
@@ -1801,13 +1806,18 @@ export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setFill] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setFill(!isWhite);
+	};
 	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={handleClick}>
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
 				d="M5 4C5.55228 4 6 4.44772 6 5V12C6 13.1046 6.89543 14 8 14H17.5858L15.2929 11.7071C14.9024 11.3166 14.9024 10.6834 15.2929 10.2929C15.6834 9.90237 16.3166 9.90237 16.7071 10.2929L20.7071 14.2929C20.8946 14.4804 21 14.7348 21 15C21 15.2652 20.8946 15.5196 20.7071 15.7071L16.7071 19.7071C16.3166 20.0976 15.6834 20.0976 15.2929 19.7071C14.9024 19.3166 14.9024 18.6834 15.2929 18.2929L17.5858 16H8C5.79086 16 4 14.2091 4 12V5C4 4.44772 4.44772 4 5 4Z"
-				fill={defaultFill}
+				fill={isWhite ? '#FFFFFF' : defaultFill}
 			/>
 		</svg>
 	);
@@ -1842,10 +1852,16 @@ export const ReplyCorner: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defa
 };
 
 export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setFill] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setFill(!isWhite);
+	};
+
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" onClick={handleClick}>
 			<path
-				fill={defaultFill}
+				fill={isWhite ? '#FFFFFF' : defaultFill}
 				d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"
 			></path>
 		</svg>
@@ -1854,24 +1870,23 @@ export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 
 export const ImageThumbnail: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="15px" height="15px" viewBox="-4 0 64 64" xmlns="http://www.w3.org/2000/svg">
-			<g fillRule="evenodd" clipRule="evenodd">
-				<path
-					d="M5.125.042c-2.801 0-5.072 2.273-5.072 5.074v53.841c0 2.803 2.271 5.073 5.072 5.073h45.775c2.801 0 5.074-2.271 5.074-5.073v-38.604l-18.904-20.311h-31.945z"
-					fill="#49C9A7"
-				/>
-
-				<path d="M55.977 20.352v1h-12.799s-6.312-1.26-6.129-6.707c0 0 .208 5.707 6.004 5.707h12.924z" fill="#000000" />
-
-				<path d="M37.074 0v14.561c0 1.656 1.104 5.791 6.104 5.791h12.799l-18.903-20.352z" opacity=".5" fill="#000000" />
-			</g>
-
+		<svg
+			className="repliedTextContentIcon_da8b30"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
 			<path
-				d="M10.119 53.739v-20.904h20.906v20.904h-20.906zm18.799-18.843h-16.691v12.6h16.691v-12.6zm-9.583 8.384l3.909-5.256 1.207 2.123 1.395-.434.984 5.631h-13.082l3.496-3.32 2.091 1.256zm-3.856-3.64c-.91 0-1.649-.688-1.649-1.538 0-.849.739-1.538 1.649-1.538.912 0 1.65.689 1.65 1.538 0 .85-.738 1.538-1.65 1.538z"
-				fillRule="evenodd"
-				clipRule="evenodd"
 				fill={defaultFill}
-			/>
+				fillRule="evenodd"
+				d="M2 5a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5Zm13.35 8.13 3.5 4.67c.37.5.02 1.2-.6 1.2H5.81a.75.75 0 0 1-.59-1.22l1.86-2.32a1.5 1.5 0 0 1 2.34 0l.5.64 2.23-2.97a2 2 0 0 1 3.2 0ZM10.2 5.98c.23-.91-.88-1.55-1.55-.9a.93.93 0 0 1-1.3 0c-.67-.65-1.78-.01-1.55.9a.93.93 0 0 1-.65 1.12c-.9.26-.9 1.54 0 1.8.48.14.77.63.65 1.12-.23.91.88 1.55 1.55.9a.93.93 0 0 1 1.3 0c.67.65 1.78.01 1.55-.9a.93.93 0 0 1 .65-1.12c.9-.26.9-1.54 0-1.8a.93.93 0 0 1-.65-1.12Z"
+				clipRule="evenodd"
+				className={defaultSize}
+			></path>
 		</svg>
 	);
 };
@@ -1982,11 +1997,54 @@ export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className={defaultSize} onClick={handleClick}>
-			<path d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z" fill={defaultFill}></path>
+			<path
+				d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z"
+				fill={isWhite ? '#FFFFFF' : defaultFill}
+			></path>
 			<path
 				d="M16.83 12.93c.26-.27.26-.75-.08-.92A9.5 9.5 0 0 0 12.47 11h-.94A9.53 9.53 0 0 0 2 20.53c0 .81.66 1.47 1.47 1.47h.22c.24 0 .44-.17.5-.4.29-1.12.84-2.17 1.32-2.91.14-.21.43-.1.4.15l-.26 2.61c-.02.3.2.55.5.55h7.64c.12 0 .17-.31.06-.36C12.82 21.14 12 20.22 12 19a3 3 0 0 1 3-3h.5a.5.5 0 0 0 .5-.5V15c0-.8.31-1.53.83-2.07ZM12 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
 				fill={isWhite ? '#FFFFFF' : defaultFill}
 			></path>
+		</svg>
+	);
+};
+
+export const TrashIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			className="actionBarIcon__5c911"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill={defaultFill}
+				d="M14.25 1c.41 0 .75.34.75.75V3h5.25c.41 0 .75.34.75.75v.5c0 .41-.34.75-.75.75H3.75A.75.75 0 0 1 3 4.25v-.5c0-.41.34-.75.75-.75H9V1.75c0-.41.34-.75.75-.75h4.5Z"
+				className=""
+			></path>
+			<path
+				fill={defaultFill}
+				fillRule="evenodd"
+				d="M5.06 7a1 1 0 0 0-1 1.06l.76 12.13a3 3 0 0 0 3 2.81h8.36a3 3 0 0 0 3-2.81l.75-12.13a1 1 0 0 0-1-1.06H5.07ZM11 12a1 1 0 1 0-2 0v6a1 1 0 1 0 2 0v-6Zm3-1a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Z"
+				clipRule="evenodd"
+				className={defaultSize}
+			></path>
+		</svg>
+)}
+
+export const Locked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
+			<path
+				fillRule="evenodd"
+				d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z"
+				clipRule="evenodd"
+				fill="#AEAEAE"
+			/>
 		</svg>
 	);
 };

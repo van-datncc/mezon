@@ -1,4 +1,4 @@
-import { Notification } from '@mezon/mezon-js';
+import { Notification } from 'mezon-js';
 import { LoadingStatus, NotificationContent } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';

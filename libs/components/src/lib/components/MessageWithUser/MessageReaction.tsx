@@ -1,5 +1,5 @@
-import { useChatReactionMessage } from '@mezon/core';
-import { ChannelStreamMode } from '@mezon/mezon-js';
+import { useChatReaction, useReference } from '@mezon/core';
+import { ChannelStreamMode } from 'mezon-js';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals } from '@mezon/utils';
 import { Fragment, useRef, useState } from 'react';
@@ -16,17 +16,16 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 	const [isHideSmileButton, setIsHideSmileButton] = useState<boolean>(false);
 	const {
 		userId,
-		reactionMessage,
-		setIsOpenEmojiReacted,
-		setIsOpenEmojiMessBox,
-		setMessageRef,
-		setEmojiPlaceActive,
-		setIsOpenEmojiReactedBottom,
-		isOpenEmojiReactedBottom,
-		refMessage,
-		dataReactionCombine,
+		reactionMessageDispatch,
+		setReactionPlaceActive,
+		reactionBottomState,
 		grandParentWidth,
-	} = useChatReactionMessage();
+		dataReactionCombine,
+		setReactionRightState,
+		setReactionBottomState,
+	} = useChatReaction();
+
+	const { referenceMessage, setReferenceMessage } = useReference();
 
 	const calculateDistance = (index: number, bannerWidth: number) => {
 		if (childRef.current && grandParentWidth) {
@@ -41,7 +40,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		setIsHideSmileButton(true);
-		await reactionMessage(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessageDispatch(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const hideSenderOnPanel = (emojiData: EmojiDataOptionals, senderId: string) => {
@@ -60,7 +59,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		message_sender_id: string,
 		action_delete: boolean,
 	) {
-		await reactionMessage('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
+		await reactionMessageDispatch('', mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
 	}
 
 	const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
@@ -71,11 +70,10 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 	const childRef = useRef<(HTMLDivElement | null)[]>([]);
 
 	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
-		setIsOpenEmojiReacted(true);
-		setIsOpenEmojiMessBox(false);
-		setMessageRef(message);
-		setEmojiPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
-		setIsOpenEmojiReactedBottom(false);
+		setReactionRightState(true);
+		setReferenceMessage(message);
+		setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_BOTTOM);
+		setReactionBottomState(false);
 		event.stopPropagation();
 	};
 
@@ -140,12 +138,12 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 											<div
 												onClick={handleClickOpenEmojiBottom}
 												className={`bg-[#313338] border-[#313338] w-8 border px-2 flex flex-row items-center rounded-md cursor-pointer ml-[2.5rem] h-6 absolute bottom-[-0.25rem]
-													${(isOpenEmojiReactedBottom && message.id === refMessage?.id) || isHovered ? 'block' : 'hidden'} `}
+													${(reactionBottomState && message.id === referenceMessage?.id) || isHovered ? 'block' : 'hidden'} `}
 												onMouseEnter={() => setIsHoverSender(false)}
 											>
 												<Icons.Smile
 													defaultSize="w-4 h-4"
-													defaultFill={isOpenEmojiReactedBottom && message.id === refMessage?.id ? '#FFFFFF' : '#AEAEAE'}
+													defaultFill={reactionBottomState && message.id === referenceMessage?.id ? '#FFFFFF' : '#AEAEAE'}
 												/>
 											</div>
 										</div>

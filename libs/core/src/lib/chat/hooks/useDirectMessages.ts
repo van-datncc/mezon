@@ -10,7 +10,7 @@ import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
 export type UseDirectMessagesOptions = {
 	channelId: string;

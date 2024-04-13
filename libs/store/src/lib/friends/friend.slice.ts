@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import { Friend } from '@mezon/mezon-js';
+import { Friend } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { channelMembersActions } from '../channelmembers/channel.members';
 export const FRIEND_FEATURE_KEY = 'friends';

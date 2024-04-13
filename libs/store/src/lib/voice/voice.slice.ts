@@ -1,4 +1,4 @@
-import { ChannelType } from '@mezon/mezon-js';
+import { ChannelType } from 'mezon-js';
 import { IChannelMember, IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -16,9 +16,10 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	voiceChannelMember: IChannelMember[];
-	showVideo: boolean;
+	showCamera: boolean;
 	showScreen: boolean;
 	statusCall: boolean;
+	voiceConnectionState: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -62,9 +63,10 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	voiceChannelMember: [],
-	showVideo: false,
+	showCamera: false,
 	showScreen: false,
 	statusCall: false,
+	voiceConnectionState: false,
 });
 
 export const voiceSlice = createSlice({
@@ -79,6 +81,9 @@ export const voiceSlice = createSlice({
 		},
 		setStatusCall: (state, action: PayloadAction<boolean>) => {
 			state.statusCall = action.payload;
+		},
+		setVoiceConnectionState: (state, action: PayloadAction<boolean>) => {
+			state.voiceConnectionState = action.payload;
 		},
 		// ...
 	},
@@ -156,5 +161,17 @@ export const selectStatusCall = createSelector(getVoiceState, (state) => state.s
 export const selectVoiceChannelMembersByChannelId = (channelId: string) =>
 	createSelector(selectVoiceEntities, (entities) => {
 		const voiceMembers = Object.values(entities);
-				return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
+		return voiceMembers.filter((member) => member && member.voice_channel_id === channelId);
 	});
+
+export const selectNumberMemberVoiceChannel = (channelId: string) =>
+	createSelector(selectVoiceChannelMembersByChannelId(channelId), (member) => {
+		return member.length;
+	});
+
+export const selectFriendVoiceChannel = (channelId: string, userId: string) =>
+	createSelector(selectVoiceChannelMembersByChannelId(channelId), (members) => {
+		return members.filter((member) => member.user_id !== userId);
+	});
+
+export const selectVoiceConnectionState = createSelector(getVoiceState, (state) => state.voiceConnectionState);

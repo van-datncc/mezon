@@ -1,10 +1,12 @@
-import { clansActions, emojiActions, getStoreAsync, notificationActions } from '@mezon/store';
+import { clansActions, emojiSuggestionActions, getStoreAsync, notificationActions } from '@mezon/store';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 
 export const mainLoader = async () => {
 	const store = await getStoreAsync();
 	store.dispatch(clansActions.fetchClans());
 	store.dispatch(notificationActions.fetchListNotification());
-	store.dispatch(emojiActions.fetchEmoji());
+	store.dispatch(emojiSuggestionActions.fetchEmoji());
+	store.dispatch(gifsActions.fetchGifsData());
 
 	return null;
 };

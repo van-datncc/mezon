@@ -3,7 +3,7 @@ import { useChatSending } from '@mezon/core';
 import { IMessageSendPayload } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'vendors/mezon-js/packages/mezon-js/dist/api.gen';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 export type ChannelMessageBoxProps = {
 	channelId: string;
@@ -37,7 +37,6 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 		<div className="mx-4 relative">
 			<ReplyMessageBox />
 			<MessageBox
-				isOpenEmojiPropOutside={controlEmoji}
 				listMentions={UserMentionList(channelId)}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}

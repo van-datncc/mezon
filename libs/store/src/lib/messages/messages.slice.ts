@@ -1,9 +1,9 @@
-import { ChannelMessage, ChannelStreamMode } from '@mezon/mezon-js';
+import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
+import { reactionActions } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { emojiActions } from '../emoji/emoji.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -56,7 +56,6 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
-	replyMessageStatus?: boolean;
 }
 
 export interface MessagesRootState {
@@ -141,7 +140,7 @@ export const fetchMessages = createAsyncThunk(
 			return Object.values(emojiDataItems);
 		});
 
-		thunkAPI.dispatch(emojiActions.setDataReactionFromServe(reactionData));
+		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
 		let hasMore = currentHasMore;
 		if (currentLastLoadMessageId === messageId) {
@@ -288,7 +287,6 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
-	replyMessageStatus: false,
 });
 
 export type SetCursorChannelArgs = {
@@ -320,9 +318,7 @@ export const messagesSlice = createSlice({
 				}
 			}
 		},
-		setReplyMessageStatus(state, action) {
-			state.replyMessageStatus = action.payload;
-		},
+
 		markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
 			messagesAdapter.updateOne(state, {
 				id: action.payload,
@@ -510,5 +506,3 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 
 export const selectMessageByMessageId = (messageId: string) =>
 	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
-
-export const selectReplyMessageStatus = createSelector(getMessagesState, (state) => state.replyMessageStatus);
