@@ -1,7 +1,7 @@
-import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { ChannelStreamMode } from 'mezon-js';
+import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import EmojiPicker, { EmojiClickData, EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
+import { ChannelStreamMode } from 'mezon-js';
 
 export type EmojiPickerOptions = {
 	messageEmoji?: IMessageWithUser;
@@ -11,7 +11,9 @@ export type EmojiPickerOptions = {
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
-	const { reactionMessageDispatch, setReactionRightState, setReactionBottomState } = useChatReaction();
+	const { reactionMessageDispatch, setReactionRightState, setReactionBottomState, setReactionPlaceActive, setUserReactionPanelState } =
+		useChatReaction();
+	const { setReferenceMessage } = useReference();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const { setSubPanelActive } = useGifsStickersEmoji();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
@@ -28,11 +30,13 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 			event.stopPropagation();
 			setReactionRightState(false);
 			setReactionBottomState(false);
+			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+			setReferenceMessage(null);
+			setUserReactionPanelState(false);
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
 			setEmojiSuggestion(emojiData.emoji);
 			event.stopPropagation();
 			setSubPanelActive(SubPanelName.NONE);
-			
 		}
 	};
 

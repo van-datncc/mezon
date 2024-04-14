@@ -1,6 +1,6 @@
 import { differenceInDays, differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, startOfDay, subDays } from 'date-fns';
 import { RefObject } from 'react';
-import { ChannelMembersEntity, ILineMention, UsersClanEntity } from '../types/index';
+import { ChannelMembersEntity, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -80,4 +80,8 @@ export const isGreaterOneMonth = (timestamp: string) => {
 	const now = new Date();
 	const result = differenceInDays(now, date);
 	return result;
+};
+
+export const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
+	return senders.reduce((sum: number, item: SenderInfoOptionals) => sum + (item.count ?? 0), 0);
 };

@@ -148,9 +148,12 @@ function PopupMessage({
 	isCombine?: boolean;
 	deleteSendMessage: (messageId: string) => Promise<void>;
 }) {
+	const { reactionPlaceActive } = useChatReaction();
 	return (
-		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-7 ${isCombine ? '-top-[0px] right-5' : '-top-[0px] right-5'}
+		<>
+			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
+				<div
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-7 ${isCombine ? '-top-[0px] right-5' : '-top-[0px] right-5'}
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -159,18 +162,22 @@ function PopupMessage({
 						? ''
 						: 'hidden group-hover:block'
 				} `}
-		>
-			<ChannelMessageOpt message={mess} />
+				>
+					<ChannelMessageOpt message={mess} />
 
-			{mess.id === referenceMessage?.id && reactionRightState && (
-				<div className="w-fit fixed right-16 bottom-[6rem]">
-					<div className="scale-75 transform mb-0 z-10">
-						<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-					</div>
+					{mess.id === referenceMessage?.id && reactionRightState && (
+						<div className="w-fit fixed right-16 bottom-[6rem]">
+							<div className="scale-75 transform mb-0 z-10">
+								<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+							</div>
+						</div>
+					)}
+					{openOptionMessageState && mess.id === referenceMessage?.id && (
+						<PopupOption message={mess} deleteSendMessage={deleteSendMessage} />
+					)}
 				</div>
 			)}
-			{openOptionMessageState && mess.id === referenceMessage?.id && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
-		</div>
+		</>
 	);
 }
 

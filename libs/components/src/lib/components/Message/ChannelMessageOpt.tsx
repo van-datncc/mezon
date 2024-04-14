@@ -48,6 +48,7 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 	useEffect(() => {
 		if (!openEditMessageState && !openEditMessageState && !reactionRightState && !reactionBottomState) {
 			dispatch(referencesActions.setReferenceMessage(null));
+			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 		}
 	}, [openEditMessageState, openEditMessageState, reactionRightState, reactionBottomState]);
 

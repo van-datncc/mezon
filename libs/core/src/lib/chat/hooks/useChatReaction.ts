@@ -1,10 +1,10 @@
 import {
 	reactionActions,
 	selectDataReactionCombine,
-	selectGrandParentWidthState,
 	selectReactionBottomState,
 	selectReactionPlaceActive,
 	selectReactionRightState,
+	selectUserReactionPanelState,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EmojiDataOptionals, EmojiPlaces } from '@mezon/utils';
@@ -23,8 +23,8 @@ export function useChatReaction() {
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
-	const grandParentWidth = useSelector(selectGrandParentWidthState);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -113,9 +113,10 @@ export function useChatReaction() {
 		},
 		[dispatch],
 	);
-	const setGrandParentWidthAction = useCallback(
-		(state: number) => {
-			dispatch(reactionActions.setGrandParentWidthState(state));
+
+	const setUserReactionPanelState = useCallback(
+		(state: boolean) => {
+			dispatch(reactionActions.setUserReactionPanelState(state));
 		},
 		[dispatch],
 	);
@@ -131,11 +132,11 @@ export function useChatReaction() {
 			reactionRightState,
 			reactionBottomState,
 			dataReactionServerAndSocket,
-			grandParentWidth,
 			dataReactionCombine,
 			setReactionRightState,
 			setReactionBottomState,
-			setGrandParentWidthAction,
+			setUserReactionPanelState,
+			userReactionPanelState,
 		}),
 		[
 			reactionActions,
@@ -147,11 +148,9 @@ export function useChatReaction() {
 			reactionRightState,
 			reactionBottomState,
 			dataReactionServerAndSocket,
-			grandParentWidth,
 			dataReactionCombine,
 			setReactionRightState,
 			setReactionBottomState,
-			setGrandParentWidthAction,
 		],
 	);
 }

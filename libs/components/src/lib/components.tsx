@@ -29,7 +29,10 @@ export { default as MentionReactInput } from './components/MessageBox/ReactionMe
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as MessageImage } from './components/MessageWithUser/MessageImage';
-export { default as MessageReaction } from './components/MessageWithUser/MessageReaction';
+export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
+export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
+export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
+
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
