@@ -21,7 +21,6 @@ function FileUploadByDnD() {
 	const handleDragOver = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		// setDraggingState(true);
 	};
 
 	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
