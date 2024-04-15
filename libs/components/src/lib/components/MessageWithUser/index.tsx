@@ -1,7 +1,7 @@
 import { MessageReaction } from '@mezon/components';
 import { selectCurrentChannelId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -11,7 +11,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useChatReaction, useReference } from '@mezon/core';
+import { useReference } from '@mezon/core';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
@@ -36,9 +36,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { setGrandParentWidthAction } = useChatReaction();
 	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
-
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -52,13 +50,6 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 		return message.attachments;
 	}, [message.attachments]);
 
-	const getWidthDivMessageWidth = divMessageWithUser.current?.getBoundingClientRect();
-	useEffect(() => {
-		if (getWidthDivMessageWidth) {
-			setGrandParentWidthAction(getWidthDivMessageWidth?.right);
-		}
-	}, [getWidthDivMessageWidth]);
-
 	const propsChild = { isCombine };
 	const checkReplied = referenceMessage && referenceMessage.id === message.id;
 	const checkMessageTargetToMoved = idMessageReplied === message.id;
@@ -66,7 +57,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] bg-[#26262B] ">
+				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] bg-[#26262B]">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
@@ -74,7 +65,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 			)}
 			<div className="relative">
 				<div
-					className={`bg-[#26262b] relative rounded-sm overflow-hidden ${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
 					<div
 						className={`${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}

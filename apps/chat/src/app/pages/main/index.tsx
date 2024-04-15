@@ -2,7 +2,7 @@ import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/compon
 import { useAppNavigation, useFriends } from '@mezon/core';
 import { gifsStickerEmojiActions, reactionActions, referencesActions, selectAllClans, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +31,7 @@ function MyApp() {
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
 		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 	};
 
 	return (

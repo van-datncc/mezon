@@ -29,7 +29,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionRightState: boolean;
 	reactionDataSocket: EmojiDataOptionals;
 	reactionDataServerAndSocket: EmojiDataOptionals[];
-	grandParentWidthState: number;
+	userReactionPanelState: boolean;
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -64,7 +64,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		message_id: '',
 	},
 	reactionDataServerAndSocket: [],
-	grandParentWidthState: 0,
+	userReactionPanelState: false,
 });
 
 export const reactionSlice = createSlice({
@@ -82,10 +82,6 @@ export const reactionSlice = createSlice({
 		},
 		setReactionRightState(state, action) {
 			state.reactionRightState = action.payload;
-		},
-
-		setGrandParentWidthState(state, action) {
-			state.grandParentWidthState = action.payload;
 		},
 
 		setReactionDataSocket: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
@@ -123,6 +119,9 @@ export const reactionSlice = createSlice({
 		setDataReactionFromServe(state, action) {
 			state.reactionDataServerAndSocket = action.payload;
 		},
+		setUserReactionPanelState(state, action) {
+			state.userReactionPanelState = action.payload;
+		},
 	},
 });
 
@@ -151,4 +150,4 @@ export const selectMessageReacted = createSelector(getReactionState, (state: Rea
 
 export const selectDataReactionCombine = createSelector(getReactionState, (state: ReactionState) => state.reactionDataServerAndSocket);
 
-export const selectGrandParentWidthState = createSelector(getReactionState, (state: ReactionState) => state.grandParentWidthState);
+export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
