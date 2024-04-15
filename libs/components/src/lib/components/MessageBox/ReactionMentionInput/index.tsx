@@ -200,11 +200,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
+	const { openReplyMessageState } = useReference();
+	
 	useEffect(() => {
-		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive) {
+		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
 			return focusToElement(editorRef);
 		}
-	}, [pressAnyButtonState, keyCodeFromKeyBoard, isEmojiListShowed, subPanelActive]);
+	}, [pressAnyButtonState, keyCodeFromKeyBoard, isEmojiListShowed, subPanelActive, referenceMessage, openReplyMessageState]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
