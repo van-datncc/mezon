@@ -42,13 +42,20 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 	}, [voice]);
 
 	const handleClick = (event: any) => {
-		setIsSelectScreen(true);
 		const oldElementSelect = document.querySelector('.showScreen');
 		if (oldElementSelect) {
 			oldElementSelect.classList.remove('showScreen');
 		}
 
+		const btnAddFriend = document.querySelector('.btnAddFriend');
 		const selectedElement = event.target;
+		const wrapperBtnAddFriend = document.querySelector('.wrapperBtnAddFriend');
+		if (btnAddFriend === selectedElement || selectedElement === wrapperBtnAddFriend) {
+			setIsSelectScreen(false);
+			return;
+		} else {
+			setIsSelectScreen(true);
+		}
 		selectedElement.classList.add('showScreen');
 	};
 
@@ -78,7 +85,7 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 			</button>
 			<div
 				id="meet"
-				className={`grid items-stretch gap-[10px] p-[10px] ${classIdMeet} w-full min-h-[50%] ${isSelectScreen ? 'h-full' : 'h-fit'}`}
+				className={`grid items-stretch gap-[10px] p-[10px] ${classIdMeet} w-full min-h-[50%] max-h-full ${isSelectScreen ? 'h-full' : 'h-fit'}`}
 				onClick={handleClick}
 				style={{
 					gridTemplateColumns: numberMember < 2 ? 'repeat(2, minmax(0, 1fr))' : '',

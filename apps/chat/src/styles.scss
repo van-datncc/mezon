@@ -357,3 +357,11 @@ blockquote span {
 		}
 	}
 }
+
+// css tagLink of markdown
+.tagLink {
+	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
+}

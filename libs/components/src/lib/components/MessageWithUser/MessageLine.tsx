@@ -7,7 +7,7 @@ type MessageLineProps = {
 
 const LineWithLink = ({ link }: { link: string }) => {
 	return (
-		<a href={link} className="text-blue-500">
+		<a href={link} className="text-blue-500 hover:underline" rel="noopener noreferrer" target="_blank">
 			{link}
 		</a>
 	);

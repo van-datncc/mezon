@@ -28,6 +28,17 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								components={{
 									pre: PreClass,
 									p: 'span',
+									a: ({ href, children }) => (
+										<a
+											href={href}
+											target="_blank"
+											rel="noopener noreferrer"
+											style={{ color: 'rgb(59,130,246)' }}
+											className="tagLink"
+										>
+											{children}
+										</a>
+									),
 								}}
 							/>
 						)}
