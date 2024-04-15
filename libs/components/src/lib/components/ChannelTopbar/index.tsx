@@ -1,11 +1,13 @@
 import { useOnClickOutside } from '@mezon/core';
-import { ChannelType } from 'mezon-js';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
 import { useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import { ChannelLabel, SearchMessage } from './TopBarComponents';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
@@ -16,6 +18,9 @@ export type ChannelTopbarProps = {
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	const checkChannelType = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
+	));
 	return (
 		<div
 			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
@@ -29,8 +34,10 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<div className="justify-end items-center gap-2 flex">
 							<div className="">
 								<div className="justify-start items-center gap-[15px] flex iconHover">
-									<Icons.AddMemberCall />
-									<Icons.Inbox />
+									<div className="relative" onClick={openInviteChannelModal}>
+										<Icons.AddMemberCall />
+									</div>
+									<InboxButton />
 									<Icons.ThreeDot />
 									<Icons.BoxChatIcon />
 								</div>

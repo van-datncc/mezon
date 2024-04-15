@@ -1,10 +1,11 @@
 import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
-import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { channelsActions, selectCurrentChannel, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import cls from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
@@ -86,8 +87,12 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		voice.setClanName(currentClan?.clan_name || '');
 	}, [channel.channel_label, channel.id, clanId, currentClan?.clan_name, userProfile?.user?.username, voice]);
 
+	const currentChannel = useSelector(selectCurrentChannel);
 	const handleVoiceChannel = (id: string) => {
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			dispatch(channelsActions.setCurrentChannelId(id));
+		}
 		dispatch(voiceActions.setStatusCall(true));
 		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 		voice.createVoiceConnection(voiceChannelName.toLowerCase(), sessionRef.current?.token || '');
