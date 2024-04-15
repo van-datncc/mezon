@@ -1,18 +1,20 @@
-import { ChannelType } from 'mezon-js';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import * as Icons from '../Icons';
+import { DeleteModal } from './Component/Modal/deleteChannelModal';
 
 export type ChannelSettingItemProps = {
 	onItemClick: (settingName: string) => void;
 	channel: IChannel;
-	openModal: () => void;
 };
 
 const ChannelSettingItem = (props: ChannelSettingItemProps) => {
-	const { onItemClick, channel, openModal } = props;
+	const { onItemClick, channel } = props;
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
+	const [showModal, setShowModal] = useState(false);
+
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
@@ -77,12 +79,19 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px] hover:text-white ${selectedButton === 'Delete' ? 'bg-[#232E3B] text-white' : ''} w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Delete');
-						openModal();
+						setShowModal(true);
 					}}
 				>
 					Delete Channel
 				</button>
 			</div>
+			{showModal && (
+				<DeleteModal
+					onClose={() => setShowModal(false)}
+					channelLable={channel?.channel_label || ''}
+					channelId={channel.channel_id as string}
+				/>
+			)}
 		</div>
 	);
 };

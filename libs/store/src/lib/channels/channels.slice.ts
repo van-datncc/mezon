@@ -1,8 +1,8 @@
-import { ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
+import { ChannelType } from 'mezon-js';
+import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -91,6 +91,18 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
+export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (body: fetchChannelMembersPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.deleteChannelDesc(mezon.session, body.channelId);
+		if (response) {
+			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId as string }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
@@ -209,6 +221,18 @@ export const channelsSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+
+		builder
+			.addCase(deleteChannel.pending, (state: ChannelsState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(deleteChannel.fulfilled, (state: ChannelsState) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(deleteChannel.rejected, (state: ChannelsState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
 	},
 });
 
@@ -242,6 +266,7 @@ export const channelsActions = {
 	fetchChannels,
 	joinChannel,
 	createNewChannel,
+	deleteChannel,
 };
 
 /*
