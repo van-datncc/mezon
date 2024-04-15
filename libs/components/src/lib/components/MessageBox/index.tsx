@@ -1,5 +1,5 @@
-import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useReference } from '@mezon/core';
+import { AttachmentPreviewThumbnail, FileUploadByDnD, MentionReactInput } from '@mezon/components';
+import { useDragAndDrop, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -22,6 +22,8 @@ export type MessageBoxProps = {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
+	const { draggingState, setDraggingState } = useDragAndDrop();
+	console.log(draggingState);
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -51,8 +53,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			return;
 		}
 	}, []);
-
-
 
 	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
 		setAttachmentData(attachment);
@@ -113,6 +113,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	return (
 		<div className="relative">
+			{draggingState && <FileUploadByDnD />}
 			<div className="w-full max-h-full flex gap-2 mb-3">
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
