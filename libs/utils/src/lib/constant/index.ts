@@ -9,3 +9,5 @@ export const threadError: ThreadError = {
 	name: 'Thread Name is required',
 	message: 'Starter Message is required',
 };
+
+export const regexToDetectGifLink = /\bhttps?:\/\/\S+\.gif\b/g;

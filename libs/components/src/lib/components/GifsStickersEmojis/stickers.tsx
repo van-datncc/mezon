@@ -63,6 +63,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 		const filteredImages = selectedType ? images.filter((image) => image.type === selectedType) : images;
 		setSelectImage(filteredImages);
 	}, [selectedType]);
+	
 	return (
 		<div className="flex h-full pr-2">
 			<div className="w-[40%] flex flex-col px-2 gap-y-2 max-w-[40%]">

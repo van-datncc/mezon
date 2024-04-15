@@ -52,6 +52,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, []);
 
+
+
 	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
 		setAttachmentData(attachment);
 	}, []);
@@ -135,6 +137,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							listMentions={props.listMentions}
 							onSend={props.onSend}
 							onTyping={props.onTyping}
+							currentChannelId={props.currentChannelId}
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />

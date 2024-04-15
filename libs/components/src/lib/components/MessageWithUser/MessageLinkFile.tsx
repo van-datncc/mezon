@@ -1,5 +1,5 @@
 import { RenderAttachmentThumbnail } from '@mezon/ui';
-import { ApiMessageAttachment } from "mezon-js/api.gen";
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export type MessageImage = {
 	content?: string;
@@ -21,13 +21,21 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 	};
 	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-12 h-12');
 
+	const hideTheInformationFile =
+		attachmentData.filetype !== 'image/gif' &&
+		attachmentData.filetype !== 'image/png' &&
+		attachmentData.filetype !== 'image/jpeg' &&
+		attachmentData.filetype !== 'video/mp4';
+
 	return (
-		<div className="break-all cursor-pointer gap-3 flex mt-[10px]" onClick={handleDownload}>
+		<div className="break-all cursor-default gap-3 flex mt-[10px]">
 			<div>{thumbnailAttachment}</div>
-			<div className="">
-				<p className="text-blue-500 underline">{attachmentData.filename}</p>
-				<p>size: {formatFileSize(attachmentData.size || 0)}</p>
-			</div>
+			{hideTheInformationFile && (
+				<div className=" cursor-pointer " onClick={handleDownload}>
+					<p className="text-blue-500 underline">{attachmentData.filename}</p>
+					<p>size: {formatFileSize(attachmentData.size || 0)}</p>
+				</div>
+			)}
 		</div>
 	);
 }

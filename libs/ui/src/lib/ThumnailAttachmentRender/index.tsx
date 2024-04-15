@@ -15,9 +15,10 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 			component: <Icons.PdfThumbnail key="pdf-thumbnail" defaultSize={size} />,
 		},
 		{
-			condition: fileType?.indexOf('image/png') !== -1 || fileType?.indexOf('image/jpeg') !== -1,
+			condition: fileType?.indexOf('image') !== -1,
 			component: <img key="image-thumbnail" src={attachment.url} role="presentation" className="w-48" alt={attachment.url} />,
 		},
+		
 		{
 			condition: fileType?.indexOf('application/msword') !== -1,
 			component: <Icons.DocThumbnail key="doc-thumbnail" defaultSize={size} />,
