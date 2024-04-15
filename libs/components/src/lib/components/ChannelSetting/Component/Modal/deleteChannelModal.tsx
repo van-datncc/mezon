@@ -1,9 +1,21 @@
+import { useClans } from '@mezon/core';
+import { channelsActions, useAppDispatch } from '@mezon/store';
+
 interface DeleteModalProps {
 	onClose: () => void;
 	channelLable: string;
+	channelId: string;
 }
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, channelLable }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, channelLable, channelId }) => {
+	const dispatch = useAppDispatch();
+	const { currentClanId } = useClans();
+
+	const handleDeleteChannel = (channelId: string) => {
+		onClose();
+		dispatch(channelsActions.deleteChannel({ channelId, clanId: currentClanId as string }));
+	};
+
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
@@ -22,7 +34,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, channelLable 
 					</button>
 					<button
 						color="blue"
-						onClick={onClose}
+						onClick={() => handleDeleteChannel(channelId)}
 						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
 					>
 						Delete

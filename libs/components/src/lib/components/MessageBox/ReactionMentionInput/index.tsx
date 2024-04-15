@@ -8,7 +8,7 @@ import textFieldEdit from 'text-field-edit';
 
 import { useReference, useThreads } from '@mezon/core';
 import { referencesActions, threadsActions, useAppDispatch } from '@mezon/store';
-import { ChannelMembersEntity, ILineMention, UsersClanEntity, uniqueUsers } from '@mezon/utils';
+import { ChannelMembersEntity, ILineMention, UsersClanEntity, regexToDetectGifLink, uniqueUsers } from '@mezon/utils';
 
 import { useChannelMembers, useClans } from '@mezon/core';
 import { ChannelsEntity, channelUsersActions, selectCurrentChannel } from '@mezon/store';
@@ -32,6 +32,7 @@ export type MentionReactInputProps = {
 	listMentions?: MentionDataProps[] | undefined;
 	isThread?: boolean;
 	handlePaste?: any;
+	currentChannelId?: string;
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
@@ -156,6 +157,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const mentionedUsers: UserMentionsOpt[] = [];
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		const linkGifDirect = newValue?.match(regexToDetectGifLink);
+		if (linkGifDirect && linkGifDirect?.length > 0) {
+			const newAttachmentDataRef = linkGifDirect
+				.filter((item) => item !== null)
+				.map((item: string) => ({
+					filetype: 'image/gif',
+					url: item,
+				}));
+
+			setAttachmentData(newAttachmentDataRef);
+		}
+
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue);
 		if (typeof props.onTyping === 'function') {
@@ -187,11 +200,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
+	const { openReplyMessageState } = useReference();
+	
 	useEffect(() => {
-		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive) {
+		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
 			return focusToElement(editorRef);
 		}
-	}, [pressAnyButtonState, keyCodeFromKeyBoard, isEmojiListShowed, subPanelActive]);
+	}, [pressAnyButtonState, keyCodeFromKeyBoard, isEmojiListShowed, subPanelActive, referenceMessage, openReplyMessageState]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();

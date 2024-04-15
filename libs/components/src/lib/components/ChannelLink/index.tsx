@@ -1,12 +1,14 @@
 import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
-import { ChannelType } from 'mezon-js';
-import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { channelsActions, selectCurrentChannel, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import cls from 'classnames';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
+import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
@@ -43,6 +45,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	const voice = useMezonVoice();
 
 	const [openSetting, setOpenSetting] = useState(false);
+	const [showModal, setShowModal] = useState(false);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [coords, setCoords] = useState<Coords>({
@@ -75,7 +78,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 	const dispatch = useAppDispatch();
 
-	useEffect(()=> {
+	useEffect(() => {
 		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
 		voice.setVoiceChannelId(channel.id);
@@ -83,12 +86,21 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		voice.setClanId(clanId || '');
 		voice.setClanName(currentClan?.clan_name || '');
 	}, [channel.channel_label, channel.id, clanId, currentClan?.clan_name, userProfile?.user?.username, voice]);
-			
-	const handleVoiceChannel = (id: string) => {		
+
+	const currentChannel = useSelector(selectCurrentChannel);
+	const handleVoiceChannel = (id: string) => {
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
+		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			dispatch(channelsActions.setCurrentChannelId(id));
+		}
 		dispatch(voiceActions.setStatusCall(true));
 		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
 		voice.createVoiceConnection(voiceChannelName.toLowerCase(), sessionRef.current?.token || '');
+	};
+
+	const handleDeleteChannel = () => {
+		setShowModal(true);
+		setIsShowPanelChannel(false);
 	};
 
 	return (
@@ -197,7 +209,21 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 			/>
 			{/* <p>{numberNotication}</p> */}
 			{isShowPanelChannel && (
-				<PanelChannel channel={channel} coords={coords} setOpenSetting={setOpenSetting} setIsShowPanelChannel={setIsShowPanelChannel} />
+				<PanelChannel
+					onDeleteChannel={handleDeleteChannel}
+					channel={channel}
+					coords={coords}
+					setOpenSetting={setOpenSetting}
+					setIsShowPanelChannel={setIsShowPanelChannel}
+				/>
+			)}
+
+			{showModal && (
+				<DeleteModal
+					onClose={() => setShowModal(false)}
+					channelLable={channel.channel_label || ''}
+					channelId={channel.channel_id as string}
+				/>
 			)}
 		</div>
 	);

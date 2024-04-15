@@ -10,8 +10,8 @@ function AddVoiceFriend({ channelId }: AddVoiceFriendProps) {
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channelId} />
 	));
 	return (
-		<div className="bg-black rounded-[10px] w-full m-auto flex justify-center items-center min-h-full overflow-hidden">
-			<button className="bg-[#26262B] rounded p-2 text-lg" onClick={openInviteChannelModal}>
+		<div className="bg-black rounded-[10px] w-full m-auto flex justify-center items-center min-h-full overflow-hidden wrapperBtnAddFriend">
+			<button className="bg-[#26262B] rounded p-2 text-lg btnAddFriend" onClick={openInviteChannelModal}>
 				Invites Friend
 			</button>
 		</div>

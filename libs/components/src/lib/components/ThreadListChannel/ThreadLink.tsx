@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
+import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
 import * as Icons from '../Icons';
 import PanelChannel from '../PanelChannel';
 
@@ -23,6 +24,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 
 	const panelRef = useRef<HTMLAnchorElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
+	const [showModal, setShowModal] = useState(false);
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
@@ -42,6 +44,11 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			setCoords({ mouseX, mouseY });
 			setIsShowPanelChannel((s) => !s);
 		}
+	};
+
+	const handleDeleteChannel = () => {
+		setShowModal(true);
+		setIsShowPanelChannel(false);
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
@@ -68,7 +75,13 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			>
 				{thread.channel_label}
 				{isShowPanelChannel && (
-					<PanelChannel channel={thread} coords={coords} setOpenSetting={setOpenSetting} setIsShowPanelChannel={setIsShowPanelChannel} />
+					<PanelChannel
+						onDeleteChannel={handleDeleteChannel}
+						channel={thread}
+						coords={coords}
+						setOpenSetting={setOpenSetting}
+						setIsShowPanelChannel={setIsShowPanelChannel}
+					/>
 				)}
 				<SettingChannel
 					open={openSetting}
@@ -77,6 +90,14 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 					}}
 					channel={thread}
 				/>
+
+				{showModal && (
+					<DeleteModal
+						onClose={() => setShowModal(false)}
+						channelLable={thread.channel_label || ''}
+						channelId={thread.channel_id as string}
+					/>
+				)}
 			</Link>
 		</div>
 	);

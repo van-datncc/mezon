@@ -1,6 +1,7 @@
+import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { Modal, ModalBody } from 'flowbite-react';
-import { useState } from 'react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useState } from 'react';
 
 export type MessageImage = {
 	content?: string;
@@ -10,15 +11,16 @@ export type MessageImage = {
 function MessageImage({ attachmentData }: MessageImage) {
 	const [openModal, setOpenModal] = useState(false);
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
+	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	return (
 		<>
 			<div className="break-all">
 				<img
-					className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid ? `cursor-pointer` : `cursor-default`}`}
+					className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? `cursor-pointer` : `cursor-default`}`}
 					src={attachmentData.url?.toString()}
 					alt={attachmentData.url}
 					onClick={() => {
-						if (!isDimensionsValid) {
+						if (!isDimensionsValid && !checkImage) {
 							setOpenModal(true);
 						} else return;
 					}}

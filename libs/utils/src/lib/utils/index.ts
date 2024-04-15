@@ -1,6 +1,7 @@
 import { differenceInDays, differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, startOfDay, subDays } from 'date-fns';
 import { RefObject } from 'react';
 import { ChannelMembersEntity, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -85,3 +86,12 @@ export const isGreaterOneMonth = (timestamp: string) => {
 export const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
 	return senders.reduce((sum: number, item: SenderInfoOptionals) => sum + (item.count ?? 0), 0);
 };
+
+
+export const notImplementForGifOrStickerSendFromPanel = (data:ApiMessageAttachment) => {
+	if(data.url?.includes('giphy.com') || data.filetype === 'image/gif'){
+		return true
+	} else {
+		return false
+	}
+}
