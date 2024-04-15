@@ -19,7 +19,6 @@ export const dragAndDropSlice = createSlice({
 	initialState: initialDragAndDropState,
 	reducers: {
 		setDraggingState: (state, action) => {
-            console.log(action.payload);
 			state.draggingState = action.payload;
 		},
 	},

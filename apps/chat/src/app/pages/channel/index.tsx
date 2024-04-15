@@ -1,6 +1,5 @@
-import { ChannelVoice, ChannelVoiceOff, MemberList } from '@mezon/components';
-import { useAuth, useClans } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
+import { useAuth, useClans, useDragAndDrop } from '@mezon/core';
 import {
 	channelsActions,
 	selectCurrentChannel,
@@ -11,7 +10,8 @@ import {
 	voiceActions,
 } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
-import { useCallback, useEffect, useRef } from 'react';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import ChannelMessages from './ChannelMessages';
@@ -28,6 +28,8 @@ function useChannelSeen(channelId: string) {
 }
 
 export default function ChannelLayout() {
+	const { draggingState, setDraggingState } = useDragAndDrop();
+
 	const isShow = useSelector(selectIsShowMemberList);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -86,66 +88,92 @@ export default function ChannelLayout() {
 		}
 	};
 
+	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setDraggingState(true);
+	};
+
+	const handleDragOver = (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setDraggingState(true);
+	};
+
+	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden" id="mainChat">
-			<div className="flex h-heightWithoutTopBar flex-row ">
-				<div className="flex flex-col flex-1 w-full h-full">
-					<div
-						className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
-						ref={messagesContainerRef}
-					>
-						{renderChannelMedia()}
-					</div>
-					{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
-						<div className="flex-1 bg-[#1E1E1E]">
-							{!statusCall ? (
-								<div></div>
-							) : (
-								<div className="relative hidden justify-center items-center gap-x-5 w-full bottom-5 group-hover:flex">
-									<button
-										className="size-[50px] rounded-full bg-black hover:bg-slate-700"
-										onClick={showScreen ? stopScreenShare : startScreenShare}
-									>
-										<ShareScreen defaultFill={showScreen ? 'white' : '#AEAEAE'} />
-									</button>
-									<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950" onClick={leaveVoiceChannel}>
-										<PhoneOff defaultSize="rotate-[138deg] m-auto" />
-									</button>
-								</div>
-							)}
+		<>
+			{draggingState && <FileUploadByDnD />}
+			<div
+				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden"
+				id="mainChat"
+				onDragEnter={handleDragEnter}
+				onDragOver={handleDragOver}
+				onDragLeave={handleDragLeave}
+			>
+				<div className="flex h-heightWithoutTopBar flex-row ">
+					<div className="flex flex-col flex-1 w-full h-full">
+						<div
+							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
+							ref={messagesContainerRef}
+						>
+							{renderChannelMedia()}
 						</div>
-					) : (
-						<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
-							{currentChannel && (
-								<ChannelTyping
-									channelId={currentChannel?.id}
-									channelLabel={currentChannel?.channel_label || ''}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-								/>
-							)}
-							{currentChannel ? (
-								<ChannelMessageBox
-									clanId={currentChannel?.clan_id}
-									channelId={currentChannel?.id}
-									channelLabel={currentChannel?.channel_label || ''}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-								/>
-							) : (
-								<ChannelMessageBox.Skeleton />
-							)}
+						{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
+							<div className="flex-1 bg-[#1E1E1E]">
+								{!statusCall ? (
+									<div></div>
+								) : (
+									<div className="relative hidden justify-center items-center gap-x-5 w-full bottom-5 group-hover:flex">
+										<button
+											className="size-[50px] rounded-full bg-black hover:bg-slate-700"
+											onClick={showScreen ? stopScreenShare : startScreenShare}
+										>
+											<ShareScreen defaultFill={showScreen ? 'white' : '#AEAEAE'} />
+										</button>
+										<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950" onClick={leaveVoiceChannel}>
+											<PhoneOff defaultSize="rotate-[138deg] m-auto" />
+										</button>
+									</div>
+								)}
+							</div>
+						) : (
+							<div className="flex-shrink-0 flex flex-col bg-[#1E1E1E] h-auto relative">
+								{currentChannel && (
+									<ChannelTyping
+										channelId={currentChannel?.id}
+										channelLabel={currentChannel?.channel_label || ''}
+										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									/>
+								)}
+								{currentChannel ? (
+									<ChannelMessageBox
+										clanId={currentChannel?.clan_id}
+										channelId={currentChannel?.id}
+										channelLabel={currentChannel?.channel_label || ''}
+										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									/>
+								) : (
+									<ChannelMessageBox.Skeleton />
+								)}
+							</div>
+						)}
+					</div>
+					{isShow && (
+						<div
+							className={`w-[245px] bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'}`}
+							id="memberList"
+						>
+							<MemberList />
 						</div>
 					)}
 				</div>
-				{isShow && (
-					<div
-						className={`w-[245px] bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'}`}
-						id="memberList"
-					>
-						<MemberList />
-					</div>
-				)}
 			</div>
-		</div>
+		</>
 	);
 }
 

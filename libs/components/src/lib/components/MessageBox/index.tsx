@@ -1,4 +1,4 @@
-import { AttachmentPreviewThumbnail, FileUploadByDnD, MentionReactInput } from '@mezon/components';
+import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useDragAndDrop, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
@@ -22,8 +22,6 @@ export type MessageBoxProps = {
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {
-	const { draggingState, setDraggingState } = useDragAndDrop();
-	console.log(draggingState);
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -113,7 +111,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	return (
 		<div className="relative">
-			{draggingState && <FileUploadByDnD />}
 			<div className="w-full max-h-full flex gap-2 mb-3">
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
@@ -150,7 +147,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 MessageBox.Skeleton = () => {
 	return (
-		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-hidden">
+		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-visible">
 			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
 					<div className="flex flex-row  justify-end h-fit">
@@ -174,3 +171,5 @@ MessageBox.Skeleton = () => {
 };
 
 export default MessageBox;
+
+

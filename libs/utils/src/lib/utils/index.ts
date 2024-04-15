@@ -95,3 +95,4 @@ export const notImplementForGifOrStickerSendFromPanel = (data:ApiMessageAttachme
 		return false
 	}
 }
+
