@@ -1,4 +1,4 @@
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useEffect, useState } from 'react';
 import MessageImage from './MessageImage';
@@ -26,7 +26,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		const documents: ApiMessageAttachment[] = [];
 
 		attachments.forEach((attachment) => {
-			if (attachment.filetype?.indexOf('video/mp4') !== -1) {
+			if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('giphy.com')) {
 				videos.push(attachment);
 			} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
 				images.push(attachment);
@@ -56,14 +56,18 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 			</div>
 		);
 	};
+
 	const renderImages = () => {
 		return (
 			<div className="flex flex-row justify-start flex-wrap w-full gap-x-2">
-				{images.map((image, index) => (
-					<div key={index} className="w-48 h-auto">
-						<MessageImage attachmentData={image} />
-					</div>
-				))}
+				{images.map((image, index) => {
+					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
+					return (
+						<div key={index} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
+							<MessageImage attachmentData={image} />
+						</div>
+					);
+				})}
 			</div>
 		);
 	};
