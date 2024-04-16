@@ -23,13 +23,11 @@ function MemberList() {
 		<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-4 gap-[24px] w-full">
 			<div className="w-full">
 				<p className="mb-3 text-[#AEAEAE] text-[14px] font-bold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-					{/* {role.title} */}
 					MEMBER - {onlineMembers.length}
 				</p>
 				<div className="flex flex-col gap-4 ">
-					{/* {role?.users.filter((obj: ChannelMembersEntity) => obj.user?.online).map((user: ChannelMembersEntity) => ( */}
 					{onlineMembers.map((user: ChannelMembersEntity) => (
-						<MemberItem user={user} key={user?.user?.id} />
+						<MemberItem user={user} key={user?.user?.id} listProfile ={true}/>
 					))}
 				</div>
 				{offlineMembers.length > 0 && (
@@ -39,8 +37,8 @@ function MemberList() {
 						</p>
 						<div className="flex flex-col gap-4">
 							{offlineMembers.map((user: ChannelMembersEntity) => (
-								<div key={user?.id} className="opacity-60">
-									<MemberItem user={user} key={user?.user?.id} />
+								<div key={user?.id}>
+									<MemberItem user={user} key={user?.user?.id} listProfile ={true} isOffline = {true}/>
 								</div>
 							))}
 						</div>

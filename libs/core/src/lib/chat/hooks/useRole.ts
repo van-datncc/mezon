@@ -1,8 +1,8 @@
-import { rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-
-export function useRoles() {
+import { ChannelType } from 'mezon-js';
+export function useRoles(channelID?:string) {
 	const RolesClan = useSelector(selectAllRolesClan);
 
 	const dispatch = useAppDispatch();
@@ -30,6 +30,9 @@ export function useRoles() {
 			remove_user_ids: string[], remove_permission_ids: string[]) => {
 			await dispatch(rolesClanActions.fetchUpdateRole({role_id, title, add_user_ids,active_permission_ids, remove_user_ids, remove_permission_ids}))
 			await dispatch(rolesClanActions.fetchRolesClan({clanId}))
+			if (channelID){
+				await dispatch(channelMembersActions.fetchChannelMembers({clanId: clanId, channelId:channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT, noCache:true, repace:true }));
+			}
 		},
 		[dispatch],
 	);

@@ -14,6 +14,8 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
+	ChannelCreatedEvent,
+	ChannelDeletedEvent,
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
 	MessageReactionEvent,
@@ -140,6 +142,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
+	const onchannelcreated = useCallback(
+		(channelCreated: ChannelCreatedEvent) => {
+			if (channelCreated) {
+				dispatch(channelsActions.createChannelSocket(channelCreated));
+			}
+		},
+		[dispatch],
+	);
+
+	const onchanneldeleted = useCallback(
+		(channelDeleted: ChannelDeletedEvent) => {
+			if (channelDeleted) {
+				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
+			}
+		},
+		[dispatch],
+	);
+
 	useEffect(() => {
 		const socket = socketRef.current;
 		if (!socket) {
@@ -166,6 +186,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		socket.onstatuspresence = onstatuspresence;
 
+		socket.onchannelcreated = onchannelcreated;
+
+		socket.onchanneldeleted = onchanneldeleted;
+
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelmessage = () => {};
@@ -190,6 +214,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onvoicejoined,
 		onvoiceleaved,
 		onerror,
+		onchannelcreated,
+		onchanneldeleted,
 	]);
 
 	useEffect(() => {
