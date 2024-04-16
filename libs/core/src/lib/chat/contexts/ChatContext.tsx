@@ -8,6 +8,7 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
+	referencesActions,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
@@ -73,6 +74,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
+			dispatch(referencesActions.setIdMessageToJump(message.id));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
