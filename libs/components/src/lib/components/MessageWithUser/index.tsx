@@ -65,10 +65,10 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 			)}
 			<div className="relative">
 				<div
-					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
 					<div
-						className={`${(checkReplied && openReplyMessageState) || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
+						className={`${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
 						className={`flex h-15 flex-col w-auto px-3  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}

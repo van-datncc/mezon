@@ -38,7 +38,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		<div
 			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
-			className="break-all cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-20 rounded border border-2 border-[#232428] bg-[#2B2D31] relative"
+			className={`break-all cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-20 rounded  ${hideTheInformationFile ? 'border-[#232428] bg-[#2B2D31] border border-2' : ''}  relative`}
 		>
 			<div>{thumbnailAttachment}</div>
 			{hideTheInformationFile && (
@@ -47,7 +47,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 					<p>size: {formatFileSize(attachmentData.size || 0)}</p>
 				</div>
 			)}
-			{hoverShowOptButtonStatus && (
+			{hideTheInformationFile && hoverShowOptButtonStatus && (
 				<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md bg-[#313338] flex flex-row justify-center items-center">
 					<div
 						onClick={handleDownload}
