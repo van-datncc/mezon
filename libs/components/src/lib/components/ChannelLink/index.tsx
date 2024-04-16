@@ -1,7 +1,7 @@
 import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
-import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import cls from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -77,25 +77,21 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 	const dispatch = useAppDispatch();
-
-	useEffect(() => {
-		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
-		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
-		voice.setVoiceChannelId(channel.id);
-		voice.setUserDisplayName(userProfile?.user?.username || '');
-		voice.setClanId(clanId || '');
-		voice.setClanName(currentClan?.clan_name || '');
-	}, [channel.channel_label, channel.id, clanId, currentClan?.clan_name, userProfile?.user?.username, voice]);
-
-	const currentChannel = useSelector(selectCurrentChannel);
+	
 	const handleVoiceChannel = (id: string) => {
+		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
+		voice.setVoiceOptions((prev) => ({
+			...prev,
+			channelId: id,
+			channelName: voiceChannelName.toLowerCase(),
+			clanId: clanId || '',
+			clanName: currentClan?.clan_name || '',
+			displayName: userProfile?.user?.username || '',
+			voiceStart: true,
+		}));		
+
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
-		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			dispatch(channelsActions.setCurrentChannelId(id));
-		}
-		dispatch(voiceActions.setStatusCall(true));
-		const voiceChannelName = currentClan?.clan_name?.replace(' ', '-') + '-' + channel.channel_label?.replace(' ', '-');
-		voice.createVoiceConnection(voiceChannelName.toLowerCase(), sessionRef.current?.token || '');
+		dispatch(voiceActions.setStatusCall(true));		
 	};
 
 	const handleDeleteChannel = () => {

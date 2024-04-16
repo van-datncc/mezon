@@ -56,6 +56,10 @@ export default function ChannelLayout() {
 	const leaveVoiceChannel = useCallback(() => {
 		stopScreenShare();
 		voice.voiceDisconnect();
+		voice.setVoiceOptions((prev) => ({
+			...prev,
+			voiceStart: true,
+		}));
 		dispatch(voiceActions.setStatusCall(false));
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));
 	}, [voice]);
