@@ -1,7 +1,7 @@
 import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
-import { ChannelType } from 'mezon-js';
+import { ChannelCreatedEvent, ChannelDeletedEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -182,6 +182,15 @@ export const channelsSlice = createSlice({
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMeta[]>) => {
 			state.channelMetadata = channelMetaAdapter.upsertMany(state.channelMetadata, action.payload);
+		},
+		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
+			const payload = action.payload;
+			const channel = mapChannelToEntity({ ...payload, type: payload.channel_type });
+			channelsAdapter.addOne(state, channel);
+		},
+		deleteChannelSocket: (state, action: PayloadAction<ChannelDeletedEvent>) => {
+			const payload = action.payload;
+			channelsAdapter.removeOne(state, payload.channel_id);
 		},
 	},
 	extraReducers: (builder) => {
