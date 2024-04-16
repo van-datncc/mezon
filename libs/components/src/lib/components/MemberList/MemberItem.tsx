@@ -3,9 +3,11 @@ import { ChannelMembersEntity } from '@mezon/store';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
 	user: ChannelMembersEntity;
+	listProfile?: boolean;
+	isOffline?: boolean;
 };
 
-function MemberItem({ user }: MemberItemProps) {
+function MemberItem({ user, listProfile, isOffline }: MemberItemProps) {
 	const userStatus = useMemberStatus(user.user?.id || '');
 	return (
 		<MemberProfile
@@ -16,6 +18,9 @@ function MemberItem({ user }: MemberItemProps) {
 			isHideStatus={true}
 			isHideIconStatus={userStatus ? false : true}
 			textColor="[#AEAEAE]"
+			user = {user}
+			listProfile = {listProfile}
+			isOffline = {isOffline}
 		/>
 	);
 }

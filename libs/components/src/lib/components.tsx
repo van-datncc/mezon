@@ -41,7 +41,7 @@ export { default as SettingAccount } from './components/SettingAccount';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
-
+export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
