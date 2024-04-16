@@ -1,14 +1,4 @@
 import {
-	ChannelMessageEvent,
-	ChannelPresenceEvent,
-	MessageReactionEvent,
-	MessageTypingEvent,
-	Notification,
-	StatusPresenceEvent,
-	VoiceJoinedEvent,
-	VoiceLeavedEvent,
-} from 'mezon-js';
-import {
 	channelMembersActions,
 	channelsActions,
 	friendsActions,
@@ -18,10 +8,21 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
+	referencesActions,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import {
+	ChannelMessageEvent,
+	ChannelPresenceEvent,
+	MessageReactionEvent,
+	MessageTypingEvent,
+	Notification,
+	StatusPresenceEvent,
+	VoiceJoinedEvent,
+	VoiceLeavedEvent,
+} from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -71,6 +72,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
+			dispatch(referencesActions.setIdMessageToJump(message.id));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -102,8 +105,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-	const ondisconnect = useCallback(() => {		
-		reconnect().catch(e => "trying to reconnect");
+	const ondisconnect = useCallback(() => {
+		reconnect().catch((e) => 'trying to reconnect');
 	}, [reconnect]);
 
 	const onerror = useCallback((event: unknown) => {
