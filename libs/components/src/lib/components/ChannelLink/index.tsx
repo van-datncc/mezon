@@ -80,13 +80,15 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	
 	const handleVoiceChannel = (id: string) => {
 		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
-		console.log("set voiceChannelName", voiceChannelName);
-		voice.setVoiceChannelName(voiceChannelName.toLowerCase());
-		voice.setVoiceChannelId(id);
-		voice.setUserDisplayName(userProfile?.user?.username || '');
-		voice.setClanId(clanId || '');
-		voice.setClanName(currentClan?.clan_name || '');
-		voice.setVoiceStart(true);
+		voice.setVoiceOptions((prev) => ({
+			...prev,
+			channelId: id,
+			channelName: voiceChannelName.toLowerCase(),
+			clanId: clanId || '',
+			clanName: currentClan?.clan_name || '',
+			displayName: userProfile?.user?.username || '',
+			voiceStart: true,
+		}));		
 
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
 		dispatch(voiceActions.setStatusCall(true));		
