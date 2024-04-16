@@ -365,3 +365,18 @@ blockquote span {
 		text-decoration: underline;
 	}
 }
+
+// css modal img show
+.modalImage {
+	[role='dialog'] {
+		padding: 0;
+		border-radius: 10px;
+		height: fit-content;
+		width: unset;
+		overflow: hidden;
+	}
+
+	[data-rmiz-ghost] {
+		display: none;
+	}
+}
