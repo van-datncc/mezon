@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StatusBar, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import FirstSheet from '../../components/servers/Servers/FirstSheet';
 import SecondSheet from '../../components/servers/Servers/SecondSheet';
 import ThirdSheet from '../../components/servers/Servers/ThirdSheet';
-
+import { darkColor } from '../../constants/Colors';
+import { useSharedValue } from 'react-native-reanimated';
 const ServersScreen = () => {
     // const signOutWithGoogle = async () => {
     //     try {
@@ -15,12 +16,17 @@ const ServersScreen = () => {
     //         console.error(error);
     //     }
     // };
+    const sheetAnimVal = useSharedValue(0);
+    const activeSheet = useSharedValue(2);
     return (
-        <View style={styles.container}>
-            <FirstSheet />
-            <SecondSheet />
-            <ThirdSheet />
-        </View>
+        <>
+            <StatusBar backgroundColor={darkColor.Border_Focus} />
+            <View style={styles.container}>
+                <FirstSheet />
+                <SecondSheet />
+                <ThirdSheet />
+            </View></>
+
     )
 }
 

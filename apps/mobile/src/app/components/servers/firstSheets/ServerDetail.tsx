@@ -19,6 +19,6 @@ const styles = StyleSheet.create({
         height: "98%",
         alignSelf: "flex-end",
         borderRadius: 8,
-        backgroundColor: darkColor.Backgound_Subtle,
+        backgroundColor: darkColor.Backgound_Disabled,
     }
 })

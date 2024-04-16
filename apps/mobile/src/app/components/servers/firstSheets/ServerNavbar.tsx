@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
         height: 40,
         width: 40,
         borderRadius: 20,
-        marginBottom: 10
+        marginBottom: 10,
+        backgroundColor: darkColor.Content_Tertiary
     },
 })
 

@@ -14,7 +14,6 @@ const SecondSheet = () => {
                         <Feather name="Search" size={20} />
                         <View style={{ marginLeft: 20 }}>
                             <Feather name="User" size={20} />
-
                         </View>
                     </View>
                 </View>
@@ -31,7 +30,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         alignSelf: 'flex-end',
-        backgroundColor: darkColor.Backgound_Brand,
+        backgroundColor: darkColor.Backgound_Primary,
         transform: [{ translateX: width * 80 / 100 }]
     },
     headerContainer: {
