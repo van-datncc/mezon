@@ -142,7 +142,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated) {
-				dispatch(channelsActions.setChannelDataSocket(channelCreated));
+				dispatch(channelsActions.createChannelSocket(channelCreated));
 			}
 		},
 		[dispatch],
@@ -151,7 +151,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchanneldeleted = useCallback(
 		(channelDeleted: ChannelDeletedEvent) => {
 			if (channelDeleted) {
-				dispatch(channelsActions.setChannelDataSocket(channelDeleted));
+				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 			}
 		},
 		[dispatch],

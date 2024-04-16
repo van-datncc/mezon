@@ -183,16 +183,14 @@ export const channelsSlice = createSlice({
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMeta[]>) => {
 			state.channelMetadata = channelMetaAdapter.upsertMany(state.channelMetadata, action.payload);
 		},
-		setChannelDataSocket: (state, action: PayloadAction<ChannelCreatedEvent | ChannelDeletedEvent>) => {
-			if ('creator_id' in action.payload) {
-				const payload = action.payload as ChannelCreatedEvent;
-				const channel = mapChannelToEntity(payload);
-				channelsAdapter.addOne(state, channel);
-			} else if ('deletor' in action.payload) {
-				const payload = action.payload as ChannelDeletedEvent;
-				const channel = mapChannelToEntity(payload);
-				channelsAdapter.removeOne(state, channel.channel_id as string);
-			}
+		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
+			const payload = action.payload;
+			const channel = mapChannelToEntity({ ...payload, type: payload.channel_type });
+			channelsAdapter.addOne(state, channel);
+		},
+		deleteChannelSocket: (state, action: PayloadAction<ChannelDeletedEvent>) => {
+			const payload = action.payload;
+			channelsAdapter.removeOne(state, payload.channel_id);
 		},
 	},
 	extraReducers: (builder) => {

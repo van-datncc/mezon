@@ -1,6 +1,6 @@
 import { useAppNavigation, useClans, useJumpToMessage, useNotification } from '@mezon/core';
 import { INotification, selectChannelById, selectCurrentChannelId, selectMemberClanByUserId } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
@@ -108,7 +108,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				</button>
 				<MessageWithUser
 					message={data as IMessageWithUser}
-					user={user}
+					user={user as IChannelMember}
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					newMessage={messageContent.t}
