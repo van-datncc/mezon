@@ -31,6 +31,7 @@ import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/rolec
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import {dragAndDropReducer} from './dragAndDrop/dragAndDrop.slice'
 
 const persistedReducer = persistReducer(
 	{
@@ -86,6 +87,8 @@ const reducer = {
 	gifs: gifsReducer,
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
+	dragAndDrop: dragAndDropReducer,
+
 };
 
 let storeInstance = configureStore({

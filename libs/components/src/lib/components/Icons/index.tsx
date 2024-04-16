@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 export * from './attachmentThumb';
+export * from './uploadThumbnail';
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (

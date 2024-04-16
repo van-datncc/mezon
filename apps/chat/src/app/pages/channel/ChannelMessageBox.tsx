@@ -1,9 +1,9 @@
-import { MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { FileUploadByDnD, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending } from '@mezon/core';
 import { IMessageSendPayload } from '@mezon/utils';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 export type ChannelMessageBoxProps = {
 	channelId: string;
@@ -35,7 +35,6 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 
 	return (
 		<div className="mx-4 relative">
-			<ReplyMessageBox />
 			<MessageBox
 				listMentions={UserMentionList(channelId)}
 				onSend={handleSend}
