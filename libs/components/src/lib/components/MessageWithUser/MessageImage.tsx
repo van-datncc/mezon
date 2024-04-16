@@ -31,6 +31,11 @@ function MessageImage({ attachmentData }: MessageImage) {
 		setScale(1);
 	}, [openModal]);
 
+	const onDragStart = (e: any) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+
 	return (
 		<>
 			<div className="break-all">
@@ -59,7 +64,7 @@ function MessageImage({ attachmentData }: MessageImage) {
 				style={{ transform: `scale(${scale})`, transition: 'transform 0.5s ease' }}
 			>
 				<ModalBody className="bg-transparent p-0 hide-scrollbar">
-					<div className="flex justify-center items-center hide-scrollbar">
+					<div className="flex justify-center items-center hide-scrollbar" onDragStart={onDragStart}>
 						{attachmentData.url && <img className="max-h-[80vh]" src={attachmentData.url} alt={attachmentData.url} />}
 					</div>
 				</ModalBody>
