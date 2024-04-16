@@ -175,3 +175,12 @@ Using `Prettier` and `ESLint` to format the codebase. The codebase should be for
 -   `camelCase` for the functions and variables
 
 See more about the naming convention [here](https://github.com/airbnb/javascript/tree/master/react#naming)
+
+## 🔔 Coding Rules
+-  Stick with the architecture
+-  Do not cause blocks to other team members
+
+## ⚠ Notice
+-  Identify and clarify to the team what and where you are going to add to the repo
+-  Do self-test for your own codes
+-  Contact **2 team members** to review your changes

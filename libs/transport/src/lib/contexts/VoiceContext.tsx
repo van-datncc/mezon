@@ -471,14 +471,12 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const createVoiceConnection = useCallback(
 		async (vChannelName: string, jwt: string) => {
 			setVoiceChannelName(vChannelName);
-			if (vChannelName && vChannelName !== voiceChannelRef.current?.getName()) {
+			if (vChannelName && vChannelName === voiceChannelRef.current?.getName()) {
+				console.log("connection already establish");				
+				return voiceConnRef.current;				
+			} else {
+				console.log("disconnect old channel", voiceChannelRef.current?.getName());
 				voiceDisconnect(); // reconnect to another channel
-			}
-
-			if (voiceConnRef && voiceConnRef.current) {
-				console.log("connection already establish");
-				onConnectionSuccess();
-				return voiceConnRef.current;
 			}
 
 			const optionsWithRoom = {
