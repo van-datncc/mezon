@@ -1,14 +1,4 @@
 import {
-	ChannelMessageEvent,
-	ChannelPresenceEvent,
-	MessageReactionEvent,
-	MessageTypingEvent,
-	Notification,
-	StatusPresenceEvent,
-	VoiceJoinedEvent,
-	VoiceLeavedEvent,
-} from 'mezon-js';
-import {
 	channelMembersActions,
 	channelsActions,
 	friendsActions,
@@ -18,10 +8,23 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
+	referencesActions,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import {
+	ChannelCreatedEvent,
+	ChannelDeletedEvent,
+	ChannelMessageEvent,
+	ChannelPresenceEvent,
+	MessageReactionEvent,
+	MessageTypingEvent,
+	Notification,
+	StatusPresenceEvent,
+	VoiceJoinedEvent,
+	VoiceLeavedEvent,
+} from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -71,6 +74,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
+			dispatch(referencesActions.setIdMessageToJump(message.id));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -102,8 +107,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch],
 	);
-	const ondisconnect = useCallback(() => {		
-		reconnect().catch(e => "trying to reconnect");
+	const ondisconnect = useCallback(() => {
+		reconnect().catch((e) => 'trying to reconnect');
 	}, [reconnect]);
 
 	const onerror = useCallback((event: unknown) => {
@@ -137,6 +142,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
+	const onchannelcreated = useCallback(
+		(channelCreated: ChannelCreatedEvent) => {
+			if (channelCreated) {
+				dispatch(channelsActions.createChannelSocket(channelCreated));
+			}
+		},
+		[dispatch],
+	);
+
+	const onchanneldeleted = useCallback(
+		(channelDeleted: ChannelDeletedEvent) => {
+			if (channelDeleted) {
+				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
+			}
+		},
+		[dispatch],
+	);
+
 	useEffect(() => {
 		const socket = socketRef.current;
 		if (!socket) {
@@ -163,6 +186,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		socket.onstatuspresence = onstatuspresence;
 
+		socket.onchannelcreated = onchannelcreated;
+
+		socket.onchanneldeleted = onchanneldeleted;
+
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelmessage = () => {};
@@ -187,6 +214,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onvoicejoined,
 		onvoiceleaved,
 		onerror,
+		onchannelcreated,
+		onchanneldeleted,
 	]);
 
 	useEffect(() => {

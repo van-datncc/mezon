@@ -95,3 +95,7 @@ export const notImplementForGifOrStickerSendFromPanel = (data:ApiMessageAttachme
 		return false
 	}
 }
+
+export const getVoiceChannelName = (clanName?: string, channelLabel?: string) => {
+	return clanName?.replace(' ', '-') + '-' + channelLabel?.replace(' ', '-');
+}
