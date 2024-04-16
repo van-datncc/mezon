@@ -9,6 +9,7 @@ export * from './lib/clanMembers/clan.members';
 export * from './lib/clanProfile/clanProfile.slice';
 export * from './lib/clans/clans.slice';
 export * from './lib/direct/direct.slice';
+export * from './lib/dragAndDrop/dragAndDrop.slice';
 export * from './lib/emojiSuggestion/emojiSuggestion.slice';
 export * from './lib/fcm/fcm.slice';
 export * from './lib/friends/friend.slice';
