@@ -1,6 +1,6 @@
 import { useMezon } from '../hooks/useMezon';
 import options from 'libs/transport/src/lib/voice/options/config';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import JitsiConference from 'lib-mezon-meet/dist/esm/JitsiConference';
 import { JitsiConferenceErrors } from 'lib-mezon-meet/dist/esm/JitsiConferenceErrors';
 import JitsiConnection from 'lib-mezon-meet/dist/esm/JitsiConnection';
@@ -28,11 +28,9 @@ export type VoiceContextValue = {
 	setVoiceChannelId: React.Dispatch<React.SetStateAction<string>>;
 	setClanId: React.Dispatch<React.SetStateAction<string>>;
 	setClanName: React.Dispatch<React.SetStateAction<string>>;
+	setVoiceStart: React.Dispatch<React.SetStateAction<boolean>>;
 	changeAudioOutput: (selected: any) => void;
 	createLocalTrack: (devices: string[]) => void;
-	createVoiceConnection: (roomName: string, jwt: string) => Promise<JitsiConnection | null>;
-	createVoiceChannel: () => void;
-	leaveVoiceChannel: () => void;
 	createScreenShare: () => void;
 	stopScreenShare: () => void;
 	voiceDisconnect: () => void;
@@ -52,6 +50,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const [userDisplayName, setUserDisplayName] = React.useState<string>('');
 	const [clanId, setClanId] = React.useState<string>('');
 	const [clanName, setClanName] = React.useState<string>('');
+	const [voiceStart, setVoiceStart] = React.useState<boolean>(false);
 	const [targetTrackNode, setTargetTrackNode] = React.useState<HTMLElement>();
 	const [screenCanvasElement, setScreenCanvasElement] = React.useState<HTMLCanvasElement>();
 	const [screenCanvasCtx, setScreenCanvasCtx] = React.useState<CanvasRenderingContext2D>();
@@ -441,6 +440,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	 */
 	const voiceDisconnect = useCallback(async () => {
 		console.log('disconnect to voice channel', voiceChannelRef.current?.getName());
+		
 		const participantCount = voiceChannelRef.current?.getParticipantCount();
 		const myUserId = voiceChannelRef.current?.myUserId();
 
@@ -466,11 +466,10 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceChannelRef.current = null;
 		voiceConnRef.current = null;
 
-	}, [clanId, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId]);
+	}, [clanId, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef, voiceChannelId]);	
 
 	const createVoiceConnection = useCallback(
 		async (vChannelName: string, jwt: string) => {
-			setVoiceChannelName(vChannelName);
 			if (vChannelName && vChannelName === voiceChannelRef.current?.getName()) {
 				console.log("connection already establish");				
 				return voiceConnRef.current;				
@@ -511,6 +510,15 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		[onConnectionSuccess, onConnectionFailed, onDisconnect, voiceDisconnect, createLocalTrack],
 	);
 
+	useEffect(() => {
+		console.log("voiceStart change", voiceStart);
+		if (voiceChannelName && voiceChannelId && voiceStart) {
+			console.log("create connection with voice channel", voiceChannelId, voiceChannelName);
+			createVoiceConnection(voiceChannelName.toLowerCase(), '');
+		}
+		
+	}, [createVoiceConnection, voiceChannelId, voiceChannelName, voiceStart]);
+
 	/**
 	 *
 	 * @param selected
@@ -533,7 +541,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			setUserDisplayName,
 			setClanId,
 			setClanName,
-			createVoiceConnection,
+			setVoiceStart,
 			createVoiceChannel,
 			leaveVoiceChannel,
 			voiceDisconnect,
@@ -543,7 +551,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			stopScreenShare,
 			attachMedia,
 		}),
-		[createVoiceConnection, createVoiceChannel, leaveVoiceChannel, voiceDisconnect, changeAudioOutput, createLocalTrack, createScreenShare, stopScreenShare, attachMedia],
+		[createVoiceChannel, leaveVoiceChannel, voiceDisconnect, changeAudioOutput, createLocalTrack, createScreenShare, stopScreenShare, attachMedia],
 	);
 
 	return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;
