@@ -1,9 +1,9 @@
 import { EmojiListSuggestion } from '@mezon/components';
-import { useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
+import { useChannels, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { ChannelThreads, IEmoji, IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
 import textFieldEdit from 'text-field-edit';
 
 import { useReference, useThreads } from '@mezon/core';
@@ -36,6 +36,7 @@ export type MentionReactInputProps = {
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
+	const { listChannels } = useChannels();
 	const [valueTextInput, setValueTextInput] = useState('');
 	const dispatch = useAppDispatch();
 	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
@@ -49,7 +50,33 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
+	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
 
+	const regexSyntaxEmoji = /:([^\s:]+)(?=\s|$)/g;
+
+	const searchEmojiByShortcode = (shortcode: string) => {
+		const matchedEmojis: IEmoji[] = [];
+		if (emojis) {
+			for (const [key, emoji] of Object.entries(emojis)) {
+				if (emoji.skins[0]?.shortcodes?.includes(shortcode)) {
+					matchedEmojis.push(emoji);
+				}
+			}
+		}
+		return matchedEmojis;
+	};
+
+	useEffect(() => {
+		const emojiSuggestions = searchEmojiByShortcode(content);
+		if (emojiSuggestions) {
+			setIsEmojiListShowed(true);
+			setSuggestions(emojiSuggestions ?? []);
+		} else {
+			setSuggestions([]);
+		}
+	}, [content]);
+
+	// console.log('SSSSSSS" ', content)
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
 			dispatch(
@@ -195,13 +222,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
 		pressAnyButtonState,
+		emojis
 	} = useEmojiSuggestion();
 
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState } = useReference();
-	
+
 	useEffect(() => {
 		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
 			return focusToElement(editorRef);
@@ -249,9 +277,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setNameThread(nameThread);
 	};
 
+	const listChannelsMention = listChannels.map((item) => {
+		return {
+			id: item.channel_id,
+			display: item.channel_label,
+			avatarUrl: '',
+		}
+	}) as any
+
 	return (
 		<div className="relative">
-			<EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} />
+			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
 			{props.isThread && !currentThread && (
 				<div>
 					<ThreadNameTextField
@@ -288,13 +324,46 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					}}
 					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 						return (
-							<div className="flex flex-row items-center gap-2 ">
+							<div className="flex flex-row items-center gap-2">
 								<img
 									src={(suggestion as any).avatarUrl}
 									alt={suggestion.display}
 									style={{ width: '30px', height: '30px', borderRadius: '50%' }}
 								/>
 								<span>{highlightedDisplay}</span>
+							</div>
+						);
+					}}
+				/>
+				<Mention
+					appendSpaceOnAdd={true}
+					style={mentionStyle}
+					data={listChannelsMention ?? []}
+					trigger="#"
+					displayTransform={(id: any, display: any) => {
+						return `#${display}`;
+					}}
+					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
+						return (
+							<div className="flex flex-row items-center gap-2">
+								<span>#</span>
+								<span>{suggestion.display}</span>
+							</div>
+						);
+					}}
+				/>
+				<Mention
+					appendSpaceOnAdd={true}
+					style={mentionStyle}
+					data={listChannels}
+					trigger={regexSyntaxEmoji}
+					displayTransform={(id: any, display: any) => {
+						return `#${display}`;
+					}}
+					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
+						return (
+							<div className="flex flex-row items-center gap-2">
+								<span>hh</span>
 							</div>
 						);
 					}}
