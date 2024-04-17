@@ -172,7 +172,9 @@ export const RolesClanSlice = createSlice({
 		removeRoleByChannel: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
 			const updatedRoles = Object.values(state.entities).filter((role) => {
-				return role.channel_id !== channelId;
+				if(role.channel_ids){
+					return !role.channel_ids.includes(channelId);
+				}
 			});
 			return RolesClanAdapter.setAll(state, updatedRoles);
 		},
@@ -297,8 +299,8 @@ export const selectRolesClanEntities = createSelector(getRolesClanState, selectE
 
 export const selectRolesByChannelId = (channelId?: string | null) =>
 	createSelector(selectRolesClanEntities, (entities) => {
-		const members = Object.values(entities);
-		return members.filter((role) => role && role.channel_id !== null && role.channel_id === channelId);
+		const roles = Object.values(entities);
+		return roles.filter((role) => role && role.channel_ids && channelId && role.channel_ids.includes(channelId));
 	});
 
 export const selectCurrentRole = createSelector(selectRolesClanEntities, selectCurrentRoleId, (RolesClanEntities, RoleId) =>
