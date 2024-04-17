@@ -2,15 +2,12 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './screens/auth/LoginScreen';
-import RegisterScreen from './screens/auth/RegisterScreen';
-import ServersScreen from './screens/main/ServersScreen';
-import Notifications from './screens/main/Notifications';
-import MessagesScreen from './screens/main/MessagesScreen';
-import SplashScreen from './screens/loading/SplashScreen';
-import BottomNavigator from './bottomNavigator/BottomNavigator';
+import BottomNavigator from './BottomNavigator';
+import SplashScreen from '../screens/loading/SplashScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 const Stack = createStackNavigator()
-const App = () => {
+const Navigation = () => {
 	const [isUser, setIsUser] = useState(false)
 	const [isAppLoading, setIsAppLoading] = useState(false)
 	return (
@@ -35,6 +32,6 @@ const App = () => {
 	)
 }
 
-export default App
+export default Navigation
 
 const styles = StyleSheet.create({})

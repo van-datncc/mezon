@@ -22,9 +22,9 @@ const ServersScreen = () => {
         <>
             <StatusBar backgroundColor={darkColor.Border_Focus} />
             <View style={styles.container}>
-                <FirstSheet />
-                <SecondSheet />
-                <ThirdSheet />
+                <FirstSheet sheetAnimVal={sheetAnimVal} activeSheet={activeSheet} />
+                <ThirdSheet sheetAnimVal={sheetAnimVal} activeSheet={activeSheet} />
+                <SecondSheet sheetAnimVal={sheetAnimVal} activeSheet={activeSheet} />
             </View></>
 
     )

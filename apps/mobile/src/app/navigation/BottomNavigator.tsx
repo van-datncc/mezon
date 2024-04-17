@@ -27,16 +27,19 @@ const BottomNavigator = () => {
             <Tab.Screen
                 name="Servers"
                 component={ServersScreen}
-                options={{
-                    tabBarIcon: ({ color }) => (
-                        <MaterialIcons name="home-work" color={color} size={28} />
-                    ),
-                }}
+                options={
+                    {
+                        headerShown: false,
+                        tabBarIcon: ({ color }) => (
+                            <MaterialIcons name="home-work" color={color} size={28} />
+                        ),
+                    }}
             />
             <Tab.Screen
                 name="Messages"
                 component={MessagesScreen}
                 options={{
+                    headerShown: false,
                     tabBarIcon: ({ color }) => (
                         <Feather name="message-circle" color={color} size={28} />
                     ),
@@ -46,6 +49,7 @@ const BottomNavigator = () => {
                 name="Notification"
                 component={Notifications}
                 options={{
+                    headerShown: false,
                     tabBarIcon: ({ color }) => (
                         <Feather name="bell" color={color} size={28} />
                     ),
@@ -55,6 +59,7 @@ const BottomNavigator = () => {
                 name="Profile"
                 component={ProfileScreen}
                 options={{
+                    headerShown: false,
                     tabBarIcon: ({ color }) => (
                         <Feather name="user" color={color} size={28} />
                     ),

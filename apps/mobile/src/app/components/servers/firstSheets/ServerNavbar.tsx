@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
     commonIconStyle: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: 40,
-        width: 40,
-        borderRadius: 20,
+        height: 50,
+        width: 50,
+        borderRadius: 12,
         marginBottom: 10,
         backgroundColor: darkColor.Content_Tertiary
     },
