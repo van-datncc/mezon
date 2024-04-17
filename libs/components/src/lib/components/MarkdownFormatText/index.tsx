@@ -76,6 +76,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								style={{ borderRadius: '4px', padding: '0 2px' }}
 								className="cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white bg-[#3C4270] hover:bg-[#5865F2]"
 								onClick={() => handMention(tagName)}
+								ref={panelRef}
 							>
 								{tagName}
 							</span>

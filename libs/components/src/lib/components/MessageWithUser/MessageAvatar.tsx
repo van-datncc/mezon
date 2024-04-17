@@ -15,13 +15,6 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 
 	const { messageHour } = useMessageParser(message);
 
-	if ((message.references?.length === 0 && isCombine) || (message.references?.length === 0 && !user)) {
-		return (
-			<div className="w-10 flex items-center justify-center min-w-10">
-				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>
-			</div>
-		);
-	}
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -30,6 +23,13 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+	if ((message.references?.length === 0 && isCombine) || (message.references?.length === 0 && !user)) {
+		return (
+			<div className="w-10 flex items-center justify-center min-w-10">
+				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>
+			</div>
+		);
+	}
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
 			<div className="pt-1">
