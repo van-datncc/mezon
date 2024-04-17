@@ -1,9 +1,9 @@
+import { ShortUserProfile } from '@mezon/components';
+import { useOnClickOutside } from '@mezon/core';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import { useMessageSender } from './useMessageSender';
-import { ShortUserProfile } from '@mezon/components'
-import { useRef, useState } from 'react';
-import { useOnClickOutside } from '@mezon/core';
 type IMessageHeadProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
@@ -20,9 +20,8 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-
 		if (event.button === 0) {
-			setIsShowPanelChannel(true)
+			setIsShowPanelChannel(true);
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
@@ -32,12 +31,11 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 				<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all">{username}</div>
 				<div className=" text-zinc-400 font-['Manrope'] text-[10px] cursor-default">{messageTime}</div>
 			</div>
-			{isShowPanelChannel ?(
-				<div
-					className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-420px] right-[-100px] opacity-100">
-						<ShortUserProfile userID={user?.user?.id|| ''}/>
+			{isShowPanelChannel ? (
+				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-420px] right-[-100px] opacity-100">
+					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
-			):null}
+			) : null}
 		</div>
 	);
 };
