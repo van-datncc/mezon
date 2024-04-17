@@ -433,7 +433,7 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +b.creationTimeMs - +a.creationTimeMs;
+		return +a.creationTimeMs - +b.creationTimeMs;
 	}
 	return 0;
 }
