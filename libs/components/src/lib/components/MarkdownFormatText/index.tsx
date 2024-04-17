@@ -28,10 +28,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 	return (
 		<article
-			className="whitespace-pre-wrap prose prose-pSre:min-w-[500px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px] inline"
-			ref={panelRef}
-			onMouseDown={(event) => handleMouseClick(event)}
-		>
+			className="whitespace-pre-wrap prose prose-pSre:min-w-[500px] prose-sm prose-h1:mb-0 prose-ul:leading-[6px] prose-code:text-[15px] prose-blockquote:leading-[6px] prose-blockquote:mt-3 prose-ol:leading-[6px] prose-p:leading-[20px] prose-li:relative prose-li:bottom-[-5px] inline">
 			{showProfileUser ? (
 				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-500px] right-[200px] opacity-100">
 					<ShortUserProfile userID={userID} />
@@ -71,7 +68,10 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						)}
 						{'  '}
 						{tagName && (
-							<span style={{ color: '#3297ff ' }} className="cursor-pointer whitespace-nowrap" onClick={() => handMention(tagName)}>
+							<span style={{ color: '#3297ff ' }} className="cursor-pointer whitespace-nowrap" onClick={() => handMention(tagName)}
+							ref={panelRef}
+							onMouseDown={(event) => handleMouseClick(event)}
+							>
 								{tagName}
 							</span>
 						)}

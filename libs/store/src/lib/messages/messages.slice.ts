@@ -448,7 +448,7 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.shift();
+		return messages.pop();
 	});
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>

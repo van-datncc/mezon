@@ -6,7 +6,6 @@ import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
-import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
@@ -14,6 +13,7 @@ import { useMessageParser } from './useMessageParser';
 import { useReference } from '@mezon/core';
 import React from 'react';
 import { useSelector } from 'react-redux';
+import MessageContent from './MessageContent';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -63,7 +63,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className="relative">
+			<div className={`relative ${isCombine ? '' : 'mt-2'}`}>
 				<div
 					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
@@ -71,16 +71,16 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						className={`${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
+						className={`flex h-15 flex-col w-auto px-3 py-[2px]  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
-							<div className="flex-col w-full flex justify-center items-start relative ">
+							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} />
-								<div className="justify-start items-center inline-flex w-full textChat">
+								<div className={`justify-start items-center inline-flex w-full h-full ${isCombine ? '' : 'pt-[2px]'} textChat`}>
 									<div
-										className="flex flex-col gap-1 text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text mt-[-1rem]"
+										className="flex flex-col text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />

@@ -1,9 +1,9 @@
+import { ShortUserProfile } from '@mezon/components';
+import { useOnClickOutside } from '@mezon/core';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import { useMessageSender } from './useMessageSender';
-import { ShortUserProfile } from "@mezon/components";
-import { useRef, useState } from 'react';
-import { useOnClickOutside } from '@mezon/core';
 type IMessageAvatarProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
@@ -31,10 +31,9 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 			</div>
 		);
 	}
-
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
-			<div>
+			<div className="pt-1">
 				{hasAvatar ? (
 					<img className="size-10 rounded-full object-cover min-w-10 min-h-[38px] cursor-pointer" src={avatarImg} alt={avatarImg} />
 				) : (
@@ -43,12 +42,11 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 					</div>
 				)}
 			</div>
-			{isShowPanelChannel ?(
-				<div
-					className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-400px] right-[-400px] opacity-100">
-						<ShortUserProfile userID={user?.user?.id|| ''}/>
+			{isShowPanelChannel ? (
+				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-400px] right-[-400px] opacity-100">
+					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
-			):null}
+			) : null}
 		</div>
 	);
 };
