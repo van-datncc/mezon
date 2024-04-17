@@ -80,9 +80,9 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 
 	return (
 		<>
-			{renderVideos()}
-			{renderImages()}
-			{renderDocuments()}
+			{videos.length > 0 && renderVideos()}
+			{images.length > 0 && renderImages()}
+			{documents.length > 0 && renderDocuments()}
 			{newMessage !== '' ? (
 				<div className="flex ">
 					<div id={message.id}>
