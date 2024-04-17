@@ -18,7 +18,7 @@ const PreClass = ({ children }: any) => {
 			<CopyToClipboard text={children.props.children} onCopy={() => setCopied(true)}>
 				<button className="icon copy-icon">{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}</button>
 			</CopyToClipboard>
-			<code>{children}</code>
+			<code className="code">{children}</code>
 		</pre>
 	);
 };
