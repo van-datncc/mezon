@@ -71,14 +71,14 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						className={`${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-1  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[4px]'}`}
+						className={`flex h-15 flex-col w-auto px-3 py-[2px]  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} />
-								<div className={`justify-start items-center inline-flex w-full h-full ${isCombine ? '' : 'pt-1'} textChat`}>
+								<div className={`justify-start items-center inline-flex w-full h-full ${isCombine ? '' : 'pt-[2px]'} textChat`}>
 									<div
 										className="flex flex-col text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
 										style={{ wordBreak: 'break-word' }}
