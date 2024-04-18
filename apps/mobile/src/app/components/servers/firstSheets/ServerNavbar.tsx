@@ -5,10 +5,6 @@ import { darkColor } from '../../../constants/Colors';
 const ServerNavbar = () => {
     return (
         <View style={styles.serverNavbarContainer}>
-            <View style={styles.commonIconStyle}>
-                <Feather name="message-circle" size={18} />
-            </View>
-
             {/* here will be the list of servers */}
 
             <View style={styles.commonIconStyle}>
@@ -21,9 +17,17 @@ const ServerNavbar = () => {
                     color: darkColor.Content_Subtle
                 }}>2nd</Text>
             </View>
+            <View style={styles.commonIconStyle}>
+                <Text style={{
+                    color: darkColor.Content_Subtle
+                }}>3nd</Text>
+            </View>
 
             <View style={styles.commonIconStyle}>
-                <Feather name="plus-circle" size={14} />
+                <Feather name="plus" size={28} style={{ color: darkColor.Foundation_Possitive }} />
+            </View>
+            <View style={styles.commonIconStyle}>
+                <Feather name="git-branch" size={28} style={{ color: darkColor.Foundation_Possitive }} />
             </View>
         </View>
     );
@@ -33,7 +37,7 @@ export default ServerNavbar
 
 const styles = StyleSheet.create({
     serverNavbarContainer: {
-        width: '20%',
+        width: '18%',
         height: '98%',
         alignSelf: "flex-end",
         alignItems: "center"
@@ -43,9 +47,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 50,
         width: 50,
-        borderRadius: 12,
+        borderRadius: 50,
         marginBottom: 10,
-        backgroundColor: darkColor.Content_Tertiary
+        backgroundColor: darkColor.Backgound_Tertiary
     },
 })
 

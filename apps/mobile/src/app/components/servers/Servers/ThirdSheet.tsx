@@ -15,7 +15,6 @@ const ThirdSheet = ({ sheetAnimVal, activeSheet }) => {
             }
         },
         onEnd: (event, ctx) => {
-            console.log(event.translationX);
             if (event.translationX > START_WIDTH / 2) {
                 sheetAnimVal.value = withTiming(1);
                 activeSheet.value = 2;
