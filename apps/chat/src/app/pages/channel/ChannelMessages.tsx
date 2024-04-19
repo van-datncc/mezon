@@ -77,20 +77,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				height: '100%',
 				overflowY: 'scroll',
 				display: 'flex',
-				flexDirection: 'column-reverse',
+				flexDirection: 'column',
 				overflowX: 'hidden',
 			}}
 		>
+			<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
+				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
 				inverse={true}
 				hasMore={hasMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
 				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
-				endMessage={<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
@@ -101,7 +101,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						key={message.id}
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}
-						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
+						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
 						channelId={channelId}
 						channelLabel={channelLabel || ''}
 					/>
