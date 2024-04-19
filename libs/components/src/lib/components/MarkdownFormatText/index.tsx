@@ -68,7 +68,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								}}
 							/>
 						)}
-						{markdown && ''}
+						{markdown && ' '}
 						{tagName && (
 							<span
 								style={{ borderRadius: '4px', padding: '0 2px' }}
