@@ -1458,7 +1458,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 
 export const ArrowDown: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
 				<path
 					id="Vector"

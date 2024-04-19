@@ -42,7 +42,7 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 				)}
 			</div>
 			{isShowPanelChannel ? (
-				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-400px] right-[-400px] opacity-100">
+				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-300px] right-[-375px] opacity-100">
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
 			) : null}
