@@ -28,11 +28,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
-		<article
-			className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-sm prose-blockquote:leading-[6px] prose-blockquote:my-0"
-			ref={panelRef}
-			onMouseDown={(event) => handleMouseClick(event)}
-		>
+		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-sm prose-blockquote:leading-[6px] prose-blockquote:my-0">
 			{showProfileUser ? (
 				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-500px] right-[200px] opacity-100">
 					<ShortUserProfile userID={userID} />
@@ -77,6 +73,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								className="cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white bg-[#3C4270] hover:bg-[#5865F2]"
 								onClick={() => handMention(tagName)}
 								ref={panelRef}
+								onMouseDown={(event) => handleMouseClick(event)}
 							>
 								{tagName}
 							</span>

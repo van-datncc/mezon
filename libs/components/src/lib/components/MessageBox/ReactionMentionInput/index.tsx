@@ -201,6 +201,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		setValueTextInput(newValue);
 		setContent(newPlainTextValue);
+		console.log(newPlainTextValue);
 		if (mentions.length > 0) {
 			for (const mention of mentions) {
 				if (mention.display.startsWith('@')) {
@@ -285,6 +286,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		};
 	}) as any;
 
+	const handleTrigger = (text: string, trigger: string) => {
+		const lastTriggerIndex = text.lastIndexOf(trigger);
+		const textAfterLastTrigger = text.slice(lastTriggerIndex + 1);
+		return textAfterLastTrigger.trim() === '';
+	};
+	let lastTrigger: string = '';
+
 	return (
 		<div className="relative">
 			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
@@ -336,13 +344,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					}}
 				/>
 				<Mention
-					markup="[#__display__]"
+					markup="[__id__]"
 					appendSpaceOnAdd={true}
 					style={mentionStyle}
 					data={listChannelsMention ?? []}
 					trigger="#"
-					displayTransform={(id: any, display: any) => {
-						return `#${id}`;
+					displayTransform={(id: any) => {
+						const item = listChannelsMention.find((item: any) => item.id === id);
+						const mappedDisplay = item ? item.display : ''; 
+						return `#${mappedDisplay}`;
 					}}
 					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 						return (
