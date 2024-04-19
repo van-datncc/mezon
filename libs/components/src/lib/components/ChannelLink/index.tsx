@@ -1,11 +1,10 @@
 import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
-import { channelsActions, selectCurrentChannel, useAppDispatch, voiceActions } from '@mezon/store';
+import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import cls from 'classnames';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
@@ -27,6 +26,7 @@ export type ChannelLinkProps = {
 export type Coords = {
 	mouseX: number;
 	mouseY: number;
+	distanceToBottom: number;
 };
 
 export const classes = {
@@ -51,16 +51,19 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
+		distanceToBottom: 0,
 	});
 
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
+		setIsShowPanelChannel(false);
 	};
 
 	const { toChannelPage } = useAppNavigation();
 
 	const handleCreateLinkInvite = () => {
 		createInviteLink(clanId || '', channel.channel_id || '');
+		setIsShowPanelChannel(false);
 	};
 
 	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');
@@ -68,16 +71,18 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
+		const windowHeight = window.innerHeight;
 
 		if (event.button === 2) {
-			setCoords({ mouseX, mouseY });
+			const distanceToBottom = windowHeight - event.clientY;
+			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 	const dispatch = useAppDispatch();
-	
+
 	const handleVoiceChannel = (id: string) => {
 		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
 		voice.setVoiceOptions((prev) => ({
@@ -88,10 +93,10 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 			clanName: currentClan?.clan_name || '',
 			displayName: userProfile?.user?.username || '',
 			voiceStart: true,
-		}));		
+		}));
 
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
-		dispatch(voiceActions.setStatusCall(true));		
+		dispatch(voiceActions.setStatusCall(true));
 	};
 
 	const handleDeleteChannel = () => {

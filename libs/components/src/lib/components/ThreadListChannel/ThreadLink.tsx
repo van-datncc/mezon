@@ -28,6 +28,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
+		distanceToBottom: 0,
 	});
 
 	const channelPath = toChannelPage(thread.channel_id as string, thread.clan_id || '');
@@ -39,9 +40,11 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const handleMouseClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
+		const windowHeight = window.innerHeight;
 
 		if (event.button === 2) {
-			setCoords({ mouseX, mouseY });
+			const distanceToBottom = windowHeight - event.clientY;
+			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
 	};
