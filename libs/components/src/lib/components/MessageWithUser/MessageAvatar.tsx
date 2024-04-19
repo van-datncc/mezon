@@ -14,15 +14,16 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user);
 
 	const { messageHour } = useMessageParser(message);
-
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+
 		if (event.button === 0) {
-			setIsShowPanelChannel(true);
+			setIsShowPanelChannel(true)
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+
 	if ((message.references?.length === 0 && isCombine) || (message.references?.length === 0 && !user)) {
 		return (
 			<div className="w-10 flex items-center justify-center min-w-10">
