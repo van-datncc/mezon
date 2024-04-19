@@ -181,6 +181,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 
+	const listChannelsMention = listChannels.map((item) => {
+		return {
+			id: item.channel_id,
+			display: item.channel_label,
+			avatarUrl: '',
+		};
+	}) as any;
+
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
 		if (linkGifDirect && linkGifDirect?.length > 0) {
@@ -199,9 +207,32 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
 		}
+
 		setValueTextInput(newValue);
 		setContent(newPlainTextValue);
-		console.log(newPlainTextValue);
+		const regexIdChannel = /#\d{19}\s/g; // Dùng cờ global để lấy tất cả các kết quả khớp
+		let matches = [];
+		let match;
+		while ((match = regexIdChannel.exec(newPlainTextValue)) !== null) {
+			matches.push(match[0]); // Thêm kết quả khớp vào mảng matches
+		}
+		// Ids từ các kết quả khớp trong matches
+		const ids = matches.map((match) => parseInt(match.slice(1), 10));
+
+		const displays = [];
+		for (let i = 0; i < ids.length; i++) {
+			const id = ids[i];
+			console.log(id.toString());
+			console.log(listChannelsMention);
+			const channel = listChannelsMention.find((channel: any) => {
+				console.log(channel.id);
+				console.log(id);
+				return channel.id.toString() === id.toString();
+			});
+			console.log(channel);
+			displays.push(channel ? channel.display : null);
+		}
+
 		if (mentions.length > 0) {
 			for (const mention of mentions) {
 				if (mention.display.startsWith('@')) {
@@ -278,21 +309,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setNameThread(nameThread);
 	};
 
-	const listChannelsMention = listChannels.map((item) => {
-		return {
-			id: item.channel_id,
-			display: item.channel_label,
-			avatarUrl: '',
-		};
-	}) as any;
-
-	const handleTrigger = (text: string, trigger: string) => {
-		const lastTriggerIndex = text.lastIndexOf(trigger);
-		const textAfterLastTrigger = text.slice(lastTriggerIndex + 1);
-		return textAfterLastTrigger.trim() === '';
-	};
-	let lastTrigger: string = '';
-
 	return (
 		<div className="relative">
 			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
@@ -350,9 +366,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					data={listChannelsMention ?? []}
 					trigger="#"
 					displayTransform={(id: any) => {
-						const item = listChannelsMention.find((item: any) => item.id === id);
-						const mappedDisplay = item ? item.display : ''; 
-						return `#${mappedDisplay}`;
+						return `#${id}`;
 					}}
 					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 						return (
