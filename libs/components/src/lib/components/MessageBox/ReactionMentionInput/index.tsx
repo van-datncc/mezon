@@ -1,9 +1,8 @@
-import { EmojiListSuggestion } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { ChannelThreads, IEmoji, IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
+import { IEmoji, IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import textFieldEdit from 'text-field-edit';
 
 import { useReference, useThreads } from '@mezon/core';
@@ -76,7 +75,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [content]);
 
-	// console.log('SSSSSSS" ', content)
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
 			dispatch(
@@ -205,10 +203,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(newPlainTextValue);
 		if (mentions.length > 0) {
 			for (const mention of mentions) {
-				mentionedUsers.push({
-					user_id: mention.id.toString() ?? '',
-					username: mention.display ?? '',
-				});
+				if (mention.display.startsWith('@')) {
+					mentionedUsers.push({
+						user_id: mention.id.toString() ?? '',
+						username: mention.display ?? '',
+					});
+				}
 			}
 			setMentionData(mentionedUsers);
 		}
@@ -222,7 +222,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		textToSearchEmojiSuggestion,
 		setTextToSearchEmojiSuggesion,
 		pressAnyButtonState,
-		emojis
+		emojis,
 	} = useEmojiSuggestion();
 
 	const editorRef = useRef<HTMLInputElement | null>(null);
@@ -282,8 +282,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			id: item.channel_id,
 			display: item.channel_label,
 			avatarUrl: '',
-		}
-	}) as any
+		};
+	}) as any;
 
 	return (
 		<div className="relative">
@@ -336,12 +336,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					}}
 				/>
 				<Mention
+					markup="[#__display__]"
 					appendSpaceOnAdd={true}
 					style={mentionStyle}
 					data={listChannelsMention ?? []}
 					trigger="#"
 					displayTransform={(id: any, display: any) => {
-						return `#${display}`;
+						return `#${id}`;
 					}}
 					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 						return (
