@@ -4,7 +4,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 export const GIFS_FEATURE_KEY = 'gifs';
 
 export interface GifsEntity extends IGif {
-	id:string
+	id: string;
 }
 
 export const gifsAdapter = createEntityAdapter<GifsEntity>();
@@ -13,24 +13,30 @@ export interface GifsState extends EntityState<GifsEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	dataGifsSearch: IGif[];
-	valueInputToCheckHandleSearchState?:string
+	valueInputToCheckHandleSearchState?: string;
 }
 export const initialGifsState: GifsState = {
 	...gifsAdapter.getInitialState(),
 	loadingStatus: 'not loaded',
 	error: null,
 	dataGifsSearch: [],
-	valueInputToCheckHandleSearchState: ''
+	valueInputToCheckHandleSearchState: '',
 };
 
-export const fetchGifsData = createAsyncThunk<any>('gifs/fetchStatus', async (_, thunkAPI) => {
+export const fetchGifCategories = createAsyncThunk<any>('gifs/fetchStatus', async (_, thunkAPI) => {
+	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL ?? '';
+	const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
+	const clientKey = 'mezon-04';
+	const limit = 10;
+	const categoriesUrl = baseUrl + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
+
 	try {
-		const response = await fetch(`${process.env.NX_CHAT_APP_API_GIPHY_TRENDING}?api_key=${process.env.NX_CHAT_APP_API_GIPHY_KEY}&limit=${10}`);
+		const response = await fetch(`${categoriesUrl}`);
 		if (!response.ok) {
 			throw new Error('Failed to fetch gifs data');
 		}
 		const data = await response.json();
-		return data.data;
+		return data.tags;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
 	}
@@ -42,20 +48,20 @@ export const gifsSlice = createSlice({
 	reducers: {
 		add: gifsAdapter.addOne,
 		remove: gifsAdapter.removeOne,
-		setValueInputSearch: (state, action)=>{
-			state.valueInputToCheckHandleSearchState = action.payload
-		}
+		setValueInputSearch: (state, action) => {
+			state.valueInputToCheckHandleSearchState = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchGifsData.pending, (state: GifsState) => {
+			.addCase(fetchGifCategories.pending, (state: GifsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchGifsData.fulfilled, (state: GifsState, action: PayloadAction<GifsEntity[]>) => {
+			.addCase(fetchGifCategories.fulfilled, (state: GifsState, action: PayloadAction<GifsEntity[]>) => {
 				gifsAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
-			.addCase(fetchGifsData.rejected, (state: GifsState, action) => {
+			.addCase(fetchGifCategories.rejected, (state: GifsState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -94,7 +100,7 @@ export const gifsReducer = gifsSlice.reducer;
 
 export const gifsActions = {
 	...gifsSlice.actions,
-	fetchGifsData,
+	fetchGifCategories,
 	fetchGifsDataSearch,
 };
 

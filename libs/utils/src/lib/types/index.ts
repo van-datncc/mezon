@@ -330,14 +330,13 @@ export type SenderInfoOptionals = {
 };
 
 export interface IGif {
-	images: {
-		original: {
-			url: string;
-		};
-		fixed_height: {
-			url: string;
-		};
-	};
+	locale: string;
+	tags: {
+		image: string;
+		name: string;
+		path: string;
+		searchterm: string;
+	}[];
 }
 
 export type MentionDataProps = {

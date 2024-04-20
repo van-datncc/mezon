@@ -1,8 +1,8 @@
 import { useChatSending, useGifs } from '@mezon/core';
 import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { Loading } from 'libs/ui/src/lib/Loading';
-import { useCallback, useEffect, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useState } from 'react';
 
 type ChannelMessageBoxProps = {
 	activeTab: SubPanelName;
@@ -13,7 +13,7 @@ type ChannelMessageBoxProps = {
 	mode: number;
 };
 
-function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
+function TenorGifCategories({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const [data, setData] = useState<any>();
 	const [isError, setIsError] = useState(false);
 
@@ -34,11 +34,12 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	useEffect(() => {
 		if (dataGifsSearch && valueInputToCheckHandleSearch !== '') {
 			setData(dataGifsSearch);
-		} else if(valueInputToCheckHandleSearch === '') {
+		} else if (valueInputToCheckHandleSearch === '') {
 			setData(dataGifs);
 		}
 	}, [dataGifs, dataGifsSearch, valueInputToCheckHandleSearch]);
 
+	console.log(dataGifs);
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -93,4 +94,4 @@ function GiphyComp({ activeTab, channelId, channelLabel, mode }: ChannelMessageB
 	);
 }
 
-export default GiphyComp;
+export default TenorGifCategories;

@@ -1,11 +1,11 @@
 import { useAppParams, useChatReaction, useGifsStickersEmoji } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmojiPickerComp from '../EmojiPicker';
-import GiphyComp from './gifs/GiphyComp';
+import TenorGifCategories from './gifs/TenorGifCategories';
 import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
 
@@ -62,7 +62,7 @@ const GifStickerEmojiPopup = () => {
 			<div className="w-full h-fit">
 				{subPanelActive === SubPanelName.GIFS && (
 					<div>
-						<GiphyComp
+						<TenorGifCategories
 							activeTab={SubPanelName.EMOJI}
 							channelId={currentChannel?.id || ''}
 							channelLabel={currentChannel?.channel_label || ''}
