@@ -208,30 +208,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onTyping();
 		}
 
-		setValueTextInput(newValue);
-		setContent(newPlainTextValue);
-		const regexIdChannel = /#\d{19}\s/g; // Dùng cờ global để lấy tất cả các kết quả khớp
-		let matches = [];
-		let match;
-		while ((match = regexIdChannel.exec(newPlainTextValue)) !== null) {
-			matches.push(match[0]); // Thêm kết quả khớp vào mảng matches
-		}
-		// Ids từ các kết quả khớp trong matches
-		const ids = matches.map((match) => parseInt(match.slice(1), 10));
-
-		const displays = [];
-		for (let i = 0; i < ids.length; i++) {
-			const id = ids[i];
-			console.log(id.toString());
-			console.log(listChannelsMention);
-			const channel = listChannelsMention.find((channel: any) => {
-				console.log(channel.id);
-				console.log(id);
-				return channel.id.toString() === id.toString();
-			});
-			console.log(channel);
-			displays.push(channel ? channel.display : null);
-		}
+		const convertedHashtag = convertToPlainTextHashtag(newValue);
+		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
 			for (const mention of mentions) {
@@ -309,6 +287,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setNameThread(nameThread);
 	};
 
+	const convertToPlainTextHashtag = (text: string) => {
+		const regex = /(@|\#)\[(.*?)\]\((.*?)\)/g;
+		const result = text.replace(regex, (match, symbol, p1, p2) => {
+			return symbol === '#' ? `#${p2}` : `@${p1}`;
+		});
+		return result;
+	};
+
 	return (
 		<div className="relative">
 			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
@@ -360,13 +346,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					}}
 				/>
 				<Mention
-					markup="[__id__]"
+					markup="#[__display__](__id__)"
 					appendSpaceOnAdd={true}
 					style={mentionStyle}
 					data={listChannelsMention ?? []}
 					trigger="#"
-					displayTransform={(id: any) => {
-						return `#${id}`;
+					displayTransform={(id: any, display: any) => {
+						return `#${display}`;
 					}}
 					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 						return (
