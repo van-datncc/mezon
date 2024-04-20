@@ -31,9 +31,9 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	}
 
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
+		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
-				<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all">{username}</div>
+				<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>{username}</div>
 				<div className=" text-zinc-400 font-['Manrope'] text-[10px] cursor-default">{messageTime}</div>
 			</div>
 			{isShowPanelChannel ? (
