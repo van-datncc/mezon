@@ -15,6 +15,7 @@ export interface GifsState extends EntityState<GifCategoriesEntity, string> {
 	dataGifsSearch: IGifCategory[];
 	valueInputToCheckHandleSearchState?: string;
 	dataGifsFeatured: any;
+	trendingClickingStatus: boolean
 }
 export const initialGifsState: GifsState = {
 	...gifsAdapter.getInitialState(),
@@ -23,6 +24,7 @@ export const initialGifsState: GifsState = {
 	dataGifsSearch: [],
 	valueInputToCheckHandleSearchState: '',
 	dataGifsFeatured: [],
+	trendingClickingStatus:false
 };
 
 export const fetchGifCategories = createAsyncThunk<any>('gifs/fetchStatus', async (_, thunkAPI) => {
@@ -59,7 +61,6 @@ export const fetchGifsDataSearch = createAsyncThunk<FetchGifsDataSearchPayload, 
 			throw new Error('Failed to fetch gifs data search');
 		}
 		const data = await response.json();
-		console.log(data);
 		return data;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
@@ -70,7 +71,7 @@ export const fetchGifCategoryFeatured = createAsyncThunk<any>('gifs/fetchDataTre
 	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_FEATURED ?? '';
 	const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
 	const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
-	const limit = 10;
+	const limit = 30;
 	const featuredUrl = baseUrl + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 
 	try {
@@ -79,7 +80,6 @@ export const fetchGifCategoryFeatured = createAsyncThunk<any>('gifs/fetchDataTre
 			throw new Error('Failed to fetch gifs data');
 		}
 		const data = await response.json();
-		console.log('trending', data);
 		return data;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);

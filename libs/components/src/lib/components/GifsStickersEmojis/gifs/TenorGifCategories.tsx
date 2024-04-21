@@ -19,13 +19,23 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
 	const { dataGifCategories, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch, dataGifsFeartured } = useGifs();
 	const [showCategories, setShowCategories] = useState<boolean>(false);
+	const [dataToRenderGifs, setDataToRenderGifs] = useState<any>();
+	const [clickedTrending, setClickedTrending] = useState<boolean>(false);
+
+	const onClickedTrending = () => {
+		setClickedTrending(true);
+		setShowCategories(false);
+		setDataToRenderGifs(dataGifsFeartured);
+	};
+
 	useEffect(() => {
-		if (valueInputToCheckHandleSearch === '' || dataGifsSearch.length === 0) {
-			setShowCategories(true);
-		} else {
+		if (dataGifsSearch.length > 0) {
+			setDataToRenderGifs(dataGifsSearch);
 			setShowCategories(false);
+		} else if (clickedTrending === false && dataGifsSearch.length === 0) {
+			setShowCategories(true);
 		}
-	}, [valueInputToCheckHandleSearch, dataGifsSearch]);
+	}, [dataGifsSearch, clickedTrending]);
 
 	const handleSend = useCallback(
 		(
@@ -50,7 +60,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		return (
 			<>
 				<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
-					<FeaturedGifs channelId={channelId} channelLabel={channelLabel} mode={mode} />
+					<FeaturedGifs onClickToTrending={() => onClickedTrending()} channelId={channelId} channelLabel={channelLabel} mode={mode} />
 
 					{Array.isArray(dataGifCategories) &&
 						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index} />)}
@@ -66,15 +76,16 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		return (
 			<div className="mx-2 flex justify-center h-[400px] overflow-y-scroll hide-scrollbar flex-wrap">
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
-					{dataGifsSearch.map((gif: any, index: number) => (
-						<div
-							key={gif.id}
-							className={`order-${index} overflow-hidden cursor-pointer`}
-							onClick={() => handleClickGif(gif.media_formats.gif.url)}
-						>
-							<img src={gif.media_formats.gif.url} alt={gif.media_formats.gif.url} className="w-full h-auto" />
-						</div>
-					))}
+					{dataToRenderGifs &&
+						dataToRenderGifs.map((gif: any, index: number) => (
+							<div
+								key={gif.id}
+								className={`order-${index} overflow-hidden cursor-pointer`}
+								onClick={() => handleClickGif(gif.media_formats.gif.url)}
+							>
+								<img src={gif.media_formats.gif.url} alt={gif.media_formats.gif.url} className="w-full h-auto" />
+							</div>
+						))}
 				</div>
 			</div>
 		);

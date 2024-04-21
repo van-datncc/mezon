@@ -12,8 +12,9 @@ function GifCategory({ gifCategory }: GifCategoryProps) {
 		fetchGifsDataSearch(gifCategory.searchterm);
 		setValueInputSearch(gifCategory.searchterm);
 	};
+	
 	return (
-		<div className="relative h-24 rounded-md cursor-pointer overflow-hidden group" onClick={clickedCategory}>
+		<div className="relative h-32 rounded-md cursor-pointer overflow-hidden group" onClick={clickedCategory}>
 			<div className="absolute inset-0 bg-black opacity-50 z-20 transition-opacity group-hover:opacity-70"></div>
 			<div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
 				<span className="text-white text-lg font-manrope">{gifCategory.searchterm}</span>
