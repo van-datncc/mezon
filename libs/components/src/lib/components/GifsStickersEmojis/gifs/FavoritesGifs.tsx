@@ -2,7 +2,7 @@ import { useChatSending, useGifs } from '@mezon/core';
 import { IGifCategory, SubPanelName } from '@mezon/utils';
 import GifCategory from './GifCategory';
 
-type FavoritesAndTrendingProps = {
+type FavoritesGifsProps = {
 	activeTab: SubPanelName;
 	channelId: string;
 	channelLabel: string;
@@ -11,9 +11,9 @@ type FavoritesAndTrendingProps = {
 	mode: number;
 };
 
-function FavoritesAndTrending({ channelId, channelLabel, mode }: FavoritesAndTrendingProps) {
+function FavoritesGifs({ channelId, channelLabel, mode }: FavoritesGifsProps) {
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const { dataGifCategories, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch } = useGifs();
+	const { dataGifCategories, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch, dataGifsFeartured } = useGifs();
 	console.log(valueInputToCheckHandleSearch);
 
 	return (
@@ -26,4 +26,4 @@ function FavoritesAndTrending({ channelId, channelLabel, mode }: FavoritesAndTre
 	);
 }
 
-export default FavoritesAndTrending;
+export default FavoritesGifs;

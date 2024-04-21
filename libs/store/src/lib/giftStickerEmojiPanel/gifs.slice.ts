@@ -14,7 +14,7 @@ export interface GifsState extends EntityState<GifCategoriesEntity, string> {
 	error?: string | null;
 	dataGifsSearch: IGifCategory[];
 	valueInputToCheckHandleSearchState?: string;
-	dataGifsTrending: IGifCategory[];
+	dataGifsFeatured: any;
 }
 export const initialGifsState: GifsState = {
 	...gifsAdapter.getInitialState(),
@@ -22,7 +22,7 @@ export const initialGifsState: GifsState = {
 	error: null,
 	dataGifsSearch: [],
 	valueInputToCheckHandleSearchState: '',
-	dataGifsTrending: [],
+	dataGifsFeatured: [],
 };
 
 export const fetchGifCategories = createAsyncThunk<any>('gifs/fetchStatus', async (_, thunkAPI) => {
@@ -66,14 +66,15 @@ export const fetchGifsDataSearch = createAsyncThunk<FetchGifsDataSearchPayload, 
 	}
 });
 
-export const fetchGifCategoryTrending = createAsyncThunk<any>('gifs/fetchDataTrending', async (_, thunkAPI) => {
-	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_TRENDING ?? '';
+export const fetchGifCategoryFeatured = createAsyncThunk<any>('gifs/fetchDataTrending', async (_, thunkAPI) => {
+	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_FEATURED ?? '';
 	const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
 	const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
-	const trendingUrl = baseUrl + apiKey + '&client_key=' + clientKey;
+	const limit = 10;
+	const featuredUrl = baseUrl + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 
 	try {
-		const response = await fetch(`${trendingUrl}`);
+		const response = await fetch(`${featuredUrl}`);
 		if (!response.ok) {
 			throw new Error('Failed to fetch gifs data');
 		}
@@ -121,14 +122,14 @@ export const gifsSlice = createSlice({
 				state.error = action.error.message;
 			});
 		builder
-			.addCase(fetchGifCategoryTrending.pending, (state: GifsState) => {
+			.addCase(fetchGifCategoryFeatured.pending, (state: GifsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchGifCategoryTrending.fulfilled, (state: GifsState, action: PayloadAction<any>) => {
-				state.dataGifsTrending = action.payload.results;
+			.addCase(fetchGifCategoryFeatured.fulfilled, (state: GifsState, action: PayloadAction<any>) => {
+				state.dataGifsFeatured = action.payload.results;
 				state.loadingStatus = 'loaded';
 			})
-			.addCase(fetchGifCategoryTrending.rejected, (state: GifsState, action) => {
+			.addCase(fetchGifCategoryFeatured.rejected, (state: GifsState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -141,7 +142,7 @@ export const gifsActions = {
 	...gifsSlice.actions,
 	fetchGifCategories,
 	fetchGifsDataSearch,
-	fetchGifCategoryTrending,
+	fetchGifCategoryFeatured,
 };
 
 const { selectAll, selectEntities } = gifsAdapter.getSelectors();
@@ -158,4 +159,4 @@ export const selectLoadingStatusGifs = createSelector(getGifsState, (state: Gifs
 
 export const selectValueInputSearch = createSelector(getGifsState, (state: GifsState) => state.valueInputToCheckHandleSearchState);
 
-export const selectDataGifsTrending = createSelector(getGifsState, (state: GifsState) => state.dataGifsTrending);
+export const selectDataGifsFeatured = createSelector(getGifsState, (state: GifsState) => state.dataGifsFeatured);

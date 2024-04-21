@@ -7,7 +7,7 @@ export const mainLoader = async () => {
 	store.dispatch(notificationActions.fetchListNotification());
 	store.dispatch(emojiSuggestionActions.fetchEmoji());
 	store.dispatch(gifsActions.fetchGifCategories());
-	store.dispatch(gifsActions.fetchGifCategoryTrending());
+	store.dispatch(gifsActions.fetchGifCategoryFeatured());
 
 	return null;
 };

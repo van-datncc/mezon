@@ -2,7 +2,7 @@ import { ThunkDispatch } from '@reduxjs/toolkit';
 import {
 	gifsActions,
 	selectAllgifCategory,
-	selectDataGifsTrending,
+	selectDataGifsFeatured,
 	selectGifsDataSearch,
 	selectLoadingStatusGifs,
 	selectValueInputSearch,
@@ -14,7 +14,7 @@ export function useGifs() {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
 	const dataGifCategories = useSelector(selectAllgifCategory)[0];
 	const dataGifsSearch = useSelector(selectGifsDataSearch);
-	const dataGifsTrending = useSelector(selectDataGifsTrending);
+	const dataGifsFeartured = useSelector(selectDataGifsFeatured);
 
 	const loadingStatusGifs = useSelector(selectLoadingStatusGifs);
 
@@ -33,9 +33,10 @@ export function useGifs() {
 		},
 		[dispatch],
 	);
-	const fetchGifsDataTrending = useCallback(() => {
-		dispatch(gifsActions.fetchGifCategoryTrending());
+	const fetchGifsDataFeatured = useCallback(() => {
+		dispatch(gifsActions.fetchGifCategoryFeatured());
 	}, [dispatch]);
+
 	return useMemo(
 		() => ({
 			fetchGifsDataSearch,
@@ -44,7 +45,8 @@ export function useGifs() {
 			loadingStatusGifs,
 			valueInputToCheckHandleSearch,
 			setValueInputSearch,
-			fetchGifsDataTrending,
+			fetchGifsDataFeatured,
+			dataGifsFeartured,
 		}),
 		[
 			dataGifCategories,
@@ -53,7 +55,8 @@ export function useGifs() {
 			loadingStatusGifs,
 			valueInputToCheckHandleSearch,
 			setValueInputSearch,
-			fetchGifsDataTrending,
+			fetchGifsDataFeatured,
+			dataGifsFeartured,
 		],
 	);
 }
