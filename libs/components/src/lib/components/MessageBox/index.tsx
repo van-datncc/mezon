@@ -1,5 +1,5 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useDragAndDrop, useReference } from '@mezon/core';
+import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -171,5 +171,3 @@ MessageBox.Skeleton = () => {
 };
 
 export default MessageBox;
-
-

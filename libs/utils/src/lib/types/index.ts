@@ -329,14 +329,21 @@ export type SenderInfoOptionals = {
 	avatar?: string | undefined;
 };
 
+export interface IGifCategory {
+	image: string;
+	name: string;
+	path: string;
+	searchterm: string;
+}
+
 export interface IGif {
-	locale: string;
-	tags: {
-		image: string;
-		name: string;
-		path: string;
-		searchterm: string;
-	}[];
+	id: string;
+	itemurl: string;
+	media_formats: {
+		gif: {
+			url: string;
+		};
+	};
 }
 
 export type MentionDataProps = {

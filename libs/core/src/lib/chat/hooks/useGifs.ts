@@ -1,7 +1,8 @@
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import {
 	gifsActions,
-	selectAllgifs,
+	selectAllgifCategory,
+	selectDataGifsTrending,
 	selectGifsDataSearch,
 	selectLoadingStatusGifs,
 	selectValueInputSearch,
@@ -11,9 +12,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export function useGifs() {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
-	const dataGifs = useSelector(selectAllgifs);
+	const dataGifCategories = useSelector(selectAllgifCategory)[0];
 	const dataGifsSearch = useSelector(selectGifsDataSearch);
+	const dataGifsTrending = useSelector(selectDataGifsTrending);
+
 	const loadingStatusGifs = useSelector(selectLoadingStatusGifs);
+
 	const valueInputToCheckHandleSearch = useSelector(selectValueInputSearch);
 
 	const fetchGifsDataSearch = useCallback(
@@ -29,16 +33,27 @@ export function useGifs() {
 		},
 		[dispatch],
 	);
-
+	const fetchGifsDataTrending = useCallback(() => {
+		dispatch(gifsActions.fetchGifCategoryTrending());
+	}, [dispatch]);
 	return useMemo(
 		() => ({
 			fetchGifsDataSearch,
-			dataGifs,
+			dataGifCategories,
 			dataGifsSearch,
 			loadingStatusGifs,
 			valueInputToCheckHandleSearch,
 			setValueInputSearch,
+			fetchGifsDataTrending,
 		}),
-		[dataGifs, fetchGifsDataSearch, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch, setValueInputSearch],
+		[
+			dataGifCategories,
+			fetchGifsDataSearch,
+			dataGifsSearch,
+			loadingStatusGifs,
+			valueInputToCheckHandleSearch,
+			setValueInputSearch,
+			fetchGifsDataTrending,
+		],
 	);
 }

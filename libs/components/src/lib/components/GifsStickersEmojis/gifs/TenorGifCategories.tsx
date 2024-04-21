@@ -1,8 +1,9 @@
 import { useChatSending, useGifs } from '@mezon/core';
-import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
+import { IGifCategory, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { Loading } from 'libs/ui/src/lib/Loading';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
+import GifCategory from './GifCategory';
 
 type ChannelMessageBoxProps = {
 	activeTab: SubPanelName;
@@ -13,33 +14,20 @@ type ChannelMessageBoxProps = {
 	mode: number;
 };
 
-function TenorGifCategories({ activeTab, channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const [data, setData] = useState<any>();
-	const [isError, setIsError] = useState(false);
-
-	const [currentPage, setCurrentPage] = useState(1);
-	const [itemsPerPage, setItemsPerPage] = useState(25);
-	const indexOfLastItem = currentPage * itemsPerPage;
-	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const { dataGifs, dataGifsSearch, loadingStatusGifs, setValueInputSearch, valueInputToCheckHandleSearch } = useGifs();
-	const [currentItems, setCurrentItems] = useState<any>();
+	const { dataGifCategories, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch } = useGifs();
+	console.log(valueInputToCheckHandleSearch);
 
+	const [showCategories, setShowCategories] = useState<boolean>(false);
 	useEffect(() => {
-		if (data) {
-			setCurrentItems(data.slice(indexOfFirstItem, indexOfLastItem));
+		if (valueInputToCheckHandleSearch === '' || dataGifsSearch.length === 0) {
+			setShowCategories(true);
+		} else {
+			setShowCategories(false);
 		}
-	}, [data]);
+	}, [valueInputToCheckHandleSearch, dataGifsSearch]);
 
-	useEffect(() => {
-		if (dataGifsSearch && valueInputToCheckHandleSearch !== '') {
-			setData(dataGifsSearch);
-		} else if (valueInputToCheckHandleSearch === '') {
-			setData(dataGifs);
-		}
-	}, [dataGifs, dataGifsSearch, valueInputToCheckHandleSearch]);
-
-	console.log(dataGifs);
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -56,42 +44,40 @@ function TenorGifCategories({ activeTab, channelId, channelLabel, mode }: Channe
 		handleSend({ t: '' }, [], [{ url: giftUrl }], []);
 	};
 
-	const renderGifs = () => {
+	const renderGifCategories = () => {
 		if (loadingStatusGifs === 'loading') {
 			return <Loading />;
 		}
 		return (
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
-				{currentItems &&
-					currentItems.map((gif: any, index: number) => (
-						<div
-							key={gif.id}
-							className={`order-${index} overflow-hidden cursor-pointer`}
-							onClick={() => handleClickGif(gif.images.original.url)}
-						>
-							<img src={gif.images.fixed_height.url} className="w-full h-auto" />
-						</div>
-					))}
+			<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
+				{Array.isArray(dataGifCategories) &&
+					dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index} />)}
 			</div>
 		);
 	};
 
-	const renderError = () => {
-		if (isError) {
-			return (
-				<div className="alert alert-danger alert-dismissible fade show" role="alert">
-					Unable to get Gifs, please try again in a few minutes
-				</div>
-			);
+	const renderGifSearch = () => {
+		if (loadingStatusGifs === 'loading') {
+			return <Loading />;
 		}
+		return (
+			<div className="mx-2 flex justify-center h-[400px] overflow-y-scroll hide-scrollbar flex-wrap">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
+					{dataGifsSearch.map((gif: any, index: number) => (
+						<div
+							key={gif.id}
+							className={`order-${index} overflow-hidden cursor-pointer`}
+							onClick={() => handleClickGif(gif.media_formats.gif.url)}
+						>
+							<img src={gif.media_formats.gif.url} alt={gif.media_formats.gif.url} className="w-full h-auto" />
+						</div>
+					))}
+				</div>
+			</div>
+		);
 	};
 
-	return (
-		<>
-			{renderError()}
-			<div className="mx-2 flex justify-center h-[400px] overflow-y-scroll hide-scrollbar flex-wrap">{renderGifs()}</div>
-		</>
-	);
+	return <>{showCategories ? renderGifCategories() : renderGifSearch()}</>;
 }
 
 export default TenorGifCategories;

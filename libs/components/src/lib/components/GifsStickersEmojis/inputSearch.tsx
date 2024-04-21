@@ -9,7 +9,7 @@ export const InputSearch: React.FC = () => {
 	const { fetchGifsDataSearch } = useGifs();
 	const [valueSearchGif, setValueSearchGif] = useState('');
 	const [valueInput, setValueInput] = useState<string>('');
-	const { setValueInputSearch } = useGifs();
+	const { setValueInputSearch, valueInputToCheckHandleSearch } = useGifs();
 
 	const debouncedSetValueSearchGif = useDebouncedCallback((value) => {
 		setValueSearchGif(value);
@@ -23,8 +23,8 @@ export const InputSearch: React.FC = () => {
 	};
 
 	useEffect(() => {
-			debouncedSetValueSearchGif(valueInput);
-			setValueInputSearch(valueInput);
+		debouncedSetValueSearchGif(valueInput);
+		setValueInputSearch(valueInput);
 	}, [valueInput]);
 
 	useEffect(() => {
@@ -42,6 +42,7 @@ export const InputSearch: React.FC = () => {
 				type="text"
 				placeholder="Search"
 				className="text-[#AEAEAE] font-['Manrope'] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
+				value={valueInputToCheckHandleSearch}
 			/>
 			<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-[#1E1F22] top-1/4 transform -translate-y-1/2 m-2 cursor-pointer">
 				<Icons.Search />
