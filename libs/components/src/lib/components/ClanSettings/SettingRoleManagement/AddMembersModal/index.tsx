@@ -29,7 +29,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 			const filteredMemberIds = membersNotInRoles.filter((member) => addUsers.includes(member.id)).map((member) => member.id);
 			setSelectedUsers(filteredMemberIds);
 		}
-	}, [isOpen, memberRoles]);;
+	}, [isOpen, memberRoles]);
 
 	const [searchResults, setSearchResults] = useState<any[]>([]);
 

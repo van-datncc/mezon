@@ -46,7 +46,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 					{Array.isArray(dmGroup.channel_avatar) && dmGroup.channel_avatar.length > 1 ? (
 						<img src={`/assets/images/avatar-group.png`} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
 					) : (
-						<img src={dmGroup.channel_avatar} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
+						<img src={dmGroup.channel_avatar?.at(0)} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
 					)}
 					<p style={{ marginRight: 'auto' }} className="pl-[10px]">
 						{dmGroup.channel_label}

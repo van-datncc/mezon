@@ -1,5 +1,5 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
-import { useAuth, useClans, useDragAndDrop } from '@mezon/core';
+import { useAuth, useClans, useDragAndDrop, useMenu } from '@mezon/core';
 import {
 	channelsActions,
 	selectCurrentChannel,
@@ -36,6 +36,7 @@ export default function ChannelLayout() {
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const { sessionRef } = useMezon();
+	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
 
 	useChannelSeen(currentChannel?.id || '');
 	const dispatch = useAppDispatch();
@@ -120,7 +121,7 @@ export default function ChannelLayout() {
 				onDragLeave={handleDragLeave}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
-					<div className="flex flex-col flex-1 w-full h-full">
+					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
 						<div
 							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 							ref={messagesContainerRef}
@@ -169,7 +170,7 @@ export default function ChannelLayout() {
 					</div>
 					{isShow && (
 						<div
-							className={`w-[245px] bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'}`}
+							className={` bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
 							id="memberList"
 						>
 							<MemberList />

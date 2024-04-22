@@ -1,12 +1,15 @@
 import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
-import { ChannelType } from 'mezon-js';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
+import { useSelector } from 'react-redux';
+import { getIsShowPopupForward } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import ForwardMessageModal from '../ForwardMessage';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -62,13 +65,14 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
-
+	const isChange = useSelector(getIsShowPopupForward);
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
 			className="overflow-y-scroll scrollbar-thin w-[100%] h-[100%] pb-[12%] "
 			id="channelList"
 		>
+			{isChange?<ForwardMessageModal open={isChange}/>:null}
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />
@@ -86,7 +90,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 									onClick={() => {
 										handleToggleCategory(category);
 									}}
-									className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
+									className="text-[#AEAEAE] flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
 								>
 									{!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
 									{category.category_name}
@@ -104,7 +108,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 							</div>
 						)}
 						{!categoriesState[category.id] && (
-							<div className="mt-[5px] space-y-0.5 font-['Manrope'] text-[#AEAEAE]">
+							<div className="mt-[5px] space-y-0.5 text-[#AEAEAE]">
 								{category?.channels
 									?.filter((channel: IChannel) => {
 										const categoryIsOpen = !categoriesState[category.id];

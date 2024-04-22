@@ -63,7 +63,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className={`relative ${isCombine ? '' : 'mt-2'}`}>
+			<div className={`relative ${isCombine ? '' : 'mt-3'}`}>
 				<div
 					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
@@ -80,7 +80,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<MessageHead message={message} user={user} isCombine={isCombine} />
 								<div className={`justify-start items-center inline-flex w-full h-full ${isCombine ? '' : 'pt-[2px]'} textChat`}>
 									<div
-										className="flex flex-col text-[#CCCCCC] font-['Manrope'] whitespace-pre-wrap text-[15px] w-fit cursor-text"
+										className="flex flex-col text-[#CCCCCC] whitespace-pre-wrap text-[15px] w-fit cursor-text"
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />

@@ -24,7 +24,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						avatar={
 							Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1
 								? '/assets/images/avatar-group.png'
-								: currentDmGroup?.channel_avatar ?? ''
+								: currentDmGroup?.channel_avatar?.at(0) ?? ''
 						}
 						name={''}
 						status={userStatus}
@@ -32,7 +32,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						isHideIconStatus={false}
 						key={currentDmGroup?.channel_id}
 					/>
-					<h2 className="font-[Manrope] shrink-1 text-white text-ellipsis">{currentDmGroup?.channel_label}</h2>
+					<h2 className="shrink-1 text-white text-ellipsis">{currentDmGroup?.channel_label}</h2>
 				</div>
 
 				<div className=" items-center h-full ml-auto flex flex-1 justify-end">

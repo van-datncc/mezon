@@ -1,8 +1,9 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useReference } from '@mezon/core';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useEscapeKey, useReference } from '@mezon/core';
 import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 
@@ -93,6 +94,9 @@ export function ChannelMessage(props: MessageProps) {
 			textareaRef.current.setSelectionRange(length, length);
 		}
 	};
+
+	useEscapeKey(handleCancelEdit);
+
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser
@@ -225,7 +229,10 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 	const handleClickDelete = () => {
 		deleteSendMessage(message.id);
 	};
-
+	const handleClickForward =()=> {
+		dispatch(toggleIsShowPopupForwardTrue());
+		dispatch(setSelectedMessage(message))
+	}
 	const checkUser = userId === message.sender_id;
 	return (
 		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
@@ -237,6 +244,10 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 				)}
 				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply}>
 					Reply
+				</li>
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" 
+					onClick={()=>{handleClickForward()}}>
+					Forward message
 				</li>
 				<CopyToClipboard text={message.content.t || ''}>
 					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy}>

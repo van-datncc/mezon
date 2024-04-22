@@ -35,13 +35,22 @@ function MemberProfile({
 	isHideAnimation,
 }: MemberProfileProps) {
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const [positionTop, setPositionTop] = useState(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === 0) {
 			setIsShowPanelChannel(true);
+			const clickY = event.clientY;
+			const windowHeight = window.innerHeight;
+			const distanceToBottom = windowHeight - clickY;
+			const heightElementShortUserProfileMin = 313;
+			if (distanceToBottom < heightElementShortUserProfileMin) {
+				setPositionTop(true);
+			}
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
 			<div
@@ -87,7 +96,9 @@ function MemberProfile({
 				</div>
 			</div>
 			{isShowPanelChannel && listProfile ? (
-				<div className="bg-black mt-[10px]  rounded-lg flex flex-col z-10 absolute top-0 right-[180px] opacity-100">
+				<div
+					className={`bg-black mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile ${positionTop ? 'fixed bottom-[15px] right-[196px]' : 'absolute top-0 right-[180px]'}`}
+				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
 			) : null}

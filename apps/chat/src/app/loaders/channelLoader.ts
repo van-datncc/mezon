@@ -1,5 +1,5 @@
 import { setJumpToMessageId } from '@mezon/core';
-import { channelsActions, getStoreAsync, messagesActions } from '@mezon/store';
+import { channelsActions, directActions, friendsActions, getStoreAsync, messagesActions } from '@mezon/store';
 import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
 
 export const channelLoader: LoaderFunction = async ({ params, request }) => {	
@@ -17,6 +17,7 @@ export const channelLoader: LoaderFunction = async ({ params, request }) => {
 	
 	store.dispatch(messagesActions.jumpToMessage({ messageId: messageId || '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId || '', channelId: channelId, noFetchMembers: false }));
+	store.dispatch(directActions.fetchDirectMessage({}));
 	return null;
 };
 

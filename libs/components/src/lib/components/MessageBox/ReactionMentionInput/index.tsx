@@ -1,5 +1,5 @@
 import { EmojiListSuggestion } from '@mezon/components';
-import { useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { useChatMessages, useClickUpToEdit, useEmojiSuggestion, useGifsStickersEmoji, useMenu } from '@mezon/core';
 import {
 	IMessageSendPayload,
 	KEY_KEYBOARD,
@@ -58,6 +58,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
+	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -210,8 +211,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState, openEditMessageState } = useReference();
-
+	const { closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
+		if (closeMenu && statusMenu) {
+			return;
+		}
 		if (subPanelActive !== SubPanelName.NONE || (referenceMessage !== null && openReplyMessageState) || !openEditMessageState) {
 			return focusToElement(editorRef);
 		}
@@ -257,6 +261,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleChangeNameThread = (nameThread: string) => {
 		setNameThread(nameThread);
 	};
+
+	const clickUpToEditMessage = () => {
+		const idRefMessage = lastMessageByUserId?.id;
+		if (idRefMessage) {
+			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			dispatch(referencesActions.setOpenEditMessageState(true));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
+			dispatch(referencesActions.setReferenceMessage(lastMessageByUserId));
+		}
+	};
+
+	useClickUpToEdit(editorRef, clickUpToEditMessage);
 
 	return (
 		<div className="relative">
