@@ -1,9 +1,9 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
 import { useAppNavigation, useFriends } from '@mezon/core';
-import { gifsStickerEmojiActions, reactionActions, referencesActions, selectAllClans, selectCurrentClan } from '@mezon/store';
+import { appActions, gifsStickerEmojiActions, reactionActions, referencesActions, selectAllClans, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -33,6 +33,22 @@ function MyApp() {
 		dispatch(referencesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 	};
+
+	useEffect(() => {
+		const handleResize = () => {
+			if (window.innerWidth < 480) {
+				dispatch(appActions.setCloseMenu(true));
+			} else {
+				dispatch(appActions.setCloseMenu(false));
+			}
+		};
+
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
 
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
