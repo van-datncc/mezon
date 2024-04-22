@@ -4,10 +4,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import { View } from 'react-native';
-import ServersScreen from '../screens/main/ServersScreen';
+import ServersScreen from '../screens/main/ClanScreen';
 import MessagesScreen from '../screens/main/MessagesScreen';
 import Notifications from '../screens/main/Notifications';
 import ProfileScreen from '../screens/main/ProfileScreen';
+import { darkColor } from '../constants/Colors';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,15 +16,17 @@ const BottomNavigator = () => {
 
     return (
         <Tab.Navigator
-            tabBarOptions={{
-                style: {
+            screenOptions={{
+                tabBarStyle: {
                     height: 55,
                     borderTopWidth: 0,
                     elevation: 0,
+                    backgroundColor: darkColor.Backgound_Tertiary
                 },
-                showLabel: false,
-                // activeTintColor: Colors.DEFAULT_GREEN,
-            }}>
+                tabBarActiveTintColor: "#FFFFFF"
+            }}
+
+        >
             <Tab.Screen
                 name="Servers"
                 component={ServersScreen}

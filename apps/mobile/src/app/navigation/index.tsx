@@ -6,6 +6,9 @@ import BottomNavigator from './BottomNavigator';
 import SplashScreen from '../screens/loading/SplashScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
+import DrawerNavigator from './DrawerNavigator';
+import MessagesScreen from '../screens/main/MessagesScreen';
+import ProfileScreen from '../screens/main/ProfileScreen';
 const Stack = createStackNavigator()
 const Navigation = () => {
 	const [isUser, setIsUser] = useState(false)
@@ -21,7 +24,10 @@ const Navigation = () => {
 						<Stack.Screen name="Register" component={RegisterScreen} /></>
 				) : (
 					<>
-						<Stack.Screen name="Servers" component={BottomNavigator} options={{ gestureEnabled: false }} />
+						<Stack.Screen name="bottom" component={BottomNavigator} options={{ gestureEnabled: false }} />
+						<Stack.Screen name="Servers" component={DrawerNavigator} options={{ gestureEnabled: false }} />
+						<Stack.Screen name="Profile" component={ProfileScreen} options={{ gestureEnabled: false }} />
+
 					</>
 				)}
 
