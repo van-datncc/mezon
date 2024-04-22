@@ -1,6 +1,5 @@
-import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useGifsStickersEmoji, useJumpToMessage, useReference } from '@mezon/core';
-import { SubPanelName } from '@mezon/utils';
+import { ChatWelcome } from '@mezon/components';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
@@ -18,10 +17,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
-	const [heightEditor, setHeightEditor] = useState(30);
 
 	const { idMessageReplied } = useReference();
-	const { subPanelActive } = useGifsStickersEmoji();
 
 	const fetchData = () => {
 		loadMoreMessage();
@@ -57,12 +54,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			}
 		};
 	}, [messageid, jumpToMessage]);
-
-	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
-
-	useEffect(() => {
-		setPopupClass(`fixed right-[1rem] bottom-[${heightEditor + 20}px] z-10`);
-	}, [heightEditor]);
 
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
@@ -107,16 +98,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					/>
 				))}
 			</InfiniteScroll>
-			{subPanelActive !== SubPanelName.NONE && (
-				<div
-					className={popupClass}
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-				>
-					<GifStickerEmojiPopup />
-				</div>
-			)}
 		</div>
 	);
 }

@@ -6,6 +6,9 @@ import * as Icons from '../Icons';
 import { IconFriends } from '../Icons';
 import DMListItem from './DMListItem';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
+import ForwardMessageModal from '../ForwardMessage';
+import { useSelector } from 'react-redux';
+import { getIsShowPopupForward } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -28,7 +31,7 @@ function DirectMessageList() {
 		setIsOpen(!isOpen);
 	};
 	const navigate = useNavigate();
-
+	const isChange = useSelector(getIsShowPopupForward);
 
 	return (
 		<>
@@ -59,6 +62,7 @@ function DirectMessageList() {
 					</button>
 				</div>
 			</div>
+			{isChange?<ForwardMessageModal open={isChange}/>:null}
 			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any, index: number) => {

@@ -1,5 +1,6 @@
-import { useChannels, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
 import { IEmoji, IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
+import { EmojiListSuggestion } from '@mezon/components';
+import { useChatMessages, useClickUpToEdit, useEmojiSuggestion, useGifsStickersEmoji, useMenu } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -74,6 +75,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setSuggestions([]);
 		}
 	}, [content]);
+	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -240,7 +242,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState } = useReference();
 
+	const { closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
+		if (closeMenu && statusMenu) {
+			return;
+		}
 		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
 			return focusToElement(editorRef);
 		}
@@ -294,6 +300,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		});
 		return result;
 	};
+
+	const clickUpToEditMessage = () => {
+		const idRefMessage = lastMessageByUserId?.id;
+		if (idRefMessage) {
+			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			dispatch(referencesActions.setOpenEditMessageState(true));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
+			dispatch(referencesActions.setReferenceMessage(lastMessageByUserId));
+		}
+	};
+
+	useClickUpToEdit(editorRef, clickUpToEditMessage);
 
 	return (
 		<div className="relative">

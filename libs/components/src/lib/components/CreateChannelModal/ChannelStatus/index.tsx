@@ -37,7 +37,7 @@ export const ChannelStatusModal: React.FC<ChannelStatusModalProps> = ({ channelN
 					/>
 				</div>
 			</div>
-			<div className="OnlySelectedMembersAndRolesWillBeAbleToViewThisChannel self-stretch text-zinc-400 text-xs font-normal font-['Manrope'] leading-[18.20px]">
+			<div className="OnlySelectedMembersAndRolesWillBeAbleToViewThisChannel self-stretch text-zinc-400 text-xs font-normal leading-[18.20px]">
 				Only selected members and roles will be able to view this channel.
 			</div>
 		</div>

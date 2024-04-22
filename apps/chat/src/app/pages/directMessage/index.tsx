@@ -1,5 +1,5 @@
-import { DirectMessageList, FooterProfile, ClanHeader } from '@mezon/components';
-import { useAuth } from '@mezon/core';
+import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
+import { useAuth, useMenu } from '@mezon/core';
 import { useState } from 'react';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
@@ -7,13 +7,14 @@ import { MainContentDirect } from './MainContentDirect';
 export default function Direct() {
 	const { userProfile } = useAuth();
 	const [openSetting, setOpenSetting] = useState(false);
+	const { statusMenu, closeMenu } = useMenu();
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
 
 	return (
 		<>
-			<div className=" flex-col w-[272px] bg-bgSurface relative">
+			<div className={`flex-col w-[272px] bg-bgSurface relative ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
 				<FooterProfile

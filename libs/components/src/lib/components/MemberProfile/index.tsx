@@ -36,33 +36,25 @@ function MemberProfile({
 }: MemberProfileProps) {
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionTop, setPositionTop] = useState(false);
-	const [differenceHeight, setDifferenceHeight] = useState(0);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === 0) {
 			setIsShowPanelChannel(true);
-		}
-	};
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
-	const handlePositionPopup = (e: any) => {
-		const clickY = e.clientY;
-		const windowHeight = window.innerHeight;
-		const distanceToBottom = windowHeight - clickY;
-		const element = document.querySelector('.shortUserProfile');
-		if (element && element.classList.contains('shortUserProfile')) {
-			const height = (element as HTMLElement).offsetHeight;
-			if (distanceToBottom < height) {
+			const clickY = event.clientY;
+			const windowHeight = window.innerHeight;
+			const distanceToBottom = windowHeight - clickY;
+			const heightElementShortUserProfileMin = 313;
+			if (distanceToBottom < heightElementShortUserProfileMin) {
 				setPositionTop(true);
 			}
 		}
 	};
+	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
 			<div
 				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
-				onClick={handlePositionPopup}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-10 h-10 text-lg text-white rounded-full">
 					{avatar ? (
@@ -105,7 +97,7 @@ function MemberProfile({
 			</div>
 			{isShowPanelChannel && listProfile ? (
 				<div
-					className={`bg-black mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile ${positionTop ? 'fixed bottom-0 right-[198px]' : 'absolute top-0 right-[180px]'}`}
+					className={`bg-black mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile ${positionTop ? 'fixed bottom-[15px] right-[196px]' : 'absolute top-0 right-[180px]'}`}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

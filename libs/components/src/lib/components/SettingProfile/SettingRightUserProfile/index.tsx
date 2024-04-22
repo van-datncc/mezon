@@ -85,16 +85,16 @@ const SettingRightUser = ({
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="text-white">
-				<h1 className="text-xl font-bold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 font-bold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
-				<button className="pt-1 text-[#AEAEAE] text-base ml-[16px] font-bold tracking-wider" onClick={handleClanProfileButtonClick}>
+				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
+				<button className="pt-1 font-semibold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
+				<button className="pt-1 text-[#AEAEAE] text-base ml-[16px] font-semibold tracking-wider" onClick={handleClanProfileButtonClick}>
 					Clan Profiles
 				</button>
 			</div>
 			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 flex-row">
 				<div className="w-1/2 text-[#CCCCCC]">
 					<div className="mt-[20px]">
-						<label className="font-bold tracking-wide text-sm">DISPLAY NAME</label>
+						<label className="font-semibold tracking-wide text-sm">DISPLAY NAME</label>
 						<br />
 						<InputField
 							onChange={handleDisplayName}
@@ -105,11 +105,11 @@ const SettingRightUser = ({
 						/>
 					</div>
 					<div className="mt-8">
-						<p className="font-bold tracking-wide text-sm">AVATAR</p>
+						<p className="font-semibold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
-									className="text-white bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px] hover:font-bold"
+									className="text-white font-semibold bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px]"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -117,7 +117,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px] hover:font-bold"
+								className="text-white bg-[#1E1E1E] font-semibold rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px]"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -126,7 +126,7 @@ const SettingRightUser = ({
 					</div>
 				</div>
 				<div className="w-1/2 text-white">
-					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
+					<p className="mt-[20px] text-[#CCCCCC] font-semibold tracking-wide text-sm">PREVIEW</p>
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
 			</div>
@@ -167,7 +167,7 @@ const SettingRightUser = ({
 							src="/assets/images/file-and-folder.png"
 							alt="file"
 						/>
-						<h3 className="text-white text-4xl font-bold">Your files are too powerful</h3>
+						<h3 className="text-white text-4xl font-semibold">Your files are too powerful</h3>
 						<h4 className="text-white text-xl">Max file size is 1MB, please!</h4>
 					</div>
 				</Modal.Body>

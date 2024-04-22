@@ -1,10 +1,10 @@
 import { useAppNavigation, useFriends } from '@mezon/core';
 import { IFriend, directActions, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 interface ModalCreateDMProps {
 	onClose: () => void;
 	isOpen: boolean;
@@ -68,7 +68,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	};
 
 	return (
-		<div className="overflow-y-scroll  flex-1 pt-3 space-y-[21px] h-32 flex flex-row justify-center text-gray-300 scrollbar-hide font-bold font-['Manrope']">
+		<div className="overflow-y-scroll  flex-1 pt-3 space-y-[21px] h-32 flex flex-row justify-center text-gray-300 scrollbar-hide font-bold">
 			<div className="flex flex-row items-center w-full gap-4 h-fit ">
 				<Modal title="Create DM" showModal={isOpen} onClose={resetAndCloseModal}>
 					<div className="bg-transparent w-full h-full">
