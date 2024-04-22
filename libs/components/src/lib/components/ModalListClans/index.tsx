@@ -1,3 +1,4 @@
+import { useEscapeKey } from '@mezon/core';
 import { IClan } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { Tick } from '../Icons';
@@ -41,6 +42,8 @@ const ModalListClans = (props: ModalListClansProps) => {
 			options.unshift(activeClan);
 		}
 	}, [idSelectedClan]);
+
+	useEscapeKey(onClose);
 
 	// TODO: using modal component
 	if (!showModal) return null;

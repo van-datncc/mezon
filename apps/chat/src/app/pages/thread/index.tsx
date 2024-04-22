@@ -1,9 +1,11 @@
 import { ThreadHeader } from '@mezon/components';
-import { useThreads } from '@mezon/core';
+import { useEscapeKey, useThreads } from '@mezon/core';
 import ThreadBox from './ThreadBox';
 
 const ThreadsMain = () => {
 	const { currentThread, setIsShowCreateThread } = useThreads();
+
+	useEscapeKey(() => setIsShowCreateThread(false));
 
 	return (
 		<div className="flex flex-col h-full">
