@@ -98,17 +98,19 @@ export default function ChannelLayout() {
 		setDraggingState(true);
 	};
 
-	const handleDragOver = (e: DragEvent<HTMLElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDraggingState(true);
-	};
+	// const handleDragOver = (e: DragEvent<HTMLElement>) => {
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// };
 
 	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
+		// setDraggingState(false);
+
 	};
 
+	console.log('draggingState-channelMEs', draggingState);
 	return (
 		<>
 			{draggingState && <FileUploadByDnD />}
@@ -116,7 +118,7 @@ export default function ChannelLayout() {
 				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden"
 				id="mainChat"
 				onDragEnter={handleDragEnter}
-				onDragOver={handleDragOver}
+				// onDragOver={handleDragOver}
 				onDragLeave={handleDragLeave}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">

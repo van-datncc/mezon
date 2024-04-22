@@ -3,7 +3,7 @@ import { selectCurrentChannelId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { DragEvent } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../components';
+import DragAndDropUI from './DragAndDropUI';
 
 function FileUploadByDnD() {
 	const { draggingState, setDraggingState } = useDragAndDrop();
@@ -16,12 +16,15 @@ function FileUploadByDnD() {
 		e.preventDefault();
 		e.stopPropagation();
 		setDraggingState(true);
+
 	};
 
-	const handleDragOver = (e: DragEvent<HTMLElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-	};
+	// const handleDragOver = (e: DragEvent<HTMLElement>) => {
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	// setDraggingState(true);
+
+	// };
 
 	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -50,16 +53,11 @@ function FileUploadByDnD() {
 	};
 
 	return (
-		<div
-			id="form-file-upload"
-			onDragEnter={handleDragEnter}
-			onDragOver={handleDragOver}
-			onDragLeave={handleDragLeave}
-			onDrop={handleDrop}
-			className="w-screen h-screen flex justify-center items-center bg-black bg-opacity-90 absolute top-0 left-0 z-50"
-		>
-			<Icons.WaitingUpload />
-		</div>
+		<>
+			<DragAndDropUI onDragEnter={handleDragEnter}
+			//  onDragOver={handleDragOver} 
+			 onDragLeave={handleDragLeave} onDrop={handleDrop} />
+		</>
 	);
 }
 
