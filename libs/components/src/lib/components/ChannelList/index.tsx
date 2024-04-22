@@ -1,7 +1,7 @@
 import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
-import { ChannelType } from 'mezon-js';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../Icons';
@@ -86,7 +86,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 									onClick={() => {
 										handleToggleCategory(category);
 									}}
-									className="font-['Manrope'] text-[#AEAEAE] font-bold flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
+									className="text-[#AEAEAE] flex items-center px-0.5 w-full font-title tracking-wide hover:text-gray-100 uppercase text-[15px]"
 								>
 									{!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
 									{category.category_name}
@@ -104,7 +104,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 							</div>
 						)}
 						{!categoriesState[category.id] && (
-							<div className="mt-[5px] space-y-0.5 font-['Manrope'] text-[#AEAEAE]">
+							<div className="mt-[5px] space-y-0.5 text-[#AEAEAE]">
 								{category?.channels
 									?.filter((channel: IChannel) => {
 										const categoryIsOpen = !categoriesState[category.id];

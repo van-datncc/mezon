@@ -122,7 +122,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					<p
 						className={cls({
 							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
-							'font-bold text-white': active || isUnReadChannel,
+							'font-medium text-white': active || isUnReadChannel,
 						})}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
@@ -147,8 +147,8 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						</div>
 						<p
 							className={cls({
-								'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
-								'font-bold text-white': active || isUnReadChannel,
+								'ml-2 font-medium text-[#AEAEAE] w-full group-hover:text-white text-[15px] focus:bg-[#36373D]': true,
+								'font-medium text-white': active || isUnReadChannel,
 							})}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>

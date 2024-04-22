@@ -48,10 +48,14 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	return (
 		<div className="relative group" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
 			<div className="flex-row items-center w-full gap-4 flex">
-				<div className="font-['Manrope'] text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all username">
+				<div
+					className="text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all username"
+					ref={panelRef}
+					onMouseDown={(event) => handleMouseClick(event)}
+				>
 					{username}
 				</div>
-				<div className=" text-zinc-400 font-['Manrope'] text-[10px] cursor-default">{messageTime}</div>
+				<div className=" text-zinc-400 text-[10px] cursor-default">{messageTime}</div>
 			</div>
 			{isShowPanelChannel ? (
 				<div
