@@ -2,7 +2,7 @@ import { Icons } from '../../components';
 
 function DocumentThumbnail() {
 	return (
-		<div className="flex flex-row justify-center z-0">
+		<div className="flex flex-row justify-center">
 			<div className="-rotate-45 -mr-12">
 				<Icons.TxtThumbnail defaultFill="#C9CEF9" defaultSize="w-28 h-28" />
 			</div>

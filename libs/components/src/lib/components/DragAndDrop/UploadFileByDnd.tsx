@@ -16,47 +16,23 @@ function FileUploadByDnD() {
 		e.preventDefault();
 		e.stopPropagation();
 		setDraggingState(true);
-		// if (draggingState === true) {
-		// 	return setDraggingState(true);
-		// } else {
-		// 	setDraggingState(false);
-		// }
-
 	};
 
 	const handleDragOver = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		// setDraggingState(true);
-		console.log('handleDragOver', draggingState);
-	};
-
-	const handleDragOverChilDiv = (e: DragEvent<HTMLElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDraggingState(true);
-		console.log('handleDragOverChilDiv', draggingState);
 	};
 
 	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setDraggingState(false);
-		console.log('handleDragLeave', draggingState);
-	};
-
-	const handleDragLeaveChildDiv = (e: DragEvent<HTMLElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDraggingState(true);
-
-		console.log('handleDragLeaveChildDiv', draggingState);
 	};
 
 	const handleDrop = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		// setDraggingState(false);
+		setDraggingState(false);
 		const files = e.dataTransfer.files;
 		const session = sessionRef.current;
 		const client = clientRef.current;
@@ -72,18 +48,8 @@ function FileUploadByDnD() {
 			attachments.forEach((attachment) => setAttachmentData(attachment));
 		});
 	};
-	console.log('sdsdsd', draggingState);
 
-	return (
-		<DragAndDropUI
-			onDragEnter={handleDragEnter}
-			onDragOver={handleDragOver}
-			onDragLeave={handleDragLeave}
-			onDrop={handleDrop}
-			onLeaveChildDiv={handleDragLeaveChildDiv}
-			onOverChildDiv={handleDragOverChilDiv}
-		/>
-	);
+	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }
 
 export default FileUploadByDnD;
