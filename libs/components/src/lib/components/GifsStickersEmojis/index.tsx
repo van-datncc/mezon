@@ -1,4 +1,4 @@
-import { useAppParams, useChatReaction, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useChatReaction, useEscapeKey, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -16,7 +16,7 @@ const GifStickerEmojiPopup = () => {
 
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 	const { setReactionPlaceActive } = useChatReaction();
-	const {setShowCategories, setValueInputSearch} = useGifs()
+	const { setShowCategories, setValueInputSearch } = useGifs();
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -35,6 +35,8 @@ const GifStickerEmojiPopup = () => {
 		}
 		setSubPanelActive(tab);
 	};
+
+	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
 
 	return (
 		<div className="flex flex-col items-center w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222]">
