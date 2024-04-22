@@ -1,5 +1,4 @@
-import { useAppNavigation } from '@mezon/core';
-import { ChannelType } from 'mezon-js';
+import { useAppNavigation, useMenu } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -12,6 +11,7 @@ import {
 	voiceActions,
 } from '@mezon/store';
 import { useMezonVoice } from '@mezon/transport';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -64,6 +64,13 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 		}
 	}, []);
 
+	const { closeMenu, setStatusMenu } = useMenu();
+	const handleClick = () => {
+		if (closeMenu) {
+			setStatusMenu(false);
+		}
+	};
+
 	return (
 		<div className="p-2 absolute w-full bottom-[57px] bg-bgSurface border-borderDefault ">
 			<div className="flex items-center gap-2 iconHover justify-between">
@@ -75,7 +82,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 						</button>
 					</div>
 
-					<div className="text-[12px] font-normal text-gray-400 hover:underline">
+					<div className="text-[12px] font-normal text-gray-400 hover:underline" onClick={handleClick}>
 						<Link to={channelPath}>
 							{currentVoiceChannel?.channel_label}/ {currentClan?.clan_name}
 						</Link>

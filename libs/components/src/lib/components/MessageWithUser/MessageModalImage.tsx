@@ -70,46 +70,7 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 								src={url}
 								alt={url}
 								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
-							/>
-							<img
-								src={url}
-								alt={url}
-								className="size-[150px] max-w-[150px] max-h-[150px] mx-auto gap-5 object-cover rounded cursor-pointer"
+								onDragStart={handleDrag}
 							/>
 						</div>
 					)}
