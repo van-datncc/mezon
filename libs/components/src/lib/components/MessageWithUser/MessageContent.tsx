@@ -26,7 +26,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		const documents: ApiMessageAttachment[] = [];
 
 		attachments.forEach((attachment) => {
-			if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('giphy.com')) {
+			if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('tenor.com')) {
 				videos.push(attachment);
 			} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
 				images.push(attachment);

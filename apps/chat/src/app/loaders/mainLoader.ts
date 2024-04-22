@@ -6,7 +6,8 @@ export const mainLoader = async () => {
 	store.dispatch(clansActions.fetchClans());
 	store.dispatch(notificationActions.fetchListNotification());
 	store.dispatch(emojiSuggestionActions.fetchEmoji());
-	store.dispatch(gifsActions.fetchGifsData());
+	store.dispatch(gifsActions.fetchGifCategories());
+	store.dispatch(gifsActions.fetchGifCategoryFeatured());
 
 	return null;
 };

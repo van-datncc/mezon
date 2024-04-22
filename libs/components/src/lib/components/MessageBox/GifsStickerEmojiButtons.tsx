@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useGifsStickersEmoji, useReference } from '@mezon/core';
+import { useGifs, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback } from 'react';
 
@@ -10,12 +10,14 @@ export type GifStickerEmojiButtonsProps = {
 function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const { setReferenceMessage } = useReference();
-
+	const { setShowCategories, setValueInputSearch } = useGifs();
 	const handleOpenGifs = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.GIFS);
 			setReferenceMessage(null);
+			setShowCategories(true);
+			setValueInputSearch('');
 		},
 		[setSubPanelActive],
 	);
@@ -25,6 +27,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.STICKERS);
 			setReferenceMessage(null);
+			setShowCategories(true);
+			setValueInputSearch('');
 		},
 		[setSubPanelActive],
 	);
@@ -34,6 +38,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.EMOJI);
 			setReferenceMessage(null);
+			setShowCategories(true);
+			setValueInputSearch('');
 		},
 		[setSubPanelActive],
 	);
