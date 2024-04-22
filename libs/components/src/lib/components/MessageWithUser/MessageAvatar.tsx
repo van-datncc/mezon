@@ -16,10 +16,19 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [positionBottom, setPositionBottom] = useState(false);
+	const [positionTop, setPositionTop] = useState(0);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-
 		if (event.button === 0) {
-			setIsShowPanelChannel(true)
+			setIsShowPanelChannel(true);
+			const clickY = event.clientY;
+			const windowHeight = window.innerHeight;
+			const distanceToBottom = windowHeight - clickY;
+			const heightElementShortUserProfileMin = 313;
+			setPositionTop(clickY - 50);
+			if (distanceToBottom < heightElementShortUserProfileMin) {
+				setPositionBottom(true);
+			}
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
@@ -43,7 +52,10 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 				)}
 			</div>
 			{isShowPanelChannel ? (
-				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-300px] right-[-375px] opacity-100">
+				<div
+					className={`bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed left-[409px]`}
+					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
+				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
 			) : null}

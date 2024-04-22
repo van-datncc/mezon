@@ -158,7 +158,7 @@ MessageBox.Skeleton = () => {
 				<div className="grow self-stretch justify-start items-center gap-2 flex">
 					<div
 						contentEditable
-						className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
+						className="grow text-white text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
 					/>
 				</div>
 				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12 rounded-r-lg">

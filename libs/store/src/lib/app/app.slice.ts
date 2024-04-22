@@ -9,6 +9,8 @@ export interface AppState {
 	error?: string | null;
 	isShowMemberList: boolean;
 	initialPath?: string;
+	closeMenu: boolean;
+	statusMenu: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -16,6 +18,8 @@ export const initialAppState: AppState = {
 	theme: 'light',
 	isShowMemberList: true,
 	initialPath: '/',
+	closeMenu: false,
+	statusMenu: true,
 };
 
 export const appSlice = createSlice({
@@ -33,7 +37,13 @@ export const appSlice = createSlice({
 		},
 		setInitialPath: (state, action) => {
 			state.initialPath = action.payload;
-		}
+		},
+		setCloseMenu: (state, action) => {
+			state.closeMenu = action.payload;
+		},
+		setStatusMenu: (state, action) => {
+			state.statusMenu = action.payload;
+		},
 	},
 });
 
@@ -55,3 +65,7 @@ export const selectError = createSelector(getAppState, (state: AppState) => stat
 export const selectIsShowMemberList = createSelector(getAppState, (state: AppState) => state.isShowMemberList);
 
 export const selectInitialPath = createSelector(getAppState, (state: AppState) => state.initialPath);
+
+export const selectCloseMenu = createSelector(getAppState, (state: AppState) => state.closeMenu);
+
+export const selectStatusMenu = createSelector(getAppState, (state: AppState) => state.statusMenu);

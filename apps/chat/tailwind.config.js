@@ -76,7 +76,7 @@ module.exports = {
       },
 
       fontFamily: {
-        manrope: ['Manrope', 'sans-serif'],
+        notoSans: ['Noto Sans', 'sans-serif'],
       },
       screens: {
         'mobile-s': '320px',
