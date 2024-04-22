@@ -1,5 +1,3 @@
-import { EmojiListSuggestion } from '@mezon/components';
-import { useChatMessages, useClickUpToEdit, useEmojiSuggestion, useGifsStickersEmoji, useMenu } from '@mezon/core';
 import {
 	IMessageSendPayload,
 	KEY_KEYBOARD,
@@ -10,15 +8,13 @@ import {
 	focusToElement,
 	threadError,
 } from '@mezon/utils';
+import { useChatMessages, useClickUpToEdit, useGifsStickersEmoji, useMenu, useChannels } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
-import textFieldEdit from 'text-field-edit';
-
 import { useReference, useThreads } from '@mezon/core';
 import { referencesActions, threadsActions, useAppDispatch } from '@mezon/store';
 import { ChannelMembersEntity, ILineMention, UsersClanEntity, regexToDetectGifLink, uniqueUsers } from '@mezon/utils';
-
 import { useChannelMembers, useClans } from '@mezon/core';
 import { ChannelsEntity, channelUsersActions, selectCurrentChannel } from '@mezon/store';
 import { useSelector } from 'react-redux';
@@ -26,7 +22,26 @@ import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import mentionsInputStyle from './RmentionInputStyle';
+import SuggestItem from './SuggestItem';
 import mentionStyle from './RmentionStyle';
+
+type Emoji = {
+	emoji: string;
+	name: string;
+	shortname: string
+}
+
+type ChannelsMentionProps = {
+	id: string;
+	display: string;
+	subText: string
+}
+
+type EmojiData = {
+	id: string;
+	emoji: string;
+	display: string
+}
 
 export type MentionReactInputProps = {
 	onSend: (
@@ -44,6 +59,8 @@ export type MentionReactInputProps = {
 	currentChannelId?: string;
 };
 
+const neverMatchingRegex = /($a)/
+
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const [valueTextInput, setValueTextInput] = useState('');
@@ -53,38 +70,31 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
 	const [nameThread, setNameThread] = useState('');
-
 	const { currentThread, messageThreadError, isPrivate } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
-	const [suggestions, setSuggestions] = useState<IEmoji[]>([]);
-
-	const regexSyntaxEmoji = /:([^\s:]+)(?=\s|$)/g;
-
-	const searchEmojiByShortcode = (shortcode: string) => {
-		const matchedEmojis: IEmoji[] = [];
-		if (emojis) {
-			for (const [key, emoji] of Object.entries(emojis)) {
-				if (emoji.skins[0]?.shortcodes?.includes(shortcode)) {
-					matchedEmojis.push(emoji);
-				}
-			}
-		}
-		return matchedEmojis;
-	};
+	const [emojis, setEmojis] = useState<Emoji[]>([]);
+	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 
 	useEffect(() => {
-		const emojiSuggestions = searchEmojiByShortcode(content);
-		if (emojiSuggestions) {
-			setIsEmojiListShowed(true);
-			setSuggestions(emojiSuggestions ?? []);
-		} else {
-			setSuggestions([]);
-		}
-	}, [content]);
-	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
+		fetch(
+			'https://gist.githubusercontent.com/oliveratgithub/0bf11a9aff0d6da7b46f1490f86a71eb/raw/d8e4b78cfe66862cf3809443c1dba017f37b61db/emojis.json'
+		)
+			.then((response) => response.json())
+			.then((jsonData) => {
+				setEmojis(jsonData.emojis);
+			});
+	}, []);
+
+	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
+		if (query.length === 0) return;
+		const matches = emojis
+			.filter((emoji) => emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.slice(0, 20).map((emojiDisplay) => ({ id: emojiDisplay?.emoji, emoji: emojiDisplay?.emoji, display: emojiDisplay?.shortname }))
+		callback(matches);
+	}
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -194,11 +204,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const listChannelsMention = listChannels.map((item) => {
 		return {
-			id: item.channel_id,
-			display: item.channel_label,
-			avatarUrl: '',
+			id: item?.channel_id ?? '',
+			display: item?.channel_label ?? '',
+			subText: item?.category_name ?? '',
 		};
-	}) as any;
+	}) as ChannelsMentionProps[];
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
@@ -234,20 +244,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setMentionData(mentionedUsers);
 		}
 	};
-
-	const {
-		isEmojiListShowed,
-		emojiPicked,
-		keyCodeFromKeyBoard,
-		setIsEmojiListShowed,
-		textToSearchEmojiSuggestion,
-		setTextToSearchEmojiSuggesion,
-		pressAnyButtonState,
-		emojis,
-	} = useEmojiSuggestion();
-
 	const editorRef = useRef<HTMLInputElement | null>(null);
-	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState, openEditMessageState } = useReference();
 	const { closeMenu, statusMenu } = useMenu();
@@ -260,43 +257,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [subPanelActive, referenceMessage, openReplyMessageState, openEditMessageState]);
 
-	useEffect(() => {
-		handleEventAfterEmojiPicked();
-	}, [emojiPicked]);
-
-	useEffect(() => {
-		if (content) {
-			setTextToSearchEmojiSuggesion(content);
-		}
-		if (content === '') {
-			setIsEmojiListShowed(false);
-		}
-	}, [content]);
-
-	const input = document.querySelector('#editorReactMention') as HTMLElement | null;
-	function handleEventAfterEmojiPicked() {
-		if (!emojiPicked || !input) {
-			return;
-		}
-		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
-		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked);
-		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
-			setValueTextInput(replaceSyntaxByEmoji);
-			setContent(replaceSyntaxByEmoji);
-			focusToElement(editorRef);
-		}
-	}
-
-	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
-		if (emojiArray.length > 0) {
-			return emojiArray[0];
-		}
-		return null;
-	}
 	const handleChangeNameThread = (nameThread: string) => {
 		setNameThread(nameThread);
 	};
@@ -323,7 +283,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	return (
 		<div className="relative">
-			{/* <EmojiListSuggestion ref={emojiListRef} valueInput={textToSearchEmojiSuggestion ?? ''} /> */}
 			{props.isThread && !currentThread && (
 				<div>
 					<ThreadNameTextField
@@ -352,58 +311,37 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			>
 				<Mention
 					appendSpaceOnAdd={true}
-					style={mentionStyle}
 					data={props.listMentions ?? []}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
 						return `@${display}`;
 					}}
-					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
-						return (
-							<div className="flex flex-row items-center gap-2">
-								<img
-									src={(suggestion as any).avatarUrl}
-									alt={suggestion.display}
-									style={{ width: '30px', height: '30px', borderRadius: '50%' }}
-								/>
-								<span>{highlightedDisplay}</span>
-							</div>
-						);
-					}}
+					renderSuggestion={(suggestion) =>
+						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText='' />
+					}
+					style={mentionStyle}
 				/>
 				<Mention
 					markup="#[__display__](__id__)"
 					appendSpaceOnAdd={true}
-					style={mentionStyle}
 					data={listChannelsMention ?? []}
 					trigger="#"
 					displayTransform={(id: any, display: any) => {
 						return `#${display}`;
 					}}
-					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
-						return (
-							<div className="flex flex-row items-center gap-2">
-								<span>#</span>
-								<span>{suggestion.display}</span>
-							</div>
-						);
-					}}
+					style={mentionStyle}
+					renderSuggestion={(suggestion) =>
+						<SuggestItem name={suggestion.display ?? ''} symbol='#' subText={(suggestion as ChannelsMentionProps).subText} />
+					}
 				/>
 				<Mention
-					appendSpaceOnAdd={true}
-					style={mentionStyle}
-					data={listChannels}
-					trigger={regexSyntaxEmoji}
-					displayTransform={(id: any, display: any) => {
-						return `#${display}`;
-					}}
-					renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
-						return (
-							<div className="flex flex-row items-center gap-2">
-								<span>hh</span>
-							</div>
-						);
-					}}
+					trigger=":"
+					markup="__id__"
+					regex={neverMatchingRegex}
+					data={queryEmojis}
+					renderSuggestion={(suggestion) =>
+						<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
+					}
 				/>
 			</MentionsInput>
 		</div>
