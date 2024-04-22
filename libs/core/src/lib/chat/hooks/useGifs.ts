@@ -2,9 +2,12 @@ import { ThunkDispatch } from '@reduxjs/toolkit';
 import {
 	gifsActions,
 	selectAllgifCategory,
+	selectButtonArrowBackStatus,
+	selectCategoriesStatus,
 	selectDataGifsFeatured,
 	selectGifsDataSearch,
 	selectLoadingStatusGifs,
+	selectTrendingClickingStatus,
 	selectValueInputSearch,
 } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { useCallback, useMemo } from 'react';
@@ -15,10 +18,11 @@ export function useGifs() {
 	const dataGifCategories = useSelector(selectAllgifCategory)[0];
 	const dataGifsSearch = useSelector(selectGifsDataSearch);
 	const dataGifsFeartured = useSelector(selectDataGifsFeatured);
-
 	const loadingStatusGifs = useSelector(selectLoadingStatusGifs);
-
 	const valueInputToCheckHandleSearch = useSelector(selectValueInputSearch);
+	const trendingClickingStatus = useSelector(selectTrendingClickingStatus);
+	const categoriesStatus = useSelector(selectCategoriesStatus);
+	const buttonArrowBackStatus = useSelector(selectButtonArrowBackStatus);
 
 	const fetchGifsDataSearch = useCallback(
 		(valueSearch: string) => {
@@ -33,10 +37,30 @@ export function useGifs() {
 		},
 		[dispatch],
 	);
+
 	const fetchGifsDataFeatured = useCallback(() => {
 		dispatch(gifsActions.fetchGifCategoryFeatured());
 	}, [dispatch]);
 
+	const setClickedTrendingGif = useCallback(
+		(status: boolean) => {
+			dispatch(gifsActions.setClickedTrendingGif(status));
+		},
+		[dispatch],
+	);
+
+	const setShowCategories = useCallback(
+		(status: boolean) => {
+			dispatch(gifsActions.setShowCategories(status));
+		},
+		[dispatch],
+	);
+	const setButtonArrowBack = useCallback(
+		(status: boolean) => {
+			dispatch(gifsActions.setButtonArrowBack(status));
+		},
+		[dispatch],
+	);
 	return useMemo(
 		() => ({
 			fetchGifsDataSearch,
@@ -47,6 +71,12 @@ export function useGifs() {
 			setValueInputSearch,
 			fetchGifsDataFeatured,
 			dataGifsFeartured,
+			trendingClickingStatus,
+			setClickedTrendingGif,
+			categoriesStatus,
+			setShowCategories,
+			buttonArrowBackStatus,
+			setButtonArrowBack
 		}),
 		[
 			dataGifCategories,
@@ -57,6 +87,12 @@ export function useGifs() {
 			setValueInputSearch,
 			fetchGifsDataFeatured,
 			dataGifsFeartured,
+			trendingClickingStatus,
+			setClickedTrendingGif,
+			categoriesStatus,
+			setShowCategories,
+			buttonArrowBackStatus,
+			setButtonArrowBack,
 		],
 	);
 }

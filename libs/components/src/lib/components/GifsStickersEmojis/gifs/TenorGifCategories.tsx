@@ -17,25 +17,37 @@ type ChannelMessageBoxProps = {
 
 function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const { dataGifCategories, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch, dataGifsFeartured } = useGifs();
-	const [showCategories, setShowCategories] = useState<boolean>(false);
+	const {
+		dataGifCategories,
+		dataGifsSearch,
+		loadingStatusGifs,
+		valueInputToCheckHandleSearch,
+		dataGifsFeartured,
+		trendingClickingStatus,
+		setClickedTrendingGif,
+		categoriesStatus,
+		setShowCategories,
+		setButtonArrowBack,
+	} = useGifs();
 	const [dataToRenderGifs, setDataToRenderGifs] = useState<any>();
-	const [clickedTrending, setClickedTrending] = useState<boolean>(false);
 
-	const onClickedTrending = () => {
-		setClickedTrending(true);
+	const ontrendingClickingStatus = () => {
+		setClickedTrendingGif(true);
 		setShowCategories(false);
-		setDataToRenderGifs(dataGifsFeartured);
+		setButtonArrowBack(true);
 	};
 
 	useEffect(() => {
-		if (dataGifsSearch.length > 0) {
+		if (dataGifsSearch.length > 0 && valueInputToCheckHandleSearch !== '') {
 			setDataToRenderGifs(dataGifsSearch);
 			setShowCategories(false);
-		} else if (clickedTrending === false && dataGifsSearch.length === 0) {
-			setShowCategories(true);
+			setButtonArrowBack(true);
+		} else if (trendingClickingStatus) {
+			setDataToRenderGifs(dataGifsFeartured);
+		} else if (valueInputToCheckHandleSearch === '') {
+			setButtonArrowBack(false);
 		}
-	}, [dataGifsSearch, clickedTrending]);
+	}, [dataGifsSearch, trendingClickingStatus, valueInputToCheckHandleSearch]);
 
 	const handleSend = useCallback(
 		(
@@ -60,7 +72,12 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		return (
 			<>
 				<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
-					<FeaturedGifs onClickToTrending={() => onClickedTrending()} channelId={channelId} channelLabel={channelLabel} mode={mode} />
+					<FeaturedGifs
+						onClickToTrending={() => ontrendingClickingStatus()}
+						channelId={channelId}
+						channelLabel={channelLabel}
+						mode={mode}
+					/>
 
 					{Array.isArray(dataGifCategories) &&
 						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index} />)}
@@ -69,7 +86,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		);
 	};
 
-	const renderGifSearch = () => {
+	const renderGifs = () => {
 		if (loadingStatusGifs === 'loading') {
 			return <Loading />;
 		}
@@ -90,8 +107,9 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 			</div>
 		);
 	};
-
-	return <>{showCategories ? renderGifCategories() : renderGifSearch()}</>;
+	return (
+		<>{categoriesStatus || (valueInputToCheckHandleSearch === '' && trendingClickingStatus === false) ? renderGifCategories() : renderGifs()}</>
+	);
 }
 
 export default TenorGifCategories;

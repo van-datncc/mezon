@@ -337,7 +337,6 @@ export interface IGifCategory {
 }
 
 export interface IGif {
-	id: string;
 	itemurl: string;
 	media_formats: {
 		gif: {

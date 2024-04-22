@@ -1,4 +1,4 @@
-import { IGifCategory } from '@mezon/utils';
+import { IGif, IGifCategory } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const GIFS_FEATURE_KEY = 'gifs';
@@ -7,15 +7,23 @@ export interface GifCategoriesEntity extends IGifCategory {
 	id: string;
 }
 
-export const gifsAdapter = createEntityAdapter<GifCategoriesEntity>();
+export interface GifEntity extends IGif {
+	id: string;
+}
+
+export const gifsAdapter = createEntityAdapter<GifCategoriesEntity>({
+	selectId: (emo: GifCategoriesEntity) => emo.id || emo.path || '',
+} as any);
 
 export interface GifsState extends EntityState<GifCategoriesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	dataGifsSearch: IGifCategory[];
+	dataGifsSearch: GifEntity[];
 	valueInputToCheckHandleSearchState?: string;
-	dataGifsFeatured: any;
-	trendingClickingStatus: boolean
+	dataGifsFeatured: GifEntity[];
+	trendingClickingStatus: boolean;
+	categoriesStatus: boolean;
+	buttonArrowBackStatus: boolean;
 }
 export const initialGifsState: GifsState = {
 	...gifsAdapter.getInitialState(),
@@ -24,14 +32,17 @@ export const initialGifsState: GifsState = {
 	dataGifsSearch: [],
 	valueInputToCheckHandleSearchState: '',
 	dataGifsFeatured: [],
-	trendingClickingStatus:false
+	trendingClickingStatus: false,
+	categoriesStatus: false,
+	buttonArrowBackStatus: false,
 };
 
-export const fetchGifCategories = createAsyncThunk<any>('gifs/fetchStatus', async (_, thunkAPI) => {
+const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
+const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
+const limit = 30;
+
+export const fetchGifCategories = createAsyncThunk<GifCategoriesEntity[]>('gifs/fetchStatus', async (_, thunkAPI) => {
 	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_CATEGORIES ?? '';
-	const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
-	const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
-	const limit = 10;
 	const categoriesUrl = baseUrl + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 
 	try {
@@ -49,13 +60,10 @@ export const fetchGifCategories = createAsyncThunk<any>('gifs/fetchStatus', asyn
 type FetchGifsDataSearchPayload = any;
 export const fetchGifsDataSearch = createAsyncThunk<FetchGifsDataSearchPayload, string>('gifs/fetchDataSearch', async (valueSearch, thunkAPI) => {
 	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_SEARCH ?? '';
-	const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
-	const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
-	const limit = 30;
-	const search_url = baseUrl + valueSearch + '&key=' + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
+	const searchUrl = baseUrl + valueSearch + '&key=' + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 
 	try {
-		const response = await fetch(`${search_url}`);
+		const response = await fetch(`${searchUrl}`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch gifs data search');
@@ -67,11 +75,8 @@ export const fetchGifsDataSearch = createAsyncThunk<FetchGifsDataSearchPayload, 
 	}
 });
 
-export const fetchGifCategoryFeatured = createAsyncThunk<any>('gifs/fetchDataTrending', async (_, thunkAPI) => {
+export const fetchGifCategoryFeatured = createAsyncThunk<GifEntity[]>('gifs/fetchDataTrending', async (_, thunkAPI) => {
 	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_FEATURED ?? '';
-	const apiKey = process.env.NX_CHAT_APP_API_TENOR_KEY;
-	const clientKey = process.env.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM;
-	const limit = 30;
 	const featuredUrl = baseUrl + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 
 	try {
@@ -94,6 +99,15 @@ export const gifsSlice = createSlice({
 		remove: gifsAdapter.removeOne,
 		setValueInputSearch: (state, action) => {
 			state.valueInputToCheckHandleSearchState = action.payload;
+		},
+		setClickedTrendingGif: (state, action) => {
+			state.trendingClickingStatus = action.payload;
+		},
+		setShowCategories: (state, action) => {
+			state.categoriesStatus = action.payload;
+		},
+		setButtonArrowBack: (state, action) => {
+			state.buttonArrowBackStatus = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -160,3 +174,9 @@ export const selectLoadingStatusGifs = createSelector(getGifsState, (state: Gifs
 export const selectValueInputSearch = createSelector(getGifsState, (state: GifsState) => state.valueInputToCheckHandleSearchState);
 
 export const selectDataGifsFeatured = createSelector(getGifsState, (state: GifsState) => state.dataGifsFeatured);
+
+export const selectTrendingClickingStatus = createSelector(getGifsState, (state: GifsState) => state.trendingClickingStatus);
+
+export const selectCategoriesStatus = createSelector(getGifsState, (state: GifsState) => state.categoriesStatus);
+
+export const selectButtonArrowBackStatus = createSelector(getGifsState, (state: GifsState) => state.buttonArrowBackStatus);

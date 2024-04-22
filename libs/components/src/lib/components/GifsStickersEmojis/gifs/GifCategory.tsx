@@ -6,13 +6,16 @@ type GifCategoryProps = {
 };
 
 function GifCategory({ gifCategory }: GifCategoryProps) {
-	const { fetchGifsDataSearch, setValueInputSearch } = useGifs();
+	const { setButtonArrowBack, fetchGifsDataSearch, setValueInputSearch, setShowCategories, setClickedTrendingGif } = useGifs();
 
 	const clickedCategory = () => {
 		fetchGifsDataSearch(gifCategory.searchterm);
 		setValueInputSearch(gifCategory.searchterm);
+		setShowCategories(false);
+		setClickedTrendingGif(false);
+		setButtonArrowBack(true);
 	};
-	
+
 	return (
 		<div className="relative h-32 rounded-md cursor-pointer overflow-hidden group" onClick={clickedCategory}>
 			<div className="absolute inset-0 bg-black opacity-50 z-20 transition-opacity group-hover:opacity-70"></div>

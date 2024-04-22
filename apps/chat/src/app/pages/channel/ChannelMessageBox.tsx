@@ -1,6 +1,6 @@
-import { MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending } from '@mezon/core';
-import { IMessageSendPayload } from '@mezon/utils';
+import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
@@ -32,9 +32,19 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-
+	const { subPanelActive } = useGifsStickersEmoji();
 	return (
 		<div className="mx-4 relative">
+			{subPanelActive !== SubPanelName.NONE && (
+				<div
+					className="absolute right-0 bottom-[105%] z-10"
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)}
 			<ReplyMessageBox />
 			<MessageBox
 				listMentions={UserMentionList(channelId)}
