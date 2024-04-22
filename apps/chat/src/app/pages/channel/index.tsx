@@ -106,20 +106,19 @@ export default function ChannelLayout() {
 	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		// setDraggingState(false);
-
+		setDraggingState(false);
 	};
 
-	console.log('draggingState-channelMEs', draggingState);
+	console.log(draggingState);
 	return (
 		<>
 			{draggingState && <FileUploadByDnD />}
 			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden"
+				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden z-0"
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 				// onDragOver={handleDragOver}
-				onDragLeave={handleDragLeave}
+				// onDragLeave={handleDragLeave}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
 					<div className="flex flex-col flex-1 w-full h-full">
