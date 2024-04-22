@@ -1,6 +1,6 @@
 import { Icons, MessageImage, MessageVideo } from '@mezon/components';
-import React from 'react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import React from 'react';
 
 export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size: string, pos?: string) => {
 	const fileType = attachment.filetype;
@@ -18,13 +18,15 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 			condition: fileType?.indexOf('image') !== -1,
 			component: <img key="image-thumbnail" src={attachment.url} role="presentation" className="w-48" alt={attachment.url} />,
 		},
-		
+
 		{
 			condition: fileType?.indexOf('application/msword') !== -1,
 			component: <Icons.DocThumbnail key="doc-thumbnail" defaultSize={size} />,
 		},
 		{
-			condition: fileType?.indexOf('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') !== -1,
+			condition:
+				fileType?.indexOf('application/vnd.ms-excel') !== -1 ||
+				fileType?.indexOf('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') !== -1,
 			component: <Icons.XlsThumbnail key="xls-thumbnail" defaultSize={size} />,
 		},
 		{

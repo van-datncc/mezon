@@ -42,13 +42,14 @@ function FileUploadByDnD() {
 
 		const promises = Array.from(files).map((file) => {
 			const fullfilename = `${currentClanId}/${currentChannelId}`.replace(/-/g, '_') + '/' + file.name;
+			console.log('fullfilename', fullfilename);
 			return handleUploadFile(client, session, fullfilename, file);
 		});
 		Promise.all(promises).then((attachments) => {
 			attachments.forEach((attachment) => setAttachmentData(attachment));
 		});
 	};
-	
+
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }
 
