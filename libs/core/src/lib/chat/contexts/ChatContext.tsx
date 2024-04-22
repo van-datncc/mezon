@@ -74,7 +74,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
-			console.log("message-2", message)
 			dispatch(referencesActions.setIdMessageToJump(message.id));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));
