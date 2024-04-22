@@ -1,5 +1,5 @@
-import { ChannelType } from 'mezon-js';
 import { ChannelsEntity, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { HeadPhoneICon, MicIcon, SettingProfile } from '../Icons';
@@ -28,10 +28,10 @@ function FooterProfile({ name, status, avatar, openSetting, channelCurrent }: Fo
 			{showScreen && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
 				className="flex items-center justify-between border-t-2
-			 border-borderDefault px-4 py-2 font-title text-[15px] 
-			 font-[500] text-white hover:bg-gray-550/[0.16] 
-			 shadow-sm transition absolute bottom-0 bg-bgSurface 
-			 w-full group"
+			 border-borderDefault px-4 py-2 font-title text-[15px]
+			 font-[500] text-white hover:bg-gray-550/[0.16]
+			 shadow-sm transition absolute bottom-0 bg-bgSurface
+			 w-full group focus-visible:outline-none"
 			>
 				<MemberProfile
 					name={name}

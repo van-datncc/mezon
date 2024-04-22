@@ -59,9 +59,6 @@ export function ChannelMessage(props: MessageProps) {
 				handleCancelEdit();
 			}
 		}
-		if (e.key === 'Escape') {
-			handleCancelEdit();
-		}
 	};
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
