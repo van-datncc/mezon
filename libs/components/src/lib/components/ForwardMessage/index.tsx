@@ -92,7 +92,7 @@ const ForwardMessageModal = (pops: ModalParam) => {
 							className="min-w-5 min-h-5 mr-[10px]"
 							onChange={() => handleToggle(DM.id, DM.type|| 0)}
 						></input>
-						<img src={DM.channel_avatar} alt='' className="size-10 min-w-10 min-h-10 object-cover rounded-full mr-[10px] my-[5px]"/>
+						<img src={DM.channel_avatar?.at(0)} alt='' className="size-10 min-w-10 min-h-10 object-cover rounded-full mr-[10px] my-[5px]"/>
 						<p>
 							{DM.channel_label}
 						</p>
