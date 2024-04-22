@@ -1,4 +1,4 @@
-import { useAppNavigation, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectIsUnreadChannelById } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
@@ -56,6 +56,14 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
+	const { closeMenu, setStatusMenu } = useMenu();
+	const handleClick = () => {
+		setIsShowCreateThread(false);
+		if (closeMenu) {
+			setStatusMenu(false);
+		}
+	};
+
 	return (
 		<div className="flex flex-row items-center h-[34px] relative ">
 			{isFirstThread ? (
@@ -74,7 +82,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium hover:text-white text-[15px] ${active ? 'font-medium bg-[#36373D] text-white' : ''} ${isUnReadChannel ? 'font-bold text-white' : ''}`}
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
-				onClick={() => setIsShowCreateThread(false)}
+				onClick={handleClick}
 			>
 				{thread.channel_label}
 				{isShowPanelChannel && (

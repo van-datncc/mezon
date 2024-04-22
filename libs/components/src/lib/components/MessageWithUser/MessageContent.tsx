@@ -10,7 +10,7 @@ import { useMessageParser } from './useMessageParser';
 type IMessageContentProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
-	isCombine: boolean;
+	isCombine?: boolean;
 	newMessage?: string;
 };
 

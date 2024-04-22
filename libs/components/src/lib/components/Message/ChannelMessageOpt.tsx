@@ -44,14 +44,6 @@ export default function ChannelMessageOpt({ message }: ChannelMessageOptProps) {
 		event.stopPropagation();
 	};
 
-	// reset refMessage
-	useEffect(() => {
-		if (!openEditMessageState && !openEditMessageState && !reactionRightState && !reactionBottomState) {
-			dispatch(referencesActions.setReferenceMessage(null));
-			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
-		}
-	}, [openEditMessageState, openEditMessageState, reactionRightState, reactionBottomState]);
-
 	return (
 		<div className="iconHover flex justify-between  bg-[#232323] rounded">
 			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">

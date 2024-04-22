@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useClans, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
@@ -104,6 +104,12 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		setIsShowPanelChannel(false);
 	};
 
+	const { closeMenu, setStatusMenu } = useMenu();
+	const handleClick = () => {
+		if (closeMenu) {
+			setStatusMenu(false);
+		}
+	};
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
@@ -132,7 +138,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</p>
 				</span>
 			) : (
-				<Link to={channelPath}>
+				<Link to={channelPath} onClick={handleClick}>
 					<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 						<div className="relative mt-[-5px]">

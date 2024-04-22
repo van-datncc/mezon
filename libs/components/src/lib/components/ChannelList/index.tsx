@@ -1,9 +1,12 @@
-import { UserRestrictionZone, useCategory, useClanRestriction } from '@mezon/core';
+import { UserRestrictionZone, useCategory, useClanRestriction, useEscapeKey } from '@mezon/core';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
+import { getIsShowPopupForward } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
+import ForwardMessageModal from '../ForwardMessage';
 import * as Icons from '../Icons';
 import { BrowseChannel, Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
@@ -62,6 +65,9 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
+	const isChange = useSelector(getIsShowPopupForward);
+
+	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
 	return (
 		<div
@@ -69,6 +75,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 			className="overflow-y-scroll scrollbar-thin w-[100%] h-[100%] pb-[12%] "
 			id="channelList"
 		>
+			{isChange ? <ForwardMessageModal open={isChange} /> : null}
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />
@@ -93,6 +100,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 								</button>
 								<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
 									<button
+										className="focus-visible:outline-none"
 										onClick={() => {
 											handleToggleCategory(category, true);
 											openModalCreateNewChannel(category);

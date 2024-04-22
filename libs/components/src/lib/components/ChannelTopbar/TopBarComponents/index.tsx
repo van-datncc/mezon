@@ -1,3 +1,4 @@
+import { useMenu } from '@mezon/core';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -7,17 +8,40 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isPrivate = channel?.channel_private;
 	const type = Number(channel?.type);
 	const name = channel?.channel_label;
+	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
+
 	return (
 		<div className="flex flex-row items-center relative">
 			<div className="absolute flex text-zinc-400 text-lg pb-0">
-				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_VOICE && (
-					<Icons.SpeakerLocked defaultSize="w-6 h-6" />
+				{closeMenu ? (
+					statusMenu ? (
+						<>
+							{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_VOICE && (
+								<Icons.SpeakerLocked defaultSize="w-6 h-6" />
+							)}
+							{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_TEXT && (
+								<Icons.HashtagLocked defaultSize="w-6 h-6 " />
+							)}
+							{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
+							{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
+						</>
+					) : (
+						<div onClick={() => setStatusMenu(true)}>
+							<Icons.OpenMenu defaultSize="w-6 h-6" />
+						</div>
+					)
+				) : (
+					<>
+						{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_VOICE && (
+							<Icons.SpeakerLocked defaultSize="w-6 h-6" />
+						)}
+						{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_TEXT && (
+							<Icons.HashtagLocked defaultSize="w-6 h-6 " />
+						)}
+						{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
+						{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
+					</>
 				)}
-				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.HashtagLocked defaultSize="w-6 h-6 " />
-				)}
-				{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-6 h-6" />}
-				{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 
 			<p className="mb-0.5 text-white ml-7 mt-2 max-w-[200px] overflow-x-hidden text-ellipsis one-line">{name}</p>
