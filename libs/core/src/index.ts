@@ -24,6 +24,7 @@ export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
 export * from './lib/chat/hooks/useDirectMessages';
 export * from './lib/chat/hooks/useDragAndDrop';
+export * from './lib/chat/hooks/useSendForwardMessage';
 export * from './lib/chat/hooks/useEmojiSuggestion';
 export * from './lib/chat/hooks/useEscapeKey';
 export * from './lib/chat/hooks/useFriends';
