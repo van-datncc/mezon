@@ -76,17 +76,15 @@ function LoginForm(props: LoginFormProps) {
 		<div className="flex-col justify-start items-center flex lg:w-[496px] h-fit lg:px-0 w-450 max-w-full">
 			<div className=" flex-row justify-start items-center flex w-full h-fit gap-x-4 pb-6">
 				<hr className="h-[0.08px] w-[272px] border-[#1E1E1E]" />
-				<p className="w-fit h-fit font-manrope text-sm text-[#aeaeae] leading-[130%]">or</p>
+				<p className="w-fit h-fit text-sm text-[#aeaeae] leading-[130%]">or</p>
 				<hr className="h-[0.08px] w-[272px]  border-[#1E1E1E]" />
 			</div>
 			<div className="flex-col justify-start items-start flex w-full h-fit gap-y-5">
 				<div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
 					<div className="flex-col justify-start items-start flex w-full h-fit gap-y-3 relative">
 						<div className="flex-row justify-start items-center flex w-full h-fit gap-x-1 ">
-							<p className="w-fit h-fit font-manrope text-left text-sm font-medium text-[#cccccc] leading-[150%]">
-								Email or Phone number
-							</p>
-							<p className="w-fit font-manrope h-fit text-left text-xs font-medium text-[#dc2626] leading-[150%]">✱</p>
+							<p className="w-fit h-fit text-left text-sm font-medium text-[#cccccc] leading-[150%]">Email or Phone number</p>
+							<p className="w-fit h-fit text-left text-xs font-medium text-[#dc2626] leading-[150%]">✱</p>
 						</div>
 						<div
 							className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] bg-[#000000] relative border-[1px] border-[#1e1e1e] ${
@@ -106,8 +104,8 @@ function LoginForm(props: LoginFormProps) {
 
 					<div className="flex-col justify-start items-start flex w-full h-fit gap-y-3">
 						<div className="flex-row justify-start items-center flex w-full h-fit gap-x-1 ">
-							<p className="w-fit h-fit font-manrope text-left text-sm font-medium text-[#cccccc] leading-[150%]">Password</p>
-							<p className="w-fit h-fit font-manrope text-left text-xs font-medium text-[#dc2626] leading-[150%]">✱</p>
+							<p className="w-fit h-fit text-left text-sm font-medium text-[#cccccc] leading-[150%]">Password</p>
+							<p className="w-fit h-fit text-left text-xs font-medium text-[#dc2626] leading-[150%]">✱</p>
 						</div>
 
 						<div className="flex-col justify-start items-start flex w-full h-fit ">
@@ -118,7 +116,7 @@ function LoginForm(props: LoginFormProps) {
 							>
 								<input
 									type={showPassword ? 'text' : 'password'}
-									className="w-full h-6 bg-transparent outline-none text-white pl-0 border-none placeholder:font-manrope"
+									className="w-full h-6 bg-transparent outline-none text-white pl-0 border-none placeholder"
 									{...register('password')}
 									name="password"
 									id="password"
@@ -130,7 +128,7 @@ function LoginForm(props: LoginFormProps) {
 								</button>
 							</div>
 
-							<p className="w-full h-fit font-manrope text-left text-sm font-medium pt-1 text-[#528bff] leading-[150%]">
+							<p className="w-full h-fit text-left text-sm font-medium pt-1 text-[#528bff] leading-[150%]">
 								<span>
 									<a className="hover:underline cursor-pointer">Forgot your password?</a>
 								</span>
@@ -144,21 +142,15 @@ function LoginForm(props: LoginFormProps) {
 						onClick={handleFormSubmit}
 						className="flex-col justify-start items-center flex w-full h-[48px] pt-3 pr-4 pb-3 pl-4 rounded-[4px] bg-[#155eef] "
 					>
-						<div className="w-fit h-fit font-manrope text-left text-base font-medium text-[#ffffff] leading-[150%] flex justify-center">
-							{isLoading === 'loading' ? (
-								<Loading  />
-							) : isLoading === 'loaded' ? (
-								'Login successful'
-							) : (
-								'Sign in'
-							)}
+						<div className="w-fit h-fit text-left text-base font-medium text-[#ffffff] leading-[150%] flex justify-center">
+							{isLoading === 'loading' ? <Loading /> : isLoading === 'loaded' ? 'Login successful' : 'Sign in'}
 						</div>
 					</button>
 
 					<div className="flex-row justify-start items-center flex w-full h-fit gap-y-2 ">
-						<p className="w-fit h-fit font-manrope text-left text-sm font-normal text-[#cccccc] leading-[130%]">Need an account?</p>
+						<p className="w-fit h-fit text-left text-sm font-normal text-[#cccccc] leading-[130%]">Need an account?</p>
 						<div className="flex-col justify-start items-center flex w-fit h-fit pt-2 pr-4 pb-2 pl-4 rounded-[4px] ">
-							<p className="w-fit h-fit font-manrope text-left text-sm font-medium hover:underline text-[#528bff] leading-[130%]">
+							<p className="w-fit h-fit text-left text-sm font-medium hover:underline text-[#528bff] leading-[130%]">
 								<span>
 									<a className="hover:underline cursor-pointer">Sign up</a>
 								</span>

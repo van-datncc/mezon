@@ -1,5 +1,5 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useReference } from '@mezon/core';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useEscapeKey, useReference } from '@mezon/core';
 import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -76,6 +76,8 @@ export function ChannelMessage(props: MessageProps) {
 		textarea.style.height = 'auto';
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
+
+	useEscapeKey(handleCancelEdit);
 
 	return (
 		<div className="fullBoxText relative group">

@@ -21,8 +21,8 @@ const DelayedDisplay: React.FC<Props> = ({ items, delayTime }) => {
 	return (
 		<>
 			{isLoading ? null : (
-				<div className={`text-white flex flex-row items-center text-sm h-full`}>
-					<p className='text-[1rem]'>{items[currentIndex]}</p>
+				<div className={`text-white flex flex-row items-center text-sm h-full justify-center`}>
+					<p className="text-[1rem]">{items[currentIndex]}</p>
 				</div>
 			)}
 		</>
@@ -30,8 +30,8 @@ const DelayedDisplay: React.FC<Props> = ({ items, delayTime }) => {
 };
 
 export const Loading: React.FC = () => {
-	const items = ['●', '● ●', '● ● ●']; 
-	const delayTime = 100; 
+	const items = ['●', '● ●', '● ● ●'];
+	const delayTime = 100;
 
 	return <DelayedDisplay items={items} delayTime={delayTime} />;
 };

@@ -1,7 +1,7 @@
-import { useChatSending } from '@mezon/core';
-import { IMessageSendPayload } from '@mezon/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+import { IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useState } from 'react';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
@@ -48,11 +48,12 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 		{ id: 14, url: 'https://cdn.mezon.vn/sticker/EmojiDom/emojibest_com_emojidom_anim_8.gif', type: 'cat' },
 		{ id: 15, url: 'https://cdn.mezon.vn/sticker/EmojiDom/emojibest_com_emojidom_anim_13.gif', type: 'cat' },
 	];
-
+	const { setSubPanelActive } = useGifsStickersEmoji();
 	const [selectedType, setSelectedType] = useState('');
 	const [selectImage, setSelectImage] = useState<any>(images);
 	const handleClickImage = (imageUrl: string) => {
 		handleSend({ t: '' }, [], [{ url: imageUrl, height: 40, width: 40, filetype: 'image/gif' }], []);
+		setSubPanelActive(SubPanelName.NONE);
 	};
 
 	const handleClickAvt = (type: string) => {
@@ -63,7 +64,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 		const filteredImages = selectedType ? images.filter((image) => image.type === selectedType) : images;
 		setSelectImage(filteredImages);
 	}, [selectedType]);
-	
+
 	return (
 		<div className="flex h-full pr-2">
 			<div className="w-[40%] flex flex-col px-2 gap-y-2 max-w-[40%]">

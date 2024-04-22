@@ -1,5 +1,5 @@
-import { ChannelType } from 'mezon-js';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../../Icons';
 
@@ -9,7 +9,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const name = channel?.channel_label;
 	return (
 		<div className="flex flex-row items-center relative">
-			<div className="absolute flex text-zinc-400 text-lg font-['Manrope'] pb-0">
+			<div className="absolute flex text-zinc-400 text-lg pb-0">
 				{isPrivate === ChannelStatusEnum.isPrivate && type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-6 h-6" />
 				)}
@@ -20,7 +20,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 
-			<p className="mb-0.5 text-white font-thin font-['Manrope'] ml-7 mt-2 max-w-[200px] overflow-x-hidden text-ellipsis one-line">{name}</p>
+			<p className="mb-0.5 text-white ml-7 mt-2 max-w-[200px] overflow-x-hidden text-ellipsis one-line">{name}</p>
 		</div>
 	);
 };
@@ -30,7 +30,7 @@ export const ThreadLable: React.FC<ThreadNameProps> = ({ name }) => {
 		<div className="items-center flex flex-row gap-1">
 			<Icons.ArrowToThread />
 			<Icons.ThreadNotClick />
-			<p className="text-white mb-0.5 font-thin font-['Manrope']"> {name}</p>
+			<p className="text-white mb-0.5 font-thin"> {name}</p>
 		</div>
 	);
 };
@@ -63,7 +63,7 @@ export const SearchMessage: React.FC = () => {
 				<input
 					type="text"
 					placeholder="Search"
-					className="text-[#AEAEAE] font-['Manrope'] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
+					className="text-[#AEAEAE] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
 					onClick={handleInputClick}
 				/>
 			</div>

@@ -89,7 +89,7 @@ export const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
 
 
 export const notImplementForGifOrStickerSendFromPanel = (data:ApiMessageAttachment) => {
-	if(data.url?.includes('giphy.com') || data.filetype === 'image/gif'){
+	if(data.url?.includes('tenor.com') || data.filetype === 'image/gif'){
 		return true
 	} else {
 		return false

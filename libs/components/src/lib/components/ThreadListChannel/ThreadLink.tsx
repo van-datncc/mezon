@@ -28,6 +28,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
+		distanceToBottom: 0,
 	});
 
 	const channelPath = toChannelPage(thread.channel_id as string, thread.clan_id || '');
@@ -39,9 +40,11 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const handleMouseClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
+		const windowHeight = window.innerHeight;
 
 		if (event.button === 2) {
-			setCoords({ mouseX, mouseY });
+			const distanceToBottom = windowHeight - event.clientY;
+			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
 	};
@@ -68,7 +71,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			<Link
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded hover:text-white text-[15px] ${active ? 'font-bold bg-[#36373D] text-white' : ''} ${isUnReadChannel ? 'font-bold text-white' : ''}`}
+				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium hover:text-white text-[15px] ${active ? 'font-medium bg-[#36373D] text-white' : ''} ${isUnReadChannel ? 'font-bold text-white' : ''}`}
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
 				onClick={() => setIsShowCreateThread(false)}

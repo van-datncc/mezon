@@ -1,6 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { IChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import { useEffect, useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
 import ItemPanel from './ItemPanel';
@@ -20,6 +21,8 @@ const typeChannel = {
 
 const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel }: PanelChannel) => {
 	const { userProfile } = useAuth();
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [positionTop, setPositionTop] = useState(false);
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -30,9 +33,17 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		onDeleteChannel();
 	};
 
+	useEffect(() => {
+		const heightPanel = panelRef.current?.clientHeight;
+		if (heightPanel && heightPanel > coords.distanceToBottom) {
+			setPositionTop(true);
+		}
+	}, [coords.distanceToBottom]);
+
 	return (
 		<div
-			style={{ left: coords.mouseX, top: coords.mouseY }}
+			ref={panelRef}
+			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
 			className="fixed top-full bg-[#323232] rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>

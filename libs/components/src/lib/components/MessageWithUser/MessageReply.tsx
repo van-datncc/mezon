@@ -58,7 +58,7 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 								<div className=" flex flex-row items-center">
 									<div
 										onClick={(e) => getIdMessageToJump(messageRefId, e)}
-										className="text-[13px] font-manrope pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-1"
+										className="text-[13px] pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-1"
 									>
 										Click to see attachment
 									</div>
@@ -67,7 +67,7 @@ const MessageReply = ({ message }: MessageReplyProps) => {
 							) : (
 								<span
 									onClick={(e) => getIdMessageToJump(messageRefId, e)}
-									className="text-[13px] font-manrope hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1"
+									className="text-[13px] hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1"
 								>
 									{messageRefFetchFromServe.content && messageRefFetchFromServe.content.t}
 								</span>

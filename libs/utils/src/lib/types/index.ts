@@ -329,12 +329,17 @@ export type SenderInfoOptionals = {
 	avatar?: string | undefined;
 };
 
+export interface IGifCategory {
+	image: string;
+	name: string;
+	path: string;
+	searchterm: string;
+}
+
 export interface IGif {
-	images: {
-		original: {
-			url: string;
-		};
-		fixed_height: {
+	itemurl: string;
+	media_formats: {
+		gif: {
 			url: string;
 		};
 	};
