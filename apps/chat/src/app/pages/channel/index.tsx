@@ -96,7 +96,9 @@ export default function ChannelLayout() {
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		setDraggingState(true);
+		if (e.dataTransfer?.types.includes('Files')) {
+			setDraggingState(true);
+		}
 	};
 
 	return (

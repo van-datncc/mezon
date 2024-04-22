@@ -48,7 +48,7 @@ function FileUploadByDnD() {
 			attachments.forEach((attachment) => setAttachmentData(attachment));
 		});
 	};
-
+	
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }
 
