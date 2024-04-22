@@ -11,7 +11,7 @@ const SearchThread = () => {
 				<input
 					type="text"
 					placeholder="Search for Thread Name"
-					className="text-[#AEAEAE] text-sm font-['Manrope'] placeholder-[#AEAEAE] placeholder:text-sm outline-none bg-transparent w-full"
+					className="text-[#AEAEAE] text-sm placeholder-[#AEAEAE] placeholder:text-sm outline-none bg-transparent w-full"
 					onChange={(event) => hanldeChange(event)}
 				/>
 			</div>

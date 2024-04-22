@@ -71,7 +71,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			<Link
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded hover:text-white text-[15px] ${active ? 'font-bold bg-[#36373D] text-white' : ''} ${isUnReadChannel ? 'font-bold text-white' : ''}`}
+				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium hover:text-white text-[15px] ${active ? 'font-medium bg-[#36373D] text-white' : ''} ${isUnReadChannel ? 'font-bold text-white' : ''}`}
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
 				onClick={() => setIsShowCreateThread(false)}

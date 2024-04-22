@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* You can add global styles to this file, and also import other style files */
 :root {
@@ -55,7 +56,7 @@ html,
 body {
   --tw-bg-opacity: 1;
   background-color: rgb(30 30 30 / var(--tw-bg-opacity));
-  font-family: 'Manrope';
+  font-family: "Noto Sans", sans-serif;
 }
 
 //button voice control pannel
@@ -196,7 +197,7 @@ input:-webkit-autofill:active {
   font-size: small;
   caret-color: white;
   font-size: inherit;
-  font-family: Manrope;
+  font-family: "Noto Sans", sans-serif;
 }
 
 // text more one line then hidden

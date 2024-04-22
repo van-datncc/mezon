@@ -127,7 +127,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 		<>
 			{isEmojiListShowed && valueInput !== '' && suggestions.length > 0 && (
 				<div className="bg-[#2B2D31] p-3 mb-2 rounded-lg h-fit absolute bottom-10 w-full duration-100 outline-none" tabIndex={0} ref={ref}>
-					<div className="mb-2 font-manrope text-xs font-semibold text-[#B1B5BC]">
+					<div className="mb-2 text-xs font-semibold text-[#B1B5BC]">
 						<p>Emoji Matching: {inputCorrect}</p>
 					</div>
 					<div className="w-full max-h-[20rem] h-fit overflow-y-scroll bg-[#2B2D31] hide-scrollbar">
@@ -143,7 +143,7 @@ const EmojiListSuggestion = forwardRef(({ valueInput = '' }: EmojiSuggestionList
 									onClick={() => pickEmoji(emoji)}
 								>
 									<span className="text-xl w-10 ml-1">{emoji.skins[0].native}</span>
-									<span className="text-xs font-manrope">{emoji.skins[0].shortcodes}</span>
+									<span className="text-xs">{emoji.skins[0].shortcodes}</span>
 								</li>
 							))}
 						</ul>

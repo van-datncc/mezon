@@ -8,8 +8,8 @@ export const QRSection: React.FC = () => {
 				</div>
 			</div>
 			<div className="flex flex-col justify-start items-center w-[210px] h-fit p-0 gap-y-1">
-				<p className="font-manrope text-base font-medium text-[#ffffff] leading-[150%]">Sign in by QR code</p>
-				<p className="font-manrope text-sm font-normal text-[#cccccc] leading-[130%]">Use Mezon on mobile to scan QR</p>
+				<p className="text-base font-medium text-[#ffffff] leading-[150%]">Sign in by QR code</p>
+				<p className="text-sm font-normal text-[#cccccc] leading-[130%]">Use Mezon on mobile to scan QR</p>
 			</div>
 		</div>
 	);
