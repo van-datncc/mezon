@@ -14,6 +14,7 @@ function GifCategory({ gifCategory }: GifCategoryProps) {
 		setShowCategories(false);
 		setClickedTrendingGif(false);
 		setButtonArrowBack(true);
+		
 	};
 
 	return (

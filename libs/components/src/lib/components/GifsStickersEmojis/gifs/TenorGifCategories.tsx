@@ -1,4 +1,4 @@
-import { useChatSending, useGifs } from '@mezon/core';
+import { useChatSending, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { IGifCategory, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { Loading } from 'libs/ui/src/lib/Loading';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -30,7 +30,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		setButtonArrowBack,
 	} = useGifs();
 	const [dataToRenderGifs, setDataToRenderGifs] = useState<any>();
-
+	const { setSubPanelActive } = useGifsStickersEmoji();
 	const ontrendingClickingStatus = () => {
 		setClickedTrendingGif(true);
 		setShowCategories(false);
@@ -63,6 +63,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 
 	const handleClickGif = (giftUrl: string) => {
 		handleSend({ t: '' }, [], [{ url: giftUrl }], []);
+		setSubPanelActive(SubPanelName.NONE);
 	};
 
 	const renderGifCategories = () => {

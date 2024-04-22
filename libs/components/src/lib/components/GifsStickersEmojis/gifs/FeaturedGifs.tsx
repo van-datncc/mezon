@@ -2,7 +2,6 @@ import { useChatSending, useGifs } from '@mezon/core';
 import { Icons } from '../../../components';
 
 type FeaturedGifsProps = {
-	// activeTab: SubPanelName;
 	channelId: string;
 	channelLabel: string;
 	controlEmoji?: boolean;
@@ -13,7 +12,7 @@ type FeaturedGifsProps = {
 
 function FeaturedGifs({ channelId, channelLabel, mode, onClickToTrending }: FeaturedGifsProps) {
 	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
-	const { dataGifCategories, dataGifsSearch, loadingStatusGifs, valueInputToCheckHandleSearch, dataGifsFeartured } = useGifs();
+	const {  dataGifsFeartured } = useGifs();
 	return (
 		<>
 			<div className="relative h-32 rounded-md cursor-pointer overflow-hidden group" onClick={onClickToTrending}>
