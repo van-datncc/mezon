@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGFM from 'remark-gfm';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
+import ChannelHashtag from './HashTag';
 import PreClass from './PreClass';
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
@@ -75,7 +76,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								ref={panelRef}
 								onMouseDown={(event) => handleMouseClick(event)}
 							>
-								{tagName}
+								{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
 							</span>
 						)}{' '}
 					</div>
