@@ -1,7 +1,7 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useAuth, useClans, useThreads } from '@mezon/core';
-import { ChannelType } from 'mezon-js';
+import { MezonPolicyProvider, useAuth, useClans, useMenu, useThreads } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData } from 'react-router-dom';
@@ -13,6 +13,7 @@ const ClanLayout = () => {
 	const { clanId } = useLoaderData() as ClanLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
+	const { closeMenu, statusMenu } = useMenu();
 
 	const { isShowCreateThread } = useThreads();
 
@@ -26,7 +27,7 @@ const ClanLayout = () => {
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
 			<MezonPolicyProvider clanId={clanId}>
-				<div className="flex flex-col max-w-[272px] bg-bgSurface relative">
+				<div className={` flex-col max-w-[272px] bg-bgSurface relative ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList channelCurrentType={currentChannel?.type} />
 					<FooterProfile

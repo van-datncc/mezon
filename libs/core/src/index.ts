@@ -32,6 +32,7 @@ export * from './lib/chat/hooks/useGifs';
 export * from './lib/chat/hooks/useGifsStickersEmojis';
 export * from './lib/chat/hooks/useInvite';
 export * from './lib/chat/hooks/useJumpMessage';
+export * from './lib/chat/hooks/useMenu';
 export * from './lib/chat/hooks/useNotify';
 export * from './lib/chat/hooks/useOnClickOutSide';
 export * from './lib/chat/hooks/useReference';
