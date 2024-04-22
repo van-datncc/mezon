@@ -1,5 +1,5 @@
 import { EmojiListSuggestion } from '@mezon/components';
-import { useChatMessages, useClickUpToEdit, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { useChatMessages, useClickUpToEdit, useEmojiSuggestion, useGifsStickersEmoji, useMenu } from '@mezon/core';
 import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
@@ -202,8 +202,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState } = useReference();
-
+	const { closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
+		if (closeMenu && statusMenu) {
+			return;
+		}
 		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
 			return focusToElement(editorRef);
 		}
