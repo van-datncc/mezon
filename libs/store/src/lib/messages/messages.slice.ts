@@ -1,10 +1,10 @@
-import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
-import { reactionActions } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
+import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
@@ -444,6 +444,11 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessagesEntities, (entities) => {
 		const messages = Object.values(entities);
 		return messages.sort(orderMessageByDate).filter((message) => message && message.channel_id === channelId);
+	});
+
+export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
+	createSelector(selectMessageByChannelId(channelId), (messages) => {
+		return messages.filter((message) => message.sender_id === senderId).pop();
 	});
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>

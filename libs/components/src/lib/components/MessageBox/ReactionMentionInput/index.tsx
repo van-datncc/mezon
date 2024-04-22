@@ -1,5 +1,5 @@
 import { EmojiListSuggestion } from '@mezon/components';
-import { useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { useChatMessages, useClickUpToEdit, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
 import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
@@ -49,6 +49,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
+	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -201,7 +202,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState } = useReference();
-	
+
 	useEffect(() => {
 		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
 			return focusToElement(editorRef);
@@ -248,6 +249,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleChangeNameThread = (nameThread: string) => {
 		setNameThread(nameThread);
 	};
+
+	const clickUpToEditMessage = () => {
+		const idRefMessage = lastMessageByUserId?.id;
+		if (idRefMessage) {
+			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			dispatch(referencesActions.setOpenEditMessageState(true));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
+			dispatch(referencesActions.setReferenceMessage(lastMessageByUserId));
+		}
+	};
+
+	useClickUpToEdit(editorRef, clickUpToEditMessage);
 
 	return (
 		<div className="relative">
