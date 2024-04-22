@@ -68,6 +68,9 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<InboxButton />
 								<HelpButton />
 							</div>
+							<div className="ssm:hidden">
+								<ChannelListButton />
+							</div>
 						</div>
 					</div>
 				</>
