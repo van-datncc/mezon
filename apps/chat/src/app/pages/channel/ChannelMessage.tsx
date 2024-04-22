@@ -2,7 +2,7 @@ import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak
 import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useReference } from '@mezon/core';
 import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 
@@ -52,6 +52,8 @@ export function ChannelMessage(props: MessageProps) {
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			e.stopPropagation();
 			if (editMessage) {
 				handleSend(editMessage, message.id);
 				setNewMessage(editMessage);
@@ -59,9 +61,12 @@ export function ChannelMessage(props: MessageProps) {
 			}
 		}
 		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopPropagation();
 			handleCancelEdit();
 		}
 	};
+
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
 			EditSendMessage(editMessage, messageId);
@@ -76,7 +81,18 @@ export function ChannelMessage(props: MessageProps) {
 		textarea.style.height = 'auto';
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
-
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	useEffect(() => {
+		if (openEditMessageState && mess.id === referenceMessage?.id) {
+			textareaRef.current?.focus();
+		}
+	}, [openEditMessageState, mess, referenceMessage]);
+	const handleFocus = () => {
+		if (textareaRef.current) {
+			const length = textareaRef.current.value.length;
+			textareaRef.current.setSelectionRange(length, length);
+		}
+	};
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser
@@ -104,6 +120,8 @@ export function ChannelMessage(props: MessageProps) {
 			{openEditMessageState && mess.id === referenceMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-21px]">
 					<textarea
+						onFocus={handleFocus}
+						ref={textareaRef}
 						defaultValue={editMessage}
 						className="w-[83%] bg-black rounded p-[10px]"
 						onKeyDown={onSend}

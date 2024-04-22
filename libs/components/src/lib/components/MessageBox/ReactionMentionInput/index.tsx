@@ -1,6 +1,15 @@
 import { EmojiListSuggestion } from '@mezon/components';
 import { useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { IMessageSendPayload, KEY_KEYBOARD, MentionDataProps, ThreadValue, UserMentionsOpt, focusToElement, threadError } from '@mezon/utils';
+import {
+	IMessageSendPayload,
+	KEY_KEYBOARD,
+	MentionDataProps,
+	SubPanelName,
+	ThreadValue,
+	UserMentionsOpt,
+	focusToElement,
+	threadError,
+} from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -200,13 +209,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const emojiListRef = useRef<HTMLDivElement>(null);
 	const { subPanelActive } = useGifsStickersEmoji();
-	const { openReplyMessageState } = useReference();
-	
+	const { openReplyMessageState, openEditMessageState } = useReference();
+
 	useEffect(() => {
-		if (keyCodeFromKeyBoard || !isEmojiListShowed || subPanelActive || (referenceMessage && openReplyMessageState)) {
+		if (subPanelActive !== SubPanelName.NONE || (referenceMessage !== null && openReplyMessageState) || !openEditMessageState) {
 			return focusToElement(editorRef);
 		}
-	}, [pressAnyButtonState, keyCodeFromKeyBoard, isEmojiListShowed, subPanelActive, referenceMessage, openReplyMessageState]);
+	}, [subPanelActive, referenceMessage, openReplyMessageState, openEditMessageState]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
