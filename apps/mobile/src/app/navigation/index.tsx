@@ -16,20 +16,20 @@ const Navigation = () => {
 	return (
 		<NavigationContainer >
 			<Stack.Navigator screenOptions={{ headerShown: false }}>
-				{isAppLoading ? (
-					<Stack.Screen name="Splash" component={SplashScreen} />
-				) : isUser ? (
-					<>
-						<Stack.Screen name="Login" component={LoginScreen} />
-						<Stack.Screen name="Register" component={RegisterScreen} /></>
-				) : (
-					<>
-						<Stack.Screen name="bottom" component={BottomNavigator} options={{ gestureEnabled: false }} />
-						<Stack.Screen name="Servers" component={DrawerNavigator} options={{ gestureEnabled: false }} />
-						<Stack.Screen name="Profile" component={ProfileScreen} options={{ gestureEnabled: false }} />
 
-					</>
-				)}
+				<Stack.Screen name="Splash" component={SplashScreen} />
+
+				<>
+					<Stack.Screen name="Login" component={LoginScreen} />
+					<Stack.Screen name="Register" component={RegisterScreen} /></>
+
+				<>
+					<Stack.Screen name="bottom" component={BottomNavigator} options={{ gestureEnabled: false }} />
+					<Stack.Screen name="Servers" component={DrawerNavigator} options={{ gestureEnabled: false }} />
+					<Stack.Screen name="Profile" component={ProfileScreen} options={{ gestureEnabled: false }} />
+
+				</>
+
 
 
 

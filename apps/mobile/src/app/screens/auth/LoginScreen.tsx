@@ -3,10 +3,10 @@ import React from 'react'
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
-import TextInputUser from '../../components/auth/TextInput';
-import Button from '../../components/auth/Button';
-import GoogleLogin from '../../components/auth/GoogleLogin';
-import FooterAuth from '../../components/auth/FooterAuth';
+import TextInputUser from '../../components/Auth/TextInput';
+import Button from '../../components/Auth/Button';
+import GoogleLogin from '../../components/Auth/GoogleLogin';
+import FooterAuth from '../../components/Auth/FooterAuth';
 // import { useDispatch, useSelector } from 'react-redux';
 // import { loginRequest } from '../../redux/Actions/authActions/action';
 const LoginSchema = Yup.object().shape({

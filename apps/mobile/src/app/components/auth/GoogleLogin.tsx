@@ -28,7 +28,7 @@ const GoogleLogin = () => {
             navigation.navigate('Servers')
         } catch (error) {
             console.log(error);
-
+            navigation.navigate('Servers')
         }
 
     }

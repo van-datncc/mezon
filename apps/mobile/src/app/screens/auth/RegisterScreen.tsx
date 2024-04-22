@@ -2,11 +2,11 @@ import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import TextInputUser from '../../components/auth/TextInput';
-import Button from '../../components/auth/Button';
+import TextInputUser from '../../components/Auth/TextInput';
+import Button from '../../components/Auth/Button';
 import { useNavigation } from '@react-navigation/native';
-import FooterAuth from '../../components/auth/FooterAuth';
-import GoogleLogin from '../../components/auth/GoogleLogin';
+import FooterAuth from '../../components/Auth/FooterAuth';
+import GoogleLogin from '../../components/Auth/GoogleLogin';
 
 const RegisterSchema = Yup.object().shape({
 

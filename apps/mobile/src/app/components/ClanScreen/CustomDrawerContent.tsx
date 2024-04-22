@@ -4,8 +4,8 @@ import Feather from 'react-native-vector-icons/Feather'
 import { useNavigation } from '@react-navigation/native';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { HEIGHT } from '../../constants/config';
-import { darkColor } from '../../constants/Colors';
 import Images from 'apps/mobile/src/assets/Images';
+import { darkColor } from '../../constants/Colors';
 
 const CustomDrawerContent = (props) => {
     const navigation = useNavigation();

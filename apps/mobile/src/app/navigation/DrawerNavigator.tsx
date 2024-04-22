@@ -6,7 +6,7 @@ import MessagesScreen from '../screens/main/MessagesScreen';
 import Feather from 'react-native-vector-icons/Feather'
 import ServersScreen from '../screens/main/ClanScreen';
 import { darkColor } from '../constants/Colors';
-import CustomDrawerContent from '../components/servers/ClanScreen/CustomDrawerContent';
+import CustomDrawerContent from '../components/ClanScreen/CustomDrawerContent';
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = ({ navigation }) => {
