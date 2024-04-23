@@ -3,7 +3,7 @@ import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useE
 import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 
@@ -53,6 +53,8 @@ export function ChannelMessage(props: MessageProps) {
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			e.stopPropagation();
 			if (editMessage) {
 				handleSend(editMessage, message.id);
 				setNewMessage(editMessage);
@@ -60,9 +62,12 @@ export function ChannelMessage(props: MessageProps) {
 			}
 		}
 		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopPropagation();
 			handleCancelEdit();
 		}
 	};
+
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
 			EditSendMessage(editMessage, messageId);
@@ -76,6 +81,18 @@ export function ChannelMessage(props: MessageProps) {
 	const updateTextareaHeight = (textarea: HTMLTextAreaElement) => {
 		textarea.style.height = 'auto';
 		textarea.style.height = textarea.scrollHeight + 'px';
+	};
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	useEffect(() => {
+		if (openEditMessageState && mess.id === referenceMessage?.id) {
+			textareaRef.current?.focus();
+		}
+	}, [openEditMessageState, mess, referenceMessage]);
+	const handleFocus = () => {
+		if (textareaRef.current) {
+			const length = textareaRef.current.value.length;
+			textareaRef.current.setSelectionRange(length, length);
+		}
 	};
 
 	useEscapeKey(handleCancelEdit);
@@ -107,6 +124,8 @@ export function ChannelMessage(props: MessageProps) {
 			{openEditMessageState && mess.id === referenceMessage?.id && (
 				<div className="inputEdit relative left-[66px] top-[-21px]">
 					<textarea
+						onFocus={handleFocus}
+						ref={textareaRef}
 						defaultValue={editMessage}
 						className="w-[83%] bg-black rounded p-[10px]"
 						onKeyDown={onSend}
@@ -210,10 +229,10 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 	const handleClickDelete = () => {
 		deleteSendMessage(message.id);
 	};
-	const handleClickForward =()=> {
+	const handleClickForward = () => {
 		dispatch(toggleIsShowPopupForwardTrue());
-		dispatch(setSelectedMessage(message))
-	}
+		dispatch(setSelectedMessage(message));
+	};
 	const checkUser = userId === message.sender_id;
 	return (
 		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
@@ -226,8 +245,12 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply}>
 					Reply
 				</li>
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" 
-					onClick={()=>{handleClickForward()}}>
+				<li
+					className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer"
+					onClick={() => {
+						handleClickForward();
+					}}
+				>
 					Forward message
 				</li>
 				<CopyToClipboard text={message.content.t || ''}>

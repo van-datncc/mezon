@@ -1,5 +1,5 @@
 import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
-import { useAuth, useMenu } from '@mezon/core';
+import { useAuth, useEscapeKey, useMenu } from '@mezon/core';
 import { useState } from 'react';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
@@ -11,6 +11,8 @@ export default function Direct() {
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
+
+	useEscapeKey(() => setOpenSetting(false));
 
 	return (
 		<>

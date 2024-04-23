@@ -1,4 +1,4 @@
-import { useOnClickOutside } from '@mezon/core';
+import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -21,6 +21,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
 	));
+
 	return (
 		<div
 			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
@@ -88,11 +89,12 @@ function ThreadButton() {
 	};
 
 	useOnClickOutside(threadRef, () => setIsShowThread(false));
+	useEscapeKey(() => setIsShowThread(false));
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
-				<button onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.ThreadIcon />
 				</button>
 			</Tooltip>
@@ -126,9 +128,11 @@ export function InboxButton() {
 	};
 
 	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
+	useEscapeKey(() => setIsShowInbox(false));
+
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<button onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
+			<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 				<Icons.Inbox />
 			</button>
 			{isShowInbox && <NotificationList />}

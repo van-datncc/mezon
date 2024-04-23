@@ -111,7 +111,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	return (
 		<div className="relative">
-			<div className="w-full max-h-full flex gap-2 mb-3">
+			<div className="w-full max-h-full flex gap-2 mb-2 mt-2">
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
 						<Fragment key={index}>
