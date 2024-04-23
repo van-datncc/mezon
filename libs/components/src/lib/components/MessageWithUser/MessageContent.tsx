@@ -10,7 +10,7 @@ import { useMessageParser } from './useMessageParser';
 type IMessageContentProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
-	isCombine: boolean;
+	isCombine?: boolean;
 	newMessage?: string;
 };
 
@@ -26,7 +26,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 		const documents: ApiMessageAttachment[] = [];
 
 		attachments.forEach((attachment) => {
-			if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('giphy.com')) {
+			if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('tenor.com')) {
 				videos.push(attachment);
 			} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
 				images.push(attachment);
@@ -80,9 +80,9 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 
 	return (
 		<>
-			{renderVideos()}
-			{renderImages()}
-			{renderDocuments()}
+			{videos.length > 0 && renderVideos()}
+			{images.length > 0 && renderImages()}
+			{documents.length > 0 && renderDocuments()}
 			{newMessage !== '' ? (
 				<div className="flex ">
 					<div id={message.id}>

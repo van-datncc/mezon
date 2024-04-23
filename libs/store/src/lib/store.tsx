@@ -28,6 +28,7 @@ import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from '.
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
+import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
@@ -79,6 +80,7 @@ const reducer = {
 	policiesDefaultSlice: policiesDefaultReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
+	forwardmessage: popupForwardReducer,
 	notification: notificationReducer,
 	voice: voiceReducer,
 	references: referencesReducer,

@@ -6,7 +6,7 @@ export default {
 
 	'&multiLine': {
 		control: {
-			fontFamily: 'manrope',
+			fontFamily: 'Noto Sans, sans-serif',
 			minHeight: 35,
 			border: 'none',
 			outline: 'none',
@@ -37,10 +37,15 @@ export default {
 	},
 
 	suggestions: {
-
+		padding: '5px 0',
+		maxHeight: 400,
+		width: '100%',
+		overflowY: 'auto',
+		borderRadius: 12,
+		marginBottom: 20,
+		backgroundColor: '#272822',
 		list: {
 			backgroundColor: '#272822',
-			fontSize: 15,
 		},
 		item: {
 			padding: '5px 15px',

@@ -1,5 +1,5 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useDragAndDrop, useReference } from '@mezon/core';
+import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -111,7 +111,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 	return (
 		<div className="relative">
-			<div className="w-full max-h-full flex gap-2 mb-3">
+			<div className="w-full max-h-full flex gap-2 mb-2 mt-2">
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
 						<Fragment key={index}>
@@ -158,7 +158,7 @@ MessageBox.Skeleton = () => {
 				<div className="grow self-stretch justify-start items-center gap-2 flex">
 					<div
 						contentEditable
-						className="grow text-white text-sm font-['Manrope'] placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
+						className="grow text-white text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
 					/>
 				</div>
 				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12 rounded-r-lg">
@@ -171,5 +171,3 @@ MessageBox.Skeleton = () => {
 };
 
 export default MessageBox;
-
-

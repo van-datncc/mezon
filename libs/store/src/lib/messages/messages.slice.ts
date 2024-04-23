@@ -1,10 +1,10 @@
-import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
-import { reactionActions } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
+import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
@@ -304,7 +304,14 @@ export const messagesSlice = createSlice({
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			messagesAdapter.addOne(state, action.payload);
+			if (action.payload.code === 0) {
+				messagesAdapter.addOne(state, action.payload);
+			} else if (action.payload.code === 1) {
+				messagesAdapter.updateOne(state, {
+					id: action.payload.id,
+					changes: action.payload,
+				});
+			}
 			if (action.payload.channel_id) {
 				// TODO: check duplicates with setChannelLastMessage
 				state.unreadMessagesEntries = {
@@ -433,7 +440,7 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +b.creationTimeMs - +a.creationTimeMs;
+		return +a.creationTimeMs - +b.creationTimeMs;
 	}
 	return 0;
 }
@@ -446,9 +453,14 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 		return messages.sort(orderMessageByDate).filter((message) => message && message.channel_id === channelId);
 	});
 
+export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
+	createSelector(selectMessageByChannelId(channelId), (messages) => {
+		return messages.filter((message) => message.sender_id === senderId).pop();
+	});
+
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.shift();
+		return messages.pop();
 	});
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>

@@ -35,7 +35,7 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 					{type === -1 ? [] : iconMap[type as ChannelType]}
 					<div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">
 						<input
-							className="Input grow shrink basis-0 h-10 outline-none bg-neutral-950 text-neutral-200 text-sm font-normal font-['Manrope'] placeholder-[#AEAEAE]"
+							className="Input grow shrink basis-0 h-10 outline-none bg-neutral-950 text-neutral-200 text-sm font-normal placeholder-[#AEAEAE]"
 							onChange={handleInputChange}
 							placeholder="Enter the channel's name"
 						/>

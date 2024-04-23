@@ -48,6 +48,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					status={userStatus}
 					isHideStatus={friend.state !== 0 ? true : false}
 					isHideIconStatus={friend.state !== 0 ? true : false}
+					isHideAnimation={true}
 					key={friend.user?.id}
 					numberCharacterCollapse={100}
 					classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList'}

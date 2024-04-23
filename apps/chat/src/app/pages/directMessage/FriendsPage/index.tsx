@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useFriends } from '@mezon/core';
+import { useFriends, useMenu } from '@mezon/core';
 import { FriendsEntity, RootState, friendsActions, requestAddFriendParam, selectMemberStatus, useAppDispatch } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { useState } from 'react';
@@ -80,10 +80,23 @@ export default function FriendsPage() {
 
 	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
 
+	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
+
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
 			<div className="flex min-w-0 gap-7 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-heightHeader">
 				<div className="flex flex-row gap-2">
+					{closeMenu ? (
+						statusMenu ? (
+							<></>
+						) : (
+							<div onClick={() => setStatusMenu(true)}>
+								<Icons.OpenMenu defaultSize="w-6 h-6" />
+							</div>
+						)
+					) : (
+						<></>
+					)}
 					<Icons.IconFriends />
 					Friend
 				</div>

@@ -1,6 +1,5 @@
-import { ChatWelcome, GifStickerEmojiPopup } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useGifsStickersEmoji, useJumpToMessage, useReference } from '@mezon/core';
-import { SubPanelName } from '@mezon/utils';
+import { ChatWelcome } from '@mezon/components';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
@@ -18,10 +17,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
-	const [heightEditor, setHeightEditor] = useState(30);
 
 	const { idMessageReplied } = useReference();
-	const { subPanelActive } = useGifsStickersEmoji();
 
 	const fetchData = () => {
 		loadMoreMessage();
@@ -58,12 +55,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
-	const [popupClass, setPopupClass] = useState('fixed right-[1rem] z-10');
-
-	useEffect(() => {
-		setPopupClass(`fixed right-[1rem] bottom-[${heightEditor + 20}px] z-10`);
-	}, [heightEditor]);
-
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
 	};
@@ -77,20 +68,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				height: '100%',
 				overflowY: 'scroll',
 				display: 'flex',
-				flexDirection: 'column-reverse',
+				flexDirection: 'column',
 				overflowX: 'hidden',
 			}}
 		>
+			<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
-				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
+				style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}
 				inverse={true}
 				hasMore={hasMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
 				scrollableTarget="scrollLoading"
 				refreshFunction={fetchData}
-				endMessage={<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
@@ -101,22 +92,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						key={message.id}
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
 						message={message}
-						preMessage={i < messages.length - 1 ? messages[i + 1] : undefined}
+						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
 						channelId={channelId}
 						channelLabel={channelLabel || ''}
 					/>
 				))}
 			</InfiniteScroll>
-			{subPanelActive !== SubPanelName.NONE && (
-				<div
-					className={popupClass}
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-				>
-					<GifStickerEmojiPopup />
-				</div>
-			)}
 		</div>
 	);
 }

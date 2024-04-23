@@ -1,11 +1,11 @@
-import { useAppParams, useChatReaction, useGifsStickersEmoji } from '@mezon/core';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { useAppParams, useChatReaction, useEscapeKey, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmojiPickerComp from '../EmojiPicker';
-import GiphyComp from './gifs/GiphyComp';
+import TenorGifCategories from './gifs/TenorGifCategories';
 import { InputSearch } from './inputSearch';
 import ImageSquare from './stickers';
 
@@ -16,6 +16,7 @@ const GifStickerEmojiPopup = () => {
 
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 	const { setReactionPlaceActive } = useChatReaction();
+	const { setShowCategories, setValueInputSearch } = useGifs();
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -27,11 +28,15 @@ const GifStickerEmojiPopup = () => {
 		}
 	}, [type]);
 	const handleTabClick = (tab: SubPanelName) => {
+		setShowCategories(true);
+		setValueInputSearch('');
 		if (tab === SubPanelName.EMOJI) {
 			setReactionPlaceActive(EmojiPlaces.EMOJI_EDITOR);
 		}
 		setSubPanelActive(tab);
 	};
+
+	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
 
 	return (
 		<div className="flex flex-col items-center w-[500px] h-fit min-h-[500px] rounded-lg bg-[#222222]">
@@ -62,7 +67,7 @@ const GifStickerEmojiPopup = () => {
 			<div className="w-full h-fit">
 				{subPanelActive === SubPanelName.GIFS && (
 					<div>
-						<GiphyComp
+						<TenorGifCategories
 							activeTab={SubPanelName.EMOJI}
 							channelId={currentChannel?.id || ''}
 							channelLabel={currentChannel?.channel_label || ''}
