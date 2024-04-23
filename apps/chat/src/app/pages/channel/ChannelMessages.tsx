@@ -24,19 +24,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
-	const { openReplyMessageState } = useReference();
 
 	useEffect(() => {
 		if (idMessageReplied) {
 			setMessageIdToJump(idMessageReplied);
 			setTimeToJump(0);
 			setPositionToJump('center');
-		} else if (lastMessageId && openReplyMessageState === false) {
-			setMessageIdToJump(lastMessageId);
-			setTimeToJump(200);
+		} else {
+			setMessageIdToJump(getJumpToMessageId());
+			setTimeToJump(1000);
 			setPositionToJump('start');
 		}
-	}, [getJumpToMessageId, idMessageReplied, lastMessageId]);
+	}, [getJumpToMessageId, idMessageReplied]);
 
 	const { jumpToMessage } = useJumpToMessage();
 
@@ -67,11 +66,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				height: '100%',
 				overflowY: 'scroll',
 				display: 'flex',
-				flexDirection: 'column',
+				flexDirection: 'column-reverse',
 				overflowX: 'hidden',
 			}}
 		>
-			<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
 			<InfiniteScroll
 				dataLength={messages.length}
 				next={fetchData}
@@ -85,6 +83,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
 			>
+				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
+
 				{messages.map((message, i) => (
 					<ChannelMessage
 						mode={mode}
