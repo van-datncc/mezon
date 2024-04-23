@@ -1,7 +1,9 @@
 import { ChatWelcome } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -24,13 +26,16 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+	const { openReplyMessageState } = useReference();
 
 	useEffect(() => {
+		console.log(openReplyMessageState);
+		console.log(idMessageReplied);
 		if (idMessageReplied) {
 			setMessageIdToJump(idMessageReplied);
 			setTimeToJump(0);
 			setPositionToJump('center');
-		} else if (lastMessageId) {
+		} else if (lastMessageId && openReplyMessageState === false) {
 			setMessageIdToJump(lastMessageId);
 			setTimeToJump(200);
 			setPositionToJump('start');

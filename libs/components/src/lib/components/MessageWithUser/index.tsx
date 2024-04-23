@@ -10,7 +10,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useReference } from '@mezon/core';
+import { useChatMessages, useReference } from '@mezon/core';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
@@ -37,6 +37,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
+	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId: currentChannelId ?? '' });
+
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -51,9 +53,8 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	}, [message.attachments]);
 
 	const propsChild = { isCombine };
-	const checkReplied = referenceMessage && referenceMessage.id === message.id;
-	const checkMessageTargetToMoved = idMessageReplied === message.id;
-
+	const checkReplied = referenceMessage && referenceMessage.id === message.id && openReplyMessageState;
+	const checkMessageTargetToMoved = idMessageReplied === message.id && message.id !== lastMessageId;
 
 	return (
 		<>
@@ -66,10 +67,10 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 			)}
 			<div className={`relative ${isCombine ? '' : 'mt-3'}`}>
 				<div
-					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+					className={`bg-[#26262b] relative rounded-sm  overflow-visible ${checkReplied || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
 					<div
-						className={`${(checkReplied && openReplyMessageState) || (checkMessageTargetToMoved && openReplyMessageState) ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
+						className={`${checkReplied || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'bg-[#26262b] group-hover:bg-[#232323]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
 						className={`flex h-15 flex-col w-auto px-3 py-[2px]  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
