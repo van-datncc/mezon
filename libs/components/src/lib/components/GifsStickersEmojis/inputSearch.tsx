@@ -76,7 +76,7 @@ export const InputSearch: React.FC = () => {
 						onChange={handleInputChange}
 						type="text"
 						placeholder="Search"
-						className="text-[#AEAEAE] font-['Manrope'] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
+						className="text-[#AEAEAE] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
 						value={valueInputToCheckHandleSearch}
 					/>
 					<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-[#1E1F22] top-1/4 transform -translate-y-1/2 m-2 cursor-pointer">

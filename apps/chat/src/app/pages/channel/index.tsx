@@ -96,29 +96,18 @@ export default function ChannelLayout() {
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		setDraggingState(true);
-	};
-
-	const handleDragOver = (e: DragEvent<HTMLElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDraggingState(true);
-	};
-
-	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
+		if (e.dataTransfer?.types.includes('Files')) {
+			setDraggingState(true);
+		}
 	};
 
 	return (
 		<>
 			{draggingState && <FileUploadByDnD />}
 			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden"
+				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden z-0"
 				id="mainChat"
 				onDragEnter={handleDragEnter}
-				onDragOver={handleDragOver}
-				onDragLeave={handleDragLeave}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
 					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
