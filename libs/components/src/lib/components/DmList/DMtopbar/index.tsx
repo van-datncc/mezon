@@ -1,4 +1,4 @@
-import { useMemberStatus } from '@mezon/core';
+import { useMemberStatus, useMenu } from '@mezon/core';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -14,11 +14,15 @@ export type ChannelTopbarProps = {
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
+	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
 		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 flex-shrink">
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
+					<div onClick={() => setStatusMenu(true)} className="mr-2">
+						<Icons.OpenMenu defaultSize={`w-6 h-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} />
+					</div>
 					<MemberProfile
 						numberCharacterCollapse={22}
 						avatar={
@@ -35,7 +39,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					<h2 className="shrink-1 text-white text-ellipsis">{currentDmGroup?.channel_label}</h2>
 				</div>
 
-				<div className=" items-center h-full ml-auto flex flex-1 justify-end">
+				<div className=" items-center h-full ml-auto hidden flex-1 justify-end ssm:flex">
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>

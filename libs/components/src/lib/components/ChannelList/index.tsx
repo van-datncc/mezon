@@ -72,7 +72,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
-			className="overflow-y-scroll scrollbar-thin w-[100%] h-[100%] pb-[12%] "
+			className="overflow-y-scroll scrollbar-thin overflow-x-hidden w-[100%] h-[100%] pb-[10px] "
 			id="channelList"
 		>
 			{isChange ? <ForwardMessageModal open={isChange} /> : null}
@@ -83,7 +83,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 			</div>
 			<hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
 			<div
-				className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ${channelCurrentType === ChannelType.CHANNEL_TYPE_VOICE ? 'pb-[110px]' : 'pb-[8%]'}`}
+				className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide ${channelCurrentType === ChannelType.CHANNEL_TYPE_VOICE ? 'pb-[230px]' : 'pb-[120px]'}`}
 			>
 				{categorizedChannels.map((category: ICategoryChannel) => (
 					<div key={category.id}>
