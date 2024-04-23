@@ -1,6 +1,6 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
 import { MezonPolicyProvider, useAuth, useClans, useMenu, useThreads } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentVoiceChannel } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,6 +20,7 @@ const ClanLayout = () => {
 	const [openSetting, setOpenSetting] = useState(false);
 
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentVoiceChannel = useSelector(selectCurrentVoiceChannel);
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
@@ -27,9 +28,9 @@ const ClanLayout = () => {
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
 			<MezonPolicyProvider clanId={clanId}>
-				<div className={` flex-col max-w-[272px] bg-bgSurface relative ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
+				<div className={` flex-col max-w-[272px] bg-bgSurface relative overflow-hidden ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
-					<ChannelList channelCurrentType={currentChannel?.type} />
+					<ChannelList channelCurrentType={currentVoiceChannel?.type} />
 					<FooterProfile
 						name={userProfile?.user?.username || ''}
 						status={userProfile?.user?.online}

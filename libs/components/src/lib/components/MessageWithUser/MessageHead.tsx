@@ -28,10 +28,11 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
 			const distanceToBottom = windowHeight - clickY;
-			const elementName = event.currentTarget.querySelector('.username');
+			const elementName = event.currentTarget;
 			if (elementName) {
 				setPositionLeft(elementName.getBoundingClientRect().width + 420);
 				setPositionTop(clickY - 50);
+				setPositionBottom(false);
 			}
 			const heightElementShortUserProfileMin = 313;
 			if (distanceToBottom < heightElementShortUserProfileMin) {
@@ -46,7 +47,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	}
 
 	return (
-		<div className="relative group" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
+		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
 					className="text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all username"

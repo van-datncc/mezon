@@ -21,9 +21,34 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 		setUserID(user?.user?.id || '');
 	};
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [positionBottom, setPositionBottom] = useState(false);
+	const [positionTop, setPositionTop] = useState(0);
+	const [positionLeft, setPositionLeft] = useState(0);
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
 		if (event.button === 0) {
 			setIsShowPanelChannel(true);
+			const clickY = event.clientY;
+			const windowHeight = window.innerHeight;
+			const distanceToBottom = windowHeight - clickY;
+			const windowWidth = window.innerWidth;
+			const elementTagName = event.target;
+			if (elementTagName instanceof HTMLElement) {
+				const positionRight = elementTagName.getBoundingClientRect().right;
+				const widthElement = elementTagName.offsetWidth;
+				const widthElementShortUserProfileMin = 380;
+				const distanceToRight = windowWidth - positionRight;
+				if (distanceToRight < widthElementShortUserProfileMin) {
+					setPositionLeft(positionRight - widthElement - widthElementShortUserProfileMin);
+				} else {
+					setPositionLeft(positionRight + 20);
+				}
+				setPositionTop(clickY - 50);
+				setPositionBottom(false);
+			}
+			const heightElementShortUserProfileMin = 313;
+			if (distanceToBottom < heightElementShortUserProfileMin) {
+				setPositionBottom(true);
+			}
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
@@ -31,7 +56,14 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	return (
 		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-sm prose-blockquote:leading-[6px] prose-blockquote:my-0">
 			{showProfileUser ? (
-				<div className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 absolute top-[-500px] right-[200px] opacity-100">
+				<div
+					className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
+					style={{
+						left: `${positionLeft}px`,
+						top: positionBottom ? '' : `${positionTop}px`,
+						bottom: positionBottom ? '64px' : '',
+					}}
+				>
 					<ShortUserProfile userID={userID} />
 				</div>
 			) : null}
