@@ -304,14 +304,24 @@ export const messagesSlice = createSlice({
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			if (action.payload.code === 0) {
-				messagesAdapter.addOne(state, action.payload);
-			} else if (action.payload.code === 1) {
-				messagesAdapter.updateOne(state, {
-					id: action.payload.id,
-					changes: action.payload,
-				});
+			const code = action.payload.code;
+			switch (code) {
+				case 0:
+					messagesAdapter.addOne(state, action.payload);
+					break;
+				case 1:
+					messagesAdapter.updateOne(state, {
+						id: action.payload.id,
+						changes: action.payload,
+					});
+					break;
+				case 2:
+					messagesAdapter.removeOne(state, action.payload.id);
+					break;
+				default:
+					break;
 			}
+
 			if (action.payload.channel_id) {
 				// TODO: check duplicates with setChannelLastMessage
 				state.unreadMessagesEntries = {
