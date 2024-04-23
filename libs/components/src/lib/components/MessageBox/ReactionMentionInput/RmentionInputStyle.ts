@@ -38,13 +38,13 @@ export default {
 
 	suggestions: {
 		padding: '5px 0',
-		maxHeight: 400,
 		width: '100%',
-		overflowY: 'auto',
 		borderRadius: 12,
 		marginBottom: 20,
 		backgroundColor: '#272822',
 		list: {
+			maxHeight: 400,
+			overflowY: 'auto',
 			backgroundColor: '#272822',
 		},
 		item: {
