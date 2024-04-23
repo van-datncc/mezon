@@ -311,6 +311,8 @@ export const messagesSlice = createSlice({
 					id: action.payload.id,
 					changes: action.payload,
 				});
+			} else if (action.payload.code === 2) {
+				messagesAdapter.removeOne(state, action.payload.id);
 			}
 			if (action.payload.channel_id) {
 				// TODO: check duplicates with setChannelLastMessage
