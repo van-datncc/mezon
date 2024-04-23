@@ -13,10 +13,6 @@ type IMessageHeadProps = {
 const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
-
-	if (isCombine && message.references?.length === 0) {
-		return <></>;
-	}
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionLeft, setPositionLeft] = useState(0);
