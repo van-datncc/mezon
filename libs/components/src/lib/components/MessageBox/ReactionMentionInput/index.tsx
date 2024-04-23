@@ -1,47 +1,58 @@
 import {
+	useChannelMembers,
+	useChannels,
+	useChatMessages,
+	useClans,
+	useClickUpToEdit,
+	useGifsStickersEmoji,
+	useMenu,
+	useReference,
+	useThreads,
+} from '@mezon/core';
+import { ChannelsEntity, channelUsersActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
+import {
+	ChannelMembersEntity,
+	ILineMention,
 	IMessageSendPayload,
 	KEY_KEYBOARD,
 	MentionDataProps,
 	SubPanelName,
 	ThreadValue,
 	UserMentionsOpt,
+	UsersClanEntity,
 	focusToElement,
+	regexToDetectGifLink,
 	threadError,
+	uniqueUsers,
 } from '@mezon/utils';
-import { useChatMessages, useClickUpToEdit, useGifsStickersEmoji, useMenu, useChannels } from '@mezon/core';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
-import { useReference, useThreads } from '@mezon/core';
-import { referencesActions, threadsActions, useAppDispatch } from '@mezon/store';
-import { ChannelMembersEntity, ILineMention, UsersClanEntity, regexToDetectGifLink, uniqueUsers } from '@mezon/utils';
-import { useChannelMembers, useClans } from '@mezon/core';
-import { ChannelsEntity, channelUsersActions, selectCurrentChannel } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import mentionsInputStyle from './RmentionInputStyle';
-import SuggestItem from './SuggestItem';
 import mentionStyle from './RmentionStyle';
+import SuggestItem from './SuggestItem';
 
 type Emoji = {
 	emoji: string;
 	name: string;
-	shortname: string
-}
+	shortname: string;
+};
 
 type ChannelsMentionProps = {
 	id: string;
 	display: string;
-	subText: string
-}
+	subText: string;
+};
 
 type EmojiData = {
 	id: string;
 	emoji: string;
-	display: string
-}
+	display: string;
+};
 
 export type MentionReactInputProps = {
 	onSend: (
@@ -59,7 +70,7 @@ export type MentionReactInputProps = {
 	currentChannelId?: string;
 };
 
-const neverMatchingRegex = /($a)/
+const neverMatchingRegex = /($a)/;
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
@@ -80,7 +91,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useEffect(() => {
 		fetch(
-			'https://gist.githubusercontent.com/oliveratgithub/0bf11a9aff0d6da7b46f1490f86a71eb/raw/d8e4b78cfe66862cf3809443c1dba017f37b61db/emojis.json'
+			'https://gist.githubusercontent.com/oliveratgithub/0bf11a9aff0d6da7b46f1490f86a71eb/raw/d8e4b78cfe66862cf3809443c1dba017f37b61db/emojis.json',
 		)
 			.then((response) => response.json())
 			.then((jsonData) => {
@@ -92,9 +103,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (query.length === 0) return;
 		const matches = emojis
 			.filter((emoji) => emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20).map((emojiDisplay) => ({ id: emojiDisplay?.emoji, emoji: emojiDisplay?.emoji, display: emojiDisplay?.shortname }))
+			.slice(0, 20)
+			.map((emojiDisplay) => ({ id: emojiDisplay?.emoji, emoji: emojiDisplay?.emoji, display: emojiDisplay?.shortname }));
 		callback(matches);
-	}
+	};
 
 	useEffect(() => {
 		if (referenceMessage && referenceMessage.attachments) {
@@ -150,7 +162,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		}
 
-		if (referenceMessage !== null && dataReferences.length > 0) {
+		if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
 			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate });
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
@@ -160,6 +172,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setNameThread('');
 			setContent('');
 			dispatch(threadsActions.setIsPrivate(0));
+			setReferenceMessage(null);
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 		} else {
 			props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameThread, isPrivate });
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
@@ -168,6 +182,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setNameThread('');
 			setContent('');
 			dispatch(threadsActions.setIsPrivate(0));
+			setReferenceMessage(null);
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 		}
 	}, [
 		valueTextInput,
@@ -316,9 +332,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					displayTransform={(id: any, display: any) => {
 						return `@${display}`;
 					}}
-					renderSuggestion={(suggestion) =>
-						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText='' />
-					}
+					renderSuggestion={(suggestion) => (
+						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+					)}
 					style={mentionStyle}
 				/>
 				<Mention
@@ -330,18 +346,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return `#${display}`;
 					}}
 					style={mentionStyle}
-					renderSuggestion={(suggestion) =>
-						<SuggestItem name={suggestion.display ?? ''} symbol='#' subText={(suggestion as ChannelsMentionProps).subText} />
-					}
+					renderSuggestion={(suggestion) => (
+						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
+					)}
 				/>
 				<Mention
 					trigger=":"
 					markup="__id__"
 					regex={neverMatchingRegex}
 					data={queryEmojis}
-					renderSuggestion={(suggestion) =>
-						<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
-					}
+					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
 				/>
 			</MentionsInput>
 		</div>

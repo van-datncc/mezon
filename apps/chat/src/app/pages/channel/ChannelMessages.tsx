@@ -14,12 +14,9 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
-
 	const { idMessageReplied } = useReference();
-
 	const fetchData = () => {
 		loadMoreMessage();
 	};
@@ -27,18 +24,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+	const { openReplyMessageState } = useReference();
 
 	useEffect(() => {
 		if (idMessageReplied) {
 			setMessageIdToJump(idMessageReplied);
 			setTimeToJump(0);
 			setPositionToJump('center');
-		} else {
-			setMessageIdToJump(getJumpToMessageId());
-			setTimeToJump(1000);
+		} else if (lastMessageId && openReplyMessageState === false) {
+			setMessageIdToJump(lastMessageId);
+			setTimeToJump(200);
 			setPositionToJump('start');
 		}
-	}, [getJumpToMessageId, idMessageReplied]);
+	}, [getJumpToMessageId, idMessageReplied, lastMessageId]);
+
 	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {

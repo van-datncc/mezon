@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon, useMezonVoice } from '@mezon/transport';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
@@ -54,6 +54,8 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		distanceToBottom: 0,
 	});
 
+	const { setReferenceMessage, setOpenReplyMessageState, setOpenEditMessageState } = useReference();
+
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 		setIsShowPanelChannel(false);
@@ -106,6 +108,9 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const { closeMenu, setStatusMenu } = useMenu();
 	const handleClick = () => {
+		setReferenceMessage(null);
+		setOpenEditMessageState(false);
+		setOpenReplyMessageState(false);
 		if (closeMenu) {
 			setStatusMenu(false);
 		}
