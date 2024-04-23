@@ -14,12 +14,9 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
-
 	const { idMessageReplied } = useReference();
-
 	const fetchData = () => {
 		loadMoreMessage();
 	};
@@ -33,12 +30,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			setMessageIdToJump(idMessageReplied);
 			setTimeToJump(0);
 			setPositionToJump('center');
-		} else {
-			setMessageIdToJump(getJumpToMessageId());
-			setTimeToJump(1000);
+		} else if (lastMessageId) {
+			setMessageIdToJump(lastMessageId);
+			setTimeToJump(200);
 			setPositionToJump('start');
 		}
-	}, [getJumpToMessageId, idMessageReplied]);
+	}, [getJumpToMessageId, idMessageReplied, lastMessageId]);
+
 	const { jumpToMessage } = useJumpToMessage();
 
 	useEffect(() => {
