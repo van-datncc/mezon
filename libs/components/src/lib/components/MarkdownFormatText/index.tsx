@@ -69,7 +69,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 			) : null}
 			{mentions.map((part, index) => {
 				const tagName = part.matchedText;
-				const markdown = part.nonMatchText.trim();
+				const markdown = (part.nonMatchText && part.nonMatchText.trim()) ?? '';
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
 				const onlyBackticks = /^```$/.test(markdown);
