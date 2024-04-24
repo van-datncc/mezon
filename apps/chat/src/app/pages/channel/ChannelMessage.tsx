@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useEscapeKey, useReference } from '@mezon/core';
-import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useReference } from '@mezon/core';
+import { directActions, referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -229,7 +229,12 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 	const handleClickDelete = () => {
 		deleteSendMessage(message.id);
 	};
+	const { listDM: dmGroupChatList } = useDirect();
+	
 	const handleClickForward = () => {
+		if (dmGroupChatList.length === 0) {
+			dispatch(directActions.fetchDirectMessage({}));
+		}
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 	};

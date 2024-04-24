@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ChannelStatusEnum, IMessageSendPayload } from '@mezon/utils';
-import { getSelectedMessage, toggleIsShowPopupForwardFalse, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useMezon } from '@mezon/transport';
 import MessageContent from '../MessageWithUser/MessageContent';
 type ModalParam = {
