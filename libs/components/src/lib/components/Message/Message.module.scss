@@ -1,18 +1,37 @@
 .UnreadMessage {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  height: 14px;
+  margin: 8px 16px 0;
+  align-items: center;
+  flex-direction: row;
 
-	.LinePart {
-		width: 100%;
-		text-align: center;
-		border-bottom: 1px solid #bd0202;
-		line-height: 0.1em;
-		margin: 10px 0 20px;
-	}
+  .LinePart {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #F13F42;
+  }
 
-	.LineText {
-		padding: 0 6px;
-		font-weight: 600;
-		color: #bd0202;
-	}
+  .LineText {
+    padding: 0 5px;
+    line-height: 14px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    background-color: #F13F42;
+    position: relative;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+  .LineText::after {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 0;
+    width: 7px;
+    height: 14px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #F13F42;
+  }
 }

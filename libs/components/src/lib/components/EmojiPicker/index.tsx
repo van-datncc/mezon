@@ -36,6 +36,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
 			setEmojiSuggestion(emojiData.emoji);
 			event.stopPropagation();
+			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 			setSubPanelActive(SubPanelName.NONE);
 		}
 	};

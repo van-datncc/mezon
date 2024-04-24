@@ -20,16 +20,23 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 export const emojiSuggestionAdapter = createEntityAdapter({
 	selectId: (emo: EmojiSuggestionEntity) => emo.id || emo.name || '',
 });
+let emojiCache: IEmoji[] = [];
 
 export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
 	try {
+		const cachedData = sessionStorage.getItem('emojiCache');
+		if (cachedData) {
+			const cachedEmojis = JSON.parse(cachedData) as IEmoji[];
+			return cachedEmojis;
+		}
 		const response = await fetch(`${process.env.NX_CHAT_APP_CDN_META_DATA_EMOJI}`);
-
 		if (!response.ok) {
 			throw new Error('Failed to fetch emoji data');
 		}
 		const data = await response.json();
-		return data;
+		emojiCache = data.emojis;
+		sessionStorage.setItem('emojiCache', JSON.stringify(emojiCache));
+		return emojiCache;
 	} catch (error) {
 		return thunkAPI.rejectWithValue(error);
 	}
@@ -58,13 +65,6 @@ export const emojiSuggestionSlice = createSlice({
 
 		setStatusSuggestionEmojiList: (state, action: PayloadAction<boolean>) => {
 			state.emojiSuggestionListStatus = action.payload;
-		},
-		setKeyCodeFromKeyBoardState: (state, action: PayloadAction<number>) => {
-			state.keyCodeFromKeyBoardState = action.payload;
-		},
-
-		setKeyboardPressAnyButtonStatus: (state, action: PayloadAction<boolean>) => {
-			state.pressAnyButtonState = action.payload;
 		},
 		setTextToSearchEmojiSuggestion: (state, action: PayloadAction<string>) => {
 			state.textToSearchEmojiSuggestion = action.payload;
@@ -106,8 +106,5 @@ export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (em
 
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 
-export const selectKeyCodeFromKeyBoardState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.keyCodeFromKeyBoardState);
-
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
-
-export const selectPressAnyButtonState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.pressAnyButtonState);
+``

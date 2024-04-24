@@ -5,7 +5,6 @@ export default function UnreadMessageBreak() {
 		<div className={styles.UnreadMessage}>
 			<div className={styles.LinePart}></div>
 			<span className={styles.LineText}>New</span>
-			<div className={styles.LinePart}></div>
 		</div>
 	);
 }

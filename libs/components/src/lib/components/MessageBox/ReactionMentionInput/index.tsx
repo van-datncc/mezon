@@ -1,10 +1,21 @@
-import { useChannelMembers, useChannels, useChatMessages, useClans, useClickUpToEdit, useMenu, useReference, useThreads } from '@mezon/core';
+import {
+	useChannelMembers,
+	useChannels,
+	useChatMessages,
+	useClans,
+	useClickUpToEdit,
+	useEmojiSuggestion,
+	useMenu,
+	useReference,
+	useThreads,
+} from '@mezon/core';
 import { ChannelsEntity, channelUsersActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import {
 	ChannelMembersEntity,
 	ILineMention,
 	IMessageSendPayload,
 	KEY_KEYBOARD,
+	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	ThreadValue,
 	UserMentionsOpt,
@@ -18,6 +29,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
+import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
@@ -57,6 +69,7 @@ export type MentionReactInputProps = {
 	isThread?: boolean;
 	handlePaste?: any;
 	currentChannelId?: string;
+	handleConvertToFile?: (valueContent: string) => void | undefined;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -75,18 +88,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
-	const [emojis, setEmojis] = useState<Emoji[]>([]);
+	const { emojis } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
-
-	useEffect(() => {
-		fetch(
-			'https://gist.githubusercontent.com/oliveratgithub/0bf11a9aff0d6da7b46f1490f86a71eb/raw/d8e4b78cfe66862cf3809443c1dba017f37b61db/emojis.json',
-		)
-			.then((response) => response.json())
-			.then((jsonData) => {
-				setEmojis(jsonData.emojis);
-			});
-	}, []);
+	const { emojiPicked } = useEmojiSuggestion();
 
 	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
 		if (query.length === 0) return;
@@ -150,7 +154,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(threadsActions.setNameThreadError(threadError.name));
 			return;
 		}
-
 		if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
 			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate });
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
@@ -248,6 +251,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			}
 			setMentionData(mentionedUsers);
 		}
+		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
+			props.handleConvertToFile(convertedHashtag);
+			setContent('');
+		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const { openReplyMessageState, openEditMessageState } = useReference();
@@ -272,6 +279,35 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		});
 		return result;
 	};
+
+	useEffect(() => {
+		handleEventAfterEmojiPicked();
+	}, [emojiPicked]);
+
+	const input = document.querySelector('#editorReactMention') as HTMLElement | null;
+	function handleEventAfterEmojiPicked() {
+		if (!emojiPicked || !input) {
+			return;
+		}
+		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
+		if (syntaxEmoji === '') {
+			textFieldEdit.insert(input, emojiPicked);
+		} else {
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
+			setValueTextInput(replaceSyntaxByEmoji);
+			setContent(replaceSyntaxByEmoji);
+			focusToElement(editorRef);
+		}
+	}
+
+	function findSyntaxEmoji(contentText: string): string | null {
+		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
+		if (emojiArray.length > 0) {
+			return emojiArray[0];
+		}
+		return null;
+	}
 
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
