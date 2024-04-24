@@ -10,6 +10,7 @@ export const useClickUpToEdit = <T extends HTMLElement = HTMLElement>(ref: RefOb
 
 		const handleKeyPress = (event: KeyboardEvent) => {
 			if (event.key === 'ArrowUp') {
+				event.preventDefault();
 				handler();
 			}
 		};

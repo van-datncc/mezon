@@ -15,7 +15,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 		useChatReaction();
 	const { setReferenceMessage } = useReference();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
-	const { setSubPanelActive } = useGifsStickersEmoji();
+	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
@@ -41,18 +41,17 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 	};
 
 	return (
-		<>
-			<div onClick={(event) => event.stopPropagation()} className="z-20">
-				<EmojiPicker
-					suggestedEmojisMode={SuggestionMode.FREQUENT}
-					onEmojiClick={handleEmojiSelect}
-					width={500}
-					theme={Theme.DARK}
-					height={458}
-					emojiStyle={EmojiStyle.NATIVE}
-				/>
-			</div>
-		</>
+		<div onClick={(event) => event.stopPropagation()} className="z-20">
+			<EmojiPicker
+				suggestedEmojisMode={SuggestionMode.FREQUENT}
+				onEmojiClick={handleEmojiSelect}
+				width={500}
+				theme={Theme.DARK}
+				height={458}
+				emojiStyle={EmojiStyle.NATIVE}
+				autoFocusSearch={subPanelActive === SubPanelName.EMOJI}
+			/>
+		</div>
 	);
 }
 
