@@ -29,8 +29,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			setMessageIdToJump(idMessageReplied);
 			setTimeToJump(0);
 			setPositionToJump('center');
+		} else {
+			setMessageIdToJump(getJumpToMessageId());
+			setTimeToJump(1000);
+			setPositionToJump('start');
 		}
-	}, [idMessageReplied]);
+	}, [getJumpToMessageId, idMessageReplied]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout | null = null;
@@ -44,7 +48,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				clearTimeout(timeoutId);
 			}
 		};
-	}, [messageid]);
+	}, [messageid, jumpToMessage]);
 
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);

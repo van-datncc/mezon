@@ -5,7 +5,14 @@ import { useMemo } from 'react';
 const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
 
 export function useMessageLine(line: string): IMessageLine {
-	const matches = useMemo(() => line.match(mentionRegex) || [], [line]);
+	const matches = useMemo(() => {
+		if (line) {
+			return line.match(mentionRegex) || [];
+		} else {
+			return [];
+		}
+	}, [line]);
+	
 	const mentions = useMemo(() => {
 		let lastIndex = 0;
 		let nonMatchText = line;
