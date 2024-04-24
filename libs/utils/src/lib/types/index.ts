@@ -269,16 +269,13 @@ export enum SubPanelName {
 }
 
 export type IEmoji = {
-	id?: string;
+	category: string;
+	emoji: string;
+	html: string;
 	name: string;
-	keywords: string[];
-	skins: {
-		unified: string;
-		native: string;
-		shortcodes: string;
-	}[];
-	version?: number;
-	search?: string;
+	order: number;
+	shortname: string;
+	unicode: string;
 };
 
 export type IEmoticons = {
