@@ -1,7 +1,7 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MentionDataProps, SubPanelName } from '@mezon/utils';
+import { IMessageSendPayload, MentionDataProps, SubPanelName, MIN_THRESHOLD_CHARS } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import * as Icons from '../Icons';
@@ -27,7 +27,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { attachmentDataRef, setAttachmentData } = useReference();
 
 	const onConvertToFiles = useCallback((content: string) => {
-		if (content.length > 2000) {
+		if (content.length > MIN_THRESHOLD_CHARS) {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
 			const filename = now + '.txt';
@@ -129,13 +129,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				/>
 
 				<div className={`w-full bg-black gap-3 flex items-center rounded-e-md`}>
-					<div className={`w-[96%] bg-black gap-3 relative`}>
+					<div className={`w-[96%] bg-black gap-3 relative whitespace-pre-wrap`}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}
 							listMentions={props.listMentions}
 							onSend={props.onSend}
 							onTyping={props.onTyping}
 							currentChannelId={props.currentChannelId}
+							handleConvertToFile={onConvertToFiles}
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />

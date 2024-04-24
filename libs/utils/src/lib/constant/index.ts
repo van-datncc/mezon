@@ -11,3 +11,5 @@ export const threadError: ThreadError = {
 };
 
 export const regexToDetectGifLink = /\bhttps?:\/\/\S+\.gif\b/g;
+
+export const MIN_THRESHOLD_CHARS = 4096;

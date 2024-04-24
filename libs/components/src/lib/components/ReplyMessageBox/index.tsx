@@ -5,6 +5,7 @@ import * as Icons from '../Icons/index';
 
 function ReplyMessageBox() {
 	const dispatch = useDispatch();
+
 	const { referenceMessage } = useReference();
 	const getSenderMessage = useSelector(selectMemberByUserId(referenceMessage?.user?.id ?? ''));
 	const messageReplyState = useSelector(selectOpenReplyMessageState);

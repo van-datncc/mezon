@@ -10,9 +10,8 @@ const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const handleNewMessage = (payload: any) => {
         if (typeof payload === 'object' && payload !== null) {
-            const parts = payload.notification.body.split('\n');
-            const content = parts[1].split(': ')[1];
-            toast.info(content);
+            const parts = payload.notification.body
+            toast.info(parts);  
         }
         onMessageListener().then(handleNewMessage).catch((error: Error) => {
             console.error('Error listening for messages:', error);

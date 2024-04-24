@@ -143,10 +143,7 @@ export const fetchMessages = createAsyncThunk(
 		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
 		let hasMore = currentHasMore;
-		if (currentLastLoadMessageId === messageId) {
-			hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
-		}
-
+		hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
 
 		if (response.last_seen_message?.id) {
@@ -304,14 +301,24 @@ export const messagesSlice = createSlice({
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			if (action.payload.code === 0) {
-				messagesAdapter.addOne(state, action.payload);
-			} else if (action.payload.code === 1) {
-				messagesAdapter.updateOne(state, {
-					id: action.payload.id,
-					changes: action.payload,
-				});
+			const code = action.payload.code;
+			switch (code) {
+				case 0:
+					messagesAdapter.addOne(state, action.payload);
+					break;
+				case 1:
+					messagesAdapter.updateOne(state, {
+						id: action.payload.id,
+						changes: action.payload,
+					});
+					break;
+				case 2:
+					messagesAdapter.removeOne(state, action.payload.id);
+					break;
+				default:
+					break;
 			}
+
 			if (action.payload.channel_id) {
 				// TODO: check duplicates with setChannelLastMessage
 				state.unreadMessagesEntries = {
@@ -440,7 +447,7 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +a.creationTimeMs - +b.creationTimeMs;
+		return +b.creationTimeMs - +a.creationTimeMs;
 	}
 	return 0;
 }
@@ -460,7 +467,7 @@ export const selectMessageByUserId = (channelId?: string | null, senderId?: stri
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.pop();
+		return messages.shift();
 	});
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
@@ -508,7 +515,7 @@ export const selectParamByChannelId = (channelId: string) =>
 
 export const selectHasMoreMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return (param && param[channelId] && param[channelId].hasMore) || false;
+		return (param && param[channelId] && param[channelId].hasMore) ?? true;
 	});
 
 export const selectLastLoadMessageIDByChannelId = (channelId: string) =>

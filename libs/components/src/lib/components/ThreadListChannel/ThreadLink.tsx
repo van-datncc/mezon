@@ -1,4 +1,4 @@
-import { useAppNavigation, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectIsUnreadChannelById } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useRef, useState } from 'react';
@@ -21,6 +21,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const { setIsShowCreateThread } = useThreads();
+	const { setReferenceMessage, setOpenReplyMessageState, setOpenEditMessageState } = useReference();
 
 	const panelRef = useRef<HTMLAnchorElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
@@ -58,6 +59,9 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 
 	const { closeMenu, setStatusMenu } = useMenu();
 	const handleClick = () => {
+		setReferenceMessage(null);
+		setOpenEditMessageState(false);
+		setOpenReplyMessageState(false);
 		setIsShowCreateThread(false);
 		if (closeMenu) {
 			setStatusMenu(false);

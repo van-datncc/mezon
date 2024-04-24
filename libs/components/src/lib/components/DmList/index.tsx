@@ -54,8 +54,8 @@ function DirectMessageList() {
 					</button>
 				</div>
 
-				<div className="text-[14px] px-3 font-bold text-[#fff] mt-6 flex flex-row items-center w-full justify-between px-1 pb-5 h-5">
-					<p>DIRECT MESSAGE</p>
+				<div className="text-xs font-semibold tracking-wide left-sp text-[#AEAEAE] mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default hover:text-white">
+					<p>DIRECT MESSAGES</p>
 					<button
 						onClick={onClickOpenModal}
 						className="cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
