@@ -68,6 +68,7 @@ export type MentionReactInputProps = {
 	isThread?: boolean;
 	handlePaste?: any;
 	currentChannelId?: string;
+	handleConvertToFile?: (valueContent: string) => void | undefined;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -161,7 +162,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(threadsActions.setNameThreadError(threadError.name));
 			return;
 		}
-
 		if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
 			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate });
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
@@ -258,6 +258,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}
 			}
 			setMentionData(mentionedUsers);
+		}
+		if (props.handleConvertToFile !== undefined && convertedHashtag.length > 4096) {
+			props.handleConvertToFile(convertedHashtag);
+			setContent('');
 		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
