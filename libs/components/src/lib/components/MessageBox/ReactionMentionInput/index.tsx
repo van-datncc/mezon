@@ -319,7 +319,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	useClickUpToEdit(editorRef, clickUpToEditMessage);
+	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
 	return (
 		<div className="relative">

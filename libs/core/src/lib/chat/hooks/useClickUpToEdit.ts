@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from 'react';
 
-export const useClickUpToEdit = <T extends HTMLElement = HTMLElement>(ref: RefObject<T>, handler: () => void) => {
+export const useClickUpToEdit = <T extends HTMLElement = HTMLElement>(ref: RefObject<T>, value: string, handler: () => void) => {
 	useEffect(() => {
 		const editorElement = ref.current;
 
@@ -9,6 +9,7 @@ export const useClickUpToEdit = <T extends HTMLElement = HTMLElement>(ref: RefOb
 		}
 
 		const handleKeyPress = (event: KeyboardEvent) => {
+			if (value) return;
 			if (event.key === 'ArrowUp') {
 				event.preventDefault();
 				handler();
@@ -20,5 +21,5 @@ export const useClickUpToEdit = <T extends HTMLElement = HTMLElement>(ref: RefOb
 		return () => {
 			editorElement.removeEventListener('keydown', handleKeyPress);
 		};
-	}, [handler, ref]);
+	}, [handler, ref, value]);
 };
