@@ -3,6 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { ChannelCreatedEvent, ChannelDeletedEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -61,6 +62,7 @@ export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
 	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
+			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 			if (!noFetchMembers) {

@@ -1,7 +1,7 @@
 import { useEscapeKey } from '@mezon/core';
 import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import MessageModalImage from './MessageModalImage';
 
 export type MessageImage = {
@@ -11,26 +11,8 @@ export type MessageImage = {
 
 function MessageImage({ attachmentData }: MessageImage) {
 	const [openModal, setOpenModal] = useState(false);
-	const [scale, setScale] = useState(1);
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
-
-	const handleWheel = (event: any) => {
-		const deltaY = event.deltaY;
-		setScale((prevScale) => {
-			let newScale = prevScale;
-			if (deltaY > 0) {
-				newScale = Math.max(1, prevScale - 0.05);
-			} else {
-				newScale = Math.min(5, prevScale + 0.05);
-			}
-			return newScale;
-		});
-	};
-
-	useEffect(() => {
-		setScale(1);
-	}, [openModal]);
 
 	const closeModal = () => {
 		setOpenModal(false);
