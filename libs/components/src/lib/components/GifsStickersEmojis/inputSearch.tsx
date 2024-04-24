@@ -61,8 +61,6 @@ export const InputSearch: React.FC = () => {
 		setButtonArrowBack(false);
 	};
 
-	console.log('subPanelActive', subPanelActive);
-
 	return (
 		<div className="flex flex-row items-center">
 			{buttonArrowBackStatus && (
