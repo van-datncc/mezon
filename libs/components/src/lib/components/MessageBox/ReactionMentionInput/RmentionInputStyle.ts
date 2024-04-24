@@ -19,6 +19,7 @@ export default {
 			padding: 9,
 			border: 'none',
 			outline: 'none',
+			whiteSpace: 'pre-wrap'
 		},
 	},
 
