@@ -1,6 +1,6 @@
 import { useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { SubPanelName } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { Icons } from '../../components';
 
@@ -9,6 +9,7 @@ export const InputSearch: React.FC = () => {
 	const { fetchGifsDataSearch } = useGifs();
 	const [valueSearchGif, setValueSearchGif] = useState('');
 	const [valueInput, setValueInput] = useState<string>('');
+	const searchInputRef = useRef<HTMLInputElement | null>(null);
 	const {
 		setValueInputSearch,
 		valueInputToCheckHandleSearch,
@@ -46,6 +47,12 @@ export const InputSearch: React.FC = () => {
 		}
 	}, [valueSearchGif]);
 
+	useEffect(() => {
+		if (subPanelActive === SubPanelName.GIFS || subPanelActive === SubPanelName.STICKERS) {
+			searchInputRef.current?.focus();
+		}
+	}, [subPanelActive]);
+
 	const onclickBackArrow = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		event.stopPropagation();
 		setShowCategories(true);
@@ -53,6 +60,8 @@ export const InputSearch: React.FC = () => {
 		setValueInputSearch('');
 		setButtonArrowBack(false);
 	};
+
+	console.log('subPanelActive', subPanelActive);
 
 	return (
 		<div className="flex flex-row items-center">
@@ -78,6 +87,7 @@ export const InputSearch: React.FC = () => {
 						placeholder="Search"
 						className="text-[#AEAEAE] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
 						value={valueInputToCheckHandleSearch}
+						ref={searchInputRef}
 					/>
 					<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-[#1E1F22] top-1/4 transform -translate-y-1/2 m-2 cursor-pointer">
 						<Icons.Search />
