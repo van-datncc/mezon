@@ -294,14 +294,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		});
 		const myUserId = voiceChannelRef.current?.myUserId() || '';
 
-		if (socketRef && socketRef.current && voiceOptions) {
-			console.log("====", myUserId,
-			voiceOptions.clanId as string,
-			voiceOptions.clanName as string,
-			voiceOptions.channelId as string,
-			voiceOptions.channelName as string,
-			voiceOptions.displayName as string,
-			'');
+		if (socketRef && socketRef.current && voiceOptions) {			
 			socketRef.current.writeVoiceJoined(
 				myUserId,
 				voiceOptions.clanId as string,
