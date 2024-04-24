@@ -295,6 +295,13 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		const myUserId = voiceChannelRef.current?.myUserId() || '';
 
 		if (socketRef && socketRef.current && voiceOptions) {
+			console.log("====", myUserId,
+			voiceOptions.clanId as string,
+			voiceOptions.clanName as string,
+			voiceOptions.channelId as string,
+			voiceOptions.channelName as string,
+			voiceOptions.displayName as string,
+			'');
 			socketRef.current.writeVoiceJoined(
 				myUserId,
 				voiceOptions.clanId as string,
@@ -458,14 +465,11 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const voiceDisconnect = useCallback(async () => {
 		console.log('disconnect to voice channel', voiceChannelRef.current?.getName());
 
-		const participantCount = voiceChannelRef.current?.getParticipantCount();
 		const myUserId = voiceChannelRef.current?.myUserId();
 
-		console.log('write', myUserId, participantCount, voiceChannelRef.current);
-
-		if (myUserId && participantCount === 1 && socketRef && socketRef.current && voiceOptions) {
+		if (myUserId && socketRef && socketRef.current && voiceOptions) {
 			console.log('write to socket voice leaved');
-			socketRef.current.writeVoiceLeaved(myUserId, voiceOptions.clanId as string, voiceOptions.channelId as string, true);
+			socketRef.current.writeVoiceLeaved(myUserId, voiceOptions.clanId as string, voiceOptions.channelId as string, false);
 		}
 
 		if (voiceConnRef && voiceConnRef.current) {
