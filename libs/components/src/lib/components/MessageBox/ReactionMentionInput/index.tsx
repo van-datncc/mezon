@@ -146,7 +146,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	const handleSend = useCallback((anonymousMessage: boolean) => {
+	const handleSend = useCallback((anonymousMessage?: boolean) => {
 		if (!valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
 			if (!nameThread.trim() && props.isThread && !currentThread) {
 				dispatch(threadsActions.setMessageThreadError(threadError.message));
