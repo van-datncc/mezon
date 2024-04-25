@@ -1,6 +1,7 @@
 export * from './lib/MezonStoreProvider';
 export * from './lib/account/account.slice';
 export * from './lib/app/app.slice';
+export * from './lib/attachment/attachments.slice';
 export * from './lib/auth/auth.slice';
 export * from './lib/categories/categories.slice';
 export * from './lib/channelmembers/channel.members';

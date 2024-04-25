@@ -14,10 +14,10 @@ const LineWithLink = ({ link }: { link: string }) => {
 };
 
 const isLink = (line: string) => {
-	if (line.includes(' ')) {
+	if (line && line.includes(' ')) {
 		return false;
 	}
-	if (line.startsWith('http://') || line.startsWith('https://')) {
+	if ((line && line.startsWith('http://')) || (line && line.startsWith('https://'))) {
 		return true;
 	}
 	return false;
