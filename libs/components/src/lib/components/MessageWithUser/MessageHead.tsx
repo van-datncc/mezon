@@ -54,9 +54,9 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 				</div>
 				<div className=" text-zinc-400 text-[10px] cursor-default">{messageTime}</div>
 			</div>
-			{isShowPanelChannel ? (
+			{isShowPanelChannel && (
 				<div
-					className={`bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 fixed `}
+					className={`bg-[#151515] mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
 						left: `${positionLeft}px`,
 						top: positionBottom ? '' : `${positionTop}px`,
@@ -65,7 +65,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
-			) : null}
+			)}
 		</div>
 	);
 };
