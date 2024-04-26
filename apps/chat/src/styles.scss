@@ -249,7 +249,7 @@ input:-webkit-autofill:active {
 }
 
 .footer-profile .memberProfile {
- padding: 2px 4px;
+	padding: 2px 4px;
 }
 
 .footer-profile:hover .memberProfile {
@@ -428,9 +428,4 @@ input:-webkit-autofill:active {
 	[data-rmiz-ghost] {
 		display: none;
 	}
-}
-
-// css editorReactMention
-#editorReactMention {
-	white-space: nowrap !important;
 }

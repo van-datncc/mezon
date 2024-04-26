@@ -25,7 +25,7 @@ function MemberList() {
 						<p className="mt-7 mb-3 text-[#AEAEAE] text-[14px] font-bold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
 							Offline - {offlineMembers.length}
 						</p>
-						<div className="flex flex-col gap-4">
+						<div className="flex flex-col gap-4 mb-3">
 							{offlineMembers.map((user: ChannelMembersEntity) => (
 								<div key={user?.id}>
 									<MemberItem user={user} key={user?.user?.id} listProfile={true} isOffline={true} />
