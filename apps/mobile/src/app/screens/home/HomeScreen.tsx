@@ -7,6 +7,7 @@ import HashSignIcon from '../../../assets/svg/loading.svg';
 import SearchLogo from '../../../assets/svg/discoverySearch.svg'
 import UsersLogo from '../../../assets/svg/users.svg'
 import BarsLogo from '../../../assets/svg/bars.svg'
+import {styles} from "./styles";
 
 const Drawer = createDrawerNavigator();
 
@@ -43,19 +44,19 @@ const DrawerScreen = React.memo(({navigation}: {navigation: any}) => {
           },
           headerShown: false,
           headerLeft(vals) {
-            return <View style={{marginLeft: 14, marginRight: 8}} {...vals} onTouchEnd={() => navigation.openDrawer()}>
+            return <View style={styles.drawerHeaderLeft} {...vals} onTouchEnd={() => navigation.openDrawer()}>
               <BarsLogo width={20} height={20} />
             </View>
           },
           headerTitle(props) {
-              return <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              return <View style={styles.drawerHeaderTitle}>
                 <HashSignIcon width={18} height={18} />
-                <Text style={{color: 'black', fontWeight: 'bold', marginLeft: 10, fontSize: 16}}>welcome-and-rules</Text>
+                <Text style={styles.drawerHeaderTitleTxt}>welcome-and-rules</Text>
               </View>
           },
           headerRight(props) {
-              return <View style={{flexDirection: 'row', paddingRight: 20}}>
-                <SearchLogo width={22} height={22} style={{marginRight: 20}} />
+              return <View style={styles.drawerHeaderRight}>
+                <SearchLogo width={22} height={22} />
                 <UsersLogo width={22} height={22} />
               </View>
           },

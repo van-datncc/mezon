@@ -7,18 +7,19 @@ import BarsLogo from '../../../../assets/svg/bars.svg'
 import ChatBox from "./ChatBox";
 import WelcomeMessage from "./WelcomeMessage";
 import MessageBox from "./MessageBox";
+import {styles} from "./styles";
 
 const HomeDefault = React.memo((props: any) => {
     const messages = [{"channelId": 1, "datetime": "4/25/2024, 10:47:00 PM", "message": "ssssss", "serverId": 1, "user_details": {"id": 1, "image": "https://unsplash.it/400/400?image=1", "name": "Paulos", "user_name": "paulos_ab"}}, {"channelId": 1, "datetime": "4/25/2024, 10:47:02 PM", "message": "sssss", "serverId": 1, "user_details": {"id": 1, "image": "https://unsplash.it/400/400?image=1", "name": "Paulos", "user_name": "paulos_ab"}}, {"channelId": 1, "datetime": "4/25/2024, 10:47:04 PM", "message": "ssss", "serverId": 1, "user_details": {"id": 1, "image": "https://unsplash.it/400/400?image=1", "name": "Paulos", "user_name": "paulos_ab"}}, {"channelId": 2, "datetime": "4/25/2024, 10:48:22 PM", "message": "hello", "serverId": 1, "user_details": {"id": 1, "image": "https://unsplash.it/400/400?image=1", "name": "Paulos", "user_name": "paulos_ab"}}, {"channelId": 2, "datetime": "4/25/2024, 10:48:25 PM", "message": "hi", "serverId": 1, "user_details": {"id": 1, "image": "https://unsplash.it/400/400?image=1", "name": "Paulos", "user_name": "paulos_ab"}}]
 
     return (
-        <View style={[styles.mainStyle, {backgroundColor: '#2b2d31', flex: 1}]}>
+        <View style={[styles.homeDefault]}>
             <HomeDefaultHeader navigation={props.navigation} channelTitle={'notes-resources'} />
 
-            <View style={{flex: 1,}}>
+            <View style={{flex: 1}}>
                 <FlatList
                     data={[{}]}
-                    contentContainerStyle={{height: '100%', flexDirection: 'column-reverse'}}
+                    contentContainerStyle={styles.listChannels}
                     renderItem={() =>
                         <>
                             <WelcomeMessage uri={''} channelTitle={'notes-resources'} serverId={1} />
@@ -56,15 +57,8 @@ const HomeDefaultHeader = React.memo(({navigation, channelTitle}: {navigation: a
                 <SearchLogo width={22} height={22} style={{marginRight: 20}} />
                 <UsersLogo width={22} height={22} />
             </View>
-
         </View>
     )
 });
-
-const styles = StyleSheet.create({
-    mainStyle: {
-
-    }
-})
 
 export default HomeDefault;

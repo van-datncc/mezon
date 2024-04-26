@@ -6,6 +6,7 @@ import SmilingFaceIcon from '../../../../assets/svg/voiceReaction.svg';
 import MicrophoneIcon from '../../../../assets/svg/microphone.svg';
 import SendButtonIcon from '../../../../assets/svg/sendButton.svg';
 import AngleRightIcon from '../../../../assets/svg/angle-right.svg';
+import {styles} from "./styles";
 
 const inputWidth = Dimensions.get('window').width * 0.6;
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
@@ -30,17 +31,17 @@ const ChatBox = React.memo((props: {channelTitle: string; channelId: number; ser
     }, [text])
 
     return (
-        <View style={{minHeight: 80, backgroundColor: '#1e1e1e', flexDirection: 'row', paddingHorizontal: 10, alignItems: 'center', justifyContent: 'space-between'}}>
+        <View style={styles.wrapperChatBox}>
             {
                 text.length > 0 ?
-                <View style={[styles.icon_container, {backgroundColor: '#333333' }]}>
+                <View style={[styles.iconContainer, {backgroundColor: '#333333' }]}>
                     <AngleRightIcon width={18} height={18} />
                 </View>:
                 <>
-                    <View style={[styles.icon_container, {backgroundColor: '#333333' }]}>
+                    <View style={[styles.iconContainer, {backgroundColor: '#333333' }]}>
                         <PlusIcon width={25} height={25} />
                     </View>
-                    <View style={[styles.icon_container, {backgroundColor: '#333333' }]}>
+                    <View style={[styles.iconContainer, {backgroundColor: '#333333' }]}>
                         <ChatGiftIcon width={25} height={25} />
                     </View>
                 </>
@@ -54,12 +55,12 @@ const ChatBox = React.memo((props: {channelTitle: string; channelId: number; ser
                     ref={inputRef}
                     style={[styles.inputStyle, text.length > 0 && {width: inputWidthWhenHasInput}, {backgroundColor: '#333333', color: '#FFFFFF'}]}
                 />
-                <SmilingFaceIcon width={25} height={25} style={{position: 'absolute', right: 10,}} />
+                <SmilingFaceIcon width={25} height={25} style={styles.iconEmoji} />
             </View>
-            <View style={[styles.icon_container, {backgroundColor: '#2b2d31' }]}>
+            <View style={[styles.iconContainer, {backgroundColor: '#2b2d31' }]}>
                 {
                     text.length > 0 ?
-                    <View onTouchEnd={handleSendMessage} style={[styles.icon_container, {backgroundColor: '#5865F2', alignItems: 'center', justifyContent: 'center' }]}>
+                    <View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
                         <SendButtonIcon width={18} height={18} />
                     </View>:
                     <MicrophoneIcon width={25} height={25} />
@@ -69,22 +70,5 @@ const ChatBox = React.memo((props: {channelTitle: string; channelId: number; ser
     )
 });
 
-const styles = StyleSheet.create({
-    icon_container: {
-        width: 35,
-        height: 35,
-        borderRadius: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    inputStyle: {
-        height: 40,
-        width: inputWidth,
-        borderBottomWidth: 0,
-        borderRadius: 20,
-        paddingHorizontal: 15,
-        fontSize: 15,
-    }
-})
 
 export default ChatBox;
