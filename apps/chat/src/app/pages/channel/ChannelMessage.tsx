@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useEscapeKey, useReference } from '@mezon/core';
-import { referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useReference } from '@mezon/core';
+import { directActions, referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -67,6 +67,13 @@ export function ChannelMessage(props: MessageProps) {
 			handleCancelEdit();
 		}
 	};
+	const handelSave = () =>{
+		if (editMessage) {
+			handleSend(editMessage, message.id);
+			setNewMessage(editMessage);
+			handleCancelEdit();
+		}
+	} 
 
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -126,7 +133,7 @@ export function ChannelMessage(props: MessageProps) {
 					<textarea
 						onFocus={handleFocus}
 						ref={textareaRef}
-						defaultValue={editMessage}
+						defaultValue={mess.content.t}
 						className="w-[83%] bg-black rounded p-[10px]"
 						onKeyDown={onSend}
 						onChange={(e) => {
@@ -134,7 +141,16 @@ export function ChannelMessage(props: MessageProps) {
 						}}
 						rows={editMessage?.split('\n').length}
 					></textarea>
-					<p className="absolute -bottom-4 text-xs">escape to cancel • enter to save</p>
+					<div className='text-xs flex'>
+						<p className='pr-[3px]'>escape to</p>
+						<p className='pr-[3px] text-[#3297ff]'
+						 style={{ cursor: 'pointer' }}
+						onClick={handleCancelEdit}>cancel</p>
+						<p className='pr-[3px]'>• enter to</p>
+						<p className='text-[#3297ff]'
+						 style={{ cursor: 'pointer' }}
+						onClick={handelSave}>save</p>
+					</div>
 				</div>
 			)}
 		</div>
@@ -229,7 +245,12 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 	const handleClickDelete = () => {
 		deleteSendMessage(message.id);
 	};
+	const { listDM: dmGroupChatList } = useDirect();
+	
 	const handleClickForward = () => {
+		if (dmGroupChatList.length === 0) {
+			dispatch(directActions.fetchDirectMessage({}));
+		}
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 	};

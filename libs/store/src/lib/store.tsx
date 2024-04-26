@@ -27,12 +27,13 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
-import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
+import { attachmentReducer } from './attachment/attachments.slice';
+import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
+import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
-import {dragAndDropReducer} from './dragAndDrop/dragAndDrop.slice'
 
 const persistedReducer = persistReducer(
 	{
@@ -62,6 +63,7 @@ const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
 	auth: persistedReducer,
+	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: channelsReducer,
 	channelMembers: channelMembersReducer,
@@ -90,7 +92,6 @@ const reducer = {
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
-
 };
 
 let storeInstance = configureStore({

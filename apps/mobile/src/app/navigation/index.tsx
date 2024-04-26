@@ -1,43 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import BottomNavigator from './BottomNavigator';
-import SplashScreen from '../screens/loading/SplashScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
-import DrawerNavigator from './DrawerNavigator';
-import MessagesScreen from '../screens/main/MessagesScreen';
-import ProfileScreen from '../screens/main/ProfileScreen';
-const Stack = createStackNavigator()
-const Navigation = () => {
-	const [isUser, setIsUser] = useState(false)
-	const [isAppLoading, setIsAppLoading] = useState(false)
+import React from 'react';
+import {CreateMezonClientOptions, MezonContextProvider} from "@mezon/transport";
+import RootNavigation from "./RootNavigator";
+
+const mezon: CreateMezonClientOptions = {
+	host: process.env.NX_CHAT_APP_API_HOST as string,
+	port: process.env.NX_CHAT_APP_API_PORT as string,
+	key: process.env.NX_CHAT_APP_API_KEY as string,
+	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
+};
+
+const App = () => {
 	return (
-		<NavigationContainer >
-			<Stack.Navigator screenOptions={{ headerShown: false }}>
+		<MezonContextProvider mezon={mezon} connect={true}>
+			<RootNavigation />
+		</MezonContextProvider>
+	);
+};
 
-				<Stack.Screen name="Splash" component={SplashScreen} />
-
-				<>
-					<Stack.Screen name="Login" component={LoginScreen} />
-					<Stack.Screen name="Register" component={RegisterScreen} /></>
-
-				<>
-					<Stack.Screen name="bottom" component={BottomNavigator} options={{ gestureEnabled: false }} />
-					<Stack.Screen name="Servers" component={DrawerNavigator} options={{ gestureEnabled: false }} />
-					<Stack.Screen name="Profile" component={ProfileScreen} options={{ gestureEnabled: false }} />
-
-				</>
-
-
-
-
-			</Stack.Navigator>
-		</NavigationContainer>
-	)
-}
-
-export default Navigation
-
-const styles = StyleSheet.create({})
+export default App;

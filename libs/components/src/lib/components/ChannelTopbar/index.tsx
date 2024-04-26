@@ -24,7 +24,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 
 	return (
 		<div
-			className={`flex p-3 min-w-0 items-center  flex-shrink h-heightHeader ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
 		>
 			{checkChannelType ? (
 				<>
@@ -69,7 +69,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<InboxButton />
 								<HelpButton />
 							</div>
-							<div className="ssm:hidden">
+							<div className="ssm:hidden mr-5">
 								<ChannelListButton />
 							</div>
 						</div>

@@ -1,9 +1,9 @@
-import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
-import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { IChannelMember, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
+import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
+import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
@@ -128,6 +128,7 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 			const channelId = channelPresence.channel_id;
 			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
 			if (!user) {
+				thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
 				thunkAPI.dispatch(fetchChannelMembers({ clanId: '', channelId: channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 		}
@@ -193,6 +194,12 @@ export const channelMembers = createSlice({
 		},
 		setMemberChannels: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
 			state.memberChannels = action.payload;
+		},
+		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
+			const payload = action.payload;
+			const member = mapUserIdToEntity(payload.joins[0].user_id, payload.joins[0].username);
+			const data = mapChannelMemberToEntity({ id: member.id + payload.channel_id, user: member }, payload.channel_id, payload.joins[0].user_id);
+			channelMembersAdapter.addOne(state, data);
 		},
 	},
 	extraReducers: (builder) => {

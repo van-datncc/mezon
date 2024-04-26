@@ -5,12 +5,11 @@ import {
 	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
-	useGifsStickersEmoji,
 	useMenu,
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { ChannelsEntity, channelUsersActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
+import { ChannelsEntity, channelUsersActions, referencesActions, selectCurrentChannel, selectCurrentChannelId, threadsActions, useAppDispatch } from '@mezon/store';
 import {
 	ChannelMembersEntity,
 	ILineMention,
@@ -18,7 +17,6 @@ import {
 	KEY_KEYBOARD,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
-	SubPanelName,
 	ThreadValue,
 	UserMentionsOpt,
 	UsersClanEntity,
@@ -64,6 +62,7 @@ export type MentionReactInputProps = {
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
+		anonymousMessage?: boolean
 	) => void;
 	onTyping?: () => void;
 	onCreateThread?: (key: string) => void;
@@ -72,6 +71,7 @@ export type MentionReactInputProps = {
 	handlePaste?: any;
 	currentChannelId?: string;
 	handleConvertToFile?: (valueContent: string) => void | undefined;
+	currentClanId?: string;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -121,7 +121,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [referenceMessage]);
 
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
-		const { keyCode, shiftKey } = event;
+		const { keyCode, ctrlKey, shiftKey } = event;
+		if (keyCode === KEY_KEYBOARD.ENTER && ctrlKey && shiftKey && valueTextInput !== '') {
+			event.preventDefault();
+			if (props.currentClanId) {
+				handleSend(true)
+			}
+			return;
+		}
 
 		switch (keyCode) {
 			case KEY_KEYBOARD.ENTER: {
@@ -129,7 +136,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					return;
 				} else {
 					event.preventDefault();
-					handleSend();
+					handleSend(false);
 					return;
 				}
 			}
@@ -139,7 +146,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	const handleSend = useCallback(() => {
+	const handleSend = useCallback((anonymousMessage?: boolean) => {
 		if (!valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
 			if (!nameThread.trim() && props.isThread && !currentThread) {
 				dispatch(threadsActions.setMessageThreadError(threadError.message));
@@ -157,7 +164,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		}
 		if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
-			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate });
+			props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate }, anonymousMessage);
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
 			setAttachmentData([]);
@@ -169,7 +176,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setReferenceMessage(null);
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 		} else {
-			props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameThread, isPrivate });
+			props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameThread, isPrivate }, anonymousMessage);
 			addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 			setValueTextInput('');
 			setAttachmentData([]);
@@ -259,17 +266,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
-	const { subPanelActive } = useGifsStickersEmoji();
 	const { openReplyMessageState, openEditMessageState } = useReference();
 	const { closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if (subPanelActive !== SubPanelName.NONE || (referenceMessage !== null && openReplyMessageState) || !openEditMessageState) {
+		if ((referenceMessage !== null && openReplyMessageState) || !openEditMessageState) {
 			return focusToElement(editorRef);
 		}
-	}, [subPanelActive, referenceMessage, openReplyMessageState, openEditMessageState]);
+	}, [referenceMessage, openReplyMessageState, openEditMessageState]);
 
 	const handleChangeNameThread = (nameThread: string) => {
 		setNameThread(nameThread);
@@ -314,7 +320,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
-		if (idRefMessage) {
+		if (idRefMessage && !valueTextInput) {
 			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -322,7 +328,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	useClickUpToEdit(editorRef, clickUpToEditMessage);
+	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
 	return (
 		<div className="relative">

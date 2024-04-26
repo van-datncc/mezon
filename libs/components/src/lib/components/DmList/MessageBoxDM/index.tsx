@@ -2,10 +2,10 @@ import { MessageBox } from '@mezon/components';
 import { useDirectMessages } from '@mezon/core';
 import { RootState } from '@mezon/store';
 import { IMessageSendPayload } from '@mezon/utils';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 
 interface DirectIdProps {
 	directParamId: string;
@@ -38,7 +38,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 	return (
-		<div>
+		<div className="mx-4 relative">
 			<MessageBox
 				onSend={handleSend}
 				currentChannelId={directParamId}

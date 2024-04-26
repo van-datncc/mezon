@@ -159,7 +159,7 @@ export default function ChannelLayout() {
 					</div>
 					{isShow && (
 						<div
-							className={` bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
+							className={` bg-bgSurface text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
 							id="memberList"
 						>
 							<MemberList />

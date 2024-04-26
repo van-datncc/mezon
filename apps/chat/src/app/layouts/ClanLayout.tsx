@@ -35,6 +35,7 @@ const ClanLayout = () => {
 						name={userProfile?.user?.username || ''}
 						status={userProfile?.user?.online}
 						avatar={userProfile?.user?.avatar_url || ''}
+						userId={userProfile?.user?.id || ''}
 						openSetting={handleOpenCreate}
 						channelCurrent={currentChannel}
 					/>

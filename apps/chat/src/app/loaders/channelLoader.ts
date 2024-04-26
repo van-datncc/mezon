@@ -17,7 +17,6 @@ export const channelLoader: LoaderFunction = async ({ params, request }) => {
 	
 	store.dispatch(messagesActions.jumpToMessage({ messageId: messageId || '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId || '', channelId: channelId, noFetchMembers: false }));
-	store.dispatch(directActions.fetchDirectMessage({}));
 	return null;
 };
 
