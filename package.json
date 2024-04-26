@@ -17,7 +17,15 @@
 		"dev:android": "npx nx run-android mobile",
 		"dev:ios": "npx nx run-ios mobile",
 		"build:android": "npx nx build-android mobile",
-		"build:ios": "npx nx build-ios mobile"
+		"build:ios": "npx nx build-ios mobile",
+		"postinstall": "electron-builder install-app-deps",
+		"dev:desktop": "nx run desktop:serve",
+		"build:desktop:app": "nx run desktop:build",
+		"build:desktop:renderer": "nx build chat --prod --baseHref=./",
+		"build:desktop": "yarn build:desktop:app && yarn build:desktop:renderer",
+		"package:desktop": "nx run desktop:package",
+		"make:desktop": "nx run desktop:make",
+		"release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop"
 	},
 	"private": true,
 	"dependencies": {
