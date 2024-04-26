@@ -16,12 +16,30 @@ module.exports = function (api) {
 			],
 			plugins: [
 				'react-native-reanimated/plugin',
+				[
+					"module:react-native-dotenv",
+					{
+						envName: "APP_ENV",
+						moduleName: "@env",
+						path: ".env"
+					}
+				]
 			],
 		};
 	}
 
 	return {
 		presets: [['module:@react-native/babel-preset', { useTransformReactJSX: true }]],
-		plugins: ['react-native-reanimated/plugin']
+		plugins: [
+			'react-native-reanimated/plugin',
+			[
+				"module:react-native-dotenv",
+				{
+					envName: "APP_ENV",
+					moduleName: "@env",
+					path: ".env"
+				}
+			]
+		]
 	};
 };

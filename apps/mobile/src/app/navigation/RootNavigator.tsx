@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { APP_SCREEN } from './ScreenTypes';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Authentication } from './Authentication';
 import { UnAuthentication } from './UnAuthentication';
-import { selectIsLogin } from "@mezon/store";
+import { initStore, MezonStoreProvider, selectIsLogin } from "@mezon/store";
 import { useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
+import { useMezon } from "@mezon/transport";
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { preloadedState } from "../../../../chat/src/app/mock/state";
 
 const RootStack = createStackNavigator();
 
-const RootNavigation = () => {
-	const isLoggedIn = true;
-	// const isLoggedIn = useSelector(selectIsLogin);
+const NavigationMain = () => {
+	const isLoggedIn = useSelector(selectIsLogin);
 
 	return (
 		<NavigationContainer>
@@ -34,6 +36,18 @@ const RootNavigation = () => {
 				)}
 			</RootStack.Navigator>
 		</NavigationContainer>
+	)
+}
+const RootNavigation = () => {
+	const mezon = useMezon();
+	const { store, persistor } = useMemo(() => {
+		return initStore(mezon, preloadedState);
+	}, [mezon]);
+
+	return (
+		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+			<NavigationMain />
+		</MezonStoreProvider>
 	);
 };
 

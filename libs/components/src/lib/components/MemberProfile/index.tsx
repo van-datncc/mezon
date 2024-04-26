@@ -36,6 +36,7 @@ function MemberProfile({
 }: MemberProfileProps) {
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionTop, setPositionTop] = useState(false);
+	const [top, setTop] = useState(0);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === 0) {
@@ -44,6 +45,7 @@ function MemberProfile({
 			const windowHeight = window.innerHeight;
 			const distanceToBottom = windowHeight - clickY;
 			const heightElementShortUserProfileMin = 313;
+			setTop(clickY - 50);
 			if (distanceToBottom < heightElementShortUserProfileMin) {
 				setPositionTop(true);
 			}
@@ -97,7 +99,8 @@ function MemberProfile({
 			</div>
 			{isShowPanelChannel && listProfile ? (
 				<div
-					className={`bg-black mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile ${positionTop ? 'fixed bottom-[15px] right-[196px]' : 'absolute top-0 right-[180px]'}`}
+					className={`bg-black mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed right-[245px] w-[360px]`}
+					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

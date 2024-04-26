@@ -4,8 +4,6 @@
 	"private": true,
 	"dependencies": {
 		"@gorhom/bottom-sheet": "^4.6.1",
-		"@react-native-firebase/app": "^19.2.2",
-		"@react-native-firebase/auth": "^19.2.2",
 		"@react-native-google-signin/google-signin": "^11.0.1",
 		"@react-native/metro-config": "*",
 		"@react-navigation/bottom-tabs": "^6.5.20",
@@ -18,8 +16,8 @@
 		"formik": "^2.4.5",
 		"metro-config": "*",
 		"moment": "^2.30.1",
-		"react": "*",
 		"react-native": "*",
+		"react-native-dotenv": "^3.4.11",
 		"react-native-fast-image": "^8.6.3",
 		"react-native-gesture-handler": "^2.16.0",
 		"react-native-raw-bottom-sheet": "^3.0.0",

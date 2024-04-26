@@ -109,7 +109,7 @@ export default function ChannelLayout() {
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 			>
-				<div className="flex flex-row ">
+				<div className="flex h-heightWithoutTopBar flex-row ">
 					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
 						<div
 							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
@@ -159,7 +159,7 @@ export default function ChannelLayout() {
 					</div>
 					{isShow && (
 						<div
-							className={` bg-bgSurface text-[#84ADFF] relative ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
+							className={` bg-bgSurface text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
 							id="memberList"
 						>
 							<MemberList />

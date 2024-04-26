@@ -39,8 +39,8 @@ export default function DirectMessage() {
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
 			<DmTopbar dmGroupId={directId} />
 			<div className="flex flex-row ">
-				<div className="flex flex-col flex-1 w-full h-full ">
-					<div className="overflow-y-auto bg-[#1E1E1E]  max-h-heightMessageViewChat h-heightMessageViewChat" ref={messagesContainerRef}>
+				<div className="flex flex-col flex-1 w-full h-full max-h-messageViewChatDM">
+					<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink" ref={messagesContainerRef}>
 						{
 							<ChannelMessages
 								channelId={directId ?? ''}

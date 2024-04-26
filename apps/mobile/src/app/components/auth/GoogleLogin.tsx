@@ -1,9 +1,9 @@
 import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, {useEffect} from 'react'
 import Images from 'apps/mobile/src/assets/Images'
-import auth from '@react-native-firebase/auth';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
+<<<<<<< HEAD
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 const GoogleLogin = () => {
 
@@ -14,13 +14,25 @@ const GoogleLogin = () => {
             offlineAccess: true
         });
     }, [])
+=======
+const GOOGLE_ANDROID_ID = '648946579638-qtugur5pktrkh30q0ampp76fnaekcmk7.apps.googleusercontent.com';
+
+const GoogleLogin = () => {
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: GOOGLE_ANDROID_ID,
+            offlineAccess: true,
+            forceCodeForRefreshToken: true,
+        });
+    }, []);
+>>>>>>> 05f7575e2b5e65bfd20e8a6cbb1960a9109d225c
     const navigation = useNavigation()
     async function onGoogleButtonPress() {
         try {
-            // Check if your device supports Google Play
-            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
             // Get the users ID token
+            await GoogleSignin.hasPlayServices();
             const { idToken } = await GoogleSignin.signIn();
+<<<<<<< HEAD
 
             // Create a Google credential with the token
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -34,6 +46,11 @@ const GoogleLogin = () => {
             console.log("Loi", JSON.stringify(error));
             console.log("LOi", error);
 
+=======
+            console.log('Tom log  => idToken', idToken);
+        } catch (error) {
+            console.log('error onGoogleButtonPress', error);
+>>>>>>> 05f7575e2b5e65bfd20e8a6cbb1960a9109d225c
         }
 
     }

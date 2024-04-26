@@ -52,7 +52,8 @@ module.exports = {
         "9/10": "90%",
       },
       height: {
-        heightMessageViewChat: `calc(100vh - 72px)`,
+        heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+        heightMessageViewChatDM: `calc(100vh - ${topBarHeight} - 75px)`,
         heightMessageViewChatThread: `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`,
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
         heightTopBar: topBarHeight,
@@ -70,6 +71,7 @@ module.exports = {
         '4/5': '80%',
         '9/10': "90%",
         heightInBox: `calc(100vh - 168px)`,
+        messageViewChatDM: `calc(100vh - 60px)`,
       },
 
       minHeight: {

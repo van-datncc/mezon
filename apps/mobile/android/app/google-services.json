@@ -1,62 +1,33 @@
 {
   "project_info": {
-    "project_number": "285548761692",
-    "project_id": "mezon-772fa",
-    "storage_bucket": "mezon-772fa.appspot.com"
+    "project_number": "650506934835",
+    "project_id": "mezon-5c924",
+    "storage_bucket": "mezon-5c924.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:285548761692:android:77d1245e9ae9f5cf4e0c99",
+        "mobilesdk_app_id": "1:650506934835:android:70af6f4b7fad1a94656146",
         "android_client_info": {
-          "package_name": "com.mobile"
+          "package_name": "com.mobile.mezon"
         }
       },
       "oauth_client": [
         {
-          "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
+          "client_id": "648946579638-qtugur5pktrkh30q0ampp76fnaekcmk7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCUDD4tD2X6h7TkzaO7rknWdZiVrEgIaeM"
+          "current_key": "AIzaSyCyEznrdPB-R4N0aPLFE7dXYNRbAJa1F8A"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:285548761692:android:fb428de8e388d1124e0c99",
-        "android_client_info": {
-          "package_name": "com.mobile"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCUDD4tD2X6h7TkzaO7rknWdZiVrEgIaeM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
+              "client_id": "648946579638-qtugur5pktrkh30q0ampp76fnaekcmk7.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
