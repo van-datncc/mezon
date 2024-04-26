@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/stack';
 
 import {APP_SCREEN} from "../../ScreenTypes";
-import Notifications from "../../../screens/main/Notifications";
+import ServersScreen from "../../../screens/main/ClanScreen";
 
 // eslint-disable-next-line no-empty-pattern
 export const ServersStacks = ({} : any) => {
@@ -25,13 +25,16 @@ export const ServersStacks = ({} : any) => {
 				},
 				cardStyle: { backgroundColor: 'white' },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-			}}>
+			}}
+			initialRouteName={APP_SCREEN.SERVERS.HOME}
+		>
 			{/*Example*/}
 			<Stack.Screen
-				name={APP_SCREEN.NOTIFICATION.HOME}
-				component={Notifications}
+				name={APP_SCREEN.SERVERS.HOME}
+				component={ServersScreen}
 				// component={ListIconScreens}
 				options={{
+					cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 					headerShown: false,
 				}}
 			/>
