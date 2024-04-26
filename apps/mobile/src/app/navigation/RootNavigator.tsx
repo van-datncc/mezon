@@ -3,9 +3,9 @@ import { APP_SCREEN } from './ScreenTypes';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Authentication } from './Authentication';
 import { UnAuthentication } from './UnAuthentication';
-import {selectIsLogin} from "@mezon/store";
-import {useSelector} from "react-redux";
-import {NavigationContainer} from "@react-navigation/native";
+import { selectIsLogin } from "@mezon/store";
+import { useSelector } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
 
 const RootStack = createStackNavigator();
 

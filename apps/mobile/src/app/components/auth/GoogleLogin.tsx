@@ -4,14 +4,16 @@ import Images from 'apps/mobile/src/assets/Images'
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 const GoogleLogin = () => {
 
-    GoogleSignin.configure({
-        webClientId: "285548761692-i672579oq9k4b80np8bkjre6o8ikgl95.apps.googleusercontent.com",
-        offlineAccess: true,
-        forceCodeForRefreshToken: true,
-    });
 
+    React.useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: "1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com",
+            offlineAccess: true
+        });
+    }, [])
     const navigation = useNavigation()
     async function onGoogleButtonPress() {
         try {
@@ -22,16 +24,39 @@ const GoogleLogin = () => {
 
             // Create a Google credential with the token
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            console.log({ idToken });
 
             // Sign-in the user with the credential
             auth().signInWithCredential(googleCredential);
-            navigation.navigate('Servers')
+            navigation.navigate(APP_SCREEN.SERVERS.HOME)
+
         } catch (error) {
-            console.log(error);
-            navigation.navigate('Servers')
+            console.log("Loi", JSON.stringify(error));
+            console.log("LOi", error);
+
         }
 
     }
+    const GoogleSingUp = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            await GoogleSignin.signIn().then(result => { console.log(result) });
+        } catch (error) {
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+                alert('User cancelled the login flow !');
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                alert('Signin in progress');
+                // operation (f.e. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                alert('Google play services not available or outdated !');
+                // play services not available or outdated
+            } else {
+                console.log(error)
+            }
+        }
+    };
+
     return (
         <Pressable style={styles.googleButton}
             onPress={onGoogleButtonPress}
