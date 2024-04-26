@@ -9,6 +9,7 @@ import ProfileScreen from '../../screens/main/ProfileScreen';
 import { darkColor } from '../../constants/Colors';
 import {APP_SCREEN} from "../ScreenTypes";
 import DrawerNavigator from "./DrawerNavigator";
+import HomeScreen from "../../screens/home/HomeScreen";
 
 const TabStack = createBottomTabNavigator();
 
@@ -17,20 +18,21 @@ const BottomNavigator = () => {
     return (
         <TabStack.Navigator
             screenOptions={{
-                tabBarStyle: {
-                    height: 65,
-                    paddingBottom: 10,
-                    borderTopWidth: 0,
-                    elevation: 0,
-                    backgroundColor: darkColor.Backgound_Tertiary
-                },
-                tabBarActiveTintColor: "#FFFFFF"
+              tabBarHideOnKeyboard: true,
+              tabBarStyle: {
+                  height: 65,
+                  paddingBottom: 10,
+                  borderTopWidth: 0,
+                  elevation: 0,
+                  backgroundColor: darkColor.Backgound_Tertiary
+              },
+              tabBarActiveTintColor: "#FFFFFF"
             }}
             initialRouteName={APP_SCREEN.DRAWER_BAR}
         >
             <TabStack.Screen
-                name={APP_SCREEN.DRAWER_BAR}
-                component={DrawerNavigator}
+                name={APP_SCREEN.HOME}
+                component={HomeScreen}
                 options={{
                     headerShown: false,
                     title: 'Servers',
