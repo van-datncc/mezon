@@ -102,9 +102,10 @@ type UpdateLinkUser = {
 	user_name: string;
 	avatar_url: string;
 	display_name: string;
+	about_me: string;
 };
 
-export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name }: UpdateLinkUser, thunkAPI) => {
+export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_name, avatar_url, display_name, about_me }: UpdateLinkUser, thunkAPI) => {
 	try {
 		const mezon = ensureClient(getMezonCtx(thunkAPI));
 		const body = {
@@ -114,6 +115,7 @@ export const updateUser = createAsyncThunk('clans/updateUser', async ({ user_nam
 			location: '',
 			timezone: '',
 			username: user_name,
+			about_me: about_me,
 		};
 		const response = await mezon.client.updateAccount(mezon.session, body);
 		if (!response) {
