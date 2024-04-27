@@ -36,7 +36,7 @@ const SettingRightUser = ({
 	const handleUpdateUser = async () => {
 		if (name || urlImage || displayName || editAboutUser) {
 			await updateUser(name, urlImage, displayName, editAboutUser);
-			if (currentChannelId){
+			if (currentChannelId && currentClanId){
 				await dispatch(channelMembersActions.fetchChannelMembers({clanId: currentClanId || '', channelId:currentChannelId || '', channelType: ChannelType.CHANNEL_TYPE_TEXT, noCache:true, repace:true }));
 			}
 		}
