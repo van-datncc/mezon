@@ -3,10 +3,9 @@ import { useMemo, useState } from 'react';
 import * as Icons from '../../../Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
-import { selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId } from '@mezon/store';
+import { selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, channelUsersActions, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useAuth } from '@mezon/core';
-import { channelUsersActions, useAppDispatch } from '@mezon/store';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
@@ -122,7 +121,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Roles</p>
 									<div>
-										{listRolesInChannel.map((role, index) => (
+										{listRolesInChannel.map((role) => (
 											<div className={`flex justify-between py-2 rounded`} key={role.id}>
 												<div className="flex gap-x-2 items-center">
 													<Icons.RoleIcon defaultSize="w-[23px] h-5" />
@@ -132,6 +131,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 													<p className="text-xs text-[#AEAEAE]">Role</p>
 													<div
 														onClick = {()=>deleteRole(role?.id||"")}
+														role="button"
 													>
 														<Icons.EscIcon defaultSize="size-[15px] cursor-pointer" />
 													</div>
@@ -144,8 +144,8 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Members</p>
 									<div>
-										{listMembersInChannel.map((user, index) => (
-											<div className={`flex justify-between py-2 rounded`} key={index}>
+										{listMembersInChannel.map((user) => (
+											<div className={`flex justify-between py-2 rounded`} key={user?.id}>
 												<div className="flex gap-x-2 items-center">
 													<img src={user?.avatar_url} alt={user?.display_name} className="size-6 object-cover rounded-full" />
 													<p className="text-sm">{user?.display_name}</p>
@@ -156,6 +156,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 													>{checkOwner(user?.google_id || '') ? 'Server Owner' : ''}</p>
 													<div
 														onClick = {()=>deleteMember(user?.id||"")}
+														role="button"
 													>
 														<Icons.EscIcon
 															defaultSize={`${checkOwner(user?.google_id || '') ? '' : 'cursor-pointer'} size-[15px]`}
