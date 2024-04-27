@@ -1,5 +1,5 @@
 import React from "react";
-import {FlatList, StyleSheet, Text, View} from "react-native";
+import {FlatList, Text, View} from "react-native";
 import HashSignIcon from '../../../../assets/svg/channelText.svg';
 import SearchLogo from '../../../../assets/svg/discoverySearch.svg'
 import UsersLogo from '../../../../assets/svg/users.svg'

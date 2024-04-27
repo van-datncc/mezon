@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet, View, TextInput } from "react-native";
+import { Dimensions, View, TextInput } from "react-native";
 import PlusIcon from '../../../../assets/svg/guildAddRole.svg';
 import ChatGiftIcon from '../../../../assets/svg/chatGiftNitro.svg';
 import SmilingFaceIcon from '../../../../assets/svg/voiceReaction.svg';

@@ -45,5 +45,4 @@ export { default as ShortUserProfile } from './components/ShortUserProfile/Short
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
-// export * from './components/MessageWithUser';
 export * from './components/SettingProfile';
