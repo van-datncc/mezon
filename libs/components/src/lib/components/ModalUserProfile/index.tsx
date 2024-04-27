@@ -4,10 +4,10 @@ import { useMezon } from '@mezon/transport';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import AboutUserProfile from './AboutUserProfile';
 import AvatarProfile from './AvatarProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
-import AboutUserProfile from './AboutUserProfile';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -48,7 +48,7 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 						<p className="font-medium tracking-wide text-sm">{userById?.user?.display_name}</p>
 					</div>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center"></div>
-					{isFooterProfile ? null: <AboutUserProfile userID={userID} />}
+					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
 					{isFooterProfile ? <StatusProfile userById={userById} /> : <RoleUserProfile userID={userID} />}
 
 					{!checkOwner(userById?.user?.google_id || '') ? (

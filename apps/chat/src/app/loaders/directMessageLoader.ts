@@ -1,6 +1,5 @@
 import { directActions, getStoreAsync } from '@mezon/store';
 import { LoaderFunction } from 'react-router-dom';
-// import { useSelector } from "react-redux";
 
 export const directMessageLoader: LoaderFunction = async ({ params }) => {
 	const { directId, type } = params;

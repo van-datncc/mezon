@@ -16,7 +16,7 @@ type MessageProps = {
 	channelLabel: string;
 };
 
-export function ChannelMessage(props: MessageProps) {
+export function ChannelMessage(props: Readonly<MessageProps>) {
 	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
@@ -67,13 +67,13 @@ export function ChannelMessage(props: MessageProps) {
 			handleCancelEdit();
 		}
 	};
-	const handelSave = () =>{
+	const handelSave = () => {
 		if (editMessage) {
 			handleSend(editMessage, message.id);
 			setNewMessage(editMessage);
 			handleCancelEdit();
 		}
-	} 
+	};
 
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -141,15 +141,15 @@ export function ChannelMessage(props: MessageProps) {
 						}}
 						rows={editMessage?.split('\n').length}
 					></textarea>
-					<div className='text-xs flex'>
-						<p className='pr-[3px]'>escape to</p>
-						<p className='pr-[3px] text-[#3297ff]'
-						 style={{ cursor: 'pointer' }}
-						onClick={handleCancelEdit}>cancel</p>
-						<p className='pr-[3px]'>• enter to</p>
-						<p className='text-[#3297ff]'
-						 style={{ cursor: 'pointer' }}
-						onClick={handelSave}>save</p>
+					<div className="text-xs flex">
+						<p className="pr-[3px]">escape to</p>
+						<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+							cancel
+						</p>
+						<p className="pr-[3px]">• enter to</p>
+						<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
+							save
+						</p>
 					</div>
 				</div>
 			)}
@@ -246,7 +246,7 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 		deleteSendMessage(message.id);
 	};
 	const { listDM: dmGroupChatList } = useDirect();
-	
+
 	const handleClickForward = () => {
 		if (dmGroupChatList.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));
