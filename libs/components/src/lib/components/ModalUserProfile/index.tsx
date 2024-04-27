@@ -42,14 +42,14 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 			<div className="h-[60px] bg-[#8CBC4F] rounded-tr-[10px] rounded-tl-[10px]"></div>
 			<AvatarProfile userById={userById} />
 			<div className="px-[16px]">
-				<div className="bg-[#232428] w-full p-3 my-[16px] rounded-[10px] flex flex-col gap-3 text-justify">
+				<div className="bg-[#232428] w-full p-2 my-[16px] rounded-[10px] flex flex-col gap-3 text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line">{userById?.user?.username}</p>
 						<p className="font-medium tracking-wide text-sm">{userById?.user?.display_name}</p>
 					</div>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center"></div>
 					{isFooterProfile ? null: <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile /> : <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? <StatusProfile userById={userById} /> : <RoleUserProfile userID={userID} />}
 
 					{!checkOwner(userById?.user?.google_id || '') ? (
 						<div className="w-full items-center">

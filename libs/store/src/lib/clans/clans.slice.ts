@@ -1,13 +1,13 @@
-import { ApiClanDesc } from 'mezon-js/api.gen';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ChannelType } from 'mezon-js';
+import { ApiClanDesc } from 'mezon-js/api.gen';
 import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
+import { usersClanActions } from '../clanMembers/clan.members';
 import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
-import { ChannelType } from 'mezon-js';
-import { usersClanActions } from '../clanMembers/clan.members';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
@@ -47,7 +47,8 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(policiesActions.fetchPermission());
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
-	thunkAPI.dispatch(voiceActions.fetchVoiceChannelMembers({
+	thunkAPI.dispatch(
+		voiceActions.fetchVoiceChannelMembers({
 			clanId: clanId ?? '',
 			channelId: '',
 			channelType: ChannelType.CHANNEL_TYPE_VOICE,
