@@ -53,6 +53,9 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
+	const handleDefault = (e: any) => {
+		e.stopPropagation();
+	};
 	return (
 		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-sm prose-blockquote:leading-[6px] prose-blockquote:my-0">
 			{showProfileUser ? (
@@ -63,6 +66,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						top: positionBottom ? '' : `${positionTop}px`,
 						bottom: positionBottom ? '64px' : '',
 					}}
+					onMouseDown={handleDefault}
 				>
 					<ShortUserProfile userID={userID} />
 				</div>

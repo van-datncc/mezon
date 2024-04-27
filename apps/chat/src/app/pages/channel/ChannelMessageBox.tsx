@@ -8,12 +8,11 @@ import { useThrottledCallback } from 'use-debounce';
 export type ChannelMessageBoxProps = {
 	channelId: string;
 	channelLabel: string;
-	controlEmoji?: boolean;
 	clanId?: string;
 	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanId, mode }: ChannelMessageBoxProps) {
+export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: ChannelMessageBoxProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
 	const handleSend = useCallback(
 		(
