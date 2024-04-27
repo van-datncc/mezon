@@ -1,6 +1,4 @@
-import firebase from 'firebase/app';
 import { initializeApp } from 'firebase/app';
-import 'firebase/messaging';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 const firebaseConfig = {
   apiKey: process.env.NX_CHAT_APP_FCM_API_KEY as string,
