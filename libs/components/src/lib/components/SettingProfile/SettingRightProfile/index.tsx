@@ -10,8 +10,6 @@ const SettingRightProfile = () => {
 		setIsUserSettings(false);
 	};
 
-	useEffect(() => {}, [userProfile]);
-
 	const handleUserSettingsClick = () => {
 		setIsUserSettings(true);
 	};
