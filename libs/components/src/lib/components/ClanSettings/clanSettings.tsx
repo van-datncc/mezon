@@ -39,7 +39,6 @@ const ClanSetting = (props: ModalSettingProps) => {
 						{!openEdit ? (
 							<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-0 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
 								{currentSetting === 'Roles' && <ServerSettingMainRoles handleOpen={openSettingEdit} />}
-								{/* {currentSetting === 'Account' && <SettingAccount />} */}
 							</div>
 						) : null}
 						<ServerSettingRoleManagement flagOption={openEdit} handleClose={closeSettingEdit} />

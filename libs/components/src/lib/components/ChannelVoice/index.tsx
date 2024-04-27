@@ -92,6 +92,7 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 					gridAutoRows: isSelectScreen ? '' : 'minmax(0, 1fr)',
 					gridTemplateRows: isSelectScreen ? '3fr 1fr' : '',
 				}}
+				role="button"
 			>
 				<div className={`contents ${showScreen ? 'block' : 'hidden'}`}>
 					<canvas id="canvas" className={`w-full bg-black rounded-[10px] h-full`}></canvas>
@@ -101,8 +102,8 @@ function ChannelVoice({ clanId, clanName, channelId, channelLabel, userName, jwt
 					{numberMember < 2 && <AddVoiceFriend channelId={channelId} />}
 				</div>
 				<div className={`remoteTrack contents`}>
-					{friendVoiceChannel.map((user: IChannelMember, index: number) => {
-						return <ChannelMemberAvatar key={index} userId={user.user_id ?? ''} />;
+					{friendVoiceChannel.map((user: IChannelMember) => {
+						return <ChannelMemberAvatar key={user.id} userId={user.user_id ?? ''} />;
 					})}
 				</div>
 				<video id="screenvideo" autoPlay width={460} height={640} />

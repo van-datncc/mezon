@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux';
 import { Hashtag, ThreadIcon } from '../Icons';
 
 export type ChatWelComeProp = {
-	type: string;
-	name?: string;
-	avatarDM?: string;
+	readonly type: Readonly<string>;
+	readonly name?: Readonly<string>;
+	readonly avatarDM?: Readonly<string>;
 };
 
 function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
@@ -24,7 +24,7 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 					<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
 				</div>
 			) : (
-				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center" src={avatarDM} />
+				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center" alt='' src={avatarDM} />
 			)}
 
 			{type === ETypeMessage.THREAD && currentThread && (
