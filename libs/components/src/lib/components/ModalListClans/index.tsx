@@ -57,14 +57,14 @@ const ModalListClans = (props: ModalListClansProps) => {
 			<div className="overflow-y-auto max-h-36">
 				{options.map((option: IClan) => {
 					return (
-						<div
+						<button
 							className={`w-auto flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`}
 							key={option.id}
 							onClick={() => onChangeClan(option.id)}
 						>
 							<div className="flex items-center gap-4 w-10/12">
 								{option.logo ? (
-									<img src={option.logo} className="rounded-full size-10 object-cover" />
+									<img src={option.logo} alt={option.logo} className="rounded-full size-10 object-cover" />
 								) : (
 									<div>
 										{option?.clan_name && (
@@ -77,7 +77,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 								<span className="text-[16px] one-line">{option.clan_name}</span>
 							</div>
 							{idSelectedClan === option.clan_id && <Tick />}
-						</div>
+						</button>
 					);
 				})}
 			</div>
