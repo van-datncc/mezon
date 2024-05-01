@@ -2,6 +2,7 @@ import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference
 import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import EmojiPicker, { EmojiClickData, EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 import { ChannelStreamMode } from 'mezon-js';
+import { useRef } from 'react';
 
 export type EmojiPickerOptions = {
 	messageEmoji?: IMessageWithUser;
@@ -40,13 +41,17 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		}
 	};
-
+	const emojiRef = useRef<HTMLDivElement>(null);
+	const parentDiv = emojiRef?.current?.parentElement; // Lấy thẻ div cha
+	const parentWidth = parentDiv?.offsetWidth; // Lấy chiều rộng của div cha
+	const parentHeight = parentDiv?.offsetHeight; // Lấy chiều cao của div cha
+	console.log(parentWidth);
 	return (
-		<div onClick={(event) => event.stopPropagation()} className="z-20">
+		<div onClick={(event) => event.stopPropagation()} className="z-20" ref={emojiRef}>
 			<EmojiPicker
 				suggestedEmojisMode={SuggestionMode.FREQUENT}
 				onEmojiClick={handleEmojiSelect}
-				width={500}
+				width={parentWidth}
 				theme={Theme.DARK}
 				height={458}
 				emojiStyle={EmojiStyle.NATIVE}
