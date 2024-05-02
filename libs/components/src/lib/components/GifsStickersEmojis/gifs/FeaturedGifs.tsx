@@ -5,11 +5,12 @@ type FeaturedGifsProps = {
 	channelId: string;
 	channelLabel: string;
 	controlEmoji?: boolean;
+	clanId?: string;
 	mode: number;
 	onClickToTrending: () => void;
 };
 
-function FeaturedGifs({ channelId, channelLabel, mode, onClickToTrending }: FeaturedGifsProps) {
+function FeaturedGifs({ onClickToTrending }: FeaturedGifsProps) {
 	const {  dataGifsFeartured } = useGifs();
 	return (
 			<div className="relative h-32 rounded-md cursor-pointer overflow-hidden group" onClick={onClickToTrending} role='button'>

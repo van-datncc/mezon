@@ -13,30 +13,7 @@ import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
-// TODO: implement useClipboard hook
-export const unsecuredCopyToClipboard = (text: string) => {
-	const textArea = document.createElement('textarea');
-	textArea.value = text;
-	document.body.appendChild(textArea);
-	textArea.focus();
-	textArea.select();
-	try {
-		document.execCommand('copy');
-	} catch (err) {
-		console.error('Unable to copy to clipboard', err);
-	}
-	document.body.removeChild(textArea);
-};
-
-export const handleCopyToClipboard = (content: string) => {
-	if (window.isSecureContext && navigator.clipboard) {
-		navigator.clipboard.writeText(content);
-	} else {
-		unsecuredCopyToClipboard(content);
-	}
-};
-
-function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
+function ChannelList({ channelCurrentType }: {readonly channelCurrentType?: number }) {
 	const { categorizedChannels } = useCategory();
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
@@ -74,6 +51,7 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 			onContextMenu={(event) => event.preventDefault()}
 			className="overflow-y-scroll scrollbar-thin overflow-x-hidden w-[100%] h-[100%] pb-[10px] "
 			id="channelList"
+			role="button"
 		>
 			{isChange ? <ForwardMessageModal open={isChange} /> : null}
 			{<CreateNewChannelModal />}
@@ -118,8 +96,8 @@ function ChannelList({ channelCurrentType }: { channelCurrentType?: number }) {
 										const categoryIsOpen = !categoriesState[category.id];
 										return categoryIsOpen || channel?.unread;
 									})
-									.map((channel: IChannel, index: number) => {
-										return <ChannelListItem key={index} channel={channel as ChannelThreads} />;
+									.map((channel: IChannel) => {
+										return <ChannelListItem key={channel.id} channel={channel as ChannelThreads} />;
 									})}
 							</div>
 						)}

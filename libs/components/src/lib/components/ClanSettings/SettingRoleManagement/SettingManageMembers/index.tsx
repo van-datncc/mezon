@@ -68,7 +68,7 @@ const SettingManageMembers = () => {
 							<span>{member.user.display_name}</span>
 							{clickRole !== 'New Role' ? (
 								<div className="w-4 h-4 rounded-full flex justify-center items-center hover:bg-slate-800">
-									<span onClick={() => handleRemoveMember(member.user.id)} className="text-white cursor-pointer">
+									<span onClick={() => handleRemoveMember(member.user.id)} className="text-white cursor-pointer" role="button">
 										x
 									</span>
 								</div>

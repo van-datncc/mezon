@@ -1,5 +1,3 @@
-// import SettingRightClan from '../SettingRightClanProfile';
-
 import { useRoles } from '@mezon/core';
 import {
 	rolesClanActions,
@@ -20,7 +18,6 @@ import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
 export type ModalOpenEdit = {
 	handleOpen: () => void;
 };
-// import SettingRightUser from '../SettingRightUserProfile';
 const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const { RolesClan } = useRoles();
 	const [showModal, setShowModal] = useState<boolean>(false);
