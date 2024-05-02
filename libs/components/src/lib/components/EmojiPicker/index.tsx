@@ -7,7 +7,6 @@ export type EmojiPickerOptions = {
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
-	emojiExist?: string;
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
@@ -42,7 +41,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 	};
 
 	return (
-		<div onClick={(event) => event.stopPropagation()} className="z-20">
+		<div onClick={(event) => event.stopPropagation()} className="z-20" role="button">
 			<EmojiPicker
 				suggestedEmojisMode={SuggestionMode.FREQUENT}
 				onEmojiClick={handleEmojiSelect}

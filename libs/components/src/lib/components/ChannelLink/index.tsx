@@ -40,7 +40,6 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
-	const { sessionRef } = useMezon();
 	const { setIsShowCreateThread } = useThreads();
 	const voice = useMezonVoice();
 
@@ -64,11 +63,11 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	const { toChannelPage } = useAppNavigation();
 
 	const handleCreateLinkInvite = () => {
-		createInviteLink(clanId || '', channel.channel_id || '');
+		createInviteLink(clanId ?? '', channel.channel_id ?? '');
 		setIsShowPanelChannel(false);
 	};
 
-	const channelPath = toChannelPage(channel.id, channel?.clan_id || '');
+	const channelPath = toChannelPage(channel.id, channel?.clan_id ?? '');
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -91,9 +90,9 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 			...prev,
 			channelId: id,
 			channelName: voiceChannelName.toLowerCase(),
-			clanId: clanId || '',
-			clanName: currentClan?.clan_name || '',
-			displayName: userProfile?.user?.username || '',
+			clanId: clanId ?? '',
+			clanName: currentClan?.clan_name ?? '',
+			displayName: userProfile?.user?.username ?? '',
 			voiceStart: true,
 		}));
 
@@ -116,9 +115,9 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		}
 	};
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} className="relative group">
+		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} onClick={() => setIsShowCreateThread(false)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
-				<span className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`} onClick={() => handleVoiceChannel(channel.id)}>
+				<span className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`} onClick={() => handleVoiceChannel(channel.id)} role="button">
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
 						{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (

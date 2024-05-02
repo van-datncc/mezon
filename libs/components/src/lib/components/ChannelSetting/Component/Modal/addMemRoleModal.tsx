@@ -94,7 +94,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 						<p className="uppercase font-bold text-xs pb-4">Roles</p>
 						<div>
 							{RolesNotAddChannel.map((role, index) => (
-								<div className={`flex justify-between py-2 'hover:bg-[#43444B] px-[6px]' rounded`} key={index}>
+								<div className={`flex justify-between py-2 'hover:bg-[#43444B] px-[6px]' rounded`} key={role.id}>
 									<div className="flex gap-x-2 items-center">
 											<input
 												id={`checkbox-item-${index}`}
@@ -113,8 +113,8 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 					<div className="mt-2">
 						<p className="uppercase font-bold text-xs pb-4">Members</p>
 						<div>
-							{listMembersNotInChannel.map((user, index) => (
-								<div className={`flex justify-between py-2 rounded hover:bg-[#43444B] px-[6px]`} key={index}>
+							{listMembersNotInChannel.map((user) => (
+								<div className={`flex justify-between py-2 rounded hover:bg-[#43444B] px-[6px]`} key={user?.id}>
 									<div className="flex gap-x-2 items-center">
 										<input
 											type="checkbox"

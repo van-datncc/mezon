@@ -53,9 +53,14 @@ function MemberProfile({
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
+	const handleDefault = (e: any) => {
+		e.stopPropagation();
+	};
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
+		<div className="relative group">
 			<div
+				ref={panelRef}
+				onMouseDown={(event) => handleMouseClick(event)}
 				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-10 h-10 text-lg text-white rounded-full">
@@ -101,6 +106,7 @@ function MemberProfile({
 				<div
 					className={`bg-black mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed right-[245px] w-[360px]`}
 					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
+					onMouseDown={handleDefault}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

@@ -1,7 +1,6 @@
 export { default as ChannelLink } from './components/ChannelLink';
 export { default as ChannelList } from './components/ChannelList';
 export { default as ChannelTopbar } from './components/ChannelTopbar';
-export { default as MessageTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/MessageTextField';
 export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
 export { default as ThreadNameTextField } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadNameTextField';
 export { default as ChannelVoice } from './components/ChannelVoice';
@@ -9,6 +8,7 @@ export { default as ChannelVoiceOff } from './components/ChannelVoice/ChannelVoi
 export { default as ChatWelcome } from './components/ChatWelcome';
 export { default as ClanHeader } from './components/ClanHeader';
 export { default as ModalCreateClan } from './components/CreateClanModal';
+export { default as SearchModal } from './components/SearchModal/index';
 export { default as DirectMessageList } from './components/DmList';
 export { default as DmTopbar } from './components/DmList/DMtopbar/index';
 export { default as MemberListGroupChat } from './components/DmList/MemberListGroupChat/index';
@@ -45,5 +45,4 @@ export { default as ShortUserProfile } from './components/ShortUserProfile/Short
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
-// export * from './components/MessageWithUser';
 export * from './components/SettingProfile';

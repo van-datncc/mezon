@@ -5,6 +5,3 @@ export const friendsLoader = async () => {
 	store.dispatch(friendsActions.fetchListFriends());
 	return null;
 };
-// export const shouldRevalidateMain = () => {
-//   return false
-// }

@@ -2,7 +2,6 @@ import React from 'react';
 interface IconProps {
 	defaultFill?: string;
 	defaultSize?: string;
-	isWhite?: boolean;
 }
 export const TxtThumbnail: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
