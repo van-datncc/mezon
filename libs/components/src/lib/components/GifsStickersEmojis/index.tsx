@@ -49,9 +49,9 @@ const GifStickerEmojiPopup = () => {
 	}, [emojiRefParentDiv]);
 
 	return (
-		<div className=" md:min-w-[500px] w-full h-fit min-h-[500px]  rounded-lg bg-[#222222] ml-[-0.6rem]">
+		<div className="md:min-w-[500px] w-full h-fit min-h-[500px] rounded-lg bg-[#222222] ">
 			<div className="w-full">
-				<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 ">
+				<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1">
 					<button
 						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold' : ' text-gray-300 hover:text-white  '}`}
 						onClick={() => handleTabClick(SubPanelName.GIFS)}
@@ -74,7 +74,7 @@ const GifStickerEmojiPopup = () => {
 				{subPanelActive !== SubPanelName.EMOJI && <InputSearch />}
 			</div>
 
-			<div className="w-full min-h-[400px] text-center md:w-[500px]  " ref={emojiRefParentDiv}>
+			<div className="w-full min-h-[400px] text-center md:w-[500px] " ref={emojiRefParentDiv}>
 				{subPanelActive === SubPanelName.GIFS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<TenorGifCategories
@@ -87,13 +87,15 @@ const GifStickerEmojiPopup = () => {
 				)}
 
 				{subPanelActive === SubPanelName.STICKERS && (
-					<div className="flex h-full pr-2 w-full md:w-[500px]">
+					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
 					</div>
 				)}
-				<div className="flex h-full w-[390px] justify-center md:w-[500px]">
-					{subPanelActive === SubPanelName.EMOJI && <EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />}
-				</div>
+				{subPanelActive === SubPanelName.EMOJI && (
+					<div className="flex h-full pr-2 w-full md:w-[500px]">
+						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+					</div>
+				)}
 			</div>
 		</div>
 	);

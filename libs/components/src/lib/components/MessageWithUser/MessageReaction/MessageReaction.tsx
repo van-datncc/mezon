@@ -26,6 +26,8 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 	} = useChatReaction();
 
 	const { referenceMessage, setReferenceMessage, setOpenReplyMessageState } = useReference();
+	const smileButtonRef = useRef<HTMLDivElement | null>(null);
+
 	async function reactOnExistEmoji(
 		id: string,
 		mode: number,
@@ -103,7 +105,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		const childElement = childRef.current[index];
 		if (!childElement) return;
 		const childRect = childElement.getBoundingClientRect();
-		const distanceToRight = parentRect.right - childRect.right;
+		const distanceToRight = parentRect.right - childRect.right - 100;
 		if (distanceToRight < PANEL_SENDER_WIDTH) {
 			return setPosToRight(true);
 		} else {
@@ -121,8 +123,6 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 			return false;
 		}
 	};
-
-	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 
 	const checkPosEmojiReactionPanel = () => {
 		if (!parentDiv.current) return;
@@ -195,6 +195,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 												<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
 											</>
 										)}
+
 										{checkMessageToMatchMessageRef(message) &&
 											userReactionPanelState &&
 											checkEmojiToMatchWithEmojiHover(emoji) &&

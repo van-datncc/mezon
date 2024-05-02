@@ -48,16 +48,14 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 	};
 
 	return (
-		<div className=" w-full flex flex-row justify-center">
-			<EmojiPicker
-				style={{ border: 'none', minWidth: '100%' }}
-				suggestedEmojisMode={SuggestionMode.FREQUENT}
-				onEmojiClick={handleEmojiSelect}
-				theme={Theme.DARK}
-				emojiStyle={EmojiStyle.NATIVE}
-				autoFocusSearch={subPanelActive === SubPanelName.EMOJI}
-			/>
-		</div>
+		<EmojiPicker
+			style={{ border: 'none', minWidth: '100%' }}
+			suggestedEmojisMode={SuggestionMode.FREQUENT}
+			onEmojiClick={handleEmojiSelect}
+			theme={Theme.DARK}
+			emojiStyle={EmojiStyle.NATIVE}
+			autoFocusSearch={subPanelActive === SubPanelName.EMOJI}
+		/>
 	);
 }
 
