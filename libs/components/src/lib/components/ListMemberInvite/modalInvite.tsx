@@ -16,11 +16,11 @@ const ModalInvite = (props: ModalParam) => {
 	const { currentClanId } = useClans();
 	const { createLinkInviteUser } = useInvite();
 
-	const { onClose, confirmButton } = props;
+	const { onClose } = props;
 
 	const handleOpenInvite = () => {
 		createLinkInviteUser(currentClanId ?? '', props.channelID ?? '', 10).then((res) => {
-			if (res && res.invite_link) {
+			if (res && res?.invite_link) {
 				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
 			}
 		});
