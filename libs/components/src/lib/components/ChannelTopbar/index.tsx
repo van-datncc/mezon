@@ -13,7 +13,7 @@ import { ChannelLabel, SearchMessage } from './TopBarComponents';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
-	channel?: IChannel | null;
+	readonly channel?: Readonly<IChannel> | null;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
@@ -35,7 +35,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 						<div className="justify-end items-center gap-2 flex">
 							<div className="">
 								<div className="justify-start items-center gap-[15px] flex iconHover">
-									<div className="relative" onClick={openInviteChannelModal}>
+									<div className="relative" onClick={openInviteChannelModal} role="button">
 										<Icons.AddMemberCall />
 									</div>
 									<InboxButton />

@@ -44,6 +44,10 @@ export function useAppNavigation() {
 		return `../message/${directId}/${type}`;
 	}, []);
 
+	const toDmGroupPageFromMainApp = useCallback((directId: string, type: number) => {
+		return `chat/direct/message/${directId}/${type}`;
+	}, []);
+
 	return useMemo(
 		() => ({
 			navigate,
@@ -55,6 +59,7 @@ export function useAppNavigation() {
 			toClanPage,
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
+			toDmGroupPageFromMainApp,
 			toMessageChannel,
 		}),
 		[
@@ -67,6 +72,7 @@ export function useAppNavigation() {
 			toClanPage,
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
+			toDmGroupPageFromMainApp,
 			toMessageChannel,
 		],
 	);

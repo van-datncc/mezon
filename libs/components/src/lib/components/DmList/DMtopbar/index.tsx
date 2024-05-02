@@ -8,7 +8,7 @@ import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
 
 export type ChannelTopbarProps = {
-	dmGroupId?: string;
+	readonly dmGroupId?: Readonly<string>;
 };
 
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
@@ -20,7 +20,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		<div className={`flex h-heightTopBar p-3 min-w-0 items-center bg-bgSecondary border-b border-black flex-shrink`}>
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
-					<div onClick={() => setStatusMenu(true)} className="mx-6">
+					<div onClick={() => setStatusMenu(true)} className="mx-6" role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5 ${closeMenu && !statusMenu ? '' : 'hidden'}`} />
 					</div>
 					<MemberProfile

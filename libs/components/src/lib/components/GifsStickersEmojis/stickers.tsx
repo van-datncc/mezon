@@ -6,8 +6,6 @@ import { useCallback, useEffect, useState } from 'react';
 type ChannelMessageBoxProps = {
 	channelId: string;
 	channelLabel: string;
-	controlEmoji?: boolean;
-	clanId?: string;
 	mode: number;
 };
 
@@ -75,6 +73,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 						alt={`avt ${avt.id}`}
 						className={`w-full h-auto cursor-pointer hover:bg-bgDisable ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-lg justify-center items-center border border-bgHoverMember rounded-lg`}
 						onClick={() => handleClickAvt(avt.type)}
+						role="button"
 					/>
 				))}
 			</div>
@@ -84,9 +83,10 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 						<img
 							key={image.id}
 							src={image.url}
-							alt={`Image ${image.id}`}
+							alt={`Img`}
 							className="w-full h-auto cursor-pointer hover:bg-bgDisable hover:rounded-lg border border-bgHoverMember rounded-lg"
 							onClick={() => handleClickImage(image.url)}
+							role='button'
 						/>
 					))}
 				</div>
