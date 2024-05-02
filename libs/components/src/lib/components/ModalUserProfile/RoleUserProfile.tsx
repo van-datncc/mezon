@@ -1,6 +1,5 @@
-import { UserRestrictionZone, useAuth, useClanRestriction, useClans, useDirect, useRoles, useSendInviteMessage } from '@mezon/core';
+import { UserRestrictionZone, useClanRestriction, useClans, useRoles } from '@mezon/core';
 import { selectCurrentChannelId, selectMemberByUserId } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
 import { EPermission } from '@mezon/utils';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -26,8 +25,18 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 
-	const handModalAddRole = () => {
+	const [positionTop, setPositionTop] = useState(40);
+	const [positionLeft, setPositionLeft] = useState(0);
+	const handModalAddRole = (e: any) => {
 		setShowPopupAddRole(true);
+		const clickY = e.clientY;
+		const windowHeight = window.innerHeight;
+		const distanceToBottom = windowHeight - clickY;
+		const heightModalAddRole = 180;
+		if (distanceToBottom < heightModalAddRole) {
+			setPositionTop(-50);
+			setPositionLeft(-320);
+		}
 	};
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);
@@ -68,24 +77,26 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 				<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
 					<span className="font-bold border border-bgDisable rounded-full bg-bgDisable px-2 relative" onClick={handModalAddRole}>
 						+
-						<div className="absolute left-0 top-10 ">
+						<div className="absolute" style={{ top: `${positionTop}px`, left: `${positionLeft}px` }}>
 							{showPopupAddRole ? (
-								<div className="w-[300px] h-[200px] bg-[#323232] p-2 text-white overflow-y: auto">
+								<div className="w-[300px] h-fit bg-[#323232] p-2 text-white overflow-y: auto">
 									<input
 										type="text"
 										className="w-full border-[#1d1c1c] rounded-[5px] bg-[#1d1c1c] px-2"
 										placeholder="Role"
 										onChange={handleInputChange}
 									/>
-									{filteredListRoleBySearch.map((role, index) => (
-										<div
-											key={index}
-											className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 bg-bgDisable mr-2 hover:bg-[#1d1c1c] "
-											onClick={() => addRole(role.id)}
-										>
-											{role.title}
-										</div>
-									))}
+									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden">
+										{filteredListRoleBySearch.map((role, index) => (
+											<div
+												key={index}
+												className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 bg-bgDisable mr-2 hover:bg-[#1d1c1c] "
+												onClick={() => addRole(role.id)}
+											>
+												{role.title}
+											</div>
+										))}
+									</div>
 								</div>
 							) : null}
 						</div>

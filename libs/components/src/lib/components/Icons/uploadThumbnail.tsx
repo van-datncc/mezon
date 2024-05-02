@@ -1,9 +1,8 @@
 interface IconProps {
-	defaultFill?: string;
 	defaultSize?: string;
 }
 
-export const WaitingUpload: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-[20rem] h-[20rem]' }) => {
+export const WaitingUpload: React.FC<IconProps> = ({ defaultSize = 'w-[20rem] h-[20rem]' }) => {
 	return (
 		<svg viewBox="0 0 1024 1024" className={defaultSize} version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>

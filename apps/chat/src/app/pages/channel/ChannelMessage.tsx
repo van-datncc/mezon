@@ -16,7 +16,7 @@ type MessageProps = {
 	channelLabel: string;
 };
 
-export function ChannelMessage(props: MessageProps) {
+export function ChannelMessage(props: Readonly<MessageProps>) {
 	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
@@ -165,6 +165,23 @@ ChannelMessage.Skeleton = () => {
 	);
 };
 
+type PopupMessageProps = {
+	reactionRightState: boolean;
+	mess: IMessageWithUser;
+	referenceMessage: IMessageWithUser | null;
+	reactionBottomState: boolean;
+	openEditMessageState: boolean;
+	openOptionMessageState: boolean;
+	mode: number;
+	isCombine?: boolean;
+	deleteSendMessage: (messageId: string) => Promise<void>;
+};
+
+type PopupOptionProps = {
+	message: IMessageWithUser;
+	deleteSendMessage: (messageId: string) => Promise<void>;
+};
+
 function PopupMessage({
 	reactionRightState,
 	mess,
@@ -175,17 +192,7 @@ function PopupMessage({
 	mode,
 	isCombine,
 	deleteSendMessage,
-}: {
-	reactionRightState: boolean;
-	mess: IMessageWithUser;
-	referenceMessage: IMessageWithUser | null;
-	reactionBottomState: boolean;
-	openEditMessageState: boolean;
-	openOptionMessageState: boolean;
-	mode: number;
-	isCombine?: boolean;
-	deleteSendMessage: (messageId: string) => Promise<void>;
-}) {
+}: PopupMessageProps) {
 	const { reactionPlaceActive } = useChatReaction();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 }); // Lưu trữ vị trí của EmojiPickerComp
@@ -213,7 +220,7 @@ function PopupMessage({
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-7 ${isCombine ? '-top-[0px] right-5' : '-top-[0px] right-5'}
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-5
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -244,7 +251,7 @@ function PopupMessage({
 	);
 }
 
-function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser; deleteSendMessage: (messageId: string) => Promise<void> }) {
+function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
 	const { userId } = useChatReaction();
 
@@ -284,11 +291,11 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
 			<ul className="flex flex-col gap-1">
 				{checkUser && (
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit}>
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit} role="button" aria-hidden>
 						Edit Message
 					</li>
 				)}
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply}>
+				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply} role="button" aria-hidden>
 					Reply
 				</li>
 				<li
@@ -296,17 +303,24 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 					onClick={() => {
 						handleClickForward();
 					}}
+					role="button"
+					aria-hidden
 				>
 					Forward message
 				</li>
 				<CopyToClipboard text={message.content.t || ''}>
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy}>
+					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy} role="button" aria-hidden>
 						Copy Text
 					</li>
 				</CopyToClipboard>
 
 				{checkUser && (
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-[#ff0000]" onClick={handleClickDelete}>
+					<li
+						className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-[#ff0000]"
+						onClick={handleClickDelete}
+						role="button"
+						aria-hidden
+					>
 						Delete Message
 					</li>
 				)}

@@ -14,9 +14,7 @@ type DragAndDropUIProps = {
 };
 function DragAndDropUI({ onDrop }: DragAndDropUIProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { draggingState, setDraggingState } = useDragAndDrop();
-
-	const [isOverChild, setIsOverChild] = useState(false);
+	const { setDraggingState } = useDragAndDrop();
 
 	const handleParentDragLeave = (e: DragEvent<HTMLElement>) => {
 		if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -42,15 +40,10 @@ function DragAndDropUI({ onDrop }: DragAndDropUIProps) {
 		>
 			<div
 				onDragEnter={() => {
-					setIsOverChild(true);
 					setDraggingState(true);
 				}}
 				onDragOver={() => {
-					setIsOverChild(true);
 					setDraggingState(true);
-				}}
-				onDragLeave={() => {
-					setIsOverChild(false);
 				}}
 				onDrop={onDrop}
 				className="w-[25rem] h-[15rem] bg-[#5865F2] flex flex-row justify-center  items-center rounded-lg z-50 relative"

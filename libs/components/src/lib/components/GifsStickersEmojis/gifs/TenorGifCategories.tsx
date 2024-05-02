@@ -7,11 +7,10 @@ import FeaturedGifs from './FeaturedGifs';
 import GifCategory from './GifCategory';
 
 type ChannelMessageBoxProps = {
+	// activeTab use TenorGifCategories
 	activeTab: SubPanelName;
 	channelId: string;
 	channelLabel: string;
-	controlEmoji?: boolean;
-	clanId?: string;
 	mode: number;
 };
 
@@ -71,7 +70,6 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 			return <Loading />;
 		}
 		return (
-			<>
 				<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
 					<FeaturedGifs
 						onClickToTrending={() => ontrendingClickingStatus()}
@@ -81,9 +79,8 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 					/>
 
 					{Array.isArray(dataGifCategories) &&
-						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index} />)}
+						dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index+item.name} />)}
 				</div>
-			</>
 		);
 	};
 
@@ -100,6 +97,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 								key={gif.id}
 								className={`order-${index} overflow-hidden cursor-pointer`}
 								onClick={() => handleClickGif(gif.media_formats.gif.url)}
+								role="button"
 							>
 								<img src={gif.media_formats.gif.url} alt={gif.media_formats.gif.url} className="w-full h-auto" />
 							</div>

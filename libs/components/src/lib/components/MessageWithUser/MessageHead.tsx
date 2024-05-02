@@ -37,6 +37,9 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+	const handleDefault = (e: any) => {
+		e.stopPropagation();
+	};
 
 	if (isCombine && message.references?.length === 0) {
 		return <></>;
@@ -50,7 +53,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 				>
-					{username? username: 'Anonymous'}
+					{username ? username : 'Anonymous'}
 				</div>
 				<div className=" text-zinc-400 text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -62,6 +65,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 						top: positionBottom ? '' : `${positionTop}px`,
 						bottom: positionBottom ? '64px' : '',
 					}}
+					onMouseDown={handleDefault}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

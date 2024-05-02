@@ -7,7 +7,6 @@ export type EmojiPickerOptions = {
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
-	emojiExist?: string;
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {

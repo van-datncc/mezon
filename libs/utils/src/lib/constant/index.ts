@@ -1,7 +1,6 @@
 import { ThreadError } from '../types';
 
 export const TIME_COMBINE = 120;
-export const START_INDEX_MESSAGE = 1000000;
 export const LIMIT_MESSAGE = 50;
 export const LIMIT_CLAN_ITEM = 50;
 
