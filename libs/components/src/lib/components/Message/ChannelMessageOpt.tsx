@@ -36,11 +36,12 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 	};
 
 	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
+		dispatch(reactionActions.setReactionRightState(true));
+		dispatch(referencesActions.setReferenceMessage(message));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
-		dispatch(reactionActions.setReactionRightState(!reactionRightState));
-		dispatch(referencesActions.setReferenceMessage(message));
+
 		event.stopPropagation();
 	};
 

@@ -57,9 +57,9 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 					<Icons.Smile defaultSize="w-4 h-4" defaultFill={setColorForIconSmile(message)} />
 					{reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM && checkMessageMatched(message) && (
 						<div
-							className={`w-fit ${isFixed ? 'fixed' : 'absolute'} ${moveToTop ? 'right-[-2rem] bottom-[-1rem]' : 'left-[-2rem] bottom-[-5rem]'}  z-20`}
+							className={`w-fit md:${isFixed ? 'fixed' : 'absolute'} md:${moveToTop ? 'right-[-2rem] bottom-[-1rem]' : 'left-[-2rem] bottom-[-5rem]'} fixed `}
 						>
-							<div className="scale-75 transform mb-0 z-10">
+							<div className="scale-75 transform mb-0 z-10 sm:left-0">
 								<EmojiPickerComp messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
 							</div>
 						</div>

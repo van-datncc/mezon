@@ -195,18 +195,17 @@ function PopupMessage({
 }: PopupMessageProps) {
 	const { reactionPlaceActive } = useChatReaction();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
-	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 }); // Lưu trữ vị trí của EmojiPickerComp
+	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
 		if (channelMessageDiv) {
 			const rect = channelMessageDiv.getBoundingClientRect();
-			if (rect.bottom < 500) {
-				setPickerPosition({ top: rect.top -50, left: rect.left });
+			if (rect.bottom < 500 && rect.top > 0) {
+				setPickerPosition({ top: rect.top - 50, left: rect.left });
 			} else {
-				setPickerPosition({ top: rect.top - 300, left: rect.left });
+				setPickerPosition({ top: rect.top - 340, left: rect.left });
 			}
 		}
-
 		return 0;
 	};
 
@@ -220,7 +219,7 @@ function PopupMessage({
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-5
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-5 
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -230,17 +229,18 @@ function PopupMessage({
 						: 'hidden group-hover:block'
 				} `}
 				>
-					<div className="flex flex-row relative">
-						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
-
-						{mess.id === referenceMessage?.id && reactionRightState && (
-							<div id="emojiPicker" className="w-fit fixed" style={{ top: pickerPosition.top - 20, left: pickerPosition.left - 310 }}>
-								<div className="scale-75 transform mb-0 z-10">
-									<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-								</div>
+					<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
+					{mess.id === referenceMessage?.id && reactionRightState && (
+						<div
+							id="emojiPicker"
+							className="fixed h-[0px]"
+							style={{ top: pickerPosition.top - 20, left: pickerPosition.left - 310, bottom: pickerPosition.top < 350 ? 0 : '' }}
+						>
+							<div className="scale-75 transform mb-0 z-10">
+								<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
-						)}
-					</div>
+						</div>
+					)}
 
 					{openOptionMessageState && mess.id === referenceMessage?.id && (
 						<PopupOption message={mess} deleteSendMessage={deleteSendMessage} />
