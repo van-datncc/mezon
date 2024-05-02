@@ -193,8 +193,6 @@ function PopupMessage({
 		const channelMessageDiv = channelMessageOptRef.current;
 		if (channelMessageDiv) {
 			const rect = channelMessageDiv.getBoundingClientRect();
-			console.log(rect);
-
 			if (rect.bottom < 500) {
 				setPickerPosition({ top: rect.top -50, left: rect.left });
 			} else {
