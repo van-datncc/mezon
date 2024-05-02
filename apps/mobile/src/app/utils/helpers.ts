@@ -1,5 +1,4 @@
 import { Platform } from 'react-native';
-import qs from 'query-string';
 
 type Size =
   | '64w'

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ChannelStatusEnum, IMessageSendPayload } from '@mezon/utils';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useMezon } from '@mezon/transport';
 import MessageContent from '../MessageWithUser/MessageContent';
@@ -85,7 +85,7 @@ const ForwardMessageModal = (pops: ModalParam) => {
 			<hr className='border-1 border-[#7a7a7a] '/>
 			<div className='h-[400px] overflow-y-auto'>
 				{listDM.map((DM, index) => (
-					<div key={index} className='flex items-center'>
+					<div key={DM.id} className='flex items-center'>
 						<input
 							id={`checkbox-item-${index}`}
 							type="checkbox"
@@ -99,7 +99,7 @@ const ForwardMessageModal = (pops: ModalParam) => {
 					</div>
 				))}
 				{listGroup.map((group, index) => (
-					<div key={index} className='flex items-center'>
+					<div key={group.id} className='flex items-center'>
 						<input
 							id={`checkbox-item-${index}`}
 							type="checkbox"
@@ -113,7 +113,7 @@ const ForwardMessageModal = (pops: ModalParam) => {
 					</div>
 				))}
 				{listChannel.map((channel, index) => (
-					<div key={index} className='flex items-center'>
+					<div key={channel.id} className='flex items-center'>
 						<input
 							id={`checkbox-item-${index}`}
 							type="checkbox"

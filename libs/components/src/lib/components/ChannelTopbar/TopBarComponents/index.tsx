@@ -26,7 +26,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 							{isPrivate === undefined && type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-6 h-6" />}
 						</>
 					) : (
-						<div onClick={() => setStatusMenu(true)}>
+						<div onClick={() => setStatusMenu(true)} role="button">
 							<Icons.OpenMenu />
 						</div>
 					)

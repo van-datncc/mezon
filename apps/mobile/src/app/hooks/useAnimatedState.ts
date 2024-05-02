@@ -10,7 +10,7 @@ type ConfigAnimated = {
 export function useAnimatedState<T>(
   initialValue: T,
   config: ConfigAnimated = {
-    duration: 400,
+    duration: 300,
     creationProp: 'opacity',
     type: 'easeInEaseOut',
   },
