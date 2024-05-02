@@ -13,10 +13,6 @@ export const InputSearch: React.FC = () => {
 	const {
 		setValueInputSearch,
 		valueInputToCheckHandleSearch,
-		dataGifCategories,
-		dataGifsSearch,
-		loadingStatusGifs,
-		dataGifsFeartured,
 		trendingClickingStatus,
 		setClickedTrendingGif,
 		categoriesStatus,
@@ -64,7 +60,7 @@ export const InputSearch: React.FC = () => {
 	return (
 		<div className="flex flex-row items-center">
 			{buttonArrowBackStatus && (
-				<div className="px-2 cursor-pointer" onClick={(e) => onclickBackArrow(e)}>
+				<div className="px-2 cursor-pointer" onClick={(e) => onclickBackArrow(e)}  role="button">
 					<Icons.BackToCategoriesGif />
 				</div>
 			)}

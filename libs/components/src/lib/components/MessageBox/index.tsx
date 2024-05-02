@@ -126,7 +126,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 
 			<div
-				className={`flex flex-inline items-center gap-2 box-content mb-4 bg-black rounded-md relative overflow-x-hidden ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
+				className={`flex flex-inline items-center gap-2 box-content mb-4 bg-black rounded-md relative ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
 			>
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}

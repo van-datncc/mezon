@@ -51,16 +51,16 @@ const ForwardMessageModal = (pops: ModalParam) => {
 	};
 	
 	const sentToMessage = async () => {
-		for (let i = 0; i < selectedObjectIdSends.length; i++) {
-			if (selectedObjectIdSends[i].type === ChannelType.CHANNEL_TYPE_DM) {
-				mezon.joinChatDirectMessage(selectedObjectIdSends[i].id, '', selectedObjectIdSends[i].type);
-				sendForwardMessage('', selectedObjectIdSends[i].id, '', ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
-			} else if (selectedObjectIdSends[i].type === ChannelType.CHANNEL_TYPE_GROUP){
-				mezon.joinChatDirectMessage(selectedObjectIdSends[i].id, '', selectedObjectIdSends[i].type);
-				sendForwardMessage('', selectedObjectIdSends[i].id, '', ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
-			} else if (selectedObjectIdSends[i].type === ChannelType.CHANNEL_TYPE_TEXT) {
-				await mezon.joinChatChannel(selectedObjectIdSends[i].id)
-				sendForwardMessage(selectedObjectIdSends[i].clanId||'',selectedObjectIdSends[i].id,selectedObjectIdSends[i].channel_label||'', ChannelStreamMode.STREAM_MODE_CHANNEL, selectedMessage);
+		for (const selectedObjectIdSend of selectedObjectIdSends) {
+			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
+				mezon.joinChatDirectMessage(selectedObjectIdSend.id, '', selectedObjectIdSend.type);
+				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP){
+				mezon.joinChatDirectMessage(selectedObjectIdSend.id, '', selectedObjectIdSend.type);
+				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				await mezon.joinChatChannel(selectedObjectIdSend.id)
+				sendForwardMessage(selectedObjectIdSend.clanId||'',selectedObjectIdSend.id,selectedObjectIdSend.channel_label||'', ChannelStreamMode.STREAM_MODE_CHANNEL, selectedMessage);
 			}
 		}
 		dispatch(toggleIsShowPopupForwardFalse());
