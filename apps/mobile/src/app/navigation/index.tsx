@@ -1,6 +1,7 @@
 import React from 'react';
 import {CreateMezonClientOptions, MezonContextProvider} from "@mezon/transport";
 import RootNavigation from "./RootNavigator";
+import { NX_CHAT_APP_API_HOST } from '@env';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,

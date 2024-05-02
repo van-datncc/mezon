@@ -8,7 +8,6 @@ import Notifications from '../../screens/main/Notifications';
 import ProfileScreen from '../../screens/main/ProfileScreen';
 import { darkColor } from '../../constants/Colors';
 import {APP_SCREEN} from "../ScreenTypes";
-import DrawerNavigator from "./DrawerNavigator";
 import HomeScreen from "../../screens/home/HomeScreen";
 
 const TabStack = createBottomTabNavigator();
