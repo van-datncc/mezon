@@ -2,7 +2,7 @@ import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } fr
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
@@ -13,7 +13,7 @@ export type ChannelMessageBoxProps = {
 	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanId, mode }: ChannelMessageBoxProps) {
+export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
 	const handleSend = useCallback(
 		(
@@ -22,9 +22,9 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
-			anonymous?: boolean
+			anonymous?: boolean,
 		) => {
-				sendMessage(content, mentions, attachments, references, anonymous);
+			sendMessage(content, mentions, attachments, references, anonymous);
 		},
 		[sendMessage],
 	);
@@ -36,7 +36,7 @@ export function ChannelMessageBox({ channelId, channelLabel, controlEmoji, clanI
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 	const { subPanelActive } = useGifsStickersEmoji();
 	return (
-		<div className="mx-4 relative">
+		<div className="mx-4 relative" role="button" aria-hidden>
 			{subPanelActive !== SubPanelName.NONE && (
 				<div
 					className="absolute right-0 bottom-[105%] z-10"
