@@ -1,4 +1,4 @@
-import { ModalCreateClan, ModalListClans, NavLinkComponent } from '@mezon/components';
+import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useFriends, useMenu } from '@mezon/core';
 import { gifsStickerEmojiActions, reactionActions, referencesActions, selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
@@ -15,8 +15,10 @@ function MyApp() {
 	const [openListClans, setOpenListClans] = useState(false);
 	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
-
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
+	const [openSearchModal, closeSearchModal] = useModal(() => (
+		<SearchModal onClose={closeSearchModal} open={true} />
+	));
 
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
@@ -82,6 +84,21 @@ function MyApp() {
 			}
 		}
 	};
+
+	const handleKeyDown = (event: any) => {
+		if (event.ctrlKey && event.key === 'k') {
+			event.preventDefault();
+			openSearchModal()
+		}
+	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, []);
+
 
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
