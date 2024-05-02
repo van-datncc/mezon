@@ -67,13 +67,13 @@ export function ChannelMessage(props: MessageProps) {
 			handleCancelEdit();
 		}
 	};
-	const handelSave = () =>{
+	const handelSave = () => {
 		if (editMessage) {
 			handleSend(editMessage, message.id);
 			setNewMessage(editMessage);
 			handleCancelEdit();
 		}
-	} 
+	};
 
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -141,15 +141,15 @@ export function ChannelMessage(props: MessageProps) {
 						}}
 						rows={editMessage?.split('\n').length}
 					></textarea>
-					<div className='text-xs flex'>
-						<p className='pr-[3px]'>escape to</p>
-						<p className='pr-[3px] text-[#3297ff]'
-						 style={{ cursor: 'pointer' }}
-						onClick={handleCancelEdit}>cancel</p>
-						<p className='pr-[3px]'>• enter to</p>
-						<p className='text-[#3297ff]'
-						 style={{ cursor: 'pointer' }}
-						onClick={handelSave}>save</p>
+					<div className="text-xs flex">
+						<p className="pr-[3px]">escape to</p>
+						<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+							cancel
+						</p>
+						<p className="pr-[3px]">• enter to</p>
+						<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
+							save
+						</p>
 					</div>
 				</div>
 			)}
@@ -187,6 +187,30 @@ function PopupMessage({
 	deleteSendMessage: (messageId: string) => Promise<void>;
 }) {
 	const { reactionPlaceActive } = useChatReaction();
+	const channelMessageOptRef = useRef<HTMLDivElement>(null);
+	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 }); // Lưu trữ vị trí của EmojiPickerComp
+	const getDivHeightToTop = () => {
+		const channelMessageDiv = channelMessageOptRef.current;
+		if (channelMessageDiv) {
+			const rect = channelMessageDiv.getBoundingClientRect();
+			console.log(rect);
+
+			if (rect.bottom < 500) {
+				setPickerPosition({ top: rect.top -50, left: rect.left });
+			} else {
+				setPickerPosition({ top: rect.top - 300, left: rect.left });
+			}
+		}
+
+		return 0;
+	};
+
+	useEffect(() => {
+		if (reactionRightState && referenceMessage?.id === mess.id) {
+			getDivHeightToTop();
+		}
+	}, [reactionRightState]);
+
 	return (
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
@@ -201,15 +225,18 @@ function PopupMessage({
 						: 'hidden group-hover:block'
 				} `}
 				>
-					<ChannelMessageOpt message={mess} />
+					<div className="flex flex-row relative">
+						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
 
-					{mess.id === referenceMessage?.id && reactionRightState && (
-						<div className="w-fit fixed right-16 bottom-[6rem]">
-							<div className="scale-75 transform mb-0 z-10">
-								<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+						{mess.id === referenceMessage?.id && reactionRightState && (
+							<div id="emojiPicker" className="w-fit fixed" style={{ top: pickerPosition.top - 20, left: pickerPosition.left - 310 }}>
+								<div className="scale-75 transform mb-0 z-10">
+									<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+								</div>
 							</div>
-						</div>
-					)}
+						)}
+					</div>
+
 					{openOptionMessageState && mess.id === referenceMessage?.id && (
 						<PopupOption message={mess} deleteSendMessage={deleteSendMessage} />
 					)}
@@ -246,7 +273,7 @@ function PopupOption({ message, deleteSendMessage }: { message: IMessageWithUser
 		deleteSendMessage(message.id);
 	};
 	const { listDM: dmGroupChatList } = useDirect();
-	
+
 	const handleClickForward = () => {
 		if (dmGroupChatList.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));

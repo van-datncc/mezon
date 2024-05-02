@@ -27,9 +27,9 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 	);
 
 	const avts = [
-		{ id: 1, url: 'https://www.emojibest.com/Crocosaurus/crocosaurus_1.webp', type: 'cs' },
-		{ id: 2, url: 'https://www.emojibest.com/FredThePug/fred_the_pug_3.webp', type: 'dog' },
-		{ id: 3, url: 'https://www.emojibest.com/MemesWithCats/memes_with_cats_0.webp', type: 'cat' },
+		{ id: 1, url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+		{ id: 2, url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+		{ id: 3, url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
 	];
 	const images = [
 		{ id: 1, url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
@@ -66,8 +66,8 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 	}, [selectedType]);
 
 	return (
-		<div className="flex h-full pr-2">
-			<div className="w-[40%] flex flex-col px-2 gap-y-2 max-w-[40%]">
+		<div className="flex h-full pr-2 w-full md:w-[500px]">
+			<div className="w-[60%] md:w-[40%] md:max-w-[40%] flex flex-col px-2 gap-y-2 max-w-[60%]">
 				{avts.map((avt) => (
 					<img
 						key={avt.id}

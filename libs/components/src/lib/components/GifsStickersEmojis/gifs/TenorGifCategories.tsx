@@ -93,7 +93,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		}
 		return (
 			<div className="mx-2 flex justify-center h-[400px] overflow-y-scroll hide-scrollbar flex-wrap">
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
+				<div className="grid grid-cols-3  gap-1">
 					{dataToRenderGifs &&
 						dataToRenderGifs.map((gif: any, index: number) => (
 							<div
