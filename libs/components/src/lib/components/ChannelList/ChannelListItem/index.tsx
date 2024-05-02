@@ -8,7 +8,6 @@ import ModalInvite from '../../ListMemberInvite/modalInvite';
 import ThreadListChannel from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 
-// TODO: move this to core
 function useChannelBadgeCount(channelId: string) {
 	const lastChannelTimestamp = useSelector(selectLastChannelTimestamp(channelId));
 	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(channelId, lastChannelTimestamp));

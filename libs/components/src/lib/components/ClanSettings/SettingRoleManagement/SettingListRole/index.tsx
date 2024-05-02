@@ -38,7 +38,7 @@ const SettingListRole = (props: closeEditRole) => {
 				<div className="rotate-90 -ml-[10px]">
 					<Icons.ArrowDown defaultSize="size-5" />
 				</div>
-				<div className="cursor-pointer tracking-wide text-sm" onClick={() => props.handleClose()}>
+				<div className="cursor-pointer tracking-wide text-sm" onClick={() => props.handleClose()} role="button">
 					BACK
 				</div>
 			</div>

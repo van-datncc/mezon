@@ -38,6 +38,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
 			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] bg-[#535353] border border-[#535353] hover:border hover:border-[#6A6A6A]"
+			role="button"
 		>
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">

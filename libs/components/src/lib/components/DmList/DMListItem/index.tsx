@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MemberProfile from '../../MemberProfile';
 export type DirectMessProp = {
-	directMessage: any;
+	readonly directMessage: Readonly<any>;
 };
 
 function DMListItem({ directMessage }: DirectMessProp) {

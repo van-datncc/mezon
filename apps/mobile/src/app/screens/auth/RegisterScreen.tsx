@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Alert, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -15,11 +15,11 @@ const RegisterSchema = Yup.object().shape({
         .required('Required'),
     email: Yup.string().email('Invalid email').required('Please enter your email'),
     password: Yup.string().min(8, "Confiem password musr be 8 characters long.").required('Please enter your password').matches(
-        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
+        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[#?!@$%^&*-]).{8,}$/,
         "Must contain minimum 8 characters, at least one uppercase letter"
     ),
     confirmPassword: Yup.string().min(8, "Confiem password musr be 8 characters long.").oneOf([Yup.ref('password')], "your password do not match").required("Confirm password is required"),
-    mobile: Yup.string().min(10, 'Must be exactly 10 digits').max(10, 'Must be exactly 10 digits').matches(/^[0-9]+$/, "Must be only digits").required('Please enter your mobile number')
+    mobile: Yup.string().min(10, 'Must be exactly 10 digits').max(10, 'Must be exactly 10 digits').matches(/^\d+$/, "Must be only digits").required('Please enter your mobile number')
 
 });
 const RegisterScreen = () => {

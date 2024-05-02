@@ -1,5 +1,5 @@
 import React from "react";
-import {FlatList, StyleSheet, Text, View} from "react-native";
+import {FlatList, Text, View} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Dots from '../../../../assets/svg/guildMoreOptions1.svg'
 import { ChannelListSection, ChannelListContext } from "./Reusables";
