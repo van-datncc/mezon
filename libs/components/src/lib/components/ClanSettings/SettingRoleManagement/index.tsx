@@ -23,7 +23,6 @@ export type ModalSettingSave = {
 	handlSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-// import SettingRightUser from '../SettingRightUserProfile';
 const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const { createRole, updateRole } = useRoles();
 	const clickRole = useSelector(getSelectedRoleId);
