@@ -1,4 +1,4 @@
-import { ReactionBottom, UserReactionPanel } from '@mezon/components';
+import { EmojiPickerComp, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals, calculateTotalCount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -22,6 +22,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		setUserReactionPanelState,
 		userReactionPanelState,
 		reactionPlaceActive,
+		reactionBottomStateResponsive,
 	} = useChatReaction();
 
 	const { referenceMessage, setReferenceMessage, setOpenReplyMessageState } = useReference();
@@ -143,62 +144,74 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 	}, [reactionBottomState]);
 
 	return (
-		<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14">
-			{dataReactionCombine
-				.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
-				?.map((emoji: EmojiDataOptionals, index: number) => {
-					const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
-					const checkID = emoji.message_id === message.id;
-					return (
-						<div key={index}>
-							{checkID && (
-								<div
-									ref={(element) => (childRef.current[index] = element)}
-									className={` justify-center items-center relative
+		<div className="relative">
+			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
+				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
+					<div className="scale-75 transform mb-0 z-20">
+						<EmojiPickerComp messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+					</div>
+				</div>
+			)}
+
+			<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14">
+				{dataReactionCombine
+					.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
+					?.map((emoji: EmojiDataOptionals, index: number) => {
+						const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
+						const checkID = emoji.message_id === message.id;
+						return (
+							<div key={index}>
+								{checkID && (
+									<div
+										ref={(element) => (childRef.current[index] = element)}
+										className={` justify-center items-center relative
 									${userSender?.count && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
-									onClick={() =>
-										reactOnExistEmoji(
-											emoji.id ?? '',
-											ChannelStreamMode.STREAM_MODE_CHANNEL,
-											message.id ?? '',
-											emoji.emoji ?? '',
-											1,
-											userId ?? '',
-											false,
-										)
-									}
-									onMouseEnter={(e) => {
-										handleOnEnterEmoji(emoji, e);
-									}}
-									onMouseLeave={() => {
-										handleOnleaveEmoji();
-									}}
-								>
-									<span className=" relative left-[-10px] ">{emoji.emoji}</span>
-									<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
-										<p>{calculateTotalCount(emoji.senders)}</p>
-									</div>
+										onClick={() =>
+											reactOnExistEmoji(
+												emoji.id ?? '',
+												ChannelStreamMode.STREAM_MODE_CHANNEL,
+												message.id ?? '',
+												emoji.emoji ?? '',
+												1,
+												userId ?? '',
+												false,
+											)
+										}
+										onMouseEnter={(e) => {
+											handleOnEnterEmoji(emoji, e);
+										}}
+										onMouseLeave={() => {
+											handleOnleaveEmoji();
+										}}
+									>
+										<span className=" relative left-[-10px] ">{emoji.emoji}</span>
+										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
+											<p>{calculateTotalCount(emoji.senders)}</p>
+										</div>
 
-									{checkMessageToMatchMessageRef(message) && reactionBottomState && lastPositionEmoji(emoji, message) && (
-										<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
-									)}
-									{checkMessageToMatchMessageRef(message) &&
-										userReactionPanelState &&
-										checkEmojiToMatchWithEmojiHover(emoji) &&
-										emojiShowUserReaction && (
-											<UserReactionPanel
-												pos={posToRight}
-												emojiShowPanel={emojiShowUserReaction}
-												mode={mode}
-												message={message}
-											/>
+										{checkMessageToMatchMessageRef(message) && reactionBottomState && lastPositionEmoji(emoji, message) && (
+											<>
+												<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
+											</>
 										)}
-								</div>
-							)}
-						</div>
-					);
-				})}
+										{checkMessageToMatchMessageRef(message) &&
+											userReactionPanelState &&
+											checkEmojiToMatchWithEmojiHover(emoji) &&
+											emojiShowUserReaction && (
+												<UserReactionPanel
+													pos={posToRight}
+													emojiShowPanel={emojiShowUserReaction}
+													mode={mode}
+													message={message}
+												/>
+											)}
+									</div>
+								)}
+							</div>
+						);
+					})}
+			</div>
 		</div>
 	);
 };

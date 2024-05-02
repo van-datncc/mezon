@@ -10,8 +10,14 @@ export type EmojiPickerOptions = {
 };
 
 function EmojiPickerComp(props: EmojiPickerOptions) {
-	const { reactionMessageDispatch, setReactionRightState, setReactionBottomState, setReactionPlaceActive, setUserReactionPanelState } =
-		useChatReaction();
+	const {
+		reactionMessageDispatch,
+		setReactionRightState,
+		setReactionBottomState,
+		setReactionPlaceActive,
+		setUserReactionPanelState,
+		setReactionBottomStateResponsive,
+	} = useChatReaction();
 	const { setReferenceMessage } = useReference();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
@@ -32,6 +38,7 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 			setReferenceMessage(null);
 			setUserReactionPanelState(false);
+			setReactionBottomStateResponsive(false);
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
 			setEmojiSuggestion(emojiData.emoji);
 			event.stopPropagation();
