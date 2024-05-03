@@ -90,5 +90,6 @@
 			}
 		}
 	],
-	"defaultProject": "desktop"
+	"defaultProject": "desktop",
+	"neverConnectToCloud": true
 }
