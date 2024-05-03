@@ -60,6 +60,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 	const childRef = useRef<(HTMLButtonElement | null)[]>([]);
 	const parentDiv = useRef<HTMLDivElement | null>(null);
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals>();
+	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
 
 	const handleOnEnterEmoji = (emojiParam: EmojiDataOptionals) => {
 		setHoverEmoji(emojiParam);
@@ -68,6 +69,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		setReferenceMessage(message);
 		setOpenReplyMessageState(false); //to hide Replymessage Component
 		setEmojiShowUserReaction(emojiParam);
+		setShowSenderPanelIn1s(true);
 	};
 
 	const handleOnleaveEmoji = () => {
@@ -84,7 +86,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 			checkPositionSenderPanel(hoverEmoji);
 		}
 	}, [hoverEmoji, parentDiv]);
-	const PANEL_SENDER_WIDTH = 350;
+	const PANEL_SENDER_WIDTH = 220;
 	const EMOJI_REACTION_BOTTOM_PANEL = 376;
 
 	const [posToRight, setPosToRight] = useState<boolean>(false);
@@ -104,14 +106,13 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		const childElement = childRef.current[index];
 		if (!childElement) return;
 		const childRect = childElement.getBoundingClientRect();
-		console.log('------------');
-		console.log(parentRect.right);
-		console.log(childRect.right);
+
 		const distanceToRight = parentRect.right - childRect.right;
-		if (distanceToRight < PANEL_SENDER_WIDTH) {
-			return setPosToRight(true);
-		} else {
+		const distanceRemainChildToParent = parentRect.width - distanceToRight;
+		if (distanceRemainChildToParent < PANEL_SENDER_WIDTH) {
 			return setPosToRight(false);
+		} else {
+			return setPosToRight(true);
 		}
 	};
 
@@ -130,6 +131,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		if (!parentDiv.current) return;
 		const parentRect = parentDiv.current.getBoundingClientRect();
 		const smileButton = smileButtonRef.current;
+
 		if (!smileButton) return;
 		const childRect = smileButton.getBoundingClientRect();
 		const distanceToRight = parentRect.right - childRect.right;
@@ -145,6 +147,16 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		checkPosEmojiReactionPanel();
 	}, [reactionBottomState]);
 
+	// work in mobile
+	useEffect(() => {
+		if (showSenderPanelIn1s) {
+			const timer = setTimeout(() => {
+				setShowSenderPanelIn1s(false);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [showSenderPanelIn1s]);
+
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
@@ -155,7 +167,15 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 				</div>
 			)}
 
-			<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14 border border-red-600">
+			<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14">
+				{hoverEmoji && showSenderPanelIn1s && (
+					<div className="hidden max-sm:block max-sm:-top-[0] absolute">
+						{checkMessageToMatchMessageRef(message) && checkEmojiToMatchWithEmojiHover(hoverEmoji) && emojiShowUserReaction && (
+							<UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} message={message} />
+						)}
+					</div>
+				)}
+
 				{dataReactionCombine
 					.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
 					?.map((emoji: EmojiDataOptionals, index: number) => {
@@ -187,7 +207,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 											handleOnleaveEmoji();
 										}}
 									>
-										<span className=" relative left-[-10px] ">{emoji.emoji}</span>
+										<span className=" absolute left-[2px] ">{emoji.emoji}</span>
 										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
 											<p>{calculateTotalCount(emoji.senders)}</p>
 										</div>
@@ -200,12 +220,14 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 											userReactionPanelState &&
 											checkEmojiToMatchWithEmojiHover(emoji) &&
 											emojiShowUserReaction && (
-												<UserReactionPanel
-													pos={posToRight}
-													emojiShowPanel={emojiShowUserReaction}
-													mode={mode}
-													message={message}
-												/>
+												<div className="max-sm:hidden">
+													<UserReactionPanel
+														moveToRight={posToRight}
+														emojiShowPanel={emojiShowUserReaction}
+														mode={mode}
+														message={message}
+													/>
+												</div>
 											)}
 									</button>
 								)}
