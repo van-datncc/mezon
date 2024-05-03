@@ -5,7 +5,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
 export type NotifyMentionProps = {
-	notify: INotification;
+	readonly notify: INotification;
 };
 
 function parseObject(obj: any) {
@@ -107,7 +107,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					Jump
 				</button>
 				<MessageWithUser
-					message={data as IMessageWithUser}
+					message={data}
 					user={user as IChannelMember}
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}

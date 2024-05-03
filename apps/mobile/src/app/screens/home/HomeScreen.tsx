@@ -1,6 +1,6 @@
-import { appActions } from '@mezon/store';
+import { appActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import BarsLogo from '../../../assets/svg/bars.svg';
@@ -73,6 +73,16 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 });
 
 const HomeScreen = React.memo((props: any) => {
+	useEffect(() => {
+		mainLoader();
+	}, []);
+
+	const mainLoader = async () => {
+		const store = await getStoreAsync();
+		store.dispatch(clansActions.fetchClans());
+		return null;
+	};
+
 	return <DrawerScreen navigation={props.navigation} />;
 });
 

@@ -98,7 +98,7 @@ export const reactionSlice = createSlice({
 				senders: [
 					{
 						sender_id: action.payload.sender_id || '',
-						count: action.payload.action ? action.payload.count && action.payload.count : 1,
+						count: action.payload.action ? action.payload.count : 1,
 						emojiIdList: [],
 						sender_name: '',
 						avatar: '',

@@ -51,8 +51,8 @@ export function useClans() {
 		async (name: string, logoUrl: string) => {
 			const action = await dispatch(clansActions.createClan({ clan_name: name, logo: logoUrl }));
 			const payload = action.payload as ClansEntity;
-			if (payload && payload.clan_id) {
-				changeCurrentClan(payload.clan_id);
+			if (payload?.clan_id) {
+				changeCurrentClan(payload?.clan_id);
 			}
 			return payload;
 		},

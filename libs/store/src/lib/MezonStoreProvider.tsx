@@ -5,10 +5,10 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { RootState } from './store';
 
 type Props = {
-	children: React.ReactNode;
-	store: Store<RootState>;
-	loading: React.ReactNode;
-	persistor: Persistor;
+	readonly children: React.ReactNode;
+	readonly store: Store<RootState>;
+	readonly loading: React.ReactNode;
+	readonly persistor: Persistor;
 };
 
 export function MezonStoreProvider({ children, store, loading, persistor }: Props) {

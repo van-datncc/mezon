@@ -19,7 +19,7 @@ export const addChannelUsers = createAsyncThunk('channelUsers/addChannelUsers', 
 			clanId: '', 
 			channelId: channelId, 
 			noCache: true, 
-			channelType: channelType|| 0,
+			channelType: channelType ?? 0,
 			repace : true
 		}
 		thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body))
@@ -66,7 +66,7 @@ export const addChannelRoles = createAsyncThunk('channelUsers/addChannelRoles', 
 			clanId: '', 
 			channelId: channelId, 
 			noCache: true, 
-			channelType: channelType|| 0,
+			channelType: channelType ?? 0,
 			repace : true
 		}
 		const bodyFetchRoles ={
@@ -100,7 +100,7 @@ export const removeChannelRole = createAsyncThunk('channelUsers/removeChannelRol
 			clanId: '', 
 			channelId: channelId, 
 			noCache: true, 
-			channelType: channelType|| 0,
+			channelType: channelType ?? 0,
 			repace : true
 		}
 		thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body))

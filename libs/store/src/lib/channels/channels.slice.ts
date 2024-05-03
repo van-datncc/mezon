@@ -104,7 +104,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteChannelDesc(mezon.session, body.channelId);
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId as string }));
+			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
@@ -317,6 +317,12 @@ export const selectCurrentChannel = createSelector(selectChannelsEntities, selec
 export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, selectCurrentVoiceChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,
 );
+
+export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
+	channels.filter((channel) => channel.type == ChannelType.CHANNEL_TYPE_VOICE),
+);
+
+export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);
 
 export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));

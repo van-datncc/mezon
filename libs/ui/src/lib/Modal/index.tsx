@@ -8,8 +8,8 @@ export type ModalProps = {
 	disableButtonConfirm?: boolean;
 	classNameBox?: string;
 	subTitleBox?: string;
-	borderBottomTitle?: string;
 	classSubTitleBox?: string;
+	borderBottomTitle?: string;
 };
 
 const Modal = (props: ModalProps) => {
@@ -23,7 +23,6 @@ const Modal = (props: ModalProps) => {
 		disableButtonConfirm,
 		classNameBox,
 		subTitleBox,
-		borderBottomTitle,
 		classSubTitleBox,
 	} = props;
 	return (
@@ -63,7 +62,8 @@ const Modal = (props: ModalProps) => {
 										<button
 											className={`text-white font-semibold text-sm px-4 py-2 shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 bg-primary text-[16px] leading-6 rounded ${disableButtonConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
 											onClick={() => {
-												confirmButton(), onClose();
+												confirmButton();
+												onClose();
 											}}
 											disabled={disableButtonConfirm}
 										>

@@ -158,7 +158,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			devices: ['desktop'],
 		})
 			.then((tracks) => {
-				onScreenShareTrack(tracks as JitsiLocalTrack[] | JitsiConferenceErrors);
+				onScreenShareTrack(tracks);
 			})
 			.catch((error) => {
 				console.log('no local track', error);
@@ -184,7 +184,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			localTracksRef.current = [...(tracks as JitsiLocalTrack[])];
 
 			for (let i = 0; i < localTracksRef.current.length; i++) {
-				const localtrack = localTracksRef.current[i] as JitsiLocalTrack;
+				const localtrack = localTracksRef.current[i];
 				localtrack.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, onTrackAudioLevelChanged);
 				localtrack.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, onTrackMuteChanged);
 				localtrack.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, onLocalTrackStoped);
@@ -245,7 +245,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			}
 
 			const participant = track.getParticipantId();
-			if (remoteTracksRef && remoteTracksRef.current) {
+			if (remoteTracksRef?.current) {
 				const remoteTrack = remoteTracksRef.current.get(participant);
 				const filter = remoteTrack?.filter((item) => item.getId() === track.getId());
 				if ((filter?.length as number) > 0) {
@@ -294,7 +294,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		});
 		const myUserId = voiceChannelRef.current?.myUserId() || '';
 
-		if (socketRef && socketRef.current && voiceOptions) {
+		if (socketRef?.current && voiceOptions) {
 			socketRef.current.writeVoiceJoined(
 				myUserId,
 				voiceOptions.clanId as string,
@@ -310,7 +310,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const onUserJoined = useCallback(
 		(id: string, user: JitsiParticipant) => {
 			remoteTracksRef.current.set(id, []);
-			if (socketRef && socketRef.current && voiceOptions) {
+			if (socketRef?.current && voiceOptions) {
 				socketRef.current.writeVoiceJoined(
 					id,
 					voiceOptions.clanId as string,
@@ -328,7 +328,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	const onUserLeft = useCallback(
 		(id: string, user: JitsiParticipant) => {
 			remoteTracksRef.current.set(id, []);
-			if (socketRef && socketRef.current && voiceOptions) {
+			if (socketRef?.current && voiceOptions) {
 				socketRef.current.writeVoiceLeaved(id, voiceOptions.clanId as string, voiceOptions.channelId as string, false);
 			}
 		},
@@ -415,7 +415,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 		const { channelName, displayName } = voiceOptions;
 
-		if (voiceChannelRef && voiceChannelRef.current && voiceChannelRef.current.getName() === channelName) {
+		if ( voiceChannelRef?.current?.getName() === channelName) {
 			return voiceChannelRef.current;
 		}
 
@@ -463,12 +463,12 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 		const myUserId = voiceChannelRef.current?.myUserId();
 
-		if (myUserId && socketRef && socketRef.current && voiceOptions) {
+		if (myUserId && socketRef?.current && voiceOptions) {
 			console.log('write to socket voice leaved');
 			socketRef.current.writeVoiceLeaved(myUserId, voiceOptions.clanId as string, voiceOptions.channelId as string, false);
 		}
 
-		if (voiceConnRef && voiceConnRef.current) {
+		if (voiceConnRef?.current) {
 			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
 			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
 			voiceConnRef.current.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onDisconnect);
@@ -527,7 +527,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	);
 
 	useEffect(() => {
-		if (voiceOptions && voiceOptions.voiceStart) {
+		if (voiceOptions?.voiceStart) {
 			createVoiceConnection((voiceOptions.channelName as string).toLowerCase(), '');
 		}
 	}, [createVoiceConnection, voiceOptions]);
