@@ -58,7 +58,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 				{options.map((option: IClan) => {
 					return (
 						<button
-							className={`w-auto flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`}
+							className={`w-full  flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`}
 							key={option.id}
 							onClick={() => onChangeClan(option.id)}
 						>
@@ -82,10 +82,10 @@ const ModalListClans = (props: ModalListClansProps) => {
 				})}
 			</div>
 			<div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-[#155EEF1A] ">
-				<div className="flex items-center gap-4 w-10/12" onClick={createClan}>
+				<button className="flex items-center gap-4 w-10/12" onClick={createClan}>
 					<img src={'/assets/images/icon-create-clan.svg'} alt={'logoMezon'} width={40} height={40} />
 					<span className="text-[16px]">Add Clan</span>
-				</div>
+				</button>
 			</div>
 		</div>
 	);
