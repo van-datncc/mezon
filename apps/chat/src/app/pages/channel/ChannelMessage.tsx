@@ -194,11 +194,32 @@ function PopupMessage({
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const { reactionPlaceActive } = useChatReaction();
+	const channelMessageOptRef = useRef<HTMLDivElement>(null);
+	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+	const getDivHeightToTop = () => {
+		const channelMessageDiv = channelMessageOptRef.current;
+		if (channelMessageDiv) {
+			const rect = channelMessageDiv.getBoundingClientRect();
+			if (rect.bottom < 500 && rect.top > 0) {
+				setPickerPosition({ top: rect.top - 50, left: rect.left });
+			} else {
+				setPickerPosition({ top: rect.top - 340, left: rect.left });
+			}
+		}
+		return 0;
+	};
+
+	useEffect(() => {
+		if (reactionRightState && referenceMessage?.id === mess.id) {
+			getDivHeightToTop();
+		}
+	}, [reactionRightState]);
+
 	return (
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-5
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded right-4 w-24 block bg-bgSecondary top-0 right-5 
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
@@ -208,15 +229,19 @@ function PopupMessage({
 						: 'hidden group-hover:block'
 				} `}
 				>
-					<ChannelMessageOpt message={mess} />
-
+					<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
 					{mess.id === referenceMessage?.id && reactionRightState && (
-						<div className="w-fit fixed right-16 bottom-[6rem]">
+						<div
+							id="emojiPicker"
+							className="fixed h-[0px]"
+							style={{ top: pickerPosition.top - 20, left: pickerPosition.left - 310, bottom: pickerPosition.top < 350 ? 0 : '' }}
+						>
 							<div className="scale-75 transform mb-0 z-10">
 								<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
 						</div>
 					)}
+
 					{openOptionMessageState && mess.id === referenceMessage?.id && (
 						<PopupOption message={mess} deleteSendMessage={deleteSendMessage} />
 					)}
