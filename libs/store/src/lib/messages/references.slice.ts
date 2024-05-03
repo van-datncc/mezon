@@ -21,6 +21,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	openReplyMessageState: boolean;
 	attachmentDataRef: ApiMessageAttachment[];
 	openOptionMessageState: boolean;
+	valueTextInput: Record<string, string>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -39,6 +40,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	openReplyMessageState: false,
 	attachmentDataRef: [],
 	openOptionMessageState: false,
+	valueTextInput: {},
 });
 
 export const referencesSlice = createSlice({
@@ -72,6 +74,9 @@ export const referencesSlice = createSlice({
 		},
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
+		},
+		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
+			state.valueTextInput[action.payload.channelId] = action.payload.value;
 		},
 	},
 	extraReducers: (builder) => {
@@ -115,3 +120,8 @@ export const selectOpenReplyMessageState = createSelector(getReferencesState, (s
 export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
 
 export const selectOpenOptionMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openOptionMessageState);
+
+export const selectValueTextInputByChannelId = (channelId: string) =>
+	createSelector(getReferencesState, (state) => {
+		return state.valueTextInput[channelId];
+	});
