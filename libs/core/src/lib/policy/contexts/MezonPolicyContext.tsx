@@ -3,8 +3,8 @@ import React from 'react';
 import { useUserPolicy } from '../hooks/useUserPolicy';
 
 type Props = {
-	children: React.ReactNode;
-	clanId: string;
+	readonly children: React.ReactNode;
+	readonly clanId: string;
 };
 
 type MezonPolicyValue = {

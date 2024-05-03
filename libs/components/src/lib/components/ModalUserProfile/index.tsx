@@ -14,7 +14,7 @@ type ModalUserProfileProps = {
 };
 
 const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) => {
-	const userById = useSelector(selectMemberByUserId(userID || ''));
+	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 
 	const { sendInviteMessage } = useSendInviteMessage();
 	const { createDirectMessageWithUser } = useDirect();

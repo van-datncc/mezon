@@ -20,7 +20,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { createClans } = useClans();
 	const userProfile = useSelector(selectAllAccount);
 	const handleFile = (e: any) => {
-		const file = e.target.files && e.target.files[0];
+		const file = e?.target?.files[0];
 		const fullfilename = file?.name;
 		const session = sessionRef.current;
 		const client = clientRef.current;

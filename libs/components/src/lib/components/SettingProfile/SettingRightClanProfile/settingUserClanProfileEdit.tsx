@@ -19,7 +19,7 @@ const SettingRightClanEdit = ({
 }) => {
 	const { userProfile } = useAuth();
 
-	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId || '', userProfile?.user?.id || ''));
+	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 
 	useEffect(() => {
@@ -51,8 +51,8 @@ const SettingRightClanEdit = ({
 
 	const editProfile = useMemo<Profilesform>(() => {
 		const profileVaile = {
-			displayName: userProfile?.user?.username || '',
-			urlImage: userProfile?.user?.avatar_url || '',
+			displayName: userProfile?.user?.username ?? '',
+			urlImage: userProfile?.user?.avatar_url ?? '',
 		};
 		if (draftProfile?.nick_name) {
 			profileVaile.displayName = draftProfile?.nick_name;
@@ -106,7 +106,7 @@ const SettingRightClanEdit = ({
 	};
 	const handleUpdateUser = async () => {
 		if (urlImage || displayName) {
-			await updateUserClanProfile(userClansProfile?.clan_id || '', displayName || '', urlImage || '');
+			await updateUserClanProfile(userClansProfile?.clan_id ?? '', displayName || '', urlImage || '');
 		}
 	};
 	const saveProfile: ModalSettingSave = {
@@ -120,9 +120,12 @@ const SettingRightClanEdit = ({
 			<div className="flex-1 flex mt-[10px] gap-x-8 flex-row">
 				<div className="w-1/2 text-white">
 					<div className="mt-[20px]">
-						<label className="text-[#CCCCCC] font-bold tracking-wide text-sm">CLAN NICKNAME</label>
+						<label htmlFor="inputField" className="text-[#CCCCCC] font-bold tracking-wide text-sm">
+							CLAN NICKNAME
+						</label>
 						<br />
 						<InputField
+							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
 							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"

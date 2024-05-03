@@ -2,8 +2,10 @@ import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
+	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiInviteUserRes,
 	ApiMessageAttachment,
 	ApiMessageMention,
 	ApiMessageReaction,
@@ -15,8 +17,6 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-
-import { ApiChannelDescription, ApiInviteUserRes } from 'mezon-js/api.gen';
 
 export * from './permissions';
 export * from './thumbnailPos';
@@ -123,9 +123,9 @@ export type IMessageMeta = {
 export type IMessage = ChannelMessage & {
 	id: string;
 	content: {
-		t?: string | undefined;
+		t?: string;
 	};
-	date?: string | undefined;
+	date?: string;
 	creationTime?: Date;
 	creationTimeMs?: number;
 	lastSeen?: boolean;
@@ -184,8 +184,8 @@ export enum channelStatusEnum {
 
 export interface CategoryProps {
 	name: string | undefined;
-	status?: string | undefined;
-	type?: string | undefined;
+	status?: string;
+	type?: string;
 }
 
 export interface ThreadProps {
@@ -209,8 +209,8 @@ export interface ChannelProps {
 
 export interface CategoryProps {
 	name: string | undefined;
-	status?: string | undefined;
-	type?: string | undefined;
+	status?: string;
+	type?: string;
 }
 
 export interface ThreadProps {
@@ -310,20 +310,20 @@ export type IMetaDataEmojis = {
 };
 
 export type EmojiDataOptionals = {
-	action?: boolean | undefined;
+	action?: boolean;
 	id: string | undefined;
 	emoji: string | undefined;
 	senders: SenderInfoOptionals[];
-	channel_id?: string | undefined;
-	message_id?: string | undefined;
+	channel_id?: string;
+	message_id?: string;
 };
 
 export type SenderInfoOptionals = {
-	sender_id?: string | undefined;
+	sender_id?: string;
 	count: number | undefined;
-	emojiIdList?: string[] | undefined;
-	sender_name?: string | undefined;
-	avatar?: string | undefined;
+	emojiIdList?: string[];
+	sender_name?: string;
+	avatar?: string;
 };
 
 export interface IGifCategory {
