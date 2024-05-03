@@ -58,7 +58,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		}
 	};
 	// Check position sender panel && emoji panel
-	const childRef = useRef<(HTMLDivElement | null)[]>([]);
+	const childRef = useRef<(HTMLButtonElement | null)[]>([]);
 	const parentDiv = useRef<HTMLDivElement | null>(null);
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals>();
 
@@ -160,9 +160,9 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 						const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 						const checkID = emoji.message_id === message.id;
 						return (
-							<div key={index}>
+							<div key={`${index + message.id}`}>
 								{checkID && (
-									<div
+									<button
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
 									${userSender?.count && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338]'}
@@ -191,9 +191,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 										</div>
 
 										{checkMessageToMatchMessageRef(message) && reactionBottomState && lastPositionEmoji(emoji, message) && (
-											<>
-												<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
-											</>
+											<ReactionBottom smileButtonRef={smileButtonRef} moveToTop={moveToTop} message={message} />
 										)}
 
 										{checkMessageToMatchMessageRef(message) &&
@@ -207,7 +205,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 													message={message}
 												/>
 											)}
-									</div>
+									</button>
 								)}
 							</div>
 						);

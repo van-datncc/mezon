@@ -184,7 +184,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			localTracksRef.current = [...(tracks as JitsiLocalTrack[])];
 
 			for (let i = 0; i < localTracksRef.current.length; i++) {
-				const localtrack = localTracksRef.current[i] as JitsiLocalTrack;
+				const localtrack = localTracksRef.current[i];
 				localtrack.addEventListener(JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED, onTrackAudioLevelChanged);
 				localtrack.addEventListener(JitsiMeetJS.events.track.TRACK_MUTE_CHANGED, onTrackMuteChanged);
 				localtrack.addEventListener(JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, onLocalTrackStoped);
