@@ -30,6 +30,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionDataSocket: EmojiDataOptionals;
 	reactionDataServerAndSocket: EmojiDataOptionals[];
 	userReactionPanelState: boolean;
+	reactionBottomStateResponsive: boolean;
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -65,6 +66,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 	},
 	reactionDataServerAndSocket: [],
 	userReactionPanelState: false,
+	reactionBottomStateResponsive: false,
 });
 
 export const reactionSlice = createSlice({
@@ -80,6 +82,10 @@ export const reactionSlice = createSlice({
 		setReactionBottomState(state, action) {
 			state.reactionBottomState = action.payload;
 		},
+		setReactionBottomStateResponsive(state, action) {
+			state.reactionBottomStateResponsive = action.payload;
+		},
+
 		setReactionRightState(state, action) {
 			state.reactionRightState = action.payload;
 		},
@@ -145,6 +151,8 @@ export const selectEmojiReactionEntities = createSelector(getReactionState, sele
 export const selectReactionPlaceActive = createSelector(getReactionState, (state: ReactionState) => state.reactionPlaceActive);
 
 export const selectReactionBottomState = createSelector(getReactionState, (state: ReactionState) => state.reactionBottomState);
+
+export const selectReactionBottomStateResponsive = createSelector(getReactionState, (state: ReactionState) => state.reactionBottomStateResponsive);
 
 export const selectReactionRightState = createSelector(getReactionState, (state: ReactionState) => state.reactionRightState);
 

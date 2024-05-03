@@ -2,6 +2,7 @@ import {
 	reactionActions,
 	selectDataReactionCombine,
 	selectReactionBottomState,
+	selectReactionBottomStateResponsive,
 	selectReactionPlaceActive,
 	selectReactionRightState,
 	selectUserReactionPanelState,
@@ -25,6 +26,7 @@ export function useChatReaction() {
 	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
+	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -114,6 +116,13 @@ export function useChatReaction() {
 		[dispatch],
 	);
 
+	const setReactionBottomStateResponsive = useCallback(
+		(state: boolean) => {
+			dispatch(reactionActions.setReactionBottomStateResponsive(state));
+		},
+		[dispatch],
+	);
+
 	const setUserReactionPanelState = useCallback(
 		(state: boolean) => {
 			dispatch(reactionActions.setUserReactionPanelState(state));
@@ -137,6 +146,8 @@ export function useChatReaction() {
 			setReactionBottomState,
 			setUserReactionPanelState,
 			userReactionPanelState,
+			setReactionBottomStateResponsive,
+			reactionBottomStateResponsive,
 		}),
 		[
 			reactionActions,
@@ -151,6 +162,8 @@ export function useChatReaction() {
 			dataReactionCombine,
 			setReactionRightState,
 			setReactionBottomState,
+			setReactionBottomStateResponsive,
+			reactionBottomStateResponsive,
 		],
 	);
 }

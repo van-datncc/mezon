@@ -14,7 +14,7 @@ export const AlertTitleTextWarning: React.FC<AlertProps> = ({ description, onCli
 	}, [description]);
 
 	const handleClose = () => {
-		() => onClick;
+		onClick?.();
 		setIsOpen(false);
 	};
 

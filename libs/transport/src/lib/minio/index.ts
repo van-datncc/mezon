@@ -42,7 +42,7 @@ export async function handleUploadFile(client: Client, session: Session, fullfil
 				height: 0,
 			});
 		} catch (error) {
-			reject(error);
+			reject(new Error(`${error}`));
 		}
 	});
 }
@@ -68,15 +68,13 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 						}
 					} else {
 						reject(new Error('Failed to get URL. URL not available.'));
-						return;
 					}
 				})
 				.catch((e) => {
 					reject(new Error('Failed to get URL. URL not available.'));
-					return;
 				});
 		} else {
-			reject({});
+			reject(new Error('Failed to get URL. URL not available.'));
 		}
 	});
 }

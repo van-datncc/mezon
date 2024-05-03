@@ -1,9 +1,10 @@
-import { accountActions, authActions, useAppDispatch } from '@mezon/store';
+import { accountActions, authActions, useAppDispatch } from '@mezon/store-mobile';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import Images from 'apps/mobile/src/assets/Images';
 import React, { useEffect } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 const GOOGLE_ANDROID_ID = '648946579638-qtugur5pktrkh30q0ampp76fnaekcmk7.apps.googleusercontent.com';
 const GOOGLE_WEB_ID = '648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com';
 
@@ -20,15 +21,18 @@ const GoogleLogin = () => {
 	const navigation = useNavigation();
 	async function onGoogleButtonPress() {
 		try {
-			// Get the users ID token
 			await GoogleSignin.hasPlayServices();
 			const { idToken } = await GoogleSignin.signIn();
 			const action = await dispatch(authActions.authenticateGoogle(idToken));
 			const session = action.payload;
-			console.log('Tom log  => session', session);
-			dispatch(accountActions.setAccount(session));
+			if (!!session) {
+				dispatch(accountActions.setAccount(session));
+			} else {
+				Alert.alert('Login Failed', 'Unable to login with Google');
+			}
 		} catch (error) {
 			console.log('error onGoogleButtonPress', error);
+			Alert.alert('Login Failed', 'Unable to login with Google');
 		}
 	}
 	return (

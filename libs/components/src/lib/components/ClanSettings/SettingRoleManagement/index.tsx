@@ -21,7 +21,7 @@ export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
 	handlSaveClose: () => void;
-	handleUpdateUser: () => void;
+	handleUpdateUser: () => Promise<void>;
 };
 const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const { createRole, updateRole } = useRoles();

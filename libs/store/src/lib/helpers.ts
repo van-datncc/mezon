@@ -50,7 +50,7 @@ export async function ensureSocket(mezon: MezonContextValue): Promise<MezonValue
 }
 
 export function ensureClient(mezon: MezonContextValue): MezonValueContext {
-	if (!mezon ?? !mezon.clientRef.current) {
+	if (!mezon?.clientRef?.current) {
 		throw new Error('Error');
 	}
 

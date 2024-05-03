@@ -1,14 +1,19 @@
+import React from 'react';
+
 export type LinkProps = {
-	href: string;
-	active?: boolean;
-	children?: React.ReactElement | string;
+  readonly href: string;
+  readonly active?: boolean;
+  readonly children?: React.ReactElement | string;
 };
 
-function Link(params: LinkProps) {
-	return (
-		// eslint-disable-next-line jsx-a11y/anchor-has-content
-		<a {...params} />
-	);
+function Link({ href, children, ...rest }: LinkProps) {
+  const content = children || 'Link';
+
+  return (
+    <a href={href} {...rest} title={typeof content === 'string' ? content : undefined}>
+      {content}
+    </a>
+  );
 }
 
 export default Link;

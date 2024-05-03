@@ -1,6 +1,6 @@
-import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
-import { ICategory, LoadingStatus } from '@mezon/utils';
+import { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
@@ -21,6 +21,7 @@ export interface CategoriesState extends EntityState<CategoriesEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentCategoryId?: string | null;
+	sortChannelByCategoryId: Record<string, boolean>;
 }
 
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
@@ -56,6 +57,7 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	loadingStatus: 'not loaded',
 	categories: [],
 	error: null,
+	sortChannelByCategoryId: {},
 });
 
 export const categoriesSlice = createSlice({
@@ -66,6 +68,11 @@ export const categoriesSlice = createSlice({
 		remove: categoriesAdapter.removeOne,
 		changeCurrentCategory: (state, action: PayloadAction<string>) => {
 			state.currentCategoryId = action.payload;
+		},
+		setCategoryIdSortChannel: (state, action: PayloadAction<SortChannel>) => {
+			if (action.payload.categoryId) {
+				state.sortChannelByCategoryId[action.payload.categoryId] = action.payload.isSortChannelByCategoryId;
+			}
 		},
 	},
 	extraReducers: (builder) => {
@@ -140,6 +147,8 @@ const { selectAll, selectEntities } = categoriesAdapter.getSelectors();
 export const getCategoriesState = (rootState: { [CATEGORIES_FEATURE_KEY]: CategoriesState }): CategoriesState => rootState[CATEGORIES_FEATURE_KEY];
 export const selectAllCategories = createSelector(getCategoriesState, selectAll);
 export const selectCurrentCategoryId = createSelector(getCategoriesState, (state) => state.currentCategoryId);
+
+export const selectCategoryIdSortChannel = createSelector(getCategoriesState, (state) => state.sortChannelByCategoryId);
 
 export const selectCategoriesEntities = createSelector(getCategoriesState, selectEntities);
 
