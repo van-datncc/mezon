@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
-import { APP_SCREEN } from './ScreenTypes';
+
 import { createStackNavigator } from '@react-navigation/stack';
+import React, { useMemo } from 'react';
 import { Authentication } from './Authentication';
+import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
 import { initStore, MezonStoreProvider, selectIsLogin } from "@mezon/store";
 import { useSelector } from "react-redux";
@@ -22,7 +23,8 @@ const NavigationMain = () => {
 					<RootStack.Group
 						screenOptions={{
 							gestureEnabled: false,
-						}}>
+						}}
+					>
 						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
 					</RootStack.Group>
 				) : (
@@ -30,14 +32,15 @@ const NavigationMain = () => {
 						screenOptions={{
 							animationTypeForReplace: 'pop',
 							gestureEnabled: false,
-						}}>
+						}}
+					>
 						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
 					</RootStack.Group>
 				)}
 			</RootStack.Navigator>
 		</NavigationContainer>
-	)
-}
+	);
+};
 const RootNavigation = () => {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {

@@ -38,8 +38,8 @@ export const mapChannelMemberToEntity = (channelRes: ChannelUserListChannelUser,
 	return { ...channelRes, id: id || '', channelId, userChannelId };
 };
 
-export const mapUserIdToEntity = (userId: string, username: string) => {
-	return { username: username, id: userId };
+export const mapUserIdToEntity = (userId: string, username: string, online: boolean) => {
+	return { username: username, id: userId, online };
 };
 
 export interface ChannelMemberRootState {
@@ -129,6 +129,7 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
 			if (!user) {
 				thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
+				thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
 				thunkAPI.dispatch(fetchChannelMembers({ clanId: '', channelId: channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 		}
@@ -197,7 +198,7 @@ export const channelMembers = createSlice({
 		},
 		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
 			const payload = action.payload;
-			const member = mapUserIdToEntity(payload.joins[0].user_id, payload.joins[0].username);
+			const member = mapUserIdToEntity(payload.joins[0].user_id, payload.joins[0].username, true);
 			const data = mapChannelMemberToEntity({ id: member.id + payload.channel_id, user: member }, payload.channel_id, payload.joins[0].user_id);
 			channelMembersAdapter.addOne(state, data);
 		},
@@ -317,7 +318,8 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
 
 export const selectMemberById = (userId: string) =>
 	createSelector(getChannelMembersState, (state) => {
-		return selectById(state, userId);
+		const user = state.memberChannels?.find((member) => member?.user?.id === userId);
+		return user;
 	});
 
 export const selectMemberByUserId = (userId: string) =>

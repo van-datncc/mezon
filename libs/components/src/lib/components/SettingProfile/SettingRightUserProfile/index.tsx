@@ -1,12 +1,12 @@
 import { useAccount } from '@mezon/core';
+import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
 import { Modal } from 'flowbite-react';
-import { useState } from 'react';
-import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
-import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { useSelector } from 'react-redux';
 import { ChannelType } from 'mezon-js';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 
 const SettingRightUser = ({
 	onClanProfileClick,
@@ -19,9 +19,8 @@ const SettingRightUser = ({
 	name: string;
 	avatar: string;
 	nameDisplay: string;
-	aboutMe: string
+	aboutMe: string;
 }) => {
-	
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
 	const [displayName, setDisplayName] = useState(nameDisplay);
@@ -36,14 +35,22 @@ const SettingRightUser = ({
 	const handleUpdateUser = async () => {
 		if (name || urlImage || displayName || editAboutUser) {
 			await updateUser(name, urlImage, displayName, editAboutUser);
-			if (currentChannelId && currentClanId){
-				await dispatch(channelMembersActions.fetchChannelMembers({clanId: currentClanId || '', channelId:currentChannelId || '', channelType: ChannelType.CHANNEL_TYPE_TEXT, noCache:true, repace:true }));
+			if (currentChannelId && currentClanId) {
+				await dispatch(
+					channelMembersActions.fetchChannelMembers({
+						clanId: currentClanId || '',
+						channelId: currentChannelId || '',
+						channelType: ChannelType.CHANNEL_TYPE_TEXT,
+						noCache: true,
+						repace: true,
+					}),
+				);
 			}
 		}
 	};
 
 	const handleFile = (e: any) => {
-		const file = e.target.files && e.target.files[0];
+		const file = e?.target?.files[0];
 		const fullfilename = file?.name;
 		const sizeImage = file?.size;
 		const session = sessionRef.current;
@@ -79,7 +86,7 @@ const SettingRightUser = ({
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value);
-		setFlags(true); 
+		setFlags(true);
 	};
 
 	const handleClanProfileButtonClick = () => {
@@ -108,9 +115,12 @@ const SettingRightUser = ({
 			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 flex-row">
 				<div className="w-1/2 text-[#CCCCCC]">
 					<div className="mt-[20px]">
-						<label className="font-semibold tracking-wide text-sm">DISPLAY NAME</label>
+						<label htmlFor="inputField" className="font-semibold tracking-wide text-sm">
+							DISPLAY NAME
+						</label>
 						<br />
 						<InputField
+							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
 							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
@@ -137,17 +147,19 @@ const SettingRightUser = ({
 								Remove avatar
 							</button>
 						</div>
-						<div className='mt-[30px] w-full'>
-							<textarea 
+						<div className="mt-[30px] w-full">
+							<textarea
 								className="bg-black rounded p-[10px] w-full"
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}
 								value={editAboutUser}
-								rows = {4}
+								rows={4}
 							></textarea>
-							<div className='w-full flex justify-end'>
-								<span className={`text-${editAboutUser.length > 128 ? '[#EF1515]' : '[#797878]'}`}>{editAboutUser.length}/{128}</span>
+							<div className="w-full flex justify-end">
+								<span className={`text-${editAboutUser.length > 128 ? '[#EF1515]' : '[#797878]'}`}>
+									{editAboutUser.length}/{128}
+								</span>
 							</div>
 						</div>
 					</div>
@@ -157,7 +169,10 @@ const SettingRightUser = ({
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
 			</div>
-			{(urlImage !== avatar && flags) || (displayName !== nameDisplay && flags) || (flagsRemoveAvartar !== false && flags) || (editAboutUser !== aboutMe && flags) ? (
+			{(urlImage !== avatar && flags) ||
+			(displayName !== nameDisplay && flags) ||
+			(flagsRemoveAvartar !== false && flags) ||
+			(editAboutUser !== aboutMe && flags) ? (
 				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform ">
 					<div className="flex-1 flex items-center text-nowrap">
 						<p className="text-[15px]">Carefull - you have unsaved changes!</p>
@@ -176,7 +191,7 @@ const SettingRightUser = ({
 							// className="ml-auto bg-blue-600 rounded-[8px] p-[8px]"
 							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
 							onClick={() => {
-								handleUpdateUser(); 
+								handleUpdateUser();
 								handlSaveClose();
 							}}
 						>

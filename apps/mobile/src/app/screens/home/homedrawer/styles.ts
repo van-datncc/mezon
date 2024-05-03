@@ -47,7 +47,8 @@ export const styles = StyleSheet.create({
 		width: inputWidth,
 		borderBottomWidth: 0,
 		borderRadius: 20,
-		paddingHorizontal: 15,
+		paddingLeft: 15,
+		paddingRight: 40,
 		fontSize: verticalScale(15),
 	},
 	iconEmoji: {
@@ -140,7 +141,12 @@ export const styles = StyleSheet.create({
 		padding: 0,
 		flex: 1,
 	},
-	serverIcon: {
+	wrapperClanIcon: {
+		width: '100%',
+		alignItems: 'center',
+		marginBottom: verticalScale(10),
+	},
+	clanIcon: {
 		height: verticalScale(50),
 		width: verticalScale(50),
 		borderRadius: verticalScale(15),
@@ -148,6 +154,11 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.gray70,
+	},
+	textLogoClanIcon: {
+		color: Colors.titleReset,
+		fontSize: size.s_24,
+		fontWeight: '600',
 	},
 	homeDefaultHeader: {
 		flexDirection: 'row',

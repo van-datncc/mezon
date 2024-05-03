@@ -30,7 +30,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, pos }: UserReactionP
 			<div
 				onClick={(e) => e.stopPropagation()}
 				className={`absolute z-50  bottom-7 w-[18rem]
-				bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] ${pos ? 'right-0' : 'left-0'}`}
+				bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] md:${pos ? 'right-0' : 'left-0'}`}
 			>
 				<div className="flex flex-row items-center m-2">
 					<div className="">{emojiShowPanel.emoji}</div>

@@ -7,7 +7,7 @@ export function useMessageSender(user?: IChannelMember | null) {
     }, [user]);
 
     const hasAvatar = useMemo(() => {
-        return user?.user?.avatar_url ? true : false;
+        return Boolean(user?.user?.avatar_url);
     }, [user])
 
     const username =  useMemo(() => {

@@ -30,7 +30,7 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 			component: <Icons.XlsThumbnail key="xls-thumbnail" defaultSize={size} />,
 		},
 		{
-			condition: fileName && fileName.toLowerCase().endsWith('.rar'),
+			condition: fileName?.toLowerCase().endsWith('.rar'),
 			component: <Icons.RarThumbnail key="rar-thumbnail" defaultSize={size} />,
 		},
 		{

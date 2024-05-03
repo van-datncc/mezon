@@ -11,6 +11,7 @@ export interface AppState {
 	initialPath?: string;
 	closeMenu: boolean;
 	statusMenu: boolean;
+	hiddenBottomTabMobile: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -20,6 +21,7 @@ export const initialAppState: AppState = {
 	initialPath: '/',
 	closeMenu: false,
 	statusMenu: true,
+	hiddenBottomTabMobile: true,
 };
 
 export const appSlice = createSlice({
@@ -43,6 +45,9 @@ export const appSlice = createSlice({
 		},
 		setStatusMenu: (state, action) => {
 			state.statusMenu = action.payload;
+		},
+		setHiddenBottomTabMobile: (state, action) => {
+			state.hiddenBottomTabMobile = action.payload;
 		},
 	},
 });
@@ -69,3 +74,5 @@ export const selectInitialPath = createSelector(getAppState, (state: AppState) =
 export const selectCloseMenu = createSelector(getAppState, (state: AppState) => state.closeMenu);
 
 export const selectStatusMenu = createSelector(getAppState, (state: AppState) => state.statusMenu);
+
+export const selectHiddenBottomTabMobile = createSelector(getAppState, (state: AppState) => state.hiddenBottomTabMobile);

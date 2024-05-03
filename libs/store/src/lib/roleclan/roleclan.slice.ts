@@ -43,7 +43,7 @@ export const fetchRolesClan = createAsyncThunk(
 			return [];
 		}
 		if (repace) {
-			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId || ''));
+			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 		}
 		return response.roles.map(mapRolesClanToEntity);
 	},
@@ -109,7 +109,7 @@ export const fetchCreateRole = createAsyncThunk(
     		color: '',
     		description: '',
     		display_online: 0,
-    		title: title || '',
+    		title: title ?? '',
 		}
 		const response = await mezon.client.createRole(mezon.session,body);
 		if (!response) {
@@ -135,7 +135,7 @@ export const fetchUpdateRole = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			role_id: role_id,
-			title: title || '',
+			title: title ?? '',
 			color: '',
 			role_icon: '',
 			description: '',
@@ -300,7 +300,7 @@ export const selectRolesClanEntities = createSelector(getRolesClanState, selectE
 export const selectRolesByChannelId = (channelId?: string | null) =>
 	createSelector(selectRolesClanEntities, (entities) => {
 		const roles = Object.values(entities);
-		return roles.filter((role) => role && role.channel_ids && channelId && role.channel_ids.includes(channelId));
+		return roles.filter((role) => role?.channel_ids?.includes(channelId!));
 	});
 
 export const selectCurrentRole = createSelector(selectRolesClanEntities, selectCurrentRoleId, (RolesClanEntities, RoleId) =>

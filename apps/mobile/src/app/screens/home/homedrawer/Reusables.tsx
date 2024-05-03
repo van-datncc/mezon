@@ -9,13 +9,17 @@ import SpeakerIcon from '../../../../assets/svg/speaker.svg';
 import { styles } from './styles';
 
 export const ChannelListContext = React.createContext({} as any);
-export const ServerIcon = React.memo((props: { icon?: any; data: any }) => {
+export const ClanIcon = React.memo((props: { icon?: any; data: any }) => {
 	return (
-		<View style={{ width: '100%', alignItems: 'center', marginBottom: 10 }}>
-			<View
-				style={styles.serverIcon}
-			>
-				{props.icon ? props.icon : <FastImageRes uri={props.data.image} />}
+		<View style={styles.wrapperClanIcon}>
+			<View style={styles.clanIcon}>
+				{props.icon ? (
+					props.icon
+				) : props?.data?.logo ? (
+					<FastImageRes uri={props.data.logo} />
+				) : (
+					<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name.charAt(0).toUpperCase()}</Text>
+				)}
 			</View>
 		</View>
 	);

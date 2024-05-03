@@ -50,7 +50,7 @@ export const checkSameDay = (startTimeString: string, endTimeString: string) => 
 };
 
 export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement | HTMLUListElement>) => {
-	if (ref && ref.current) {
+	if (ref?.current) {
 		ref.current.focus();
 	}
 };
