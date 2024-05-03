@@ -17,7 +17,6 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		reactionMessageDispatch,
 		reactionBottomState,
 		dataReactionCombine,
-		setReactionRightState,
 		setReactionBottomState,
 		setUserReactionPanelState,
 		userReactionPanelState,
@@ -105,7 +104,10 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 		const childElement = childRef.current[index];
 		if (!childElement) return;
 		const childRect = childElement.getBoundingClientRect();
-		const distanceToRight = parentRect.right - childRect.right - 100;
+		console.log('------------');
+		console.log(parentRect.right);
+		console.log(childRect.right);
+		const distanceToRight = parentRect.right - childRect.right;
 		if (distanceToRight < PANEL_SENDER_WIDTH) {
 			return setPosToRight(true);
 		} else {
@@ -153,7 +155,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 				</div>
 			)}
 
-			<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14">
+			<div ref={parentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14 border border-red-600">
 				{dataReactionCombine
 					.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
 					?.map((emoji: EmojiDataOptionals, index: number) => {
