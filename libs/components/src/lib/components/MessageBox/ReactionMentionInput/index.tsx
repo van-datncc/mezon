@@ -94,6 +94,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { emojis } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked } = useEmojiSuggestion();
+	const { reactionRightState } = useChatReaction();
 
 	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
 		if (query.length === 0) return;
@@ -231,16 +232,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		};
 	}) as ChannelsMentionProps[];
 
-	const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
-
-	type emojiUpSizeProps = {
-		emoji: string;
-		size: string;
-	};
-	const EmojiWithSize = ({ emoji, size }: emojiUpSizeProps) => {
-		return <span style={{ fontSize: size }}>{emoji}</span>;
-	};
-
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
 		if (linkGifDirect && linkGifDirect?.length > 0) {
@@ -282,8 +273,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const { openReplyMessageState, openEditMessageState } = useReference();
 	const { closeMenu, statusMenu } = useMenu();
-	const { reactionRightState } = useChatReaction();
-
 	useEffect(() => {
 		if (closeMenu && statusMenu) {
 			return;
@@ -318,9 +307,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (syntaxEmoji === '') {
 			textFieldEdit.insert(input, emojiPicked);
 		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, match => (
-				document.createElement('span').appendChild(document.createTextNode(`<span style="font-size: 60px;">${emojiPicked}</span>`)).parentNode.innerHTML
-			  ));			
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
 			setValueTextInput(replaceSyntaxByEmoji);
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
@@ -328,6 +315,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
+		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
 		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
 		if (emojiArray.length > 0) {
 			return emojiArray[0];
