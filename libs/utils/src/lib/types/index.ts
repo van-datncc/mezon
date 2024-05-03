@@ -394,3 +394,8 @@ export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
 }
+
+export type SortChannel = {
+	isSortChannelByCategoryId: boolean;
+	categoryId: string | null;
+};

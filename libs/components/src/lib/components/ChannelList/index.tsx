@@ -1,5 +1,5 @@
 import { UserRestrictionZone, useCategory, useClanRestriction, useEscapeKey } from '@mezon/core';
-import { channelsActions, useAppDispatch } from '@mezon/store';
+import { categoriesActions, channelsActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { getIsShowPopupForward } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
@@ -13,9 +13,13 @@ import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
-function ChannelList({ channelCurrentType }: {readonly channelCurrentType?: number }) {
+function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: number }) {
+	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
+	const isChange = useSelector(getIsShowPopupForward);
+	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
 		categorizedChannels.reduce((acc, category) => {
 			acc[category.id] = false;
@@ -37,12 +41,14 @@ function ChannelList({ channelCurrentType }: {readonly channelCurrentType?: numb
 		}
 	};
 
-	const dispatch = useAppDispatch();
+	const handleSortByName = (categoryId: string) => {
+		dispatch(categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[categoryId], categoryId }));
+	};
+
 	const openModalCreateNewChannel = (paramCategory: ICategory) => {
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
-	const isChange = useSelector(getIsShowPopupForward);
 
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
@@ -66,7 +72,7 @@ function ChannelList({ channelCurrentType }: {readonly channelCurrentType?: numb
 				{categorizedChannels.map((category: ICategoryChannel) => (
 					<div key={category.id}>
 						{category.category_name && (
-							<div className="flex flex-row px-2 relative">
+							<div className="flex flex-row px-2 relative gap-1">
 								<button
 									onClick={() => {
 										handleToggleCategory(category);
@@ -75,6 +81,12 @@ function ChannelList({ channelCurrentType }: {readonly channelCurrentType?: numb
 								>
 									{!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
 									{category.category_name}
+								</button>
+								<button
+									onClick={() => handleSortByName(category.category_id ?? '')}
+									className="focus-visible:outline-none text-[#AEAEAE] hover:text-white"
+								>
+									<Icons.UpDownIcon />
 								</button>
 								<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
 									<button
