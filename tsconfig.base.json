@@ -26,6 +26,8 @@
 			"@mezon/logger": ["libs/logger/src/index.ts"],
 			"@mezon/mobile-components": ["libs/mobile-components/src/index.ts"],
 			"@mezon/store": ["libs/store/src/index.ts"],
+			"@mezon/store-mobile": ["libs/store/src/index-mobile.ts"],
+			"@mezon/async-storage-mobile": ["libs/store/src/AsyncLocalStorageMobile.tsx"],
 			"@mezon/transport": ["libs/transport/src/index.ts"],
 			"@mezon/ui": ["libs/ui/src/index.ts"],
 			"@mezon/utils": ["libs/utils/src/index.ts"],

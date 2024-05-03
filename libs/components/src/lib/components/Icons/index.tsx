@@ -1383,7 +1383,6 @@ export const AddCircle: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 };
 
 export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="live area">
@@ -1398,7 +1397,6 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize 
 };
 
 export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-
 	return (
 		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
@@ -1859,14 +1857,7 @@ export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 
 export const ImageThumbnail: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			width="20"
-			height="20"
-			fill="none"
-			viewBox="0 0 24 24"
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
 			<path
 				fill={defaultFill}
 				fillRule="evenodd"
@@ -1989,14 +1980,7 @@ export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 
 export const TrashIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			fill="none"
-			viewBox="0 0 24 24"
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 			<path
 				fill={defaultFill}
 				d="M14.25 1c.41 0 .75.34.75.75V3h5.25c.41 0 .75.34.75.75v.5c0 .41-.34.75-.75.75H3.75A.75.75 0 0 1 3 4.25v-.5c0-.41.34-.75.75-.75H9V1.75c0-.41.34-.75.75-.75h4.5Z"
@@ -2028,14 +2012,7 @@ export const Locked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSi
 
 export const Download: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			fill="none"
-			viewBox="0 0 24 24"
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 			<path
 				fill="currentColor"
 				d="M12 2a1 1 0 0 1 1 1v10.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42l3.3 3.3V3a1 1 0 0 1 1-1ZM3 20a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2H3Z"
@@ -2063,14 +2040,7 @@ export const OpenMenu: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 
 export const TrendingGifs: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			fill="none"
-			viewBox="0 0 24 24"
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 			<path
 				fill="currentColor"
 				fillRule="evenodd"
@@ -2160,6 +2130,18 @@ export function ConvertAccount(props: React.HTMLAttributes<SVGElement>) {
 					<rect width="20" height="20" fill="white" transform="translate(22 2) rotate(90)" />
 				</clipPath>
 			</defs>
+		</svg>
+	);
+}
+
+export function UpDownIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4" {...props}>
+			<path
+				fillRule="evenodd"
+				d="M5.22 10.22a.75.75 0 0 1 1.06 0L8 11.94l1.72-1.72a.75.75 0 1 1 1.06 1.06l-2.25 2.25a.75.75 0 0 1-1.06 0l-2.25-2.25a.75.75 0 0 1 0-1.06ZM10.78 5.78a.75.75 0 0 1-1.06 0L8 4.06 6.28 5.78a.75.75 0 0 1-1.06-1.06l2.25-2.25a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06Z"
+				clipRule="evenodd"
+			/>
 		</svg>
 	);
 }

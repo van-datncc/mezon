@@ -1,6 +1,7 @@
 import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
-import { useMezon, useMezonVoice } from '@mezon/transport';
+import { useMezon } from '@mezon/transport';
+import { useMezonVoice } from '@mezon/voice';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import cls from 'classnames';
 import { ChannelType } from 'mezon-js';
