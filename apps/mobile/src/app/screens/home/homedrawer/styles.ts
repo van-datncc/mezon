@@ -47,7 +47,8 @@ export const styles = StyleSheet.create({
 		width: inputWidth,
 		borderBottomWidth: 0,
 		borderRadius: 20,
-		paddingHorizontal: 15,
+		paddingLeft: 15,
+		paddingRight: 40,
 		fontSize: verticalScale(15),
 	},
 	iconEmoji: {
