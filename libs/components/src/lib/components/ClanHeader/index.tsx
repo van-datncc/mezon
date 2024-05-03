@@ -3,13 +3,14 @@ import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/s
 import { InputField } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ClanSetting from '../ClanSettings/clanSettings';
 import * as Icons from '../Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
+import SearchModal from '../SearchModal';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -18,6 +19,7 @@ export type ClanHeaderProps = {
 };
 
 function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
+	const inputRef = useRef<HTMLInputElement | null>(null);
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -30,6 +32,10 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
+	const [openSearchModal, closeSearchModal] = useModal(() => (
+		<SearchModal onClose={closeSearchModal} open={true} />
+	));
+
 	const onClose = () => {
 		setOpenCreateCate(false);
 	};
@@ -44,14 +50,20 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		setNameCate('');
 		onClose();
 	};
+	const handleInputFocus = () => {
+		openSearchModal();
+		inputRef.current?.blur();
+	};
 	return (
 		<>
 			{type === 'direct' ? (
 				<div className="px-3 border-b-1 border-bgPrimary font-title font-semibold text-white border-b-[#000] border-b-[1px] h-heightHeader flex items-center">
-					<InputField
-						type="text"
+					<input
+						ref={inputRef}
 						placeholder="Find or start a conversation"
-						className=" text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]"
+						className={`font-[400] px-[16px] rounded w-full text-white outline-none text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]`}
+						type='text'
+						onFocus={handleInputFocus}
 					/>
 				</div>
 			) : (

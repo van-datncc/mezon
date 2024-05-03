@@ -2,7 +2,7 @@ import { useModal } from 'react-modal-hook';
 import ModalInvite from '../../../ListMemberInvite/modalInvite';
 
 export type AddVoiceFriendProps = {
-	channelId: string;
+	readonly channelId: Readonly<string>;
 };
 
 function AddVoiceFriend({ channelId }: AddVoiceFriendProps) {

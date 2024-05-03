@@ -8,18 +8,14 @@ import Button from '../../components/Auth/Button';
 import GoogleLogin from '../../components/Auth/GoogleLogin';
 import FooterAuth from '../../components/Auth/FooterAuth';
 import {APP_SCREEN} from "../../navigation/ScreenTypes";
-// import { useDispatch, useSelector } from 'react-redux';
-// import { loginRequest } from '../../redux/Actions/authActions/action';
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Please enter your email'),
     password: Yup.string().min(8, "Confiem password musr be 8 characters long.").required('Please enter your password').matches(
-        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
+        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)(?=.*?[#?!@$%^&*-]).{8,}$/,
         "Must contain minimum 8 characters, at least one uppercase letter"
     ),
 });
 const LoginScreen = () => {
-    // const dispatch = useDispatch();
-    // const isLoading = useSelector(state => state.auth.loading);
 
     const navigation = useNavigation()
     return (

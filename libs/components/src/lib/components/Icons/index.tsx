@@ -1007,13 +1007,9 @@ interface IconProps {
 }
 
 export const ThreadIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 	const handleClick = () => {
-		setFill(!isWhite);
-	};
-	const handleMouseLeave = () => {
-		console.log('out');
+		setIsWhite(!isWhite);
 	};
 
 	return (
@@ -1072,11 +1068,10 @@ export const ThreadIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 };
 
 export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
@@ -1106,11 +1101,10 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 };
 
 export const PinRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
@@ -1166,10 +1160,10 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defau
 };
 
 export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
@@ -1194,11 +1188,10 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 };
 
 export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} cursor-pointer`} onClick={handleClick}>
@@ -1216,11 +1209,10 @@ export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 };
 
 export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
@@ -1243,7 +1235,6 @@ export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize
 };
 
 export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g clipPath="url(#clip0_431_37913)">
@@ -1366,11 +1357,10 @@ export function ThreadNotClick(props: React.HTMLAttributes<SVGElement>) {
 }
 
 export const AddCircle: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
@@ -1393,7 +1383,6 @@ export const AddCircle: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 };
 
 export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
 
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
@@ -1409,7 +1398,6 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize 
 };
 
 export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
 
 	return (
 		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1432,7 +1420,6 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	// TODO: remove state and handle click, pass fill as prop
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="live area" clipPath="url(#clip0_2253_934)">
@@ -1650,8 +1637,14 @@ export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			xmlns="http://www.w3.org/2000/svg"
 			className={defaultSize}
 			style={{ fill: '#CBD5E0', transition: 'fill 0.3s, transform 0.3s' }}
-			onMouseEnter={(e) => ((e.currentTarget.style.fill = 'white'), (e.currentTarget.style.transform = 'scale(1.3)'))}
-			onMouseLeave={(e) => ((e.currentTarget.style.fill = '#CBD5E0'), (e.currentTarget.style.transform = 'scale(1)'))}
+			onMouseEnter={(e) => {
+				e.currentTarget.style.fill = 'white';
+				e.currentTarget.style.transform = 'scale(1.3)';
+			}}
+			onMouseLeave={(e) => {
+				e.currentTarget.style.fill = '#CBD5E0';
+				e.currentTarget.style.transform = 'scale(1)';
+			}}
 		>
 			<g id="Live area">
 				<path
@@ -1802,10 +1795,10 @@ export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 	return (
 		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={handleClick}>
@@ -1848,10 +1841,10 @@ export const ReplyCorner: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defa
 };
 
 export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 
 	return (
@@ -1867,9 +1860,7 @@ export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 export const ImageThumbnail: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
-			className="repliedTextContentIcon_da8b30"
 			aria-hidden="true"
-			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="20"
 			height="20"
@@ -1968,10 +1959,10 @@ export const RightIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 };
 
 export const BoxChatIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setFill] = useState<boolean>(false);
+	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
-		setFill(!isWhite);
+		setIsWhite(!isWhite);
 	};
 
 	return (
@@ -1999,9 +1990,7 @@ export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 export const TrashIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
-			className="actionBarIcon__5c911"
 			aria-hidden="true"
-			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -2040,9 +2029,7 @@ export const Locked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSi
 export const Download: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
-			className="downloadHoverButtonIcon_c189c0"
 			aria-hidden="true"
-			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -2077,9 +2064,7 @@ export const OpenMenu: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 export const TrendingGifs: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
-			className="categoryIcon__7e2ee"
 			aria-hidden="true"
-			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -2099,7 +2084,7 @@ export const TrendingGifs: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', def
 
 export const BackToCategoriesGif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 			<path
 				fill="currentColor"
 				d="M3.3 11.3a1 1 0 0 0 0 1.4l5 5a1 1 0 0 0 1.4-1.4L6.42 13H20a1 1 0 1 0 0-2H6.41l3.3-3.3a1 1 0 0 0-1.42-1.4l-5 5Z"

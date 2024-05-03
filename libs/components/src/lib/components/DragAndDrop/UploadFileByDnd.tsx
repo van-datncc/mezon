@@ -6,8 +6,8 @@ import { useSelector } from 'react-redux';
 import DragAndDropUI from './DragAndDropUI';
 
 function FileUploadByDnD() {
-	const { draggingState, setDraggingState } = useDragAndDrop();
-	const { attachmentDataRef, setAttachmentData } = useReference();
+	const { setDraggingState } = useDragAndDrop();
+	const { setAttachmentData } = useReference();
 	const { sessionRef, clientRef } = useMezon();
 	const { currentClanId } = useClans();
 	const currentChannelId = useSelector(selectCurrentChannelId);

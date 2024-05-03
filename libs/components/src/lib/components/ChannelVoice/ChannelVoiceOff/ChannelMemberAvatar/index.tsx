@@ -2,7 +2,7 @@ import { selectMemberByUserId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 export type ChannelMemberAvatarProps = {
-	userId: string;
+	readonly userId: Readonly<string>;
 };
 function ChannelMemberAvatar({ userId }: ChannelMemberAvatarProps) {
 	const user = useSelector(selectMemberByUserId(userId));

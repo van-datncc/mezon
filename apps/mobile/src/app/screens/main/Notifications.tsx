@@ -1,4 +1,4 @@
-import {Image, ScrollView, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View} from 'react-native'
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import { darkColor } from '../../constants/Colors'
 import { HEIGHT, WIDTH } from '../../constants/config'

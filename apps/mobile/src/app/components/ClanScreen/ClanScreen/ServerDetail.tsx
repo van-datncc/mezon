@@ -47,9 +47,7 @@ const ServerDetail = () => {
                             <Feather name="chevron-right" style={{ color: darkColor.Backgound_Subtle }} />
                             <Text style={{ color: darkColor.Backgound_Subtle }}>Kênh đàm thoại</Text>
                         </View>
-
                     </ScrollView>
-
                 </>
             </View>
         </View>

@@ -32,6 +32,9 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+	const handleDefault = (e: any) => {
+		e.stopPropagation();
+	};
 
 	if ((message.references?.length === 0 && isCombine) || (message.references?.length === 0 && !user)) {
 		return (
@@ -41,8 +44,8 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 		);
 	}
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} className="relative group">
-			<div className="pt-1">
+		<div className="relative group">
+			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
 				{hasAvatar ? (
 					<img className="size-10 rounded-full object-cover min-w-10 min-h-[38px] cursor-pointer" src={avatarImg} alt={avatarImg} />
 				) : (
@@ -55,6 +58,7 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 				<div
 					className={`bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed left-[409px]`}
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
+					onMouseDown={handleDefault}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

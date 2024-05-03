@@ -99,3 +99,13 @@ export const notImplementForGifOrStickerSendFromPanel = (data:ApiMessageAttachme
 export const getVoiceChannelName = (clanName?: string, channelLabel?: string) => {
 	return clanName?.replace(' ', '-') + '-' + channelLabel?.replace(' ', '-');
 }
+
+export const removeDuplicatesById = (array: any) => {
+	return array.reduce((acc: any, current: any) => {
+	  const isDuplicate = acc.some((item:any) => item.id === current.id);
+  	  if (!isDuplicate) {
+		acc.push(current);
+	  }
+	  	  return acc;
+	}, []);
+  };
