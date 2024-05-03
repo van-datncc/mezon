@@ -48,6 +48,7 @@ export const referencesSlice = createSlice({
 		add: referencesAdapter.addOne,
 		remove: referencesAdapter.removeOne,
 		setReferenceMessage(state, action) {
+			console.log(action.payload);
 			state.reference = action.payload;
 		},
 		setDataReferences(state, action) {
