@@ -74,7 +74,6 @@ const reducer = {
 	categories: categoriesReducer,
 	rolesclan: RolesClanReducer,
 	usersClan: usersClanReducer,
-	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
