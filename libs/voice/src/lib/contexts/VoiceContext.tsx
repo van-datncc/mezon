@@ -1,3 +1,4 @@
+import { useMezon } from '@mezon/transport';
 import JitsiConference from 'lib-mezon-meet/dist/esm/JitsiConference';
 import { JitsiConferenceErrors } from 'lib-mezon-meet/dist/esm/JitsiConferenceErrors';
 import JitsiConnection from 'lib-mezon-meet/dist/esm/JitsiConnection';
@@ -8,9 +9,8 @@ import JitsiRemoteTrack from 'lib-mezon-meet/dist/esm/modules/RTC/JitsiRemoteTra
 import JitsiTrack from 'lib-mezon-meet/dist/esm/modules/RTC/JitsiTrack';
 import { MediaType } from 'lib-mezon-meet/dist/esm/service/RTC/MediaType';
 import { VideoType } from 'lib-mezon-meet/dist/esm/service/RTC/VideoType';
-import options from 'libs/transport/src/lib/voice/options/config';
+import options from 'libs/voice/src/lib/voice/options/config';
 import React, { useCallback, useEffect } from 'react';
-import { useMezon } from '../hooks/useMezon';
 
 type VoiceContextProviderProps = {
 	children: React.ReactNode;
@@ -294,7 +294,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		});
 		const myUserId = voiceChannelRef.current?.myUserId() || '';
 
-		if (socketRef && socketRef.current && voiceOptions) {			
+		if (socketRef && socketRef.current && voiceOptions) {
 			socketRef.current.writeVoiceJoined(
 				myUserId,
 				voiceOptions.clanId as string,
@@ -311,12 +311,15 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		(id: string, user: JitsiParticipant) => {
 			remoteTracksRef.current.set(id, []);
 			if (socketRef && socketRef.current && voiceOptions) {
-				socketRef.current.writeVoiceJoined(id, 
-					voiceOptions.clanId as string, 
-					voiceOptions.clanName as string, 
-					voiceOptions.channelId as string, 
-					voiceOptions.channelName as string, 
-					user.getDisplayName(), '');
+				socketRef.current.writeVoiceJoined(
+					id,
+					voiceOptions.clanId as string,
+					voiceOptions.clanName as string,
+					voiceOptions.channelId as string,
+					voiceOptions.channelName as string,
+					user.getDisplayName(),
+					'',
+				);
 			}
 		},
 		[voiceOptions, socketRef],
@@ -408,7 +411,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 			p2p: {
 				enabled: true,
 			},
-		};		
+		};
 
 		const { channelName, displayName } = voiceOptions;
 

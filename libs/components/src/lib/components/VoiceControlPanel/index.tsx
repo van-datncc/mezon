@@ -10,7 +10,7 @@ import {
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
-import { useMezonVoice } from '@mezon/transport';
+import { useMezonVoice } from '@mezon/voice';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';

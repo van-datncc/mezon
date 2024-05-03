@@ -1,6 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { selectFriendVoiceChannel, selectNumberMemberVoiceChannel, selectShowScreen } from '@mezon/store';
-import { useMezonVoice } from '@mezon/transport';
+import { useMezonVoice } from '@mezon/voice';
 import { IChannelMember } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';

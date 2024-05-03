@@ -1,4 +1,4 @@
-export * from '../../transport/src/lib/contexts/VoiceContext';
+export * from '../../voice/src/lib/contexts/VoiceContext';
 export * from './lib/app/hooks/useAppNavigation';
 export * from './lib/app/hooks/useAppParams';
 export * from './lib/auth/hooks/useAuth';
