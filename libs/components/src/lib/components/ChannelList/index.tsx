@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import ForwardMessageModal from '../ForwardMessage';
 import * as Icons from '../Icons';
-import { BrowseChannel, Events } from './ChannelListComponents';
+import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -61,9 +61,8 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		>
 			{isChange ? <ForwardMessageModal open={isChange} /> : null}
 			{<CreateNewChannelModal />}
-			<div className="self-stretch h-[52px] px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
+			<div className="self-stretch h-fit px-4 flex-col justify-start items-start gap-3 flex mt-[24px]">
 				<Events />
-				<BrowseChannel />
 			</div>
 			<hr className="h-[0.08px] w-[272px] mt-[24px] border-[#1E1E1E]" />
 			<div

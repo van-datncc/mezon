@@ -318,6 +318,12 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 	clanId ? clansEntities[clanId] : null,
 );
 
+export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
+	channels.filter((channel) => channel.type == ChannelType.CHANNEL_TYPE_VOICE),
+);
+
+export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);
+
 export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
