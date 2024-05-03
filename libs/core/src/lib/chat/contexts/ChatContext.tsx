@@ -112,10 +112,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [reconnect]);
 
 	const onerror = useCallback((event: unknown) => {
-		// TODO: handle error
-		console.log(event);
-	}, []);
-
+		try {
+		  console.log(event);
+		} catch (error) {
+		  console.error("An error occurred while handling the error:", error);
+		}
+	  }, []);
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			if (e && e.sender_id === userId) {

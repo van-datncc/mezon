@@ -150,7 +150,7 @@ const MessageReaction = ({ currentChannelId, message, mode }: MessageReactionPro
 					const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 					const checkID = emoji.message_id === message.id;
 					return (
-						<div key={message.id}>
+						<div key={index}>
 							{checkID && (
 								<button
 									ref={(element) => (childRef.current[index] = element)}

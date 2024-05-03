@@ -5,7 +5,7 @@ import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 export type NotifyProps = {
-	notify: INotification;
+	readonly notify: INotification;
 };
 
 function NotificationItem({ notify }: NotifyProps) {

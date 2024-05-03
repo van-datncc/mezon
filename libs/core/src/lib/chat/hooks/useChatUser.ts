@@ -5,8 +5,6 @@ import { selectChannelMemberByUserIds } from "@mezon/store";
 
 export function useChatUser(userId: string) {
     const isOnline = useMemberStatus(userId);
-    // TODO:
-    const user = useSelector(selectChannelMemberByUserIds('channel_id', [userId]))
 
     return useMemo(() => ({
         isOnline,

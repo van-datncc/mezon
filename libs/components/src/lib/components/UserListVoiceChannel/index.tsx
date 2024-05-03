@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 
 export type UserListVoiceChannelProps = {
-	channelID: string;
+	readonly channelID: string;
 };
 
 function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
@@ -16,7 +16,7 @@ function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 		<>
 			{voiceChannelMember?.map((item: IChannelMember, index: number) => {
 				return (
-					<Fragment key={index}>
+					<Fragment key={item.id}>
 						<div className="hover:bg-[#36373D] w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
 							<div className="w-5 h-5 rounded-full scale-75">
 								<div className="w-8 h-8 mt-[-0.3rem]">

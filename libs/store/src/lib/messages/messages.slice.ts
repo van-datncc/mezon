@@ -104,7 +104,6 @@ export const fetchMessages = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		const currentLastLoadMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
@@ -142,8 +141,7 @@ export const fetchMessages = createAsyncThunk(
 
 		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
-		let hasMore = currentHasMore;
-		hasMore = !(Number(response.messages.length) < LIMIT_MESSAGE);
+		let hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
 
 		if (response.last_seen_message?.id) {
@@ -327,7 +325,7 @@ export const messagesSlice = createSlice({
 				};
 				const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
 
-				if (state?.typingUsers && state?.typingUsers[typingUserKey]) {
+				if (state?.typingUsers?.[typingUserKey]) {
 					delete state.typingUsers[typingUserKey];
 				}
 			}
@@ -385,9 +383,7 @@ export const messagesSlice = createSlice({
 				state.error = action.error.message;
 			});
 
-		builder.addCase(updateLastSeenMessage.fulfilled, (state: MessagesState) => {
-			// state.loadingStatus = 'loaded';
-		});
+		builder.addCase(updateLastSeenMessage.fulfilled, (state: MessagesState) => {});
 	},
 });
 
@@ -457,7 +453,8 @@ export const selectMessagesEntities = createSelector(getMessagesState, selectEnt
 export const selectMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessagesEntities, (entities) => {
 		const messages = Object.values(entities);
-		return messages.sort(orderMessageByDate).filter((message) => message && message.channel_id === channelId);
+		const sortedMessages = messages.slice().sort(orderMessageByDate);
+		return sortedMessages.filter((message) => message && message.channel_id === channelId);
 	});
 
 export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
@@ -472,14 +469,14 @@ export const selectLastMessageByChannelId = (channelId?: string | null) =>
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
 	createSelector(selectLastMessageByChannelId(channelId), (message) => {
-		return message && message.id;
+		return message?.id;
 	});
 
 export const selectUnreadMessageEntries = createSelector(getMessagesState, (state) => state.unreadMessagesEntries);
 
 export const selectUnreadMessageIdByChannelId = (channelId?: string | null) =>
 	createSelector(getMessagesState, selectUnreadMessageEntries, (state, lastMessagesEntries) => {
-		return lastMessagesEntries && lastMessagesEntries[channelId || ''];
+		return lastMessagesEntries?.[channelId ?? ''];
 	});
 
 export const selectTypingUsers = createSelector(getMessagesState, (state) => state.typingUsers);
@@ -489,38 +486,38 @@ export const selectTypingUsersList = createSelector(selectTypingUsers, (typingUs
 });
 
 export const selectTypingUserIds = createSelector(selectTypingUsersList, (typingUsers) => {
-	return typingUsers && typingUsers.map((u) => u.userId);
+	return typingUsers?.map((u) => u.userId);
 });
 
 export const selectTypingUserIdsByChannelId = (channelId: string) =>
 	createSelector(selectTypingUsersList, (typingUsers) => {
-		return typingUsers && typingUsers.filter((user) => user.channelId === channelId).map((u) => u.userId);
+		return typingUsers?.filter((user) => user.channelId === channelId).map((u) => u.userId);
 	});
 
 export const selectTypingUsersListByChannelId = (channelId: string) =>
 	createSelector(selectTypingUsersList, (typingUsers) => {
-		return typingUsers && typingUsers.filter((user) => user.channelId === channelId);
+		return typingUsers?.filter((user) => user.channelId === channelId);
 	});
 
 export const selectTypingUserById = (userId: string) =>
 	createSelector(selectTypingUsers, (typingUsers) => {
-		return typingUsers && typingUsers[userId];
+		return typingUsers?.[userId];
 	});
 
 export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
 export const selectParamByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return param && param[channelId];
+		return param?.[channelId];
 	});
 
 export const selectHasMoreMessageByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return (param && param[channelId] && param[channelId].hasMore) ?? true;
+		return param?.[channelId]?.hasMore ?? true;
 	});
 
 export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 	createSelector(selectMessageParams, (param) => {
-		return param && param[channelId] && param[channelId].lastLoadMessageId;
+		return param[channelId]?.lastLoadMessageId;
 	});
 
 export const selectMessageByMessageId = (messageId: string) =>

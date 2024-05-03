@@ -2,7 +2,7 @@ import { selectMemberByUserId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 type Props = {
-	id: string;
+	readonly id: string;
 };
 
 export function AvatarComponent({ id }: Props) {

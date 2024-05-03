@@ -104,7 +104,7 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteChannelDesc(mezon.session, body.channelId);
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId as string }));
+			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);

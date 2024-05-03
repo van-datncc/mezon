@@ -107,4 +107,4 @@ export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (em
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
-``
+
