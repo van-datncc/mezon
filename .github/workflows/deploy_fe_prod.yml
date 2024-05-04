@@ -1,0 +1,41 @@
+name: Deploy Mezon FE Prod
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: mezone-fe-prod
+    name: Build Mezon FE
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: |
+          echo "Environments"
+          echo "NODE_ENV: ${{ env.NODE_ENV }}"
+          echo "Node version: $(node -v)"
+          echo "Installing dependencies"
+          npm install --no-package-lock | true
+      - name: Build
+        run: |
+          echo "Build"
+          npm run build:chat
+
+  deploy:
+    runs-on: mezone-fe-prod
+    name: Deploy Mezon FE
+    environment: prod
+    needs:
+      - build
+    steps:
+      - name: Clear www folder
+        run: |
+          echo "Clearing /var/www/mezon/"
+          rm -rf /var/www/mezon/*
+   
+      - name: Copy files to www
+        run: |
+          echo "Copying files to /var/www/mezon/"
+          cp -r ./dist/apps/chat/* /var/www/mezon/
