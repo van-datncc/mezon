@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: mezone-fe-prod
+    runs-on: mezon-server-prod
     name: Build Mezon FE
     environment: prod
     steps:
@@ -24,7 +24,7 @@ jobs:
           npm run build:chat
 
   deploy:
-    runs-on: mezone-fe-prod
+    runs-on: mezon-server-prod
     name: Deploy Mezon FE
     environment: prod
     needs:
