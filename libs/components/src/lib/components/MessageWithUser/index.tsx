@@ -75,6 +75,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div
 						className={`flex h-15 flex-col w-auto px-3 py-[2px]  group-hover:bg-[#232323] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
+						{' '}
 						<MessageReply message={message} />
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
@@ -91,7 +92,6 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
-
 						<MessageReaction currentChannelId={currentChannelId || ''} message={message} mode={mode} />
 						{message && !isMessNotifyMention && (
 							<div

@@ -43,7 +43,7 @@ export function extractActionError(error: unknown): FormalError {
 		return {
 			message: error.message,
 			name: error.name,
-			stack: error.stack || '',
+			stack: error.stack ?? '',
 		};
 	}
 

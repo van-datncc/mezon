@@ -1,19 +1,19 @@
-import { Notification } from 'mezon-js';
-import { LoadingStatus, NotificationContent } from '@mezon/utils';
+import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { Notification } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 
 export interface INotification extends Notification {
 	id: string;
-	content?: any | NotificationContent;
+	content?: any;
 }
 export interface NotificationEntity extends INotification {
 	id: string;
 }
 
 export const mapNotificationToEntity = (notifyRes: Notification): INotification => {
-	return { ...notifyRes, id: notifyRes.id || '', content: { ...notifyRes.content, create_time: notifyRes.create_time } || null };
+	return { ...notifyRes, id: notifyRes.id || '', content: notifyRes.content ? { ...notifyRes.content, create_time: notifyRes.create_time } : null };
 };
 
 export interface NotificationState extends EntityState<NotificationEntity, string> {
@@ -48,6 +48,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	notificationMentions: [],
 	error: null,
 });
+const NOTIFICATION_CODE = -9;
 
 export const notificationSlice = createSlice({
 	name: NOTIFICATION_FEATURE_KEY,
@@ -87,13 +88,11 @@ export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]: No
 
 export const selectAllNotification = createSelector(getNotificationState, selectAll);
 
-// TODO: Add enum for notification code
 export const selectNotificationByCode = (code: number) =>
 	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
 
-// Mention notification is code -9
 export const selectNotificationMentions = createSelector(selectAllNotification, (notifications) =>
-	notifications.filter((notification) => notification.code === -9),
+	notifications.filter((notification) => notification.code === NOTIFICATION_CODE),
 );
 
 export const selectNotificationMentionsByChannelId = (channelId: string, after = 0) =>
@@ -104,8 +103,10 @@ export const selectNotificationMentionsByChannelId = (channelId: string, after =
 	);
 
 export const selectNotificationMentionCountByChannelId = (channelId: string, after = 0) =>
-	createSelector(selectNotificationMentions, (notifications) =>
-		notifications.filter(
-			(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-		).length,
+	createSelector(
+		selectNotificationMentions,
+		(notifications) =>
+			notifications.filter(
+				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+			).length,
 	);

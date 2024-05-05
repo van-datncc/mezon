@@ -187,7 +187,7 @@ export default class CanvasFreeDrawing {
   }
 
   requiredParam(object: BaseObject, param: string): void {
-    if (!object || !object[param]) {
+    if (!object?.[param]) {
       throw new Error(`${param} is required`);
     }
   }
@@ -337,7 +337,7 @@ export default class CanvasFreeDrawing {
     const positions = [[...this.positions].pop()];
 
     positions.forEach((position) => {
-      if (position && position[0] && position[0].strokeColor) {
+      if (position?.[0].strokeColor) {
         this.context.strokeStyle = this.rgbaFromArray(position[0].strokeColor);
         this.context.lineWidth = position[0].lineWidth;
         this.draw(position);
@@ -615,7 +615,8 @@ export default class CanvasFreeDrawing {
   }
 
   toggleBucketTool(): boolean {
-    return (this.isBucketToolEnabled = !this.isBucketToolEnabled);
+    this.isBucketToolEnabled = !this.isBucketToolEnabled;
+    return this.isBucketToolEnabled;
   }
 
   toggleDrawingMode(): boolean {

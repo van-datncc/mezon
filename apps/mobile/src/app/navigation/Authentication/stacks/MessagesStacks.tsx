@@ -5,13 +5,13 @@ import {
 	TransitionSpecs,
 } from '@react-navigation/stack';
 
-import {APP_SCREEN} from "../../ScreenTypes";
+import { APP_SCREEN } from "../../ScreenTypes";
 import Notifications from "../../../screens/main/Notifications";
 
 // eslint-disable-next-line no-empty-pattern
-export const MessagesStacks = ({} : any) => {
+export const MessagesStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
-	
+
 	return (
 		<Stack.Navigator
 			screenOptions={{

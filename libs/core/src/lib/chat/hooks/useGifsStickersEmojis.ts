@@ -20,6 +20,6 @@ export function useGifsStickersEmoji() {
 			subPanelActive,
 			setSubPanelActive,
 		}),
-		[, subPanelActive, setSubPanelActive],
+		[subPanelActive, setSubPanelActive],
 	);
 }

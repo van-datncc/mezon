@@ -10,21 +10,25 @@ export type useChannelMembersOptions = {
 export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
 	const rawMembers = useSelector(selectMembersByChannelId(channelId));
 	const onlineStatus = useSelector(selectMemberStatus);
+
 	const { userId } = useAuth();
 	const userProfile = useSelector(selectMemberByUserId(userId as string));
 
 	const onlineMembers = useMemo(() => {
 		const listMembers = rawMembers.filter((member) => member.user?.online === true && onlineStatus[member.user.id ?? ''] === true);
-		if (userProfile) {
+
+		const isProfile = listMembers.find((member) => member.user?.id === userProfile?.user?.id);
+
+		if (userProfile && !isProfile) {
 			listMembers.push(userProfile);
 		}
 		return listMembers;
 	}, [onlineStatus, rawMembers, userProfile]);
 
 	const offlineMembers = useMemo(() => {
-		const listMembers = rawMembers.filter((member) => !onlineMembers.includes(member) && member.user?.id !== userId);
+		const listMembers = rawMembers.filter((member) => !onlineMembers.some((memberOnline) => member.user?.id === memberOnline.user?.id));
 		return listMembers;
-	}, [onlineMembers, rawMembers, userId]);
+	}, [onlineMembers, rawMembers]);
 
 	const members = useMemo(() => {
 		if (!rawMembers) {

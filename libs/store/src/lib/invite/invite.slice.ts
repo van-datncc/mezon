@@ -1,18 +1,16 @@
-import { ApiClanDesc, ApiInviteUserRes, ApiLinkInviteUser } from 'mezon-js/api.gen';
-import { IClan, IInvite, LoadingStatus } from '@mezon/utils';
+import { IInvite, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiInviteUserRes, ApiLinkInviteUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 
 export const INVITE_FEATURE_KEY = 'invite';
-
 
 export interface InvitesEntity extends IInvite {
 	id: string; // Primary ID
 }
 
-
-export const mapInviteToEntity = (inviteRes: ApiInviteUserRes, inviteId: string ) => {
-	return { ...inviteRes, id : inviteId || '' };
+export const mapInviteToEntity = (inviteRes: ApiInviteUserRes, inviteId: string) => {
+	return { ...inviteRes, id: inviteId || '' };
 };
 
 export interface InviteState extends EntityState<InvitesEntity, string> {
@@ -28,24 +26,27 @@ export type CreateLinkInviteUser = {
 	expiry_time: number;
 };
 
-export const createLinkInviteUser = createAsyncThunk('invite/createLinkInviteUser', async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const body = {
-			channel_id: channel_id,
-			clan_id: clan_id,
-			expiry_time: expiry_time,
-		};
-		const response = await mezon.client.createLinkInviteUser(mezon.session, body);
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+export const createLinkInviteUser = createAsyncThunk(
+	'invite/createLinkInviteUser',
+	async ({ channel_id, clan_id, expiry_time }: CreateLinkInviteUser, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const body = {
+				channel_id: channel_id,
+				clan_id: clan_id,
+				expiry_time: expiry_time,
+			};
+			const response = await mezon.client.createLinkInviteUser(mezon.session, body);
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			return response as ApiLinkInviteUser;
+		} catch (error: any) {
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
 		}
-		return response as ApiLinkInviteUser;
-	} catch(error : any) {		
-		const errmsg = await error.json();
-		return thunkAPI.rejectWithValue(errmsg.message);
-	}
-});
+	},
+);
 
 type InviteUser = {
 	inviteId: string;
@@ -59,7 +60,7 @@ export const inviteUser = createAsyncThunk('invite/inviteUser', async ({ inviteI
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response as ApiInviteUserRes;
-	} catch(error : any) {		
+	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
@@ -67,14 +68,14 @@ export const inviteUser = createAsyncThunk('invite/inviteUser', async ({ inviteI
 
 export const getLinkInvite = createAsyncThunk('invite/getLinkInvite', async ({ inviteId }: InviteUser, thunkAPI) => {
 	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));	
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.getLinkInvite(mezon.session, inviteId);
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		return mapInviteToEntity(response, inviteId)
-	} catch(error : any) {		
+		return mapInviteToEntity(response, inviteId);
+	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}

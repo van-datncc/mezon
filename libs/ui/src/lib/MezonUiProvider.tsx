@@ -3,8 +3,8 @@ import { SkeletonTheme } from 'react-loading-skeleton';
 import { ModalProvider } from 'react-modal-hook';
 
 type Props = {
-	children: React.ReactNode;
-	themeName?: string;
+	readonly children: React.ReactNode;
+	readonly themeName?: string;
 };
 
 type MezonUiContextValue = {
@@ -16,7 +16,7 @@ export const MezonUiContext = React.createContext<MezonUiContextValue>({
 });
 
 export function MezonUiProvider({ children, themeName }: Props) {
-	const [selectedTheme] = React.useState(themeName || 'light');
+	const [selectedTheme] = React.useState(themeName ?? 'light');
 
 	const value = React.useMemo(() => ({ selectedTheme }), [selectedTheme]);
 

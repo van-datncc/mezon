@@ -1,6 +1,6 @@
 export type NavLinkProps = {
-	active?: boolean;
-	children?: React.ReactElement | string;
+	readonly active?: boolean;
+	readonly children?: React.ReactElement | string;
 };
 
 function NavLinkComponent({ active, children }: NavLinkProps) {

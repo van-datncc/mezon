@@ -5,7 +5,7 @@ export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
 	handlSaveClose: () => void;
-	handleUpdateUser: () => void;
+	handleUpdateUser: () => Promise<void>;
 };
 export type PropsModalSettingSave = {
 	PropsSave: ModalSettingSave;

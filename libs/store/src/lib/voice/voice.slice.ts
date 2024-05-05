@@ -93,7 +93,6 @@ export const voiceSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchVoiceChannelMembers.fulfilled, (state: VoiceState, action: PayloadAction<any>) => {
-				//voiceAdapter.addMany(state, action.payload);
 				state.voiceChannelMember = action.payload;
 				state.loadingStatus = 'loaded';
 			})

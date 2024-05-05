@@ -10,7 +10,7 @@ import {
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
-import { useMezonVoice } from '@mezon/transport';
+import { useMezonVoice } from '@mezon/voice';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
 import * as Icons from '../Icons';
 
 export type VoiceControlPanelProps = {
-	channelCurrent: ChannelsEntity | null | undefined;
+	readonly channelCurrent: ChannelsEntity | null | undefined;
 };
 
 function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
@@ -82,11 +82,11 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 						</button>
 					</div>
 
-					<div className="text-[12px] font-normal text-gray-400 hover:underline" onClick={handleClick}>
+					<button className="text-[12px] font-normal text-gray-400 hover:underline" onClick={handleClick}>
 						<Link to={channelPath}>
 							{currentVoiceChannel?.channel_label}/ {currentClan?.clan_name}
 						</Link>
-					</div>
+					</button>
 				</div>
 				<div className="flex">
 					<button className="button w-[20px] h-[20px]">
@@ -100,16 +100,16 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 			<div className="actionButtons">
 				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
 					<div className="flex items-center">
-						<div className=" w-[18px] h-[20px]" onClick={openCamera}>
+						<button className=" w-[18px] h-[20px]" onClick={openCamera}>
 							<Icons.CameraIcon />
-						</div>
+						</button>
 					</div>
 				</button>
 				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
 					<div>
-						<div className="flex w-[18px] h-[20px]" onClick={showScreen ? stopScreenShare : startScreenShare}>
+						<button className="flex w-[18px] h-[20px]" onClick={showScreen ? stopScreenShare : startScreenShare}>
 							<Icons.ShareIcon defaultFill={showScreen ? 'white' : '#AEAEAE'} />
-						</div>
+						</button>
 					</div>
 				</button>
 				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">

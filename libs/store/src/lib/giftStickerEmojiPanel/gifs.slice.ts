@@ -57,8 +57,7 @@ export const fetchGifCategories = createAsyncThunk<GifCategoriesEntity[]>('gifs/
 	}
 });
 
-type FetchGifsDataSearchPayload = any;
-export const fetchGifsDataSearch = createAsyncThunk<FetchGifsDataSearchPayload, string>('gifs/fetchDataSearch', async (valueSearch, thunkAPI) => {
+export const fetchGifsDataSearch = createAsyncThunk<any, string>('gifs/fetchDataSearch', async (valueSearch, thunkAPI) => {
 	const baseUrl = process.env.NX_CHAT_APP_API_TENOR_URL_SEARCH ?? '';
 	const searchUrl = baseUrl + valueSearch + '&key=' + apiKey + '&client_key=' + clientKey + '&limit=' + limit;
 

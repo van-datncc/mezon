@@ -16,9 +16,7 @@ function MyApp() {
 	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
-	const [openSearchModal, closeSearchModal] = useModal(() => (
-		<SearchModal onClose={closeSearchModal} open={true} />
-	));
+	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
@@ -34,6 +32,7 @@ function MyApp() {
 		dispatch(reactionActions.setReactionBottomState(false));
 		dispatch(referencesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
+		dispatch(reactionActions.setReactionBottomStateResponsive(false));
 	};
 
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
@@ -88,7 +87,7 @@ function MyApp() {
 	const handleKeyDown = (event: any) => {
 		if (event.ctrlKey && event.key === 'k') {
 			event.preventDefault();
-			openSearchModal()
+			openSearchModal();
 		}
 	};
 
@@ -98,7 +97,6 @@ function MyApp() {
 			window.removeEventListener('keydown', handleKeyDown);
 		};
 	}, []);
-
 
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
