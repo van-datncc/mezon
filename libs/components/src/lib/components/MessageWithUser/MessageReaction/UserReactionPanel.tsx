@@ -28,7 +28,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 	return (
 		<>
 			{calculateTotalCount(emojiShowPanel.senders) > 0 && (
-				<button
+				<div
 					onClick={(e) => e.stopPropagation()}
 					className={`absolute z-50  bottom-7 w-[18rem]
 				bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
@@ -50,7 +50,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 										<NameComponent id={sender.sender_id ?? ''} />
 										<p className="text-xs absolute right-8">{sender.count}</p>
 										{sender.sender_id === userId.userId && (
-											<button
+											<div
 												onClick={(e: any) => {
 													return (
 														e.stopPropagation(),
@@ -67,7 +67,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 												className="right-1 absolute"
 											>
 												<Icons.Close defaultSize="w-3 h-3" />
-											</button>
+											</div>
 										)}
 									</div>
 								)}
@@ -75,7 +75,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 						);
 					})}
 					<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
-				</button>
+				</div>
 			)}
 		</>
 	);
