@@ -1,4 +1,4 @@
-import { useClans, useOnClickOutside } from '@mezon/core';
+import { useClans, useInvite, useOnClickOutside } from '@mezon/core';
 import { ILineMention } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -6,6 +6,8 @@ import remarkGFM from 'remark-gfm';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 import ChannelHashtag from './HashTag';
 import PreClass from './PreClass';
+import { useModal } from 'react-modal-hook';
+import ExpiryTimeModal from '../ExpiryTime';
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 };
@@ -56,6 +58,26 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	const handleDefault = (e: any) => {
 		e.stopPropagation();
 	};
+	const { getLinkInvite } = useInvite();
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
+		<ExpiryTimeModal onClose={closeInviteChannelModal} open={true} />
+	));
+	const getLinkinvite = (children:any) => {
+		const inviteId = children.split('/invite/')[1];
+		if (inviteId) {
+			getLinkInvite(inviteId).then((res) => {
+				if (res.expiry_time) {
+					if (new Date(res.expiry_time) < new Date()) {
+						openInviteChannelModal();
+					}else{
+						window.location.href = children;
+					}
+				}
+			})
+		}else{
+			window.open(children, '_blank');
+		}
+	}
 	return (
 		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0">
 			{showProfileUser ? (
@@ -89,16 +111,15 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								components={{
 									pre: PreClass,
 									p: 'span',
-									a: ({ href, children }) => (
-										<a
-											href={href}
-											target="_blank"
+									a: ({ children }) => (
+										<span
+											onClick={()=>getLinkinvite(children)}
 											rel="noopener noreferrer"
-											style={{ color: 'rgb(59,130,246)' }}
+											style={{ color: 'rgb(59,130,246)',cursor: 'pointer' }}
 											className="tagLink"
 										>
 											{children}
-										</a>
+										</span>
 									),
 								}}
 							/>
