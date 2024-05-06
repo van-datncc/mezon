@@ -49,7 +49,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-sm text-white font-[600] text-[15px] tracking-wider cursor-pointer break-all username"
+					className="text-base text-white font-medium tracking-wider cursor-pointer break-all username"
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 					role='button'
