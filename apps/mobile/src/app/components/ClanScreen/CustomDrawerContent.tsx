@@ -17,9 +17,9 @@ const CustomDrawerContent = (props) => {
                     {/* Your sidebar content */}
                     <View style={styles.serverNavbarContainer}>
                         {/* here will be the list of servers */}
-                        <Pressable onPress={() => navigation.navigate('Profile')} style={styles.commonIconStyle}>
-                            <Text style={{ color: darkColor.Content_Subtle }}>1st</Text>
-                        </Pressable>
+                        {/*<Pressable onPress={() => navigation.navigate('Profile')} style={styles.commonIconStyle}>*/}
+                        {/*    <Text style={{ color: darkColor.Content_Subtle }}>1st</Text>*/}
+                        {/*</Pressable>*/}
                         <View style={styles.commonIconStyle}>
                             <Text style={{ color: darkColor.Content_Subtle }}>2nd</Text>
                         </View>
