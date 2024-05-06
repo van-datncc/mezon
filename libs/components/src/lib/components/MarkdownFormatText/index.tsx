@@ -57,7 +57,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 		e.stopPropagation();
 	};
 	return (
-		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-sm prose-blockquote:leading-[6px] prose-blockquote:my-0">
+		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0">
 			{showProfileUser ? (
 				<div
 					className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
@@ -107,7 +107,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						{tagName && (
 							<span
 								style={{ borderRadius: '4px', padding: '0 2px' }}
-								className="cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white bg-[#3C4270] hover:bg-[#5865F2]"
+								className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white bg-[#3C4270] hover:bg-[#5865F2]"
 								onClick={() => handMention(tagName)}
 								ref={panelRef}
 								onMouseDown={(event) => handleMouseClick(event)}
