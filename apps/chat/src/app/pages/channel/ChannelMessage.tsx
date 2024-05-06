@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useMenu, useReference } from '@mezon/core';
-import { directActions, referencesActions, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { directActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -193,6 +193,7 @@ function PopupMessage({
 	isCombine,
 	deleteSendMessage,
 }: PopupMessageProps) {
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { reactionPlaceActive } = useChatReaction();
 	const { closeMenu, statusMenu } = useMenu();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
@@ -216,7 +217,7 @@ function PopupMessage({
 		<>
 			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
 				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded w-24 block bg-bgSecondary top-0 right-5 
+					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block bg-bgSecondary top-0 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
 				${
 					(reactionRightState && mess.id === referenceMessage?.id) ||
 					(reactionBottomState && mess.id === referenceMessage?.id) ||
