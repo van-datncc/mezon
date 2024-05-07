@@ -90,6 +90,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
 	const [nameThread, setNameThread] = useState('');
@@ -185,6 +186,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setDataReferences([]);
 				setNameThread('');
 				setContent('');
+				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -195,6 +197,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setAttachmentData([]);
 				setNameThread('');
 				setContent('');
+				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -243,6 +246,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}) as ChannelsMentionProps[];
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		const mentionList = members[0].users?.map((item: ChannelMembersEntity) => ({
+            id: item?.user?.id ?? '',
+            display: item?.user?.username ?? '',
+            avatarUrl: item?.user?.avatar_url ?? '',
+        })) ?? [];
+		const convertedMentions: UserMentionsOpt[] = mentionList ? mentionList.map(mention => ({
+			user_id: mention.id.toString()??'',
+			username: mention.display??'',
+		})):[];
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
 		if (linkGifDirect && linkGifDirect?.length > 0) {
 			const newAttachmentDataRef = linkGifDirect
@@ -265,12 +277,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
-			for (const mention of mentions) {
-				if (mention.display.startsWith('@')) {
-					mentionedUsers.push({
-						user_id: mention.id.toString() ?? '',
-						username: mention.display ?? '',
-					});
+			if (mentions.some(mention => mention.display === "@here")) {
+				mentionedUsers.splice(0, mentionedUsers.length);
+				convertedMentions.forEach(item => {
+					mentionedUsers.push(item);
+				});
+			}else{
+				for (const mention of mentions) {
+					if (mention.display.startsWith('@')) {
+						mentionedUsers.push({
+							user_id: mention.id.toString() ?? '',
+							username: mention.display ?? '',
+						});
+					}
 				}
 			}
 			setMentionData(mentionedUsers);

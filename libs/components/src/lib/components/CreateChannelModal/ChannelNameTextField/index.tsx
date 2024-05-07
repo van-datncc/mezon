@@ -1,18 +1,34 @@
 import { ChannelType } from 'mezon-js';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
+import { useState } from 'react';
 
 interface ChannelNameModalProps {
 	type: number;
 	channelNameProps: string;
 	onChange: (value: string) => void;
+	onCheckValidate: (check: boolean) => void;
 	error: string;
 }
 
-export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelNameProps, type, onChange, error }) => {
+export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelNameProps, type, onChange, onCheckValidate, error }) => {
+	const [checkvalidate, setCheckValidate] = useState(true)
+	const [checkNameChannel, setCheckNameChannel] = useState(true);
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		onChange(value);
+		if (value==='') {
+			setCheckNameChannel(true)
+		}else{
+			setCheckNameChannel(false)
+		}
+		if (/^[A-Za-z0-9_-]{0,64}$/.test(value)) {
+			setCheckValidate(false);
+			onCheckValidate(true);
+		} else {
+			setCheckValidate(true);
+			onCheckValidate(false);
+		}
 	};
 
 	const iconMap = {
@@ -42,6 +58,9 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 					</div>
 				</div>
 			</div>
+			{checkvalidate || checkNameChannel ? (
+			<p className='text-[#e44141] text-xs italic font-thin'>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>)
+			:null}
 		</div>
 	);
 };
