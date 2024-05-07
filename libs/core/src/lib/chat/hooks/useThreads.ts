@@ -30,8 +30,8 @@ export function useThreads() {
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 
 	const setIsShowCreateThread = useCallback(
-		(isShowCreateThread: boolean) => {
-			dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannelId as string, isShowCreateThread }));
+		(isShowCreateThread: boolean, channelId?: string) => {
+			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread }));
 		},
 		[currentChannelId, dispatch],
 	);
@@ -65,18 +65,34 @@ export function useThreads() {
 		}
 	}, [channels, currentChannelId, listThreadId]);
 
-	return {
-		threads,
-		threadChannel,
-		isShowCreateThread,
-		isPrivate,
-		nameThreadError,
-		messageThreadError,
-		threadChannelOld,
-		threadChannelOnline,
-		threadCurrentChannel,
-		nameValueThread,
-		setIsShowCreateThread,
-		setNameValueThread,
-	};
+	return useMemo(
+		() => ({
+			threads,
+			threadChannel,
+			isShowCreateThread,
+			isPrivate,
+			nameThreadError,
+			messageThreadError,
+			threadChannelOld,
+			threadChannelOnline,
+			threadCurrentChannel,
+			nameValueThread,
+			setIsShowCreateThread,
+			setNameValueThread,
+		}),
+		[
+			isPrivate,
+			isShowCreateThread,
+			messageThreadError,
+			nameThreadError,
+			nameValueThread,
+			threadChannel,
+			threadChannelOld,
+			threadChannelOnline,
+			threadCurrentChannel,
+			threads,
+			setNameValueThread,
+			setIsShowCreateThread,
+		],
+	);
 }
