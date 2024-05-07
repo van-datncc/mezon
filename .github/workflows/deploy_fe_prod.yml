@@ -22,6 +22,8 @@ jobs:
       - name: Build
         run: |
           echo "Build"
+          rm apps/chat/.env
+          mv apps/chat/prod.env apps/chat/.env
           npm run build:chat
 
   deploy:
