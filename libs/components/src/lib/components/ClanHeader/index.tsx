@@ -1,4 +1,4 @@
-import { useAuth, useCategory, useClans } from '@mezon/core';
+import { useAuth, useCategory, useChannelMembers, useClans } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { Dropdown, Modal } from 'flowbite-react';
@@ -54,6 +54,17 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		openSearchModal();
 		inputRef.current?.blur();
 	};
+	const [checkvalidate, setCheckValidate] = useState(true)
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setNameCate(value)
+		if (/^[A-Za-z0-9_-]{0,64}$/.test(value) && value !=="") {
+			setCheckValidate(false)
+		} else {
+			setCheckValidate(true)
+		}
+	};
+	
 	return (
 		<>
 			{type === 'direct' ? (
@@ -139,19 +150,20 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 						<span className="font-[600] text-sm ">What is category's name?</span>
 						<InputField
 							type="text"
-							onChange={(e) => setNameCate(e.target.value)}
+							onChange={handleInputChange}
 							placeholder="Enter the category's name"
 							className="py-[8px] bg-black text-[14px] mt-2 mb-0 border-blue-600 border"
 							value={nameCate}
 						/>
 					</div>
+					{checkvalidate && <p className='text-[#e44141] text-xs italic font-thin'>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>}
 				</Modal.Body>
 				<div className=" text-white font-semibold text-sm flex bg-bgTertiary justify-end flex-row items-center gap-4 py-4 px-6 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
 					<button onClick={onClose}>Cancel</button>
 					<button
-						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${!nameCate.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkvalidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 						onClick={handleCreateCate}
-						disabled={!nameCate.trim()}
+						disabled={checkvalidate}
 					>
 						Create Category
 					</button>
