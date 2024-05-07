@@ -25,7 +25,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
 		}
 		setIsShowThread(false);
-		setIsShowCreateThread(true);
+		setIsShowCreateThread(true, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 		dispatch(threadsActions.setNameThreadError(''));
 		dispatch(threadsActions.setMessageThreadError(''));
 	};
