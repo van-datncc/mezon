@@ -88,6 +88,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
 		voice.setVoiceOptions((prev) => ({
 			...prev,
+			userId: userProfile?.user?.id,
 			channelId: id,
 			channelName: voiceChannelName.toLowerCase(),
 			clanId: clanId ?? '',
