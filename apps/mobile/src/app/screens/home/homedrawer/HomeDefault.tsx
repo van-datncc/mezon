@@ -1,6 +1,6 @@
 import { selectCurrentChannel } from '@mezon/store';
 import React from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -81,11 +81,11 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 	return (
 		<View style={styles.homeDefaultHeader}>
 			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-				<View style={{ marginLeft: 14, marginRight: 8 }} onTouchEnd={() => navigation.openDrawer()}>
+				<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={() => navigation.openDrawer()}>
 					<BarsLogo width={20} height={20} />
-				</View>
-				<View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 14 }}>
-					<HashSignIcon width={18} height={18} />
+				</TouchableOpacity>
+				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+					{!!channelTitle && <HashSignIcon width={18} height={18} />}
 					<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
 				</View>
 			</View>
