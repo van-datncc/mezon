@@ -11,8 +11,8 @@ export type ChatWelComeProp = {
 };
 
 function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
-	const { currentThread } = useThreads();
-	const user = useSelector(selectMemberByUserId(currentThread?.creator_id as string));
+	const { threadCurrentChannel } = useThreads();
+	const user = useSelector(selectMemberByUserId(threadCurrentChannel?.creator_id as string));
 	return (
 		<div className="space-y-2 px-4 mb-4 mt-[250px]">
 			{type === ETypeMessage.CHANNEL ? (
@@ -24,12 +24,12 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 					<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
 				</div>
 			) : (
-				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center" alt='' src={avatarDM} />
+				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center" alt="" src={avatarDM} />
 			)}
 
-			{type === ETypeMessage.THREAD && currentThread && (
+			{type === ETypeMessage.THREAD && threadCurrentChannel && (
 				<div>
-					<h4 className="text-[32px] font-bold my-2">{currentThread?.channel_label}</h4>
+					<h4 className="text-[32px] font-bold my-2">{threadCurrentChannel?.channel_label}</h4>
 					<div className="mb-1">
 						<span className="text-base">Started by &nbsp;</span>
 						<span className="text-base font-semibold">{user?.user?.username}</span>
@@ -37,7 +37,7 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 				</div>
 			)}
 
-			{type !== ETypeMessage.THREAD && !currentThread && (
+			{type !== ETypeMessage.THREAD && !threadCurrentChannel && (
 				<div>
 					<p className="text-xl md:text-3xl font-bold pt-1" style={{ wordBreak: 'break-word' }}>
 						{type === 'CHANNEL' ? 'Welcome to #' : ''} {name}

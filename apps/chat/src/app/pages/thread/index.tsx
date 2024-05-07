@@ -3,13 +3,13 @@ import { useEscapeKey, useThreads } from '@mezon/core';
 import ThreadBox from './ThreadBox';
 
 const ThreadsMain = () => {
-	const { currentThread, setIsShowCreateThread } = useThreads();
+	const { threadCurrentChannel, setIsShowCreateThread } = useThreads();
 
 	useEscapeKey(() => setIsShowCreateThread(false));
 
 	return (
 		<div className="flex flex-col h-full">
-			<ThreadHeader currentThread={currentThread} setIsShowCreateThread={setIsShowCreateThread} />
+			<ThreadHeader threadCurrentChannel={threadCurrentChannel} />
 			<ThreadBox />
 		</div>
 	);

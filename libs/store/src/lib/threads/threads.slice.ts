@@ -1,4 +1,3 @@
-import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -14,11 +13,12 @@ export interface ThreadsEntity extends IThread {
 export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	isShowCreateThread?: boolean;
-	currentThread?: ApiChannelDescription;
+	isShowCreateThread?: Record<string, boolean>;
 	nameThreadError?: string;
 	messageThreadError?: string;
 	isPrivate: number;
+	listThreadId?: Record<string, string>;
+	nameValueThread?: Record<string, string>;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -52,8 +52,9 @@ export const fetchThreads = createAsyncThunk<ThreadsEntity[]>('threads/fetchStat
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	isShowCreateThread: false,
+	isShowCreateThread: {},
 	isPrivate: 0,
+	nameValueThread: {},
 });
 
 export const threadsSlice = createSlice({
@@ -62,12 +63,15 @@ export const threadsSlice = createSlice({
 	reducers: {
 		add: threadsAdapter.addOne,
 		remove: threadsAdapter.removeOne,
-		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<boolean>) => {
-			state.isShowCreateThread = action.payload;
-			state.currentThread = undefined;
-		},
-		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
-			state.currentThread = action.payload;
+		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
+			state.isShowCreateThread = {
+				...state.isShowCreateThread,
+				[action.payload.channelId]: action.payload.isShowCreateThread,
+			};
+			state.listThreadId = {
+				...state.listThreadId,
+				[action.payload.channelId]: '',
+			};
 		},
 		setNameThreadError: (state, action: PayloadAction<string>) => {
 			state.nameThreadError = action.payload;
@@ -77,6 +81,18 @@ export const threadsSlice = createSlice({
 		},
 		setIsPrivate: (state, action: PayloadAction<number>) => {
 			state.isPrivate = action.payload;
+		},
+		setListThreadId: (state, action: PayloadAction<{ channelId: string; threadId: string }>) => {
+			state.listThreadId = {
+				...state.listThreadId,
+				[action.payload.channelId]: action.payload.threadId,
+			};
+		},
+		setNameValueThread: (state, action: PayloadAction<{ channelId: string; nameValue: string }>) => {
+			state.nameValueThread = {
+				...state.nameValueThread,
+				[action.payload.channelId]: action.payload.nameValue,
+			};
 		},
 		// ...
 	},
@@ -139,16 +155,24 @@ const { selectAll, selectEntities } = threadsAdapter.getSelectors();
 
 export const getThreadsState = (rootState: { [THREADS_FEATURE_KEY]: ThreadsState }): ThreadsState => rootState[THREADS_FEATURE_KEY];
 
-export const selectCurrentThread = createSelector(getThreadsState, (state) => state.currentThread);
-
 export const selectAllThreads = createSelector(getThreadsState, selectAll);
 
 export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);
-
-export const selectIsShowCreateThread = createSelector(getThreadsState, (state) => state.isShowCreateThread);
 
 export const selectIsPrivate = createSelector(getThreadsState, (state) => state.isPrivate);
 
 export const selectNameThreadError = createSelector(getThreadsState, (state) => state.nameThreadError);
 
 export const selectMessageThreadError = createSelector(getThreadsState, (state) => state.messageThreadError);
+
+export const selectListThreadId = createSelector(getThreadsState, (state) => state.listThreadId);
+
+export const selectNameValueThread = (channelId: string) =>
+	createSelector(getThreadsState, (state) => {
+		return state.nameValueThread?.[channelId] as string;
+	});
+
+export const selectIsShowCreateThread = (channelId: string) =>
+	createSelector(getThreadsState, (state) => {
+		return state.isShowCreateThread?.[channelId] as boolean;
+	});

@@ -371,7 +371,7 @@ export type ThreadError = {
 };
 
 export type ThreadValue = {
-	nameThread: string;
+	nameValueThread: string;
 	isPrivate: number;
 };
 
