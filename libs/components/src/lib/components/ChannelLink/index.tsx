@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
+import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useReference } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
@@ -40,7 +40,6 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
-	const { setIsShowCreateThread } = useThreads();
 	const voice = useMezonVoice();
 
 	const [openSetting, setOpenSetting] = useState(false);
@@ -88,6 +87,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
 		voice.setVoiceOptions((prev) => ({
 			...prev,
+			userId: userProfile?.user?.id,
 			channelId: id,
 			channelName: voiceChannelName.toLowerCase(),
 			clanId: clanId ?? '',
@@ -115,13 +115,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		}
 	};
 	return (
-		<div
-			ref={panelRef}
-			onMouseDown={(event) => handleMouseClick(event)}
-			onClick={() => setIsShowCreateThread(false)}
-			role="button"
-			className="relative group"
-		>
+		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
 					className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`}

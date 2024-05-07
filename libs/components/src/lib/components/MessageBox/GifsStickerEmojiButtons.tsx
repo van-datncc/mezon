@@ -55,7 +55,7 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			</div>
 
 			<div onClick={handleOpenEmoji} className="cursor-pointer">
-				<Icons.Smile defaultFill={`${subPanelActive === SubPanelName.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
+				<Icons.Smile defaultSize='w-6 h-6' defaultFill={`${subPanelActive === SubPanelName.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
 			</div>
 		</div>
 	);

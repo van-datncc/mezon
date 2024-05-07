@@ -110,7 +110,7 @@ const RegisterScreen = () => {
 							isPass={false}
 						/>
 						{/* button  */}
-						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign up'} />
+						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign up'}/>
 					</>
 				)}
 			</Formik>

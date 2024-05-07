@@ -3,11 +3,12 @@ import {
 	selectAllThreads,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentThread,
 	selectIsPrivate,
 	selectIsShowCreateThread,
+	selectListThreadId,
 	selectMessageThreadError,
 	selectNameThreadError,
+	selectNameValueThread,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -18,20 +19,28 @@ import { useSelector } from 'react-redux';
 export function useThreads() {
 	const dispatch = useAppDispatch();
 	const threads = useSelector(selectAllThreads);
-	const currentThread = useSelector(selectCurrentThread);
 	const channels = useSelector(selectAllChannels);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const isShowCreateThread = useSelector(selectIsShowCreateThread);
 	const isPrivate = useSelector(selectIsPrivate);
 	const nameThreadError = useSelector(selectNameThreadError);
 	const messageThreadError = useSelector(selectMessageThreadError);
+	const listThreadId = useSelector(selectListThreadId);
+	const isShowCreateThread = useSelector(selectIsShowCreateThread(currentChannelId as string));
+	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 
 	const setIsShowCreateThread = useCallback(
-		(isShowCreateThread: boolean) => {
-			dispatch(threadsActions.setIsShowCreateThread(isShowCreateThread));
+		(isShowCreateThread: boolean, channelId?: string) => {
+			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread }));
 		},
-		[dispatch],
+		[currentChannelId, dispatch],
+	);
+
+	const setNameValueThread = useCallback(
+		(nameValue: string) => {
+			dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue }));
+		},
+		[currentChannelId, dispatch],
 	);
 
 	const threadChannel = useMemo(() => {
@@ -50,16 +59,40 @@ export function useThreads() {
 
 	const threadChannelOnline = threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp as string) <= 30);
 
-	return {
-		threads,
-		threadChannel,
-		currentThread,
-		isShowCreateThread,
-		isPrivate,
-		nameThreadError,
-		messageThreadError,
-		threadChannelOld,
-		threadChannelOnline,
-		setIsShowCreateThread,
-	};
+	const threadCurrentChannel = useMemo(() => {
+		if (listThreadId && currentChannelId) {
+			return channels.find((channel) => channel.channel_id === listThreadId[currentChannelId]);
+		}
+	}, [channels, currentChannelId, listThreadId]);
+
+	return useMemo(
+		() => ({
+			threads,
+			threadChannel,
+			isShowCreateThread,
+			isPrivate,
+			nameThreadError,
+			messageThreadError,
+			threadChannelOld,
+			threadChannelOnline,
+			threadCurrentChannel,
+			nameValueThread,
+			setIsShowCreateThread,
+			setNameValueThread,
+		}),
+		[
+			isPrivate,
+			isShowCreateThread,
+			messageThreadError,
+			nameThreadError,
+			nameValueThread,
+			threadChannel,
+			threadChannelOld,
+			threadChannelOnline,
+			threadCurrentChannel,
+			threads,
+			setNameValueThread,
+			setIsShowCreateThread,
+		],
+	);
 }

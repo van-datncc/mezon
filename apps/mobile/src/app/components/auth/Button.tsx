@@ -5,7 +5,7 @@ interface ButtonProps {
 	onPress: () => void;
 	title: string;
 	disabled: boolean;
-	loading: boolean;
+	loading?: boolean;
 }
 const Button: React.FC<ButtonProps> = ({ isValid, onPress, title, disabled, loading }) => {
 	// const loading = useSelector(state => state?.auth?.loading);

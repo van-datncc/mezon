@@ -88,12 +88,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
+	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
-	const [nameThread, setNameThread] = useState('');
-	const { currentThread, messageThreadError, isPrivate } = useThreads();
+	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
@@ -102,7 +102,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked } = useEmojiSuggestion();
 	const { reactionRightState } = useChatReaction();
-	const { valueTextInput } = useMessageValue(currentChannelId as string);
+	const { valueTextInput, setValueTextInput } = useMessageValue(
+		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
+	);
 
 	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
 		if (query.length === 0) return;
@@ -160,41 +162,51 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if (!valueTextInput?.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
-				if (!nameThread.trim() && props.isThread && !currentThread) {
+			if (
+				valueTextInput &&
+				typeof valueTextInput === 'string' &&
+				!valueTextInput.trim() &&
+				attachmentDataRef.length === 0 &&
+				mentionData.length === 0
+			) {
+				if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
 					dispatch(threadsActions.setNameThreadError(threadError.name));
 					return;
 				}
-				if (props.isThread && !currentThread) {
+				if (props.isThread && !threadCurrentChannel) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
 				}
 				return;
 			}
 
-			if (!nameThread.trim() && props.isThread && !currentThread) {
+			if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
 			if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
-				props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameThread, isPrivate }, anonymousMessage);
+				props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameValueThread, isPrivate }, anonymousMessage);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
-				dispatch(referencesActions.setValueTextInput({ channelId: currentChannelId as string, value: '' }));
+				setValueTextInput('', props.isThread);
+
 				setAttachmentData([]);
 				setReferenceMessage(null);
 				setDataReferences([]);
-				setNameThread('');
+				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
+				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
-				props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameThread, isPrivate }, anonymousMessage);
+				props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameValueThread, isPrivate }, anonymousMessage);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
-				dispatch(referencesActions.setValueTextInput({ channelId: currentChannelId as string, value: '' }));
+				setValueTextInput('', props.isThread);
+
 				setAttachmentData([]);
-				setNameThread('');
+				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
+				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -204,9 +216,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			valueTextInput,
 			attachmentDataRef,
 			mentionData,
-			nameThread,
+			nameValueThread,
 			currentChannel,
-			currentThread,
+			threadCurrentChannel,
 			mentions,
 			isPrivate,
 			content,
@@ -243,6 +255,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}) as ChannelsMentionProps[];
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		const mentionList =
+			members[0].users?.map((item: ChannelMembersEntity) => ({
+				id: item?.user?.id ?? '',
+				display: item?.user?.username ?? '',
+				avatarUrl: item?.user?.avatar_url ?? '',
+			})) ?? [];
+		const convertedMentions: UserMentionsOpt[] = mentionList
+			? mentionList.map((mention) => ({
+					user_id: mention.id.toString() ?? '',
+					username: mention.display ?? '',
+				}))
+			: [];
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
 		if (linkGifDirect && linkGifDirect?.length > 0) {
 			const newAttachmentDataRef = linkGifDirect
@@ -256,7 +280,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 
 		dispatch(threadsActions.setMessageThreadError(''));
-		dispatch(referencesActions.setValueTextInput({ channelId: currentChannelId as string, value: newValue }));
+		setValueTextInput(newValue, props.isThread);
+
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
 		}
@@ -265,12 +290,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
-			for (const mention of mentions) {
-				if (mention.display.startsWith('@')) {
-					mentionedUsers.push({
-						user_id: mention.id.toString() ?? '',
-						username: mention.display ?? '',
-					});
+			if (mentions.some((mention) => mention.display === '@here')) {
+				mentionedUsers.splice(0, mentionedUsers.length);
+				convertedMentions.forEach((item) => {
+					mentionedUsers.push(item);
+				});
+			} else {
+				for (const mention of mentions) {
+					if (mention.display.startsWith('@')) {
+						mentionedUsers.push({
+							user_id: mention.id.toString() ?? '',
+							username: mention.display ?? '',
+						});
+					}
 				}
 			}
 			setMentionData(mentionedUsers);
@@ -293,7 +325,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [referenceMessage, openReplyMessageState, openEditMessageState, emojiPicked]);
 
 	const handleChangeNameThread = (nameThread: string) => {
-		setNameThread(nameThread);
+		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
 	};
 
 	const convertToPlainTextHashtag = (text: string) => {
@@ -317,7 +349,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			textFieldEdit.insert(input, emojiPicked);
 		} else {
 			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
-			dispatch(referencesActions.setValueTextInput({ channelId: currentChannelId as string, value: replaceSyntaxByEmoji }));
+			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
+
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
 		}
@@ -354,20 +387,22 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	return (
 		<div className="relative">
-			{props.isThread && !currentThread && (
+			{props.isThread && !threadCurrentChannel && (
 				<div>
 					<ThreadNameTextField
 						onChange={handleChangeNameThread}
 						onKeyDown={onKeyDown}
-						value={nameThread}
+						value={nameValueThread ?? ''}
 						label="Thread Name"
-						placeholder="Enter Thread Name"
+						placeholder={openThreadMessageState && referenceMessage?.content.t !== '' ? referenceMessage?.content.t : 'Enter Thread Name'}
 						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
 					/>
-					<PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />
+					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 				</div>
 			)}
-			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}
+			{props.isThread && messageThreadError && !threadCurrentChannel && (
+				<span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>
+			)}
 			<MentionsInput
 				onPaste={props.handlePaste}
 				id="editorReactMention"

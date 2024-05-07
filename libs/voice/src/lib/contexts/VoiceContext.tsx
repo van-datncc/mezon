@@ -17,6 +17,7 @@ type VoiceContextProviderProps = {
 };
 
 export type VoiceContextOption = {
+	userId?: string;
 	channelId?: string;
 	channelName?: string;
 	displayName?: string;
@@ -329,7 +330,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		(id: string, user: JitsiParticipant) => {
 			remoteTracksRef.current.set(id, []);
 			if (socketRef?.current && voiceOptions) {
-				socketRef.current.writeVoiceLeaved(id, voiceOptions.clanId as string, voiceOptions.channelId as string, false);
+				socketRef.current.writeVoiceLeaved(id, voiceOptions.clanId as string, voiceOptions.channelId as string, "");
 			}
 		},
 		[voiceOptions, socketRef],
@@ -465,7 +466,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 
 		if (myUserId && socketRef?.current && voiceOptions) {
 			console.log('write to socket voice leaved');
-			socketRef.current.writeVoiceLeaved(myUserId, voiceOptions.clanId as string, voiceOptions.channelId as string, false);
+			socketRef.current.writeVoiceLeaved(myUserId, voiceOptions.clanId as string, voiceOptions.channelId as string, voiceOptions.userId as string);
 		}
 
 		if (voiceConnRef?.current) {

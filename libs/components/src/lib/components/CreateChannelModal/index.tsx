@@ -43,6 +43,11 @@ export const CreateNewChannelModal = () => {
 			return;
 		}
 
+		if (!validate) {
+			setIsErrorName("Please enter a valid channel name");
+			return
+		}
+
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId?.toString(),
 			type: channelType,
@@ -73,6 +78,11 @@ export const CreateNewChannelModal = () => {
 	const handleChannelNameChange = (value: string) => {
 		setIsErrorName('');
 		setChannelName(value);
+		
+	};
+	const [validate, setValidate] = useState(true)
+	const checkValidate = (check: boolean) => {
+		setValidate(check);
 	};
 
 	const [channelType, setChannelType] = useState<number>(-1);
@@ -144,6 +154,7 @@ export const CreateNewChannelModal = () => {
 								</div>
 								<ChannelNameTextField
 									onChange={handleChannelNameChange}
+									onCheckValidate={checkValidate}
 									type={channelType}
 									channelNameProps="What is channel's name?"
 									error={isErrorName}

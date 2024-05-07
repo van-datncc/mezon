@@ -19,7 +19,7 @@ const ThreadBox = () => {
 
 	const { threadRef } = useMezon();
 	const thread = threadRef.current;
-	const { currentThread, isPrivate } = useThreads();
+	const { isPrivate, threadCurrentChannel } = useThreads();
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: thread?.id as string,
 		channelLabel: thread?.chanel_label as string,
@@ -30,7 +30,7 @@ const ThreadBox = () => {
 		async (value: ThreadValue) => {
 			const body: ApiCreateChannelDescRequest = {
 				clan_id: currentClanId?.toString(),
-				channel_label: value.nameThread,
+				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
 				parrent_id: currentChannelId as string,
 				category_id: currentChannel?.category_id,
@@ -50,7 +50,7 @@ const ThreadBox = () => {
 			value?: ThreadValue,
 		) => {
 			if (sessionUser) {
-				if (value?.nameThread) {
+				if (value?.nameValueThread) {
 					await createThread(value);
 				}
 				await sendMessageThread(content, mentions, attachments, references);
@@ -70,7 +70,7 @@ const ThreadBox = () => {
 	return (
 		<div className="flex flex-col flex-1 justify-end">
 			<div>
-				{!currentThread && (
+				{!threadCurrentChannel && (
 					<div className="relative flex items-center justify-center mx-4 w-16 h-16 bg-[#26262B] rounded-full pointer-events-none">
 						<Icons.ThreadIcon defaultSize="w-7 h-7" />
 						{isPrivate === 1 && (
@@ -81,11 +81,11 @@ const ThreadBox = () => {
 					</div>
 				)}
 
-				{currentThread && (
+				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages
-							channelId={thread?.id as string}
-							channelLabel={thread?.chanel_label}
+							channelId={threadCurrentChannel.channel_id as string}
+							channelLabel={threadCurrentChannel.channel_label}
 							type={ETypeMessage.THREAD}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						/>
@@ -96,7 +96,7 @@ const ThreadBox = () => {
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}
-					listMentions={UserMentionList(thread?.id as string)}
+					listMentions={UserMentionList(threadCurrentChannel?.channel_id as string)}
 					isThread
 				/>
 			</div>
