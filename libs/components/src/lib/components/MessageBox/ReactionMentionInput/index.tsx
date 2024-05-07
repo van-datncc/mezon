@@ -2,6 +2,7 @@ import {
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
+	useChatReaction,
 	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
@@ -23,7 +24,6 @@ import {
 	ChannelMembersEntity,
 	ILineMention,
 	IMessageSendPayload,
-	KEY_KEYBOARD,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	ThreadValue,
@@ -65,7 +65,7 @@ type EmojiData = {
 };
 
 export type MentionReactInputProps = {
-	onSend: (
+	readonly onSend: (
 		content: IMessageSendPayload,
 		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
@@ -73,14 +73,13 @@ export type MentionReactInputProps = {
 		value?: ThreadValue,
 		anonymousMessage?: boolean,
 	) => void;
-	onTyping?: () => void;
-	onCreateThread?: (key: string) => void;
-	listMentions?: MentionDataProps[] | undefined;
-	isThread?: boolean;
-	handlePaste?: any;
-	currentChannelId?: string;
-	handleConvertToFile?: (valueContent: string) => void | undefined;
-	currentClanId?: string;
+	readonly onTyping?: () => void;
+	readonly listMentions?: MentionDataProps[] | undefined;
+	readonly isThread?: boolean;
+	readonly handlePaste?: any;
+	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
+	readonly currentClanId?: string;
+	readonly currentChannelId?: string;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -89,7 +88,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences } = useReference();
+	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
@@ -102,6 +101,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { emojis } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked } = useEmojiSuggestion();
+	const { reactionRightState } = useChatReaction();
 	const { valueTextInput } = useMessageValue(currentChannelId as string);
 
 	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
@@ -123,7 +123,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						ref_type: 0,
 						message_sender_id: referenceMessage.sender_id,
 						content: JSON.stringify(referenceMessage.content),
-						has_attachment: referenceMessage.attachments?.length > 0 ? true : false,
+						has_attachment: referenceMessage.attachments?.length > 0,
 					},
 				]),
 			);
@@ -131,8 +131,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [referenceMessage]);
 
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
-		const { keyCode, ctrlKey, shiftKey } = event;
-		if (keyCode === KEY_KEYBOARD.ENTER && ctrlKey && shiftKey && valueTextInput !== '') {
+		const { key, ctrlKey, shiftKey } = event;
+		const isEnterKey = key === 'Enter';
+
+		if (isEnterKey && ctrlKey && shiftKey && valueTextInput !== '') {
 			event.preventDefault();
 			if (props.currentClanId) {
 				handleSend(true);
@@ -140,8 +142,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		}
 
-		switch (keyCode) {
-			case KEY_KEYBOARD.ENTER: {
+		switch (key) {
+			case 'Enter': {
 				if (shiftKey) {
 					return;
 				} else {
@@ -158,7 +160,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if (!valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
+			if (valueTextInput && typeof valueTextInput === 'string' && !valueTextInput.trim() && attachmentDataRef.length === 0 && mentionData.length === 0) {
 				if (!nameThread.trim() && props.isThread && !currentThread) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
 					dispatch(threadsActions.setNameThreadError(threadError.name));
@@ -223,7 +225,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		const body = {
 			channelId: currentChannel?.channel_id as string,
 			channelType: currentChannel?.type,
-			userIds: userIds as string[],
+			userIds: userIds,
 		};
 		if (userIds.length > 0) {
 			await dispatch(channelUsersActions.addChannelUsers(body));
@@ -285,28 +287,27 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if ((referenceMessage !== null && openReplyMessageState) || !openEditMessageState) {
+		if ((referenceMessage !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
 			return focusToElement(editorRef);
 		}
-	}, [referenceMessage, openReplyMessageState, openEditMessageState]);
+	}, [referenceMessage, openReplyMessageState, openEditMessageState, emojiPicked]);
 
 	const handleChangeNameThread = (nameThread: string) => {
 		setNameThread(nameThread);
 	};
 
 	const convertToPlainTextHashtag = (text: string) => {
-		const regex = /(@|\#)\[(.*?)\]\((.*?)\)/g;
+		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 		const result = text.replace(regex, (match, symbol, p1, p2) => {
 			return symbol === '#' ? `#${p2}` : `@${p1}`;
 		});
 		return result;
 	};
-
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
 
-	const input = document.querySelector('#editorReactMention') as HTMLElement | null;
+	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
 		if (!emojiPicked || !input) {
 			return;
@@ -342,8 +343,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	useEffect(() => {
-		if (currentChannelId) {
-			setContent(valueTextInput);
+		if (currentChannelId && valueTextInput) {
+			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
+			setContent(convertedHashtag);
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, valueTextInput]);
@@ -353,16 +355,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	return (
 		<div className="relative">
 			{props.isThread && !currentThread && (
-				<div>
+				<div onClick={()=>console.log(referenceMessage)}>
 					<ThreadNameTextField
 						onChange={handleChangeNameThread}
 						onKeyDown={onKeyDown}
 						value={nameThread}
 						label="Thread Name"
-						placeholder="Enter Thread Name"
+						placeholder={(openThreadMessageState && referenceMessage?.content.t!=='' )? referenceMessage?.content.t : 'Enter Thread Name'}
 						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
 					/>
-					<PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />
+					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 				</div>
 			)}
 			{props.isThread && messageThreadError && !currentThread && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>}
