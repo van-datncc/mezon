@@ -55,12 +55,12 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(referencesActions.setReferenceMessage(message));
-	}
+	};
 
 	return (
 		<div ref={ref} className="iconHover flex justify-between  bg-[#232323] rounded">
 			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
-				<Icons.Smile />
+				<Icons.Smile defaultSize="w-5 h-5" />
 			</div>
 
 			{userId === message.sender_id ? (
@@ -71,12 +71,12 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180">
 					<Icons.Reply />
 				</button>
-			)} 
-			{ Number(currentChannel?.parrent_id) === 0 && 
-				<button className="h-full p-1 cursor-pointer" onClick={handleThread}> 
-					<Icons.ThreadIcon isWhite={thread}/>
+			)}
+			{Number(currentChannel?.parrent_id) === 0 && (
+				<button className="h-full p-1 cursor-pointer" onClick={handleThread}>
+					<Icons.ThreadIcon isWhite={thread} />
 				</button>
-			}
+			)}
 			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
 				<Icons.ThreeDot />
 			</button>
