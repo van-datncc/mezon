@@ -9,7 +9,9 @@ import Button from '../../components/Auth/Button';
 import FooterAuth from '../../components/Auth/FooterAuth';
 import GoogleLogin from '../../components/Auth/GoogleLogin';
 import TextInputUser from '../../components/Auth/TextInput';
+import LoadingModal from '../../components/LoadingModal';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { size } from '../../themes/Fonts';
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Please enter your email'),
 	password: Yup.string()
@@ -65,11 +67,12 @@ const LoginScreen = () => {
 							isPass={true}
 						/>
 						{/* button  */}
-						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Login'} loading={isLoading === 'loading'} />
+						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign in'} />
 					</>
 				)}
 			</Formik>
 			<FooterAuth content={'Need an account?'} onPress={() => navigation.navigate(APP_SCREEN.REGISTER as never)} title={'Register'} />
+			<LoadingModal isVisible={isLoading === 'loading'} />
 		</View>
 	);
 };
@@ -95,21 +98,23 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 	},
 	headerTitle: {
-		fontSize: 38,
+		fontSize: size.s_34,
 		textAlign: 'center',
+		fontWeight: 'bold',
 		color: '#FFFFFF',
 	},
 	headerContent: {
-		fontSize: 16,
+		fontSize: size.s_14,
 		lineHeight: 20 * 1.4,
 		textAlign: 'center',
 		color: '#CCCCCC',
 	},
 	orText: {
-		fontSize: 15,
+		fontSize: size.s_12,
 		lineHeight: 15 * 1.4,
 		color: '#AEAEAE',
 		marginLeft: 5,
 		alignSelf: 'center',
+		paddingTop: 10,
 	},
 });

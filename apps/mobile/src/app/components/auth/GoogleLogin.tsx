@@ -4,7 +4,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import Images from 'apps/mobile/src/assets/Images';
 import React, { useEffect } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const GoogleLogin = () => {
 	const GOOGLE_WEB_ID = '648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com';
 	const dispatch = useAppDispatch();
@@ -28,14 +28,12 @@ const GoogleLogin = () => {
 		}
 	}
 	return (
-		<Pressable style={styles.googleButton} onPress={onGoogleButtonPress}>
+		<TouchableOpacity style={styles.googleButton} onPress={onGoogleButtonPress}>
 			<View style={styles.socialButtonsContainer}>
-				<View style={styles.signinButtonLogoContainer}>
-					<Image source={Images.ICON_GOOGLE} style={styles.signinButtonLogo} />
-				</View>
+				<Image source={Images.ICON_GOOGLE} style={styles.signinButtonLogo} />
 				<Text style={styles.socialSigninButtonText}>Continue with Google</Text>
 			</View>
-		</Pressable>
+		</TouchableOpacity>
 	);
 };
 
@@ -43,10 +41,10 @@ export default GoogleLogin;
 
 const styles = StyleSheet.create({
 	googleButton: {
-		backgroundColor: '#D1E0FF',
+		backgroundColor: '#f3f6fc',
 		paddingVertical: 15,
 		marginHorizontal: 20,
-		borderRadius: 8,
+		borderRadius: 4,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -55,6 +53,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		width: '100%',
+		gap: 10,
 	},
 	signinButtonLogoContainer: {
 		backgroundColor: '#155EEF',

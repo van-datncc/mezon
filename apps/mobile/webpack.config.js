@@ -30,4 +30,18 @@ module.exports = {
 			// svgr: false
 		}),
 	],
+	module: {
+		rules: [
+			{
+				test: /\.js$/,
+				exclude: /node_modules\/(?!(react-native-vector-icons)\/).*/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: ['@babel/preset-env', '@babel/preset-react'],
+					},
+				},
+			},
+		],
+	},
 };

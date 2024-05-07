@@ -156,6 +156,10 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: Colors.Tertiary,
 	},
+	logoClan: {
+		height: verticalScale(70),
+		width: verticalScale(70),
+	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
 		fontSize: size.s_24,
@@ -165,7 +169,6 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: 10,
 		borderBottomWidth: 0.5,
 		borderBottomColor: 'lightgray',
 		backgroundColor: Colors.titleReset,
@@ -194,4 +197,9 @@ export const styles = StyleSheet.create({
 		color: Colors.Tertiary,
 		top: size.s_6,
 	},
+	iconBar: {
+		paddingLeft: size.s_14,
+		paddingRight: size.s_18,
+		paddingVertical: size.s_10,
+	}
 });
