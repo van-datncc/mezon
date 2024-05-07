@@ -16,8 +16,11 @@ type ChannelMessagesProps = {
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const fetchData = () => {
-		loadMoreMessage();
+	const [isLoading, setIsLoading] = useState(false)
+	const fetchData = async () => {
+		setIsLoading(true)
+		const res = await loadMoreMessage();
+		setIsLoading(false)
 	};
 
 	const listRef = useRef<any>({});
@@ -30,23 +33,27 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [messages.length]);
 
 	function getRowHeight(index: any) {
-		return rowHeights.current[index] + 1 || 60;
+		return rowHeights.current[index] || 60;
 	}
 
 	function Row({ index, style }: any) {
 		const rowRef = useRef<any>({});
 		useEffect(() => {
 			if (rowRef.current) {
-				const newHeight = rowRef.current.clientHeight;
-				setRowHeight(index, newHeight);
+				if (messages[index].attachments?.length) {
+					rowRef.current.clientHeight > 40 ? setRowHeight(index, rowRef.current.clientHeight) : setRowHeight(index, 100)
+				}
+				else {
+					const newHeight = rowRef.current.clientHeight;
+					setRowHeight(index, newHeight);
+				}
 			}
 		}, [rowRef.current]);
 		return (
-			<div style={style}>
+			<div style={style} key={messages[index].id}>
 				<div ref={rowRef}>
 					<ChannelMessage
 						mode={mode}
-						key={messages[index].id}
 						lastSeen={messages[index].id === unreadMessageId && messages[index].id !== lastMessageId}
 						message={messages[index]}
 						preMessage={messages.length > 0 ? messages[index - 1] : undefined}
@@ -64,7 +71,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}
 
 	function scrollToBottom() {
-		console.log('on Bottom:', messages.length - 50)
 		if (listRef.current) {
 			if (messages.length > 50) {
 				listRef.current?.scrollToItem(60, "end");
@@ -80,18 +86,16 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		}
 	};
 
-
 	return (
 		<div
 			className="bg-[#26262B] relative"
 			style={{
 				height: '100%',
 				display: 'flex',
-				flexDirection: 'column-reverse',
 				overflowX: 'hidden',
 			}}
 		>
-			<AutoSizer style={{ width: '100%', height: '100%' }}>
+			<AutoSizer>
 				{({ height, width }) => (
 					<List
 						height={height - 15}
@@ -100,11 +104,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						ref={listRef}
 						width={width}
 						onScroll={onScroll}
+						initialScrollOffset={10000}
 					>
 						{Row}
 					</List>
 				)}
-
 			</AutoSizer>
 		</div>
 	);
