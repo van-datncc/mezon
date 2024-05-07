@@ -1,20 +1,46 @@
-
+import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin } from '@mezon/store-mobile';
+import { MezonSuspense, useMezon } from '@mezon/transport';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
-import { initStore, MezonStoreProvider, selectIsLogin } from "@mezon/store-mobile";
-import { useSelector } from "react-redux";
-import { NavigationContainer } from "@react-navigation/native";
-import { useMezon } from "@mezon/transport";
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { preloadedState } from "../../../../chat/src/app/mock/state";
+import { ChatContextProvider } from '@mezon/core';
+import { IWithError } from '@mezon/utils';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { preloadedState } from '../../../../chat/src/app/mock/state';
 
 const RootStack = createStackNavigator();
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
+
+	useEffect(() => {
+		authLoader();
+	}, []);
+
+	const authLoader = async () => {
+		const store = await getStoreAsync();
+		try {
+			const response = await store.dispatch(authActions.refreshSession());
+			if ((response as unknown as IWithError).error) {
+				console.log('Session expired');
+				return;
+			}
+
+			const profileResponse = await store.dispatch(accountActions.getUserProfile());
+
+			if ((profileResponse as unknown as IWithError).error) {
+				console.log('Session expired');
+				return;
+			}
+		} catch (error) {
+			console.log('Tom log  => error authLoader', error);
+		}
+	};
 
 	return (
 		<NavigationContainer>
@@ -49,7 +75,9 @@ const RootNavigation = () => {
 
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<NavigationMain />
+			<ChatContextProvider>
+				<NavigationMain />
+			</ChatContextProvider>
 		</MezonStoreProvider>
 	);
 };

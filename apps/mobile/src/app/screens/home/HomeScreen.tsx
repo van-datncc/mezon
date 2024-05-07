@@ -1,8 +1,8 @@
-import { appActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
+import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import BarsLogo from '../../../assets/svg/bars.svg';
 import SearchLogo from '../../../assets/svg/discoverySearch.svg';
 import HashSignIcon from '../../../assets/svg/loading.svg';
@@ -73,6 +73,15 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 });
 
 const HomeScreen = React.memo((props: any) => {
+	const currentClan = useSelector(selectCurrentClan);
+	const clans = useSelector(selectAllClans);
+
+	useEffect(() => {
+		if (clans?.length) {
+			setCurrentClanLoader();
+		}
+	}, [clans]);
+
 	useEffect(() => {
 		mainLoader();
 	}, []);
@@ -80,6 +89,18 @@ const HomeScreen = React.memo((props: any) => {
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.fetchClans());
+		if (currentClan) {
+			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
+		}
+		return null;
+	};
+
+	const setCurrentClanLoader = async () => {
+		const lastClanId = clans[clans.length - 1].clan_id;
+		const store = await getStoreAsync();
+		if (lastClanId) {
+			store.dispatch(clansActions.changeCurrentClan({ clanId: lastClanId }));
+		}
 		return null;
 	};
 

@@ -156,6 +156,10 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: Colors.Tertiary,
 	},
+	logoClan: {
+		height: verticalScale(70),
+		width: verticalScale(70),
+	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
 		fontSize: size.s_24,

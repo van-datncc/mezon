@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
-import { selectIsUnreadChannelById } from '@mezon/store';
+import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -30,7 +30,7 @@ export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: an
 				{props.icon ? (
 					props.icon
 				) : props?.data?.logo ? (
-					<FastImageRes uri={props.data.logo} />
+					<Image source={{ uri: props.data.logo }} style={styles.logoClan} />
 				) : (
 					<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name.charAt(0).toUpperCase()}</Text>
 				)}
@@ -67,7 +67,6 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 
 export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; collapseItems: any }) => {
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
-	const isUnReadChannel = useSelector(selectIsUnreadChannelById(props?.data?.id));
 
 	return (
 		<View key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListSection}>
@@ -77,9 +76,12 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 				isCollapsed={isCollapsed}
 			/>
 			{!isCollapsed &&
-				props.data.channels?.map((item: any, index: number) => (
-					<ChannelListItem data={item} key={Math.floor(Math.random() * 9999999).toString() + index} isUnRead={isUnReadChannel} />
-				))}
+				props.data.channels?.map((item: any, index: number) => {
+					// eslint-disable-next-line react-hooks/rules-of-hooks
+					const isUnReadChannel = useSelector(selectIsUnreadChannelById(item?.id));
+
+					return <ChannelListItem data={item} key={Math.floor(Math.random() * 9999999).toString() + index} isUnRead={isUnReadChannel} />;
+				})}
 		</View>
 	);
 });
@@ -87,8 +89,11 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 export const ChannelListItem = React.memo((props: { data: any; image?: string; isUnRead: boolean }) => {
 	const useChannelListContentIn = React.useContext(ChannelListContext);
 
-	const handleRouteData = React.useCallback(() => {
+	const handleRouteData = React.useCallback(async () => {
+		const store = await getStoreAsync();
 		useChannelListContentIn.navigation.closeDrawer();
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: props?.data?.channel_id }));
+		store.dispatch(channelsActions.joinChannel({ clanId: props?.data?.clanId ?? '', channelId: props?.data?.channel_id, noFetchMembers: false }));
 	}, []);
 
 	return (
