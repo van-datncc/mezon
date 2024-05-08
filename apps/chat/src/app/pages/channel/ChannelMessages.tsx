@@ -81,15 +81,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		>
 			<AutoSizer>
 				{({ height, width }) => (
-					<List
-						height={height - 15}
-						itemCount={messages.length}
-						itemSize={getRowHeight}
-						ref={listRef}
-						width={width}
-						onScroll={onScroll}
-						initialScrollOffset={10000}
-					>
+					<List height={height - 15} itemCount={messages.length} itemSize={getRowHeight} ref={listRef} width={width} onScroll={onScroll}>
 						{Row}
 					</List>
 				)}
