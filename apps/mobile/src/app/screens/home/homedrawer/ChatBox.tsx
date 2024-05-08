@@ -1,3 +1,4 @@
+import { Colors } from '@mezon/mobile-ui';
 import React from 'react';
 import { Dimensions, TextInput, View } from 'react-native';
 import AngleRightIcon from '../../../../assets/svg/angle-right.svg';
@@ -7,7 +8,6 @@ import MicrophoneIcon from '../../../../assets/svg/microphone.svg';
 import SendButtonIcon from '../../../../assets/svg/sendButton.svg';
 import SmilingFaceIcon from '../../../../assets/svg/voiceReaction.svg';
 import { styles } from './styles';
-import {Colors} from "../../../themes";
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
@@ -54,7 +54,7 @@ const ChatBox = React.memo((props: { channelTitle: string; channelId: number; se
 					style={[
 						styles.inputStyle,
 						text.length > 0 && { width: inputWidthWhenHasInput },
-						{ backgroundColor: '#333333', color: '#FFFFFF' },
+						{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 					]}
 				/>
 				<SmilingFaceIcon width={25} height={25} style={styles.iconEmoji} />

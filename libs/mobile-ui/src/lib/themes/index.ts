@@ -1,5 +1,5 @@
 import Colors from "./Colors";
-import Fonts, { size as sizes } from "./Fonts";
+import Fonts, { size } from "./Fonts";
 import {
 	Metrics,
 	horizontalScale,
@@ -13,5 +13,5 @@ export {
 	horizontalScale,
 	moderateScale,
 	verticalScale,
-	sizes,
+	size,
 };

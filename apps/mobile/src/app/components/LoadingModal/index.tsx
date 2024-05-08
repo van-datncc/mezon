@@ -1,7 +1,6 @@
+import { Colors, verticalScale } from '@mezon/mobile-ui';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { verticalScale } from '../../themes';
-import colors from '../../themes/Colors';
 
 type IProps = {
 	isVisible: boolean;
@@ -12,7 +11,7 @@ const LoadingModal = ({ isVisible }: IProps) => {
 	return (
 		<View style={styles.centeredView}>
 			<View style={styles.modalView}>
-				<ActivityIndicator size={'large'} color={colors.white} />
+				<ActivityIndicator size={'large'} color={Colors.white} />
 			</View>
 		</View>
 	);
@@ -31,7 +30,7 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 	modalView: {
-		backgroundColor: colors.black,
+		backgroundColor: Colors.black,
 		borderRadius: verticalScale(20),
 		padding: verticalScale(20),
 		alignItems: 'center',

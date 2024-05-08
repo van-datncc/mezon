@@ -6,6 +6,7 @@ import DiscoveryIcon from '../../../../assets/svg/discoveryStudentHubs.svg';
 import PlusGreenIcon from '../../../../assets/svg/guildAddCategoryChannel.svg';
 import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
+import { styles } from './styles';
 
 const ServerList = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
@@ -16,7 +17,7 @@ const ServerList = React.memo((props: any) => {
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
 	return (
-		<View style={{ height: '100%', paddingTop: 20, width: '22%', justifyContent: 'flex-start' }}>
+		<View style={styles.wrapperServerList}>
 			<ClanIcon icon={<LogoMezon width={40} height={40} />} data={[]} />
 			<View style={{ width: '100%', alignItems: 'center', marginBottom: 10 }}>
 				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
