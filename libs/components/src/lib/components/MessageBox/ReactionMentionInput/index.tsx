@@ -162,6 +162,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
+			if (!valueTextInput || valueTextInput.trim() === '') {
+				return;
+			}
 			if (
 				valueTextInput &&
 				typeof valueTextInput === 'string' &&
