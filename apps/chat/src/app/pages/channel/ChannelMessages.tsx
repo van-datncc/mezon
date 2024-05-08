@@ -1,5 +1,5 @@
 import { useChatMessages } from '@mezon/core';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
 import { ChannelMessage } from './ChannelMessage';
@@ -19,9 +19,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const rowHeights = useRef<any>({});
 
 	useEffect(() => {
-		if (messages.length > 0) {
-			scrollToBottom();
-		}
+		// TODO: May find another solution instead of delay to get ref
+		setTimeout(() => {
+			if (messages.length > 0) {
+				listRef.current?.scrollToItem(messages.length - 1);
+			}
+		}, 100);
 	}, [messages.length]);
 
 	function getRowHeight(index: any) {
@@ -61,16 +64,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		rowHeights.current = { ...rowHeights.current, [index]: size };
 	}
 
-	function scrollToBottom() {
-		if (listRef.current) {
-			if (messages.length > 50) {
-				listRef.current?.scrollToItem(60, 'end');
-			} else {
-				listRef.current?.scrollToItem(messages.length, 'end');
-			}
-		}
-	}
-
 	const onScroll = ({ scrollOffset }: any) => {
 		if (scrollOffset < 50 && hasMoreMessage && messages.length > 49) {
 			loadMoreMessage();
@@ -89,13 +82,14 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			<AutoSizer>
 				{({ height, width }) => (
 					<List
-            height={height - 15}
-            itemCount={messages.length}
-            itemSize={getRowHeight}
-            ref={listRef}
-            width={width}
-            onScroll={onScroll}
-          >
+						height={height - 15}
+						itemCount={messages.length}
+						itemSize={getRowHeight}
+						ref={listRef}
+						width={width}
+						onScroll={onScroll}
+						initialScrollOffset={10000}
+					>
 						{Row}
 					</List>
 				)}
