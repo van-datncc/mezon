@@ -1,9 +1,8 @@
-import { ChatWelcome } from '@mezon/components';
 import { useChatMessages } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { VariableSizeList as List } from 'react-window';
 import { ChannelMessage } from './ChannelMessage';
-import AutoSizer from "react-virtualized-auto-sizer";
-import { VariableSizeList as List } from "react-window";
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -14,14 +13,7 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const containerRef = useRef<HTMLDivElement>(null);
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const [isLoading, setIsLoading] = useState(false)
-	const fetchData = async () => {
-		setIsLoading(true)
-		const res = await loadMoreMessage();
-		setIsLoading(false)
-	};
 
 	const listRef = useRef<any>({});
 	const rowHeights = useRef<any>({});
@@ -41,9 +33,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		useEffect(() => {
 			if (rowRef.current) {
 				if (messages[index].attachments?.length) {
-					rowRef.current.clientHeight > 40 ? setRowHeight(index, rowRef.current.clientHeight) : setRowHeight(index, 100)
-				}
-				else {
+					rowRef.current.clientHeight > 40 ? setRowHeight(index, rowRef.current.clientHeight) : setRowHeight(index, 100);
+				} else {
 					const newHeight = rowRef.current.clientHeight;
 					setRowHeight(index, newHeight);
 				}
@@ -73,9 +64,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	function scrollToBottom() {
 		if (listRef.current) {
 			if (messages.length > 50) {
-				listRef.current?.scrollToItem(60, "end");
+				listRef.current?.scrollToItem(60, 'end');
 			} else {
-				listRef.current?.scrollToItem(messages.length, "end");
+				listRef.current?.scrollToItem(messages.length, 'end');
 			}
 		}
 	}
@@ -98,14 +89,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			<AutoSizer>
 				{({ height, width }) => (
 					<List
-						height={height - 15}
-						itemCount={messages.length}
-						itemSize={getRowHeight}
-						ref={listRef}
-						width={width}
-						onScroll={onScroll}
-						initialScrollOffset={10000}
-					>
+            height={height - 15}
+            itemCount={messages.length}
+            itemSize={getRowHeight}
+            ref={listRef}
+            width={width}
+            onScroll={onScroll}
+          >
 						{Row}
 					</List>
 				)}
