@@ -73,9 +73,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	function scrollToBottom() {
 		if (listRef.current) {
 			if (messages.length > 50) {
-				listRef.current?.scrollToItem(60, "end");
+				//listRef.current.scrollToItem(60, "end");
 			} else {
-				listRef.current?.scrollToItem(messages.length, "end");
+				//listRef.current.scrollToItem(messages.length, "end");
 			}
 		}
 	}
