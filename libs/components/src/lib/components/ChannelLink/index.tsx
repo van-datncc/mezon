@@ -31,8 +31,8 @@ export type Coords = {
 
 export const classes = {
 	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
-	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-[#36373D]',
-	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-[#36373D]',
+	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-bgModifierHover',
+	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-bgModifierHover',
 };
 
 function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
@@ -118,7 +118,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
-					className={`${classes[state]} cursor-pointer ${active ? 'bg-[#36373D]' : ''}`}
+					className={`${classes[state]} cursor-pointer ${active ? 'bg-bgModifierHover' : ''}`}
 					onClick={() => handleVoiceChannel(channel.id)}
 					role="button"
 				>
@@ -135,7 +135,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					</div>
 					<p
 						className={cls({
-							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-base font-medium focus:bg-[#36373D]': true,
+							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-base font-medium focus:bg-bgModifierHover': true,
 							'font-medium text-white': active || isUnReadChannel,
 						})}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
@@ -147,7 +147,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				</span>
 			) : (
 				<Link to={channelPath} onClick={handleClick}>
-					<span className={`${classes[state]} ${active ? 'bg-[#36373D]' : ''}`}>
+					<span className={`${classes[state]} ${active ? 'bg-bgModifierHover' : ''}`}>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 						<div className="relative mt-[-5px]">
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
@@ -161,7 +161,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						</div>
 						<p
 							className={cls({
-								'ml-2 font-medium text-[#AEAEAE] w-full group-hover:text-white text-base focus:bg-[#36373D]': true,
+								'ml-2 font-medium text-[#AEAEAE] w-full group-hover:text-white text-base focus:bg-bgModifierHover': true,
 								'font-medium text-white': active || isUnReadChannel,
 							})}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
@@ -194,11 +194,11 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				) : (
 					<>
 						<AddPerson
-							className={`tesst absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} block right-8 cursor-pointer`}
+							className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-transparent'} block right-8 cursor-pointer`}
 							onClick={handleCreateLinkInvite}
 						/>
 						<SettingProfile
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 ${active ? 'text-white' : 'text-[#0B0B0B]'} block group-hover:block group-hover:text-white cursor-pointer`}
+							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${active ? 'text-white' : 'text-transparent'} block group-hover:block group-hover:text-white cursor-pointer`}
 							onClick={handleOpenCreate}
 						/>
 					</>
@@ -206,7 +206,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 			) : (
 				<>
 					<AddPerson
-						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-[#0B0B0B]'} hidden right-3 cursor-pointer`}
+						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-transparent'} hidden right-3 cursor-pointer`}
 						onClick={handleCreateLinkInvite}
 					/>
 					{numberNotication !== 0 && (

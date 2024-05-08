@@ -444,6 +444,7 @@ input:-webkit-autofill:active {
   }
 }
 
+// thread-scroll
 .thread-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
@@ -454,6 +455,15 @@ input:-webkit-autofill:active {
 
 .thread-scroll:hover::-webkit-scrollbar-thumb {
   background: #151515;
+}
+
+// message-channel-scroll
+.message-channel-scroll::-webkit-scrollbar-track {
+  background: #2B2D31;
+}
+
+.message-channel-scroll::-webkit-scrollbar-thumb {
+  background: #1A1B1E;
 }
 
 // css tagLink of markdown

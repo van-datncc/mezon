@@ -44,8 +44,8 @@ export const CreateNewChannelModal = () => {
 		}
 
 		if (!validate) {
-			setIsErrorName("Please enter a valid channel name");
-			return
+			setIsErrorName('Please enter a valid channel name');
+			return;
 		}
 
 		const body: ApiCreateChannelDescRequest = {
@@ -78,9 +78,8 @@ export const CreateNewChannelModal = () => {
 	const handleChannelNameChange = (value: string) => {
 		setIsErrorName('');
 		setChannelName(value);
-		
 	};
-	const [validate, setValidate] = useState(true)
+	const [validate, setValidate] = useState(true);
 	const checkValidate = (check: boolean) => {
 		setValidate(check);
 	};
@@ -104,7 +103,7 @@ export const CreateNewChannelModal = () => {
 		<>
 			{isOpenModal && (
 				<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
-					<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] bg-[#151515] rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
+					<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] bg-bgPrimary rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
 						<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
 							<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
 								<div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">

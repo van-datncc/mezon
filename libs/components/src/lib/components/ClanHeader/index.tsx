@@ -1,16 +1,16 @@
-import { useAuth, useCategory, useChannelMembers, useClans } from '@mezon/core';
+import { useAuth, useCategory, useClans, useOnClickOutside } from '@mezon/core';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { Dropdown, Modal } from 'flowbite-react';
+import { Modal } from 'flowbite-react';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
-import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ClanSetting from '../ClanSettings/clanSettings';
 import * as Icons from '../Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import SearchModal from '../SearchModal';
+import ItemModal from './ItemModal';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -20,21 +20,22 @@ export type ClanHeaderProps = {
 
 function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const inputRef = useRef<HTMLInputElement | null>(null);
+	const modalRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const [openCreateCate, setOpenCreateCate] = useState(false);
-	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const { currentClan } = useClans();
 	const { categorizedChannels } = useCategory();
-	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
-
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
-	const [openSearchModal, closeSearchModal] = useModal(() => (
-		<SearchModal onClose={closeSearchModal} open={true} />
-	));
+	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
+
+	const [openCreateCate, setOpenCreateCate] = useState(false);
+	const [openServerSettings, setOpenServerSettings] = useState(false);
+	const [isShowModalPannelClan, setIsShowModalPannelClan] = useState<boolean>(false);
+
+	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
 
 	const onClose = () => {
 		setOpenCreateCate(false);
@@ -54,80 +55,72 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		openSearchModal();
 		inputRef.current?.blur();
 	};
-	const [checkvalidate, setCheckValidate] = useState(true)
+	const [checkvalidate, setCheckValidate] = useState(true);
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
-		setNameCate(value)
-		if (/^[A-Za-z0-9_-]{0,64}$/.test(value) && value !=="") {
-			setCheckValidate(false)
+		setNameCate(value);
+		if (/^[A-Za-z0-9_-]{0,64}$/.test(value) && value !== '') {
+			setCheckValidate(false);
 		} else {
-			setCheckValidate(true)
+			setCheckValidate(true);
 		}
 	};
-	
+
+	const handleShowModalClan = () => {
+		setIsShowModalPannelClan(!isShowModalPannelClan);
+	};
+
+	const handleShowCreateCategory = () => {
+		setOpenCreateCate(true);
+		setIsShowModalPannelClan(false);
+	};
+
+	const handleShowInviteClanModal = () => {
+		openInviteClanModal();
+		setIsShowModalPannelClan(false);
+	};
+
+	const handleShowServerSettings = () => {
+		setOpenServerSettings(true);
+		setIsShowModalPannelClan(false);
+	};
+
+	useOnClickOutside(modalRef, () => setIsShowModalPannelClan(false));
+
 	return (
 		<>
 			{type === 'direct' ? (
-				<div className="px-3 border-b-1 border-bgPrimary font-title font-semibold text-white border-b-[#000] border-b-[1px] h-heightHeader flex items-center">
+				<div className="px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] border-bgTertiary">
 					<input
 						ref={inputRef}
 						placeholder="Find or start a conversation"
-						className={`font-[400] px-[16px] rounded w-full text-white outline-none text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]`}
-						type='text'
+						className={`font-[400] px-[16px] rounded text-white outline-none text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]`}
+						type="text"
 						onFocus={handleInputFocus}
 					/>
 				</div>
 			) : (
 				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950`}>
 					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
-					<div className="border-b border-borderDefault cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-[#030712]">
-						<p className="text-white text-lg font-bold">{name?.toLocaleUpperCase()}</p>
-						<Dropdown
-							label=""
-							className="bg-bgTertiary border-borderDefault text-contentPrimary p-2 w-[240px] text-[14px]"
-							dismissOnClick={true}
-							placement="bottom-end"
-							renderTrigger={() => (
-								<button className="w-6 h-8 relative flex flex-col justify-center iconHover">
-									<Icons.ArrowDown />
-								</button>
-							)}
-						>
-							<Dropdown.Item
-								icon={MdOutlineCreateNewFolder}
-								theme={{
-									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-								}}
-								onClick={() => setOpenCreateCate(true)}
+					<div ref={modalRef} className="relative h-full" onClick={handleShowModalClan}>
+						<div className="cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-bgSecondary hover:bg-[#35373C] shadow border-b-[1px] border-bgTertiary">
+							<p className="text-white text-base font-semibold select-none">{name?.toLocaleUpperCase()}</p>
+							<button className="w-6 h-8 flex flex-col justify-center iconHover">
+								<Icons.ArrowDown />
+							</button>
+						</div>
+						{isShowModalPannelClan && (
+							<div
+								onClick={(e) => e.stopPropagation()}
+								className="bg-bgProfileBody p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
 							>
-								Create Category
-							</Dropdown.Item>
-							<Dropdown.Item
-								icon={MdOutlineCreateNewFolder}
-								theme={{
-									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-								}}
-								onClick={() => {
-									openInviteClanModal();
-									// handleOpenInvite()
-								}}
-							>
-								Invite People
-							</Dropdown.Item>
-							{currentClan?.creator_id === userProfile?.user?.id && (
-								<Dropdown.Item
-									icon={MdOutlineCreateNewFolder}
-									theme={{
-										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex items-center',
-									}}
-									onClick={() => {
-										setOpenServerSettings(true);
-									}}
-								>
-									Clan Settings
-								</Dropdown.Item>
-							)}
-						</Dropdown>
+								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
+									<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />
+									<ItemModal onClick={handleShowInviteClanModal} children="Invite People" endIcon={<Icons.AddPerson />} />
+									<ItemModal onClick={handleShowServerSettings} children="Clan Settings" endIcon={<Icons.SettingProfile />} />
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 			)}
@@ -138,6 +131,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					setOpenServerSettings(false);
 				}}
 			/>
+
 			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary bg-opacity-80" size="lg">
 				<div className="bg-[#1E1E1E] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-bold uppercase">Create Category</div>
@@ -156,7 +150,11 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 							value={nameCate}
 						/>
 					</div>
-					{checkvalidate && <p className='text-[#e44141] text-xs italic font-thin'>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>}
+					{checkvalidate && (
+						<p className="text-[#e44141] text-xs italic font-thin">
+							Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+						</p>
+					)}
 				</Modal.Body>
 				<div className=" text-white font-semibold text-sm flex bg-bgTertiary justify-end flex-row items-center gap-4 py-4 px-6 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
 					<button onClick={onClose}>Cancel</button>

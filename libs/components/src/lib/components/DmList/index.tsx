@@ -44,7 +44,7 @@ function DirectMessageList() {
 			<div className="mt-5 px-2 py-1">
 				<div className="w-full flex flex-row items-center">
 					<button
-						className={`py-2 px-3 rounded-[4px] w-full flex gap-4 items-center ${pathname.includes('friends') ? 'bg-bgTertiary' : ''}`}
+						className={`py-2 px-3 rounded-[4px] w-full flex gap-4 items-center ${pathname.includes('friends') ? 'bg-bgModifierHover' : ''}`}
 						onClick={() => {
 							navigate('/chat/direct/friends');
 						}}

@@ -31,7 +31,7 @@ const StatusProfile = ({ userById }: StatusProfileProps) => {
 					)}
 					label=""
 					placement="right-start"
-					className="bg-[#232428] border-none ml-2 py-[6px] px-[8px] w-[200px]"
+					className="bg-bgSecondary600 border-none ml-2 py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemStatus children="Online" startIcon={<OnlineStatus />} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>

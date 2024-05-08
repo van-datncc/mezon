@@ -89,7 +89,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 						>
 							Cancel
 						</Button>
-						<Button className="h-10 px-4 rounded bg-primaryButton hover:!bg-primaryButton focus:ring-transparent" type="submit">
+						<Button className="h-10 px-4 rounded bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent" type="submit">
 							Save
 						</Button>
 					</div>

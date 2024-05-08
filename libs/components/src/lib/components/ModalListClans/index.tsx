@@ -52,7 +52,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 		<div
 			ref={modalRef}
 			className="flex w-64 flex-col text-[16px] px-3 py-2 gap-2 z-50 border-[1px] border-bg-bgSecondary
-         border-borderDefault bg-bgSecondary rounded-lg"
+         border-borderDefault bg-bgProfileBody rounded"
 		>
 			<div className="overflow-y-auto max-h-36">
 				{options.map((option: IClan) => {

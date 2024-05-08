@@ -28,7 +28,9 @@ const ClanLayout = () => {
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
 			<MezonPolicyProvider clanId={clanId}>
-				<div className={` flex-col flex max-w-[272px] bg-bgSurface relative overflow-hidden ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}>
+				<div
+					className={` flex-col flex max-w-[272px] bg-bgSecondary relative overflow-hidden ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
+				>
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList channelCurrentType={currentVoiceChannel?.type} />
 					<FooterProfile
@@ -50,8 +52,8 @@ const ClanLayout = () => {
 				</div>
 				{isShowCreateThread && (
 					<>
-						<div className="w-2 cursor-ew-resize bg-[#000]" />
-						<div className="w-[480px] bg-[#1E1E1E] rounded-l-lg">
+						<div className="w-2 cursor-ew-resize bg-bgTertiary" />
+						<div className="w-[480px] bg-bgPrimary rounded-l-lg">
 							<ThreadsMain />
 						</div>
 					</>
