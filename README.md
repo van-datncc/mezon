@@ -19,7 +19,7 @@
 
 ## Start the app
 
-To start the development server run `nx run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
+To start the development server run `npm run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
 
 ## Linting
 
