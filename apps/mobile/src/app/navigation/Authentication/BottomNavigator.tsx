@@ -1,3 +1,4 @@
+import { Colors } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
@@ -5,7 +6,6 @@ import 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
-import { darkColor } from '../../constants/Colors';
 import HomeScreen from '../../screens/home/HomeScreen';
 import MessagesScreen from '../../screens/main/MessagesScreen';
 import Notifications from '../../screens/main/Notifications';
@@ -26,7 +26,7 @@ const BottomNavigator = () => {
 					paddingBottom: 10,
 					borderTopWidth: 0,
 					elevation: 0,
-					backgroundColor: darkColor.Backgound_Tertiary,
+					backgroundColor: Colors.secondary,
 				},
 				tabBarActiveTintColor: '#FFFFFF',
 			}}

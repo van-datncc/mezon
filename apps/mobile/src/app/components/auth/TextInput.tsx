@@ -1,9 +1,7 @@
+import { Colors, size, verticalScale } from '@mezon/mobile-ui';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import { verticalScale } from '../../themes';
-import colors from '../../themes/Colors';
-import { size } from '../../themes/Fonts';
 
 interface UserTextInputProps {
 	placeholder: string;
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		height: 50,
-		borderColor: colors.gray48,
+		borderColor: Colors.gray48,
 		borderWidth: 1,
 		borderRadius: 5,
 		paddingHorizontal: 10,

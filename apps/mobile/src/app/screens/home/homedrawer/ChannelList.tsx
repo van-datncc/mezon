@@ -1,4 +1,5 @@
 import { useCategory } from '@mezon/core';
+import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentClan } from '@mezon/store-mobile';
 import React from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
@@ -8,7 +9,6 @@ import { useSelector } from 'react-redux';
 import Dots from '../../../../assets/svg/guildMoreOptions1.svg';
 import { darkColor } from '../../../constants/Colors';
 import { useAnimatedState } from '../../../hooks/useAnimatedState';
-import { Colors } from '../../../themes';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { styles } from './styles';
 
@@ -27,12 +27,12 @@ const ChannelList = React.memo((props: any) => {
 	};
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
-			<View style={[styles.mainList, { backgroundColor: '#232323' }]}>
+			<View style={[styles.mainList, { backgroundColor: Colors.surface }]}>
 				<ServerListHeader title={currentClan?.clan_name} />
 				<View style={styles.channelListSearch}>
 					<View style={styles.channelListSearchWrapperInput}>
-						<Feather size={18} name="search" style={{ color: Colors.black }} />
-						<TextInput placeholder={'Search'} placeholderTextColor={Colors.textGray} style={styles.channelListSearchInput} />
+						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
+						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
 					<View
 						style={{
@@ -40,7 +40,7 @@ const ChannelList = React.memo((props: any) => {
 							justifyContent: 'center',
 							display: 'flex',
 							borderRadius: 50,
-							backgroundColor: darkColor.Border_Focus,
+							backgroundColor: Colors.tertiaryWeight,
 							width: 30,
 							height: 30,
 						}}
