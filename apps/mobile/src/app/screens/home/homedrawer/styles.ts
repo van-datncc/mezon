@@ -1,6 +1,5 @@
+import { Colors, verticalScale, size } from '@mezon/mobile-ui';
 import { Dimensions, StyleSheet } from 'react-native';
-import { Colors, verticalScale } from '../../../themes';
-import { size } from '../../../themes/Fonts';
 
 const inputWidth = Dimensions.get('window').width * 0.6;
 export const styles = StyleSheet.create({
@@ -30,7 +29,7 @@ export const styles = StyleSheet.create({
 	},
 	wrapperChatBox: {
 		minHeight: 80,
-		backgroundColor: '#1e1e1e',
+		backgroundColor: Colors.secondary,
 		flexDirection: 'row',
 		paddingHorizontal: 10,
 		alignItems: 'center',
@@ -73,6 +72,7 @@ export const styles = StyleSheet.create({
 	listChannels: {
 		height: '100%',
 		flexDirection: 'column-reverse',
+		backgroundColor: Colors.tertiaryWeight,
 	},
 	channelListSection: {
 		width: '100%',
@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
 		textTransform: 'uppercase',
 		fontSize: 15,
 		fontWeight: 'bold',
-		color: Colors.Tertiary,
+		color: Colors.tertiary,
 	},
 	channelListItem: {
 		width: '100%',
@@ -107,10 +107,10 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_14,
 		fontWeight: '600',
 		marginLeft: size.s_6,
-		color: Colors.Tertiary,
+		color: Colors.tertiary,
 	},
 	channelListItemTitleActive: {
-		color: Colors.black,
+		color: Colors.white,
 	},
 	dotIsNew: {
 		position: 'absolute',
@@ -118,7 +118,7 @@ export const styles = StyleSheet.create({
 		width: size.s_6,
 		height: size.s_6,
 		borderRadius: size.s_6,
-		backgroundColor: Colors.black,
+		backgroundColor: Colors.white,
 	},
 	channelListSearch: {
 		width: '100%',
@@ -129,7 +129,7 @@ export const styles = StyleSheet.create({
 		gap: 10,
 	},
 	channelListSearchWrapperInput: {
-		backgroundColor: Colors.gray48,
+		backgroundColor: Colors.tertiaryWeight,
 		flex: 1,
 		borderRadius: size.s_16,
 		alignItems: 'center',
@@ -154,7 +154,7 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.Tertiary,
+		backgroundColor: Colors.tertiaryWeight,
 	},
 	logoClan: {
 		height: verticalScale(70),
@@ -171,7 +171,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		borderBottomWidth: 0.5,
 		borderBottomColor: 'lightgray',
-		backgroundColor: Colors.titleReset,
+		backgroundColor: Colors.secondary,
 	},
 	lineActiveClan: {
 		backgroundColor: Colors.black,
@@ -194,12 +194,19 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_14,
 		fontWeight: '600',
 		marginLeft: size.s_6,
-		color: Colors.Tertiary,
+		color: Colors.tertiary,
 		top: size.s_6,
 	},
 	iconBar: {
 		paddingLeft: size.s_14,
 		paddingRight: size.s_18,
-		paddingVertical: size.s_10,
-	}
+		paddingVertical: size.s_14,
+	},
+	wrapperServerList: {
+		height: '100%',
+		paddingTop: size.s_20,
+		width: '22%',
+		justifyContent: 'flex-start',
+		backgroundColor: Colors.primary,
+	},
 });

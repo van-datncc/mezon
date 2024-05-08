@@ -1,3 +1,4 @@
+import { size } from '@mezon/mobile-ui';
 import { RootState } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
@@ -11,7 +12,6 @@ import GoogleLogin from '../../components/Auth/GoogleLogin';
 import TextInputUser from '../../components/Auth/TextInput';
 import LoadingModal from '../../components/LoadingModal';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { size } from '../../themes/Fonts';
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Please enter your email'),
 	password: Yup.string()
