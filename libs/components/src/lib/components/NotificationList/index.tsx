@@ -29,7 +29,7 @@ function NotificationList() {
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-lg mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
-				<div className="py-2 px-3 bg-bgPrimary">
+				<div className="py-2 px-3 bg-bgTertiary">
 					<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
 						<InboxButton />
 						<div>Inbox </div>

@@ -494,3 +494,14 @@ input:-webkit-autofill:active {
 #editorReactMention {
   max-width: calc(100% - 100px);
 }
+
+// emojiPicker
+.emojiPicker {
+  h2 {
+    background-color: #2B2D31;
+  }
+
+  input {
+    background-color: #1E1F22;
+  }
+}
