@@ -72,7 +72,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			className="bg-[#26262B] relative"
+			className="bg-bgPrimary relative"
 			style={{
 				height: '100%',
 				display: 'flex',
@@ -81,7 +81,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		>
 			<AutoSizer>
 				{({ height, width }) => (
-					<List height={height - 15} itemCount={messages.length} itemSize={getRowHeight} ref={listRef} width={width} onScroll={onScroll}>
+					<List
+						height={height - 15}
+						itemCount={messages.length}
+						itemSize={getRowHeight}
+						ref={listRef}
+						width={width}
+						onScroll={onScroll}
+						className="message-channel-scroll"
+					>
 						{Row}
 					</List>
 				)}

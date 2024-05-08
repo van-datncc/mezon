@@ -10,7 +10,7 @@ interface CreateChannelProps {
 export const CreateChannelButton: React.FC<CreateChannelProps> = ({ onClickCancel, onClickCreate }) => {
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
 	return (
-		<div className="Frame394 relative border-t border-solid border-borderDefault self-stretch mb-0 bg-[#151515] pt-3 justify-end items-center gap-4 inline-flex">
+		<div className="Frame394 relative border-t border-solid border-borderDefault self-stretch mb-0 pt-3 justify-end items-center gap-4 inline-flex">
 			<button onClick={onClickCancel} className="Text text-white hover:underline text-xs leading-normal font-semibold">
 				Cancel
 			</button>

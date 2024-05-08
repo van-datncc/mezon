@@ -1,6 +1,5 @@
 export default {
 	control: {
-		backgroundColor: '#000',
 		fontSize: 16,
 	},
 

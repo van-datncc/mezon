@@ -13,12 +13,24 @@ module.exports = {
   colorNeutral: '#AEAEAE',
 
   /* background */
-  bgPrimary: '#000000',
-  bgSecondary: '#151515',
-  bgTertiary: '#1E1E1E',
+  bgPrimary: '#313338',
+  bgPrimary1: '#2E3035',
+  bgSecondary: '#2B2D31',
+  bgSecondaryHover: '#282A2E',
+  bgSecondary600: '#232428',
+  bgTertiary: '#1E1F22',
   bgDisable: '#323232',
   bgSurface: '#0B0B0B',
   bgHoverMember: '#3b3b3b',
+  bgHover: '#393C41',
+  bgModifierHover: '#404249',
+  bgProfileBody: '#111214',
+  bgSelectItem: '#505cdc',
+  bgSelectItemHover: '#4752C4',
+
+  /* text */
+  channelTextarea: '#383A40',
+  textPrimary: '#DBDEE1',
 
   /* border */
   borderDefault: '#1E1E1E',
@@ -26,7 +38,7 @@ module.exports = {
   borderFocus: '#535353',
 
   /* button */
-  primaryButton: '#004EEB',
+  buttonProfile: '#4E5058',
 
   primary: '#155EEF',
   hoverPrimary: '#124FC9',

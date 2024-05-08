@@ -13,7 +13,7 @@ function NotificationItem({ notify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 
 	const userName = notify?.content?.username;
-	
+
 	let notice = notify?.subject;
 
 	if (userName) {
@@ -22,7 +22,7 @@ function NotificationItem({ notify }: NotifyProps) {
 	}
 
 	return (
-		<div className="flex flex-row justify-between hover:bg-bgSurface py-3 px-3 w-full">
+		<div className="flex flex-row justify-between hover:bg-bgSecondaryHover py-3 px-3 w-full cursor-pointer">
 			<div className="flex items-center gap-2">
 				<MemberProfile
 					isHideUserName={true}

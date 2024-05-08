@@ -444,6 +444,7 @@ input:-webkit-autofill:active {
   }
 }
 
+// thread-scroll
 .thread-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
@@ -454,6 +455,15 @@ input:-webkit-autofill:active {
 
 .thread-scroll:hover::-webkit-scrollbar-thumb {
   background: #151515;
+}
+
+// message-channel-scroll
+.message-channel-scroll::-webkit-scrollbar-track {
+  background: #2B2D31;
+}
+
+.message-channel-scroll::-webkit-scrollbar-thumb {
+  background: #1A1B1E;
 }
 
 // css tagLink of markdown
@@ -483,4 +493,15 @@ input:-webkit-autofill:active {
 // css editorReactMention text box chat
 #editorReactMention {
   max-width: calc(100% - 100px);
+}
+
+// emojiPicker
+.emojiPicker {
+  h2 {
+    background-color: #2B2D31;
+  }
+
+  input {
+    background-color: #1E1F22;
+  }
 }

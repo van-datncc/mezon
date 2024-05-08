@@ -19,7 +19,7 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 		setSelectedButton('');
 	};
 	return (
-		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-bgSecondary flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
 			<div className="w-170px ">
 				<p className="text-[#84ADFF] font-bold text-sm tracking-wider uppercase">{currentClan?.clan_name}</p>
 				<button
@@ -33,7 +33,7 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE] text-[15px] pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-[#155EEF1A]' : ''} w-[170px] text-left rounded-[5px] hover:text-white`}
+					className={`p-2 text-[#AEAEAE] text-[16px] font-medium pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-[#155EEF1A]' : ''} w-[170px] text-left rounded-[5px] hover:text-white`}
 					onClick={() => {}}
 				>
 					Delete Server

@@ -11,7 +11,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 	const { profiles } = props;
 
 	return (
-		<div className="bg-black mt-[10px]  rounded-lg flex flex-col relative">
+		<div className="bg-bgSecondary600 mt-[10px]  rounded-lg flex flex-col relative">
 			<div className="h-20 bg-[#8CBC4F] rounded-tr-[10px] rounded-tl-[10px]"></div>
 			<div className="text-black ml-[50px]">
 				{profiles.urlImage === undefined || profiles.urlImage === '' ? (
@@ -27,7 +27,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 				)}
 			</div>
 			<div className="px-[16px]">
-				<div className="bg-bgSecondary w-full p-4 my-[16px] rounded-[10px] flex flex-col gap-y-6 xl:gap-y-7">
+				<div className="bg-bgTertiary w-full p-4 my-[16px] rounded-[10px] flex flex-col gap-y-6 xl:gap-y-7">
 					<div className="w-[300px]">
 						<p className="font-bold tracking-wider text-xl one-line">{profiles.displayName}</p>
 						<p className="font-medium tracking-wide text-sm">{userProfile?.user?.username}</p>
@@ -47,7 +47,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 						</div>
 					</div>
 					<div className="w-full items-center">
-						<button className="w-full h-[50px] bg-[#1E1E1E] rounded-lg font-medium tracking-wide">Example button</button>
+						<button className="w-full h-[32px] bg-buttonProfile rounded font-medium tracking-wide">Example button</button>
 					</div>
 				</div>
 			</div>

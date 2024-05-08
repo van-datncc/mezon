@@ -1,7 +1,7 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
-const topBarHeight = '58px';
+const topBarHeight = '60px';
 const chatBoxHeight = '52px';
 const chatBoxHeightThread = '60px';
 const clanWidth = '72px';
@@ -58,7 +58,7 @@ module.exports = {
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
         heightTopBar: topBarHeight,
         heightChatBox: chatBoxHeight,
-        heightHeader: "58px",
+        heightHeader: "60px",
         "9/10": "90%",
       },
 

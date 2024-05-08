@@ -63,7 +63,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 				className="flex items-center justify-between border-t-2
 			 border-borderDefault px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
-			 shadow-sm transition bg-bgSurface
+			 shadow-sm transition bg-bgSecondary600
 			 w-full group focus-visible:outline-none"
 			>
 				<div className="footer-profile" ref={profileRef} onClick={handleClickFooterProfile}>

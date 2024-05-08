@@ -26,7 +26,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgSecondary border-b border-black'}`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'bg-bgPrimary shadow border-b-[1px] border-bgTertiary'}`}
 		>
 			{checkChannelType ? (
 				<>
@@ -65,7 +65,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<SearchMessage />
 							</div>
 							<div
-								className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-[linear-gradient(90deg,_#151515de,_#151515,_#151515)]'}`}
+								className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgPrimary'}`}
 								id="inBox"
 							>
 								<InboxButton />
@@ -97,7 +97,7 @@ function ThreadButton() {
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip className={`${isShowThread && 'hidden'}`} content="Threads" trigger="hover" animation="duration-500">
 				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.ThreadIcon isWhite={isShowThread} defaultSize='size-6'/>
+					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
 			</Tooltip>
 			{isShowThread && <ThreadModal setIsShowThread={setIsShowThread} />}

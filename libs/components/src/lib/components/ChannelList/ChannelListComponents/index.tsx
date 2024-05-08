@@ -15,8 +15,8 @@ export const Events = () => {
 
 	return (
 		<>
-			<div className="self-stretch inline-flex cursor-pointer" onClick={openModal}>
-				<div className="grow w-5 flex-row h-5 items-center gap-2 flex">
+			<div className="self-stretch inline-flex cursor-pointer px-2 mx-2 rounded h-[34px] hover:bg-bgModifierHover" onClick={openModal}>
+				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
 						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
 							<Icons.EventIcon />

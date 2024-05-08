@@ -86,7 +86,7 @@ export const SearchMessage: React.FC = () => {
 			<div
 				className={`transition-all duration-300 ${
 					expanded ? 'w-80' : 'w-40'
-				} h-8 pl-4 pr-2 py-3 bg-[#0B0B0B] rounded items-center inline-flex`}
+				} h-8 pl-4 pr-2 py-3 bg-bgTertiary rounded items-center inline-flex`}
 			>
 				<input
 					type="text"
@@ -95,7 +95,7 @@ export const SearchMessage: React.FC = () => {
 					onClick={handleInputClick}
 				/>
 			</div>
-			<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-[#0B0B0B] top-1/2 transform -translate-y-1/2">
+			<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">
 				<Icons.Search />
 			</div>
 		</div>
