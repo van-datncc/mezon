@@ -44,7 +44,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		<div
 			ref={panelRef}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="fixed top-full bg-[#323232] rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
+			className="fixed top-full bg-bgProfileBody rounded-sm shadow z-10 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
 				<ItemPanel children="Mark As Read" />
@@ -70,7 +70,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					)}
 					label=""
 					placement="right-start"
-					className="bg-[#323232] border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+					className="bg-bgProfileBody border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemPanel children="For 15 Minutes" />
 					<ItemPanel children="For 1 Hour" />

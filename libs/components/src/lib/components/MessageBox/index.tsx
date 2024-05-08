@@ -125,7 +125,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 
 			<div
-				className={`flex flex-inline items-center gap-2 box-content mb-4 bg-black rounded-md relative ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
+				className={`flex flex-inline items-center gap-2 box-content mb-4 bg-channelTextarea rounded-md relative ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
 			>
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
@@ -133,7 +133,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					onFinishUpload={handleFinishUpload}
 				/>
 
-				<div className={`w-full bg-black gap-3 flex items-center rounded-e-md`}>
+				<div className={`w-full bg-channelTextarea gap-3 flex items-center rounded-e-md`}>
 					<div className={`w-[96%] bg-black gap-3 relative whitespace-pre-wrap`}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}

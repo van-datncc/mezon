@@ -104,7 +104,7 @@ const SettingRightUser = ({
 		setFlags(true);
 	};
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgPrimary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="text-white">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 font-semibold text-base border-b-2 border-[#1f2020] pb-2 tracking-wider">User Profile</button>
@@ -123,7 +123,7 @@ const SettingRightUser = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
+							className="rounded-[3px] w-full text-white border border-bgTertiary px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-bgTertiary font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
 						/>
@@ -133,7 +133,7 @@ const SettingRightUser = ({
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
-									className="text-white font-semibold bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[15px]"
+									className="text-white font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[14px]"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -141,7 +141,7 @@ const SettingRightUser = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="text-white bg-[#1E1E1E] font-semibold rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[15px]"
+								className="text-white bg-[#1E1E1E] font-medium rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -149,7 +149,7 @@ const SettingRightUser = ({
 						</div>
 						<div className="mt-[30px] w-full">
 							<textarea
-								className="bg-black rounded p-[10px] w-full"
+								className="bg-bgTertiary rounded p-[10px] w-full"
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}

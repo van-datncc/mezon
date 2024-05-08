@@ -5,7 +5,7 @@ type EmptyPinMessageProps = {
 const EmptyPinMessage = ({ onClick }: EmptyPinMessageProps) => {
 	return (
 		<div className="flex flex-col items-center justify-center">
-			<div className="flex flex-col items-center py-16 px-7 bg-[#323232]">
+			<div className="flex flex-col items-center py-16 px-7 bg-bgSecondary">
 				<p className="text-base font-medium text-gray-300 text-center">This channel doesn't have any pinned messages... yet.</p>
 			</div>
 			<div className="flex flex-col items-center h-[106px] bg-[#1E1F22] p-4 w-full">

@@ -1,11 +1,11 @@
+import { useAuth } from '@mezon/core';
+import { channelUsersActions, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import * as Icons from '../../../Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
-import { selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, channelUsersActions, useAppDispatch } from '@mezon/store';
-import { useSelector } from 'react-redux';
-import { useAuth } from '@mezon/core';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
@@ -16,7 +16,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
-	
+
 	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
@@ -38,13 +38,13 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	};
 	const listMembersInChannel = useMemo(() => {
 		if (!rawMembers) return [];
-		const filteredMembers = rawMembers.filter(member => member.userChannelId !== "0");
-		return filteredMembers.map(member => member.user)
+		const filteredMembers = rawMembers.filter((member) => member.userChannelId !== '0');
+		return filteredMembers.map((member) => member.user);
 	}, [rawMembers]);
 
 	const listRolesInChannel = useMemo(() => {
 		if (!RolesChannel) return [];
-		return RolesChannel.filter((role) =>typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
+		return RolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
 	}, [RolesChannel]);
 
 	const closeAddMemRoleModal = () => {
@@ -55,14 +55,14 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		return userId === userProfile?.user?.google_id;
 	};
 	const deleteMember = async (userId: string) => {
-		if(userId!== userProfile?.user?.id){
+		if (userId !== userProfile?.user?.id) {
 			const body = {
 				channelId: channel.id,
 				userId: userId,
 			};
 			await dispatch(channelUsersActions.removeChannelUsers(body));
 		}
-	}
+	};
 
 	const deleteRole = async (roleId: string) => {
 		const body = {
@@ -72,11 +72,11 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 			channelType: channel.type,
 		};
 		await dispatch(channelUsersActions.removeChannelRole(body));
-	}
+	};
 
 	return (
 		<>
-			<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
+			<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgPrimary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
 				<div className="text-white text-[15px]">
 					<h3 className="mb-4 font-bold">Channel Permissions</h3>
 					<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
@@ -129,10 +129,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 												</div>
 												<div className="flex items-center gap-x-2">
 													<p className="text-xs text-[#AEAEAE]">Role</p>
-													<div
-														onClick = {()=>deleteRole(role?.id||"")}
-														role="button"
-													>
+													<div onClick={() => deleteRole(role?.id || '')} role="button">
 														<Icons.EscIcon defaultSize="size-[15px] cursor-pointer" />
 													</div>
 												</div>
@@ -147,21 +144,22 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 										{listMembersInChannel.map((user) => (
 											<div className={`flex justify-between py-2 rounded`} key={user?.id}>
 												<div className="flex gap-x-2 items-center">
-													<img src={user?.avatar_url} alt={user?.display_name} className="size-6 object-cover rounded-full" />
+													<img
+														src={user?.avatar_url}
+														alt={user?.display_name}
+														className="size-6 object-cover rounded-full"
+													/>
 													<p className="text-sm">{user?.display_name}</p>
 												</div>
-												<div className="flex items-center gap-x-2"
-												>
-													<p className="text-xs text-[#AEAEAE]"
-													>{checkOwner(user?.google_id || '') ? 'Server Owner' : ''}</p>
-													<div
-														onClick = {()=>deleteMember(user?.id||"")}
-														role="button"
-													>
+												<div className="flex items-center gap-x-2">
+													<p className="text-xs text-[#AEAEAE]">
+														{checkOwner(user?.google_id || '') ? 'Server Owner' : ''}
+													</p>
+													<div onClick={() => deleteMember(user?.id || '')} role="button">
 														<Icons.EscIcon
 															defaultSize={`${checkOwner(user?.google_id || '') ? '' : 'cursor-pointer'} size-[15px]`}
 															defaultFill={`${checkOwner(user?.google_id || '') ? '#4C4D55' : '#AEAEAE'}`}
-															/>
+														/>
 													</div>
 												</div>
 											</div>

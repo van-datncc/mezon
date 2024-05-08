@@ -92,7 +92,7 @@ const ThreadBox = () => {
 					</div>
 				)}
 			</div>
-			<div className="flex-shrink-0 flex flex-col pb-4 px-4 bg-[#1E1E1E] h-auto relative">
+			<div className="flex-shrink-0 flex flex-col pb-4 px-4 bg-bgPrimary h-auto relative">
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}

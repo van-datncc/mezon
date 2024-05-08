@@ -33,7 +33,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
-				<div className="bg-[#1E1E1E] flex flex-row items-center justify-between p-[16px] h-12">
+				<div className="bg-bgTertiary flex flex-row items-center justify-between p-[16px] h-12">
 					<div className="flex flex-row items-center border-r-[1px] border-r-[#6A6A6A] pr-[16px] gap-4">
 						<Icons.ThreadIcon />
 						<span className="cursor-default">Threads</span>
@@ -43,7 +43,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						<Button
 							onClick={handleCreateThread}
 							size="sm"
-							className="h-6 rounded focus:ring-transparent bg-primaryButton hover:!bg-primaryButton items-center"
+							className="h-6 rounded focus:ring-transparent bg-bgSelectItem hover:!bg-bgSelectItemHover items-center"
 						>
 							Create
 						</Button>
@@ -52,7 +52,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						</button>
 					</div>
 				</div>
-				<div className="flex flex-col bg-[#323232] px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
+				<div className="flex flex-col bg-bgSecondary px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
 					{threadChannelOnline.length > 0 && (
 						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
 							{threadChannelOnline.map((thread) => (

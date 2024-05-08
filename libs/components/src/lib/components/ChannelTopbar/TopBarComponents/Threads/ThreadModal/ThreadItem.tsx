@@ -37,7 +37,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
-			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] bg-[#535353] border border-[#535353] hover:border hover:border-[#6A6A6A]"
+			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] bg-bgPrimary border border-bgPrimary hover:border-bgModifierHover"
 			role="button"
 		>
 			<div className="flex flex-row justify-between items-center">

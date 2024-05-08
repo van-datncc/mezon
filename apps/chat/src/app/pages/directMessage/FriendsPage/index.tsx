@@ -83,8 +83,8 @@ export default function FriendsPage() {
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<div className="flex min-w-0 items-center bg-bgSecondary border-b-[#000] border-b-[1px] px-6 py-3 justify-start h-heightHeader">
+		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgPrimary h-[100%]">
+			<div className="flex min-w-0 items-center bg-bgPrimary shadow border-b-[1px] border-bgTertiary px-6 py-3 justify-start h-heightHeader">
 				{closeMenu ? (
 					statusMenu ? (
 						<></>
@@ -101,7 +101,7 @@ export default function FriendsPage() {
 						<Icons.IconFriends />
 						Friend
 					</div>
-					<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-borderDefault">
+					<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-bgModifierHover">
 						{tabData.map((tab, index) => (
 							<div key={index} className="relative">
 								<button
@@ -129,7 +129,7 @@ export default function FriendsPage() {
 				</div>
 			</div>
 			<div className="flex-1 flex w-full">
-				<div className="px-8 py-6 flex-1">
+				<div className="px-8 py-6 flex-1 bg-bgPrimary">
 					{!openModalAddFriend && (
 						<div className="flex flex-col text-[#AEAEAE]">
 							<div className="relative">
@@ -137,7 +137,7 @@ export default function FriendsPage() {
 									type="text"
 									onChange={(e) => setTextSearch(e.target.value)}
 									placeholder="Search"
-									className="mb-6 py-[10px] text-[14px] h-[44px] placeholder-gray-600"
+									className="mb-6 py-[10px] bg-bgTertiary text-[16px] font-normal h-[44px] text-textPrimary placeholder-textPrimary"
 								/>
 								<div className="absolute top-3 right-5">
 									<Icons.Search />

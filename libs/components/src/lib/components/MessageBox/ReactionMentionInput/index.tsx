@@ -398,7 +398,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						value={nameValueThread ?? ''}
 						label="Thread Name"
 						placeholder={openThreadMessageState && referenceMessage?.content.t !== '' ? referenceMessage?.content.t : 'Enter Thread Name'}
-						className="h-10 p-[10px] bg-black text-base outline-none rounded-md placeholder:text-sm"
+						className="h-10 p-[10px] bg-bgTertiary text-base outline-none rounded-md placeholder:text-sm"
 					/>
 					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 				</div>
@@ -414,6 +414,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={mentionsInputStyle}
+				className="bg-channelTextarea"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
