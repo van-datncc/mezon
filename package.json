@@ -90,7 +90,7 @@
 		"@nx/jest": "18.2.2",
 		"@nx/js": "18.2.2",
 		"@nx/react": "18.2.2",
-		"@nx/react-native": "18.2.2",
+		"@nx/react-native": "19.0.1",
 		"@nx/web": "18.2.2",
 		"@nx/webpack": "18.2.2",
 		"@nx/workspace": "18.2.2",
