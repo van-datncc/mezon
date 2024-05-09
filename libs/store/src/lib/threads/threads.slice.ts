@@ -1,4 +1,4 @@
-import { IThread, LoadingStatus } from '@mezon/utils';
+import { IMessageWithUser, IThread, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -19,6 +19,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	isPrivate: number;
 	listThreadId?: Record<string, string>;
 	nameValueThread?: Record<string, string>;
+	valueThread: IMessageWithUser | null;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -55,6 +56,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	isShowCreateThread: {},
 	isPrivate: 0,
 	nameValueThread: {},
+	valueThread: null,
 });
 
 export const threadsSlice = createSlice({
@@ -75,6 +77,9 @@ export const threadsSlice = createSlice({
 		},
 		setNameThreadError: (state, action: PayloadAction<string>) => {
 			state.nameThreadError = action.payload;
+		},
+		setValueThread: (state, action: PayloadAction<IMessageWithUser>) => {
+			state.valueThread = action.payload;
 		},
 		setMessageThreadError: (state, action: PayloadAction<string>) => {
 			state.messageThreadError = action.payload;
@@ -166,6 +171,8 @@ export const selectNameThreadError = createSelector(getThreadsState, (state) => 
 export const selectMessageThreadError = createSelector(getThreadsState, (state) => state.messageThreadError);
 
 export const selectListThreadId = createSelector(getThreadsState, (state) => state.listThreadId);
+
+export const selectValueThread = createSelector(getThreadsState, (state) => state.valueThread);
 
 export const selectNameValueThread = (channelId: string) =>
 	createSelector(getThreadsState, (state) => {

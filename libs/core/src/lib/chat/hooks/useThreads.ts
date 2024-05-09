@@ -9,10 +9,11 @@ import {
 	selectMessageThreadError,
 	selectNameThreadError,
 	selectNameValueThread,
+	selectValueThread,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
-import { isGreaterOneMonth } from '@mezon/utils';
+import { IMessageWithUser, isGreaterOneMonth } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -28,6 +29,7 @@ export function useThreads() {
 	const listThreadId = useSelector(selectListThreadId);
 	const isShowCreateThread = useSelector(selectIsShowCreateThread(currentChannelId as string));
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
+	const valueThread = useSelector(selectValueThread);
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
@@ -41,6 +43,13 @@ export function useThreads() {
 			dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue }));
 		},
 		[currentChannelId, dispatch],
+	);
+
+	const setValueThread = useCallback(
+		(value: IMessageWithUser) => {
+			dispatch(threadsActions.setValueThread(value));
+		},
+		[dispatch],
 	);
 
 	const threadChannel = useMemo(() => {
@@ -77,8 +86,10 @@ export function useThreads() {
 			threadChannelOnline,
 			threadCurrentChannel,
 			nameValueThread,
+			valueThread,
 			setIsShowCreateThread,
 			setNameValueThread,
+			setValueThread,
 		}),
 		[
 			isPrivate,
@@ -91,8 +102,10 @@ export function useThreads() {
 			threadChannelOnline,
 			threadCurrentChannel,
 			threads,
+			valueThread,
 			setNameValueThread,
 			setIsShowCreateThread,
+			setValueThread,
 		],
 	);
 }

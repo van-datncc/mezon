@@ -27,6 +27,8 @@ export interface AttachmentEntity extends IChannelAttachment {
 export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	attachment: string;
+	openModalAttachment: boolean;
 }
 
 export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
@@ -69,6 +71,8 @@ export const fetchChannelAttachments = createAsyncThunk(
 export const initialAttachmentState: AttachmentState = attachmentAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	attachment: '',
+	openModalAttachment: false,
 });
 
 export const attachmentSlice = createSlice({
@@ -78,6 +82,12 @@ export const attachmentSlice = createSlice({
 		add: attachmentAdapter.addOne,
 		addMany: attachmentAdapter.addMany,
 		remove: attachmentAdapter.removeOne,
+		setAttachment: (state, action) => {
+			state.attachment = action.payload;
+		},
+		setOpenModalAttachment: (state, action) => {
+			state.openModalAttachment = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -144,6 +154,10 @@ export const getAttachmentState = (rootState: { [ATTACHMENT_FEATURE_KEY]: Attach
 export const selectAllAttachment = createSelector(getAttachmentState, selectAll);
 
 export const selectAttachmentEntities = createSelector(getAttachmentState, selectEntities);
+
+export const selectAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.attachment);
+
+export const selectOpenModalAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.openModalAttachment);
 
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => attachments.filter((att) => att.filetype == 'image/png' || att.filetype == 'image/jpeg'));
