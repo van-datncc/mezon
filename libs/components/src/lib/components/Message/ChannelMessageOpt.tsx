@@ -55,6 +55,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(referencesActions.setReferenceMessage(message));
+		dispatch(referencesActions.setOpenReplyMessageState(false));
 	};
 
 	return (
