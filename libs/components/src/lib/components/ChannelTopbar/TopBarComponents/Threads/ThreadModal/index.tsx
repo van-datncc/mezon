@@ -1,4 +1,4 @@
-import { useAppNavigation, useThreads } from '@mezon/core';
+import { useAppNavigation, useReference, useThreads } from '@mezon/core';
 import { selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { Button } from 'flowbite-react';
 import { useSelector } from 'react-redux';
@@ -18,9 +18,11 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
+	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 
 	const handleCreateThread = () => {
+		setOpenThreadMessageState(false);
 		if (currentChannel && currentChannel?.parrent_id !== '0') {
 			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
 		}

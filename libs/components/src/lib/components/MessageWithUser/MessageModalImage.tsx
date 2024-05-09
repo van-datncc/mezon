@@ -61,7 +61,6 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 							onDragStart={handleDrag}
 							onWheel={handleWheel}
 							style={{ transform: `scale(${scale})`, transition: 'transform 0.3s ease' }}
-							onClick={() => console.log(attachments)}
 						/>
 					</div>
 					<button

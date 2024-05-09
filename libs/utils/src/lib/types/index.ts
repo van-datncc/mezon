@@ -137,6 +137,7 @@ export type IMessageWithUser = IMessage & {
 
 export type IMessageSendPayload = {
 	t: string;
+	contentThread?: string;
 };
 
 export type IUser = {

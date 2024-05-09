@@ -17,6 +17,7 @@ import {
 	referencesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectOpenThreadMessageState,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -45,6 +46,7 @@ import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+import ChannelMessageThread from './ChannelMessageThread';
 
 type Emoji = {
 	emoji: string;
@@ -88,7 +90,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState } = useReference();
+	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState, setOpenThreadMessageState } = useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -136,12 +138,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		const { key, ctrlKey, shiftKey } = event;
 		const isEnterKey = key === 'Enter';
 
-		if (isEnterKey && ctrlKey && shiftKey && valueTextInput !== '') {
+		if (isEnterKey && ctrlKey && shiftKey) {
 			event.preventDefault();
-			if (props.currentClanId) {
-				handleSend(true);
+			if( valueTextInput !== '' || openThreadMessageState){
+				if (props.currentClanId) {
+					handleSend(true);
+				}
+				return;
 			}
-			return;
 		}
 
 		switch (key) {
@@ -183,12 +187,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
+			if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel && !openThreadMessageState) {
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
+
 			if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
-				props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, { nameValueThread, isPrivate }, anonymousMessage);
+				props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, {nameValueThread: nameValueThread, isPrivate }, anonymousMessage);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
 
@@ -202,7 +207,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
-				props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameValueThread, isPrivate }, anonymousMessage);
+				if(openThreadMessageState){
+					props.onSend({ t: referenceMessage?.content.t || '', contentThread: content }, referenceMessage?.mentions, referenceMessage?.attachments, referenceMessage?.references, { nameValueThread: nameValueThread ?? referenceMessage?.content.t, isPrivate }, anonymousMessage);
+					setOpenThreadMessageState(false);
+				} else {
+					props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameValueThread: nameValueThread, isPrivate }, anonymousMessage);
+				}
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
 
@@ -227,6 +237,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			content,
 			referenceMessage,
 			dataReferences,
+			openThreadMessageState,
 		],
 	);
 
@@ -401,6 +412,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						className="h-10 p-[10px] bg-bgTertiary text-base outline-none rounded-md placeholder:text-sm"
 					/>
 					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
+					{(referenceMessage && openThreadMessageState)  && <ChannelMessageThread message={referenceMessage}/>}
 				</div>
 			)}
 			{props.isThread && messageThreadError && !threadCurrentChannel && (

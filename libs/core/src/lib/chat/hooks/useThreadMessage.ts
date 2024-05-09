@@ -4,6 +4,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useClans } from './useClans';
+import { useReference } from './useReference';
 
 export type UseThreadMessage = {
 	channelId: string;
@@ -16,6 +17,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 	const dispatch = useAppDispatch();
 
 	const { clientRef, sessionRef, socketRef, threadRef } = useMezon();
+	const { setOpenThreadMessageState, openThreadMessageState } = useReference();
 
 	const sendMessageThread = React.useCallback(
 		async (
@@ -33,7 +35,10 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(currentClanId, thread.id, thread.chanel_label, mode, content, mentions, attachments, references);
+			await socket.writeChatMessage(currentClanId, thread.id, thread.chanel_label, mode, {t: content.t}, mentions, attachments, references);
+			if(content.contentThread){
+				await socket.writeChatMessage(currentClanId, thread.id, thread.chanel_label, mode, {t: content.contentThread}, [], [], undefined);
+			}
 
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
