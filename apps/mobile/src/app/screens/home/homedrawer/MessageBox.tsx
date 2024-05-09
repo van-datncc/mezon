@@ -1,23 +1,25 @@
+import { selectMemberByUserId } from '@mezon/store';
 import React from 'react';
 import { Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { FastImageRes } from './Reusables';
+import { styles } from './styles';
 
 const MessageBox = React.memo((props: { data: any }) => {
+	const user = useSelector(selectMemberByUserId(props?.data?.sender_id));
+
 	return (
-		<View
-			key={Math.floor(Math.random() * 9999999).toString()}
-			style={{ flexDirection: 'row', paddingHorizontal: 10, marginBottom: 25, alignItems: 'center' }}
-		>
+		<View style={styles.wrapperMessageBox}>
 			<View style={{ width: 40, height: 40, borderRadius: 50, overflow: 'hidden' }}>
-				<FastImageRes uri={props.data.user_details.image} />
+				<FastImageRes uri={user?.user?.avatar_url} />
 			</View>
-			<View style={{ marginLeft: 15, justifyContent: 'space-between' }}>
-				<View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: 5 }}>
-					<Text style={{ fontSize: 17, marginRight: 10, color: '#dcdcdc' }}>{props.data.user_details.name}</Text>
-					<Text style={{ fontSize: 12, color: '#b4b4b4' }}>{props.data.datetime}</Text>
+			<View style={styles.rowMessageBox}>
+				<View style={styles.messageBoxTop}>
+					<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
+					<Text style={styles.dateMessageBox}>{props?.data?.date}</Text>
 				</View>
 				<View>
-					<Text style={{ fontSize: 15, color: '#dcdcdc' }}>{props.data.message}</Text>
+					<Text style={styles.contentMessageBox}>{props?.data?.content?.t}</Text>
 				</View>
 			</View>
 		</View>

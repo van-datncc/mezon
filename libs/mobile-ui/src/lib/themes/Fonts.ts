@@ -22,6 +22,7 @@ export const size = {
   tiny: 8.5,
   label: 16,
 
+	s_2: verticalScale(2),
   s_8: verticalScale(8),
   s_4: verticalScale(4),
   s_6: verticalScale(6),

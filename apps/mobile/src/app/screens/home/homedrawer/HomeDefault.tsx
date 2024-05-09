@@ -1,10 +1,13 @@
+import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
+import { ChannelStreamMode } from 'mezon-js';
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import SearchLogo from '../../../../assets/svg/discoverySearch-white.svg';
+import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
 import MessageBox from './MessageBox';
 import WelcomeMessage from './WelcomeMessage';
@@ -55,21 +58,25 @@ const HomeDefault = React.memo((props: any) => {
 		<View style={[styles.homeDefault]}>
 			<HomeDefaultHeader navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
 
-			<View style={{ flex: 1 }}>
-				<FlatList
-					data={[{}]}
-					contentContainerStyle={styles.listChannels}
-					renderItem={() => (
-						<>
-							<WelcomeMessage uri={''} channelTitle={currentChannel?.channel_label || ''} serverId={1} />
-							{messages
-								.filter((message) => message.channelId == 2 && message.serverId == 1)
-								.map((message) => (
-									<MessageBox data={message} />
-								))}
-						</>
-					)}
-				/>
+			<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
+				{currentChannel ? (
+					<ChannelMessages channelId={currentChannel.channel_id} type="CHANNEL" mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+				) : (
+					<FlatList
+						data={[{}]}
+						contentContainerStyle={styles.listChannels}
+						renderItem={() => (
+							<>
+								<WelcomeMessage uri={''} channelTitle={currentChannel?.channel_label || ''} serverId={1} />
+								{messages
+									.filter((message) => message.channelId == 2 && message.serverId == 1)
+									.map((message) => (
+										<MessageBox data={message} />
+									))}
+							</>
+						)}
+					/>
+				)}
 			</View>
 
 			<ChatBox channelTitle={currentChannel?.channel_label || ''} channelId={2} serverId={1} />
