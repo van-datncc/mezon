@@ -3,10 +3,10 @@ import { Formik } from 'formik';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import * as Yup from 'yup';
-import Button from '../../components/Auth/Button';
-import FooterAuth from '../../components/Auth/FooterAuth';
-import GoogleLogin from '../../components/Auth/GoogleLogin';
-import TextInputUser from '../../components/Auth/TextInput';
+import Button from '../../components/auth/Button';
+import FooterAuth from '../../components/auth/FooterAuth';
+import GoogleLogin from '../../components/auth/GoogleLogin';
+import TextInputUser from '../../components/auth/TextInput';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 
 const RegisterSchema = Yup.object().shape({
@@ -110,7 +110,7 @@ const RegisterScreen = () => {
 							isPass={false}
 						/>
 						{/* button  */}
-						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign up'}/>
+						<Button disabled={!isValid} onPress={handleSubmit} isValid={isValid} title={'Sign up'} />
 					</>
 				)}
 			</Formik>
