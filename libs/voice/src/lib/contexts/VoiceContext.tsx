@@ -288,13 +288,13 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	);
 
 	const onConferenceJoined = useCallback(() => {
+		console.log("onConferenceJoined");
 		setIsJoinedConf(true);
 
 		localTracksRef.current.forEach((localTrack) => {
 			voiceChannelRef.current?.addTrack(localTrack);
 		});
-		const myUserId = voiceChannelRef.current?.myUserId() || '';
-
+		const myUserId = voiceChannelRef.current?.myUserId() || '';		
 		if (socketRef?.current && voiceOptions) {
 			socketRef.current.writeVoiceJoined(
 				myUserId,
@@ -400,6 +400,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	}, [voiceChannelRef, voiceConnRef]);
 
 	const createVoiceChannel = useCallback(async () => {
+		console.log("createVoiceChannel");
 		if (!voiceOptions) {
 			throw new Error('voice channel params is undefined');
 		}
@@ -450,6 +451,7 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 	]);
 
 	const onConnectionSuccess = useCallback(() => {
+		console.log("onConnectionSuccess");
 		if (voiceChannelRef.current?.getName()) {
 			leaveVoiceChannel();
 		}
@@ -485,12 +487,13 @@ const VoiceContextProvider: React.FC<VoiceContextProviderProps> = ({ children })
 		voiceConnRef.current = null;
 	}, [voiceOptions, onConnectionFailed, onConnectionSuccess, onDisconnect, socketRef]);
 
-	const createVoiceConnection = useCallback(
+	const createVoiceConnection = useCallback(		
 		async (vChannelName: string, jwt: string) => {
+			console.log("createVoiceConnection");
 			if (vChannelName && vChannelName === voiceChannelRef.current?.getName()) {
 				console.log('connection already establish');
 				return voiceConnRef.current;
-			} else {
+			} else if (voiceChannelRef.current?.getName()) {
 				console.log('disconnect old channel', voiceChannelRef.current?.getName());
 				voiceDisconnect(); // reconnect to another channel
 			}
