@@ -141,7 +141,7 @@ export const fetchMessages = createAsyncThunk(
 
 		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
-		let hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
+		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
 
 		if (response.last_seen_message?.id) {
@@ -459,7 +459,7 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 
 export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.filter((message) => message.sender_id === senderId).pop();
+		return messages.filter((message) => message.sender_id === senderId);
 	});
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
