@@ -81,8 +81,8 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
 				isCollapsed={isCollapsed}
 			/>
-			{!isCollapsed &&
-				props.data.channels?.map((item: any, index: number) => {
+			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
+				{props.data.channels?.map((item: any, index: number) => {
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					const isUnReadChannel = useSelector(selectIsUnreadChannelById(item?.id));
 					const isActive = currentChanel?.id === item.id;
@@ -97,6 +97,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 						/>
 					);
 				})}
+			</View>
 		</View>
 	);
 });
