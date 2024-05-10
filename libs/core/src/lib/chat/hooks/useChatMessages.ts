@@ -1,4 +1,5 @@
 import {
+	MessagesEntity,
 	messagesActions,
 	selectHasMoreMessageByChannelId,
 	selectLastMessageIdByChannelId,
@@ -28,11 +29,15 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
 	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
-	const lastMessageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));
+	const messageByUserId = useSelector(selectMessageByUserId(channelId, user.userId));
 
 	const loadMoreMessage = React.useCallback(async () => {
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
+
+	const lastMessageByUserId = messageByUserId?.reduce((lastMessage: MessagesEntity, message: MessagesEntity) => {
+		return new Date(lastMessage.create_time) > new Date(message.create_time) ? lastMessage : message;
+	}, {} as MessagesEntity);
 
 	return useMemo(
 		() => ({
