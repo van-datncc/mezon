@@ -86,7 +86,7 @@ const LocationModal = (props: LocationModalProps) => {
 							--choose voice channel--
 						</option>
 						{voicesChannel.map((voice) => (
-							<option key={voice.id} className="text-white">
+							<option key={voice.id} className="text-white" value={voice.id}>
 								{voice.channel_label}
 							</option>
 						))}
@@ -103,7 +103,7 @@ const LocationModal = (props: LocationModalProps) => {
 						value={titleEvent}
 						onChange={onChangeTitle}
 						placeholder="Add a location, link or something."
-						className="bg-bgPrimary font-[400] rounded w-full text-white outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500"
+						className="font-[400] rounded w-full text-white outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 bg-black"
 					/>
 				</div>
 			)}

@@ -65,25 +65,23 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 		handleUpdateUser,
 	};
 	return (
-		<>
-			{props.flagOption ? (
-				<div className="overflow-y-auto flex flex-row flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
-					<SettingListRole handleClose={props.handleClose} />
-					<div className="border-l border-gray-400"></div>
-					<div className=" w-2/3">
-						<div className="font-semibold pl-3">
-							{clickRole === 'New Role' ? (
-								<div className="tracking-wide text-sm mb-4">NEW ROLE</div>
-							) : (
-								<div className="tracking-wide mb-4 text-sm">EDIT ROLE</div>
-							)}
-							<SettingValueDisplayRole />
-						</div>
+		props.flagOption ? (
+			<div className="overflow-y-auto flex flex-row flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
+				<SettingListRole handleClose={props.handleClose} />
+				<div className="border-l border-gray-400"></div>
+				<div className=" w-2/3">
+					<div className="font-semibold pl-3">
+						{clickRole === 'New Role' ? (
+							<div className="tracking-wide text-sm mb-4">NEW ROLE</div>
+						) : (
+							<div className="tracking-wide mb-4 text-sm">EDIT ROLE</div>
+						)}
+						<SettingValueDisplayRole />
 					</div>
-					<SettingUserClanProfileSave PropsSave={saveProfile} />
 				</div>
-			) : null}
-		</>
+				<SettingUserClanProfileSave PropsSave={saveProfile} />
+			</div>
+		) : null
 	);
 };
 
