@@ -459,7 +459,7 @@ export const selectMessageByChannelId = (channelId?: string | null) =>
 
 export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.filter((message) => message.sender_id === senderId).pop();
+		return messages.filter((message) => message.sender_id === senderId);
 	});
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
