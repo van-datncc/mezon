@@ -1,7 +1,6 @@
 import { useChatMessages } from '@mezon/core';
+import { useVirtualizer } from '@mezon/virtual';
 import { useEffect, useRef } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { VariableSizeList as List } from 'react-window';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -15,60 +14,25 @@ type ChannelMessagesProps = {
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
-	const listRef = useRef<any>({});
-	const rowHeights = useRef<any>({});
+	const parentRef = useRef<any>();
+
+	const rowVirtualizer = useVirtualizer({
+		count: messages.length + 1, // Add 1 to account for loader row
+		estimateSize: () => 100,
+		getScrollElement: () => parentRef.current,
+		overscan: 50,
+		reverse: true,
+	});
 
 	useEffect(() => {
-		// TODO: May find another solution instead of delay to get ref
-		setTimeout(() => {
-			if (messages.length > 0) {
-				listRef.current?.scrollToItem(messages.length - 1);
-			}
-		}, 100);
-	}, [messages.length]);
+		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
 
-	function getRowHeight(index: any) {
-		return rowHeights.current[index] || 60;
-	}
+		if (!lastItem) return;
 
-	function Row({ index, style }: any) {
-		const rowRef = useRef<any>({});
-		useEffect(() => {
-			if (rowRef.current) {
-				if (messages[index].attachments?.length) {
-					rowRef.current.clientHeight > 40 ? setRowHeight(index, rowRef.current.clientHeight) : setRowHeight(index, 100);
-				} else {
-					const newHeight = rowRef.current.clientHeight;
-					setRowHeight(index, newHeight);
-				}
-			}
-		}, [rowRef.current]);
-		return (
-			<div style={style} key={messages[index].id}>
-				<div ref={rowRef}>
-					<ChannelMessage
-						mode={mode}
-						lastSeen={messages[index].id === unreadMessageId && messages[index].id !== lastMessageId}
-						message={messages[index]}
-						preMessage={messages.length > 0 ? messages[index - 1] : undefined}
-						channelId={channelId}
-						channelLabel={channelLabel || ''}
-					/>
-				</div>
-			</div>
-		);
-	}
-
-	function setRowHeight(index: any, size: any) {
-		listRef.current.resetAfterIndex(0);
-		rowHeights.current = { ...rowHeights.current, [index]: size };
-	}
-
-	const onScroll = ({ scrollOffset }: any) => {
-		if (scrollOffset < 50 && hasMoreMessage && messages.length > 49) {
+		if (lastItem.index <= messages.length - 1 && hasMoreMessage) {
 			loadMoreMessage();
 		}
-	};
+	}, [hasMoreMessage, loadMoreMessage, messages.length]);
 
 	return (
 		<div
@@ -79,21 +43,76 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				overflowX: 'hidden',
 			}}
 		>
-			<AutoSizer>
-				{({ height, width }) => (
-					<List
-						height={height - 15}
-						itemCount={messages.length}
-						itemSize={getRowHeight}
-						ref={listRef}
-						width={width}
-						onScroll={onScroll}
-						className="message-channel-scroll"
-					>
-						{Row}
-					</List>
-				)}
-			</AutoSizer>
+			<div
+				ref={parentRef}
+				className="List"
+				style={{
+					display: 'flex',
+					flexDirection: 'column-reverse',
+					justifyContent: 'flex-start',
+					minHeight: '0',
+					overflow: 'auto',
+					width: '100%',
+				}}
+			>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column-reverse',
+						flexShrink: '0',
+						height: `${rowVirtualizer.getTotalSize()}px`,
+						justifyContent: 'flex-start',
+						marginBottom: 'auto',
+						position: 'relative',
+						width: '100%',
+					}}
+				>
+					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+						const isLoaderRow = virtualRow.index === messages.length;
+						const message = messages[virtualRow.index];
+						console.log('message', message);
+						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
+						const minHeight = hasAttachment ? '200px' : 'auto';
+						return (
+							<div
+								ref={virtualRow.measureElement}
+								key={virtualRow.index}
+								style={{
+									position: 'absolute',
+									bottom: 0,
+									left: 0,
+									width: '100%',
+									transform: `translateY(${virtualRow.end}px)`,
+								}}
+							>
+								<div
+									style={{
+										height: isLoaderRow ? '100px' : 'auto',
+										minHeight,
+									}}
+								>
+									{isLoaderRow ? (
+										hasMoreMessage ? (
+											'Loading more...'
+										) : (
+											'Nothing more to load'
+										)
+									) : (
+										<ChannelMessage
+											mode={mode}
+											lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+											message={message}
+											preMessage={messages[virtualRow.index - 1]}
+											channelId={channelId}
+											channelLabel={channelLabel || ''}
+										/>
+									)}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
 		</div>
 	);
 }
