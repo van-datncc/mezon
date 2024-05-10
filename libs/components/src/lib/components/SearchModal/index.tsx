@@ -174,7 +174,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [handleSelectChannel, handleSelectMem, idActive, listChannelSearch, listMemSearch, searchText]);
 
 	return (
-		<Modal show={open} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary bg-opacity-90">
+		<Modal
+			show={open}
+			dismissible={true}
+			onClose={onClose}
+			className="bg-[#111111] text-contentPrimary bg-opacity-90 focus-visible:[&>*]:outline-none"
+		>
 			<Modal.Body className="bg-[#36393e] px-6 py-4 rounded-[6px] h-[200px] w-full">
 				<div className="flex flex-col">
 					<InputField
