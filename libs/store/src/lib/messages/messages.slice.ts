@@ -141,7 +141,7 @@ export const fetchMessages = createAsyncThunk(
 
 		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
-		let hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
+		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
 
 		if (response.last_seen_message?.id) {
@@ -443,7 +443,7 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return +a.creationTimeMs - +b.creationTimeMs;
+		return  +b.creationTimeMs - +a.creationTimeMs;
 	}
 	return 0;
 }
