@@ -95,7 +95,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
-	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread } = useThreads();
+	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
@@ -208,7 +208,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
 				if(openThreadMessageState){
-					props.onSend({ t: referenceMessage?.content.t || '', contentThread: content }, referenceMessage?.mentions, referenceMessage?.attachments, referenceMessage?.references, { nameValueThread: nameValueThread ?? referenceMessage?.content.t, isPrivate }, anonymousMessage);
+					props.onSend({ t: valueThread?.content.t || '', contentThread: content }, valueThread?.mentions, valueThread?.attachments, valueThread?.references, { nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate }, anonymousMessage);
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameValueThread: nameValueThread, isPrivate }, anonymousMessage);
@@ -408,11 +408,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						onKeyDown={onKeyDown}
 						value={nameValueThread ?? ''}
 						label="Thread Name"
-						placeholder={openThreadMessageState && referenceMessage?.content.t !== '' ? referenceMessage?.content.t : 'Enter Thread Name'}
+						placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
 						className="h-10 p-[10px] bg-bgTertiary text-base outline-none rounded-md placeholder:text-sm"
 					/>
 					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
-					{(referenceMessage && openThreadMessageState)  && <ChannelMessageThread message={referenceMessage}/>}
+					{(valueThread && openThreadMessageState)  && <ChannelMessageThread message={valueThread}/>}
 				</div>
 			)}
 			{props.isThread && messageThreadError && !threadCurrentChannel && (
