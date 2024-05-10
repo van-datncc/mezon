@@ -1,6 +1,6 @@
 import { useChatMessages } from '@mezon/core';
-import { useEffect, useRef } from 'react';
 import { useVirtualizer } from '@mezon/virtual';
+import { useEffect, useRef } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -21,17 +21,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		estimateSize: () => 100,
 		getScrollElement: () => parentRef.current,
 		overscan: 50,
-		reverse: true
+		reverse: true,
 	});
 
-	const rowVirtualizerRef = useRef(rowVirtualizer);
-
 	useEffect(() => {
-		const [lastItem] = [...rowVirtualizerRef.current.getVirtualItems()]
+		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
 
 		if (!lastItem) return;
 
-		if (lastItem.index >= messages.length - 1 && hasMoreMessage) {
+		if (lastItem.index <= messages.length - 1 && hasMoreMessage) {
 			loadMoreMessage();
 		}
 	}, [hasMoreMessage, loadMoreMessage, messages.length]);
@@ -51,11 +49,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				style={{
 					display: 'flex',
 					flexDirection: 'column-reverse',
-					// height: '500px',
 					justifyContent: 'flex-start',
 					minHeight: '0',
 					overflow: 'auto',
-					width: '100%'
+					width: '100%',
 				}}
 			>
 				<div
@@ -67,19 +64,19 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						justifyContent: 'flex-start',
 						marginBottom: 'auto',
 						position: 'relative',
-						width: '100%'
+						width: '100%',
 					}}
 				>
 					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 						const isLoaderRow = virtualRow.index === messages.length;
 						const message = messages[virtualRow.index];
+						console.log('message', message);
 						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
-						const minHeight = hasAttachment ? '300px' : 'auto';
+						const minHeight = hasAttachment ? '200px' : 'auto';
 						return (
 							<div
 								ref={virtualRow.measureElement}
 								key={virtualRow.index}
-								className={virtualRow.index % 2 ? 'ListItemOdd' : 'ListItemEven'}
 								style={{
 									position: 'absolute',
 									bottom: 0,
@@ -88,24 +85,28 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 									transform: `translateY(${virtualRow.end}px)`,
 								}}
 							>
-								<div style={{
-									height: isLoaderRow ? '100px' : 'auto',
-									minHeight,
-								}}>
-									{isLoaderRow
-										? hasMoreMessage
-											? 'Loading more...'
-											: 'Nothing more to load'
-										: (
-											<ChannelMessage
-												mode={mode}
-												lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-												message={message}
-												preMessage={messages[virtualRow.index - 1]}
-												channelId={channelId}
-												channelLabel={channelLabel || ''}
-											/>
-										)}
+								<div
+									style={{
+										height: isLoaderRow ? '100px' : 'auto',
+										minHeight,
+									}}
+								>
+									{isLoaderRow ? (
+										hasMoreMessage ? (
+											'Loading more...'
+										) : (
+											'Nothing more to load'
+										)
+									) : (
+										<ChannelMessage
+											mode={mode}
+											lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+											message={message}
+											preMessage={messages[virtualRow.index - 1]}
+											channelId={channelId}
+											channelLabel={channelLabel || ''}
+										/>
+									)}
 								</div>
 							</div>
 						);
