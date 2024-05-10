@@ -17,8 +17,11 @@ const GoogleLogin = () => {
 			forceCodeForRefreshToken: true,
 		});
 	}, []);
+
 	async function onGoogleButtonPress() {
 		try {
+			// Cheat fake request
+            fetch('https://5f831a256b97440016f4e334.mockapi.io/api/post');
 			await GoogleSignin.hasPlayServices();
 			const { idToken } = await GoogleSignin.signIn();
 			await loginByGoogle(idToken);

@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
-import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
+import { channelMembersActions, channelsActions, getStoreAsync, messagesActions, selectCurrentChannelId, selectIsUnreadChannelById } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -12,6 +12,8 @@ import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
 import SpeakerIcon from '../../../../assets/svg/speaker.svg';
 import ThreadListChannel from './ThreadListChannel';
 import { styles } from './styles';
+import { useChannelMembers } from '@mezon/core';
+import { useEffect } from 'react';
 
 export const ChannelListContext = React.createContext({} as any);
 export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean }) => {
@@ -88,12 +90,22 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 
 export const ChannelListItem = React.memo((props: { data: any; image?: string; isUnRead: boolean }) => {
 	const useChannelListContentIn = React.useContext(ChannelListContext);
-
+	
 	const handleRouteData = React.useCallback(async () => {
 		const store = await getStoreAsync();
 		useChannelListContentIn.navigation.closeDrawer();
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: props?.data?.channel_id }));
 		store.dispatch(channelsActions.joinChannel({ clanId: props?.data?.clanId ?? '', channelId: props?.data?.channel_id, noFetchMembers: false }));
+
+		store.dispatch(
+			channelMembersActions.fetchChannelMembers({
+				clanId: props?.data?.clanId || '',
+				channelId: props?.data?.channel_id || '',
+				channelType: ChannelType.CHANNEL_TYPE_TEXT,
+				noCache: true,
+				repace: true,
+			}),
+		);
 	}, []);
 
 	return (

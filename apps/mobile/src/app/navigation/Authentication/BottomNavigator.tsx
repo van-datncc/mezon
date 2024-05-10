@@ -11,6 +11,7 @@ import MessagesScreen from '../../screens/main/MessagesScreen';
 import Notifications from '../../screens/main/Notifications';
 import ProfileScreen from '../../screens/main/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
+import MemberListStatus from '../../screens/member';
 
 const TabStack = createBottomTabNavigator();
 
@@ -30,7 +31,8 @@ const BottomNavigator = () => {
 				},
 				tabBarActiveTintColor: '#FFFFFF',
 			}}
-			initialRouteName={APP_SCREEN.DRAWER_BAR}
+			// initialRouteName={APP_SCREEN.DRAWER_BAR}
+			initialRouteName={"abcd"}
 		>
 			<TabStack.Screen
 				name={APP_SCREEN.HOME}
@@ -65,6 +67,16 @@ const BottomNavigator = () => {
 				options={{
 					headerShown: false,
 					title: 'Profile',
+					tabBarIcon: ({ color }) => <Feather name="user" color={color} size={28} />,
+				}}
+			/>
+
+			<TabStack.Screen
+				name={"abcd"}
+				component={MemberListStatus}
+				options={{
+					headerShown: false,
+					title: 'List',
 					tabBarIcon: ({ color }) => <Feather name="user" color={color} size={28} />,
 				}}
 			/>
