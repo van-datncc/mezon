@@ -6,10 +6,10 @@ import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import Button from '../../components/Auth/Button';
-import FooterAuth from '../../components/Auth/FooterAuth';
-import GoogleLogin from '../../components/Auth/GoogleLogin';
-import TextInputUser from '../../components/Auth/TextInput';
+import Button from '../../components/auth/Button';
+import FooterAuth from '../../components/auth/FooterAuth';
+import GoogleLogin from '../../components/auth/GoogleLogin';
+import TextInputUser from '../../components/auth/TextInput';
 import LoadingModal from '../../components/LoadingModal';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 const LoginSchema = Yup.object().shape({

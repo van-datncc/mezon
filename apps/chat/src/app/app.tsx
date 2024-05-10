@@ -4,7 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { RouterProvider } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { VoiceContextProvider } from '@mezon/core';
+import { VoiceContextProvider } from '@mezon/voice';
 import { StrictMode, useEffect, useMemo } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
