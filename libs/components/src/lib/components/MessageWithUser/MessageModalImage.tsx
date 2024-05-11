@@ -1,21 +1,15 @@
-import { useEscapeKey } from '@mezon/core';
-import { selectAttachmentPhoto } from '@mezon/store';
+import { useAttachments, useEscapeKey } from '@mezon/core';
+import { selectAttachmentPhoto, selectOpenModalAttachment } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 
-export type MessageModalImageProps = {
-	open: boolean;
-	closeModal: () => void;
-	url: string | undefined;
-};
-
-const MessageModalImage = (props: MessageModalImageProps) => {
-	const { open, closeModal, url } = props;
+const MessageModalImage = () => {
 	const [scale, setScale] = useState(1);
 	const [showList, setShowList] = useState(true);
 	const attachments = useSelector(selectAttachmentPhoto());
-	const [urlImg, setUrlImg] = useState(url);
+	const { openModalAttachment, setOpenModalAttachment, attachment } = useAttachments();
+	const [urlImg, setUrlImg] = useState(attachment);
 
 	const handleShowList = () => {
 		setShowList(!showList);
@@ -24,8 +18,8 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 	useEffect(() => {
 		setShowList(true);
 		setScale(1);
-		setUrlImg(url);
-	}, [open]);
+		setUrlImg(attachment);
+	}, [openModalAttachment]);
 
 	const handleDrag = (e: any) => {
 		e.preventDefault();
@@ -47,11 +41,15 @@ const MessageModalImage = (props: MessageModalImageProps) => {
 		setUrlImg(url);
 	};
 
+	const closeModal = () => {
+		setOpenModalAttachment(false);
+	}
+
 	useEscapeKey(closeModal);
 
 	return (
 		<div>
-			{open ? (
+			{openModalAttachment ? (
 				<div className="justify-center items-center flex flex-col md:flex-row fixed inset-0 z-50 outline-none focus:outline-none bg-black text-white">
 					<div className="flex-1 flex justify-center items-center p-5 overflow-hidden h-full w-full">
 						<img

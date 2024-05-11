@@ -8,6 +8,7 @@ import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
+import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
@@ -169,6 +170,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+			<MessageModalImage />
 		</div>
 	);
 }
