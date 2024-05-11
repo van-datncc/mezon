@@ -1,4 +1,3 @@
-export * from '../../voice/src/lib/contexts/VoiceContext';
 export * from './lib/app/hooks/useAppNavigation';
 export * from './lib/app/hooks/useAppParams';
 export * from './lib/auth/hooks/useAuth';
@@ -41,6 +40,6 @@ export * from './lib/chat/hooks/useSendForwardMessage';
 export * from './lib/chat/hooks/useSendInviteMessage';
 export * from './lib/chat/hooks/useThreadMessage';
 export * from './lib/chat/hooks/useThreads';
+export * from './lib/chat/hooks/useAttachment';
 
-export * from './lib/core';
 export * from './lib/policy';

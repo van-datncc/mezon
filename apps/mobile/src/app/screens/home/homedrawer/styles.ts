@@ -1,4 +1,4 @@
-import { Colors, verticalScale, size } from '@mezon/mobile-ui';
+import { Colors, size, verticalScale } from '@mezon/mobile-ui';
 import { Dimensions, StyleSheet } from 'react-native';
 
 const inputWidth = Dimensions.get('window').width * 0.6;
@@ -63,15 +63,13 @@ export const styles = StyleSheet.create({
 	containerDrawerContent: {
 		flex: 1,
 		flexDirection: 'row',
-		backgroundColor: '#2b2d31',
+		backgroundColor: Colors.primary,
 	},
 	homeDefault: {
 		backgroundColor: '#2b2d31',
 		flex: 1,
 	},
 	listChannels: {
-		height: '100%',
-		flexDirection: 'column-reverse',
 		backgroundColor: Colors.tertiaryWeight,
 	},
 	channelListSection: {
@@ -102,6 +100,10 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingVertical: 8,
 		borderRadius: 5,
+	},
+	channelListItemActive: {
+		backgroundColor: Colors.tertiaryWeight,
+		borderRadius: size.s_10,
 	},
 	channelListItemTitle: {
 		fontSize: size.s_14,
@@ -229,5 +231,53 @@ export const styles = StyleSheet.create({
 	inviteButton: {
 		paddingVertical: 8,
 		paddingHorizontal: 12
+	},
+	threadItem: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+	},
+	threadItemActive: {
+		backgroundColor: Colors.tertiaryWeight,
+		borderRadius: size.s_10,
+		position: 'absolute',
+		width: '95%',
+		height: '85%',
+		right: 0,
+		top: size.s_20,
+	},
+	threadFirstItemActive: {
+		height: '160%',
+		right: 0,
+		top: size.s_2,
+	},
+	wrapperMessageBox: {
+		flexDirection: 'row',
+		paddingLeft: size.s_10,
+		marginBottom: size.s_24,
+		paddingRight: size.s_50,
+	},
+	rowMessageBox: {
+		marginLeft: 15,
+		justifyContent: 'space-between',
+	},
+	messageBoxTop: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+		marginBottom: size.s_6,
+	},
+	userNameMessageBox: {
+		fontSize: size.s_16,
+		marginRight: size.s_10,
+		fontWeight: '600',
+		color: Colors.textGray,
+	},
+	dateMessageBox: {
+		fontSize: size.s_12,
+		color: Colors.gray72,
+	},
+	contentMessageBox: {
+		fontSize: size.s_16,
+		color: Colors.tertiary,
+		flex: 1,
 	},
 });

@@ -13,7 +13,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 	const dispatch = useAppDispatch();
 	const { reactionActions, userId } = useChatReaction();
 	const { openOptionMessageState, setOpenThreadMessageState } = useReference();
-	const { setIsShowCreateThread } = useThreads();
+	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 
@@ -54,7 +54,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		setThread(!thread);
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
-		dispatch(referencesActions.setReferenceMessage(message));
+		setValueThread(message);
 	};
 
 	return (
