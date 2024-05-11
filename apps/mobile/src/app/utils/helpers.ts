@@ -40,3 +40,8 @@ export const getSnapToOffets = (imageWidth: number, padding: number, width: numb
 export const isImage = (url?: string) => {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)/.test(url);
 };
+
+export const normalizeString = (str: string) => {
+  const normalizedStr = str.replace(/\s+/g, '').trim();
+  return normalizedStr.toLowerCase();
+}

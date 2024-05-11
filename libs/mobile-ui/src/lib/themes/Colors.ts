@@ -17,6 +17,7 @@ const colors = {
 	tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
+	bg_Primary: isDarkTheme ? '#3e4247' : '#FFFFFF'
 };
 
 export default colors;

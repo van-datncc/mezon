@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
-import { ICategoryChannel } from '@mezon/utils';
+import { ICategoryChannel, IUser } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import HashSignWhiteIcon from '../../../../assets/svg/channelText-white.svg';
@@ -12,6 +12,7 @@ import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
 import SpeakerIcon from '../../../../assets/svg/speaker.svg';
 import ThreadListChannel from './ThreadListChannel';
 import { styles } from './styles';
+import { MezonButton } from '../../../temp-ui';
 
 export const ChannelListContext = React.createContext({} as any);
 export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean }) => {
@@ -114,6 +115,34 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 				<Text style={[styles.channelListItemTitle, props.isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
 			</View>
 			{!!props?.data?.threads?.length && <ThreadListChannel threads={props?.data?.threads} />}
+		</View>
+	);
+});
+
+export const FriendListItem = React.memo((props: { user: IUser }) => {
+	const { user } = props;
+
+	const inviteFriend = (user: IUser) => {
+		console.log('invited:', user);
+	}
+
+	return (
+		<View style={styles.friendItemWrapper}>
+			<View style={styles.friendItemContent}>
+				<FastImage
+					style={{ width: 40, height: 40, borderRadius: 50 }}
+					source={{
+						uri: user?.avatarSm,
+					}}
+					resizeMode={FastImage.resizeMode.cover}
+				/>
+				<Text style={styles.friendItemName}>{user?.name}</Text>
+			</View>
+		
+			<MezonButton
+				viewContainerStyle={styles.inviteButton}
+				onPress={() => inviteFriend(user)}
+			>Invite</MezonButton>
 		</View>
 	);
 });

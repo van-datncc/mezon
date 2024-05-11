@@ -7,10 +7,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import Dots from '../../../../assets/svg/guildMoreOptions1.svg';
-import { darkColor } from '../../../constants/Colors';
 import { useAnimatedState } from '../../../hooks/useAnimatedState';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { styles } from './styles';
+import { InviteToChannel } from './components';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -34,22 +34,11 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<View
-						style={{
-							alignItems: 'center',
-							justifyContent: 'center',
-							display: 'flex',
-							borderRadius: 50,
-							backgroundColor: Colors.tertiaryWeight,
-							width: 30,
-							height: 30,
-						}}
-					>
-						<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
-					</View>
+					<InviteToChannel />
 				</View>
 				<FlatList
 					data={categorizedChannels || []}
+					keyExtractor={(_, index) => index.toString()}
 					renderItem={({ item, index }) => (
 						<ChannelListSection data={item} index={index} onPressHeader={toggleCollapseChannel} collapseItems={collapseChannelItems} />
 					)}
