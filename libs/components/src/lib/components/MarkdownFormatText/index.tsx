@@ -2,18 +2,19 @@ import { useClans, useInvite, useOnClickOutside } from '@mezon/core';
 import { ILineMention } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import Markdown from 'react-markdown';
+import { useModal } from 'react-modal-hook';
 import remarkGFM from 'remark-gfm';
+import ExpiryTimeModal from '../ExpiryTime';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 import ChannelHashtag from './HashTag';
 import PreClass from './PreClass';
-import { useModal } from 'react-modal-hook';
-import ExpiryTimeModal from '../ExpiryTime';
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 };
 
 const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
+	const [upSizeEmoji, setUpSizeEmoji] = useState<boolean>(false);
 	const [userID, setUserID] = useState('');
 	const { usersClan } = useClans();
 	const handMention = (tagName: string) => {
@@ -59,25 +60,24 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 		e.stopPropagation();
 	};
 	const { getLinkInvite } = useInvite();
-	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
-		<ExpiryTimeModal onClose={closeInviteChannelModal} open={true} />
-	));
-	const getLinkinvite = (children:any) => {
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => <ExpiryTimeModal onClose={closeInviteChannelModal} open={true} />);
+	const getLinkinvite = (children: any) => {
 		const inviteId = children.split('/invite/')[1];
 		if (inviteId) {
 			getLinkInvite(inviteId).then((res) => {
 				if (res.expiry_time) {
 					if (new Date(res.expiry_time) < new Date()) {
 						openInviteChannelModal();
-					}else{
+					} else {
 						window.location.href = children;
 					}
 				}
-			})
-		}else{
+			});
+		} else {
 			window.open(children, '_blank');
 		}
-	}
+	};
+
 	return (
 		<article className="prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0">
 			{showProfileUser ? (
@@ -99,23 +99,24 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
 				const onlyBackticks = /^```$/.test(markdown);
-
+				const markdownArr = markdown.split(' ');
+				const hasEmoji = /[^\u0000-\u007F]/.test(markdown);
 				return (
 					<div key={index} className="lineText contents">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (
 							<Markdown
-								children={markdown}
+								children={!hasEmoji ? markdown : null}
 								remarkPlugins={[remarkGFM]}
 								components={{
 									pre: PreClass,
 									p: 'span',
 									a: ({ children }) => (
 										<span
-											onClick={()=>getLinkinvite(children)}
+											onClick={() => getLinkinvite(children)}
 											rel="noopener noreferrer"
-											style={{ color: 'rgb(59,130,246)',cursor: 'pointer' }}
+											style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 											className="tagLink"
 										>
 											{children}
@@ -124,7 +125,17 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								}}
 							/>
 						)}
-						{markdown && ' '}
+						{Array.isArray(markdownArr) &&
+							hasEmoji &&
+							markdownArr.map((item: string, index: number) => {
+								const isEmoji = /[^\u0000-\u007F]/.test(item);
+								const fontSizeClass = markdownArr.length === 1 && isEmoji ? 'text-3xl' : isEmoji ? 'text-xl' : '';
+								return (
+									<span key={index} className={fontSizeClass}>
+										{item}
+									</span>
+								);
+							})}
 						{tagName && (
 							<span
 								style={{ borderRadius: '4px', padding: '0 2px' }}

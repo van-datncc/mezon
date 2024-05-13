@@ -10,7 +10,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	const { mentions } = useMessageLine(line);
 
 	return (
-		<div>
+		<div className='py-1'>
 			<MarkdownFormatText mentions={mentions} />
 		</div>
 			
