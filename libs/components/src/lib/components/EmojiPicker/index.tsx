@@ -1,15 +1,16 @@
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
-import EmojiPicker, { EmojiClickData, EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 import { ChannelStreamMode } from 'mezon-js';
 
-export type EmojiPickerOptions = {
+export type EmojiCustomPanelOptions = {
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
 };
 
-function EmojiPickerComp(props: EmojiPickerOptions) {
+function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
+	const { emojis } = useEmojiSuggestion();
+	console.log('emojis', emojis);
 	const {
 		reactionMessageDispatch,
 		setReactionRightState,
@@ -19,20 +20,21 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 		setReactionBottomStateResponsive,
 	} = useChatReaction();
 	const { setReferenceMessage } = useReference();
-	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
-	const handleEmojiSelect = async (emojiData: EmojiClickData, event: MouseEvent) => {
+	const { setEmojiSuggestion } = useEmojiSuggestion();
+
+	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (props.emojiAction === EmojiPlaces.EMOJI_REACTION || props.emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 				props.messageEmoji?.id ?? '',
-				emojiData.emoji,
+				emojiPicked,
 				1,
 				props.messageEmoji?.sender_id ?? '',
 				false,
 			);
-			event.stopPropagation();
+			// event.stopPropagation();
 			setReactionRightState(false);
 			setReactionBottomState(false);
 			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
@@ -40,24 +42,33 @@ function EmojiPickerComp(props: EmojiPickerOptions) {
 			setUserReactionPanelState(false);
 			setReactionBottomStateResponsive(false);
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
-			setEmojiSuggestion(emojiData.emoji);
-			event.stopPropagation();
+			setEmojiSuggestion(emojiPicked);
+			// event.stopPropagation();
 			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 			setSubPanelActive(SubPanelName.NONE);
 		}
 	};
 
 	return (
-		<EmojiPicker
-			style={{ border: 'none', minWidth: '100%', minHeight: '100%', backgroundColor: '#2B2D31' }}
-			className="emojiPicker"
-			suggestedEmojisMode={SuggestionMode.FREQUENT}
-			onEmojiClick={handleEmojiSelect}
-			theme={Theme.DARK}
-			emojiStyle={EmojiStyle.NATIVE}
-			autoFocusSearch={subPanelActive === SubPanelName.EMOJI}
-		/>
+		<div className="flex h-full px-2 w-full md:w-[500px]">
+			<div className="w-[60%] md:w-[10%] md:max-w-[10%] flex flex-col px-2 gap-y-2 max-w-[90%] border"></div>
+			<div className="w-auto">
+				{
+					<div className="grid grid-cols-12 max-h-[400px] overflow-y-scroll hide-scrollbar">
+						{emojis.map((item, index) => (
+							<button
+								key={index}
+								className="text-xl emoji-button border border-green-900 hover:bg-[#41434A] hover:rounded-sm m-1 w-8 h-8"
+								onClick={() => handleEmojiSelect(item.emoji)}
+							>
+								{item.emoji}
+							</button>
+						))}
+					</div>
+				}
+			</div>
+		</div>
 	);
 }
 
-export default EmojiPickerComp;
+export default EmojiCustomPanel;
