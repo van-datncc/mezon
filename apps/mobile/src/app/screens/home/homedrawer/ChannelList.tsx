@@ -1,7 +1,7 @@
 import { useCategory } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
-import { selectCurrentClan } from '@mezon/store-mobile';
-import React from 'react';
+import { channelsActions, getStoreAsync, messagesActions, selectCurrentClan } from '@mezon/store-mobile';
+import React, { useEffect } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
@@ -16,6 +16,12 @@ const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const { categorizedChannels } = useCategory();
 
+	useEffect(() => {
+		if (categorizedChannels?.length) {
+			setDefaultChannelLoader();
+		}
+	}, [categorizedChannels]);
+
 	const [collapseChannelItems, setCollapseChannelItems] = useAnimatedState([]);
 
 	const toggleCollapseChannel = (index: string) => {
@@ -23,6 +29,19 @@ const ChannelList = React.memo((props: any) => {
 			setCollapseChannelItems(collapseChannelItems.filter((item) => item !== index)); // Collapse if already Collapse
 		} else {
 			setCollapseChannelItems([...collapseChannelItems, index]); // Expand if not Collapse
+		}
+	};
+
+	const setDefaultChannelLoader = async () => {
+		const store = await getStoreAsync();
+		// Auto choose channels first
+		if (categorizedChannels) {
+			const firstChannel = categorizedChannels?.[0]?.channels?.[0];
+
+			const channelId = firstChannel?.channel_id;
+			const clanId = firstChannel?.clan_id;
+			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 		}
 	};
 	return (
@@ -34,17 +53,7 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<View
-						style={{
-							alignItems: 'center',
-							justifyContent: 'center',
-							display: 'flex',
-							borderRadius: 50,
-							backgroundColor: Colors.tertiaryWeight,
-							width: 30,
-							height: 30,
-						}}
-					>
+					<View style={styles.iconUserClan}>
 						<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
 					</View>
 				</View>

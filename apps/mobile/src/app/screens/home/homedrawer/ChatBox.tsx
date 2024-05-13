@@ -1,6 +1,8 @@
+import { useChatSending } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Dimensions, TextInput, View } from 'react-native';
+import { useThrottledCallback } from 'use-debounce';
 import AngleRightIcon from '../../../../assets/svg/angle-right.svg';
 import ChatGiftIcon from '../../../../assets/svg/chatGiftNitro.svg';
 import PlusIcon from '../../../../assets/svg/guildAddRole.svg';
@@ -11,22 +13,24 @@ import { styles } from './styles';
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
-const ChatBox = React.memo((props: { channelTitle: string; channelId: number; serverId: number }) => {
+const ChatBox = React.memo((props: { channelLabel: string; channelId: string; mode: number }) => {
 	const inputRef = React.useRef<any>();
-	const [text, setText] = React.useState<string>('');
-	const user_details = { id: 1, image: 'https://unsplash.it/400/400?image=1', name: 'Paulos', user_name: 'paulos_ab' };
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 
-	const handleSendMessage = React.useCallback(() => {
-		if (text.length == 0) return;
-		const message = {
-			channelId: props.channelId,
-			serverId: props.serverId,
-			message: text,
-			datetime: new Date().toLocaleString(),
-			user_details: user_details,
-		};
+	const [text, setText] = React.useState<string>('');
+
+	const handleSendMessage = useCallback(() => {
+		// TODO: Just send only text messages
+		// sendMessage(text, mentions, attachments, references, anonymous);
+		sendMessage({ t: text }, [], [], undefined, false);
 		setText('');
-	}, [text]);
+	}, [sendMessage, text]);
+
+	const handleTyping = useCallback(() => {
+		sendMessageTyping();
+	}, [sendMessageTyping]);
+
+	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 	return (
 		<View style={styles.wrapperChatBox}>
@@ -46,11 +50,16 @@ const ChatBox = React.memo((props: { channelTitle: string; channelId: number; se
 			)}
 			<View style={{ position: 'relative', justifyContent: 'center' }}>
 				<TextInput
-					placeholder={'Message #' + props.channelTitle}
+					placeholder={'Write your thoughs here...'}
 					placeholderTextColor={Colors.textGray}
-					onChangeText={setText}
+					onChangeText={(text: string) => {
+						setText(text);
+						handleTypingDebounced();
+					}}
 					defaultValue={text}
 					ref={inputRef}
+					blurOnSubmit={false}
+					onSubmitEditing={handleSendMessage}
 					style={[
 						styles.inputStyle,
 						text.length > 0 && { width: inputWidthWhenHasInput },

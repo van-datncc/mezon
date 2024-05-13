@@ -18,12 +18,21 @@ const HomeDefault = React.memo((props: any) => {
 		<View style={[styles.homeDefault]}>
 			<HomeDefaultHeader navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
 
-			<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
-				{currentChannel && (
-					<ChannelMessages channelId={currentChannel.channel_id} type="CHANNEL" mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
-				)}
-			</View>
-			<ChatBox channelTitle={currentChannel?.channel_label || ''} channelId={2} serverId={1} />
+			{currentChannel && (
+				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
+					<ChannelMessages
+						channelId={currentChannel.channel_id}
+						type="CHANNEL"
+						channelLabel={currentChannel?.channel_label}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
+					<ChatBox
+						channelId={currentChannel.channel_id}
+						channelLabel={currentChannel?.channel_label || ''}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
+				</View>
+			)}
 		</View>
 	);
 });

@@ -1,3 +1,4 @@
+import { ChatContextProvider } from '@mezon/core';
 import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
@@ -104,7 +105,11 @@ const HomeScreen = React.memo((props: any) => {
 		return null;
 	};
 
-	return <DrawerScreen navigation={props.navigation} />;
+	return (
+		<ChatContextProvider>
+			<DrawerScreen navigation={props.navigation} />
+		</ChatContextProvider>
+	);
 });
 
 export default HomeScreen;
