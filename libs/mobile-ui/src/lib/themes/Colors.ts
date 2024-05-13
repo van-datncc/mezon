@@ -5,8 +5,8 @@ import { Appearance } from 'react-native';
 const isDarkTheme = true;
 
 const colors = {
-	primary: isDarkTheme ? '#151515' : '#FFFFFF',
-	secondary: isDarkTheme ? '#1e1f22' : '#F0F0F0',
+	primary: isDarkTheme ? '#000000' : '#FFFFFF',
+	secondary: isDarkTheme ? '#151515' : '#F0F0F0',
 	surface: isDarkTheme ? '#0B0B0B' : '#F7F7F7',
 	transparent: 'rgba(0,0,0,0)',
 	white: isDarkTheme ? '#FFFFFF' : '#000000',
@@ -18,7 +18,7 @@ const colors = {
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
 	textLink: '#007AFF',
-	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30"
+	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30",
 
 	test: '#676b73',
 	/* border color */
