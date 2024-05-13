@@ -2,7 +2,7 @@ import { ChatWelcome } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 //import InfiniteScroll from 'react-infinite-scroll-component';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import InfiniteScroll from 'react-infinite-scroller'
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -62,16 +62,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={containerRef}
 		>
 			<InfiniteScroll
-				dataLength={messages.length}
-				next={fetchData}
 				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
-				inverse={true}
 				hasMore={hasMoreMessage}
+				loadMore={fetchData}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
-				scrollableTarget="scrollLoading"
-				refreshFunction={fetchData}
-				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
-				pullDownToRefreshThreshold={50}
 				onScroll={handleScroll}
 			>
 				{messages.map((message, i) => (
