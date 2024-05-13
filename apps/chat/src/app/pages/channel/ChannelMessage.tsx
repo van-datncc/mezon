@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useMenu, useReference } from '@mezon/core';
-import { directActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { directActions, messagesActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -254,7 +254,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
 		event.stopPropagation();
 	};
@@ -262,14 +262,14 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const handleClickReply = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
 		event.stopPropagation();
 	};
 
 	const handleClickCopy = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(null));
 		dispatch(referencesActions.setDataReferences(null));
 	};

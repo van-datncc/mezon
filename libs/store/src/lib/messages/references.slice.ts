@@ -19,10 +19,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageToJump: string;
 	openEditMessageState: boolean;
 	openReplyMessageState: boolean;
-	openThreadMessageState: boolean;
 	attachmentDataRef: ApiMessageAttachment[];
-	openOptionMessageState: boolean;
-	valueTextInput: Record<string, string>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -39,10 +36,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
-	openThreadMessageState: false,
 	attachmentDataRef: [],
-	openOptionMessageState: false,
-	valueTextInput: {},
 });
 
 export const referencesSlice = createSlice({
@@ -57,9 +51,7 @@ export const referencesSlice = createSlice({
 		setDataReferences(state, action) {
 			state.dataReferences = action.payload;
 		},
-		setOpenThreadMessageState(state, action) {
-			state.openThreadMessageState = action.payload;
-		},
+
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
@@ -75,12 +67,6 @@ export const referencesSlice = createSlice({
 			} else {
 				state.attachmentDataRef.push(action.payload);
 			}
-		},
-		setOpenOptionMessageState(state, action) {
-			state.openOptionMessageState = action.payload;
-		},
-		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
-			state.valueTextInput[action.payload.channelId] = action.payload.value;
 		},
 	},
 	extraReducers: (builder) => {
@@ -121,13 +107,4 @@ export const selectOpenEditMessageState = createSelector(getReferencesState, (st
 
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
 
-export const selectOpenThreadMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openThreadMessageState);
-
 export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
-
-export const selectOpenOptionMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openOptionMessageState);
-
-export const selectValueTextInputByChannelId = (channelId: string) =>
-	createSelector(getReferencesState, (state) => {
-		return state.valueTextInput[channelId];
-	});
