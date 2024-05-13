@@ -16,6 +16,11 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
+		if (props.data.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			// 	TODO: handle voice channel
+			alert('updating...')
+			return;
+		}
 		useChannelListContentIn.navigation.closeDrawer();
 		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
@@ -35,7 +40,7 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 					<View style={{ width: 30, height: 30, borderRadius: 50, overflow: 'hidden' }}>
 						<FastImageRes uri={props.image} />
 					</View>
-				) : props.data.type == ChannelType.CHANNEL_TYPE_VOICE ? (
+				) : props.data.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 					<SpeakerIcon width={20} height={20} fill={'#FFFFFF'} />
 				) : isUnRead ? (
 					<HashSignWhiteIcon width={18} height={18} />
