@@ -10,6 +10,8 @@ import SearchLogo from '../../../../assets/svg/discoverySearch-white.svg';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
 import { styles } from './styles';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -29,10 +31,15 @@ const HomeDefault = React.memo((props: any) => {
 });
 
 const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation: any; channelTitle: string }) => {
+  const navigateMenuThreadDetail = () => {
+    navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET});
+  }
 	return (
 		<View style={styles.homeDefaultHeader}>
-			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-				<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={() => navigation.openDrawer()}>
+      <TouchableOpacity style={ {flex: 1}} onPress={navigateMenuThreadDetail}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+				<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={() => {
+          navigation.openDrawer()}}>
 					<BarsLogo width={20} height={20} />
 				</TouchableOpacity>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -40,6 +47,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
 				</View>
 			</View>
+      </TouchableOpacity>
 			<SearchLogo width={22} height={22} style={{ marginRight: 20 }} />
 		</View>
 	);
