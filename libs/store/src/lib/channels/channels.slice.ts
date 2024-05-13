@@ -9,6 +9,7 @@ import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { threadsActions } from '../threads/threads.slice';
+import { appActions } from '../app/app.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -65,6 +66,7 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+			thunkAPI.dispatch(appActions.setIsShowMemberList(true));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
