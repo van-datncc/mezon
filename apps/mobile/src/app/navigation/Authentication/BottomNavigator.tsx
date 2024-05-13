@@ -31,8 +31,7 @@ const BottomNavigator = () => {
 				},
 				tabBarActiveTintColor: '#FFFFFF',
 			}}
-			// initialRouteName={APP_SCREEN.DRAWER_BAR}
-			initialRouteName={"abcd"}
+			initialRouteName={APP_SCREEN.DRAWER_BAR}
 		>
 			<TabStack.Screen
 				name={APP_SCREEN.HOME}
