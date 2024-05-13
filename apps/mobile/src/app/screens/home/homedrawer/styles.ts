@@ -69,6 +69,10 @@ export const styles = StyleSheet.create({
 		backgroundColor: '#2b2d31',
 		flex: 1,
 	},
+	wrapperChannelMessage: {
+		flex: 1,
+		justifyContent: 'space-between',
+	},
 	listChannels: {
 		backgroundColor: Colors.tertiaryWeight,
 	},
@@ -211,6 +215,27 @@ export const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.primary,
 	},
+	friendItemWrapper: {
+		marginHorizontal: 20,
+		paddingVertical: 12,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.borderPrimary
+	},
+	friendItemContent: {
+		flexDirection: 'row'
+	},
+	friendItemName: {
+		paddingTop: 10,
+		paddingLeft: 10,
+		lineHeight: 20,
+		color: Colors.white
+	},
+	inviteButton: {
+		paddingVertical: 8,
+		paddingHorizontal: 12
+	},
 	threadItem: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
@@ -232,8 +257,12 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginBottom: size.s_24,
+		marginTop: size.s_24,
+		marginBottom: size.s_6,
 		paddingRight: size.s_50,
+	},
+	wrapperMessageBoxCombine: {
+		marginTop: size.s_2,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
@@ -248,7 +277,7 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_16,
 		marginRight: size.s_10,
 		fontWeight: '600',
-		color: Colors.textGray,
+		color: Colors.white,
 	},
 	dateMessageBox: {
 		fontSize: size.s_12,
@@ -257,6 +286,80 @@ export const styles = StyleSheet.create({
 	contentMessageBox: {
 		fontSize: size.s_16,
 		color: Colors.tertiary,
-		flex: 1,
+	},
+	contentMessageLink: {
+		fontSize: size.s_16,
+		color: Colors.textLink,
+	},
+	contentMessageMention: {
+		fontSize: size.s_16,
+		fontWeight: '600',
+		color: Colors.textLink,
+	},
+	loadMoreChannelMessage: {
+		paddingVertical: size.s_20,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	avatarMessageBoxDefault: {
+		width: '100%',
+		height: '100%',
+		borderRadius: size.s_50,
+		backgroundColor: Colors.titleReset,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	textAvatarMessageBoxDefault: {
+		fontSize: size.s_22,
+		color: Colors.white,
+	},
+	imageMessageRender: {
+		borderRadius: verticalScale(5),
+	},
+	wrapperTypingLabel: {
+		position: 'absolute',
+		bottom: 0,
+		width: '100%',
+		paddingHorizontal: size.s_10,
+		paddingVertical: size.s_10,
+	},
+	typingLabel: {
+		paddingHorizontal: size.s_14,
+		paddingVertical: size.s_6,
+		fontSize: size.s_14,
+		color: Colors.gray72,
+	},
+	iconUserClan: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		display: 'flex',
+		borderRadius: 50,
+		backgroundColor: Colors.tertiaryWeight,
+		width: size.s_30,
+		height: size.s_30,
+	},
+	wrapperWelcomeMessage: {
+		paddingHorizontal: size.s_10,
+		marginVertical: size.s_30,
+	},
+	iconWelcomeMessage: {
+		backgroundColor: 'rgb(80,80,80)',
+		marginBottom: size.s_10,
+		width: 70,
+		height: 70,
+		borderRadius: 50,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	titleWelcomeMessage: {
+		fontSize: size.s_22,
+		marginBottom: size.s_10,
+		color: Colors.white,
+		fontWeight: '600',
+	},
+	subTitleWelcomeMessage: {
+		fontSize: size.s_14,
+		color: Colors.tertiary,
+		marginBottom: size.s_10,
 	},
 });

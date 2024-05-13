@@ -47,6 +47,10 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 		}
 		stopScreenShare();
 		voice.voiceDisconnect();
+		voice.setVoiceOptions((prev) => ({
+			...prev,
+			voiceStart: false,
+		}));
 		dispatch(voiceActions.setStatusCall(false));
 		dispatch(channelsActions.setCurrentVoiceChannelId(''));
 	}, [voice]);

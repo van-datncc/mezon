@@ -34,6 +34,7 @@ import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/rolec
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -59,19 +60,36 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
+const persistChannelsReducer =  persistReducer(
+	{
+		key: 'channels',
+		storage,
+	},
+	channelsReducer,
+);
+
+const persistedVoiceReducer = persistReducer(
+	{
+		key: 'voice',
+		storage,
+	},
+	voiceReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
-	channels: channelsReducer,
+	channels: persistChannelsReducer,
 	channelMembers: channelMembersReducer,
 	threads: threadsReducer,
 	messages: messagesReducer,
 	users: usersReducer,
 	categories: categoriesReducer,
 	rolesclan: RolesClanReducer,
+	eventmanagement: eventManagementReducer,
 	usersClan: usersClanReducer,
 	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
@@ -84,7 +102,7 @@ const reducer = {
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
 	notification: notificationReducer,
-	voice: voiceReducer,
+	voice: persistedVoiceReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: emojiSuggestionReducer,

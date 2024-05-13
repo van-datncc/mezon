@@ -10,6 +10,7 @@ import {
 export {
 	Colors,
 	Metrics,
+	Fonts,
 	horizontalScale,
 	moderateScale,
 	verticalScale,
