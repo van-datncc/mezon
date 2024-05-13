@@ -3,13 +3,13 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { ChannelCreatedEvent, ChannelDeletedEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { appActions } from '../app/app.slice';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { threadsActions } from '../threads/threads.slice';
-import { appActions } from '../app/app.slice';
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -41,6 +41,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	currentCategory: ICategory | null;
 	channelMetadata: EntityState<ChannelMeta, string>;
 	currentVoiceChannelId: string;
+	valueTextInput: Record<string, string>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -156,6 +157,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	currentCategory: null,
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
+	valueTextInput: {},
 });
 
 export const channelsSlice = createSlice({
@@ -199,6 +201,9 @@ export const channelsSlice = createSlice({
 		deleteChannelSocket: (state, action: PayloadAction<ChannelDeletedEvent>) => {
 			const payload = action.payload;
 			channelsAdapter.removeOne(state, payload.channel_id);
+		},
+		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
+			state.valueTextInput[action.payload.channelId] = action.payload.value;
 		},
 	},
 	extraReducers: (builder) => {
@@ -347,4 +352,9 @@ export const selectLastChannelTimestamp = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
 		const channel = state.channelMetadata.entities[channelId];
 		return channel?.lastSeenTimestamp || 0;
+	});
+
+export const selectValueTextInputByChannelId = (channelId: string) =>
+	createSelector(getChannelsState, (state) => {
+		return state.valueTextInput[channelId];
 	});
