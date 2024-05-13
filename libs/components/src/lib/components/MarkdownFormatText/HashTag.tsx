@@ -10,10 +10,7 @@ type ChannelHashtagProps = {
 const ChannelHashtag = ({ tagName }: ChannelHashtagProps) => {
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
-	const getChannelById = (channelId: string) => {
-		const channel = useSelector(selectChannelById(channelId));
-		return channel;
-	};
+
 	const getChannelPath = (tagName: string, clanId: string): string | undefined => {
 		if (tagName.startsWith('#')) {
 			return toChannelPage(tagName.slice(1), clanId || '');
@@ -21,6 +18,11 @@ const ChannelHashtag = ({ tagName }: ChannelHashtagProps) => {
 		return undefined;
 	};
 	const channelPath = getChannelPath(tagName, clanId ?? '');
+
+	const getChannelById = (channelId: string) => {
+		const channel = useSelector(selectChannelById(channelId));
+		return channel;
+	};
 	return (
 		channelPath && (
 			<Link
