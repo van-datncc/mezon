@@ -26,87 +26,44 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	useEffect(() => {
 		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
-
 		if (!lastItem) return;
 
-		if (lastItem.index <= messages.length - 1 && hasMoreMessage) {
+		if (lastItem.index <= messages.length && hasMoreMessage) {
 			loadMoreMessage();
 		}
-	}, [hasMoreMessage, loadMoreMessage, messages.length]);
+	}, [hasMoreMessage, loadMoreMessage, messages.length, rowVirtualizer]);
 
 	return (
 		<div
-			className="bg-bgPrimary relative"
-			style={{
-				height: '100%',
-				display: 'flex',
-				overflowX: 'hidden',
-			}}
+			className="bg-bgPrimary relative h-full flex overflow-x-hidden"
 		>
 			<div
 				ref={parentRef}
-				className="List"
-				style={{
-					display: 'flex',
-					flexDirection: 'column-reverse',
-					justifyContent: 'flex-start',
-					minHeight: '0',
-					overflow: 'auto',
-					width: '100%',
-				}}
+				className="flex flex-col-reverse overflow-y-auto w-full min-h-0 justify-start"
 			>
 				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'column-reverse',
-						flexShrink: '0',
-						height: `${rowVirtualizer.getTotalSize()}px`,
-						justifyContent: 'flex-start',
-						marginBottom: 'auto',
-						position: 'relative',
-						width: '100%',
-					}}
+					className='relative flex flex-col-reverse w-full min-h-0 justify-start mb-auto flex-shrink-0'
 				>
-					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-						const isLoaderRow = virtualRow.index === messages.length;
-						const message = messages[virtualRow.index];
+					{messages.map((message) => {
 						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
-						const minHeight = hasAttachment ? '200px' : 'auto';
+						const minHeight = hasAttachment ? '300px' : 'auto';
+
 						return (
 							<div
-								ref={virtualRow.measureElement}
-								key={virtualRow.index}
+								key={message.id}
 								style={{
-									position: 'absolute',
-									bottom: 0,
-									left: 0,
-									width: '100%',
-									transform: `translateY(${virtualRow.end}px)`,
+									height: 'auto',
+									minHeight,
 								}}
 							>
-								<div
-									style={{
-										height: isLoaderRow ? '100px' : 'auto',
-										minHeight,
-									}}
-								>
-									{isLoaderRow ? (
-										hasMoreMessage ? (
-											'Loading more...'
-										) : (
-											'Nothing more to load'
-										)
-									) : (
-										<ChannelMessage
-											mode={mode}
-											lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-											message={message}
-											preMessage={messages[virtualRow.index - 1]}
-											channelId={channelId}
-											channelLabel={channelLabel || ''}
-										/>
-									)}
-								</div>
+								<ChannelMessage
+									mode={mode}
+									lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+									message={message}
+									preMessage={messages.length > 0 ? messages[messages.length - 1] : undefined}
+									channelId={channelId}
+									channelLabel={channelLabel || ''}
+								/>
 							</div>
 						);
 					})}
