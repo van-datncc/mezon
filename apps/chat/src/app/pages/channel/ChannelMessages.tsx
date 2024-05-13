@@ -1,7 +1,7 @@
+
 import { ChatWelcome } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
-//import InfiniteScroll from 'react-infinite-scroll-component';
 import InfiniteScroll from 'react-infinite-scroller'
 import { ChannelMessage } from './ChannelMessage';
 
@@ -22,9 +22,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
-	const fetchData = () => {
+	
+  const fetchData = () => {
 		loadMoreMessage();
 	};
+
 	useEffect(() => {
 		if (idMessageReplied) {
 			setMessageIdToJump(idMessageReplied);

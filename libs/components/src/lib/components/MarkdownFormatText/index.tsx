@@ -129,10 +129,11 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							markdownArr.map((item: string, index: number) => {
 								const isEmoji = /\p{Emoji}/gu.test(item);
 								const isNumber = /[0-9]/.test(item);
+
 								const fontSizeClass = markdownArr.length === 1 && isEmoji ? 'text-3xl' : isEmoji && !isNumber ? 'text-xl' : ' ';
 								return (
 									<span key={index} className={fontSizeClass}>
-										{item}{' '}
+										{item}
 									</span>
 								);
 							})}
