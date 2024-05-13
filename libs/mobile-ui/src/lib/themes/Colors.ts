@@ -17,6 +17,21 @@ const colors = {
 	tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
+	textLink: '#007AFF',
+
+	test: '#676b73',
+	/* border color */
+	borderPrimary: '#363940',
+	/* text color */
+	header1: '#888c94',
+	header2: '#676b73',
+	/* background color */
+	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
+	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
+	bgGrayLight: '#676b73',
+	bgGrayDark: '#676b73',
+	bgDarkSlate: '#2a2e31',
+	bgCharcoal: '#313338'
 };
 
 export default colors;

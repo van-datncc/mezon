@@ -1,8 +1,8 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useAuth, useClans, useMenu, useThreads } from '@mezon/core';
+import { MezonPolicyProvider, useApp, useAuth, useClans, useMenu, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectCurrentVoiceChannel } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
@@ -16,6 +16,7 @@ const ClanLayout = () => {
 	const { closeMenu, statusMenu } = useMenu();
 
 	const { isShowCreateThread } = useThreads();
+	const { setIsShowMemberList } = useApp();
 
 	const [openSetting, setOpenSetting] = useState(false);
 
@@ -24,6 +25,12 @@ const ClanLayout = () => {
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
 	};
+
+	useEffect(()=>{
+		if(isShowCreateThread){
+			setIsShowMemberList(false);
+		}
+	},[isShowCreateThread])
 
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
