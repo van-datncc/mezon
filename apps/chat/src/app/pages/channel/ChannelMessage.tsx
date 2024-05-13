@@ -195,7 +195,6 @@ function PopupMessage({
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { reactionPlaceActive } = useChatReaction();
-	const { closeMenu, statusMenu } = useMenu();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
 	const getDivHeightToTop = () => {
@@ -229,13 +228,6 @@ function PopupMessage({
 				>
 					<div className="relative">
 						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
-						{mess.id === referenceMessage?.id && reactionRightState && (
-							<div id="emojiPicker" className={`absolute right-[126px] size-[500px] ${closeMenu && !statusMenu && 'w-[370px]'}`}>
-								<div className="mb-0 z-10 h-full">
-									<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-								</div>
-							</div>
-						)}
 					</div>
 
 					{openOptionMessageState && mess.id === referenceMessage?.id && (
