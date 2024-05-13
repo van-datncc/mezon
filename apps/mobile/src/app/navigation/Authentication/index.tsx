@@ -9,6 +9,7 @@ import { ServersStacks } from "./stacks/ServersStacks";
 import {
 	BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
+import { MenuThreadDetailStacks } from './stacks/MenuThreadDetailStacks';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
@@ -50,7 +51,18 @@ export const Authentication = () => {
 						gestureDirection: 'horizontal',
 					}}
 				/>
+        <RootStack.Screen
+					name={APP_SCREEN.MENU_THREAD.STACK}
+					children={props =>
+             (
+						<MenuThreadDetailStacks {...props} />
+					)}
+          options={{
+						gestureEnabled: true,
+						gestureDirection: 'horizontal',
+					}}
+				/>
 			</RootStack.Navigator>
-		</BottomSheetModalProvider>
+		 </BottomSheetModalProvider>
 	);
 };

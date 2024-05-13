@@ -17,6 +17,7 @@ const colors = {
 	tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
+  bgButton: isDarkTheme ? "#5865f2" : "#5865f2",
 	textLink: '#007AFF',
 
 	test: '#676b73',
