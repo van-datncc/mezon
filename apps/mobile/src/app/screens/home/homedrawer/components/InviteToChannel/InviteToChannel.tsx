@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Colors } from '@mezon/mobile-ui';
-import { Keyboard, Pressable, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, TouchableWithoutFeedback, View, VirtualizedList } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import { darkColor } from '../../../../../constants/Colors';
@@ -9,7 +9,6 @@ import { styles } from './InviteToChannel.style';
 import { EMaxUserCanInvite } from '../../../../../enums';
 import { LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../../../../constants';
 import BottomSheet from 'react-native-raw-bottom-sheet';
-import { VirtualizedList  } from 'react-native';
 import { friendList } from '../fakeData';
 import { useCategory, useClans, useInvite } from '@mezon/core';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -18,15 +17,15 @@ import { normalizeString } from '../../../../../utils/helpers';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
 
 export const InviteToChannel = React.memo(() => {
-	const [isVisibleEditLinkModal, setVisibleEditLinkModal] = useState(false);
-	const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+	const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
+	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
     const [currentInviteLink, setCurrentInviteLink] = useState('');
 	const [searchUserText, setSearchUserText] = useState('');
     const { currentClanId } = useClans();
     const { createLinkInviteUser } = useInvite();
 
 	const refRBSheet = useRef(null);
-	//Todo: get from API
+	//TODO: get from API
 	const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] =
 		useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
 	const [expiredTimeSelected, setExpiredTimeSelected] =
@@ -38,7 +37,7 @@ export const InviteToChannel = React.memo(() => {
 
 	const openEditLinkModal = () => {
 		refRBSheet.current.close();
-		setVisibleEditLinkModal(true);
+		setIsVisibleEditLinkModal(true);
 	}
 
     const onVisibleEditLinkModalChange = (isVisible: boolean) => {
@@ -48,13 +47,13 @@ export const InviteToChannel = React.memo(() => {
     }
 
 	const backToInviteModal = () => {
-		setVisibleEditLinkModal(false);
+		setIsVisibleEditLinkModal(false);
 		refRBSheet.current.open();
 	}
 
 	const saveInviteLinkSettings = () => {
-		//Todo: save invite link
-		setVisibleEditLinkModal(false);
+		//TODO: save invite link
+		setIsVisibleEditLinkModal(false);
 	}
 
     const addInviteLinkToClipboard = () => {
@@ -80,13 +79,13 @@ export const InviteToChannel = React.memo(() => {
 		const keyboardDidShowListener = Keyboard.addListener(
 		  'keyboardDidShow',
 		  () => {
-			setKeyboardVisible(true);
+			setIsKeyboardVisible(true);
 		  }
 		);
 		const keyboardDidHideListener = Keyboard.addListener(
 		  'keyboardDidHide',
 		  () => {
-			setKeyboardVisible(false);
+			setIsKeyboardVisible(false);
 		  }
 		);
 
@@ -216,7 +215,7 @@ export const InviteToChannel = React.memo(() => {
                                     style={[styles.radioItem, option.value === expiredTimeSelected ? styles.radioItemActive : styles.radioItemDeActive]}
                                     onPress={() => setExpiredTimeSelected(option.value)}
                                 >
-                                    <Text style={[{ color: option.value === expiredTimeSelected ? 'white' : '#888c94', textAlign: 'center' }]}>{option.label}</Text>
+                                    <Text style={[{ color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray, textAlign: 'center' }]}>{option.label}</Text>
                                 </Pressable>
                             ))}
                         </View>
@@ -233,20 +232,20 @@ export const InviteToChannel = React.memo(() => {
                                     style={[styles.radioItem, option === maxUserCanInviteSelected ? styles.radioItemActive : styles.radioItemDeActive]}
                                     onPress={() => setMaxUserCanInviteSelected(option)}
                                 >
-                                    <Text style={[{ color: option === maxUserCanInviteSelected ? 'white' : '#888c94', textAlign: 'center' }]}>{option}</Text>
+                                    <Text style={[{ color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray, textAlign: 'center' }]}>{option}</Text>
                                 </Pressable>
                             ))}
                         </View>
                     </ScrollView>
                     <View style={styles.temporaryMemberWrapper}>
-                        <Text style={{color: '#dfe2ea', fontSize: 16}}>Temporary Membership</Text>
+                        <Text style={styles.temporaryMemberTitle}>Temporary Membership</Text>
                         <MezonSwitch 
                             value={isTemporaryMembership}
                             onValueChange={setIsTemporaryMembership}
                         />
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{color: '#888c94'}}>Members are automatically kicked when they disconnect unless a role is assigned.</Text>
+                        <Text style={{color: Colors.textGray}}>Members are automatically kicked when they disconnect unless a role is assigned.</Text>
                     </View>
                 </View>
             </MezonModal>

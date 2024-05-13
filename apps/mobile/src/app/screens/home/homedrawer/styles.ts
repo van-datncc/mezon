@@ -217,7 +217,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
         borderBottomWidth: 1,
-        borderBottomColor: '#3e4247'
+        borderBottomColor: Colors.borderPrimary
 	},
 	friendItemContent: {
 		flexDirection: 'row'
@@ -253,8 +253,12 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginBottom: size.s_24,
+		marginTop: size.s_24,
+		marginBottom: size.s_6,
 		paddingRight: size.s_50,
+	},
+	wrapperMessageBoxCombine: {
+		marginTop: size.s_2,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
@@ -269,7 +273,7 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_16,
 		marginRight: size.s_10,
 		fontWeight: '600',
-		color: Colors.textGray,
+		color: Colors.white,
 	},
 	dateMessageBox: {
 		fontSize: size.s_12,
@@ -279,5 +283,36 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_16,
 		color: Colors.tertiary,
 		flex: 1,
+	},
+	contentMessageLink: {
+		fontSize: size.s_16,
+		color: Colors.textLink,
+		flex: 1,
+	},
+	contentMessageMention: {
+		fontSize: size.s_16,
+		fontWeight: '600',
+		color: Colors.textLink,
+		flex: 1,
+	},
+	loadMoreChannelMessage: {
+		paddingVertical: size.s_20,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	avatarMessageBoxDefault: {
+		width: '100%',
+		height: '100%',
+		borderRadius: size.s_50,
+		backgroundColor: Colors.titleReset,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	textAvatarMessageBoxDefault: {
+		fontSize: size.s_22,
+		color: Colors.white,
+	},
+	imageMessageRender: {
+		borderRadius: verticalScale(5),
 	},
 });

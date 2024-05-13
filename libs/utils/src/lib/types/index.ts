@@ -5,6 +5,7 @@ import {
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiEventManagement,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
 	ApiMessageMention,
@@ -47,6 +48,10 @@ export type IUsersClan = ClanUserListClanUser & {
 };
 
 export type IRolesClan = ApiRole & {
+	id: string;
+};
+
+export type IEventManagement = ApiEventManagement & {
 	id: string;
 };
 

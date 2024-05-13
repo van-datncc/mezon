@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     buttonWrapper: {
-        backgroundColor: Colors.bg_Primary,
+        backgroundColor: Colors.bgPrimary,
         borderRadius: 3,
         elevation: 1
     },

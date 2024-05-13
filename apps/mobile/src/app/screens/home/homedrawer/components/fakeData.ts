@@ -1,6 +1,6 @@
 import { IUser } from "@mezon/utils";
 
-//Todo: delete later
+//TODO: delete later
 export const friendList: IUser[] = [
     {
       "name": "John Doe",

@@ -22,20 +22,20 @@ export const styles = StyleSheet.create({
 		marginRight: 10,
 	},
 	radioItemDeActive: {
-		backgroundColor: '#1c2023'
+		backgroundColor: Colors.secondary
 	},
 	radioItemActive: {
-		backgroundColor: '#5a62f4'
+		backgroundColor: Colors.bgViolet
 	},
 	inviteHeader: {
-		backgroundColor: '#1c2023',
+		backgroundColor: Colors.secondary,
 		padding: 19,
 		width: '100%',
 		borderTopRightRadius: 8,
 		borderTopLeftRadius: 8
 	},
 	inviteHeaderText: {
-		color: '#FFFFFF',
+		color: Colors.white,
 		fontWeight: 'bold',
 		fontSize: 15,
 	},
@@ -46,14 +46,14 @@ export const styles = StyleSheet.create({
 	shareToInviteIcon: {
 		borderRadius: 50,
 		padding: 10,
-		backgroundColor: '#3e4247',
-		color: '#FFFFFF',
+		backgroundColor: Colors.bgGrayLight,
+		color: Colors.white,
 	},
 	inviteIconText: {
-		color: '#7c7f87',
+		color: Colors.textGray,
 	},
 	searchFriendToInviteWrapper: {
-		backgroundColor: '#1c2023',
+		backgroundColor: Colors.primary,
 		borderRadius: 8,
 		alignItems: 'center',
 		paddingHorizontal: size.s_6,
@@ -70,7 +70,7 @@ export const styles = StyleSheet.create({
 	},
 	inviteWrapper: {
 		flex: 1,
-		backgroundColor: '#31343d',
+		backgroundColor: Colors.bgCharcoal,
 		width: '100%',
 		borderTopRightRadius: 8,
 		borderTopLeftRadius: 8
@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		padding: 19,
-		borderBottomColor: '#363940',
+		borderBottomColor: Colors.bgCharcoal,
 		borderBottomWidth: 3
 	},
 	searchInviteFriendWrapper: {
@@ -89,7 +89,7 @@ export const styles = StyleSheet.create({
 		color: Colors.white
 	},
 	linkText: {
-		color: '#2b6478'
+		color: Colors.textLink
 	},
     channelInviteTitle: {
 		fontSize: size.s_14,
@@ -108,11 +108,11 @@ export const styles = StyleSheet.create({
         paddingVertical: 20,
         borderBottomWidth: 2,
         borderTopWidth: 2,
-        borderColor: '#363940',
+        borderColor: Colors.borderPrimary,
         paddingHorizontal: 10
     },
     inviteChannelListTitle: {
-        color: '#888c94',
+        color: Colors.header1,
         fontSize: 16,
         fontWeight: '500'
     },
@@ -121,12 +121,12 @@ export const styles = StyleSheet.create({
         gap: 10
     },
     advancedSettingTitle: {
-        color: '#888c94',
+        color: Colors.header1,
         fontSize: 16,
         fontWeight: '500'
     },
     advancedSettingSubTitle: {
-        color: '#676b73',
+        color: Colors.header2,
         fontSize: 16,
         fontWeight: '500'
     },
@@ -134,5 +134,9 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         flexDirection: 'row',
         paddingTop: 20
-    }
+    },
+	temporaryMemberTitle: {
+		color: Colors.textGray,
+		fontSize: 16
+	},
 });
