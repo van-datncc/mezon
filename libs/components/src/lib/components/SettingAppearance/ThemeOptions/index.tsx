@@ -1,13 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icons } from '../../../components';
+import { useApp } from '@mezon/core';
 
 const ThemeOptions = () => {
+	const { appearanceTheme, setAppearanceTheme } = useApp();
 	const [themeChosen, setThemeChosen] = useState<string>('dark');
-    
+
+	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
+	
+	const onWindowMatch = () =>{
+		if(themeChosen === "system" && systemIsDark.matches){
+			setAppearanceTheme("dark");
+		}else if (themeChosen === "system" && !systemIsDark.matches){
+			setAppearanceTheme("light");
+		}
+	}
+
+    useEffect(()=>{
+		setAppearanceTheme(themeChosen);
+		console.log(appearanceTheme);
+	}, [themeChosen, appearanceTheme, setAppearanceTheme]);
+
+	onWindowMatch();
 	return (
 		<div className="pt-10">
 			<div>Theme</div>
-			<div className="theme-container flex gap-[30px]">
+			<div className="theme-container flex gap-[30px] mt-3">
 				<div
 					className={`light-theme aspect-square bg-white w-[60px] rounded-full border border-solid cursor-pointer relative ${themeChosen === 'light' ? 'border-indigo-600 border-2': ''}`}
 					onClick={() => setThemeChosen('light')}

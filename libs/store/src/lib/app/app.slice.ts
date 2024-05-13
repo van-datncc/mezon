@@ -4,7 +4,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 export const APP_FEATURE_KEY = 'app';
 
 export interface AppState {
-	theme: 'light' | 'dark';
+	theme: 'light' | 'dark' | 'system';
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowMemberList: boolean;
@@ -16,7 +16,7 @@ export interface AppState {
 
 export const initialAppState: AppState = {
 	loadingStatus: 'not loaded',
-	theme: 'light',
+	theme: 'dark',
 	isShowMemberList: true,
 	initialPath: '/',
 	closeMenu: false,
