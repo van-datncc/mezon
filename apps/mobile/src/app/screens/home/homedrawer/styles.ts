@@ -215,6 +215,27 @@ export const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.primary,
 	},
+	friendItemWrapper: {
+		marginHorizontal: 20,
+		paddingVertical: 12,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.borderPrimary
+	},
+	friendItemContent: {
+		flexDirection: 'row'
+	},
+	friendItemName: {
+		paddingTop: 10,
+		paddingLeft: 10,
+		lineHeight: 20,
+		color: Colors.white
+	},
+	inviteButton: {
+		paddingVertical: 8,
+		paddingHorizontal: 12
+	},
 	threadItem: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',

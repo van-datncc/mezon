@@ -5,13 +5,15 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 export type EventInfoModalProps = {
 	topic: string;
+	description: string;
 	handleTopic: (content: string) => void;
+	handleTime: (time: string) => void;
+	handleDescription: (content: string) => void;
 };
 
 const EventInfoModal = (props: EventInfoModalProps) => {
-	const { topic, handleTopic } = props;
+	const { topic, description, handleTopic, handleTime, handleDescription } = props;
 	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-	const [description, setDescription] = useState('');
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1024);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,9 +46,13 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	};
 
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setDescription(e.target.value);
+		handleDescription(e.target.value);
 		setCountCharacterDescription(1024 - e.target.value.length);
 	};
+
+	const handleChangeTime = (e:any)=>{
+		handleTime(e.target.value);
+	}
 
 	return (
 		<div>
@@ -58,7 +64,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					placeholder="What's your event?"
 					onChange={(e) => handleTopic(e.target.value)}
 					value={topic}
-					className="bg-bgPrimary font-[400] rounded w-full text-white outline-none text-[15px]border border-black p-2 focus:outline-none focus:border-white-500"
+					className="font-[400] rounded w-full text-white outline-none text-[15px]border border-black p-2 focus:outline-none focus:border-white-500 bg-black"
 				/>
 			</div>
 			<div className="mb-4 flex gap-x-4">
@@ -77,6 +83,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<h3 className="uppercase text-[11px] font-semibold ">Start Time</h3>
 					<select
 						name="time"
+						onChange={handleChangeTime}
 						className="block w-full bg-black border border-black text-white rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 					>
 						{renderOptions()}

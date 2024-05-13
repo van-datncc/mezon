@@ -34,6 +34,7 @@ import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/rolec
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -72,6 +73,7 @@ const reducer = {
 	users: usersReducer,
 	categories: categoriesReducer,
 	rolesclan: RolesClanReducer,
+	eventmanagement: eventManagementReducer,
 	usersClan: usersClanReducer,
 	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,

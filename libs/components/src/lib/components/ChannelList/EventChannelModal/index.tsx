@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import * as Icons from '../../Icons';
 import ModalCreate from './ModalCreate';
-import { useAuth, useClans } from '@mezon/core';
+import { useAuth, useClans, useEventManagement } from '@mezon/core';
+import ItemEventManagement from './ModalCreate/itemEventManagement';
 
 export type EventModalProps = {
 	open: boolean;
@@ -13,6 +14,7 @@ const EventModal = (props: EventModalProps) => {
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
 	const [openModal, setOpenModal] = useState(false);
+	const { allEventManagement } = useEventManagement();
 
 	return open ? (
 		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 text-white">
@@ -39,12 +41,22 @@ const EventModal = (props: EventModalProps) => {
 									×
 								</span>
 							</div>
-							<div className="bg-[#313339] h-80 flex justify-center items-center">
-								<Icons.EventIcon defaultSize="size-[100px]" />
-							</div>
+							
+							{ allEventManagement.length !== 0 ? 
+								<div className='bg-[#313339] max-h-80 h-80 overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col'>
+									{allEventManagement.map((event, index)=>{
+										return <div key={index}>
+											<ItemEventManagement topic={event.title || ''} voiceChannel={event.channel_id || ''} titleEvent={event.title || ''} address={event.address} option=""/>
+										</div>
+									})}
+								</div> :
+								<div className="bg-[#313339] h-80 flex justify-center items-center">
+									<Icons.EventIcon defaultSize="size-[100px]" />
+								</div>
+							}
 						</>
 					) : (
-						<ModalCreate onClose={() => setOpenModal(false)} />
+						<ModalCreate onClose={() => setOpenModal(false)} onCloseEventModal={onClose}/>
 					)}
 				</div>
 			</div>
