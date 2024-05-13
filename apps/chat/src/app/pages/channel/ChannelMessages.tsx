@@ -70,7 +70,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 						const isLoaderRow = virtualRow.index === messages.length;
 						const message = messages[virtualRow.index];
-						console.log('message', message);
 						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
 						const minHeight = hasAttachment ? '200px' : 'auto';
 						return (
