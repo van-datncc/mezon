@@ -1,14 +1,22 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useFriends, useMenu } from '@mezon/core';
-import { gifsStickerEmojiActions, reactionActions, referencesActions, selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
+import {
+	gifsStickerEmojiActions,
+	messagesActions,
+	reactionActions,
+	referencesActions,
+	selectAllClans,
+	selectCurrentChannel,
+	selectCurrentClan,
+} from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
 import { useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
-import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
@@ -31,7 +39,7 @@ function MyApp() {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 		dispatch(reactionActions.setReactionBottomStateResponsive(false));
 	};

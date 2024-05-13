@@ -8,6 +8,7 @@ import {
 	selectOpenReplyMessageState,
 	selectOpenThreadMessageState,
 	selectReferenceMessage,
+	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
@@ -63,7 +64,7 @@ export function useReference() {
 
 	const setOpenThreadMessageState = useCallback(
 		(status: boolean) => {
-			dispatch(referencesActions.setOpenThreadMessageState(status));
+			dispatch(threadsActions.setOpenThreadMessageState(status));
 		},
 		[dispatch],
 	);
@@ -75,13 +76,6 @@ export function useReference() {
 		[dispatch],
 	);
 
-	const setOpenOptionMessageState = useCallback(
-		(status: boolean) => {
-			dispatch(referencesActions.setOpenOptionMessageState(status));
-		},
-		[dispatch],
-	);
-
 	return useMemo(
 		() => ({
 			setReferenceMessage,
@@ -89,7 +83,6 @@ export function useReference() {
 			setIdMessageToJump,
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
-			setOpenOptionMessageState,
 			setOpenThreadMessageState,
 			referenceMessage,
 			dataReferences,
@@ -107,7 +100,6 @@ export function useReference() {
 			setIdMessageToJump,
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
-			setOpenOptionMessageState,
 			setOpenThreadMessageState,
 			referenceMessage,
 			dataReferences,
