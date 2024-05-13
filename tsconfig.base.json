@@ -30,7 +30,6 @@
 			"@mezon/transport": ["libs/transport/src/index.ts"],
 			"@mezon/ui": ["libs/ui/src/index.ts"],
 			"@mezon/utils": ["libs/utils/src/index.ts"],
-			"@mezon/virtual": ["libs/virtual/src/index.ts"],
 			"@mezon/voice": ["libs/voice/src/index.ts"],
 			"react": ["./node_modules/@types/react"]
 		}

@@ -9,7 +9,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 
@@ -39,6 +39,13 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 		return new Date(lastMessage.create_time) > new Date(message.create_time) ? lastMessage : message;
 	}, {} as MessagesEntity);
 
+	const setOpenOptionMessageState = useCallback(
+		(status: boolean) => {
+			dispatch(messagesActions.setOpenOptionMessageState(status));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			client,
@@ -48,7 +55,8 @@ export function useChatMessages({ channelId }: useMessagesOptions) {
 			hasMoreMessage,
 			lastMessageByUserId,
 			loadMoreMessage,
+			setOpenOptionMessageState,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, loadMoreMessage],
+		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, lastMessageByUserId, loadMoreMessage, setOpenOptionMessageState],
 	);
 }

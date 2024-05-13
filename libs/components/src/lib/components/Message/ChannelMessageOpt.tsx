@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useReference, useThreads } from '@mezon/core';
-import { referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { messagesActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { Ref, forwardRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -37,7 +37,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		e.stopPropagation();
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
-		dispatch(referencesActions.setOpenOptionMessageState(!openOptionMessageState));
+		dispatch(messagesActions.setOpenOptionMessageState(!openOptionMessageState));
 		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
@@ -47,6 +47,13 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
+		const rect = (event.target as HTMLElement).getBoundingClientRect(); 
+		const distanceToBottom = window.innerHeight - rect.bottom; 
+		if(distanceToBottom > 550){
+			dispatch(reactionActions.setReactionTopState(true));
+		} else {
+			dispatch(reactionActions.setReactionTopState(false));
+		}
 		event.stopPropagation();
 	};
 

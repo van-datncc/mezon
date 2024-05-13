@@ -20,6 +20,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	listThreadId?: Record<string, string>;
 	nameValueThread?: Record<string, string>;
 	valueThread: IMessageWithUser | null;
+	openThreadMessageState: boolean;
 }
 
 export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
@@ -57,6 +58,7 @@ export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState(
 	isPrivate: 0,
 	nameValueThread: {},
 	valueThread: null,
+	openThreadMessageState: false,
 });
 
 export const threadsSlice = createSlice({
@@ -98,6 +100,9 @@ export const threadsSlice = createSlice({
 				...state.nameValueThread,
 				[action.payload.channelId]: action.payload.nameValue,
 			};
+		},
+		setOpenThreadMessageState(state, action) {
+			state.openThreadMessageState = action.payload;
 		},
 		// ...
 	},
@@ -173,6 +178,8 @@ export const selectMessageThreadError = createSelector(getThreadsState, (state) 
 export const selectListThreadId = createSelector(getThreadsState, (state) => state.listThreadId);
 
 export const selectValueThread = createSelector(getThreadsState, (state) => state.valueThread);
+
+export const selectOpenThreadMessageState = createSelector(getThreadsState, (state: ThreadsState) => state.openThreadMessageState);
 
 export const selectNameValueThread = (channelId: string) =>
 	createSelector(getThreadsState, (state) => {
