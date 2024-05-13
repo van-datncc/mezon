@@ -100,7 +100,6 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 				const markdownArr = markdown.split(' ');
 				const hasEmoji = /[^\u0000-\u007F]/.test(markdown);
-
 				return (
 					<div key={index} className="lineText contents">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (

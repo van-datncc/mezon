@@ -1,0 +1,53 @@
+import { ChannelMembersEntity } from "@mezon/utils";
+import { Image, Text, View } from "react-native";
+import { OfflineStatus, OnlineStatus } from "@mezon/mobile-components"
+import style from "./style";
+interface IProps {
+    user: ChannelMembersEntity;
+    status?: boolean;
+    numCharCollapse?: number;
+    isHideIconStatus?: boolean;
+    isHideUserName?: boolean;
+    isOffline?: boolean;
+}
+
+export default function MemberProfile({
+    user, status,
+    isHideIconStatus, isHideUserName,
+    numCharCollapse = 6,
+    isOffline
+}: IProps) {
+    return (
+        <View style={{ ...style.container, opacity: isOffline ? 0.5 : 1 }} >
+
+            {/* Avatar */}
+            <View style={{ padding: 0 }}>
+                <View style={style.avatarContainer}>
+                    <Image
+                        style={style.avatar}
+                        source={{ uri: user.user.avatar_url }}
+                    />
+
+                    {!isHideIconStatus &&
+                        <View style={style.statusWrapper}>
+                            {status ? <OnlineStatus /> : <OfflineStatus />}
+                        </View>
+                    }
+                </View>
+            </View>
+
+            {/* Name */}
+            <View style={{ ...style.nameContainer, borderBottomWidth: 1 }}>
+                {!isHideUserName &&
+                    <Text style={style.textName}>
+                        {
+                            user.user.username.length > numCharCollapse
+                                ? `${user.user.username.substring(0, numCharCollapse)}...`
+                                : user.user.username
+                        }
+                    </Text>
+                }
+            </View>
+        </View >
+    )
+}

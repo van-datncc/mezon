@@ -60,13 +60,29 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
+const persistChannelsReducer =  persistReducer(
+	{
+		key: 'channels',
+		storage,
+	},
+	channelsReducer,
+);
+
+const persistedVoiceReducer = persistReducer(
+	{
+		key: 'voice',
+		storage,
+	},
+	voiceReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
-	channels: channelsReducer,
+	channels: persistChannelsReducer,
 	channelMembers: channelMembersReducer,
 	threads: threadsReducer,
 	messages: messagesReducer,
@@ -86,7 +102,7 @@ const reducer = {
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
 	notification: notificationReducer,
-	voice: voiceReducer,
+	voice: persistedVoiceReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: emojiSuggestionReducer,

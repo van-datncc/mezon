@@ -5,6 +5,8 @@ import RootNavigation from "./RootNavigator";
 // @ts-expect-error
 import { NX_CHAT_APP_API_HOST } from '@env';
 
+console.log(process.env.NX_CHAT_APP_API_HOST);
+
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
 	port: process.env.NX_CHAT_APP_API_PORT as string,
