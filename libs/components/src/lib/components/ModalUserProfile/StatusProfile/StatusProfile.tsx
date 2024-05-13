@@ -15,7 +15,6 @@ export const StatusProfile = () => {
 		dispatch(userClanProfileActions.setShowModalFooterProfile(false));
 	};
 
-	console.log('openModal', openModal);
 	return (
 		<>
 			<div>
