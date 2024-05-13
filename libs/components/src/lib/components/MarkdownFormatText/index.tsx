@@ -100,6 +100,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 				const markdownArr = markdown.split(' ');
 				const hasEmoji = /[^\u0000-\u007F]/.test(markdown);
+
 				return (
 					<div key={index} className="lineText contents">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
@@ -127,11 +128,12 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						{Array.isArray(markdownArr) &&
 							hasEmoji &&
 							markdownArr.map((item: string, index: number) => {
-								const isEmoji = /[^\u0000-\u007F]/.test(item);
-								const fontSizeClass = markdownArr.length === 1 && isEmoji ? 'text-3xl' : isEmoji ? 'text-xl' : '';
+								const isEmoji = /\p{Emoji}/gu.test(item);
+								const isNumber = /[0-9]/.test(item);
+								const fontSizeClass = markdownArr.length === 1 && isEmoji ? 'text-3xl' : isEmoji && !isNumber ? 'text-xl' : ' ';
 								return (
 									<span key={index} className={fontSizeClass}>
-										{item}
+										{item}{' '}
 									</span>
 								);
 							})}
