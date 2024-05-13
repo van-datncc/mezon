@@ -1,6 +1,7 @@
-import { useChatMessages } from '@mezon/core';
-import { useVirtualizer } from '@mezon/virtual';
-import { useEffect, useRef } from 'react';
+import { ChatWelcome } from '@mezon/components';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
+import { useEffect, useRef, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -9,66 +10,89 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-};
+}
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+	const containerRef = useRef<HTMLDivElement>(null);
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-
-	const parentRef = useRef<any>();
-
-	const rowVirtualizer = useVirtualizer({
-		count: messages.length + 1, // Add 1 to account for loader row
-		estimateSize: () => 100,
-		getScrollElement: () => parentRef.current,
-		overscan: 50,
-		reverse: true,
-	});
+	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
+	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
+	const [timeToJump, setTimeToJump] = useState(1000);
+	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+	const { jumpToMessage } = useJumpToMessage();
+	const { idMessageReplied } = useReference();
+	const fetchData = () => {
+		loadMoreMessage();
+	};
+	useEffect(() => {
+		if (idMessageReplied) {
+			setMessageIdToJump(idMessageReplied);
+			setTimeToJump(0);
+			setPositionToJump('center');
+		} else {
+			setMessageIdToJump(getJumpToMessageId());
+			setTimeToJump(1000);
+			setPositionToJump('start');
+		}
+	}, [getJumpToMessageId, idMessageReplied]);
 
 	useEffect(() => {
-		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
-		if (!lastItem) return;
-
-		if (lastItem.index <= messages.length && hasMoreMessage) {
-			loadMoreMessage();
+		let timeoutId: NodeJS.Timeout | null = null;
+		if (messageid) {
+			timeoutId = setTimeout(() => {
+				jumpToMessage(messageid, positionToJump);
+			}, timeToJump);
 		}
-	}, [hasMoreMessage, loadMoreMessage, messages.length, rowVirtualizer]);
+		return () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+		};
+	}, [messageid, jumpToMessage]);
+
+	const handleScroll = (e: any) => {
+		setPosition(e.target.scrollTop);
+	};
 
 	return (
 		<div
-			className="bg-bgPrimary relative h-full flex overflow-x-hidden"
+			className="bg-bgPrimary relative"
+			id="scrollLoading"
+			ref={containerRef}
+			style={{
+				height: '100%',
+				overflowY: 'scroll',
+				display: 'flex',
+				flexDirection: 'column-reverse',
+				overflowX: 'hidden',
+			}}
 		>
-			<div
-				ref={parentRef}
-				className="flex flex-col-reverse overflow-y-auto w-full min-h-0 justify-start"
+			<InfiniteScroll
+				dataLength={messages.length}
+				next={fetchData}
+				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
+				inverse={true}
+				hasMore={hasMoreMessage}
+				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
+				scrollableTarget="scrollLoading"
+				refreshFunction={fetchData}
+				pullDownToRefresh={containerRef.current !== null && containerRef.current.scrollHeight > containerRef.current.clientHeight}
+				pullDownToRefreshThreshold={50}
+				onScroll={handleScroll}
 			>
-				<div
-					className='relative flex flex-col-reverse w-full min-h-0 justify-start mb-auto flex-shrink-0'
-				>
-					{messages.map((message) => {
-						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
-						const minHeight = hasAttachment ? '300px' : 'auto';
-
-						return (
-							<div
-								key={message.id}
-								style={{
-									height: 'auto',
-									minHeight,
-								}}
-							>
-								<ChannelMessage
-									mode={mode}
-									lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-									message={message}
-									preMessage={messages.length > 0 ? messages[messages.length - 1] : undefined}
-									channelId={channelId}
-									channelLabel={channelLabel || ''}
-								/>
-							</div>
-						);
-					})}
-				</div>
-			</div>
+				{messages.map((message, i) => (
+					<ChannelMessage
+						mode={mode}
+						key={message.id}
+						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+						message={message}
+						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+						channelId={channelId}
+						channelLabel={channelLabel || ''}
+					/>
+				))}
+				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
+			</InfiniteScroll>
 		</div>
 	);
 }
