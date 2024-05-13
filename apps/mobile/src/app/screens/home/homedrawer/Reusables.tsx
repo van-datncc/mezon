@@ -8,6 +8,8 @@ import { useSelector } from 'react-redux';
 import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
 import { ChannelListItem } from './ChannelListItem';
 import { styles } from './styles';
+import { useChannelMembers } from '@mezon/core';
+import { useEffect } from 'react';
 import { MezonButton } from '../../../temp-ui';
 
 export const ChannelListContext = React.createContext({} as any);

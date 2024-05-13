@@ -20,7 +20,12 @@ export const Authentication = () => {
 			<RootStack.Navigator
 				initialRouteName={getInitialRouteName}
 				screenOptions={{ headerShown: false, gestureEnabled: true }}>
-				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigator} options={{ gestureEnabled: false }} />
+
+				<RootStack.Screen
+					name={APP_SCREEN.BOTTOM_BAR}
+					component={BottomNavigator}
+					options={{ gestureEnabled: false }}
+				/>
 				<RootStack.Screen
 					name={APP_SCREEN.SERVERS.STACK}
 					children={props => (
