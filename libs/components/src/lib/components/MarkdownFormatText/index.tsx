@@ -14,7 +14,6 @@ type MarkdownFormatTextProps = {
 
 const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
-	const [upSizeEmoji, setUpSizeEmoji] = useState<boolean>(false);
 	const [userID, setUserID] = useState('');
 	const { usersClan } = useClans();
 	const handMention = (tagName: string) => {
