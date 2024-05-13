@@ -1,6 +1,7 @@
 import { ChatWelcome } from '@mezon/components';
 import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
+//import InfiniteScroll from 'react-infinite-scroll-component';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -56,16 +57,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			className="bg-bgPrimary relative"
+			className="bg-bgPrimary relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
 			id="scrollLoading"
 			ref={containerRef}
-			style={{
-				height: '100%',
-				overflowY: 'scroll',
-				display: 'flex',
-				flexDirection: 'column-reverse',
-				overflowX: 'hidden',
-			}}
 		>
 			<InfiniteScroll
 				dataLength={messages.length}
