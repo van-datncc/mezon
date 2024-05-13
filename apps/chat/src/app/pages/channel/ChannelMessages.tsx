@@ -1,10 +1,8 @@
-import { useChatMessages } from '@mezon/core';
-import { useAppDispatch } from '@mezon/store';
-import { useVirtualizer } from '@mezon/virtual';
-import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
-import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+
+import { ChatWelcome } from '@mezon/components';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
+import { useEffect, useRef, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroller'
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -13,117 +11,78 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-};
+}
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const dispatch = useAppDispatch();
-	const openPopupForward = useSelector(getIsShowPopupForward);
-
+	const containerRef = useRef<HTMLDivElement>(null);
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-
-	const parentRef = useRef<any>();
-
-	const handleCloseModalForward = () => {
-		dispatch(toggleIsShowPopupForwardFalse());
+	const [position, setPosition] = useState(containerRef.current?.scrollTop || 0);
+	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
+	const [timeToJump, setTimeToJump] = useState(1000);
+	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+	const { jumpToMessage } = useJumpToMessage();
+	const { idMessageReplied } = useReference();
+	
+  const fetchData = () => {
+		loadMoreMessage();
 	};
 
-	const rowVirtualizer = useVirtualizer({
-		count: messages.length + 1, // Add 1 to account for loader row
-		estimateSize: () => 100,
-		getScrollElement: () => parentRef.current,
-		overscan: 50,
-		reverse: true,
-	});
+	useEffect(() => {
+		if (idMessageReplied) {
+			setMessageIdToJump(idMessageReplied);
+			setTimeToJump(0);
+			setPositionToJump('center');
+		} else {
+			setMessageIdToJump(getJumpToMessageId());
+			setTimeToJump(1000);
+			setPositionToJump('start');
+		}
+	}, [getJumpToMessageId, idMessageReplied]);
 
 	useEffect(() => {
-		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
-
-		if (!lastItem) return;
-
-		if (lastItem.index <= messages.length - 1 && hasMoreMessage) {
-			loadMoreMessage();
+		let timeoutId: NodeJS.Timeout | null = null;
+		if (messageid) {
+			timeoutId = setTimeout(() => {
+				jumpToMessage(messageid, positionToJump);
+			}, timeToJump);
 		}
-	}, [hasMoreMessage, loadMoreMessage, messages.length]);
+		return () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+		};
+	}, [messageid, jumpToMessage]);
+
+	const handleScroll = (e: any) => {
+		setPosition(e.target.scrollTop);
+	};
 
 	return (
 		<div
-			className="bg-bgPrimary relative"
-			style={{
-				height: '100%',
-				display: 'flex',
-				overflowX: 'hidden',
-			}}
+			className="bg-bgPrimary relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
+			id="scrollLoading"
+			ref={containerRef}
 		>
-			<div
-				ref={parentRef}
-				className="List"
-				style={{
-					display: 'flex',
-					flexDirection: 'column-reverse',
-					justifyContent: 'flex-start',
-					minHeight: '0',
-					overflow: 'auto',
-					width: '100%',
-				}}
+			<InfiniteScroll
+				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
+				hasMore={hasMoreMessage}
+				loadMore={fetchData}
+				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
+				onScroll={handleScroll}
 			>
-				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'column-reverse',
-						flexShrink: '0',
-						height: `${rowVirtualizer.getTotalSize()}px`,
-						justifyContent: 'flex-start',
-						marginBottom: 'auto',
-						position: 'relative',
-						width: '100%',
-					}}
-				>
-					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-						const isLoaderRow = virtualRow.index === messages.length;
-						const message = messages[virtualRow.index];
-						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
-						const minHeight = hasAttachment ? '200px' : 'auto';
-						return (
-							<div
-								ref={virtualRow.measureElement}
-								key={virtualRow.index}
-								style={{
-									position: 'absolute',
-									bottom: 0,
-									left: 0,
-									width: '100%',
-									transform: `translateY(${virtualRow.end}px)`,
-								}}
-							>
-								<div
-									style={{
-										height: isLoaderRow ? '100px' : 'auto',
-										minHeight,
-									}}
-								>
-									{isLoaderRow ? (
-										hasMoreMessage ? (
-											'Loading more...'
-										) : (
-											'Nothing more to load'
-										)
-									) : (
-										<ChannelMessage
-											mode={mode}
-											lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-											message={message}
-											preMessage={messages[virtualRow.index - 1]}
-											channelId={channelId}
-											channelLabel={channelLabel || ''}
-										/>
-									)}
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			</div>
-			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
+				{messages.map((message, i) => (
+					<ChannelMessage
+						mode={mode}
+						key={message.id}
+						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+						message={message}
+						preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+						channelId={channelId}
+						channelLabel={channelLabel || ''}
+					/>
+				))}
+				<ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />
+			</InfiniteScroll>
 		</div>
 	);
 }
