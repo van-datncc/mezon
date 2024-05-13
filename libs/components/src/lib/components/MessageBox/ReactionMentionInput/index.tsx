@@ -166,7 +166,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if (!valueTextInput || valueTextInput.trim() === '') {
+			if ((!valueTextInput && attachmentDataRef.length === 0) || (valueTextInput.trim() === '' && attachmentDataRef.length === 0)){
 				return;
 			}
 			if (
