@@ -25,7 +25,7 @@ export default function MenuThreadDetail() {
       id: 2,
       title: 'Threads',
       action: ()=>{
-        navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
+        navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD});
       },
       icon: <ThreadIcon width={22} height={22}/>
     },
@@ -44,12 +44,12 @@ export default function MenuThreadDetail() {
   ]
 
   return (
-    <View style={styles.bottomSheetContainer}>
-    <View style={{ flexDirection: 'row', alignItems: 'center', height: 60 }}>
+     <View style={styles.bottomSheetContainer}>
+    <View style={styles.bottomSheetContent}>
       {!!currentChannel?.channel_label && <HashSignIcon width={18} height={18} />}
-      <Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{currentChannel?.channel_label}</Text>
+      <Text style={styles.channelLabel}>{currentChannel?.channel_label}</Text>
     </View>
-    <View style={{flexDirection: 'row', alignItems: 'center', gap: 20}}>
+    <View style={styles.iconContainer}>
         {
           threadOption.map(option => (
             <Pressable onPress={option.action}>

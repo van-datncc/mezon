@@ -8,6 +8,7 @@ import ThreadAddButton from "../../../components/CreateThreadModal/ThreadAddButt
 import CreateThreadForm from "../../../components/CreateThreadModal/CreateThreadForm";
 import SearchLogo from '../../../../assets/svg/discoverySearch-white.svg';
 import MenuThreadDetail from "../../../components/CreateThreadModal/MenuThreadDetail";
+import { Colors, size } from "@mezon/mobile-ui";
 
 export const MenuThreadDetailStacks = ({} : any) =>{
   const Stack = createStackNavigator();
@@ -23,7 +24,7 @@ export const MenuThreadDetailStacks = ({} : any) =>{
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
 				},
-				cardStyle: { backgroundColor: '#2b2d31' },
+				cardStyle: { backgroundColor: Colors.secondary },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
 			>
@@ -40,12 +41,12 @@ export const MenuThreadDetailStacks = ({} : any) =>{
 					headerShown: true,
           headerTitle: 'Threads',
           headerTitleStyle: {
-            color: 'white',
+            color: Colors.white,
           },
           headerStyle: {
-            backgroundColor: '#1e1f22',
+            backgroundColor: Colors.secondary,
           },
-          headerTintColor: '#ffffff',
+          headerTintColor: Colors.white,
           headerRight: () => (
             <ThreadAddButton />
           ),
@@ -56,14 +57,14 @@ export const MenuThreadDetailStacks = ({} : any) =>{
 				component={CreateThreadForm}
 				options={{
 					headerShown: true,
-          headerTitle: ()=> <Text style={{color: 'white'}}>{currentChannel.channel_label}</Text>,
+          headerTitle: ()=> <Text style={{color: Colors.white, fontSize: size.h5}}>{currentChannel?.channel_label}</Text>,
           headerTitleStyle: {
-            color: 'white',
+            color: Colors.white,
           },
           headerStyle: {
-            backgroundColor: '#1e1f22',
+            backgroundColor: Colors.secondary,
           },
-          headerTintColor: '#ffffff',
+          headerTintColor: Colors.white,
           headerRight: () => (
             <SearchLogo width={22} height={22}/>
           ),

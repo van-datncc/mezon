@@ -1,7 +1,8 @@
+import { Colors } from '@mezon/mobile-ui';
 import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
 	createChannelContainer: {
-    backgroundColor: '#2b2d31',
+    backgroundColor: Colors.secondary,
     height: '100%',
     width: '100%',
     position: 'relative'

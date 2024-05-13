@@ -1,7 +1,8 @@
+import { Colors, size } from '@mezon/mobile-ui';
 import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
 	createChannelContainer: {
-    backgroundColor: '#2b2d31',
+    backgroundColor: Colors.secondary,
     height: '100%',
     width: '100%',
     position: 'relative'
@@ -15,16 +16,16 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textNoThread: {
-    fontSize: 24,
-    lineHeight: 1.25 * 24,
+    fontSize: size.h5,
+    lineHeight: 1.25 * 20,
     fontWeight: '600',
     color: '#f2f3f5',
     marginBottom: 8
   },
   textNotify: {
     textAlign: 'center',
-    color: '#b3b8bf',
-    fontSize: 16,
+    color: Colors.textGray,
+    fontSize: size.label,
     lineHeight: 1.25 * 16,
     fontWeight: '400',
     marginBottom: 8
@@ -33,7 +34,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#5865f2',
+    backgroundColor: Colors.bgButton,
     borderRadius: 50,
     paddingVertical: 2,
     paddingHorizontal: 16,
@@ -43,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: size.medium,
     fontWeight: '500',
     lineHeight: 16,
     textAlign: 'center',
@@ -52,7 +53,7 @@ export const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 50,
-    backgroundColor: '#313338',
+    backgroundColor: Colors.tertiaryWeight,
     marginBottom: 16,
     display: 'flex',
     justifyContent: 'center',

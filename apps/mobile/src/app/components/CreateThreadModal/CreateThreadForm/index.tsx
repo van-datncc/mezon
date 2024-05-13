@@ -3,11 +3,14 @@ import { View , Text, TextInput, SafeAreaView, Switch, Button} from 'react-nativ
 import { styles } from './CreateThreadForm.style';
 import { Formik } from 'formik';
 import { useSelector } from 'react-redux';
-import { createNewChannel, selectCurrentChannel, selectCurrentChannelId } from 'libs/store/src/lib/channels/channels.slice';
+import { createNewChannel, selectCurrentChannel, selectCurrentChannelId, channelsActions, messagesActions } from '@mezon/store-mobile';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { getStoreAsync, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import ThreadIcon from '../../../../assets/svg/thread.svg'
+import { IChannel } from '@mezon/utils';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { useNavigation } from '@react-navigation/native';
 
 
 export default function CreateThreadForm() {
@@ -15,6 +18,7 @@ export default function CreateThreadForm() {
   const currentClanId = useSelector(selectCurrentClanId);
   const currentChannel = useSelector(selectCurrentChannel);
   const currentChannelId = useSelector(selectCurrentChannelId);
+  const navigation = useNavigation();
  const handleCreateThreads = async (value) =>{
   const body: ApiCreateChannelDescRequest = {
     clan_id: currentClanId?.toString(),
@@ -26,12 +30,20 @@ export default function CreateThreadForm() {
   };
    if(value?.threadName) {
     try {
-       await dispatch(createNewChannel(body));
+     const newThreadResponse =  await dispatch(createNewChannel(body));
+     handleRouteData(newThreadResponse.payload as IChannel)
     } catch (error) {}
-
    }
-
  }
+
+ const handleRouteData = async (thread?: IChannel) => {
+  const store = await getStoreAsync();
+  navigation.navigate(APP_SCREEN.HOME);
+  const channelId =  thread?.channel_id ;
+  const clanId = thread?.clan_id
+  store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+  store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+};
 
   return (
     <View style={styles.createChannelContainer}>
@@ -65,7 +77,7 @@ export default function CreateThreadForm() {
         <Switch
          value={values.isPrivateThread}
          trackColor={{false: '#676b73', true: '#5a62f4'}}
-          thumbColor={values.isPrivateThread ? 'white' : 'white'}
+          thumbColor={'white'}
           ios_backgroundColor="#3e3e3e"
           onValueChange={value =>{
             setFieldValue('isPrivateThread', value)
