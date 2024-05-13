@@ -41,6 +41,7 @@ export * from './lib/chat/hooks/useSendForwardMessage';
 export * from './lib/chat/hooks/useSendInviteMessage';
 export * from './lib/chat/hooks/useThreadMessage';
 export * from './lib/chat/hooks/useThreads';
+export * from './lib/chat/hooks/useApp';
 export * from './lib/chat/hooks/useAttachment';
 
 export * from './lib/policy';

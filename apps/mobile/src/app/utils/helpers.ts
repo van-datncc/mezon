@@ -41,6 +41,10 @@ export const isImage = (url?: string) => {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)/.test(url);
 };
 
+export const normalizeString = (str: string) => {
+  const normalizedStr = str.replace(/\s+/g, '').trim();
+  return normalizedStr.toLowerCase();
+}
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
 export const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
 export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$))/g;

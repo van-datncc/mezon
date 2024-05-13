@@ -3,13 +3,14 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { selectCurrentChannel } from '@mezon/store-mobile';
-import { ICategoryChannel } from '@mezon/utils';
+import { ICategoryChannel, IUser } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
 import { ChannelListItem } from './ChannelListItem';
 import { styles } from './styles';
 import { useChannelMembers } from '@mezon/core';
 import { useEffect } from 'react';
+import { MezonButton } from '../../../temp-ui';
 
 export const ChannelListContext = React.createContext({} as any);
 export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean }) => {
@@ -93,6 +94,34 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 					);
 				})}
 			</View>
+		</View>
+	);
+});
+
+export const FriendListItem = React.memo((props: { user: IUser }) => {
+	const { user } = props;
+
+	const inviteFriend = (user: IUser) => {
+		console.log('invited:', user);
+	}
+
+	return (
+		<View style={styles.friendItemWrapper}>
+			<View style={styles.friendItemContent}>
+				<FastImage
+					style={{ width: 40, height: 40, borderRadius: 50 }}
+					source={{
+						uri: user?.avatarSm,
+					}}
+					resizeMode={FastImage.resizeMode.cover}
+				/>
+				<Text style={styles.friendItemName}>{user?.name}</Text>
+			</View>
+		
+			<MezonButton
+				viewContainerStyle={styles.inviteButton}
+				onPress={() => inviteFriend(user)}
+			>Invite</MezonButton>
 		</View>
 	);
 });
