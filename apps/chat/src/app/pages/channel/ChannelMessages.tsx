@@ -1,6 +1,10 @@
 import { useChatMessages } from '@mezon/core';
+import { useAppDispatch } from '@mezon/store';
 import { useVirtualizer } from '@mezon/virtual';
+import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -12,9 +16,16 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+	const dispatch = useAppDispatch();
+	const openPopupForward = useSelector(getIsShowPopupForward);
+
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 
 	const parentRef = useRef<any>();
+
+	const handleCloseModalForward = () => {
+		dispatch(toggleIsShowPopupForwardFalse());
+	};
 
 	const rowVirtualizer = useVirtualizer({
 		count: messages.length + 1, // Add 1 to account for loader row
@@ -112,6 +123,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					})}
 				</div>
 			</div>
+			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 		</div>
 	);
 }
