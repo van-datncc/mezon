@@ -1,5 +1,5 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
-import { useAuth, useClans, useDragAndDrop, useMenu } from '@mezon/core';
+import { useAuth, useClans, useDragAndDrop, useMenu, useThreads } from '@mezon/core';
 import {
 	channelsActions,
 	selectCurrentChannel,
@@ -31,13 +31,13 @@ function useChannelSeen(channelId: string) {
 export default function ChannelLayout() {
 	const { draggingState, setDraggingState } = useDragAndDrop();
 
-	const isShow = useSelector(selectIsShowMemberList);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const { sessionRef } = useMezon();
 	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
+	const { setIsShowCreateThread } = useThreads();
 
 	useChannelSeen(currentChannel?.id || '');
 	const dispatch = useAppDispatch();
@@ -102,6 +102,12 @@ export default function ChannelLayout() {
 		}
 	};
 
+	useEffect(()=>{
+		if(isShowMemberList){
+			setIsShowCreateThread(false);
+		}
+	}, [isShowMemberList]);
+
 	return (
 		<>
 			{draggingState && <FileUploadByDnD />}
@@ -158,7 +164,7 @@ export default function ChannelLayout() {
 							</div>
 						)}
 					</div>
-					{isShow && (
+					{isShowMemberList && (
 						<div
 							className={` bg-bgSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
 							id="memberList"
