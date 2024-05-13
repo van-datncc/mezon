@@ -1,5 +1,5 @@
 import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin } from '@mezon/store-mobile';
-import { MezonSuspense, useMezon } from '@mezon/transport';
+import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useMemo } from 'react';
@@ -10,8 +10,8 @@ import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { preloadedState } from '../../../../chat/src/app/mock/state';
+import messaging from '@react-native-firebase/messaging';
+import { createLocalNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
@@ -20,6 +20,11 @@ const NavigationMain = () => {
 
 	useEffect(() => {
 		authLoader();
+		const unsubscribe = messaging().onMessage((remoteMessage) => {
+			createLocalNotification(remoteMessage?.notification?.title, remoteMessage?.notification?.body, remoteMessage?.data);
+		});
+
+		return unsubscribe;
 	}, []);
 
 	const authLoader = async () => {
@@ -70,7 +75,7 @@ const NavigationMain = () => {
 const RootNavigation = () => {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
-		return initStore(mezon, preloadedState);
+		return initStore(mezon, undefined);
 	}, [mezon]);
 
 	return (
