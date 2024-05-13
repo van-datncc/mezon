@@ -2,15 +2,11 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
-import { channelMembersActions, channelsActions, getStoreAsync, messagesActions, selectCurrentChannelId, selectIsUnreadChannelById } from '@mezon/store-mobile';
+import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import HashSignWhiteIcon from '../../../../assets/svg/channelText-white.svg';
-import HashSignIcon from '../../../../assets/svg/channelText.svg';
 import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
-import SpeakerIcon from '../../../../assets/svg/speaker.svg';
-import ThreadListChannel from './ThreadListChannel';
+import { ChannelListItem } from './ChannelListItem';
 import { styles } from './styles';
 import { useChannelMembers } from '@mezon/core';
 import { useEffect } from 'react';
@@ -58,7 +54,12 @@ export const FastImageRes = React.memo(({ uri }: { uri: string }) => {
 
 export const ChannelListHeader = React.memo((props: { title: string; onPress: any; isCollapsed: boolean }) => {
 	return (
-		<TouchableOpacity onPress={props?.onPress} key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListHeader}>
+		<TouchableOpacity
+			activeOpacity={0.8}
+			onPress={props?.onPress}
+			key={Math.floor(Math.random() * 9999999).toString()}
+			style={styles.channelListHeader}
+		>
 			<View style={styles.channelListHeaderItem}>
 				<AngleDownIcon width={20} height={20} style={[props?.isCollapsed && { transform: [{ rotate: '-90deg' }] }]} />
 				<Text style={styles.channelListHeaderItemTitle}>{props.title}</Text>
@@ -69,6 +70,7 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 
 export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; collapseItems: any }) => {
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
+	const currentChanel = useSelector(selectCurrentChannel);
 
 	return (
 		<View key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListSection}>
@@ -77,55 +79,20 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
 				isCollapsed={isCollapsed}
 			/>
-			{!isCollapsed &&
-				props.data.channels?.map((item: any, index: number) => {
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const isUnReadChannel = useSelector(selectIsUnreadChannelById(item?.id));
+			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
+				{props.data.channels?.map((item: any, index: number) => {
+					const isActive = currentChanel?.id === item.id;
 
-					return <ChannelListItem data={item} key={Math.floor(Math.random() * 9999999).toString() + index} isUnRead={isUnReadChannel} />;
+					return (
+						<ChannelListItem
+							data={item}
+							key={Math.floor(Math.random() * 9999999).toString() + index}
+							isActive={isActive}
+							currentChanel={currentChanel}
+						/>
+					);
 				})}
-		</View>
-	);
-});
-
-export const ChannelListItem = React.memo((props: { data: any; image?: string; isUnRead: boolean }) => {
-	const useChannelListContentIn = React.useContext(ChannelListContext);
-	
-	const handleRouteData = React.useCallback(async () => {
-		const store = await getStoreAsync();
-		useChannelListContentIn.navigation.closeDrawer();
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: props?.data?.channel_id }));
-		store.dispatch(channelsActions.joinChannel({ clanId: props?.data?.clanId ?? '', channelId: props?.data?.channel_id, noFetchMembers: false }));
-
-		store.dispatch(
-			channelMembersActions.fetchChannelMembers({
-				clanId: props?.data?.clanId || '',
-				channelId: props?.data?.channel_id || '',
-				channelType: ChannelType.CHANNEL_TYPE_TEXT,
-				noCache: true,
-				repace: true,
-			}),
-		);
-	}, []);
-
-	return (
-		<View>
-			<View onTouchEnd={handleRouteData} style={styles.channelListItem}>
-				{props.isUnRead && <View style={styles.dotIsNew} />}
-				{props.image != undefined ? (
-					<View style={{ width: 30, height: 30, borderRadius: 50, overflow: 'hidden' }}>
-						<FastImageRes uri={props.image} />
-					</View>
-				) : props.data.type == ChannelType.CHANNEL_TYPE_VOICE ? (
-					<SpeakerIcon width={20} height={20} fill={'#FFFFFF'} />
-				) : props.isUnRead ? (
-					<HashSignWhiteIcon width={18} height={18} />
-				) : (
-					<HashSignIcon width={18} height={18} />
-				)}
-				<Text style={[styles.channelListItemTitle, props.isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
 			</View>
-			{!!props?.data?.threads?.length && <ThreadListChannel threads={props?.data?.threads} />}
 		</View>
 	);
 });

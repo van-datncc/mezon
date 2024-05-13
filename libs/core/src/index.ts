@@ -36,6 +36,7 @@ export * from './lib/chat/hooks/useNotify';
 export * from './lib/chat/hooks/useOnClickOutSide';
 export * from './lib/chat/hooks/useReference';
 export * from './lib/chat/hooks/useRole';
+export * from './lib/chat/hooks/useEventManagement';
 export * from './lib/chat/hooks/useSendForwardMessage';
 export * from './lib/chat/hooks/useSendInviteMessage';
 export * from './lib/chat/hooks/useThreadMessage';

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import EventInfoModal from './eventInfoModal';
 import LocationModal from './locationModal';
 import ReviewModal from './reviewModal';
+import { useClans, useEventManagement } from '@mezon/core';
 
 enum Tabs_Option {
 	LOCATION = 0,
@@ -13,16 +14,21 @@ enum Tabs_Option {
 
 export type ModalCreateProps = {
 	onClose: () => void;
+	onCloseEventModal: () => void;
 };
 
 const ModalCreate = (props: ModalCreateProps) => {
-	const { onClose } = props;
+	const { onClose, onCloseEventModal } = props;
 	const [currentModal, setCurrentModal] = useState(0);
 	const [topic, setTopic] = useState('');
+	const [time, setTime] = useState('00:00');
 	const [voiceChannel, setVoiceChannel] = useState('');
 	const [buttonWork, setButtonWork] = useState(true);
 	const [titleEvent, setTitleEvent] = useState('');
 	const [option, setOption] = useState('');
+	const [description, setDescription] = useState('');
+	const { createEventManagement } = useEventManagement();
+	const { currentClanId } = useClans();
 
 	const voicesChannel = useSelector(selectVoiceChannelAll);
 	const tabs = ['Location', 'Event Info', 'Review'];
@@ -39,6 +45,10 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 	const handleTopic = (topic: string) => {
 		setTopic(topic);
+	};
+
+	const handleTime = (time: string) => {
+		setTime(time);
 	};
 
 	const handleVoiceChannel = (channel: string) => {
@@ -58,6 +68,25 @@ const ModalCreate = (props: ModalCreateProps) => {
 			setCurrentModal(number);
 		}
 	};
+
+	const handleDescription = (content: string) => {
+		setDescription(content);
+	}
+
+	const handleSubmit = async ()=>{
+		const timeValue = handleTimeISO(time);
+		await createEventManagement(currentClanId || '', voiceChannel, titleEvent, topic, timeValue, timeValue, description);
+		onClose();
+		onCloseEventModal();
+	}
+
+	const handleTimeISO = (time:string)=>{
+		const currentDate = new Date();
+		const [hours, minutes] = time.split(':');
+		currentDate.setHours(parseInt(hours, 10));
+		currentDate.setMinutes(parseInt(minutes, 10));
+		return currentDate.toISOString();
+	}
 
 	useEffect(() => {
 		if (currentModal >= 1) {
@@ -95,7 +124,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						handleTitleEvent={handleTitleEvent}
 					/>
 				)}
-				{currentModal === Tabs_Option.EVENT_INFO && <EventInfoModal topic={topic} handleTopic={handleTopic} />}
+				{currentModal === Tabs_Option.EVENT_INFO && <EventInfoModal topic={topic} handleTopic={handleTopic} handleTime={handleTime} description={description} handleDescription={handleDescription}/>}
 				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} />}
 			</div>
 			<div className="flex justify-between mt-4 w-full">
@@ -111,7 +140,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 					</button>
 					<button
 						className={`px-4 py-2 rounded bg-primary ${!buttonWork && 'bg-opacity-50'}`}
-						onClick={currentModal === Tabs_Option.REVIEW ? () => console.log('submit') : () => handleNext(currentModal)}
+						onClick={currentModal === Tabs_Option.REVIEW ? () => handleSubmit() : () => handleNext(currentModal)}
 					>
 						{currentModal === Tabs_Option.REVIEW ? 'Create Event' : 'Next'}
 					</button>

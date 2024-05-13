@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import HomeScreen from '../../screens/home/HomeScreen';
 import MessagesScreen from '../../screens/main/MessagesScreen';
 import Notifications from '../../screens/main/Notifications';
-import ProfileScreen from '../../screens/main/ProfileScreen';
+import ProfileScreen from '../../screens/profile/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
 import MemberListStatus from '../../screens/member';
 

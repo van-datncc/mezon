@@ -1,4 +1,4 @@
-import { Colors, verticalScale, size } from '@mezon/mobile-ui';
+import { Colors, size, verticalScale } from '@mezon/mobile-ui';
 import { Dimensions, StyleSheet } from 'react-native';
 
 const inputWidth = Dimensions.get('window').width * 0.6;
@@ -63,15 +63,13 @@ export const styles = StyleSheet.create({
 	containerDrawerContent: {
 		flex: 1,
 		flexDirection: 'row',
-		backgroundColor: '#2b2d31',
+		backgroundColor: Colors.primary,
 	},
 	homeDefault: {
 		backgroundColor: '#2b2d31',
 		flex: 1,
 	},
 	listChannels: {
-		height: '100%',
-		flexDirection: 'column-reverse',
 		backgroundColor: Colors.tertiaryWeight,
 	},
 	channelListSection: {
@@ -102,6 +100,10 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingVertical: 8,
 		borderRadius: 5,
+	},
+	channelListItemActive: {
+		backgroundColor: Colors.tertiaryWeight,
+		borderRadius: size.s_10,
 	},
 	channelListItemTitle: {
 		fontSize: size.s_14,
@@ -208,5 +210,88 @@ export const styles = StyleSheet.create({
 		width: '22%',
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.primary,
+	},
+	threadItem: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+	},
+	threadItemActive: {
+		backgroundColor: Colors.tertiaryWeight,
+		borderRadius: size.s_10,
+		position: 'absolute',
+		width: '95%',
+		height: '85%',
+		right: 0,
+		top: size.s_20,
+	},
+	threadFirstItemActive: {
+		height: '160%',
+		right: 0,
+		top: size.s_2,
+	},
+	wrapperMessageBox: {
+		flexDirection: 'row',
+		paddingLeft: size.s_10,
+		marginTop: size.s_24,
+		marginBottom: size.s_6,
+		paddingRight: size.s_50,
+	},
+	wrapperMessageBoxCombine: {
+		marginTop: size.s_2,
+	},
+	rowMessageBox: {
+		marginLeft: 15,
+		justifyContent: 'space-between',
+	},
+	messageBoxTop: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+		marginBottom: size.s_6,
+	},
+	userNameMessageBox: {
+		fontSize: size.s_16,
+		marginRight: size.s_10,
+		fontWeight: '600',
+		color: Colors.white,
+	},
+	dateMessageBox: {
+		fontSize: size.s_12,
+		color: Colors.gray72,
+	},
+	contentMessageBox: {
+		fontSize: size.s_16,
+		color: Colors.tertiary,
+		flex: 1,
+	},
+	contentMessageLink: {
+		fontSize: size.s_16,
+		color: Colors.textLink,
+		flex: 1,
+	},
+	contentMessageMention: {
+		fontSize: size.s_16,
+		fontWeight: '600',
+		color: Colors.textLink,
+		flex: 1,
+	},
+	loadMoreChannelMessage: {
+		paddingVertical: size.s_20,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	avatarMessageBoxDefault: {
+		width: '100%',
+		height: '100%',
+		borderRadius: size.s_50,
+		backgroundColor: Colors.titleReset,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	textAvatarMessageBoxDefault: {
+		fontSize: size.s_22,
+		color: Colors.white,
+	},
+	imageMessageRender: {
+		borderRadius: verticalScale(5),
 	},
 });
