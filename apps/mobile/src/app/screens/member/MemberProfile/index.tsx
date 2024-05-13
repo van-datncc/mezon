@@ -1,8 +1,7 @@
 import { ChannelMembersEntity } from "@mezon/utils";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import { OfflineStatus, OnlineStatus } from "@mezon/mobile-components"
-import { Colors, Fonts, Metrics, } from "@mezon/mobile-ui";
-
+import style from "./style";
 interface IProps {
     user: ChannelMembersEntity;
     status?: boolean;
@@ -52,49 +51,3 @@ export default function MemberProfile({
         </View >
     )
 }
-
-
-const style = StyleSheet.create({
-    avatar: {
-        height: 35,
-        width: 35,
-        overflow: "hidden",
-        borderRadius: 9999,
-    },
-
-    avatarContainer: {
-        position: "relative",
-        width: 35,
-        height: 35,
-        borderRadius: 9999
-    },
-
-    statusWrapper: {
-        backgroundColor: Colors.secondary,
-        padding: 3,
-        position: "absolute",
-        bottom: -4,
-        right: -4,
-        borderRadius: 9999,
-    },
-
-    nameContainer: {
-        paddingVertical: 20,
-        width: "100%",
-        borderBottomColor: "#5a5b5c30",
-    },
-
-    container: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 20,
-        paddingHorizontal: 20
-    },
-
-    textName: {
-        color: "purple",
-        fontSize: Fonts.size.small,
-        fontWeight: "700"
-    }
-})

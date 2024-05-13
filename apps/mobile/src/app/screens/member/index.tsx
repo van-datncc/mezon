@@ -1,10 +1,10 @@
 import { useChannelMembers } from "@mezon/core";
-import { Colors } from "@mezon/mobile-ui";
 import { selectCurrentChannelId } from "@mezon/store-mobile";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import MemberItem from "./MemberItem";
+import style from "./style";
 
 export default function MemberListStatus() {
     const currentChannelId = useSelector(selectCurrentChannelId);
@@ -43,23 +43,3 @@ export default function MemberListStatus() {
         </ScrollView>
     )
 }
-
-
-const style = StyleSheet.create({
-    container: {
-        backgroundColor: Colors.primary,
-        height: "100%",
-        padding: 20
-    },
-
-    text: {
-        color: "white"
-    },
-
-    box: {
-        backgroundColor: Colors.secondary,
-        marginTop: 10,
-        borderRadius: 15,
-        paddingVertical: 10
-    }
-})
