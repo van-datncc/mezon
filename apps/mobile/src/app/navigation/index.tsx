@@ -4,6 +4,8 @@ import RootNavigation from "./RootNavigator";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import { NX_CHAT_APP_API_HOST } from '@env';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '@mezon/translations';
 
 console.log(process.env.NX_CHAT_APP_API_HOST);
 
@@ -16,9 +18,11 @@ const mezon: CreateMezonClientOptions = {
 
 const App = () => {
 	return (
-		<MezonContextProvider mezon={mezon} connect={true}>
-			<RootNavigation />
-		</MezonContextProvider>
+		<I18nextProvider i18n={i18n}>
+			<MezonContextProvider mezon={mezon} connect={true}>
+				<RootNavigation />
+			</MezonContextProvider>
+		</I18nextProvider>
 	);
 };
 

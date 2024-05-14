@@ -15,6 +15,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { IUser } from '@mezon/utils';
 import { normalizeString } from '../../../../../utils/helpers';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
+import { useTranslation } from 'react-i18next';
 
 export const InviteToChannel = React.memo(() => {
 	const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
@@ -23,6 +24,7 @@ export const InviteToChannel = React.memo(() => {
 	const [searchUserText, setSearchUserText] = useState('');
     const { currentClanId } = useClans();
     const { createLinkInviteUser } = useInvite();
+	const { t } = useTranslation(['inviteToChannel']);
 
 	const refRBSheet = useRef(null);
 	//TODO: get from API
@@ -133,27 +135,26 @@ export const InviteToChannel = React.memo(() => {
 							<View style={styles.inviteHeader}>
 								<Text style={styles.inviteHeaderText}>Invite a friend</Text>
 							</View>
-						
 							<View style={styles.iconAreaWrapper}>
 								<Pressable style={styles.inviteIconWrapper}>
 									<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
-									<Text style={styles.inviteIconText}>Twitter</Text>
+									<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
 								</Pressable>
 								<Pressable style={styles.inviteIconWrapper}>
 									<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
-									<Text style={styles.inviteIconText}>Facebook</Text>
+									<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
 								</Pressable>
 								<Pressable style={styles.inviteIconWrapper}>
 									<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
-									<Text style={styles.inviteIconText}>Youtube</Text>
+									<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
 								</Pressable>
 								<Pressable style={styles.inviteIconWrapper}>
 									<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard() } />
-									<Text style={styles.inviteIconText}>Copy link</Text>
+									<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
 								</Pressable>
 								<Pressable style={styles.inviteIconWrapper}>
 									<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
-									<Text style={styles.inviteIconText}>Email</Text>
+									<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
 								</Pressable>
 							</View>
 							</>:
