@@ -98,15 +98,13 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
 				const onlyBackticks = /^```$/.test(markdown);
-				const markdownArr = markdown.split(' ');
-				const hasEmoji = /[^\u0000-\u007F]/.test(markdown);
 				return (
 					<div key={index} className="lineText contents">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (
 							<Markdown
-								children={!hasEmoji ? markdown : null}
+								children={markdown}
 								remarkPlugins={[remarkGFM]}
 								components={{
 									pre: PreClass,
@@ -124,19 +122,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								}}
 							/>
 						)}
-						{Array.isArray(markdownArr) &&
-							hasEmoji &&
-							markdownArr.map((item: string, index: number) => {
-								const isEmoji = /\p{Emoji}/gu.test(item);
-								const isNumber = /[0-9]/.test(item);
-
-								const fontSizeClass = markdownArr.length === 1 && isEmoji ? 'text-3xl' : isEmoji && !isNumber ? 'text-xl' : ' ';
-								return (
-									<span key={index} className={fontSizeClass}>
-										{item}
-									</span>
-								);
-							})}
+						{markdown && ' '}
 						{tagName && (
 							<span
 								style={{ borderRadius: '4px', padding: '0 2px' }}

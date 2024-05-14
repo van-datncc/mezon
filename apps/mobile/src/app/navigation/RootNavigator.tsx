@@ -1,8 +1,8 @@
 import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
-import { NavigationContainer } from '@react-navigation/native';
+import { MezonSuspense, useMezon } from '@mezon/transport';
+import { DefaultTheme, NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -10,6 +10,9 @@ import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { preloadedState } from '../../../../chat/src/app/mock/state';
+import { darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
 import { createLocalNotification } from '../utils/pushNotificationHelpers';
 
@@ -17,7 +20,7 @@ const RootStack = createStackNavigator();
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
-
+	const [isDarkMode] = useState(true); //TODO: move to custom hook
 	useEffect(() => {
 		authLoader();
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
@@ -47,8 +50,26 @@ const NavigationMain = () => {
 		}
 	};
 
+	//TODO: update later
+	const lightTheme = {
+		...DefaultTheme,
+		colors: {
+		  ...DefaultTheme.colors,
+		  ...lightThemeColor
+		},
+	};
+
+	//TODO: update later
+	const darkTheme = {
+		...DarkTheme,
+		colors: {
+			...DarkTheme.colors,
+			...darkThemeColor
+		}
+	}
+
 	return (
-		<NavigationContainer>
+		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
 			<RootStack.Navigator screenOptions={{ headerShown: false }}>
 				{isLoggedIn ? (
 					<RootStack.Group

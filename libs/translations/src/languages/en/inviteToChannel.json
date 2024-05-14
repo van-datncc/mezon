@@ -1,0 +1,10 @@
+{
+    "title": "invite a friend",
+    "iconTitle": {
+        "twitter": "Twitter",
+        "faceBook": "FaceBook",
+        "youtube": "Youtube",
+        "copyLink": "Copy Link",
+        "email": "Email"
+    }
+}

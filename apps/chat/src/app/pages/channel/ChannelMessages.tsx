@@ -22,10 +22,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
-	
-  const fetchData = () => {
-		loadMoreMessage();
-	};
 
 	useEffect(() => {
 		if (idMessageReplied) {
@@ -37,7 +33,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			setTimeToJump(1000);
 			setPositionToJump('start');
 		}
-	}, [getJumpToMessageId, idMessageReplied]);
+	}, [idMessageReplied]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout | null = null;
@@ -51,7 +47,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				clearTimeout(timeoutId);
 			}
 		};
-	}, [messageid, jumpToMessage]);
+	}, [messageid, jumpToMessage, timeToJump, positionToJump]);
 
 	const handleScroll = (e: any) => {
 		setPosition(e.target.scrollTop);
@@ -65,8 +61,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		>
 			<InfiniteScroll
 				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
-				hasMore={hasMoreMessage}
-				loadMore={fetchData}
+				hasMore={false}
+				loadMore={loadMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
 				onScroll={handleScroll}
 			>

@@ -17,6 +17,7 @@
 		"skipDefaultLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
+			"@mezon/translations": ["libs/translations/src/i18n.config.ts"],
 			"@mezon/assets": ["libs/assets/src/index.ts"],
 			"@mezon/async-storage-mobile": ["libs/store/src/AsyncLocalStorageMobile.tsx"],
 			"@mezon/components": ["libs/components/src/index.ts"],
