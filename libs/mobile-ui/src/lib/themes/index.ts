@@ -1,4 +1,4 @@
-import Colors from "./Colors";
+import { colors as Colors, lightThemeColor, darkThemeColor } from "./Colors";
 import Fonts, { size } from "./Fonts";
 import {
 	Metrics,
@@ -9,6 +9,8 @@ import {
 
 export {
 	Colors,
+	lightThemeColor,
+	darkThemeColor,
 	Metrics,
 	Fonts,
 	horizontalScale,
