@@ -380,11 +380,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		}
 		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
-		const emojiWithSpace = ' ' + emojiPicked + ' ';
 		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiWithSpace);
+			textFieldEdit.insert(input, emojiPicked);
 		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiWithSpace);
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
 			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
