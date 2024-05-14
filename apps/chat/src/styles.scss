@@ -445,6 +445,10 @@ input:-webkit-autofill:active {
 }
 
 // thread-scroll
+.thread-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
 .thread-scroll::-webkit-scrollbar-track {
   background: transparent;
 }

@@ -83,13 +83,16 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 					</div>
 					<div className="flex justify-end p-4 rounded-b bg-[#2B2D31]">
 						<Button
-							className="h-10 px-4 rounded bg-transparent hover:!bg-transparent hover:!underline focus:ring-transparent"
+							className="h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent"
 							type="button"
 							onClick={onClose}
 						>
 							Cancel
 						</Button>
-						<Button className="h-10 px-4 rounded bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent" type="submit">
+						<Button
+							className="h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent"
+							type="submit"
+						>
 							Save
 						</Button>
 					</div>

@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useClans, useMenu, useOnClickOutside, useReference } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useClans, useMenu, useOnClickOutside, useReference } from '@mezon/core';
 import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
@@ -15,7 +15,6 @@ import PanelChannel from '../PanelChannel';
 export type ChannelLinkProps = {
 	clanId?: string;
 	channel: IChannel;
-	active?: boolean;
 	createInviteLink: (clanId: string, channelId: string) => void;
 	isPrivate?: number;
 	isUnReadChannel?: boolean;
@@ -35,9 +34,7 @@ export const classes = {
 	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 hover:bg-bgModifierHover',
 };
 
-function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
-	const state = active ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
-
+function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
 	const { userProfile } = useAuth();
 	const { currentClan } = useClans();
 	const voice = useMezonVoice();
@@ -60,13 +57,16 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 	};
 
 	const { toChannelPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+
+	const channelPath = toChannelPage(channel.id, channel?.clan_id ?? '');
+
+	const state = currentURL === channelPath ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
 
 	const handleCreateLinkInvite = () => {
 		createInviteLink(clanId ?? '', channel.channel_id ?? '');
 		setIsShowPanelChannel(false);
 	};
-
-	const channelPath = toChannelPage(channel.id, channel?.clan_id ?? '');
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -118,7 +118,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
-					className={`${classes[state]} cursor-pointer ${active ? 'bg-bgModifierHover' : ''}`}
+					className={`${classes[state]} cursor-pointer ${currentURL === channelPath ? 'bg-bgModifierHover' : ''}`}
 					onClick={() => handleVoiceChannel(channel.id)}
 					role="button"
 				>
@@ -136,7 +136,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 					<p
 						className={cls({
 							'ml-2 text-[#AEAEAE] w-full group-hover:text-white text-base font-medium focus:bg-bgModifierHover': true,
-							'font-medium text-white': active || isUnReadChannel,
+							'font-medium text-white': currentURL === channelPath || isUnReadChannel,
 						})}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
@@ -147,7 +147,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				</span>
 			) : (
 				<Link to={channelPath} onClick={handleClick}>
-					<span className={`${classes[state]} ${active ? 'bg-bgModifierHover' : ''}`}>
+					<span className={`${classes[state]} ${currentURL === channelPath ? 'bg-bgModifierHover' : ''}`}>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 						<div className="relative mt-[-5px]">
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
@@ -162,7 +162,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						<p
 							className={cls({
 								'ml-2 font-medium text-[#AEAEAE] w-full group-hover:text-white text-base focus:bg-bgModifierHover': true,
-								'font-medium text-white': active || isUnReadChannel,
+								'font-medium text-white': currentURL === channelPath || isUnReadChannel,
 							})}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
@@ -178,11 +178,11 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				numberNotication !== 0 ? (
 					<>
 						<AddPerson
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block text-white ${active ? '' : ''}`}
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block text-white ${currentURL === channelPath ? '' : ''}`}
 							onClick={handleCreateLinkInvite}
 						/>
 						<SettingProfile
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block text-white ${active ? '' : ''}`}
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block text-white ${currentURL === channelPath ? '' : ''}`}
 							onClick={handleOpenCreate}
 						/>
 						<div
@@ -194,11 +194,11 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 				) : (
 					<>
 						<AddPerson
-							className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-transparent'} block right-8 cursor-pointer`}
+							className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${currentURL === channelPath ? 'text-white' : 'text-transparent'} block right-8 cursor-pointer`}
 							onClick={handleCreateLinkInvite}
 						/>
 						<SettingProfile
-							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${active ? 'text-white' : 'text-transparent'} block group-hover:block group-hover:text-white cursor-pointer`}
+							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${currentURL === channelPath ? 'text-white' : 'text-transparent'} block group-hover:block group-hover:text-white cursor-pointer`}
 							onClick={handleOpenCreate}
 						/>
 					</>
@@ -206,7 +206,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 			) : (
 				<>
 					<AddPerson
-						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'text-white' : 'text-transparent'} hidden right-3 cursor-pointer`}
+						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${currentURL === channelPath ? 'text-white' : 'text-transparent'} hidden right-3 cursor-pointer`}
 						onClick={handleCreateLinkInvite}
 					/>
 					{numberNotication !== 0 && (
