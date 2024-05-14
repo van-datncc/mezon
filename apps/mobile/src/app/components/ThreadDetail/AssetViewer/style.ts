@@ -1,5 +1,5 @@
 import { Colors } from "@mezon/mobile-ui";
-import { Dimensions, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
@@ -10,7 +10,9 @@ const styles = StyleSheet.create({
     },
 
     headerTab: {
+        marginTop: 20,
         padding: 20,
+        paddingVertical: 10,
         display: "flex",
         flexDirection: "row",
         justifyContent: "flex-start",
@@ -20,6 +22,19 @@ const styles = StyleSheet.create({
 
     tabLabel: {
         color: Colors.white
+    },
+
+    a: {
+        width: "100%",
+        paddingHorizontal: 20,
+        position: "relative",
+    },
+    b: {
+        position: "absolute",
+        backgroundColor: "purple",
+        height: 3,
+        top: 0,
+        borderRadius: 50,
     }
 })
 
