@@ -4,7 +4,7 @@ import { useApp } from '@mezon/core';
 
 const ThemeOptions = () => {
 	const { appearanceTheme, setAppearanceTheme } = useApp();
-	const [themeChosen, setThemeChosen] = useState<string>('dark');
+	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
 	const elementHTML = document.documentElement;
 	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
 
