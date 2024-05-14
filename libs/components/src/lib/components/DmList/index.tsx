@@ -1,6 +1,7 @@
 import { useDirect, useEscapeKey } from '@mezon/core';
+import { useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { getIsShowPopupForward } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -14,6 +15,7 @@ export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function DirectMessageList() {
+	const dispatch = useAppDispatch();
 	const pathname = useLocation().pathname;
 	const { listDM: dmGroupChatList } = useDirect();
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
@@ -31,7 +33,11 @@ function DirectMessageList() {
 		setIsOpen(!isOpen);
 	};
 	const navigate = useNavigate();
-	const isChange = useSelector(getIsShowPopupForward);
+	const openPopupForward = useSelector(getIsShowPopupForward);
+
+	const handleCloseModalForward = () => {
+		dispatch(toggleIsShowPopupForwardFalse());
+	};
 
 	useEscapeKey(() => setIsOpen(false));
 
@@ -64,7 +70,7 @@ function DirectMessageList() {
 					</button>
 				</div>
 			</div>
-			{isChange ? <ForwardMessageModal open={isChange} /> : null}
+			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3">
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any, index: number) => {

@@ -2,7 +2,7 @@ import { useAppNavigation, useAuth, useChannels, useClans, useDirect, useFriends
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 
 export type SearchModalProps = {
@@ -24,6 +24,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { friends } = useFriends();
 
 	const [idActive, setIdActive] = useState('');
+	const boxRef = useRef<HTMLDivElement | null>(null);
+	const itemRef = useRef<HTMLDivElement | null>(null);
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
@@ -134,6 +136,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			setIdActive(totalLists[0]?.id);
 		}
 
+		let maxHight = itemRef.current?.clientHeight ?? 0;
+
+		const boxHight = boxRef.current?.clientHeight ?? 0;
 		const handleKeyDown = (event: KeyboardEvent) => {
 			const nextIndex = (currentIndex: number, length: number) => (currentIndex === length - 1 ? 0 : currentIndex + 1);
 			const prevIndex = (currentIndex: number) => (currentIndex === 0 ? totalLists.length - 1 : currentIndex - 1);
@@ -141,6 +146,28 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 			switch (event.key) {
 				case 'ArrowDown':
+					if (itemRef && itemRef.current) {
+						maxHight =
+							itemRef.current.clientHeight *
+							(nextIndex(
+								totalLists.findIndex((item: any) => item.id === idActive),
+								totalLists.length,
+							) +
+								1);
+
+						if (maxHight > boxHight) {
+							boxRef.current?.scroll({
+								top: maxHight - boxHight + 46,
+								behavior: 'smooth',
+							});
+						}
+						if (maxHight === itemRef.current?.clientHeight) {
+							boxRef.current?.scroll({
+								top: 0,
+								behavior: 'smooth',
+							});
+						}
+					}
 					setIdActive(
 						totalLists[
 							nextIndex(
@@ -151,6 +178,22 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					);
 					break;
 				case 'ArrowUp':
+					if (itemRef && itemRef.current) {
+						maxHight = itemRef.current.clientHeight * (prevIndex(totalLists.findIndex((item: any) => item.id === idActive)) + 1);
+
+						if (maxHight > boxHight) {
+							boxRef.current?.scroll({
+								top: maxHight - boxHight + 46,
+								behavior: 'smooth',
+							});
+						}
+						if (maxHight === itemRef.current?.clientHeight) {
+							boxRef.current?.scroll({
+								top: 0,
+								behavior: 'smooth',
+							});
+						}
+					}
 					setIdActive(totalLists[prevIndex(totalLists.findIndex((item: any) => item.id === idActive))]?.id);
 					break;
 				case 'Enter':
@@ -191,7 +234,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
 				</div>
-				<div className="w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px]">
+				<div ref={boxRef} className="w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px]">
 					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
 						<>
 							{listMemSearch.length
@@ -201,6 +244,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 										.map((item: any, index: number) => {
 											return (
 												<div
+													ref={itemRef}
+													key={item.id}
 													onClick={() => handleSelectMem(item)}
 													onMouseEnter={() => setIdActive(item.id)}
 													onMouseLeave={() => setIdActive(item.id)}
@@ -218,6 +263,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 										.map((item: any) => {
 											return (
 												<div
+													ref={itemRef}
+													key={item.id}
 													onClick={() => handleSelectChannel(item)}
 													onMouseEnter={() => setIdActive(item.id)}
 													onMouseLeave={() => setIdActive(item.id)}
@@ -242,6 +289,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 											.map((item: any) => {
 												return (
 													<div
+														ref={itemRef}
+														key={item.id}
 														onClick={() => handleSelectMem(item)}
 														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
@@ -266,6 +315,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 											.map((item: any) => {
 												return (
 													<div
+														ref={itemRef}
+														key={item.id}
 														onClick={() => handleSelectChannel(item)}
 														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
