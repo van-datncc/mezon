@@ -1,8 +1,8 @@
 import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin } from '@mezon/store-mobile';
 import { MezonSuspense, useMezon } from '@mezon/transport';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -12,12 +12,13 @@ import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { preloadedState } from '../../../../chat/src/app/mock/state';
+import { darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
 
 const RootStack = createStackNavigator();
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
-
+	const [isDarkMode] = useState(true); //TODO: move to custom hook
 	useEffect(() => {
 		authLoader();
 	}, []);
@@ -42,8 +43,26 @@ const NavigationMain = () => {
 		}
 	};
 
+	//TODO: update later
+	const lightTheme = {
+		...DefaultTheme,
+		colors: {
+		  ...DefaultTheme.colors,
+		  ...lightThemeColor
+		},
+	};
+
+	//TODO: update later
+	const darkTheme = {
+		...DarkTheme,
+		colors: {
+			...DarkTheme.colors,
+			...darkThemeColor
+		}
+	}
+
 	return (
-		<NavigationContainer>
+		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
 			<RootStack.Navigator screenOptions={{ headerShown: false }}>
 				{isLoggedIn ? (
 					<RootStack.Group
