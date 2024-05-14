@@ -40,23 +40,24 @@ const HomeDefault = React.memo((props: any) => {
 });
 
 const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation: any; channelTitle: string }) => {
-  const navigateMenuThreadDetail = () => {
-    navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET});
-  }
+	const navigateMenuThreadDetail = () => {
+		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
+	}
 	return (
 		<View style={styles.homeDefaultHeader}>
-      <TouchableOpacity style={ {flex: 1}} onPress={navigateMenuThreadDetail}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-				<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={() => {
-          navigation.openDrawer()}}>
-					<BarsLogo width={20} height={20} />
-				</TouchableOpacity>
+			<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					{!!channelTitle && <HashSignIcon width={18} height={18} />}
-					<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
+					<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={() => {
+						navigation.openDrawer()
+					}}>
+						<BarsLogo width={20} height={20} />
+					</TouchableOpacity>
+					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+						{!!channelTitle && <HashSignIcon width={18} height={18} />}
+						<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
+					</View>
 				</View>
-			</View>
-      </TouchableOpacity>
+			</TouchableOpacity>
 			<SearchLogo width={22} height={22} style={{ marginRight: 20 }} />
 		</View>
 	);

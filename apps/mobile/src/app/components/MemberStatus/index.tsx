@@ -1,6 +1,6 @@
 import { useChannelMembers } from "@mezon/core";
 import { selectCurrentChannelId } from "@mezon/store-mobile";
-import { Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import MemberItem from "./MemberItem";
@@ -11,29 +11,26 @@ export default function MemberListStatus() {
     const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannelId });
 
     return (
-        <ScrollView style={style.container}>
-            <>
-                <Text style={style.text}>Member - {onlineMembers.length}</Text>
+        <ScrollView
+            contentContainerStyle={style.container}>
+            <Text style={style.text}>Member - {onlineMembers.length}</Text>
 
-                <View style={style.box}>
-                    {onlineMembers.map((user) => (
-                        <MemberItem
-                            user={user}
-                            key={user?.user?.id}
-                        />
-                    ))}
-                </View>
-            </>
+            <View style={style.box}>
+                {onlineMembers.map((user) => (
+                    <MemberItem
+                        user={user}
+                        key={user?.user?.id}
+                    />
+                ))}
+            </View>
 
             {offlineMembers.length > 0 && (
-                <View style={{marginTop: 40}}>
+                <View style={{ marginTop: 20 }}>
                     <Text style={style.text}>Offline - {offlineMembers.length}</Text>
-
                     <View style={style.box}>
                         {offlineMembers.map((user) => (
                             <MemberItem
                                 user={user}
-                                key={user?.user?.id}
                                 isOffline={true}
                             />
                         ))}

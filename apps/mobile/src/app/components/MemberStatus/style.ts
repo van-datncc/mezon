@@ -3,9 +3,9 @@ import { StyleSheet } from "react-native";
 
 const style = StyleSheet.create({
     container: {
-        backgroundColor: Colors.primary,
-        height: "100%",
-        padding: 20
+        // backgroundColor: Colors.secondary,
+        padding: 20,
+        width: "100%",
     },
 
     text: {
@@ -13,10 +13,10 @@ const style = StyleSheet.create({
     },
 
     box: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: Colors.primary,
         marginTop: 10,
         borderRadius: 15,
-        paddingVertical: 10
+        width: "100%"
     }
 })
 

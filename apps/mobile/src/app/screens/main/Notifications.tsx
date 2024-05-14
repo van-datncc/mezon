@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import MemberListStatus from '../../components/member'
+import MemberListStatus from '../../components/MemberStatus'
 import CategoryDrawer from '../../components/category';
 import { useRef } from 'react';
 
