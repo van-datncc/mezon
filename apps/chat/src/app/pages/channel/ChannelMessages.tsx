@@ -61,7 +61,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		>
 			<InfiniteScroll
 				style={{ display: 'flex', flexDirection: 'column-reverse', overflowX: 'hidden' }}
-				hasMore={hasMoreMessage}
+				hasMore={false}
 				loadMore={loadMoreMessage}
 				loader={<h4 className="h-[50px] py-[18px] text-center">Loading...</h4>}
 				onScroll={handleScroll}
