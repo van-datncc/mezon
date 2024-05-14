@@ -71,7 +71,7 @@ const GifStickerEmojiPopup = () => {
 						Emoji
 					</button>
 				</div>
-				{subPanelActive !== SubPanelName.EMOJI && <InputSearch />}
+				<InputSearch />
 			</div>
 
 			<div className="w-full min-h-[400px] text-center md:w-[500px] " ref={emojiRefParentDiv}>

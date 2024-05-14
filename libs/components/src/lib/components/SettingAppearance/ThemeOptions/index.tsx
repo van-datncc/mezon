@@ -4,6 +4,7 @@ import { useApp } from '@mezon/core';
 
 const ThemeOptions = () => {
 	const { appearanceTheme, setAppearanceTheme } = useApp();
+
 	const elementHTML = document.documentElement;
 	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
 
@@ -13,8 +14,10 @@ const ThemeOptions = () => {
 		if(themeChosen === "system"){
 			if(systemIsDark.matches){
 				setAppearanceTheme("dark");
+				elementHTML.classList.add('dark');
 			}else{
 				setAppearanceTheme("light");
+				elementHTML.classList.remove('dark');
 			}
 		}
 		if(themeChosen === "dark"){
@@ -34,6 +37,19 @@ const ThemeOptions = () => {
 		};
 	}, [themeChosen, systemIsDark]);
 
+	useEffect(()=>{
+		switch(appearanceTheme){
+			case "dark":
+				elementHTML.classList.add('dark');
+				break;
+			case "light":
+				elementHTML.classList.remove('dark');
+				break;
+			default:
+				break;
+		}
+	}, [appearanceTheme])
+
     useEffect(()=>{
 		if(themeChosen !== "system"){
 			setAppearanceTheme(themeChosen);
@@ -42,10 +58,10 @@ const ThemeOptions = () => {
 
 	return (
 		<div className="pt-10">
-			<div>Theme</div>
+			<div className='dark:text-white text-black'>Theme</div>
 			<div className="theme-container flex gap-[30px] mt-3">
 				<div
-					className={`light-theme aspect-square bg-white w-[60px] rounded-full border border-solid cursor-pointer relative ${themeChosen === 'light' ? 'border-indigo-600 border-2': ''}`}
+					className={`light-theme aspect-square bg-white w-[60px] rounded-full border dark:border-white border-black border-solid cursor-pointer relative ${themeChosen === 'light' ? 'border-indigo-600 border-2': ''}`}
 					onClick={() => setThemeChosen('light')}
 				>
 					<div className={`checked-theme w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full ${themeChosen === 'light' ? 'block' : 'hidden'}`}>

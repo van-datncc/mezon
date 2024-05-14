@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 export * from './attachmentThumb';
+export * from './iconInEmojiPanel';
 export * from './uploadThumbnail';
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
@@ -1600,11 +1601,6 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
 	return (
 		<svg
 			className={`${defaultSize} ${isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
@@ -1614,7 +1610,6 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			width="24"
 			height="24"
 			viewBox="0 0 24 24"
-			onClick={handleClick}
 		>
 			<path
 				fill="currentColor"
