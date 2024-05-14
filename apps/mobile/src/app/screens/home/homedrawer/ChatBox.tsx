@@ -5,11 +5,11 @@ import { Dimensions, TextInput, View } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import AngleRightIcon from '../../../../assets/svg/angle-right.svg';
 import ChatGiftIcon from '../../../../assets/svg/chatGiftNitro.svg';
-import PlusIcon from '../../../../assets/svg/guildAddRole.svg';
 import MicrophoneIcon from '../../../../assets/svg/microphone.svg';
 import SendButtonIcon from '../../../../assets/svg/sendButton.svg';
-import SmilingFaceIcon from '../../../../assets/svg/voiceReaction.svg';
 import { styles } from './styles';
+import EmojiPicker from "./components/EmojiPicker";
+import AttachmentPicker from "./components/AttachmentPicker";
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
@@ -41,7 +41,7 @@ const ChatBox = React.memo((props: { channelLabel: string; channelId: string; mo
 			) : (
 				<>
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
-						<PlusIcon width={22} height={22} />
+						<AttachmentPicker />
 					</View>
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<ChatGiftIcon width={22} height={22} />
@@ -66,7 +66,9 @@ const ChatBox = React.memo((props: { channelLabel: string; channelId: string; mo
 						{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 					]}
 				/>
-				<SmilingFaceIcon width={25} height={25} style={styles.iconEmoji} />
+				<View style={styles.iconEmoji}>
+					<EmojiPicker />
+				</View>
 			</View>
 			<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
 				{text.length > 0 ? (
