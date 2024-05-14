@@ -55,7 +55,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			className="bg-bgPrimary relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
+			className="dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
 			id="scrollLoading"
 			ref={containerRef}
 		>

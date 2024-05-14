@@ -40,7 +40,7 @@ const ClanLayout = () => {
 		<div className="flex flex-row flex-1 bg-bgSurface">
 			<MezonPolicyProvider clanId={clanId}>
 				<div
-					className={` flex-col flex max-w-[272px] bg-bgSecondary relative overflow-hidden ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
+					className={` flex-col flex max-w-[272px] dark:bg-bgSecondary bg-bgLightMode relative overflow-hidden ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
 				>
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList channelCurrentType={currentVoiceChannel?.type} />
