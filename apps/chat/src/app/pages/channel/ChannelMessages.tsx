@@ -1,5 +1,5 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference } from '@mezon/core';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference, useMessages } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -21,27 +21,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
 
-
-	useEffect(() => {
-		const topDiv = chatRef?.current
-
-		const handleScroll = () => {
-			const scrollHeight = topDiv?.scrollHeight || 0;
-			const clientHeight = topDiv?.clientHeight || 0;
-			const scrollTop = topDiv?.scrollTop || 0;
-
-			const scrollBottom = scrollHeight + (scrollTop - clientHeight);
-
-			if (scrollBottom < 200 && hasMoreMessage) {
-				loadMoreMessage();
-			}
-		}
-
-		topDiv?.addEventListener('scroll', handleScroll);
-		return () => {
-			topDiv?.removeEventListener('scroll', handleScroll);
-		}
-	}, [hasMoreMessage, loadMoreMessage, chatRef])
+	// share logic to load more message
+	useMessages({ chatRef, hasMoreMessage, loadMoreMessage });
 
 	useEffect(() => {
 		if (idMessageReplied) {
