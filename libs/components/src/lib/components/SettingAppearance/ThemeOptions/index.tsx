@@ -4,7 +4,8 @@ import { useApp } from '@mezon/core';
 
 const ThemeOptions = () => {
 	const { appearanceTheme, setAppearanceTheme } = useApp();
-	const [themeChosen, setThemeChosen] = useState<string>('dark');
+	const elementHTML = document.documentElement;
+	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
 
 	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -15,6 +16,11 @@ const ThemeOptions = () => {
 			}else{
 				setAppearanceTheme("light");
 			}
+		}
+		if(themeChosen === "dark"){
+			elementHTML.classList.add('dark');
+		} else {
+			elementHTML.classList.remove('dark');
 		}
 	}
 	useEffect(() => {
@@ -32,7 +38,6 @@ const ThemeOptions = () => {
 		if(themeChosen !== "system"){
 			setAppearanceTheme(themeChosen);
 		}
-		console.log(appearanceTheme);
 	}, [themeChosen, appearanceTheme, setAppearanceTheme]);
 
 	return (

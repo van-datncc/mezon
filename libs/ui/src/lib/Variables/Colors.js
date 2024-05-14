@@ -27,6 +27,8 @@ module.exports = {
   bgProfileBody: '#111214',
   bgSelectItem: '#505cdc',
   bgSelectItemHover: '#4752C4',
+  bgLightMode: '#f7f7f7',
+  bgLightModeButton: '#155EEF1A',
 
   /* text */
   channelTextarea: '#383A40',

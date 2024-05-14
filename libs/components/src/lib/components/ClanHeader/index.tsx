@@ -103,9 +103,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950`}>
 					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
 					<div ref={modalRef} className="relative h-full" onClick={handleShowModalClan}>
-						<div className="cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-bgSecondary hover:bg-[#35373C] shadow border-b-[1px] border-bgTertiary">
-							<p className="text-white text-base font-semibold select-none">{name?.toLocaleUpperCase()}</p>
-							<button className="w-6 h-8 flex flex-col justify-center iconHover">
+						<div className="cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-[#35373C] dark:hover:bg-bgLightModeButton shadow border-b-[1px] border-bgTertiary">
+							<p className="dark:text-white text-black text-base font-semibold select-none ">{name?.toLocaleUpperCase()}</p>
+							<button className="w-6 h-8 flex flex-col justify-center iconHove">
 								<Icons.ArrowDown />
 							</button>
 						</div>
