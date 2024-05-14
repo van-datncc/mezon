@@ -6,6 +6,7 @@ import {
 	selectTextToSearchEmojiSuggestion,
 	useAppDispatch,
 } from '@mezon/store';
+import { IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -38,6 +39,11 @@ export function useEmojiSuggestion() {
 		[dispatch],
 	);
 
+	const categoriesEmoji = (emojis: IEmoji[]) => {
+		const categories = emojis.map((emoji) => emoji.category.replace(/ *\([^)]*\) */g, ''));
+		return [...new Set(categories)];
+	};
+
 	return useMemo(
 		() => ({
 			emojis,
@@ -47,6 +53,7 @@ export function useEmojiSuggestion() {
 			isEmojiListShowed,
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
+			categoriesEmoji,
 		}),
 		[
 			emojis,
@@ -56,6 +63,7 @@ export function useEmojiSuggestion() {
 			isEmojiListShowed,
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
+			categoriesEmoji,
 		],
 	);
 }

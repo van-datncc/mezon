@@ -13,6 +13,8 @@ import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { preloadedState } from '../../../../chat/src/app/mock/state';
 import { darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
+import messaging from '@react-native-firebase/messaging';
+import { createLocalNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
@@ -21,6 +23,11 @@ const NavigationMain = () => {
 	const [isDarkMode] = useState(true); //TODO: move to custom hook
 	useEffect(() => {
 		authLoader();
+		const unsubscribe = messaging().onMessage((remoteMessage) => {
+			createLocalNotification(remoteMessage?.notification?.title, remoteMessage?.notification?.body, remoteMessage?.data);
+		});
+
+		return unsubscribe;
 	}, []);
 
 	const authLoader = async () => {
@@ -89,7 +96,7 @@ const NavigationMain = () => {
 const RootNavigation = () => {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
-		return initStore(mezon, preloadedState);
+		return initStore(mezon, undefined);
 	}, [mezon]);
 
 	return (
