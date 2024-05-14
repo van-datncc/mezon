@@ -7,21 +7,34 @@ const ThemeOptions = () => {
 	const [themeChosen, setThemeChosen] = useState<string>('dark');
 
 	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
-	
+
 	const onWindowMatch = () =>{
-		if(themeChosen === "system" && systemIsDark.matches){
-			setAppearanceTheme("dark");
-		}else if (themeChosen === "system" && !systemIsDark.matches){
-			setAppearanceTheme("light");
+		if(themeChosen === "system"){
+			if(systemIsDark.matches){
+				setAppearanceTheme("dark");
+			}else{
+				setAppearanceTheme("light");
+			}
 		}
 	}
+	useEffect(() => {
+		onWindowMatch();
+		const handleChange = () => {
+			onWindowMatch();
+		};
+		systemIsDark.addEventListener('change', handleChange);
+		return () => {
+			systemIsDark.removeEventListener('change', handleChange);
+		};
+	}, [themeChosen, systemIsDark]);
 
     useEffect(()=>{
-		setAppearanceTheme(themeChosen);
+		if(themeChosen !== "system"){
+			setAppearanceTheme(themeChosen);
+		}
 		console.log(appearanceTheme);
 	}, [themeChosen, appearanceTheme, setAppearanceTheme]);
 
-	onWindowMatch();
 	return (
 		<div className="pt-10">
 			<div>Theme</div>
