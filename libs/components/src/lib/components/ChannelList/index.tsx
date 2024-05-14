@@ -1,12 +1,10 @@
 import { UserRestrictionZone, useCategory, useClanRestriction, useEscapeKey } from '@mezon/core';
 import { categoriesActions, channelsActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
-import { getIsShowPopupForward } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
-import ForwardMessageModal from '../ForwardMessage';
 import * as Icons from '../Icons';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
@@ -17,7 +15,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
-	const isChange = useSelector(getIsShowPopupForward);
+
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
 	const [categoriesState, setCategoriesState] = useState<CategoriesState>(
@@ -59,7 +57,6 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 			id="channelList"
 			role="button"
 		>
-			{isChange ? <ForwardMessageModal open={isChange} /> : null}
 			{<CreateNewChannelModal />}
 			<div className="self-stretch h-fit flex-col justify-start items-start gap-3 p-2 flex">
 				<Events />
