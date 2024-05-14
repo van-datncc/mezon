@@ -1,5 +1,5 @@
 import React from 'react'
-import { View , Text, TextInput, SafeAreaView, Switch, Button} from 'react-native'
+import { View , Text, TextInput, SafeAreaView, Switch, Button, Alert} from 'react-native'
 import { styles } from './CreateThreadForm.style';
 import { Formik } from 'formik';
 import { useSelector } from 'react-redux';
@@ -31,8 +31,14 @@ export default function CreateThreadForm() {
    if(value?.threadName) {
     try {
      const newThreadResponse =  await dispatch(createNewChannel(body));
-     handleRouteData(newThreadResponse.payload as IChannel)
-    } catch (error) {}
+     if(newThreadResponse.meta.requestStatus === 'rejected') {
+      Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
+     } else {
+      handleRouteData(newThreadResponse.payload as IChannel)
+     }
+    } catch (error) {
+      Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
+    }
    }
  }
 
