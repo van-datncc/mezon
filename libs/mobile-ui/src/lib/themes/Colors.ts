@@ -19,8 +19,7 @@ const colors = {
 	gray48: isDarkTheme ? '#484848' : '#484848',
   bgButton: isDarkTheme ? "#5865f2" : "#5865f2",
 	textLink: '#007AFF',
-	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30"
-
+	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30",
 	test: '#676b73',
 	/* border color */
 	borderPrimary: '#363940',
