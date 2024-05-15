@@ -1,9 +1,14 @@
+import { useApp } from "@mezon/core";
+import { Tooltip } from "flowbite-react";
+
 export type NavLinkProps = {
 	readonly active?: boolean;
 	readonly children?: React.ReactElement | string;
+	clanName: string;
 };
 
-function NavLinkComponent({ active, children }: NavLinkProps) {
+function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
+	const { appearanceTheme } = useApp();
 	return (
 		<div className="group block relative rounded-3xl">
 			<div className="flex absolute -left-2 items-center h-full">
@@ -15,15 +20,17 @@ function NavLinkComponent({ active, children }: NavLinkProps) {
 			</div>
 
 			<div className="group-active:translate-y-px">
-				<div
-					className={`${
-						active
-							? 'rounded-xl bg-brand text-white bg-bgTertiary'
-							: 'text-gray-100 group-hover:bg-brand group-hover:text-white group-hover:rounded-xl rounded-3xl dark:group-hover:bg-bgTertiary group-hover:bg-bgLightModeButton'
-					} flex items-center justify-center w-12 h-12 transition-all duration-200 overflow-hidden `}
-				>
-					{children}
-				</div>
+				<Tooltip content={clanName} trigger="hover" animation="duration-500" style = { appearanceTheme === "light" ? "light" : "dark"} placement="right">
+					<div
+						className={`${
+							active
+								? 'rounded-xl bg-brand text-white bg-bgTertiary'
+								: 'text-gray-100 group-hover:bg-brand group-hover:text-white group-hover:rounded-xl rounded-3xl dark:group-hover:bg-bgTertiary group-hover:bg-bgLightModeButton'
+						} flex items-center justify-center w-12 h-12 transition-all duration-200 overflow-hidden `}
+					>
+						{children}
+					</div>
+				</Tooltip>
 			</div>
 		</div>
 	);

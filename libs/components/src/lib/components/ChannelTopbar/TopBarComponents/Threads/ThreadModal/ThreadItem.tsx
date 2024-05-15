@@ -37,12 +37,12 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
-			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] bg-bgPrimary border border-bgPrimary hover:border-bgModifierHover"
+			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightMode border border-bgPrimary dark:hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			role="button"
 		>
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">
-					<p className="text-base font-semibold leading-5">{thread?.channel_label}</p>
+					<p className="text-base font-semibold leading-5 dark:text-white text-black">{thread?.channel_label}</p>
 					{thread?.last_sent_message ? (
 						<div className="flex flex-row items-center h-6">
 							<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
@@ -52,7 +52,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 							</div>
 							<div className="overflow-x-hidden">
 								<p className="text-xs font-medium leading-4 ml-2">
-									<span className="truncate">•&nbsp;{timeMessage}</span>
+									<span className="truncate dark:text-white text-colorTextLightMode">•&nbsp;{timeMessage}</span>
 								</p>
 							</div>
 						</div>

@@ -115,7 +115,7 @@ function MyApp() {
 				id="menu"
 			>
 				<NavLink to="/chat/direct/friends">
-					<NavLinkComponent active={pathName.includes('direct')}>
+					<NavLinkComponent active={pathName.includes('direct')} clanName='DM'>
 						<div>
 							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} className="clan" />
 							{quantityPendingRequest !== 0 && (
@@ -131,7 +131,7 @@ function MyApp() {
 					<NavLink
 						to={`${currentChannel?.id ? `/chat/clans/${currentClan.id}/channels/${currentChannel?.id}` : `/chat/clans/${currentClan.id}`}`}
 					>
-						<NavLinkComponent active={!pathName.includes('direct')}>
+						<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || ''}>
 							{currentClan?.logo ? (
 								<Image
 									src={currentClan?.logo || ''}

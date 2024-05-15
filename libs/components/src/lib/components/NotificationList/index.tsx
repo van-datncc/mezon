@@ -28,8 +28,8 @@ function NotificationList() {
 
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
-			<div className="flex flex-col bg-bgPrimary border-borderDefault text-contentSecondary pt-1 text-[14px] rounded-lg mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
-				<div className="py-2 px-3 bg-bgTertiary">
+			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black pt-1 text-[14px] rounded-lg mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
+				<div className="py-2 px-3 dark:bg-bgTertiary bg-white">
 					<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
 						<InboxButton />
 						<div>Inbox </div>
@@ -39,7 +39,7 @@ function NotificationList() {
 							return (
 								<div key={index}>
 									<button
-										className={`px-2 py-[4px] rounded-[4px] text-base font-medium ${currentTabNotify === tab.value ? 'bg-bgTertiary text-contentPrimary' : ''}`}
+										className={`px-2 py-[4px] rounded-[4px] text-base font-medium ${currentTabNotify === tab.value ? 'dark:bg-bgTertiary bg-bgLightModeButton dark:text-contentPrimary text-colorTextLightMode' : ''}`}
 										tabIndex={index}
 										onClick={() => handleChangeTab(tab.value)}
 									>
@@ -51,14 +51,14 @@ function NotificationList() {
 					</div>
 				</div>
 				{currentTabNotify === 'individual' && (
-					<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
+					<div className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto">
 						{notificationItem.map((notify: INotification) => (
 							<NotificationItem notify={notify} key={notify.id} />
 						))}
 					</div>
 				)}
 				{currentTabNotify === 'mention' && (
-					<div className="bg-bgSecondary flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
+					<div className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
 						{notifyMentionItem.map((notify: INotification) => (
 							<NotifyMentionItem notify={notify} key={notify.id} />
 						))}
