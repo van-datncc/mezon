@@ -1,71 +1,62 @@
-import { LayoutAnimation, Pressable, Text, View } from "react-native";
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from "react-native";
 import styles from "./style"
 import MemberListStatus from "../../MemberStatus";
+import AssetsHeader from "../AssetsHeader";
 import { useState } from "react";
-
-const TabList = [
-    { name: "Members" },
-    { name: "Media" },
-    { name: "Pins" },
-    { name: "Links" },
-    { name: "Files" }
-]
+import { useRef } from "react";
 
 interface IProps {
-    activeId: number;
 }
 
-interface IPos {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
+const TabList = [
+    "Members",
+    "Media",
+    "Pins",
+    "Links",
+    "Files"
+]
 
-export default function AssetsViewer({ activeId }: IProps) {
-    const [pos, setPos] = useState<IPos[]>([]);
-    const [selected, setSelected] = useState<number>(activeId);
+export default function AssetsViewer({ }: IProps) {
+    const [pageID, setPageID] = useState<number>(0);
+    const ref = useRef<ScrollView>();
 
-    function handleKLayout(event, index: number) {
-        const { x, y, width, height } = event.nativeEvent.layout;
-        const tmp = pos;
-        tmp[index] = { x, y, width, height };
-        setPos(tmp);
+    function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
+        const currentOffsetX = event.nativeEvent.contentOffset.x;
+        const windowWidth = Dimensions.get('window').width;
+
+        const pageID_ = Math.round(currentOffsetX / windowWidth);
+        if (pageID !== pageID_) {
+            setPageID(pageID_);
+        }
     }
 
-    function handlePress(event, index: number) {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-        setSelected(index);
+    function handelHeaderTabChange(index: number) {
+        const windowWidth = Dimensions.get('window').width;
+        ref && ref.current && ref.current.scrollTo({ x: index * windowWidth, animated: true })
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.headerTab}>
-                {TabList.map((tab, index) => (
-                    <Pressable
-                        key={index.toString()}
-                        onLayout={(e) => handleKLayout(e, index)}
-                        onPress={(e) => handlePress(e, index)}
-                    >
-                        <Text style={{ color: index === selected ? "purple" : "white" }}>
-                            {tab.name}
-                        </Text>
-                    </Pressable>
-                ))}
-            </View>
+        <>
+            <AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} titles={TabList} />
+            <View style={styles.container}>
+                <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+                    <MemberListStatus />
+                    <Page2 />
+                    <Page2 />
+                    <Page2 />
+                    <Page2 />
+                </ScrollView>
+            </View >
+        </>
 
-            {pos.length > selected && (
-                <View style={styles.a}>
-                    <View style={{
-                        ...styles.b,
-                        width: pos[selected].width || 0,
-                        left: pos[selected].x || 0,
-                    }}>
-                    </View>
-                </View>
-            )}
+    )
+}
 
-            <MemberListStatus />
-        </View >
+// Just for testing purposes
+function Page2() {
+    return (
+        <View style={{ width: Dimensions.get("screen").width }}>
+            <Text style={{ color: "white" }}>sdcsx</Text>
+        </View>
     )
 }

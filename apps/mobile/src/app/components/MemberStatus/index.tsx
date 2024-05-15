@@ -1,9 +1,12 @@
 import { useChannelMembers } from "@mezon/core";
 import { selectCurrentChannelId } from "@mezon/store-mobile";
-import { FlatList, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import MemberItem from "./MemberItem";
+import RightIcon from "../../../assets/svg/angle-right.svg";
+import AddMemberIcon from "../../../assets/svg/addMember.svg";
+
 import style from "./style";
 
 export default function MemberListStatus() {
@@ -11,8 +14,21 @@ export default function MemberListStatus() {
     const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannelId });
 
     return (
-        <ScrollView
-            contentContainerStyle={style.container}>
+        <ScrollView contentContainerStyle={style.container}>
+            <Pressable>
+                <View style={style.inviteBtn}>
+                    <View style={style.iconNameWrapper}>
+                        <View style={style.iconWrapper}>
+                            <AddMemberIcon height={16} width={16} />
+                        </View>
+                        <Text style={style.text}>Invite Members</Text>
+                    </View>
+                    <View>
+                        <RightIcon height={22} width={22} />
+                    </View>
+                </View>
+            </Pressable>
+
             <Text style={style.text}>Member - {onlineMembers.length}</Text>
 
             <View style={style.box}>

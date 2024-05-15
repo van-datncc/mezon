@@ -3,8 +3,7 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    height: Dimensions.get("window").height,
-    paddingBottom: 20,
+    flex: 1,
     display: "flex",
     flexDirection: "column"
   },

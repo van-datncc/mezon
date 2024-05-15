@@ -1,11 +1,11 @@
 import { Colors } from "@mezon/mobile-ui";
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 const style = StyleSheet.create({
     container: {
-        // backgroundColor: Colors.secondary,
+        backgroundColor: Colors.secondary,
         padding: 20,
-        width: "100%",
+        width: Dimensions.get("screen").width,
     },
 
     text: {
@@ -17,6 +17,29 @@ const style = StyleSheet.create({
         marginTop: 10,
         borderRadius: 15,
         width: "100%"
+    },
+    inviteBtn: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 10,
+        backgroundColor: Colors.primary,
+        borderRadius: 15,
+        marginBottom: 10
+    },
+
+    iconWrapper: {
+        padding: 10,
+        backgroundColor: "purple",
+        borderRadius: 50
+    },
+    iconNameWrapper: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        gap: 10
     }
 })
 

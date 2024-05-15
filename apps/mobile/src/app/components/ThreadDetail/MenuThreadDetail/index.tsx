@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StatusBar, Dimensions, StyleSheet } from 'react-native'
+import { View, Text} from 'react-native'
 import { styles } from './style';
 import { selectCurrentChannel } from '@mezon/store';
 import { useSelector } from 'react-redux';
@@ -23,7 +23,7 @@ export default function MenuThreadDetail() {
             </View>
 
             <ActionRow />
-            <AssetsViewer activeId={0} />
+            <AssetsViewer/>
         </View>
 
     )
