@@ -1,16 +1,15 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import MemberListStatus from '../../components/MemberStatus'
-import CategoryDrawer from '../../components/category';
-import { useRef } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 
 const Notifications = () => {
-    const ref = useRef<{ open: () => {} }>();
+    const navigation = useNavigation();
 
     function handlePress() {
-        console.log('Hello');
-        ref && ref.current && ref.current.open()
-        console.log(ref.current);
+        // @ts-ignore
+        navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
     }
 
     return (
@@ -19,8 +18,6 @@ const Notifications = () => {
                 <TouchableOpacity onPress={handlePress}>
                     <Text>Hello</Text>
                 </TouchableOpacity>
-                
-                <CategoryDrawer ref={ref} />
             </View>
 
             <MemberListStatus />
