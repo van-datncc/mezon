@@ -120,7 +120,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				<span
 					className={`${classes[state]} cursor-pointer ${currentURL === channelPath ? 'bg-bgModifierHover' : ''}`}
 					onClick={() => handleVoiceChannel(channel.id)}
-					role="button"
+					role="link"
 				>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">

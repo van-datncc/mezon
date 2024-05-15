@@ -559,9 +559,9 @@ export const CameraIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 	);
 };
 
-export const ShareIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
+export const ShareIcon: React.FC<IconProps> = ({ defaultFill = '#FFFFFF', defaultSize = 'w-6 h-6' }) => {
 	return (
-		<svg viewBox="0 0 24 24" width="24" height="24" preserveAspectRatio="xMidYMid meet">
+		<svg viewBox="0 0 24 24" width="18" height="20" preserveAspectRatio="xMidYMid meet">
 			<defs>
 				<clipPath id="__lottie_element_827">
 					<rect width="24" height="24" x="0" y="0"></rect>
@@ -612,6 +612,7 @@ export const ShareIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 									strokeOpacity="1"
 									strokeWidth="2"
 									d="M0 0"
+									fill={defaultFill}
 								></path>
 							</g>
 							<g opacity="1" transform="matrix(1,0,0,1,0,0)">
