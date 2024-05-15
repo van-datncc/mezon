@@ -11,6 +11,7 @@ module.exports = {
   colorSuccess: '#16A34A',
   colorWarning: '#EAB308',
   colorNeutral: '#AEAEAE',
+  colorTextLightMode: '#535353',
 
   /* background */
   bgPrimary: '#313338',
@@ -27,6 +28,10 @@ module.exports = {
   bgProfileBody: '#111214',
   bgSelectItem: '#505cdc',
   bgSelectItemHover: '#4752C4',
+  bgLightMode: '#f7f7f7',
+  bgLightModeSecond: '#F0F0F0',
+  bgLightModeButton: '#155EEF1A',
+  bgModifierHoverLight: '#D7D9DC',
 
   /* text */
   channelTextarea: '#383A40',

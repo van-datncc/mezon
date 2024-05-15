@@ -446,7 +446,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={mentionsInputStyle}
-				className="bg-channelTextarea"
+				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}

@@ -143,7 +143,7 @@ export default function ChannelLayout() {
 								)}
 							</div>
 						) : (
-							<div className={`flex-shrink-0 flex flex-col bg-bgPrimary h-auto relative max-w-full`}>
+							<div className={`flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative max-w-full`}>
 								{currentChannel && (
 									<ChannelTyping
 										channelId={currentChannel?.id}
@@ -166,7 +166,7 @@ export default function ChannelLayout() {
 					</div>
 					{isShowMemberList && (
 						<div
-							className={` bg-bgSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
+							className={` dark:bg-bgSecondary bg-bgLightModeSecond text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
 							id="memberList"
 						>
 							<div className="w-1 h-full bg-bgPrimary"></div>
