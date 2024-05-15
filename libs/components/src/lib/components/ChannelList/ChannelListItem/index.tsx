@@ -1,4 +1,4 @@
-import { selectCurrentChannel, selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import { Fragment } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -22,7 +22,6 @@ type ChannelListItemProp = {
 const ChannelListItem = (props: ChannelListItemProp) => {
 	const { channel } = props;
 
-	const currentChanel = useSelector(selectCurrentChannel);
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(channel.id));
 	const numberNotification = useChannelBadgeCount(channel.id);
 
@@ -39,7 +38,6 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 			<ChannelLink
 				clanId={channel?.clan_id}
 				channel={channel}
-				active={currentChanel?.id === channel.id}
 				key={channel.id}
 				createInviteLink={handleOpenInvite}
 				isPrivate={channel.channel_private}

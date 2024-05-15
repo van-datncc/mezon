@@ -1,3 +1,4 @@
+import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
 import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -18,12 +19,14 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 		const store = await getStoreAsync();
 		if (props.data.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			// 	TODO: handle voice channel
-			alert('updating...')
+			alert('updating...');
 			return;
 		}
 		useChannelListContentIn.navigation.closeDrawer();
 		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
+		save(STORAGE_KEY_CHANNEL_ID, channelId);
+		save(STORAGE_KEY_CLAN_ID, clanId);
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};

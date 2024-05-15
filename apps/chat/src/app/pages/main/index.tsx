@@ -110,7 +110,7 @@ function MyApp() {
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
 			<div
-				className={`overflow-visible py-4 px-3 space-y-2 bg-bgTertiary scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
@@ -126,7 +126,7 @@ function MyApp() {
 						</div>
 					</NavLinkComponent>
 				</NavLink>
-				<div className="py-2 border-t-2 border-t-borderDefault" style={{ marginTop: '16px' }}></div>
+				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (
 					<NavLink
 						to={`${currentChannel?.id ? `/chat/clans/${currentClan.id}/channels/${currentChannel?.id}` : `/chat/clans/${currentClan.id}`}`}
@@ -162,7 +162,7 @@ function MyApp() {
 					}}
 				>
 					{/* <Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" /> */}
-					<div className="size-12 bg-bgPrimary flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl hover:bg-slate-800 transition-all duration-200 ">
+					<div className="size-12 dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl dark:hover:bg-slate-800 hover:bg-bgLightModeButton  transition-all duration-200 ">
 						<p className="text-2xl font-bold text-[#155EEF]">+</p>
 					</div>
 					<div className="absolute bottom-0 right-0 top-0 left-[60px] z-10 bg-bgSecondary">

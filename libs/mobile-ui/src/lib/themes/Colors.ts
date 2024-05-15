@@ -18,42 +18,42 @@ const BaseColors = {
 	red500: '#F44336',
 	red600: '#E53935',
 	red700: '#D32F2F',
- 
+
 	violet100: '#E5E9FA',
 	violet200: '#CFD5F6',
 	violet300: '#9398E6',
 	violet400: '#7977DB',
 	violet500: '#695ECD',
 	violet600: '#5A4EB4',
- 
+
 	green100: '#E0F8E9',
 	green200: '#C3EFD4',
 	green300: '#95E0B3',
 	green400: '#5FC98A',
 	green500: '#40C174',
 	green600: '#30A65F',
- 
+
 	yellow100: '#FFF9EB',
 	yellow200: '#FFEEC6',
 	yellow300: '#FFDB88',
 	yellow400: '#FFCC67',
 	yellow500: '#FFBF41',
 	yellow600: '#F8B83A',
- 
+
 	orange100: '#FFEDD5',
 	orange200: '#FED8AA',
 	orange300: '#FEBB73',
 	orange400: '#FC943B',
 	orange500: '#FA781A',
 	orange600: '#EB5A0B',
- 
+
 	blue100: '#DFEAFA',
 	blue200: '#C6DAF7',
 	blue300: '#9FC2F1',
 	blue400: '#71A1E9',
 	blue500: '#4A7CE0',
 	blue600: '#3B64D5',
- 
+
 	brand100: '#E1F8F5',
 	brand200: '#D1F0ED',
 	brand300: '#B9E8E4',
@@ -61,7 +61,7 @@ const BaseColors = {
 	brand500: '#00AA9F',
 	brand600: '#0AA095',
 	brand700: '#38DBD0',
- 
+
 	gray50: '#F2F5F7',
 	gray100: '#E7EAED',
 	gray150: '#E6E6E6',
@@ -107,8 +107,8 @@ const lightThemeColor = {
 }
 
 const colors = {
-	primary: isDarkTheme ? '#151515' : '#FFFFFF',
-	secondary: isDarkTheme ? '#1e1f22' : '#F0F0F0',
+	primary: isDarkTheme ? '#000000' : '#FFFFFF',
+	secondary: isDarkTheme ? '#151515' : '#F0F0F0',
 	surface: isDarkTheme ? '#0B0B0B' : '#F7F7F7',
 	transparent: 'rgba(0,0,0,0)',
 	white: isDarkTheme ? '#FFFFFF' : '#000000',
@@ -119,7 +119,7 @@ const colors = {
 	tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
-  bgButton: isDarkTheme ? "#5865f2" : "#5865f2",
+	bgButton: isDarkTheme ? "#5865f2" : "#5865f2",
 	textLink: '#007AFF',
 	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30",
 	test: '#676b73',
@@ -134,7 +134,8 @@ const colors = {
 	bgGrayLight: '#676b73',
 	bgGrayDark: '#676b73',
 	bgDarkSlate: '#2a2e31',
-	bgCharcoal: '#313338'
+	bgCharcoal: '#313338',
+	green: "green"
 };
 
 export { colors, lightThemeColor, darkThemeColor };

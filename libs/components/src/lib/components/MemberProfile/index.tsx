@@ -73,7 +73,7 @@ function MemberProfile({
 					)}
 					{!isHideIconStatus && avatar !== '/assets/images/avatar-group.png' ? (
 						<span
-							className={`absolute bottom-[-1px] right-[-1px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white bg-[#111] rounded-full`}
+							className={`absolute bottom-[-1px] right-[-1px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-[#111] bg-bgLightMode rounded-full`}
 						>
 							{status ? <OnlineStatus /> : <OfflineStatus />}
 						</span>
@@ -87,14 +87,14 @@ function MemberProfile({
 					>
 						{!isHideStatus && (
 							<>
-								<span className={`text-[11px] text-${textColor}`}>{!status ? 'Offline' : 'Online'}</span>
-								<p className="text-[11px] text-contentSecondary">{name}</p>
+								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>{!status ? 'Offline' : 'Online'}</span>
+								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode">{name}</p>
 							</>
 						)}
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] bg-bgSecondary600'} nameMemberProfile`}
+							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-bgSecondary600 bg-bgLightMode'} nameMemberProfile`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}

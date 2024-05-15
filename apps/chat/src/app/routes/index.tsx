@@ -17,7 +17,6 @@ import { friendsLoader } from '../loaders/friendsLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 
 import { loginLoader } from '../loaders/loginLoader';
-import ChannelsRoutes from './ChannelsRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
 
@@ -34,12 +33,14 @@ const Main = loadable(() => import('../pages/main'));
 const DirectMain = loadable(() => import('../pages/directMessage'));
 const InvitePage = loadable(() => import('../pages/invite'));
 const ChannelMain = loadable(() => import('../pages/channel'));
+const MemberMain = loadable(() => import('../pages/member'));
 const ChannelIndex = loadable(() => import('../pages/channel/ChannelIndex'));
 const ClanIndex = loadable(() => import('../pages/clan/ClanIndex'));
 const DirectMessage = loadable(() => import('../pages/directMessage/DMPage'));
 const DirectMessageIndex = loadable(() => import('../pages/directMessage/DMPage/DirectMessageIndex'));
 const FriendsPage = loadable(() => import('../pages/directMessage/FriendsPage'));
 const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
+const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 
 // Components
 export const routes = createBrowserRouter([
@@ -97,8 +98,12 @@ export const routes = createBrowserRouter([
 														element: <ClanIndex />,
 													},
 													{
+														path: 'member-safety',
+														element: <MemberMain />,
+													},
+													{
 														path: 'channels',
-														element: <ChannelsRoutes />,
+														element: <ChannelLayout />,
 														children: [
 															{
 																path: '',

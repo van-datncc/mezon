@@ -5,7 +5,7 @@ export default function ThreadAddButton() {
   return (
     <TouchableHighlight>
       <View>
-      <PlusIcon width={22} height={22}/>
+        <PlusIcon width={22} height={22} />
       </View>
     </TouchableHighlight>
   )

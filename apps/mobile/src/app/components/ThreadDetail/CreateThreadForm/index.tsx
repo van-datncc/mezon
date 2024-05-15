@@ -7,10 +7,10 @@ import { createNewChannel, selectCurrentChannel, selectCurrentChannelId, channel
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { getStoreAsync, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import ThreadIcon from '../../../../assets/svg/thread.svg'
 import { IChannel } from '@mezon/utils';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { useNavigation } from '@react-navigation/native';
+import { ThreadIcon } from '@mezon/mobile-components';
 
 
 export default function CreateThreadForm() {

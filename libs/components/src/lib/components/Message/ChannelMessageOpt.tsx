@@ -65,7 +65,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 	};
 
 	return (
-		<div ref={ref} className="iconHover flex justify-between bg-bgPrimary border border-bgSecondary rounded">
+		<div ref={ref} className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
 			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer">
 				<Icons.Smile defaultSize="w-5 h-5" />
 			</div>

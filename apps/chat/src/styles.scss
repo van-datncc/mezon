@@ -301,11 +301,19 @@ input:-webkit-autofill:active {
 }
 
 .footer-profile:hover .memberProfile {
-  background-color: #3b3b3b;
-
-  .nameMemberProfile {
     background-color: #3b3b3b;
-  }
+
+    .nameMemberProfile {
+      background-color: #3b3b3b;
+    }
+}
+
+.footer-profile.lightMode:hover .memberProfile {
+    background-color: #e1e8f1;
+
+    .nameMemberProfile {
+      background-color: #e1e8f1;
+    }
 }
 
 // css friendList
@@ -349,6 +357,10 @@ input:-webkit-autofill:active {
 
   * {
     color: #ccc;
+  }
+
+  &.lightMode *{
+    color: #535353;
   }
 
   .lineText {
@@ -445,6 +457,10 @@ input:-webkit-autofill:active {
 }
 
 // thread-scroll
+.thread-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
 .thread-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
@@ -504,4 +520,24 @@ input:-webkit-autofill:active {
   input {
     background-color: #1E1F22;
   }
+}
+
+// custom dark - light mode
+.customScrollLightMode {
+  scrollbar-width: thin; 
+  scrollbar-color: white #E1E1E1; 
+}
+
+.customScrollLightMode::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.customScrollLightMode::-webkit-scrollbar-track {
+  background: #E1E1E1; 
+}
+
+.customScrollLightMode::-webkit-scrollbar-thumb {
+  background-color: white; 
+  border-radius: 4px;
 }
