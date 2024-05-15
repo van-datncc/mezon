@@ -1,4 +1,4 @@
-import { IMessageWithUser, convertDateString, convertTimeHour, convertTimeString } from '@mezon/utils';
+import { IMessageWithUser, convertDateString, convertTimeHour, convertTimeString, getTimeDifferenceDate } from '@mezon/utils';
 import { useMemo } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
@@ -31,6 +31,10 @@ export function useMessageParser(message: IMessageWithUser) {
 		return convertTimeHour(message?.create_time || ('' as string));
 	}, [message]);
 
+  const messageTimeDifference = useMemo(()=>{
+    return getTimeDifferenceDate(message?.create_time as string)
+  }, [message])
+
 	return {
 		content,
 		messageTime,
@@ -39,5 +43,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		mentions,
 		lines,
 		messageDate,
+    messageTimeDifference
 	};
 }
