@@ -11,6 +11,8 @@ import { useAnimatedState } from '../../../hooks/useAnimatedState';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { styles } from './styles';
 import { InviteToChannel } from './components';
+import { useNavigation } from '@react-navigation/native';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -68,8 +70,14 @@ const ChannelList = React.memo((props: any) => {
 });
 
 const ServerListHeader = React.memo((props: { title: string }) => {
+	const navigation = useNavigation();
+
+	function handlePress() {
+		// @ts-ignore
+		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
+	}
 	return (
-		<TouchableOpacity style={styles.listHeader}>
+		<TouchableOpacity style={styles.listHeader} onPress={handlePress}>
 			<Text style={styles.titleHeaderChannel}>{props.title}</Text>
 			<Dots width={30} height={30} />
 		</TouchableOpacity>
