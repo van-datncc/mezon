@@ -110,7 +110,7 @@ function MyApp() {
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
 			<div
-				className={`overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
