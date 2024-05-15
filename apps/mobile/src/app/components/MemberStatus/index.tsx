@@ -29,16 +29,19 @@ export default function MemberListStatus() {
                 </View>
             </Pressable>
 
-            <Text style={style.text}>Member - {onlineMembers.length}</Text>
-
-            <View style={style.box}>
-                {onlineMembers.map((user) => (
-                    <MemberItem
-                        user={user}
-                        key={user?.user?.id}
-                    />
-                ))}
-            </View>
+            {onlineMembers.length > 0 && (
+                <View>
+                    <Text style={style.text}>Member - {onlineMembers.length}</Text>
+                    <View style={style.box}>
+                        {onlineMembers.map((user) => (
+                            <MemberItem
+                                user={user}
+                                key={user?.user?.id}
+                            />
+                        ))}
+                    </View>
+                </View>
+            )}
 
             {offlineMembers.length > 0 && (
                 <View style={{ marginTop: 20 }}>

@@ -31,7 +31,7 @@ const style = StyleSheet.create({
 
     iconWrapper: {
         padding: 10,
-        backgroundColor: "purple",
+        backgroundColor: Colors.green,
         borderRadius: 50
     },
     iconNameWrapper: {

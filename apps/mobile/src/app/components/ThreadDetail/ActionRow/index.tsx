@@ -3,11 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { View } from "react-native";
 import { Pressable, Text } from "react-native";
 import styles from "./style";
-
-import SearchLogo from '../../../../assets/svg/discoverySearch-white.svg';
-import ThreadIcon from '../../../../assets/svg/thread.svg';
-import MuteIcon from '../../../../assets/svg/mute.svg';
-import SettingIcon from '../../../../assets/svg/setting.svg';
+import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon } from "@mezon/mobile-components";
 
 export default function ActionRow() {
     const navigation = useNavigation()
@@ -16,7 +12,7 @@ export default function ActionRow() {
         {
             title: 'Search',
             action: () => { },
-            icon: <SearchLogo width={22} height={22} />
+            icon: <SearchIcon width={22} height={22} />
         },
         {
             title: 'Threads',

@@ -7,7 +7,7 @@ import { NX_CHAT_APP_API_HOST } from '@env';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@mezon/translations';
 
-console.log(process.env.NX_CHAT_APP_API_HOST);
+console.log(NX_CHAT_APP_API_HOST);
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,

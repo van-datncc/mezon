@@ -6,11 +6,11 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
-import SearchLogo from '../../../../assets/svg/discoverySearch-white.svg';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
 import { styles } from './styles';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { SearchIcon } from '@mezon/mobile-components';
 
 
 const HomeDefault = React.memo((props: any) => {
@@ -58,7 +58,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					</View>
 				</View>
 			</TouchableOpacity>
-			<SearchLogo width={22} height={22} style={{ marginRight: 20 }} />
+			<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
 		</View>
 	);
 });

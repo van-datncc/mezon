@@ -3,10 +3,10 @@ import { View, Text} from 'react-native'
 import { styles } from './style';
 import { selectCurrentChannel } from '@mezon/store';
 import { useSelector } from 'react-redux';
-import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 
 import ActionRow from '../ActionRow';
 import AssetsViewer from '../AssetViewer';
+import { HashSignIcon } from '@mezon/mobile-components';
 
 export default function MenuThreadDetail() {
     const currentChannel = useSelector(selectCurrentChannel);

@@ -41,7 +41,7 @@ const style = StyleSheet.create({
     },
 
     textName: {
-        color: "green",
+        color: Colors.green,
         fontSize: Fonts.size.small,
         fontWeight: "700"
     }

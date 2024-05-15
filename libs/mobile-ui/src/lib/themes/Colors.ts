@@ -134,7 +134,8 @@ const colors = {
 	bgGrayLight: '#676b73',
 	bgGrayDark: '#676b73',
 	bgDarkSlate: '#2a2e31',
-	bgCharcoal: '#313338'
+	bgCharcoal: '#313338',
+	green: "green"
 };
 
 export { colors, lightThemeColor, darkThemeColor };

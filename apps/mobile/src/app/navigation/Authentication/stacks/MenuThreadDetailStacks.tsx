@@ -6,9 +6,9 @@ import { selectCurrentChannel } from "libs/store/src/lib/channels/channels.slice
 import CreateThreadModal from "../../../components/ThreadDetail";
 import ThreadAddButton from "../../../components/ThreadDetail/ThreadAddButton";
 import CreateThreadForm from "../../../components/ThreadDetail/CreateThreadForm";
-import SearchLogo from '../../../../assets/svg/discoverySearch-white.svg';
 import MenuThreadDetail from "../../../components/ThreadDetail/MenuThreadDetail";
 import { Colors, size } from "@mezon/mobile-ui";
+import { SearchIcon } from "@mezon/mobile-components";
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
@@ -67,7 +67,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					},
 					headerTintColor: Colors.white,
 					headerRight: () => (
-						<SearchLogo width={22} height={22} />
+						<SearchIcon width={22} height={22} />
 					),
 				}}
 			/>

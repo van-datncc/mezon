@@ -5,8 +5,9 @@ import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import CrossIcon from "../../../assets/svg/cross.svg";
 import styles from './style';
+import { CrossIcon } from '@mezon/mobile-components';
+import { Colors } from '@mezon/mobile-ui';
 
 export default function CategoryCreator({ navigation }: { navigation: any }) {
     const [isPrivate, setPrivate] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
         navigation.navigate(APP_SCREEN.HOME);
     };
 
-    function handleClose(){
+    function handleClose() {
         navigation.goBack();
     }
 
@@ -67,8 +68,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                         <Text style={styles.labelNormal}>Private Category</Text>
                     </View>
                     <Switch
-                        trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={isPrivate ? '#f5dd4b' : '#f4f3f4'}
+                        trackColor={{ false: Colors.gray48, true: Colors.green }}
                         onValueChange={handleTogglePrivate}
                         value={isPrivate}
                     />

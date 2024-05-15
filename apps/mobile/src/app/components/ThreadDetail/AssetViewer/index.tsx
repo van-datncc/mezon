@@ -41,9 +41,9 @@ export default function AssetsViewer({ }: IProps) {
             <View style={styles.container}>
                 <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
                     <MemberListStatus />
-                    <Page2 />
-                    <Page2 />
-                    <Page2 />
+                    <Page2 /> 
+                    <Page2 /> 
+                    <Page2 /> 
                     <Page2 />
                 </ScrollView>
             </View >
