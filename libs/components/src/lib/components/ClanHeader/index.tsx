@@ -90,11 +90,11 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	return (
 		<>
 			{type === 'direct' ? (
-				<div className="px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] border-bgTertiary">
+				<div className="px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] dark:border-bgTertiary border-gray-200">
 					<input
 						ref={inputRef}
 						placeholder="Find or start a conversation"
-						className={`font-[400] px-[16px] rounded text-white outline-none text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]`}
+						className={`font-[400] px-[16px] rounded dark:text-white text-black outline-none text-[14px] w-full dark:bg-bgTertiary bg-[#E1E1E1] dark:border-borderDefault h-[36px]`}
 						type="text"
 						onFocus={handleInputFocus}
 					/>

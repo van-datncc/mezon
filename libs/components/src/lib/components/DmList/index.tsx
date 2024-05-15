@@ -1,4 +1,4 @@
-import { useDirect, useEscapeKey } from '@mezon/core';
+import { useApp, useDirect, useEscapeKey } from '@mezon/core';
 import { useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -40,7 +40,7 @@ function DirectMessageList() {
 	};
 
 	useEscapeKey(() => setIsOpen(false));
-
+	const { appearanceTheme } = useApp();
 	return (
 		<>
 			<div className="absolute">
@@ -50,7 +50,7 @@ function DirectMessageList() {
 			<div className="mt-5 px-2 py-1">
 				<div className="w-full flex flex-row items-center">
 					<button
-						className={`py-2 px-3 rounded-[4px] w-full flex gap-4 items-center ${pathname.includes('friends') ? 'bg-bgModifierHover' : ''}`}
+						className={`py-2 px-3 rounded-[4px] dark:text-white text-black w-full flex gap-4 items-center ${pathname.includes('friends') ? 'dark:bg-bgModifierHover bg-[#F7F7F7]' : ''}`}
 						onClick={() => {
 							navigate('/chat/direct/friends');
 						}}
@@ -60,7 +60,7 @@ function DirectMessageList() {
 					</button>
 				</div>
 
-				<div className="text-xs font-semibold tracking-wide left-sp text-[#AEAEAE] mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default hover:text-white">
+				<div className="text-xs font-semibold tracking-wide left-sp dark:text-[#AEAEAE] text-[#585858] mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default dark:hover:text-white hover:text-black">
 					<p>DIRECT MESSAGES</p>
 					<button
 						onClick={onClickOpenModal}
@@ -71,7 +71,7 @@ function DirectMessageList() {
 				</div>
 			</div>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
-			<div className="flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3">
+			<div className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{filteredDataDM.map((directMessage: any, index: number) => {
 						return <DMListItem key={index} directMessage={directMessage} />;
