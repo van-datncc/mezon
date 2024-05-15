@@ -1,0 +1,13 @@
+{
+    "actions": {
+        "editMessage": "Chỉnh sửa tin nhắn",
+        "reply": "Trả lời",
+        "createThread": "Tạo Chủ Đề",
+        "copyText": "Sao Chép Văn Bản",
+        "deleteMessage": "Xóa tin nhắn",
+        "pinMessage": "Ghim tin nhắn",
+        "markUnRead": "Đánh dấu chưa đọc",
+        "mention": "Đề cập",
+        "copyMessageLink": "Sao chép đường dẫn tin nhắn"
+    }
+}
