@@ -30,6 +30,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const categoriesWithIcons = dataCategories
 		.map((category, index) => ({ name: category, icon: categoryIcons[index] }))
 		.filter((category) => category.name !== '' && category.name !== 'Component');
+	[categoriesWithIcons[0], categoriesWithIcons[1]] = [categoriesWithIcons[1], categoriesWithIcons[0]];
 
 	const {
 		reactionMessageDispatch,
@@ -75,7 +76,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		setEmojiHoverShortCode(emojiHover.shortname);
 	};
 
-	const scrollToCategory = (categoryName: string) => {
+	const scrollToCategory = (event: React.MouseEvent, categoryName: string) => {
+		event.stopPropagation();
 		setSelectedCategory(categoryName);
 		const categoryDiv = categoryRefs.current[categoryName];
 		if (categoryDiv && containerRef.current) {
@@ -126,7 +128,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						<button
 							key={index}
 							className={`w-9 h-9 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
-							onClick={() => scrollToCategory(item.name)}
+							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}
 						</button>
@@ -176,18 +178,16 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 
 	return (
 		<div>
-			{categoryName !== '' && (
-				<button
-					onClick={() => setEmojisPanelStatus(!emojisPanel)}
-					className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 bg-[#2B2D31] z-10"
-				>
-					{categoryName}
-					<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
-						{' '}
-						<Icons.ArrowRight />
-					</span>
-				</button>
-			)}
+			<button
+				onClick={() => setEmojisPanelStatus(!emojisPanel)}
+				className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 bg-[#2B2D31] z-10"
+			>
+				{categoryName}
+				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
+					{' '}
+					<Icons.ArrowRight />
+				</span>
+			</button>
 			{emojisPanel && (
 				<div className=" grid grid-cols-12 ml-1 gap-1">
 					{emojisByCategoryName.map((item, index) => (

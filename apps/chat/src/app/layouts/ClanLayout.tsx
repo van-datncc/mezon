@@ -1,6 +1,7 @@
-import { ChannelList, ChannelTopbar, ClanHeader, EmojiPickerComp, FooterProfile } from '@mezon/components';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, GifStickerEmojiPopup } from '@mezon/components';
 import { MezonPolicyProvider, useApp, useAuth, useClans, useMenu, useReference, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectCurrentVoiceChannel, selectReactionRightState, selectReactionTopState } from '@mezon/store';
+import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -8,7 +9,6 @@ import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
-import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 
 const ClanLayout = () => {
 	const reactionRightState = useSelector(selectReactionRightState);
@@ -30,11 +30,11 @@ const ClanLayout = () => {
 		setOpenSetting(true);
 	};
 
-	useEffect(()=>{
-		if(isShowCreateThread){
+	useEffect(() => {
+		if (isShowCreateThread) {
 			setIsShowMemberList(false);
 		}
-	},[isShowCreateThread])
+	}, [isShowCreateThread]);
 
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
@@ -60,13 +60,20 @@ const ClanLayout = () => {
 					<div className="flex h-heightWithoutTopBar flex-row">
 						<Outlet />
 					</div>
-					{ reactionRightState &&  
-						<div id="emojiPicker" className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}>
+					{reactionRightState && (
+						<div
+							id="emojiPicker"
+							className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
+						>
 							<div className="mb-0 z-10 h-full">
-								<EmojiPickerComp messageEmoji={referenceMessage as IMessageWithUser} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+								<GifStickerEmojiPopup
+									messageEmoji={referenceMessage as IMessageWithUser}
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									emojiAction={EmojiPlaces.EMOJI_REACTION}
+								/>
 							</div>
 						</div>
-					}
+					)}
 				</div>
 				{isShowCreateThread && (
 					<>
