@@ -12,6 +12,7 @@ import { MenuThreadDetailStacks } from './stacks/MenuThreadDetailStacks';
 import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
+import { MenuClanStacks } from './stacks/MenuSererStack';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
@@ -62,7 +63,21 @@ export const Authentication = () => {
 				/>
 				<RootStack.Screen
 					name={APP_SCREEN.MENU_THREAD.STACK}
-					children={(props) => <MenuThreadDetailStacks {...props} />}
+					children={props =>
+					(
+						<MenuThreadDetailStacks {...props} />
+					)}
+					options={{
+						gestureEnabled: true,
+						gestureDirection: 'horizontal',
+					}}
+				/>
+
+				<RootStack.Screen
+					name={APP_SCREEN.MENU_CLAN.STACK}
+					children={props => (
+						<MenuClanStacks {...props} />
+					)}
 					options={{
 						gestureEnabled: true,
 						gestureDirection: 'horizontal',
