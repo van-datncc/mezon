@@ -15,8 +15,8 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 	};
 
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgPrimary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
-			<div className="text-white">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+			<div className="dark:text-white text-black">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 text-[#AEAEAE] font-bold text-base tracking-wider" onClick={handleUserProfileButtonClick}>
 					User Profile
@@ -24,15 +24,15 @@ const SettingRightClan = ({ onUserProfileClick }: { onUserProfileClick?: () => v
 				<button className="pt-1 font-bold text-base ml-[16px] border-b-2 border-[#155EEF] pb-2 tracking-wider">Clan Profiles</button>
 				<div className="flex mt-[30px] flex-col xl:flex-row gap-x-1 text-sm font-normal">
 					<p>Show who you are with different profiles for each of your clans</p>
-					<a href=" " className="text-[#84ADFF] text-sm font-normal">
+					<a href=" " className="text-[#155EEF] text-sm font-normal">
 						{' '}
 						Learn more about Clan Profiles
 					</a>
 				</div>
-				<p className="mt-[20px] font-bold text-sm text-[#CCCCCC] tracking-wide">CHOOSE A CLAN</p>
+				<p className="mt-[20px] font-bold text-sm dark:text-[#CCCCCC] text-black tracking-wide">CHOOSE A CLAN</p>
 				<select
 					name="clan"
-					className="block w-full mt-1 bg-black border border-black text-white rounded px-4 py-3 font-normal text-sm tracking-wide"
+					className="block w-full mt-1 dark:bg-black bg-[#f0f0f0] border border-black dark:text-white text-black rounded px-4 py-3 font-normal text-sm tracking-wide"
 					disabled={flagOption}
 					value={selectedClanId}
 					onChange={handleClanChange}

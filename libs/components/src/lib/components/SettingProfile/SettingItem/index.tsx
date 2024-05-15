@@ -19,11 +19,11 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 		setSelectedButton('');
 	};
 	return (
-		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-bgSecondary flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-[#F0F0F0] flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
 			<div className="w-170px ">
-				<p className="text-[#84ADFF] font-bold text-sm tracking-wider">USER SETTINGS</p>
+				<p className="dark:text-[#84ADFF] text-black font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
-					className={`text-[#AEAEAE] w-[170px] text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4 hover:text-white ${selectedButton === 'Account' ? 'bg-[#232E3B] text-white' : ''}`}
+					className={`dark:text-[#AEAEAE] text-black w-[170px] text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Account' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''}`}
 					onClick={() => {
 						handleButtonClick('Account');
 						onItemClick && onItemClick('Account');
@@ -33,7 +33,7 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 				</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE]  pl-2 ml-[-8px] hover:text-white ${selectedButton === 'Profiles' ? 'bg-[#232E3B] text-white' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px]  ${selectedButton === 'Profiles' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Profiles');
 						onItemClick && onItemClick('Profiles');
@@ -42,42 +42,42 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 					Profiles
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Privacy & Safety
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Family Center
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Family Center
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Authorized Apps
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Devices
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Connections
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Clips
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Friend Requests
 				</button>
 				<hr className="border-t border-solid border-borderDefault mt-4" />
-				<button className="pt-2 text-[#84ADFF] mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
+				<button className="pt-2 dark:text-[#84ADFF] text-black mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE]  pl-2 ml-[-8px] hover:text-white ${selectedButton === 'Appearance' ? 'bg-[#232E3B] text-white' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px]  ${selectedButton === 'Appearance' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Appearance');
 						onItemClick && onItemClick('Appearance');
@@ -86,40 +86,40 @@ const SettingItem = ({ onItemClick }: { onItemClick?: (settingName: string) => v
 					Appearance
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Accessibility
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Voice & Video
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Text & Image
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Notifications
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Keybinds
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Language
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Streamer Mode
 				</button>
 				<br />
-				<button className="p-2 text-[#AEAEAE] text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] hover:text-white">
+				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Advanced
 				</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE] text-[16px] font-medium ${selectedButton === 'Log Out' ? 'bg-[#232E3B]' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] hover:text-white`}
+					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium ${selectedButton === 'Log Out' ? 'bg-[#232E3B]' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] `}
 					onClick={() => {
 						handleButtonClick('Log Out');
 						handleOpenModal();
