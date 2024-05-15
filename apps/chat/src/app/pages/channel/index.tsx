@@ -169,7 +169,7 @@ export default function ChannelLayout() {
 							className={` dark:bg-bgSecondary bg-bgLightModeSecond text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
 							id="memberList"
 						>
-							<div className="w-1 h-full bg-bgPrimary"></div>
+							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightModeSecond"></div>
 							<MemberList />
 						</div>
 					)}

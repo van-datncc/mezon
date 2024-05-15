@@ -49,23 +49,23 @@ const GifStickerEmojiPopup = () => {
 	}, [emojiRefParentDiv]);
 
 	return (
-		<div className="w-[370px] sbm:w-[500px] h-fit min-h-[500px] rounded-lg bg-bgSecondary shadow shadow-neutral-900">
+		<div className="w-[370px] sbm:w-[500px] h-fit min-h-[500px] rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900">
 			<div className="w-full">
 				<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1">
 					<button
-						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold' : ' text-gray-300 hover:text-white  '}`}
+						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
 						onClick={() => handleTabClick(SubPanelName.GIFS)}
 					>
 						Gifs
 					</button>
 					<button
-						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.STICKERS ? 'font-semibold' : ' text-gray-300 hover:text-white '}`}
+						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.STICKERS ? 'font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
 						onClick={() => handleTabClick(SubPanelName.STICKERS)}
 					>
 						Stickers
 					</button>
 					<button
-						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.EMOJI ? 'font-semibold' : ' text-gray-300 hover:text-white '}`}
+						className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.EMOJI ? 'font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
 						onClick={() => handleTabClick(SubPanelName.EMOJI)}
 					>
 						Emoji
@@ -93,7 +93,7 @@ const GifStickerEmojiPopup = () => {
 				)}
 				{subPanelActive === SubPanelName.EMOJI && (
 					<div className="flex h-full pr-2 w-full md:w-[500px]">
-						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+						<EmojiPickerComp emojiAction={EmojiPlaces.EMOJI_EDITOR}/>
 					</div>
 				)}
 			</div>

@@ -134,7 +134,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 						{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 					</div>
 					<p
-						className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover font-medium ${(active || isUnReadChannel) ? 'dark:text-white text-black' : ''}`}
+						className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(active || isUnReadChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
@@ -157,7 +157,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 							{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 						</div>
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover font-medium ${(active || isUnReadChannel) ? 'dark:text-white text-black' : ''}`}
+							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(active || isUnReadChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20
@@ -200,7 +200,7 @@ function ChannelLink({ clanId, channel, active, isPrivate, createInviteLink, isU
 			) : (
 				<>
 					<AddPerson
-						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block group-hover:text-white  ${active ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
+						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black  ${active ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
 						onClick={handleCreateLinkInvite}
 					/>
 					{numberNotication !== 0 && (

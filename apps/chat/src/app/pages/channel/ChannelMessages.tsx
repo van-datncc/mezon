@@ -1,5 +1,5 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference, useMessages } from '@mezon/core';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference, useMessages, useApp } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -20,6 +20,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
+	const { appearanceTheme } = useApp();
 
 	// share logic to load more message
 	useMessages({ chatRef, hasMoreMessage, loadMoreMessage });
@@ -52,7 +53,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	return (
 		<div
-			className="dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
+			className={`dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
 		>

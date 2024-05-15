@@ -35,10 +35,10 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
-				<div className="bg-bgTertiary flex flex-row items-center justify-between p-[16px] h-12">
-					<div className="flex flex-row items-center border-r-[1px] border-r-[#6A6A6A] pr-[16px] gap-4">
+				<div className="dark:bg-bgTertiary bg-white flex flex-row items-center justify-between p-[16px] h-12">
+					<div className="flex flex-row items-center border-r-[1px] dark:border-r-[#6A6A6A] border-r-[#E1E1E1] pr-[16px] gap-4">
 						<Icons.ThreadIcon />
-						<span className="cursor-default">Threads</span>
+						<span className="cursor-default dark:text-white text-black">Threads</span>
 					</div>
 					<SearchThread />
 					<div className="flex flex-row items-center gap-4">
@@ -50,11 +50,11 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 							Create
 						</Button>
 						<button onClick={() => setIsShowThread(false)}>
-							<Icons.Close defaultSize="w-4 h-4" />
+							<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
 						</button>
 					</div>
 				</div>
-				<div className="flex flex-col bg-bgSecondary px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
+				<div className="flex flex-col dark:bg-bgSecondary bg-gray-100 px-[16px] min-h-full flex-1 overflow-y-auto thread-scroll">
 					{threadChannelOnline.length > 0 && (
 						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
 							{threadChannelOnline.map((thread) => (

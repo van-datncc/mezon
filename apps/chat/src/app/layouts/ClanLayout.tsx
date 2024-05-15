@@ -63,15 +63,15 @@ const ClanLayout = () => {
 					{ reactionRightState &&  
 						<div id="emojiPicker" className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}>
 							<div className="mb-0 z-10 h-full">
-								<EmojiPickerComp messageEmoji={referenceMessage as IMessageWithUser} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
+								<EmojiPickerComp messageEmoji={referenceMessage as IMessageWithUser} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} isReaction={true}/>
 							</div>
 						</div>
 					}
 				</div>
 				{isShowCreateThread && (
 					<>
-						<div className="w-2 cursor-ew-resize bg-bgTertiary" />
-						<div className="w-[480px] bg-bgPrimary rounded-l-lg">
+						<div className="w-2 cursor-ew-resize dark:bg-bgTertiary bg-white" />
+						<div className="w-[480px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-l-lg">
 							<ThreadsMain />
 						</div>
 					</>

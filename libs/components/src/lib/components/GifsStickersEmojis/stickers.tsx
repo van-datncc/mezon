@@ -71,7 +71,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 						key={avt.id}
 						src={avt.url}
 						alt={`avt ${avt.id}`}
-						className={`w-full h-auto cursor-pointer hover:bg-bgDisable ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-lg justify-center items-center border border-bgHoverMember rounded-lg`}
+						className={`w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-lg justify-center items-center border border-bgHoverMember rounded-lg`}
 						onClick={() => handleClickAvt(avt.type)}
 						role="button"
 					/>
@@ -84,7 +84,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 							key={image.id}
 							src={image.url}
 							alt={`Img`}
-							className="w-full h-auto cursor-pointer hover:bg-bgDisable hover:rounded-lg border border-bgHoverMember rounded-lg"
+							className="w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton hover:rounded-lg border border-bgHoverMember rounded-lg"
 							onClick={() => handleClickImage(image.url)}
 							role='button'
 						/>
