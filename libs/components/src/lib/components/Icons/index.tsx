@@ -1008,13 +1008,12 @@ export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 			y="0"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
-			className={defaultSize}
-			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			className={`${defaultSize} ${isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			viewBox="0 0 24 24"
 		>
 			<path
 				d="M12 2.81a1 1 0 0 1 0-1.41l.36-.36a1 1 0 0 1 1.41 0l9.2 9.2a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.3.13l-9.54-6.72a1 1 0 0 1-.08-1.58l1-1L12 2.8ZM12 21.2a1 1 0 0 1 0 1.41l-.35.35a1 1 0 0 1-1.41 0l-9.2-9.19a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.3-.12l9.54 6.72a1 1 0 0 1 .07 1.58l-1 1 .35.36ZM15.66 16.8a1 1 0 0 1-1.38.28l-8.49-5.66A1 1 0 1 1 6.9 9.76l8.49 5.65a1 1 0 0 1 .27 1.39ZM17.1 14.25a1 1 0 1 0 1.11-1.66L9.73 6.93a1 1 0 0 0-1.11 1.66l8.49 5.66Z"
-				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fill="currentColor"
 			></path>
 		</svg>
 	);
@@ -1036,11 +1035,11 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill="#B5BAC1"
+			className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}
 			viewBox="0 0 24 24"
 		>
 			<path
-				fill="#B5BAC1"
+				fill="currentColor"
 				d="M1.3 21.3a1 1 0 1 0 1.4 1.4l20-20a1 1 0 0 0-1.4-1.4l-20 20ZM3.13 16.13c.11.27.46.28.66.08L15.73 4.27a.47.47 0 0 0-.07-.74 6.97 6.97 0 0 0-1.35-.64.62.62 0 0 1-.38-.43 2 2 0 0 0-3.86 0 .62.62 0 0 1-.38.43A7 7 0 0 0 5 9.5v2.09a.5.5 0 0 1-.13.33l-1.1 1.22A3 3 0 0 0 3 15.15v.28c0 .24.04.48.13.7ZM18.64 9.36c.13-.13.36-.05.36.14v2.09c0 .12.05.24.13.33l1.1 1.22a3 3 0 0 1 .77 2.01v.28c0 .67-.34 1.29-.95 1.56-1.31.6-4 1.51-8.05 1.51-.46 0-.9-.01-1.33-.03a.48.48 0 0 1-.3-.83l8.27-8.28ZM9.18 19.84A.16.16 0 0 0 9 20a3 3 0 1 0 6 0c0-.1-.09-.17-.18-.16a24.84 24.84 0 0 1-5.64 0Z"
 			></path>
 		</svg>
@@ -1057,11 +1056,11 @@ export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}
 			viewBox="0 0 24 24"
 		>
 			<path
-				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fill="currentColor"
 				d="M19.38 11.38a3 3 0 0 0 4.24 0l.03-.03a.5.5 0 0 0 0-.7L13.35.35a.5.5 0 0 0-.7 0l-.03.03a3 3 0 0 0 0 4.24L13 5l-2.92 2.92-3.65-.34a2 2 0 0 0-1.6.58l-.62.63a1 1 0 0 0 0 1.42l9.58 9.58a1 1 0 0 0 1.42 0l.63-.63a2 2 0 0 0 .58-1.6l-.34-3.64L19 11l.38.38ZM9.07 17.07a.5.5 0 0 1-.08.77l-5.15 3.43a.5.5 0 0 1-.63-.06l-.42-.42a.5.5 0 0 1-.06-.63L6.16 15a.5.5 0 0 1 .77-.08l2.14 2.14Z"
 			></path>
 		</svg>
@@ -1078,11 +1077,11 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defau
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}
 			viewBox="0 0 24 24"
 		>
 			<path
-				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fill="currentColor"
 				d="M14.5 8a3 3 0 1 0-2.7-4.3c-.2.4.06.86.44 1.12a5 5 0 0 1 2.14 3.08c.01.06.06.1.12.1ZM18.44 17.27c.15.43.54.73 1 .73h1.06c.83 0 1.5-.67 1.5-1.5a7.5 7.5 0 0 0-6.5-7.43c-.55-.08-.99.38-1.1.92-.06.3-.15.6-.26.87-.23.58-.05 1.3.47 1.63a9.53 9.53 0 0 1 3.83 4.78ZM12.5 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2 20.5a7.5 7.5 0 0 1 15 0c0 .83-.67 1.5-1.5 1.5a.2.2 0 0 1-.2-.16c-.2-.96-.56-1.87-.88-2.54-.1-.23-.42-.15-.42.1v2.1a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2.1c0-.25-.31-.33-.42-.1-.32.67-.67 1.58-.88 2.54a.2.2 0 0 1-.2.16A1.5 1.5 0 0 1 2 20.5Z"
 			></path>
 		</svg>
@@ -1096,20 +1095,20 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 		setIsWhite(!isWhite);
 	};
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize} onClick={handleClick}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} ${isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} onClick={handleClick}>
 			<g id="Live area">
 				<g id="Vector">
 					<path
 						d="M5 10C5 10.8284 4.32843 11.5 3.5 11.5C2.67157 11.5 2 10.8284 2 10C2 9.17157 2.67157 8.5 3.5 8.5C4.32843 8.5 5 9.17157 5 10Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
+						fill="currentColor"
 					/>
 					<path
 						d="M18 10C18 10.8284 17.3284 11.5 16.5 11.5C15.6716 11.5 15 10.8284 15 10C15 9.17157 15.6716 8.5 16.5 8.5C17.3284 8.5 18 9.17157 18 10Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
+						fill="currentColor"
 					/>
 					<path
 						d="M10 11.5C10.8284 11.5 11.5 10.8284 11.5 10C11.5 9.17157 10.8284 8.5 10 8.5C9.17157 8.5 8.5 9.17157 8.5 10C8.5 10.8284 9.17157 11.5 10 11.5Z"
-						fill={isWhite ? '#FFFFFF' : defaultFill}
+						fill="currentColor"
 					/>
 				</g>
 			</g>
@@ -1133,11 +1132,11 @@ export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}
 			viewBox="0 0 24 24"
 		>
 			<path
-				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fill="currentColor"
 				fillRule="evenodd"
 				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H5ZM4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5h-2.65c-.5 0-.85.5-.85 1a3 3 0 1 1-6 0c0-.5-.35-1-.85-1H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"
 				clipRule="evenodd"
@@ -1162,12 +1161,12 @@ export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+			className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}
 			viewBox="0 0 24 24"
 		>
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
 			<path
-				fill={isWhite ? '#FFFFFF' : '#B5BAC1'}
+				fill="currentColor"
 				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm-.28-16c-.98 0-1.81.47-2.27 1.14A1 1 0 1 1 7.8 7.01 4.73 4.73 0 0 1 11.72 5c2.5 0 4.65 1.88 4.65 4.38 0 2.1-1.54 3.77-3.52 4.24l.14 1a1 1 0 0 1-1.98.27l-.28-2a1 1 0 0 1 .99-1.14c1.54 0 2.65-1.14 2.65-2.38 0-1.23-1.1-2.37-2.65-2.37ZM13 17.88a1.13 1.13 0 1 1-2.25 0 1.13 1.13 0 0 1 2.25 0Z"
 				clipRule="evenodd"
@@ -1197,20 +1196,20 @@ export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 
 export function Speaker({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
-		<svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} dark:text-[#AEAEAE] text-colorTextLightMode`}>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
 					<path
 						d="M10.1977 0.750516C10.4846 0.889971 10.6667 1.18099 10.6667 1.50001V16.5C10.6667 16.819 10.4846 17.1101 10.1977 17.2495C9.91077 17.389 9.56941 17.3524 9.31856 17.1553L4.24217 13.1667H1.50008C1.03984 13.1667 0.666748 12.7936 0.666748 12.3333V5.66668C0.666748 5.20644 1.03984 4.83334 1.50008 4.83334H4.24217L9.31856 0.844747C9.56941 0.64765 9.91077 0.611061 10.1977 0.750516Z"
-						fill={defaultFill}
+						fill="currentColor"
 					/>
 					<path
 						d="M14.5893 3.41075C14.2639 3.08531 13.7363 3.08531 13.4108 3.41075C13.0854 3.73619 13.0854 4.26382 13.4108 4.58926L13.6968 4.87521C15.9748 7.15327 15.9748 10.8467 13.6968 13.1248L13.4108 13.4107C13.0854 13.7362 13.0854 14.2638 13.4108 14.5893C13.7363 14.9147 14.2639 14.9147 14.5893 14.5893L14.8753 14.3033C17.8042 11.3744 17.8042 6.62563 14.8753 3.6967L14.5893 3.41075Z"
-						fill={defaultFill}
+						fill="currentColor"
 					/>
 					<path
 						d="M12.9227 5.91075C12.5972 5.58531 12.0696 5.58531 11.7442 5.91075C11.4187 6.23619 11.4187 6.76382 11.7442 7.08926L11.8871 7.23224C12.8634 8.20855 12.8634 9.79146 11.8871 10.7678L11.7442 10.9107C11.4187 11.2362 11.4187 11.7638 11.7442 12.0893C12.0696 12.4147 12.5972 12.4147 12.9227 12.0893L13.0656 11.9463C14.6928 10.3191 14.6928 7.68091 13.0656 6.05373L12.9227 5.91075Z"
-						fill={defaultFill}
+						fill="currentColor"
 					/>
 				</g>
 			</g>
@@ -1602,19 +1601,24 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 };
 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setIsWhite] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setIsWhite(!isWhite);
+	};
 	return (
 		<svg
-			className={defaultSize}
+			className={`${defaultSize} ${isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill={defaultFill}
 			viewBox="0 0 24 24"
+			onClick={handleClick}
 		>
 			<path
-				fill={defaultFill}
+				fill="currentColor"
 				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22ZM6.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm-9.8 1.17a1 1 0 0 1 1.39.27 3.5 3.5 0 0 0 5.82 0 1 1 0 0 1 1.66 1.12 5.5 5.5 0 0 1-9.14 0 1 1 0 0 1 .27-1.4Z"
 				clipRule="evenodd"
@@ -1623,7 +1627,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export const ArrowDown: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
+export const ArrowDown: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black' }) => {
 	return (
 		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
@@ -1632,7 +1636,7 @@ export const ArrowDown: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M14.5892 5.91075C14.9147 6.23619 14.9147 6.76382 14.5892 7.08926L9.58924 12.0893C9.2638 12.4147 8.73616 12.4147 8.41072 12.0893L3.41072 7.08926C3.08529 6.76382 3.08529 6.23619 3.41072 5.91075C3.73616 5.58531 4.2638 5.58531 4.58924 5.91075L8.99998 10.3215L13.4107 5.91075C13.7362 5.58531 14.2638 5.58531 14.5892 5.91075Z"
-					fill={defaultFill}
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -1655,20 +1659,20 @@ export const BrowwseChannel: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' })
 	);
 };
 
-export const EventIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
+export const EventIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 dark:text-contentTertiary text-colorTextLightMode' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area" clipPath="url(#clip0_2155_1626)">
 				<g id="Vector">
 					<path
 						d="M9.42848 7.59963C9.25324 7.24456 8.74692 7.24456 8.57169 7.59962L7.91172 8.93686C7.84214 9.07785 7.70762 9.17558 7.55202 9.19819L6.0763 9.41263C5.68446 9.46957 5.528 9.9511 5.81154 10.2275L6.87938 11.2684C6.99197 11.3781 7.04335 11.5363 7.01677 11.6912L6.76469 13.161C6.69776 13.5512 7.10737 13.8488 7.45785 13.6646L8.77777 12.9707C8.91695 12.8975 9.08321 12.8975 9.22239 12.9707L10.5423 13.6646C10.8928 13.8488 11.3024 13.5512 11.2355 13.161L10.9834 11.6912C10.9568 11.5363 11.0082 11.3781 11.1208 11.2684L12.1886 10.2275C12.4722 9.9511 12.3157 9.46957 11.9239 9.41263L10.4481 9.19819C10.2925 9.17558 10.158 9.07786 10.0884 8.93686L9.42848 7.59963Z"
-						fill="#AEAEAE"
+						fill="currentColor"
 					/>
 					<path
 						fillRule="evenodd"
 						clipRule="evenodd"
 						d="M6.50008 1.49999C6.50008 1.03975 6.12699 0.666656 5.66675 0.666656C5.20651 0.666656 4.83341 1.03975 4.83341 1.49999V2.33332H4.00008C2.15913 2.33332 0.666748 3.82571 0.666748 5.66666V15.6667C0.666748 16.5871 1.41294 17.3333 2.33341 17.3333H15.6667C16.5872 17.3333 17.3334 16.5871 17.3334 15.6667V5.66666C17.3334 3.82571 15.841 2.33332 14.0001 2.33332H13.1667V1.49999C13.1667 1.03975 12.7937 0.666656 12.3334 0.666656C11.8732 0.666656 11.5001 1.03975 11.5001 1.49999V2.33332L6.50008 2.33332V1.49999ZM11.5001 4.83332V3.99999L6.50008 3.99999V4.83332C6.50008 5.29356 6.12699 5.66666 5.66675 5.66666C5.20651 5.66666 4.83341 5.29356 4.83341 4.83332V3.99999H4.00008C3.07961 3.99999 2.33341 4.74618 2.33341 5.66666L2.33341 15.6667H15.6667V5.66666C15.6667 4.74618 14.9206 3.99999 14.0001 3.99999H13.1667V4.83332C13.1667 5.29356 12.7937 5.66666 12.3334 5.66666C11.8732 5.66666 11.5001 5.29356 11.5001 4.83332Z"
-						fill="#AEAEAE"
+						fill="currentColor"
 					/>
 				</g>
 			</g>
@@ -1802,12 +1806,12 @@ export const Sent: React.FC<IconProps> = () => {
 
 export const Plus: React.FC<IconProps> = () => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode dark:hover:text-white hover:text-black">
 			<g id="Live area">
 				<path
 					id="Vector"
 					d="M11 4C11 3.44772 10.5523 3 10 3C9.44772 3 9 3.44772 9 4V9H4C3.44771 9 3 9.44771 3 10C3 10.5523 3.44771 11 4 11H9V16C9 16.5523 9.44772 17 10 17C10.5523 17 11 16.5523 11 16V11H16C16.5523 11 17 10.5523 17 10C17 9.44772 16.5523 9 16 9H11V4Z"
-					fill="#CBD5E0"
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -1924,24 +1928,24 @@ export const Private: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 
 export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} dark:text-[#AEAEAE] text-colorTextLightMode`}>
 			<path
 				d="M11.5512 1.57323C11.9214 1.75834 12.1065 2.12856 12.1065 2.40622V19.0659C12.1065 19.4361 11.9214 19.7138 11.5512 19.8989C11.2735 20.084 10.8107 19.9915 10.5331 19.8064L4.88727 15.3638H1.92554C1.37022 15.3638 1 14.9936 1 14.4382V7.03392C1 6.47859 1.37022 6.10838 1.92554 6.10838H4.97982L10.6256 1.66579C10.9033 1.48068 11.2735 1.48068 11.5512 1.57323Z"
-				fill="#AEAEAE"
+				fill="currentColor"
 			/>
 			<path
 				d="M16.7342 17.5851L16.4565 17.8627C16.0863 18.2329 15.531 18.2329 15.1608 17.8627C14.7905 17.4925 14.7905 16.9372 15.1608 16.567L15.531 16.2893C17.4746 14.2531 17.9374 11.2914 16.8267 8.885H18.8629C19.7885 11.8467 19.1406 15.2712 16.7342 17.5851Z"
-				fill="#AEAEAE"
+				fill="currentColor"
 			/>
 			<path
 				d="M14.7905 14.9936L14.6054 15.1787C14.2352 15.5489 13.6799 15.5489 13.3097 15.1787C12.9395 14.8084 12.9395 14.2531 13.3097 13.8829L13.4948 13.6978C14.6054 12.5872 14.6054 10.8286 13.4948 9.81054L13.3097 9.62543C13.032 9.34777 13.032 8.97755 13.032 8.69989C13.032 8.79244 13.2171 8.885 13.3097 8.885H15.1608C16.5491 10.7361 16.4565 13.3276 14.7905 14.9936Z"
-				fill="#AEAEAE"
+				fill="currentColor"
 			/>
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
 				d="M15.0682 2.036V1.66579C15.0682 0.740249 15.8086 -0.000183105 16.7342 -0.000183105C17.6597 -0.000183105 18.4001 0.740249 18.4001 1.66579V2.036H18.7704C19.1406 2.036 19.4182 2.31367 19.4182 2.68388V6.01582C19.4182 6.38604 19.1406 6.6637 18.7704 6.6637H14.698C14.3278 6.6637 14.0501 6.38604 14.0501 6.01582V2.68388C14.0501 2.31367 14.3278 2.036 14.698 2.036H15.0682ZM15.7161 1.66579C15.7161 1.11046 16.1789 0.647695 16.7342 0.647695C17.2895 0.647695 17.7523 1.11046 17.7523 1.66579V2.036H15.7161V1.66579ZM16.7342 3.60942C17.0118 3.60942 17.1969 3.79453 17.1969 4.07219V4.72007C17.1969 4.99773 17.0118 5.18284 16.7342 5.18284C16.4565 5.18284 16.2714 4.99773 16.2714 4.72007V4.07219C16.2714 3.79453 16.4565 3.60942 16.7342 3.60942Z"
-				fill="#AEAEAE"
+				fill="currentColor"
 			/>
 		</svg>
 	);
@@ -1949,17 +1953,17 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 
 export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} block`}>
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} block dark:text-[#AEAEAE] text-colorTextLightMode`}>
 			<g className="transform translate-y-[2px] translate-x-[-1.5px]">
 				<path
 					d="M17.4393 9.4715L17.6833 8.6585H11.7483C11.5857 8.6585 11.4231 8.49589 11.4231 8.33329V7.76419H9.14667L10.2036 3.86175H8.41496L7.35805 7.76419H3.37431L2.8865 9.4715H6.87024L6.05724 12.3983H2.1548L1.66699 14.1056H5.65073L4.51252 18.3333H6.30114L7.43935 14.1056H10.5288L9.39057 18.3333H11.1792L12.3174 14.1056H16.3011L16.7889 12.3983H12.8052L13.6182 9.4715H17.4393ZM10.9353 12.3983H7.84585L8.65886 9.4715H11.7483L10.9353 12.3983Z"
-					fill="#AEAEAE"
+					fill="currentColor"
 				/>
 				<path
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M13.2117 3.45524V3.13004C13.2117 2.31703 13.8621 1.66663 14.6751 1.66663C15.4881 1.66663 16.1385 2.31703 16.1385 3.13004V3.45524H16.4637C16.7889 3.45524 17.0328 3.69915 17.0328 4.02435V6.95118C17.0328 7.27638 16.7889 7.52028 16.4637 7.52028H12.8865C12.5613 7.52028 12.3174 7.27638 12.3174 6.95118V4.02435C12.3174 3.69915 12.5613 3.45524 12.8865 3.45524H13.2117ZM13.7808 3.13004C13.7808 2.64224 14.1873 2.23573 14.6751 2.23573C15.1629 2.23573 15.5694 2.64224 15.5694 3.13004V3.45524H13.7808V3.13004ZM14.6751 4.83736C14.919 4.83736 15.0816 4.99996 15.0816 5.24386V5.81297C15.0816 6.05687 14.919 6.21947 14.6751 6.21947C14.4312 6.21947 14.2686 6.05687 14.2686 5.81297V5.24386C14.3499 4.99996 14.5125 4.83736 14.6751 4.83736Z"
-					fill="#AEAEAE"
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -1968,11 +1972,11 @@ export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 
 export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} block`}>
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} block dark:text-[#AEAEAE] text-colorTextLightMode`}>
 			<g className="transform translate-y-[4.5px] translate-x-[-0.7px]">
 				<path
 					d="M3.56915 15.415L4.73001 11.0721H0.666992L1.13341 9.31012H5.20679L6.00489 6.28358H1.94187L2.41865 4.53192H6.48167L7.55961 0.5H9.38382L8.29552 4.53192H11.4568L12.5347 0.5H14.3589L13.2706 4.53192H17.3337L16.8672 6.28358H12.8042L11.9854 9.31012H16.0484L15.582 11.0721H11.519L10.3581 15.415H8.54427L9.69477 11.0721H6.54386L5.383 15.415H3.56915ZM7.02064 9.31012H10.1716L10.98 6.28358H7.8291L7.02064 9.31012Z"
-					fill={defaultFill}
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -1986,12 +1990,12 @@ export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 		setIsWhite(!isWhite);
 	};
 	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={handleClick}>
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={handleClick} className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}>
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
 				d="M5 4C5.55228 4 6 4.44772 6 5V12C6 13.1046 6.89543 14 8 14H17.5858L15.2929 11.7071C14.9024 11.3166 14.9024 10.6834 15.2929 10.2929C15.6834 9.90237 16.3166 9.90237 16.7071 10.2929L20.7071 14.2929C20.8946 14.4804 21 14.7348 21 15C21 15.2652 20.8946 15.5196 20.7071 15.7071L16.7071 19.7071C16.3166 20.0976 15.6834 20.0976 15.2929 19.7071C14.9024 19.3166 14.9024 18.6834 15.2929 18.2929L17.5858 16H8C5.79086 16 4 14.2091 4 12V5C4 4.44772 4.44772 4 5 4Z"
-				fill={isWhite ? '#FFFFFF' : defaultFill}
+				fill="currentColor"
 			/>
 		</svg>
 	);
@@ -2033,9 +2037,9 @@ export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	};
 
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" onClick={handleClick}>
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" onClick={handleClick} className={isWhite ? 'dark:text-white text-black': 'dark:text-[#B5BAC1] text-colorTextLightMode'}>
 			<path
-				fill={isWhite ? '#FFFFFF' : defaultFill}
+				fill="currentColor"
 				d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"
 			></path>
 		</svg>
