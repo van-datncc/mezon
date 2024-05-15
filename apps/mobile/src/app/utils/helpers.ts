@@ -53,3 +53,5 @@ export const validURL = (string: string) => {
   const res = string.match(urlPattern);
   return res !== null;
 };
+
+export const clanAndChannelIdLinkRegex = /clans\/(\d+)\/channels\/(\d+)/;

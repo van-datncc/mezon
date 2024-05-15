@@ -60,14 +60,6 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
-const persistChannelsReducer =  persistReducer(
-	{
-		key: 'channels',
-		storage,
-	},
-	channelsReducer,
-);
-
 const persistedVoiceReducer = persistReducer(
 	{
 		key: 'voice',
@@ -82,7 +74,7 @@ const reducer = {
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
-	channels: persistChannelsReducer,
+	channels: channelsReducer,
 	channelMembers: channelMembersReducer,
 	threads: threadsReducer,
 	messages: messagesReducer,

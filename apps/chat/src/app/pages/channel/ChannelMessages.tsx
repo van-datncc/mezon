@@ -1,6 +1,6 @@
-import { useChatMessages } from '@mezon/core';
-import { useVirtualizer } from '@mezon/virtual';
-import { useEffect, useRef } from 'react';
+import { ChatWelcome } from '@mezon/components';
+import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference, useMessages } from '@mezon/core';
+import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -9,111 +9,68 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-};
+}
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+	const chatRef = useRef<HTMLDivElement>(null);
+
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
+	const [timeToJump, setTimeToJump] = useState(1000);
+	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+	const { jumpToMessage } = useJumpToMessage();
+	const { idMessageReplied } = useReference();
 
-	const parentRef = useRef<any>();
-
-	const rowVirtualizer = useVirtualizer({
-		count: messages.length + 1, // Add 1 to account for loader row
-		estimateSize: () => 100,
-		getScrollElement: () => parentRef.current,
-		overscan: 50,
-		reverse: true,
-	});
+	// share logic to load more message
+	useMessages({ chatRef, hasMoreMessage, loadMoreMessage });
 
 	useEffect(() => {
-		const [lastItem] = [...rowVirtualizer.getVirtualItems()];
-
-		if (!lastItem) return;
-
-		if (lastItem.index <= messages.length - 1 && hasMoreMessage) {
-			loadMoreMessage();
+		if (idMessageReplied) {
+			setMessageIdToJump(idMessageReplied);
+			setTimeToJump(0);
+			setPositionToJump('center');
+		} else {
+			setMessageIdToJump(getJumpToMessageId());
+			setTimeToJump(1000);
+			setPositionToJump('start');
 		}
-	}, [hasMoreMessage, loadMoreMessage, messages.length]);
+	}, [getJumpToMessageId, idMessageReplied]);
+
+	useEffect(() => {
+		let timeoutId: NodeJS.Timeout | null = null;
+		if (messageid) {
+			timeoutId = setTimeout(() => {
+				jumpToMessage(messageid, positionToJump);
+			}, timeToJump);
+		}
+		return () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+		};
+	}, [messageid, jumpToMessage]);
 
 	return (
 		<div
-			className="bg-bgPrimary relative"
-			style={{
-				height: '100%',
-				display: 'flex',
-				overflowX: 'hidden',
-			}}
+			className="dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
+			id="scrollLoading"
+			ref={chatRef}
 		>
-			<div
-				ref={parentRef}
-				className="List"
-				style={{
-					display: 'flex',
-					flexDirection: 'column-reverse',
-					justifyContent: 'flex-start',
-					minHeight: '0',
-					overflow: 'auto',
-					width: '100%',
-				}}
-			>
-				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'column-reverse',
-						flexShrink: '0',
-						height: `${rowVirtualizer.getTotalSize()}px`,
-						justifyContent: 'flex-start',
-						marginBottom: 'auto',
-						position: 'relative',
-						width: '100%',
-					}}
-				>
-					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-						const isLoaderRow = virtualRow.index === messages.length;
-						const message = messages[virtualRow.index];
-						console.log('message', message);
-						const hasAttachment = (message?.attachments?.length ?? 0) > 0;
-						const minHeight = hasAttachment ? '200px' : 'auto';
-						return (
-							<div
-								ref={virtualRow.measureElement}
-								key={virtualRow.index}
-								style={{
-									position: 'absolute',
-									bottom: 0,
-									left: 0,
-									width: '100%',
-									transform: `translateY(${virtualRow.end}px)`,
-								}}
-							>
-								<div
-									style={{
-										height: isLoaderRow ? '100px' : 'auto',
-										minHeight,
-									}}
-								>
-									{isLoaderRow ? (
-										hasMoreMessage ? (
-											'Loading more...'
-										) : (
-											'Nothing more to load'
-										)
-									) : (
-										<ChannelMessage
-											mode={mode}
-											lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-											message={message}
-											preMessage={messages[virtualRow.index - 1]}
-											channelId={channelId}
-											channelLabel={channelLabel || ''}
-										/>
-									)}
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			</div>
+			{messages.map((message, i) => (
+				<ChannelMessage
+					mode={mode}
+					key={message.id}
+					lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+					message={message}
+					preMessage={messages.length > 0 ? messages[i - 1] : undefined}
+					channelId={channelId}
+					channelLabel={channelLabel || ''}
+				/>
+			))}
+
+			{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 		</div>
+
 	);
 }
 

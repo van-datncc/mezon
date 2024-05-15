@@ -56,6 +56,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, UserTypingState>;
 	paramEntries: Record<string, FetchMessageParam>;
+	openOptionMessageState: boolean;
 }
 
 export interface MessagesRootState {
@@ -282,6 +283,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	unreadMessagesEntries: {},
 	typingUsers: {},
 	paramEntries: {},
+	openOptionMessageState: false,
 });
 
 export type SetCursorChannelArgs = {
@@ -307,7 +309,7 @@ export const messagesSlice = createSlice({
 				case 1:
 					messagesAdapter.updateOne(state, {
 						id: action.payload.id,
-						changes: action.payload,
+						changes: { content: action.payload.content },
 					});
 					break;
 				case 2:
@@ -367,6 +369,9 @@ export const messagesSlice = createSlice({
 				}
 			}
 			state.typingUsers = typingUsers;
+		},
+		setOpenOptionMessageState(state, action) {
+			state.openOptionMessageState = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -443,12 +448,14 @@ export const selectAllMessages = createSelector(getMessagesState, selectAll);
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
-		return  +b.creationTimeMs - +a.creationTimeMs;
+		return +b.creationTimeMs - +a.creationTimeMs;
 	}
 	return 0;
 }
 
 export const selectMessagesEntities = createSelector(getMessagesState, selectEntities);
+
+export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
 export const selectMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessagesEntities, (entities) => {

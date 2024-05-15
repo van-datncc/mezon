@@ -10,10 +10,9 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	const { mentions } = useMessageLine(line);
 
 	return (
-		<div>
+		<div className="pt-[0.3rem]">
 			<MarkdownFormatText mentions={mentions} />
 		</div>
-			
 	);
 };
 

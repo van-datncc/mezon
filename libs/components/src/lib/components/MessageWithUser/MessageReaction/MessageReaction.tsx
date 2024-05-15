@@ -187,7 +187,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 									<div
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
-									${userSender?.count && userSender.count > 0 ? 'bg-[#373A54] border-blue-600 border' : 'bg-[#313338] border-[#313338]'}
+									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-bgLightMode border-blue-600 border' : 'dark:bg-[#313338] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 										onClick={() =>
 											reactOnExistEmoji(
@@ -208,7 +208,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 										}}
 									>
 										<span className=" absolute left-[2px] ">{emoji.emoji}</span>
-										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer">
+										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
 											<p>{calculateTotalCount(emoji.senders)}</p>
 										</div>
 

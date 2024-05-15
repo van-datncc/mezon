@@ -1,4 +1,4 @@
-import { referencesActions, selectCurrentChannelId, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectCurrentChannelId, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +10,7 @@ export function useMessageValue(channelId?: string) {
 	const setValueTextInput = useCallback(
 		(value: string, isThread?: boolean) => {
 			dispatch(
-				referencesActions.setValueTextInput({
+				channelsActions.setValueTextInput({
 					channelId: isThread ? currentChannelId + String(isThread) : (currentChannelId as string),
 					value,
 				}),

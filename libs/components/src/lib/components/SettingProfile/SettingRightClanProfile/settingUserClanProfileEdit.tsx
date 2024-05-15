@@ -118,9 +118,9 @@ const SettingRightClanEdit = ({
 	return (
 		<>
 			<div className="flex-1 flex mt-[10px] gap-x-8 flex-row">
-				<div className="w-1/2 text-white">
+				<div className="w-1/2 dark:text-white text-black">
 					<div className="mt-[20px]">
-						<label htmlFor="inputField" className="text-[#CCCCCC] font-bold tracking-wide text-sm">
+						<label htmlFor="inputField" className="dark:text-[#CCCCCC] text-black font-bold tracking-wide text-sm">
 							CLAN NICKNAME
 						</label>
 						<br />
@@ -128,7 +128,7 @@ const SettingRightClanEdit = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full text-white border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 bg-black font-normal text-sm tracking-wide"
+							className="rounded-[3px] w-full dark:text-white text-black border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 dark:bg-black bg-[#f0f0f0] font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
 						/>
@@ -138,7 +138,7 @@ const SettingRightClanEdit = ({
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
 								<div
-									className="text-[14px] font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer"
+									className="text-[14px] font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-white"
 									onChange={(e) => handleFile(e)}
 								>
 									Change avatar
@@ -146,7 +146,7 @@ const SettingRightClanEdit = ({
 								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
-								className="bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px] font-medium"
+								className="bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px] font-medium text-white"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar

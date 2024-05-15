@@ -17,6 +17,7 @@
 		"skipDefaultLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
+			"@mezon/translations": ["libs/translations/src/i18n.config.ts"],
 			"@mezon/assets": ["libs/assets/src/index.ts"],
 			"@mezon/async-storage-mobile": ["libs/store/src/AsyncLocalStorageMobile.tsx"],
 			"@mezon/components": ["libs/components/src/index.ts"],
@@ -30,7 +31,6 @@
 			"@mezon/transport": ["libs/transport/src/index.ts"],
 			"@mezon/ui": ["libs/ui/src/index.ts"],
 			"@mezon/utils": ["libs/utils/src/index.ts"],
-			"@mezon/virtual": ["libs/virtual/src/index.ts"],
 			"@mezon/voice": ["libs/voice/src/index.ts"],
 			"react": ["./node_modules/@types/react"]
 		}

@@ -1,0 +1,14 @@
+{
+	"name": "translations",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/translations/src/i18n.config.ts",
+	"projectType": "library",
+	"tags": [],
+	"// targets": "to see all targets run: nx show project translations --web",
+	"targets": {
+		"lint": {
+		  "executor": "@nx/eslint:lint",
+		  "outputs": ["{options.outputFile}"]
+		}
+	}
+}

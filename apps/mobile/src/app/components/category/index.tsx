@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Pressable, Switch, Text, TextInput, View } from 'react-native';
 import LockIcon from "../../../assets/svg/lock.svg"
-import styles from './style';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import CrossIcon from "../../../assets/svg/cross.svg";
+import styles from './style';
 
 export default function CategoryCreator({ navigation }: { navigation: any }) {
     const [isPrivate, setPrivate] = useState<boolean>(false);

@@ -1,6 +1,6 @@
 import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useMenu, useReference } from '@mezon/core';
-import { directActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { directActions, messagesActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -195,7 +195,6 @@ function PopupMessage({
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { reactionPlaceActive } = useChatReaction();
-	const { closeMenu, statusMenu } = useMenu();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
 	const getDivHeightToTop = () => {
@@ -229,13 +228,6 @@ function PopupMessage({
 				>
 					<div className="relative">
 						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
-						{mess.id === referenceMessage?.id && reactionRightState && (
-							<div id="emojiPicker" className={`absolute right-[126px] size-[500px] ${closeMenu && !statusMenu && 'w-[370px]'}`}>
-								<div className="mb-0 z-10 h-full">
-									<EmojiPickerComp messageEmoji={referenceMessage} mode={mode} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-								</div>
-							</div>
-						)}
 					</div>
 
 					{openOptionMessageState && mess.id === referenceMessage?.id && (
@@ -254,7 +246,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
 		event.stopPropagation();
 	};
@@ -262,14 +254,14 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const handleClickReply = (event: React.MouseEvent<HTMLLIElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(message));
 		event.stopPropagation();
 	};
 
 	const handleClickCopy = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
-		dispatch(referencesActions.setOpenOptionMessageState(false));
+		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(referencesActions.setReferenceMessage(null));
 		dispatch(referencesActions.setDataReferences(null));
 	};

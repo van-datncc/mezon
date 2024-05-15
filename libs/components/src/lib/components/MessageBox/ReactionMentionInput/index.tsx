@@ -17,7 +17,6 @@ import {
 	referencesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectOpenThreadMessageState,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -43,10 +42,10 @@ import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
+import ChannelMessageThread from './ChannelMessageThread';
 import mentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import ChannelMessageThread from './ChannelMessageThread';
 
 type Emoji = {
 	emoji: string;
@@ -90,7 +89,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState, setOpenThreadMessageState } = useReference();
+	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState, setOpenThreadMessageState } =
+		useReference();
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -140,7 +140,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		if (isEnterKey && ctrlKey && shiftKey) {
 			event.preventDefault();
-			if( valueTextInput !== '' || openThreadMessageState){
+			if (valueTextInput !== '' || openThreadMessageState) {
 				if (props.currentClanId) {
 					handleSend(true);
 				}
@@ -166,7 +166,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if ((!valueTextInput && attachmentDataRef.length === 0) || (valueTextInput.trim() === '' && attachmentDataRef.length === 0)){
+			if ((!valueTextInput && attachmentDataRef.length === 0) || (valueTextInput.trim() === '' && attachmentDataRef.length === 0)) {
 				return;
 			}
 			if (
@@ -193,7 +193,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			}
 
 			if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
-				props.onSend({ t: content }, mentionData, attachmentDataRef, dataReferences, {nameValueThread: nameValueThread, isPrivate }, anonymousMessage);
+				props.onSend(
+					{ t: content },
+					mentionData,
+					attachmentDataRef,
+					dataReferences,
+					{ nameValueThread: nameValueThread, isPrivate },
+					anonymousMessage,
+				);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
 
@@ -207,11 +214,25 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
-				if(openThreadMessageState){
-					props.onSend({ t: valueThread?.content.t || '', contentThread: content }, valueThread?.mentions, valueThread?.attachments, valueThread?.references, { nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate }, anonymousMessage);
+				if (openThreadMessageState) {
+					props.onSend(
+						{ t: valueThread?.content.t || '', contentThread: content },
+						valueThread?.mentions,
+						valueThread?.attachments,
+						valueThread?.references,
+						{ nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate },
+						anonymousMessage,
+					);
 					setOpenThreadMessageState(false);
 				} else {
-					props.onSend({ t: content }, mentionData, attachmentDataRef, undefined, { nameValueThread: nameValueThread, isPrivate }, anonymousMessage);
+					props.onSend(
+						{ t: content },
+						mentionData,
+						attachmentDataRef,
+						undefined,
+						{ nameValueThread: nameValueThread, isPrivate },
+						anonymousMessage,
+					);
 				}
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
@@ -364,7 +385,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		} else {
 			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
 			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
-
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
 		}
@@ -412,7 +432,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						className="h-10 p-[10px] bg-bgTertiary text-base outline-none rounded-md placeholder:text-sm"
 					/>
 					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
-					{(valueThread && openThreadMessageState)  && <ChannelMessageThread message={valueThread}/>}
+					{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}
 				</div>
 			)}
 			{props.isThread && messageThreadError && !threadCurrentChannel && (
@@ -426,7 +446,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={mentionsInputStyle}
-				className="bg-channelTextarea"
+				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}

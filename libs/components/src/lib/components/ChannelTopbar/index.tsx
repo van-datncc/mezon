@@ -26,7 +26,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'bg-bgPrimary shadow border-b-[1px] border-bgTertiary'}`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'dark:bg-bgPrimary bg-bgLightModeSecond shadow border-b-[1px] dark:border-bgTertiary border-white'}`}
 		>
 			{checkChannelType ? (
 				<>
@@ -56,7 +56,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 					<div className="items-center h-full ml-auto flex">
 						<div className="justify-end items-center gap-2 flex">
 							<div className="hidden ssm:flex">
-								<div className="relative justify-start items-center gap-[15px] flex iconHover mr-4">
+								<div className="relative justify-start items-center gap-[15px] flex mr-4">
 									<ThreadButton />
 									<MuteButton />
 									<PinButton />
@@ -65,7 +65,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<SearchMessage />
 							</div>
 							<div
-								className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'bg-bgPrimary'}`}
+								className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightModeSecond'}`}
 								id="inBox"
 							>
 								<InboxButton />

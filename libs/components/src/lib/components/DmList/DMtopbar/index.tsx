@@ -60,7 +60,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 						<SearchMessage />
 						<div
-							className={`gap-4 iconHover relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
+							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
 							id="inBox"
 						>
 							<InboxButton />

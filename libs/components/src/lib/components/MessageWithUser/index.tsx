@@ -58,7 +58,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] bg-bgPrimary">
+				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-bgPrimary bg-bgLightModeSecond">
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
@@ -66,13 +66,13 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 			)}
 			<div className={`relative ${isCombine ? '' : 'mt-2'}`}>
 				<div
-					className={`bg-bgPrimary relative rounded-sm  overflow-visible ${checkReplied || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
+					className={`dark:bg-bgPrimary bg-bgLightModeSecond relative rounded-sm  overflow-visible ${checkReplied || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
 					<div
-						className={`${checkReplied || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'bg-bgPrimary group-hover:bg-bgPrimary1'} absolute w-1 h-full left-0`}
+						className={`${checkReplied || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-bgLightModeButton'} absolute w-1 h-full left-0`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-[2px] group-hover:bg-bgPrimary1 ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
+						className={`flex h-15 flex-col w-auto px-3 py-[2px] dark:group-hover:bg-bgPrimary1 group-hover:bg-bgLightModeButton ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
 						{' '}
 						<MessageReply message={message} />
