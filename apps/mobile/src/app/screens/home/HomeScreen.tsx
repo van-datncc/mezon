@@ -2,7 +2,7 @@ import { ChatContextProvider } from '@mezon/core';
 import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, notificationActions } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { SafeAreaView, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import BarsLogo from '../../../assets/svg/bars.svg';
 import SearchLogo from '../../../assets/svg/discoverySearch.svg';
@@ -107,9 +107,11 @@ const HomeScreen = React.memo((props: any) => {
 	};
 
 	return (
-		<ChatContextProvider>
-			<DrawerScreen navigation={props.navigation} />
-		</ChatContextProvider>
+		<SafeAreaView style={{ flex: 1 }}>
+			<ChatContextProvider>
+				<DrawerScreen navigation={props.navigation} />
+			</ChatContextProvider>
+		</SafeAreaView>
 	);
 });
 
