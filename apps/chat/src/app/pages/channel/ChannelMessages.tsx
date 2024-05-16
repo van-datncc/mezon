@@ -1,5 +1,5 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useMessages, useReference } from '@mezon/core';
+import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
