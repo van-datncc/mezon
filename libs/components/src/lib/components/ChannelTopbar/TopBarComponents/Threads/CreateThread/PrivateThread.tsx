@@ -18,14 +18,14 @@ const PrivateThread = ({ label, title }: PrivateThreadProps) => {
 
 	return (
 		<div className="flex flex-col mt-4 mb-4">
-			<span className="text-xs font-semibold uppercase mb-2 text-[#CCC]">{title}</span>
+			<span className="text-xs font-semibold uppercase mb-2 dark:text-[#CCC] text-black">{title}</span>
 			<div className="flex items-center gap-2">
 				<Checkbox onChange={handleToggle} id="private" className="w-6 h-6 rounded-lg focus:ring-transparent cursor-pointer" />
-				<Label htmlFor="private" className="text-[#CCC] text-base hover:text-white cursor-pointer">
+				<Label htmlFor="private" className="dark:text-[#CCC] text-colorTextLightMode text-base dark:hover:text-white hover:text-black cursor-pointer">
 					{label}
 				</Label>
 			</div>
-			{isPrivate === 1 && <span className="text-xs text-[#CCC] mt-2">You can invite new people by @mentioning them.</span>}
+			{isPrivate === 1 && <span className="text-xs dark:text-[#CCC] text-colorTextLightMode mt-2">You can invite new people by @mentioning them.</span>}
 		</div>
 	);
 };

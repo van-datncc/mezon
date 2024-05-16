@@ -1,4 +1,4 @@
-import { EmojiPickerComp } from '@mezon/components';
+import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useMenu, useReference, useThreads } from '@mezon/core';
 import { selectCurrentChannel, selectReactionRightState, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
@@ -29,7 +29,7 @@ const ChannelLayout = () => {
 					className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 				>
 					<div className="mb-0 z-10 h-full">
-						<EmojiPickerComp
+						<GifStickerEmojiPopup
 							messageEmoji={referenceMessage as IMessageWithUser}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 							emojiAction={EmojiPlaces.EMOJI_REACTION}

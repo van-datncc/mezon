@@ -1,15 +1,9 @@
-import { Metrics } from '@mezon/mobile-ui';
 import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
-import {
-	IChannelMember,
-	IMessageWithUser,
-	convertTimeString,
-	notImplementForGifOrStickerSendFromPanel,
-	getTimeDifferenceInSeconds, TIME_COMBINE, checkSameDay
-} from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
 import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Metrics, size } from '@mezon/mobile-ui';
+import { IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-viewing';
 import VideoPlayer from 'react-native-video-player';
@@ -48,7 +42,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	// TODO: add logic here
 	const isCombine = true;
-	
+
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
 		const images: ApiMessageAttachment[] = [];
@@ -247,7 +241,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 				<Pressable
 					onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)}
-					style={{ width: 40, height: 40, borderRadius: 50, overflow: 'hidden' }}
+					style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden' }}
 				>
 					{isCombine &&
 						(user?.user?.avatar_url ? (

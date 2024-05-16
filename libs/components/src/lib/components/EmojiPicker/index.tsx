@@ -8,6 +8,7 @@ export type EmojiCustomPanelOptions = {
 	messageEmoji?: IMessageWithUser;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
+	isReaction?: boolean;
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
@@ -30,6 +31,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const categoriesWithIcons = dataCategories
 		.map((category, index) => ({ name: category, icon: categoryIcons[index] }))
 		.filter((category) => category.name !== '' && category.name !== 'Component');
+	[categoriesWithIcons[0], categoriesWithIcons[1]] = [categoriesWithIcons[1], categoriesWithIcons[0]];
 
 	const {
 		reactionMessageDispatch,
@@ -75,7 +77,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		setEmojiHoverShortCode(emojiHover.shortname);
 	};
 
-	const scrollToCategory = (categoryName: string) => {
+	const scrollToCategory = (event: React.MouseEvent, categoryName: string) => {
+		event.stopPropagation();
 		setSelectedCategory(categoryName);
 		const categoryDiv = categoryRefs.current[categoryName];
 		if (categoryDiv && containerRef.current) {
@@ -112,12 +115,14 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	}, []);
 
 	return (
-		<div className="flex max-h-full flex-row w-full md:w-[500px]">
-			<div className="w-[10%] md:w-[10%] md:max-w-[10%] flex flex-col gap-y-1 max-w-[90%]  md:ml-2 bg-[#1E1F22] mb-2 pt-1 px-1 md:items-start  h-[25rem] pb-1">
-				<div className="w-9 h-9  flex flex-row justify-center items-center hover:bg-[#41434A] hover:rounded-md">
+		<div className={`flex max-h-full flex-row w-full md:w-[500px] ${props.isReaction && 'border border-black rounded overflow-hidden'}`}>
+			<div
+				className={`w-[10%] md:w-[10%] md:max-w-[10%] flex flex-col gap-y-1 max-w-[90%] dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1 px-1 md:items-start h-[25rem] pb-1 rounded ${!props.isReaction && 'md:ml-2 mb-2'}`}
+			>
+				<div className="w-9 h-9  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.Star defaultSize="w-7 h-7" />
 				</div>
-				<div className="w-9 h-9  flex flex-row justify-center items-center hover:bg-[#41434A] hover:rounded-md">
+				<div className="w-9 h-9  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.ClockHistory defaultSize="w-7 h-7" />
 				</div>
 				<hr className=" bg-gray-200  border w-full" />
@@ -126,7 +131,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						<button
 							key={index}
 							className={`w-9 h-9 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
-							onClick={() => scrollToCategory(item.name)}
+							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}
 						</button>
@@ -134,7 +139,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				})}
 			</div>
 			<div className="flex flex-col">
-				<div ref={containerRef} className="w-full max-h-[352px] overflow-y-scroll overflow-x-hidden hide-scrollbar">
+				<div
+					ref={containerRef}
+					className="w-full max-h-[352px] overflow-y-scroll overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
+				>
 					{categoriesWithIcons.map((item, index) => {
 						return (
 							<div className="w-full" key={item.name} ref={(el) => (categoryRefs.current[item.name] = el)}>
@@ -143,7 +151,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						);
 					})}
 				</div>
-				<div className="w-full min-h-12  bg-[#232428] mb-2 flex flex-row items-center pl-1 gap-x-1 justify-start">
+				<div
+					className={`w-full min-h-12  dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!props.isReaction && 'mb-2'}`}
+				>
 					<span className="text-3xl"> {emojiHoverNative}</span>
 					{emojiHoverShortCode}
 				</div>
@@ -176,24 +186,22 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 
 	return (
 		<div>
-			{categoryName !== '' && (
-				<button
-					onClick={() => setEmojisPanelStatus(!emojisPanel)}
-					className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 bg-[#2B2D31] z-10"
-				>
-					{categoryName}
-					<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
-						{' '}
-						<Icons.ArrowRight />
-					</span>
-				</button>
-			)}
+			<button
+				onClick={() => setEmojisPanelStatus(!emojisPanel)}
+				className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 bg-[#2B2D31] z-10"
+			>
+				{categoryName}
+				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
+					{' '}
+					<Icons.ArrowRight />
+				</span>
+			</button>
 			{emojisPanel && (
 				<div className=" grid grid-cols-12 ml-1 gap-1">
 					{emojisByCategoryName.map((item, index) => (
 						<button
 							key={index}
-							className="text-2xl emoji-button border rounded-md border-[#363A53] hover:bg-[#41434A] hover:rounded-md w-8 h-8 flex items-center justify-center w-full"
+							className="text-2xl emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-8 h-8 flex items-center justify-center w-full"
 							onClick={() => onEmojiSelect(item.emoji)}
 							onMouseEnter={() => onEmojiHover(item)}
 						>

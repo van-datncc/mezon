@@ -111,10 +111,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
 	);
 
-	const { closeMenu, statusMenu } = useMenu();
+	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
 	return (
 		<div className="relative">
-			<div className="w-full max-h-full flex gap-2 mb-2 mt-2 overflow-x-scroll hide-scrollbar">
+			<div
+				className={`${isShowMemberList ? 'w-widthMessageViewChat' : 'w-widthThumnailAttachment'} pr-5 max-h-full flex gap-2 mb-2 mt-2 overflow-x-auto`}
+			>
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
 						<Fragment key={index}>
