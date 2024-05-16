@@ -71,7 +71,7 @@ const ThreadBox = () => {
 		<div className="flex flex-col flex-1 justify-end">
 			<div>
 				{!threadCurrentChannel && (
-					<div className="relative flex items-center justify-center mx-4 w-16 h-16 bg-[#26262B] rounded-full pointer-events-none">
+					<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-[#26262B] bg-bgLightModeButton rounded-full pointer-events-none">
 						<Icons.ThreadIcon defaultSize="w-7 h-7" />
 						{isPrivate === 1 && (
 							<div className="absolute right-4 bottom-4">
@@ -92,7 +92,7 @@ const ThreadBox = () => {
 					</div>
 				)}
 			</div>
-			<div className="flex-shrink-0 flex flex-col pb-4 px-4 bg-bgPrimary h-auto relative">
+			<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative">
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}

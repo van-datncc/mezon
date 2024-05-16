@@ -89,7 +89,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					</div>
 				</div>
 				<button
-					className="bg-bgTertiary mr-1 text-contentPrimary rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
 					onClick={() => {
 						deleteNotify(notify.id);
 					}}
@@ -97,9 +97,9 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					✕
 				</button>
 			</div>
-			<div className="bg-bgTertiary rounded-[8px] relative group">
+			<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
 				<button
-					className="absolute py-1 px-2 bg-bgSecondary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 					onClick={() => {
 						jump(data.message_id);
 					}}

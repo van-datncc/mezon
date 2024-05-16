@@ -1,11 +1,16 @@
 import {  createAsyncThunk } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 
-export const registFcmDeviceToken = createAsyncThunk('fcm/registFcmDeviceToken', async ( tokenId : string, thunkAPI) => {
+type FcmDeviceTokenPayload = {
+	tokenId: string;
+	deviceId: string;
+	platform?: string;
+};
+
+export const registFcmDeviceToken = createAsyncThunk('fcm/registFcmDeviceToken', async ( {tokenId, deviceId, platform}:FcmDeviceTokenPayload, thunkAPI) => {
 	try {
-		
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.registFCMDeviceToken(mezon.session, tokenId);
+		const response = await mezon.client.registFCMDeviceToken(mezon.session, tokenId, deviceId, platform||"");
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}

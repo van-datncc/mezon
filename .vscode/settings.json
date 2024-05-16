@@ -3,6 +3,7 @@
         "Mezon",
         "onchannelmessage",
         "onmessagetyping",
-        "persistor"
+        "persistor",
+        "Pressable"
     ]
 }

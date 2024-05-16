@@ -92,7 +92,7 @@ function LoginForm(props: LoginFormProps) {
 							}`}
 						>
 							<input
-								className="w-full h-6  dark:bg-transparent bg-white outline-none relative text-white"
+								className="w-full h-6  dark:bg-transparent bg-white outline-none relative dark:text-white text-colorTextLightMode"
 								{...register('userEmail')}
 								name="userEmail"
 								id="userEmail"
@@ -116,7 +116,7 @@ function LoginForm(props: LoginFormProps) {
 							>
 								<input
 									type={showPassword ? 'text' : 'password'}
-									className="w-full h-6 dark:bg-transparent bg-white outline-none text-white pl-0 border-none placeholder"
+									className="w-full h-6 dark:bg-transparent bg-white outline-none dark:text-white text-colorTextLightMode pl-0 border-none placeholder"
 									{...register('password')}
 									name="password"
 									id="password"

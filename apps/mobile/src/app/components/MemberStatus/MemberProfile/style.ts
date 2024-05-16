@@ -27,7 +27,7 @@ const style = StyleSheet.create({
 
     nameContainer: {
         paddingVertical: 20,
-        width: "100%",
+        flexGrow: 1,
         borderBottomColor: Colors.borderDim,
     },
 
@@ -36,11 +36,12 @@ const style = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 20,
-        paddingHorizontal: 20
+        paddingLeft: 20,
+        width: "100%"
     },
 
     textName: {
-        color: "purple",
+        color: Colors.green,
         fontSize: Fonts.size.small,
         fontWeight: "700"
     }

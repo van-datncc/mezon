@@ -6,7 +6,7 @@ const chatBoxHeight = '52px';
 const chatBoxHeightThread = '60px';
 const clanWidth = '72px';
 const channelListWidth = '272px';
-const memberWidth = '268px';
+const memberWidth = '245px';
 const avatarWidth = '68px';
 const iconWidth = '160px';
 
@@ -52,6 +52,8 @@ module.exports = {
         widthChannelTypeText: `calc(100% - 10px)`,
         widthSideBar: `calc(100vw - 72px)`,
         widthHeader: `calc(100% - 344px)`,
+        widthMemberList: memberWidth,
+        widthThumnailAttachment: `calc(100vw - ${clanWidth} - ${channelListWidth})`,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",
