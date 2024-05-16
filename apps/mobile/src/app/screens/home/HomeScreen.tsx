@@ -1,5 +1,5 @@
 import { ChatContextProvider } from '@mezon/core';
-import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
+import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, notificationActions } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
@@ -89,6 +89,7 @@ const HomeScreen = React.memo((props: any) => {
 
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
+    store.dispatch(notificationActions.fetchListNotification());
 		store.dispatch(clansActions.fetchClans());
 		if (currentClan) {
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
