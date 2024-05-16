@@ -20,7 +20,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-12 h-12');
+	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&
@@ -37,9 +37,10 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		<div
 			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
-			className={`break-all cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-20 rounded  ${hideTheInformationFile ? 'border-[#232428] bg-[#2B2D31] border border-2' : ''}  relative`} role='button'
+			className={`break-all w-[430px] cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded  ${hideTheInformationFile ? 'border-[#232428] bg-[#2B2D31] border-2' : ''}  relative`}
+			role="button"
 		>
-			<div>{thumbnailAttachment}</div>
+			<div className="flex items-center">{thumbnailAttachment}</div>
 			{hideTheInformationFile && (
 				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
 					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
@@ -50,7 +51,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 				<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md bg-[#313338] flex flex-row justify-center items-center">
 					<div
 						onClick={handleDownload}
-						role='button'
+						role="button"
 						className="rounded-l-md  w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#393C40]"
 					>
 						<Icons.Download defaultSize="w-4 h-4" />
