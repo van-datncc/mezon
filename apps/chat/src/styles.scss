@@ -473,12 +473,16 @@ input:-webkit-autofill:active {
   background: #151515;
 }
 
-// message-channel-scroll
-.message-channel-scroll::-webkit-scrollbar-track {
+// attachment-scroll
+.attachment-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.attachment-scroll::-webkit-scrollbar-track {
   background: #2B2D31;
 }
 
-.message-channel-scroll::-webkit-scrollbar-thumb {
+.attachment-scroll::-webkit-scrollbar-thumb {
   background: #1A1B1E;
 }
 
@@ -524,8 +528,8 @@ input:-webkit-autofill:active {
 
 // custom dark - light mode
 .customScrollLightMode {
-  scrollbar-width: thin; 
-  scrollbar-color: white #E1E1E1; 
+  scrollbar-width: thin;
+  scrollbar-color: white #E1E1E1;
 }
 
 .customScrollLightMode::-webkit-scrollbar {
@@ -534,10 +538,10 @@ input:-webkit-autofill:active {
 }
 
 .customScrollLightMode::-webkit-scrollbar-track {
-  background: #E1E1E1; 
+  background: #E1E1E1;
 }
 
 .customScrollLightMode::-webkit-scrollbar-thumb {
-  background-color: white; 
+  background-color: white;
   border-radius: 4px;
 }

@@ -7,12 +7,10 @@ import {
 
 import {APP_SCREEN} from "../../ScreenTypes";
 import Notifications from "../../../screens/main/Notifications";
-import NotificationsDetail from "../../../screens/main/NotificationsDetail";
 
 // eslint-disable-next-line no-empty-pattern
 export const NotificationStacks = ({} : any) => {
 	const Stack = createStackNavigator();
-	
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -36,14 +34,14 @@ export const NotificationStacks = ({} : any) => {
 					headerShown: false,
 				}}
 			/>
-			<Stack.Screen
+			{/* <Stack.Screen
 				name={APP_SCREEN.NOTIFICATION.DETAIL}
 				component={NotificationsDetail}
 				// component={ListIconScreens}
 				options={{
 					headerShown: false,
 				}}
-			/>
+			/> */}
 		</Stack.Navigator>
 	);
 };
