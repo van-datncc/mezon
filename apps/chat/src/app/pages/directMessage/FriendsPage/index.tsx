@@ -137,7 +137,7 @@ export default function FriendsPage() {
 									type="text"
 									onChange={(e) => setTextSearch(e.target.value)}
 									placeholder="Search"
-									className="mb-6 py-[10px] dark:bg-bgTertiary bg-white text-[16px] font-normal h-[44px] text-textPrimary placeholder-textPrimary"
+									className="mb-6 py-[10px] dark:bg-bgTertiary bg-white text-[16px] font-normal h-[44px] dark:text-textDarkTheme text-textLightTheme placeholder-textPrimary"
 								/>
 								<div className="absolute top-3 right-5">
 									<Icons.Search />
