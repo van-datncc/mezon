@@ -137,6 +137,7 @@ const colors = {
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
 	green: "green",
+  bgDarkCharcoal: '#323232',
   // background button
 	bgButton: "#5865f2",
   bgToggleOnBtn: '#008ECC',
