@@ -10,10 +10,12 @@ import NotificationOption from './NotificationOption'
 import NotificationIndividualItem from './NotificationIndividualItem'
 import { EActionDataNotify } from './types'
 import moment from 'moment';
+import { useTranslation } from 'react-i18next'
 
 
 const Notifications = () => {
 	const { notification } = useNotification();
+  const { t } = useTranslation(['notification']);
   const [notifications, setNotifications] = useState([]);
 	const { channels } = useChannels();
   const handleFilterNotify = (tabNotify) =>{
@@ -65,7 +67,7 @@ const Notifications = () => {
     return (
        <View style={styles.notifications}>
         <View style={styles.notificationsHeader}>
-          <Text style={styles.notificationHeaderTitle}>Notifications</Text>
+          <Text style={styles.notificationHeaderTitle}>{t('headerTitle')}</Text>
           <Pressable onPress={()=>openBottomSheet()}>
             <View style={styles.notificationHeaderIcon}>
                 <Feather name="more-horizontal" size={20} color={'white'} />

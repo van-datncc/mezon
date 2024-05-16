@@ -5,12 +5,14 @@ import { styles as s } from './NotificationOption.styles'
 import { EActionDataNotify } from '../types'
 import { MuteIcon, SettingIcon, } from "@mezon/mobile-components";
 import MezonRadioButton from '../../../../temp-ui/MezonRadioButton'
+import { useTranslation } from 'react-i18next'
 
 
 const NotificationOption = ({onChange}) => {
+  const { t } = useTranslation(['notification']);
   const tabDataNotify = [
-    {id: 1, title: 'For you', value: 'individual', icon: <Text style={s.icon}>@</Text>  },
-    {id: 2, title: 'Mention', value: 'mention', icon: <MuteIcon width={22} height={22} />  },
+    {id: 1, title: t('tabNotify.forYou'), value: 'individual', icon: <Text style={s.icon}>@</Text>  },
+    {id: 2, title: t('tabNotify.mention'), value: 'mention', icon: <MuteIcon width={22} height={22} />  },
   ];
   const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
 
@@ -40,7 +42,7 @@ const NotificationOption = ({onChange}) => {
 
     return (
         <View style={s.wrapperOption}>
-            <Text style={s.headerTitle}>Notifications</Text>
+            <Text style={s.headerTitle}>{t('headerTitle')}</Text>
             <View style={s.optionContainer}>{
               tabDataNotify.map((option)=>(
                 <View key={option.id} style={s.option}>
@@ -61,7 +63,7 @@ const NotificationOption = ({onChange}) => {
             <View style={s.notifySetting}>
             <View style={s.option}>
                   <SettingIcon width={22} height={22} />
-                  <Text style={s.textOption}>Notification Settings</Text>
+                  <Text style={s.textOption}>{t('tabNotify.notificationSettings')}</Text>
                 </View>
             </View>
         </View >

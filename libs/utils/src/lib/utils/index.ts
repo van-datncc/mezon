@@ -112,7 +112,7 @@ export const removeDuplicatesById = (array: any) => {
 
 export const getTimeDifferenceDate = (dateString: string) => {
   const now = new Date();
-  const codeTime = parseISO(dateString);
+  const codeTime = new Date(dateString);
   const hoursDifference = differenceInHours(now, codeTime);
   const daysDifference = differenceInDays(now, codeTime);
   const monthsDifference = differenceInMonths(now, codeTime);
