@@ -75,9 +75,9 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 	}
 
 	const pushMessageActionIntoStack = (messagePayload: IMessageActionNeedToResolve) => {
-		const { targetMessage } = messagePayload;
-		setCurrentSelectedMessage(targetMessage);
-		setSenderId(targetMessage.sender_id);
+		const { message } = messagePayload;
+		setCurrentSelectedMessage(message);
+		setSenderId(message?.sender_id);
 	}
 
 	useEffect(() => {

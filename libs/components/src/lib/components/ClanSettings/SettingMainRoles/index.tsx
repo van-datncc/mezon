@@ -1,4 +1,4 @@
-import { useRoles } from '@mezon/core';
+import { useApp, useRoles } from '@mezon/core';
 import {
 	rolesClanActions,
 	setAddMemberRoles,
@@ -48,14 +48,15 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const handleDeleteRole = async (roleId: string) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
 	};
+	const {appearanceTheme} = useApp();
 	return (
 		<>
-			<h1 className="text-2xl font-bold tracking-wider mb-8">Roles</h1>
+			<h1 className="text-2xl font-bold tracking-wider mb-8 dark:text-white text-black">Roles</h1>
 			<div className="flex items-center space-x-4">
 				<div className="w-full flex-grow">
 					<InputField
 						type="text"
-						className="text-[15px] rounded-[3px] w-full text-white border border-black px-4 py-2 focus:outline-none focus:border-white-500 bg-black"
+						className="text-[15px] rounded-[3px] w-full dark:text-white text-black border dark:border-black px-4 py-2 focus:outline-none focus:border-white-500 dark:bg-black bg-white"
 						placeholder="Search Roles"
 					/>
 				</div>
@@ -73,22 +74,22 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 				</button>
 			</div>
 			<br />
-			<div className="overflow-y-scroll relative w-full">
+			<div className={`overflow-y-scroll relative w-full ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
 				<table className="w-full divide-y divide-gray-200">
-					<thead className="bg-borderDefault sticky top-0">
+					<thead className="dark:bg-borderDefault bg-bgLightMode sticky top-0">
 						<tr className="h-11">
-							<th scope="col" className="  text-sm font-bold text-gray-200 uppercase tracking-wider w-1/2 text-center">
+							<th scope="col" className="  text-sm font-bold dark:text-gray-200 text-black uppercase tracking-wider w-1/2 text-center">
 								Roles - {RolesClan.length}
 							</th>
-							<th scope="col" className=" text-sm font-bold text-gray-200 uppercase tracking-wider w-1/4 text-center">
+							<th scope="col" className=" text-sm font-bold dark:text-gray-200 text-black uppercase tracking-wider w-1/4 text-center">
 								Members
 							</th>
-							<th scope="col" className=" text-sm font-bold text-gray-200 uppercase tracking-wider w-1/4 text-center">
+							<th scope="col" className=" text-sm font-bold dark:text-gray-200 text-black uppercase tracking-wider w-1/4 text-center">
 								Options
 							</th>
 						</tr>
 					</thead>
-					<tbody className="bg-bgSecondary divide-y divide-gray-200">
+					<tbody className="dark:bg-bgSecondary bg-bgLightMode divide-y divide-gray-200">
 						{activeRoles.length === 0 ? (
 							<tr className="h-14">
 								<td className=" text-gray-300 text-center text-[15px]">
@@ -97,7 +98,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 							</tr>
 						) : (
 							activeRoles.map((role) => (
-								<tr key={role.id} className="h-14">
+								<tr key={role.id} className="h-14 dark:text-white text-black">
 									<td className="text-center ">
 										<p
 											className="text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2"
@@ -114,7 +115,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 									<td className="  flex h-14 justify-center items-center">
 										<div className="flex gap-x-1 ">
 											<p
-												className="text-[15px] cursor-pointer hover:bg-slate-800 p-2 rounded-sm"
+												className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight p-2 rounded-sm"
 												onClick={() => {
 													props.handleOpen();
 													handleRoleClick(role.id);
@@ -123,7 +124,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 												Edit
 											</p>
 											<p
-												className="text-[15px] cursor-pointer hover:bg-slate-800 p-2 rounded-sm"
+												className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight p-2 rounded-sm"
 												onClick={() => {
 													handleOpenModalDelete();
 													handleRoleClick(role.id);

@@ -30,12 +30,15 @@ module.exports = {
   bgSelectItemHover: '#4752C4',
   bgLightMode: '#f7f7f7',
   bgLightModeSecond: '#F0F0F0',
+  bgLightModeThird: 'rgb(235, 237, 239)',
   bgLightModeButton: '#155EEF1A',
   bgModifierHoverLight: '#D7D9DC',
 
   /* text */
   channelTextarea: '#383A40',
   textPrimary: '#DBDEE1',
+  textLightTheme: "#000000",
+  textDarkTheme: "#ffffff",
 
   /* border */
   borderDefault: '#1E1E1E',

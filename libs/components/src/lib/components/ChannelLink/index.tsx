@@ -117,7 +117,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
-					className={`${classes[state]} cursor-pointer ${currentURL === channelPath ? 'bg-bgModifierHover' : ''}`}
+					className={`${classes[state]} cursor-pointer ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
 					onClick={() => handleVoiceChannel(channel.id)}
 					role="link"
 				>

@@ -34,9 +34,9 @@ export const styles = StyleSheet.create({
     borderRadius: 50
   },
   boxImageChar: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
+    width: size.s_40,
+    height: size.s_40,
+    borderRadius: size.s_40,
     backgroundColor: Colors.bgDarkCharcoal,
     display: 'flex',
     alignItems: 'center',

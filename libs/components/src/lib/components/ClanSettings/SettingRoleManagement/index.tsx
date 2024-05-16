@@ -66,11 +66,11 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	};
 	return (
 		props.flagOption ? (
-			<div className="overflow-y-auto flex flex-row flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
+			<div className="overflow-y-auto flex flex-row flex-1 shrink dark:bg-bgSecondary bg-bgLightMode w-1/2 pt-[94px] pr-[40px] pb-[94px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px]">
 				<SettingListRole handleClose={props.handleClose} />
 				<div className="border-l border-gray-400"></div>
 				<div className=" w-2/3">
-					<div className="font-semibold pl-3">
+					<div className="font-semibold pl-3 dark:text-white text-black">
 						{clickRole === 'New Role' ? (
 							<div className="tracking-wide text-sm mb-4">NEW ROLE</div>
 						) : (
