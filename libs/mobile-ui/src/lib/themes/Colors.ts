@@ -119,15 +119,15 @@ const colors = {
 	tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
-	bgButton: isDarkTheme ? "#5865f2" : "#5865f2",
 	textLink: '#007AFF',
 	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30",
-	test: '#676b73',
 	/* border color */
+  	borderNeutralDisable: '#9091931a',
 	borderPrimary: '#363940',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
+  	titleSteelGray: '#939292',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
@@ -135,7 +135,12 @@ const colors = {
 	bgGrayDark: '#676b73',
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
-	green: "green"
+	green: "green",
+  bgDarkCharcoal: '#323232',
+  // background button
+	bgButton: "#5865f2",
+  bgToggleOnBtn: '#008ECC',
+  bgToggleOffBtn: '#c3c3c3',
 };
 
 export { colors, lightThemeColor, darkThemeColor };

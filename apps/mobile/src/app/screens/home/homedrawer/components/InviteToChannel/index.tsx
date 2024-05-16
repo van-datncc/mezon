@@ -5,9 +5,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import { darkColor } from '../../../../../constants/Colors';
 import { FriendListItem } from '../../Reusables';
-import { styles } from './InviteToChannel.style';
-import { EMaxUserCanInvite } from '../../../../../enums';
-import { LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../../../../constants';
+import { styles } from './styles';
+import { LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import { friendList } from '../fakeData';
 import { useCategory, useClans, useInvite } from '@mezon/core';
@@ -16,6 +15,7 @@ import { IUser } from '@mezon/utils';
 import { normalizeString } from '../../../../../utils/helpers';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
 import { useTranslation } from 'react-i18next';
+import { EMaxUserCanInvite } from '../../enums';
 
 export const InviteToChannel = React.memo(() => {
 	const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
@@ -79,23 +79,23 @@ export const InviteToChannel = React.memo(() => {
 
 	useEffect(() => {
 		const keyboardDidShowListener = Keyboard.addListener(
-		  'keyboardDidShow',
-		  () => {
-			setIsKeyboardVisible(true);
-		  }
+			'keyboardDidShow',
+			() => {
+				setIsKeyboardVisible(true);
+			}
 		);
 		const keyboardDidHideListener = Keyboard.addListener(
-		  'keyboardDidHide',
-		  () => {
-			setIsKeyboardVisible(false);
-		  }
+			'keyboardDidHide',
+			() => {
+				setIsKeyboardVisible(false);
+			}
 		);
 
 		return () => {
 		  keyboardDidShowListener.remove();
 		  keyboardDidHideListener.remove();
 		};
-	  }, []);
+	}, []);
 
     useEffect(() => {
         const fetchInviteLink = async () => {

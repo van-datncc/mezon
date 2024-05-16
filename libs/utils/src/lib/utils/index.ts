@@ -1,4 +1,4 @@
-import { differenceInDays, differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, startOfDay, subDays } from 'date-fns';
+import { differenceInDays, differenceInHours, differenceInMonths, differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, parseISO, startOfDay, subDays } from 'date-fns';
 import { RefObject } from 'react';
 import { ChannelMembersEntity, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -109,3 +109,18 @@ export const removeDuplicatesById = (array: any) => {
 	  	  return acc;
 	}, []);
   };
+
+export const getTimeDifferenceDate = (dateString: string) => {
+  const now = new Date();
+  const codeTime = new Date(dateString);
+  const hoursDifference = differenceInHours(now, codeTime);
+  const daysDifference = differenceInDays(now, codeTime);
+  const monthsDifference = differenceInMonths(now, codeTime);
+  if(hoursDifference < 24) {
+    return `${hoursDifference}h`
+  } else if(daysDifference < 30) {
+    return `${daysDifference}d`
+  } else {
+    return `${monthsDifference}mo`
+  }
+}

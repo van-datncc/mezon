@@ -39,10 +39,10 @@ export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: an
 	);
 });
 
-export const FastImageRes = React.memo(({ uri }: { uri: string }) => {
+export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string, isCirle?: boolean }) => {
 	return (
 		<FastImage
-			style={{ width: '100%', height: '100%' }}
+			style={[{ width: '100%', height: '100%' }, isCirle && {borderRadius: 50}]}
 			source={{
 				uri: uri,
 				headers: { Authorization: 'someAuthToken' },

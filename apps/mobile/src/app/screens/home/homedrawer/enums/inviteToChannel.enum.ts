@@ -1,4 +1,5 @@
 export enum EMaxUserCanInvite {
+    //TODO: update later
     One = 1,
     Five = 5,
     Ten = 10,

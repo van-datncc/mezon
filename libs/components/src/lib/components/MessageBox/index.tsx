@@ -115,19 +115,21 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative">
 			<div
-				className={`${isShowMemberList ? 'w-widthMessageViewChat' : 'w-widthThumnailAttachment'} pr-5 max-h-full flex gap-2 mb-2 mt-2 overflow-x-auto`}
+				className={`${isShowMemberList ? 'w-wrappBoxChatView' : 'w-widthThumnailAttachment'} ${attachmentDataRef.length > 0 ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-bgLightMode max-h-full`}
 			>
-				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
-					return (
-						<Fragment key={index}>
-							<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
-						</Fragment>
-					);
-				})}
+				<div className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll`}>
+					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
+						return (
+							<Fragment key={index}>
+								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
+							</Fragment>
+						);
+					})}
+				</div>
 			</div>
 
 			<div
-				className={`flex flex-inline items-center gap-2 box-content mb-4 dark:bg-channelTextarea bg-bgLightMode rounded-md relative ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
+				className={`flex flex-inline items-center gap-2 box-content mb-4 dark:bg-channelTextarea bg-bgLightMode rounded-lg relative ${attachmentDataRef.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'} ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
 			>
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
