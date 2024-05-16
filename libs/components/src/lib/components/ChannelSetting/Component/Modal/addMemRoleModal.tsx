@@ -70,7 +70,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 dark:bg-gray-900  bg-bgDisable p-6 rounded-[5px] w-[440px] text-[15px]">
+			<div className="relative z-10 dark:bg-bgDisable bg-bgLightMode dark:text-textDarkTheme text-textLightTheme p-6 rounded-[5px] w-[440px] text-[15px]">
 				<h2 className="text-[24px] font-semibold text-center">Add members or roles</h2>
 				<div className="flex justify-center">
 					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
