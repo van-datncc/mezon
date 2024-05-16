@@ -2,3 +2,4 @@
 export * from './MezonButton';
 export * from './MezonModal';
 export * from './MezonSwitch';
+export * from './MezonRadioButton'

@@ -1,34 +1,57 @@
+import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 
 type MessageProps = {
-	chatRef: React.RefObject<HTMLDivElement>;
-	hasMoreMessage: boolean;
-	loadMoreMessage: () => void;
+  chatRef: React.RefObject<HTMLDivElement>;
+  channelId: string;
+  hasMoreMessage: boolean;
+  loadMoreMessage: () => void;
+  messages: IMessageWithUser[];
 };
 
-export const useMessages = ({ chatRef, hasMoreMessage, loadMoreMessage }: MessageProps) => {
-	const [isFetching, setIsFetching] = useState(false);
-	useEffect(() => {
-		const topDiv = chatRef?.current;
+export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessage, messages }: MessageProps) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [currentChannelId, setCurrentChannelId] = useState(channelId);
 
-		const handleScroll = () => {
-			const scrollHeight = topDiv?.scrollHeight || 0;
-			const clientHeight = topDiv?.clientHeight || 0;
-			const scrollTop = topDiv?.scrollTop || 0;
+  useEffect(() => {
+    const currentChatRef = chatRef.current;
+    if (!currentChatRef || isFetching) return;
 
-			const scrollBottom = scrollHeight + (scrollTop - clientHeight);
+    if (channelId !== currentChannelId) {
+      currentChatRef.scrollTop = currentChatRef.scrollHeight;
+      setCurrentChannelId(channelId);
+    }
+  }, [channelId, currentChannelId, isFetching, chatRef]);
 
-			if (scrollBottom <= 1 && hasMoreMessage) {
-				setIsFetching(true);
-				loadMoreMessage();
-			}
-		};
+  useEffect(() => {
+    const currentChatRef = chatRef.current;
+    if (!currentChatRef || isFetching) return;
 
-		topDiv?.addEventListener('scroll', handleScroll);
-		return () => {
-			topDiv?.removeEventListener('scroll', handleScroll);
-		};
-	}, [hasMoreMessage, loadMoreMessage, chatRef]);
+    if (messages.length <= 50) {
+      currentChatRef.scrollTop = currentChatRef.scrollHeight;
+    }
+  }, [messages.length, chatRef, isFetching]);
 
-	return isFetching;
+  useEffect(() => {
+    const handleWheel = async (event: WheelEvent) => {
+      const currentChatRef = chatRef.current;
+      if (!currentChatRef || isFetching) return;
+
+      if (currentChatRef.scrollTop === 0 && hasMoreMessage) {
+        const previousHeight = currentChatRef.scrollHeight;
+        setIsFetching(true);
+        await loadMoreMessage();
+        setIsFetching(false);
+        currentChatRef.scrollTop = currentChatRef.scrollHeight - previousHeight;
+      }
+    };
+
+    const currentChatRef = chatRef.current;
+    currentChatRef?.addEventListener('wheel', handleWheel);
+    return () => {
+      currentChatRef?.removeEventListener('wheel', handleWheel);
+    };
+  }, [hasMoreMessage, loadMoreMessage, chatRef, isFetching]);
+
+  return isFetching;
 };
