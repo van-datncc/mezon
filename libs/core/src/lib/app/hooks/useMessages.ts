@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
@@ -7,7 +7,6 @@ type MessageProps = {
 };
 
 export const useMessages = ({ chatRef, hasMoreMessage, loadMoreMessage }: MessageProps) => {
-	const [isFetching, setIsFetching] = useState(false);
 	useEffect(() => {
 		const topDiv = chatRef?.current;
 
@@ -19,7 +18,6 @@ export const useMessages = ({ chatRef, hasMoreMessage, loadMoreMessage }: Messag
 			const scrollBottom = scrollHeight + (scrollTop - clientHeight);
 
 			if (scrollBottom <= 1 && hasMoreMessage) {
-				setIsFetching(true);
 				loadMoreMessage();
 			}
 		};
@@ -29,6 +27,4 @@ export const useMessages = ({ chatRef, hasMoreMessage, loadMoreMessage }: Messag
 			topDiv?.removeEventListener('scroll', handleScroll);
 		};
 	}, [hasMoreMessage, loadMoreMessage, chatRef]);
-
-	return isFetching;
 };
