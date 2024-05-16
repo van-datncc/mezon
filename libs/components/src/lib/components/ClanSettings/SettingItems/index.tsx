@@ -19,11 +19,11 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 		setSelectedButton('');
 	};
 	return (
-		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-bgSecondary flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-white flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
 			<div className="w-170px ">
 				<p className="text-[#84ADFF] font-bold text-sm tracking-wider uppercase">{currentClan?.clan_name}</p>
 				<button
-					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Roles' ? 'bg-[#232E3B] text-white' : ''}`}
+					className={`text-[#AEAEAE] w-[170px] text-[15px] rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Roles' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight dark:text-white text-black' : ''}`}
 					onClick={() => {
 						handleButtonClick('Roles');
 						onItemClick && onItemClick('Roles');

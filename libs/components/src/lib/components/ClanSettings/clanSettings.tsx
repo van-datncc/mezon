@@ -37,7 +37,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 					<div className="flex text-gray- w-screen">
 						<ServerSettingItems onItemClick={handleSettingItemClick} />
 						{!openEdit ? (
-							<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgSecondary w-1/2 pt-[94px] pb-0 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
+							<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgSecondary bg-bgLightModeSecond w-1/2 pt-[94px] pb-0 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] hide-scrollbar">
 								{currentSetting === 'Roles' && <ServerSettingMainRoles handleOpen={openSettingEdit} />}
 							</div>
 						) : null}

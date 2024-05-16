@@ -12,7 +12,7 @@ const AvatarProfile = () => {
 				<img
 					src={userProfile?.user?.avatar_url}
 					alt=""
-					className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] bg-bgSecondary mt-[-50px] ml-[-25px] border-[6px] border-solid border-bgSecondary600 object-cover"
+					className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] dark:bg-bgSecondary bg-white mt-[-50px] ml-[-25px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
 				/>
 			)}
 		</div>

@@ -45,7 +45,7 @@ const SettingManageMembers = () => {
 		<>
 			<div className="w-full flex gap-x-3">
 				<input
-					className="flex-grow bg-black p-[7px] border rounded-lg font-normal"
+					className="flex-grow dark:bg-black bg-white p-[7px] border rounded-lg font-normal"
 					type="text"
 					placeholder="Search Members"
 					value={searchTerm}

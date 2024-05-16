@@ -151,14 +151,14 @@ export default function FriendsPage() {
 					)}
 					{openModalAddFriend && (
 						<div className="w-full flex flex-col gap-3">
-							<span className="font-[700]">ADD FRIEND</span>
-							<span className="font-[400] text-[14px] text-contentTertiary">You can add friends with their Mezon usernames</span>
+							<span className="font-[700] dark:text-white text-black">ADD FRIEND</span>
+							<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">You can add friends with their Mezon usernames</span>
 
 							<div className="relative">
 								<InputField
 									onChange={(e) => handleChange('username', e.target.value)}
 									type="text"
-									className="bg-bgSurface mb-2 mt-1 py-3"
+									className="dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3"
 									value={requestAddFriend.usernames}
 									placeholder="Usernames"
 								/>

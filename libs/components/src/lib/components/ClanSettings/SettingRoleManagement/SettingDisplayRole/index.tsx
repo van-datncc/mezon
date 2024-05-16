@@ -42,7 +42,7 @@ const SettingDisplayRole = () => {
 		<div className="w-full flex flex-col gap-y-5 text-[15px]">
 			<div className="tracking-wide font-normal">Role name</div>
 			<input
-				className="bg-black text-[15px] w-full p-[7px] font-normal border rounded-lg "
+				className="dark:bg-black bg-white text-[15px] w-full p-[7px] font-normal border rounded-lg "
 				type="text"
 				value={nameRole}
 				onChange={handleDisplayName}

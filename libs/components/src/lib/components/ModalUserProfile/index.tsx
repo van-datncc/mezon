@@ -42,7 +42,7 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 			<div className="h-[60px] bg-[#8CBC4F] rounded-tr-[10px] rounded-tl-[10px]"></div>
 			<AvatarProfile />
 			<div className="px-[16px]">
-				<div className="bg-bgProfileBody w-full p-2 my-[16px] rounded-[10px] flex flex-col gap-3 text-justify">
+				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col gap-3 text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line">{userById?.user?.username}</p>
 						<p className="font-medium tracking-wide text-sm">{userById?.user?.display_name}</p>
@@ -55,7 +55,7 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 						<div className="w-full items-center">
 							<input
 								type="text"
-								className="w-full border border-bgDisable rounded-[5px] bg-bgDisable p-[5px] "
+								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgDisable bg-bgLightModeSecond p-[5px] "
 								placeholder={`Message @${userById?.user?.username}`}
 								value={content}
 								onKeyPress={(e) => {

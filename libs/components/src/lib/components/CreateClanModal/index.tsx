@@ -60,8 +60,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			classNameBox="h-full"
 		>
 			<div className="flex items-center flex-col justify-center ">
-				<span className="text-contentPrimary text-[24px] pb-4 font-[700] leading-8">Customize Your Server</span>
-				<p className="text-contentTertiary  text-center text-[20px] leading-6 font-[400]">
+				<span className="dark:text-contentPrimary text-black text-[24px] pb-4 font-[700] leading-8">Customize Your Server</span>
+				<p className="dark:text-contentTertiary text-black  text-center text-[20px] leading-6 font-[400]">
 					Give your new clan a personality with a name and an icon. You can always change it later.
 				</p>
 				<label className="block mt-8 mb-4">
@@ -70,12 +70,12 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					) : (
 						<div
 							id="preview_img"
-							className="h-[81px] w-[81px] flex justify-center items-center flex-col bg-bgSecondary border-white relative border-[1px] border-dashed rounded-full cursor-pointer transform hover:scale-105 transition duration-300 ease-in-out"
+							className="h-[81px] w-[81px] flex justify-center items-center flex-col dark:bg-bgSecondary bg-bgModifierHoverLight border-white relative border-[1px] border-dashed rounded-full cursor-pointer transform hover:scale-105 transition duration-300 ease-in-out"
 						>
 							<div className="absolute right-0 top-[-3px] left-[54px]">
 								<Icons.AddIcon />
 							</div>
-							<Icons.UploadImage />
+							<Icons.UploadImage className='text-black dark:text-white'/>
 							<span className="text-[14px]">Upload</span>
 						</div>
 					)}
@@ -86,7 +86,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					<InputField
 						onChange={(e) => setNameClan(e.target.value)}
 						type="text"
-						className="bg-bgSurface mb-2 mt-4 py-2"
+						className="dark:bg-bgSurface bg-bgModifierHoverLight mb-2 mt-4 py-2"
 						placeholder={`${userProfile?.user?.username}'s clan`}
 					/>
 					<span className="text-[14px] text-contentTertiary">

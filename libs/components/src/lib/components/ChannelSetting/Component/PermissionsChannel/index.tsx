@@ -76,8 +76,8 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 
 	return (
 		<>
-			<div className="overflow-y-auto flex flex-col flex-1 shrink bg-bgPrimary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
-				<div className="text-white text-[15px]">
+			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
+				<div className="dark:text-white text-[15px] text-black">
 					<h3 className="mb-4 font-bold">Channel Permissions</h3>
 					<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
 					<div className="flex mt-4 p-4">
@@ -86,7 +86,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 						<p className="font-bold pl-1"> {channel.category_name}</p>
 					</div>
 					<div className="rounded-md overflow-hidden mt-4">
-						<div className="bg-black flex justify-between items-start p-4">
+						<div className="dark:bg-black bg-white flex justify-between items-start p-4">
 							<div>
 								<div className="inline-flex mb-2">
 									<Icons.LockIcon />
@@ -110,10 +110,10 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 							/>
 						</div>
 						{!valueToggle && (
-							<div className="p-4 bg-[#0B0B0B]">
+							<div className="p-4 dark:bg-[#0B0B0B] bg-white">
 								<div className="flex justify-between items-center pb-4">
 									<p className="uppercase font-bold text-xs">Who can access this channel?</p>
-									<button className="bg-[#155EEF] hover:bg-blue-500 px-4 py-1 rounded" onClick={openAddMemRoleModal}>
+									<button className="bg-[#155EEF] hover:bg-blue-500 px-4 py-1 rounded text-white" onClick={openAddMemRoleModal}>
 										Add members or roles
 									</button>
 								</div>

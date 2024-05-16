@@ -30,16 +30,16 @@ const LocationModal = (props: LocationModalProps) => {
 	return (
 		<div>
 			<div className="flex flex-col mb-4">
-				<h3 className="text-xl text-center font-semibold">Where is your event?</h3>
+				<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Where is your event?</h3>
 				<p className="text-slate-400 text-center">So no one gets lost on where to go.</p>
 			</div>
 			<div className="flex flex-col gap-y-4 mb-4">
-				<div className="w-full bg-[#2B2D31] rounded flex justify-between items-center p-2">
+				<div className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2">
 					<div className="flex items-center gap-x-2">
 						<Icons.Speaker />
 						<div>
-							<h4 className={`font-semibold ${option === OptionEvent.OPTION_SPEAKER ? '' : 'text-slate-400'}`}>Voice Channel</h4>
-							<p className={option === OptionEvent.OPTION_SPEAKER ? '' : 'text-slate-400'}>
+							<h4 className={`font-semibold ${option === OptionEvent.OPTION_SPEAKER ? 'dark:text-white text-black' : 'text-slate-400'}`}>Voice Channel</h4>
+							<p className={option === OptionEvent.OPTION_SPEAKER ? 'dark:text-white text-black' : 'text-slate-400'}>
 								Hang out with voice, video, Screen Share and Go Live.
 							</p>
 						</div>
@@ -53,12 +53,12 @@ const LocationModal = (props: LocationModalProps) => {
 						id="Speaker"
 					/>
 				</div>
-				<div className="w-full bg-[#2B2D31] rounded flex justify-between items-center p-2">
+				<div className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2">
 					<div className="flex items-center gap-x-2">
 						<Icons.Hashtag />
 						<div>
-							<h4 className={`font-semibold ${option === OptionEvent.OPTION_HASTAG ? '' : 'text-slate-400'}`}>Somewhere Else</h4>
-							<p className={option === OptionEvent.OPTION_HASTAG ? '' : 'text-slate-400'}>
+							<h4 className={`font-semibold ${option === OptionEvent.OPTION_HASTAG ? 'dark:text-white text-black' : 'text-slate-400'}`}>Somewhere Else</h4>
+							<p className={option === OptionEvent.OPTION_HASTAG ? 'dark:text-white text-black' : 'text-slate-400'}>
 								Text channel, external link or in-person location.
 							</p>
 						</div>
@@ -75,12 +75,12 @@ const LocationModal = (props: LocationModalProps) => {
 			</div>
 			{option === OptionEvent.OPTION_SPEAKER && (
 				<div>
-					<h3 className="uppercase text-[11px] font-semibold">Select a channel</h3>
+					<h3 className="uppercase text-[11px] font-semibold dark:text-white text-black ">Select a channel</h3>
 					<select
 						name="voice"
 						value={voice}
 						onChange={handleChangeVoice}
-						className="block w-full mt-1 bg-black border border-black text-white rounded px-4 py-3 font-normal text-sm tracking-wide"
+						className="block w-full mt-1 dark:bg-black bg-bgLightModeSecond border dark:order-black dark:text-white text-black rounded px-4 py-3 font-normal text-sm tracking-wide"
 					>
 						<option className="text-white" value="">
 							--choose voice channel--
@@ -96,14 +96,14 @@ const LocationModal = (props: LocationModalProps) => {
 
 			{option === OptionEvent.OPTION_HASTAG && (
 				<div>
-					<h3 className="uppercase text-[11px] font-semibold">Enter a location</h3>
+					<h3 className="uppercase text-[11px] font-semibold dark:text-white text-black ">Enter a location</h3>
 					<input
 						type="text"
 						name="location"
 						value={titleEvent}
 						onChange={onChangeTitle}
 						placeholder="Add a location, link or something."
-						className="font-[400] rounded w-full text-white outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 bg-black"
+						className="font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgLightModeSecond"
 					/>
 				</div>
 			)}
