@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
     width: horizontalScale(60),
     height: verticalScale(60),
     borderRadius: 50,
-    backgroundColor: '#323232',
+    backgroundColor: Colors.bgDarkCharcoal,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
