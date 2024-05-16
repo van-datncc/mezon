@@ -111,10 +111,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
 	);
 
-	const { closeMenu, statusMenu } = useMenu();
+	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
 	return (
 		<div className="relative">
-			<div className="w-full max-h-full flex gap-2 mb-2 mt-2 overflow-x-scroll hide-scrollbar">
+			<div
+				className={`${isShowMemberList ? 'w-widthMessageViewChat' : 'w-widthThumnailAttachment'} pr-5 max-h-full flex gap-2 mb-2 mt-2 overflow-x-auto`}
+			>
 				{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
 					return (
 						<Fragment key={index}>
@@ -125,7 +127,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 
 			<div
-				className={`flex flex-inline items-center gap-2 box-content mb-4 bg-channelTextarea rounded-md relative ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
+				className={`flex flex-inline items-center gap-2 box-content mb-4 dark:bg-channelTextarea bg-bgLightMode rounded-md relative ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'max-w-wrappBoxChatView '}`}
 			>
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
@@ -133,7 +135,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					onFinishUpload={handleFinishUpload}
 				/>
 
-				<div className={`w-full bg-channelTextarea gap-3 flex items-center rounded-e-md`}>
+				<div className={`w-full dark:bg-channelTextarea bg-bgLightMode gap-3 flex items-center rounded-e-md`}>
 					<div className={`w-[96%] bg-black gap-3 relative whitespace-pre-wrap`}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}

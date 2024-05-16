@@ -102,9 +102,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			) : (
 				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950`}>
 					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
-					<div ref={modalRef} className="relative h-full" onClick={handleShowModalClan}>
-						<div className="cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-bgSecondary hover:bg-[#35373C] shadow border-b-[1px] border-bgTertiary">
-							<p className="text-white text-base font-semibold select-none">{name?.toLocaleUpperCase()}</p>
+					<div ref={modalRef} className="relative h-[60px]" onClick={handleShowModalClan}>
+						<div className="cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-white">
+							<p className="dark:text-white text-black text-base font-semibold select-none">{name?.toLocaleUpperCase()}</p>
 							<button className="w-6 h-8 flex flex-col justify-center iconHover">
 								<Icons.ArrowDown />
 							</button>
@@ -112,12 +112,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 						{isShowModalPannelClan && (
 							<div
 								onClick={(e) => e.stopPropagation()}
-								className="bg-bgProfileBody p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
+								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
 									<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />
-									<ItemModal onClick={handleShowInviteClanModal} children="Invite People" endIcon={<Icons.AddPerson />} />
-									<ItemModal onClick={handleShowServerSettings} children="Clan Settings" endIcon={<Icons.SettingProfile />} />
+									<ItemModal onClick={handleShowInviteClanModal} children="Invite People" endIcon={<Icons.AddPerson className='dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white'/>} />
+									<ItemModal onClick={handleShowServerSettings} children="Clan Settings" endIcon={<Icons.SettingProfile className='dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white'/>} />
 								</div>
 							</div>
 						)}

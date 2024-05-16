@@ -22,7 +22,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 			const messageReferenceUserId = message.references[0].message_sender_id;
 			setMessageId(messageReferenceId ?? '');
 			setSenderId(messageReferenceUserId ?? '');
-			dispatch(referencesActions.setOpenReplyMessageState(true));
 		}
 	}, [message]);
 

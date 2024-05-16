@@ -49,14 +49,14 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-base text-white font-medium tracking-wider cursor-pointer break-all username"
+					className="text-base dark:text-white text-black font-medium tracking-wider cursor-pointer break-all username"
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 					role='button'
 				>
 					{username ?? 'Anonymous'}
 				</div>
-				<div className=" text-zinc-400 text-[10px] cursor-default">{messageTime}</div>
+				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
 			{isShowPanelChannel && (
 				<div

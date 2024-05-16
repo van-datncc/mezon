@@ -17,18 +17,16 @@ function ReplyMessageBox() {
 	};
 
 	return (
-		<>
-			{referenceMessage && messageReplyState && (
-				<div className="flex flex-row items-center justify-between w-full my-2  bg-[#2B2D31] p-2 rounded-md text-[14px]">
-					<div className="">
-						Replying to <span className=" text-[#84ADFF] font-semibold">{getSenderMessage?.user?.username}</span>
-					</div>
-					<button className="relative iconHover" onClick={handleRemoveReply}>
-						<Icons.CircleClose />
-					</button>
+		referenceMessage && messageReplyState && (
+			<div className="flex flex-row items-center justify-between w-full my-2 dark:bg-[#2B2D31] bg-bgLightMode p-2 rounded-md text-[14px]">
+				<div className="dark:text-white text-black">
+					Replying to <span className=" dark:text-[#84ADFF] text-[#3297ff] font-semibold">{getSenderMessage?.user?.username}</span>
 				</div>
-			)}
-		</>
+				<button className="relative" onClick={handleRemoveReply}>
+					<Icons.CircleClose />
+				</button>
+			</div>
+		)
 	);
 }
 

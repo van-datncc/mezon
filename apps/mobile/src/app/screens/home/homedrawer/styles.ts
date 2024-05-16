@@ -257,8 +257,7 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginTop: size.s_24,
-		marginBottom: size.s_6,
+		marginBottom: size.s_20,
 		paddingRight: size.s_50,
 	},
 	wrapperMessageBoxCombine: {
@@ -274,25 +273,25 @@ export const styles = StyleSheet.create({
 		marginBottom: size.s_6,
 	},
 	userNameMessageBox: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		marginRight: size.s_10,
 		fontWeight: '600',
 		color: Colors.white,
 	},
 	dateMessageBox: {
-		fontSize: size.s_12,
+		fontSize: size.small,
 		color: Colors.gray72,
 	},
 	contentMessageBox: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		color: Colors.tertiary,
 	},
 	contentMessageLink: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		color: Colors.textLink,
 	},
 	contentMessageMention: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		fontWeight: '600',
 		color: Colors.textLink,
 	},
