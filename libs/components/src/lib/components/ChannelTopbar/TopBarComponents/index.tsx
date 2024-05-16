@@ -91,7 +91,7 @@ export const SearchMessage: React.FC = () => {
 				<input
 					type="text"
 					placeholder="Search"
-					className="text-[#AEAEAE] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
+					className="dark:text-[#AEAEAE] text-black dark:placeholder-[#AEAEAE] placeholder-colorTextLightMode outline-none bg-transparent w-full"
 					onClick={handleInputClick}
 				/>
 			</div>

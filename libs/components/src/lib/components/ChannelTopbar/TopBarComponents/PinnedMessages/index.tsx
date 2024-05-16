@@ -8,9 +8,9 @@ const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md w-[420px] max-h-[80vh] shadow-sm overflow-hidden">
-				<div className="bg-bgTertiary flex flex-row items-center justify-between p-[16px] h-12">
+				<div className="dark:bg-bgTertiary bg-white flex flex-row items-center justify-between p-[16px] h-12">
 					<div className="flex flex-row items-center pr-[16px] gap-4">
-						<span className="text-base font-medium cursor-default">Pinned Messages</span>
+						<span className="text-base font-medium cursor-default dark:text-white text-black">Pinned Messages</span>
 					</div>
 				</div>
 				<div className="flex flex-col bg-bgSecondary min-h-full flex-1 overflow-y-auto thread-scroll">

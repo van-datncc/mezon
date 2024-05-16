@@ -1,6 +1,6 @@
 import { RenderAttachmentThumbnail } from '@mezon/ui';
-import React from 'react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import React from 'react';
 import { Icons } from '../../components';
 
 interface ThumbnailProps {
@@ -16,11 +16,14 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove }) => {
 	};
 	const filename = attachment.filename;
 	const displayedFilename = filename && filename.length > 25 ? filename.substring(0, 25) + '...' : filename;
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachment, 'w-32 h-32');
+	const thumbnailAttachment = RenderAttachmentThumbnail(attachment);
 
 	return (
-		<div title={attachment.filename} className="py-[2.5rem] my-[0.2rem] border border-[#2B2D31] rounded-sm relative">
-			<div className="cursor-pointer w-48 min-h-24 rounded-md px-1 flex flex-row justify-center items-center">
+		<div
+			title={attachment.filename}
+			className="flex justify-center items-center p-2 mb-3 rounded bg-bgSecondary w-[216px] h-[216px] flex-shrink-0 border border-[#2B2D31] relative"
+		>
+			<div className="cursor-pointer rounded-md flex flex-row justify-center items-center mb-2">
 				<div>
 					<div>{thumbnailAttachment}</div>
 				</div>
@@ -37,7 +40,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove }) => {
 						</button>
 					</div>
 				</div>
-				<div className=" absolute bottom-0 left-1 text-xs ">
+				<div className=" absolute bottom-0 mt-2 left-1 text-sm ">
 					<p>{displayedFilename}</p>
 				</div>
 			</div>

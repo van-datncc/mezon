@@ -80,10 +80,10 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 					</div>
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
 				</div>
-				<div className="flex items-center gap-2 iconHover bgHover">
-					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 iconRed" />
-					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80" />
-					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 text-[#AEAEAE]" onClick={openSetting} />
+				<div className="flex items-center gap-2 bgHover">
+					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#DC2626] text-[#DC2626]" />
+					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-colorTextLightMode" />
+					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-colorTextLightMode" onClick={openSetting} />
 				</div>
 			</button>
 			{showModalCustomStatus && <ModalCustomStatus name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}

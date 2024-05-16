@@ -1,3 +1,4 @@
-export * from './InviteToChannel/InviteToChannel'
+export * from './InviteToChannel'
 export * from './EmojiPicker'
 export * from './AttachmentPicker'
+export * from './MessageItemBS'

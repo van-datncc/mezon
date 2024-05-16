@@ -1,14 +1,6 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
 import { useAuth, useClans, useDragAndDrop, useMenu, useThreads } from '@mezon/core';
-import {
-	channelsActions,
-	selectCurrentChannel,
-	selectIsShowMemberList,
-	selectShowScreen,
-	selectStatusCall,
-	useAppDispatch,
-	voiceActions,
-} from '@mezon/store';
+import { channelsActions, selectCurrentChannel, selectShowScreen, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { useMezonVoice } from '@mezon/voice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -102,8 +94,8 @@ export default function ChannelLayout() {
 		}
 	};
 
-	useEffect(()=>{
-		if(isShowMemberList){
+	useEffect(() => {
+		if (isShowMemberList) {
 			setIsShowCreateThread(false);
 		}
 	}, [isShowMemberList]);
@@ -117,7 +109,7 @@ export default function ChannelLayout() {
 				onDragEnter={handleDragEnter}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
-					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
+					<div className={`flex flex-col flex-1 w-widthMessageViewChat h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
 						<div
 							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 							ref={messagesContainerRef}
@@ -143,7 +135,9 @@ export default function ChannelLayout() {
 								)}
 							</div>
 						) : (
-							<div className={`flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative max-w-full`}>
+							<div
+								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'w-widthThumnailAttachment'}`}
+							>
 								{currentChannel && (
 									<ChannelTyping
 										channelId={currentChannel?.id}
@@ -166,10 +160,10 @@ export default function ChannelLayout() {
 					</div>
 					{isShowMemberList && (
 						<div
-							className={` dark:bg-bgSecondary bg-bgLightModeSecond text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-[245px]'}`}
+							className={` dark:bg-bgSecondary bg-bgLightModeSecond text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
 							id="memberList"
 						>
-							<div className="w-1 h-full bg-bgPrimary"></div>
+							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightModeSecond"></div>
 							<MemberList />
 						</div>
 					)}
