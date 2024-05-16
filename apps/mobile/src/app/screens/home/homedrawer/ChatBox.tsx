@@ -16,7 +16,7 @@ import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageRef } from 'mezon-js/api.gen';
-import { IMessageListNeedToResolve } from './types';
+import { IMessageActionNeedToResolve } from './types';
 import { IMessageWithUser } from '@mezon/utils';
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
@@ -26,12 +26,11 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	// const [messageRefId, setMessageId] = useState<string>('')
-	const [ messageListNeedToResolve, setMessageListNeedToResolve ] = useState<IMessageListNeedToResolve[]>([]);
+	const [ messageActionListNeedToResolve, setMessageActionListNeedToResolve ] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
 	const [currentSelectedMessage, setCurrentSelectedMessage] = useState<IMessageWithUser | null>(null); //TODO: update later
 	const [isFocus, setIsFocus] = useState<boolean>(false);
 	const [senderId, setSenderId] = useState<string>('');
-	
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 
 	const { t } = useTranslation(['message']);
@@ -39,7 +38,6 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 	const handleSendMessage = useCallback(() => {
 		// TODO: Just send only text messages
 		// sendMessage(text, mentions, attachments, references, anonymous);
-		console.log('message được reply:', currentSelectedMessage);
 		const reference = currentSelectedMessage ? [{
 			message_id: '',
 			message_ref_id: currentSelectedMessage.id,
@@ -48,14 +46,12 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 			content: JSON.stringify(currentSelectedMessage.content),
 			has_attachment: Boolean(currentSelectedMessage.attachments.length),
 		}]: undefined;
-		
-		console.log('reference:', reference);
 
 		sendMessage({ t: text }, [], [], reference, false);
 		setText('');
 		setSenderId('');
 		setCurrentSelectedMessage(null);
-	}, [sendMessage, text]);
+	}, [sendMessage, text, currentSelectedMessage]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -78,51 +74,39 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 		}
 	}
 
+	const pushMessageActionIntoStack = (messagePayload: IMessageActionNeedToResolve) => {
+		const { targetMessage } = messagePayload;
+		setCurrentSelectedMessage(targetMessage);
+		setSenderId(targetMessage.sender_id);
+	}
+
 	useEffect(() => {
 		const showKeyboard = DeviceEventEmitter.addListener(
 			'@SHOW_KEYBOARD',
 			(value) => {
 				//NOTE: trigger from message action 'MessageItemBS component'
-				inputRef.current.blur();
-				setIsFocus(false);
-				handleClearTimeout();
-				timeoutRef.current = setTimeout(() => {
-					inputRef.current.focus();
-					setIsFocus(true);
-					const { message } = value;
-					setCurrentSelectedMessage(message);
-					console.log('message:', message);
-					// if (message.references && message.references.length > 0) {
-					// 	const messageReferenceId = message.references[0].message_ref_id;
-					// 	const messageReferenceUserId = message.references[0].message_sender_id;
-					// }
-					setSenderId(message.sender_id);
-				}, 300);
+				resetInput();
+				openKeyBoard();
+				pushMessageActionIntoStack(value);
 			},
 		);
 	
 		return () => {
 		  	showKeyboard.remove();
-			handleClearTimeout();
+			resetInput();
 		};
 	}, []);
 
-	useEffect(() => {
-		const keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			() => {
-				console.log('Keyboard closed');
-				// Do something when the keyboard is closed
-			}
-		);
-	
-		// Cleanup the event listener
-		return () => {
-		  keyboardDidHideListener.remove();
-		};
-	}, []);
+	const openKeyBoard = () => {
+		timeoutRef.current = setTimeout(() => {
+			inputRef.current.focus();
+			setIsFocus(true);
+		}, 300);
+	}
 
-	const handleClearTimeout = () => {
+	const resetInput = () => {
+		inputRef.current?.blur();
+		setIsFocus(false);
 		if (timeoutRef) {
 			clearTimeout(timeoutRef.current);
 		}

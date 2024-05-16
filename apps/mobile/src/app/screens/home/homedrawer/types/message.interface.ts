@@ -14,7 +14,7 @@ export interface IMessageAction {
     type: EMessageActionType;
 }
 
-export interface IMessageListNeedToResolve {
+export interface IMessageActionNeedToResolve {
     type: EChatBoxAction,
-    message: IMessageWithUser,
+    targetMessage: IMessageWithUser,
 }

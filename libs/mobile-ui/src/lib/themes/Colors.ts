@@ -122,12 +122,12 @@ const colors = {
 	textLink: '#007AFF',
 	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30",
 	/* border color */
-  borderNeutralDisable: '#9091931a',
-	// borderPrimary: '#363940',
+  	borderNeutralDisable: '#9091931a',
+	borderPrimary: '#363940',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
-  titleSteelGray: '#939292',
+  	titleSteelGray: '#939292',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
