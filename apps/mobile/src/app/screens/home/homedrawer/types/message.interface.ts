@@ -1,5 +1,5 @@
 import { IMessageWithUser } from "@mezon/utils";
-import { EMessageActionType, EMessageBSToShow } from "../enums";
+import { EChatBoxAction, EMessageActionType, EMessageBSToShow } from "../enums";
 
 export interface IReplyBottomSheet {
     message: IMessageWithUser;
@@ -12,4 +12,9 @@ export interface IMessageAction {
     title: string;
     icon: string;
     type: EMessageActionType;
+}
+
+export interface IMessageListNeedToResolve {
+    type: EChatBoxAction,
+    message: IMessageWithUser,
 }

@@ -28,12 +28,29 @@ export const styles = StyleSheet.create({
 		textTransform: 'uppercase',
 	},
 	wrapperChatBox: {
-		minHeight: 80,
 		backgroundColor: Colors.secondary,
-		flexDirection: 'row',
-		paddingHorizontal: 10,
-		alignItems: 'center',
+		flexDirection: 'column',
 		justifyContent: 'space-between',
+	},
+	aboveTextBoxWrapper: {
+		flexDirection: 'column',
+		backgroundColor: Colors.bgCharcoal
+	},
+	aboveTextBoxText: {
+		color: Colors.white,
+		fontSize: size.s_12
+	},
+	aboveTextBoxItem: {
+		flexDirection: 'row',
+		paddingHorizontal: size.tiny,
+		padding: size.tiny,
+		gap: 10
+	},
+	closeIcon: {
+		color: Colors.bgDarkSlate,
+		backgroundColor: Colors.white,
+		borderRadius: 50,
+		fontSize: 19
 	},
 	iconContainer: {
 		width: 35,
@@ -257,9 +274,39 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginTop: size.s_24,
-		marginBottom: size.s_6,
 		paddingRight: size.s_50,
+	},
+	aboveMessage: {
+		flexDirection: 'row',
+		paddingLeft: size.s_10,
+		gap: 15,
+	},
+	iconReply: {
+		width: 35,
+		height: '100%',
+		alignItems: 'center',
+		paddingLeft: 30
+	},
+	replyAvatar: {
+		width: 25,
+		height: 25,
+		borderRadius: 50,
+	},
+	messageWrapper: {
+		flexDirection: 'column',
+		marginTop: 20,
+		paddingBottom: size.tiny
+	},
+	repliedTextAvatar: {
+		fontSize: size.s_16,
+		color: Colors.white,
+	},
+	repliedContentText: {
+		color: Colors.white
+	},
+	repliedMessageWrapper: {
+		flexDirection: 'row',
+		gap: 8
 	},
 	wrapperMessageBoxCombine: {
 		marginTop: size.s_2,
@@ -267,6 +314,7 @@ export const styles = StyleSheet.create({
 	rowMessageBox: {
 		marginLeft: 15,
 		justifyContent: 'space-between',
+		width: '100%'
 	},
 	messageBoxTop: {
 		flexDirection: 'row',
@@ -286,6 +334,7 @@ export const styles = StyleSheet.create({
 	contentMessageBox: {
 		fontSize: size.s_16,
 		color: Colors.tertiary,
+		marginTop: -5
 	},
 	contentMessageLink: {
 		fontSize: size.s_16,

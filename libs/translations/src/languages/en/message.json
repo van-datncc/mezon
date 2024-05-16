@@ -9,5 +9,9 @@
         "markUnRead": "Mark UnRead",
         "mention": "Mention",
         "copyMessageLink": "Copy Message Link"
+    },
+    "chatBox": {
+        "replyingTo": "Replying to",
+        "editingMessage": "Editing Message"
     }
 }

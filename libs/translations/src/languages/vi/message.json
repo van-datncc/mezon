@@ -9,5 +9,9 @@
         "markUnRead": "Đánh dấu chưa đọc",
         "mention": "Đề cập",
         "copyMessageLink": "Sao chép đường dẫn tin nhắn"
+    },
+    "chatBox": {
+        "replyingTo": "Đang phản hổi",
+        "editingMessage": "Đang chỉnh sửa tin nhắn"
     }
 }
