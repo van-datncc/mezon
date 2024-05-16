@@ -24,7 +24,7 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 					<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
 				</div>
 			) : (
-				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center" alt="" src={avatarDM} />
+				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
 			)}
 
 			{type === ETypeMessage.THREAD && threadCurrentChannel && (

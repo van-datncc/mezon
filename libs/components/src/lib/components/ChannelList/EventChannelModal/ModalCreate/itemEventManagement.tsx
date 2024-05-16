@@ -22,13 +22,13 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 
 
     return (
-        <div className="bg-black rounded-lg overflow-hidden">
+        <div className="dark:bg-black bg-bgModifierHoverLight rounded-lg overflow-hidden">
 				<div className="p-4 border-b border-slate-600">
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.EventIcon />
 						<p className="font-semibold text-[#959CF7]">Event</p>
 					</div>
-					<p className="hover:underline font-bold">{topic}</p>
+					<p className="hover:underline font-bold dark:text-white text-black">{topic}</p>
 				</div>
 				<div className="p-4 flex items-center gap-x-2">
 					{option == OptionEvent.OPTION_SPEAKER || channelVoice && (

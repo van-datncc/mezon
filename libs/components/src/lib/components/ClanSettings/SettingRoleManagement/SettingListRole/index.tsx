@@ -1,4 +1,4 @@
-import { useRoles } from '@mezon/core';
+import { useApp, useRoles } from '@mezon/core';
 import { getIsShow, getSelectedRoleId, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ type closeEditRole = {
 	handleClose: () => void;
 };
 const SettingListRole = (props: closeEditRole) => {
+	const {appearanceTheme} = useApp();
 	const isChange = useSelector(getIsShow);
 
 	const clickRole = useSelector(getSelectedRoleId);
@@ -38,11 +39,11 @@ const SettingListRole = (props: closeEditRole) => {
 				<div className="rotate-90 -ml-[10px]">
 					<Icons.ArrowDown defaultSize="size-5" />
 				</div>
-				<div className="cursor-pointer tracking-wide text-sm" onClick={() => props.handleClose()} role="button">
+				<div className="cursor-pointer tracking-wide text-sm dark:text-white text-black" onClick={() => props.handleClose()} role="button">
 					BACK
 				</div>
 			</div>
-			<div className="overflow-y-scroll flex flex-col gap-y-2">
+			<div className={`overflow-y-scroll flex flex-col gap-y-2  ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
 				{clickedRole === 'New Role' ? (
 					<div>
 						<button className={`block w-full py-2 px-4 rounded text-[15px] bg-gray-500 hover:bg-gray-70 text-white font-bold`}>
