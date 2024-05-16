@@ -1,4 +1,4 @@
-import { useOnClickOutside } from '@mezon/core';
+import { useApp, useOnClickOutside } from '@mezon/core';
 import {
 	ChannelsEntity,
 	selectShowModalCustomStatus,
@@ -31,6 +31,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 	const showScreen = useSelector(selectStatusCall);
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
+	const { appearanceTheme } = useApp();
 
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,12 +62,12 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 			{showScreen && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
 				className="flex items-center justify-between border-t-2
-			 border-borderDefault px-4 py-2 font-title text-[15px]
+			 dark:border-borderDefault border-white px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
-			 shadow-sm transition bg-bgSecondary600
+			 shadow-sm transition dark:bg-bgSecondary600 bg-bgLightMode
 			 w-full group focus-visible:outline-none"
 			>
-				<div className="footer-profile" ref={profileRef} onClick={handleClickFooterProfile}>
+				<div className={`footer-profile ${appearanceTheme === "light" && 'lightMode'}`} ref={profileRef} onClick={handleClickFooterProfile}>
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
@@ -79,10 +80,10 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 					</div>
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
 				</div>
-				<div className="flex items-center gap-2 iconHover bgHover">
-					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 iconRed" />
-					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80" />
-					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 text-[#AEAEAE]" onClick={openSetting} />
+				<div className="flex items-center gap-2 bgHover">
+					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#DC2626] text-[#DC2626]" />
+					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-colorTextLightMode" />
+					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-colorTextLightMode" onClick={openSetting} />
 				</div>
 			</button>
 			{showModalCustomStatus && <ModalCustomStatus name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}

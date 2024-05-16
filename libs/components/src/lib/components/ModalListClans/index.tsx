@@ -52,13 +52,13 @@ const ModalListClans = (props: ModalListClansProps) => {
 		<div
 			ref={modalRef}
 			className="flex w-64 flex-col text-[16px] px-3 py-2 gap-2 z-50 border-[1px] border-bg-bgSecondary
-         border-borderDefault bg-bgProfileBody rounded"
+         dark:border-borderDefault border-[#E1E1E1] dark:bg-bgProfileBody bg-[#F0F0F0] duration-100 rounded"
 		>
-			<div className="overflow-y-auto max-h-36">
+			<div className="overflow-y-auto max-h-36 hide-scrollbar">
 				{options.map((option: IClan) => {
 					return (
 						<button
-							className={`w-full  flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'bg-[#151C2B] text-contentPrimary font-bold' : 'text-contentSecondary'}`}
+							className={`w-full  flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'dark:bg-[#151C2B] bg-bgLightModeButton duration-100 dark:text-contentPrimary text-black font-bold' : 'dark:text-contentSecondary text-[#323232]'}`}
 							key={option.id}
 							onClick={() => onChangeClan(option.id)}
 						>
@@ -81,10 +81,12 @@ const ModalListClans = (props: ModalListClansProps) => {
 					);
 				})}
 			</div>
-			<div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-[#155EEF1A] ">
+			<div className="w-auto flex py-1 px-2 items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group">
 				<button className="flex items-center gap-4 w-10/12" onClick={createClan}>
-					<img src={'/assets/images/icon-create-clan.svg'} alt={'logoMezon'} width={40} height={40} />
-					<span className="text-[16px]">Add Clan</span>
+					<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-10">
+						<p className="text-2xl font-bold text-[#155EEF]">+</p>
+					</div>
+					<span className="text-[16px] dark:text-contentPrimary text-black">Add Clan</span>
 				</button>
 			</div>
 		</div>

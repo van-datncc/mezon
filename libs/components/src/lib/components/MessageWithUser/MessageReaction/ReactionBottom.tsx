@@ -1,6 +1,7 @@
-import { EmojiPickerComp, Icons } from '@mezon/components';
+import { GifStickerEmojiPopup, Icons } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { useState } from 'react';
 
 type ReactionBottomProps = {
@@ -68,7 +69,11 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 							className={`hidden md:block w-fit ${isFixed ? 'fixed' : 'absolute'} ${moveToTop ? 'right-[-2rem] bottom-[-1rem]' : 'left-[-2rem] bottom-[-5rem]'}  z-20`}
 						>
 							<div className="scale-75 transform mb-0 z-10">
-								<EmojiPickerComp messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+								<GifStickerEmojiPopup
+									messageEmoji={message}
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM}
+								/>
 							</div>
 						</div>
 					)}

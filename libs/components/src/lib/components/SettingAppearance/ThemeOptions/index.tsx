@@ -18,6 +18,11 @@ const ThemeOptions = () => {
 				elementHTML.classList.remove('dark');
 			}
 		}
+		if(themeChosen === "dark"){
+			elementHTML.classList.add('dark');
+		} else {
+			elementHTML.classList.remove('dark');
+		}
 	}
 	useEffect(() => {
 		onWindowMatch();
@@ -47,7 +52,6 @@ const ThemeOptions = () => {
 		if(themeChosen !== "system"){
 			setAppearanceTheme(themeChosen);
 		}
-		console.log(appearanceTheme);
 	}, [themeChosen, appearanceTheme, setAppearanceTheme]);
 
 	return (

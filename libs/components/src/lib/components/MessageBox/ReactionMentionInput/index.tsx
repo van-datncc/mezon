@@ -429,7 +429,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						value={nameValueThread ?? ''}
 						label="Thread Name"
 						placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
-						className="h-10 p-[10px] bg-bgTertiary text-base outline-none rounded-md placeholder:text-sm"
+						className="h-10 p-[10px] dark:bg-bgTertiary bg-white dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
 					/>
 					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 					{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}
@@ -446,7 +446,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={mentionsInputStyle}
-				className="bg-channelTextarea"
+				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
@@ -462,6 +462,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
 					)}
 					style={mentionStyle}
+					className='dark:bg-[#3B416B] bg-bgLightModeButton'
 				/>
 				<Mention
 					markup="#[__display__](__id__)"
@@ -475,6 +476,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					renderSuggestion={(suggestion) => (
 						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
 					)}
+					className='dark:bg-[#3B416B] bg-bgLightModeButton'
 				/>
 				<Mention
 					trigger=":"
@@ -482,6 +484,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					regex={neverMatchingRegex}
 					data={queryEmojis}
 					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
+					className='dark:bg-[#3B416B] bg-bgLightModeButton'
 				/>
 			</MentionsInput>
 		</div>

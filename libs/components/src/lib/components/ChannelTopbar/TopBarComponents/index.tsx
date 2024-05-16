@@ -45,7 +45,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			</div>
 
 			<p
-				className={` text-base font-semibold text-white mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '}`}
+				className={` text-base font-semibold dark:text-white text-colorTextLightMode mt-[2px] max-w-[200px] overflow-x-hidden text-ellipsis one-line ${closeMenu && !statusMenu ? 'ml-[56px]' : 'ml-7 '}`}
 			>
 				{name}
 			</p>
@@ -86,12 +86,12 @@ export const SearchMessage: React.FC = () => {
 			<div
 				className={`transition-all duration-300 ${
 					expanded ? 'w-80' : 'w-40'
-				} h-8 pl-4 pr-2 py-3 bg-bgTertiary rounded items-center inline-flex`}
+				} h-8 pl-4 pr-2 py-3 dark:bg-bgTertiary bg-[#F7F7F7] rounded items-center inline-flex`}
 			>
 				<input
 					type="text"
 					placeholder="Search"
-					className="text-[#AEAEAE] placeholder-[#AEAEAE] outline-none bg-transparent w-full"
+					className="dark:text-[#AEAEAE] text-black dark:placeholder-[#AEAEAE] placeholder-colorTextLightMode outline-none bg-transparent w-full"
 					onClick={handleInputClick}
 				/>
 			</div>

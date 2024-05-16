@@ -1,6 +1,6 @@
 import { RenderAttachmentThumbnail } from '@mezon/ui';
-import React from 'react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import React from 'react';
 import { Icons } from '../../components';
 
 interface ThumbnailProps {
@@ -16,7 +16,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove }) => {
 	};
 	const filename = attachment.filename;
 	const displayedFilename = filename && filename.length > 25 ? filename.substring(0, 25) + '...' : filename;
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachment, 'w-32 h-32');
+	const thumbnailAttachment = RenderAttachmentThumbnail(attachment);
 
 	return (
 		<div title={attachment.filename} className="py-[2.5rem] my-[0.2rem] border border-[#2B2D31] rounded-sm relative">
