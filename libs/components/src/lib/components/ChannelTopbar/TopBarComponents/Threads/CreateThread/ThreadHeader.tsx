@@ -17,10 +17,10 @@ const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[58px] border-b border-gray-800">
+		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[58px] border-b dark:border-gray-800 border-white">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
 				<Icons.ThreadIcon />
-				<span className="text-base font-semibold">{threadCurrentChannel ? threadCurrentChannel.channel_label : 'New Thread'}</span>
+				<span className="text-base font-semibold dark:text-white text-colorTextLightMode">{threadCurrentChannel ? threadCurrentChannel.channel_label : 'New Thread'}</span>
 			</div>
 			<button onClick={handleCloseModal} className="relative right-0">
 				<Icons.Close />

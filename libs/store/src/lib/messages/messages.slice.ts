@@ -309,7 +309,7 @@ export const messagesSlice = createSlice({
 				case 1:
 					messagesAdapter.updateOne(state, {
 						id: action.payload.id,
-						changes: action.payload,
+						changes: { content: action.payload.content },
 					});
 					break;
 				case 2:

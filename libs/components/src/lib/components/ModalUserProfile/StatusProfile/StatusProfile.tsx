@@ -1,17 +1,13 @@
 import { Icons, MemberProfile } from '@mezon/components';
 import { useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Dropdown } from 'flowbite-react';
-import { useState } from 'react';
 import { OnlineStatus } from '../../Icons';
 import ItemStatus from './ItemStatus';
-import ModalCustomStatus from './ModalCustomStatus';
 
 export const StatusProfile = () => {
 	const dispatch = useAppDispatch();
-	const [openModal, setOpenModal] = useState(false);
 
 	const handleCustomStatus = () => {
-		setOpenModal(true);
 		dispatch(userClanProfileActions.setShowModalFooterProfile(false));
 	};
 
@@ -34,7 +30,7 @@ export const StatusProfile = () => {
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 					<ItemStatus children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
 					<ItemStatus children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} />
-					<ItemStatus children="Invisible" startIcon={<Icons.StatusOffline />} />
+					<ItemStatus children="Invisible" startIcon={<Icons.OfflineStatus />} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 				</Dropdown>
 				<ItemStatus onClick={handleCustomStatus} children="Set Custom Status" startIcon={<Icons.SmilingFace />} />
@@ -55,7 +51,6 @@ export const StatusProfile = () => {
 				<MemberProfile name={''} status={true} avatar={''} isHideStatus={false} numberCharacterCollapse={15} classParent="memberProfile" />
 				<ItemStatus children="Manage Accounts" />
 			</Dropdown>
-			{openModal && <ModalCustomStatus openModal={openModal} />}
 		</>
 	);
 };

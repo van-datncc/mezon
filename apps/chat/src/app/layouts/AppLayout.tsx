@@ -1,3 +1,4 @@
+import { useAuth } from '@mezon/core';
 import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
 import { onMessageListener, requestForToken } from 'libs/components/src/lib/components/Firebase/firebase';
@@ -8,6 +9,8 @@ import { toast } from 'react-toastify';
 const theme = 'dark';
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
+	const { userProfile } = useAuth();
+	
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
 			const parts = payload.notification.body;
@@ -29,7 +32,7 @@ const AppLayout = () => {
 		requestForToken()
 			.then((token) => {
 				if (token) {
-					dispatch(fcmActions.registFcmDeviceToken(token));
+					dispatch(fcmActions.registFcmDeviceToken({tokenId: token, deviceId: userProfile?.user?.id||""}));
 				}
 			})
 			.catch((error: Error) => {

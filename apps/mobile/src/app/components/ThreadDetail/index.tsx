@@ -3,7 +3,7 @@ import { View , Text, TouchableOpacity} from 'react-native'
 import { styles } from './styles'
 import {useNavigation} from '@react-navigation/native'
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import ThreadIcon from '../../../assets/svg/thread.svg'
+import { ThreadIcon } from '@mezon/mobile-components';
 
 export default function CreateThreadModal() {
   const navigation = useNavigation();

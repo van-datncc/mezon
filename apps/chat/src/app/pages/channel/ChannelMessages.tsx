@@ -1,5 +1,5 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference, useMessages, useApp } from '@mezon/core';
+import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useReference } from '@mezon/core';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -9,7 +9,7 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-}
+};
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const chatRef = useRef<HTMLDivElement>(null);
@@ -20,9 +20,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
+	const { appearanceTheme } = useApp();
 
 	// share logic to load more message
-	useMessages({ chatRef, hasMoreMessage, loadMoreMessage });
+	const isFetching = useMessages({ chatRef, hasMoreMessage, loadMoreMessage });
 
 	useEffect(() => {
 		if (idMessageReplied) {
@@ -50,13 +51,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
-	const { appearanceTheme } = useApp();
-
 	return (
 		<div
-			className={`dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex ${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}
+			className={`dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
+			style={{ scrollbarWidth: 'thin' }}
 		>
 			{messages.map((message, i) => (
 				<ChannelMessage
@@ -70,9 +70,9 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				/>
 			))}
 
+			{isFetching && hasMoreMessage && <p className="px-3">Loading messages</p>}
 			{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 		</div>
-
 	);
 }
 

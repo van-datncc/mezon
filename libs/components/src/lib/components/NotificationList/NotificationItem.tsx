@@ -22,7 +22,7 @@ function NotificationItem({ notify }: NotifyProps) {
 	}
 
 	return (
-		<div className="flex flex-row justify-between hover:bg-bgSecondaryHover py-3 px-3 w-full cursor-pointer">
+		<div className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton py-3 px-3 w-full cursor-pointer">
 			<div className="flex items-center gap-2">
 				<MemberProfile
 					isHideUserName={true}
@@ -41,7 +41,7 @@ function NotificationItem({ notify }: NotifyProps) {
 				</div>
 			</div>
 			<button
-				className="bg-bgTertiary mr-1 text-contentPrimary rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+				className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
 				onClick={() => {
 					deleteNotify(notify.id);
 				}}
