@@ -15,6 +15,7 @@ import { styles } from './styles';
 import { MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { ReplyIcon } from '@mezon/mobile-components';
+import { useDeleteMessage } from '@mezon/core';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -26,6 +27,8 @@ export type MessageItemProps = {
 	newMessage?: string;
 	child?: JSX.Element;
 	isMention?: boolean;
+	channelLabel?: string;
+	channelId?: string;
 };
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { attachments, lines } = useMessageParser(props.message);
@@ -36,9 +39,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null)
-	const [messageRefId, setMessageId] = useState<string>('')
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
+	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 
 	// TODO: add logic here
 	const isCombine = true;
@@ -205,10 +208,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return <Text style={styles.contentMessageBox}>{lines}</Text>;
 	};
 
+	const onConfirmDeleteMessage = () => {
+		DeleteSendMessage(props.message.id);
+	}
+
 	const setMessageSelected = (type: EMessageBSToShow) => {
 		setOpenBottomSheet(type)
-		console.log('nguoi gui', repliedSender);
-		console.log('message selected:', messageRefFetchFromServe);
 	}
 
 	const jumpToRepliedMesage = () => {
@@ -275,7 +280,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					{renderTextContent()}
 				</Pressable>
 			</View>
-			<MessageItemBS message={props.message} type={openBottomSheet} onClose={() => setOpenBottomSheet(null)} />
+			<MessageItemBS message={props.message} onConfirmDeleteMessage={onConfirmDeleteMessage} type={openBottomSheet} onClose={() => setOpenBottomSheet(null)} />
 		</View>
 	);
 });

@@ -17,9 +17,9 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, channelLable,
 	};
 
 	return (
-		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
+		<div className="fixed  inset-0 flex items-center justify-center z-50 dark:text-white text-black">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 dark:bg-gray-900  bg-bgDisable p-6 rounded-[5px] text-center">
+			<div className="relative z-10 dark:bg-gray-900 bg-bgLightModeSecond p-6 rounded-[5px] text-center">
 				<h2 className="text-[30px] font-semibold mb-4">Delete Channel</h2>
 				<p className="text-white-600 mb-6 text-[16px]">
 					Are you sure you want to delete <b>{channelLable}</b>?This cannot be undone.

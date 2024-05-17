@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, FlatList, DeviceEventEmitter } from 'react-native';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { View, Text, Pressable, FlatList, DeviceEventEmitter, Alert } from 'react-native';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import { styles } from './styles';
-import { useRef } from 'react';
-import { useEffect } from 'react';
-import Feather from 'react-native-vector-icons/Feather';
-import { IReplyBottomSheet } from '../../types/message.interface';
+import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { useTranslation } from 'react-i18next';
 import { getMessageActions } from '../../constants';
+import { useAuth } from '@mezon/core';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Toast from 'react-native-toast-message';
+import { CopyIcon, FlagIcon, HashtagIcon, LinkIcon, MarkUnreadIcon, MentionIcon, PenIcon, PinMessageIcon, ReplyMessageIcon, TrashIcon } from '@mezon/mobile-components';
+import { Colors } from '@mezon/mobile-ui';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
-    const { type, onClose, message } = props;
+    const { type, onClose, message, onConfirmDeleteMessage } = props;
     const ref = useRef(null);
     const [content, setContent] = useState<React.ReactNode>(<View />);
     const { t } = useTranslation(['message']);
+    const { userProfile } = useAuth();
 
     const handleActionEditMessage = () => {
         onClose();
-        const payload = {
+        const payload: IMessageActionNeedToResolve = {
             type: EMessageActionType.EditMessage,
-            message
+            targetMessage: message
         }
         //Note: trigger to ChatBox.tsx
         DeviceEventEmitter.emit('@SHOW_KEYBOARD', payload);
@@ -28,11 +31,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
     const handleActionReply = () => {
         onClose();
-        //Note: trigger to ChatBox.tsx
-        const payload = {
+        const payload: IMessageActionNeedToResolve = {
             type: EMessageActionType.Reply,
-            message
+            targetMessage: message
         }
+        //Note: trigger to ChatBox.tsx
         DeviceEventEmitter.emit('@SHOW_KEYBOARD', payload);
     }
 
@@ -41,11 +44,33 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     }
 
     const handleActionCopyText = () => {
-        console.log('CopyText');
+        onClose();
+        Clipboard.setString(message.content.t);
+        Toast.show({
+            type: 'success',
+            props: {
+                text2: t('toast.copyText'),
+                leadingIcon: <CopyIcon color={Colors.bgGrayLight} />
+            }
+        });
     }
 
     const handleActionDeleteMessage = () => {
-        console.log('DeleteMessage');
+        onClose()
+        //TODO: replace with modal
+        Alert.alert(
+            "Delete Message",
+            "Are you sure you want to delete this message?",
+            [
+              {
+                text: "No",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+              { text: "Yes", onPress: () => onConfirmDeleteMessage() }
+            ],
+            { cancelable: false }
+        );
     }
 
     const handleActionPinMessage = () => {
@@ -61,6 +86,10 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     }
 
     const handleActionCopyMessageLink = () => {
+        console.log('CopyMessageLink');
+    }
+
+    const handleActionReportMessage = () => {
         console.log('CopyMessageLink');
     }
 
@@ -93,10 +122,51 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             case EMessageActionType.CopyMessageLink:
                 handleActionCopyMessageLink();
                 break;
+            case EMessageActionType.Report:
+                handleActionReportMessage();
+                break;
             default:
                 break;
         }
     }
+
+    const getActionMessageIcon = (type: EMessageActionType) => {
+        switch (type) {
+            case EMessageActionType.EditMessage:
+                return <PenIcon />;
+            case EMessageActionType.Reply:
+                return <ReplyMessageIcon />;
+            case EMessageActionType.CreateThread:
+                return <HashtagIcon />;
+            case EMessageActionType.CopyText:
+                return <CopyIcon />;
+            case EMessageActionType.DeleteMessage:
+                return <TrashIcon />;
+            case EMessageActionType.PinMessage:
+                return <PinMessageIcon />;
+            case EMessageActionType.MarkUnRead:
+                return <MarkUnreadIcon />;
+            case EMessageActionType.Mention:
+                return <MentionIcon />;
+            case EMessageActionType.CopyMessageLink:
+                return <LinkIcon />;
+            case EMessageActionType.Report:
+                return <FlagIcon />;
+            default:
+                return <View />;
+        }
+    }
+
+    const messageActionList = useMemo(() => {
+        const isMyMessage = userProfile?.user?.id === message?.user?.id;
+
+        const listOfActionOnlyMyMessage =  [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
+        const listOfActionOnlyOtherMessage =  [EMessageActionType.Report];
+        if (isMyMessage) {
+            return getMessageActions(t).filter(action => !listOfActionOnlyOtherMessage.includes(action.type));
+        }
+        return getMessageActions(t).filter(action => !listOfActionOnlyMyMessage.includes(action.type));
+    }, [t, userProfile, message])
 
     const renderUserInformation = () => {
         return (
@@ -110,11 +180,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
         return (
             <View style={styles.messageActionsWrapper}>
                 <FlatList
-                    data={getMessageActions(t)}
+                    data={messageActionList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <Pressable style={styles.actionItem} onPress={() => implementAction(item.type)}>
-                            <Feather size={25} name={item.icon} style={styles.actionIcon} />
+                            <View style={styles.icon}>
+                                {getActionMessageIcon(item.type)}
+                            </View>
                             <Text style={styles.actionText}>{item.title}</Text>
                         </Pressable>
                     )}

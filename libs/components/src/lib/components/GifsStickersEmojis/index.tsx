@@ -22,7 +22,8 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 	const { setReactionPlaceActive } = useChatReaction();
-	const { setShowCategories, setValueInputSearch } = useGifs();
+	const { setShowCategories } = useGifs();
+	const { setValueInputSearch } = useGifsStickersEmoji();
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -56,6 +57,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 
 	return (
 		<div
+			onClick={(e) => e.stopPropagation()}
 			className={`w-[370px] sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
 		>
 			<div className="w-full">
@@ -81,7 +83,6 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 						</button>
 					</div>
 				)}
-
 				<InputSearch />
 			</div>
 
