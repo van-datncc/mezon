@@ -37,7 +37,9 @@ export const fetchEventManagement = createAsyncThunk(
 	async ({ clanId }: fetchEventManagementPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listEvents(mezon.session, clanId);
+		
 		if (!response.events) {
+			thunkAPI.dispatch(eventManagementActions.clearEntities());
 			return thunkAPI.rejectWithValue([]);
 		}
 
@@ -95,6 +97,9 @@ export const eventManagementSlice = createSlice({
 		add: eventManagementAdapter.addOne,
 		addMany: eventManagementAdapter.addMany,
 		remove: eventManagementAdapter.removeOne,
+		clearEntities: (state) => {
+			eventManagementAdapter.removeAll(state);
+		},
 	},
 	extraReducers: (builder) => {
 		builder

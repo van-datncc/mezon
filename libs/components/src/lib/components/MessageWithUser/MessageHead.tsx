@@ -60,7 +60,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 			</div>
 			{isShowPanelChannel && (
 				<div
-					className={`bg-[#151515] mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 fixed `}
+					className={`dark:bg-[#151515] bg-gray-200 mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
 						left: `${positionLeft}px`,
 						top: positionBottom ? '' : `${positionTop}px`,

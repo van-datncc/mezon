@@ -394,7 +394,7 @@ export function WifiIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function LookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 24 24" width="20">
+		<svg viewBox="0 0 24 24" width="20" className='dark:text-[#AEAEAE] dark:hover:text-white text-colorTextLightMode hover:text-black' >
 			<g clipPath="url(#__lottie_element_5917)">
 				<g clipPath="url(#__lottie_element_5919)" transform="matrix(0.03999999910593033,0,0,0.03999999910593033,0,0)" opacity="1">
 					<g mask="url(#__lottie_element_5935_1)">
@@ -403,35 +403,35 @@ export function LookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
 								<g transform="matrix(25,0,0,25,25,50)" opacity="1">
 									<g opacity="1" transform="matrix(1,0,0,1,1,10)">
 										<path
-											fill="gray"
+											fill="currentColor"
 											fillOpacity="1"
 											d=" M0,-5 C0,-5 0,-5 0,-5 C0.5519999861717224,-5 1,-4.552000045776367 1,-4 C1,-4 1,4 1,4 C1,4.552000045776367 0.5519999861717224,5 0,5 C-0.5519999861717224,5 -1,4.552000045776367 -1,4 C-1,4 -1,-4 -1,-4 C-1,-4.552000045776367 -0.5519999861717224,-5 0,-5z"
 										></path>
 									</g>
 									<g opacity="1" transform="matrix(1,0,0,1,11,10)">
 										<path
-											fill="gray"
+											fill="currentColor"
 											fillOpacity="1"
 											d=" M-5,-10 C-5,-10 -5,-10 -5,-10 C-4.447999954223633,-10 -4,-9.552000045776367 -4,-9 C-4,-9 -4,9 -4,9 C-4,9.552000045776367 -4.447999954223633,10 -5,10 C-5.552000045776367,10 -6,9.552000045776367 -6,9 C-6,9 -6,-9 -6,-9 C-6,-9.552000045776367 -5.552000045776367,-10 -5,-10z"
 										></path>
 									</g>
 									<g opacity="1" transform="matrix(1,0,0,1,6,10)">
 										<path
-											fill="gray"
+											fill="currentColor"
 											fillOpacity="1"
 											d=" M5,-7 C5,-7 5,-7 5,-7 C5.552000045776367,-7 6,-6.552000045776367 6,-6 C6,-6 6,6 6,6 C6,6.552000045776367 5.552000045776367,7 5,7 C4.447999954223633,7 4,6.552000045776367 4,6 C4,6 4,-6 4,-6 C4,-6.552000045776367 4.447999954223633,-7 5,-7z"
 										></path>
 									</g>
 									<g opacity="1" transform="matrix(1,0,0,1,16,10)">
 										<path
-											fill="gray"
+											fill="currentColor"
 											fillOpacity="1"
 											d=" M0,-8 C0,-8 0,-8 0,-8 C0.5519999861717224,-8 1,-7.552000045776367 1,-7 C1,-7 1,7 1,7 C1,7.552000045776367 0.5519999861717224,8 0,8 C-0.5519999861717224,8 -1,7.552000045776367 -1,7 C-1,7 -1,-7 -1,-7 C-1,-7.552000045776367 -0.5519999861717224,-8 0,-8z"
 										></path>
 									</g>
 									<g opacity="1" transform="matrix(1,0,0,1,21,10)">
 										<path
-											fill="gray"
+											fill="currentColor"
 											fillOpacity="1"
 											d=" M0,-4 C0,-4 0,-4 0,-4 C0.5519999861717224,-4 1,-3.552000045776367 1,-3 C1,-3 1,3 1,3 C1,3.552000045776367 0.5519999861717224,4 0,4 C-0.5519999861717224,4 -1,3.552000045776367 -1,3 C-1,3 -1,-3 -1,-3 C-1,-3.552000045776367 -0.5519999861717224,-4 0,-4z"
 										></path>
@@ -448,7 +448,7 @@ export function LookBlankIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function PhoneIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 24 24" width="24" height="24">
+		<svg viewBox="0 0 24 24" width="24" height="24" className='dark:text-[#AEAEAE] dark:hover:text-white text-colorTextLightMode hover:text-black'>
 			<defs>
 				<clipPath id="__lottie_element_6223">
 					<rect width="24" height="24" x="0" y="0"></rect>
@@ -462,7 +462,7 @@ export function PhoneIcon(props: React.HTMLAttributes<SVGElement>) {
 					<g transform="matrix(25,0,0,25,300,315)" opacity="1">
 						<g opacity="1" transform="matrix(1,0,0,1,0,-0.6100000143051147)">
 							<path
-								fill="gray"
+								fill="currentColor"
 								fillOpacity="1"
 								d=" M9.335000038146973,-1.8179999589920044 C4.184999942779541,-6.9670000076293945 -4.164000034332275,-6.9670000076293945 -9.312999725341797,-1.8179999589920044 C-11.690999984741211,0.5609999895095825 -11.35099983215332,3.6040000915527344 -9.555999755859375,5.39900016784668 C-9.300999641418457,5.6539998054504395 -8.909000396728516,5.7129998207092285 -8.59000015258789,5.544000148773193 C-8.59000015258789,5.544000148773193 -4.269999980926514,3.256999969482422 -4.269999980926514,3.256999969482422 C-3.871000051498413,3.0460000038146973 -3.683000087738037,2.5769999027252197 -3.8259999752044678,2.1489999294281006 C-3.8259999752044678,2.1489999294281006 -4.558000087738037,-0.04600000008940697 -4.558000087738037,-0.04600000008940697 C-1.8250000476837158,-1.9980000257492065 1.8459999561309814,-1.9980000257492065 4.578999996185303,-0.04600000008940697 C4.578999996185303,-0.04600000008940697 3.815000057220459,2.757999897003174 3.815000057220459,2.757999897003174 C3.693000078201294,3.2070000171661377 3.9240000247955322,3.677000045776367 4.354000091552734,3.8540000915527344 C4.354000091552734,3.8540000915527344 8.63599967956543,5.617000102996826 8.63599967956543,5.617000102996826 C8.946000099182129,5.744999885559082 9.303000450134277,5.672999858856201 9.539999961853027,5.435999870300293 C11.331999778747559,3.6440000534057617 11.708999633789062,0.5559999942779541 9.335000038146973,-1.8179999589920044z"
 							></path>
@@ -2183,7 +2183,7 @@ export const PasteIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 
 export const RightIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" className="w-5 h-5 dark:text-[#B5BAC1] text-black group-hover:text-white">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" className="w-5 h-5 dark:text-[#B5BAC1] text-black dark:group-hover:text-white">
 			<path
 				fillRule="evenodd"
 				d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
