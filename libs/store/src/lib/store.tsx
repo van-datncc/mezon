@@ -60,14 +60,6 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
-const persistedVoiceReducer = persistReducer(
-	{
-		key: 'voice',
-		storage,
-	},
-	voiceReducer,
-);
-
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -94,7 +86,7 @@ const reducer = {
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
 	notification: notificationReducer,
-	voice: persistedVoiceReducer,
+	voice: voiceReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: emojiSuggestionReducer,

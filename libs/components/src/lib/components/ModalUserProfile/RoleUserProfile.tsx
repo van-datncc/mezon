@@ -78,18 +78,18 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						+
 						<div className="absolute" style={{ top: `${positionTop}px`, left: `${positionLeft}px` }}>
 							{showPopupAddRole ? (
-								<div className="w-[300px] h-fit bg-[#323232] p-2 text-white overflow-y: auto">
+								<div className="w-[300px] h-fit dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto">
 									<input
 										type="text"
-										className="w-full border-[#1d1c1c] rounded-[5px] bg-[#1d1c1c] px-2"
+										className="w-full border-[#1d1c1c] rounded-[5px] dark:bg-[#1d1c1c] bg-bgLightModeSecond px-2"
 										placeholder="Role"
 										onChange={handleInputChange}
 									/>
-									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden">
+									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden hide-scrollbar">
 										{filteredListRoleBySearch.map((role, index) => (
 											<div
 												key={index}
-												className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 bg-bgDisable mr-2 hover:bg-[#1d1c1c] "
+												className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgLightMode mr-2 dark:hover:bg-[#1d1c1c] hover:bg-bgLightModeButton"
 												onClick={() => addRole(role.id)}
 											>
 												{role.title}

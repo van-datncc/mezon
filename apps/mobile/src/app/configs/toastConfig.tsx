@@ -1,22 +1,22 @@
 
 import { BaseToast, ToastConfig } from 'react-native-toast-message';
 import { View, StyleSheet } from 'react-native';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, size } from '@mezon/mobile-ui';
 
 const styles = StyleSheet.create({
     container: {
-        height: 60,
+        height: size.s_50,
         width: '80%',
         backgroundColor: Colors.surface,
-        borderRadius: 40,
+        borderRadius: size.s_40,
         flexDirection: 'row',
         alignItems: 'center',
         borderLeftColor: 'transparent',
-        paddingHorizontal: 20,
+        paddingHorizontal: size.s_20,
     },
     iconWrapper: {
-        width: 20,
-        height: 20,
+        width: size.s_20,
+        height: size.s_20,
     }
 });
 
@@ -38,16 +38,14 @@ export const toastConfig: ToastConfig = {
         return (
             <BaseToast
                 style={styles.container}
-                contentContainerStyle={{ paddingHorizontal: 15 }}
+                contentContainerStyle={{ paddingHorizontal: size.s_20 }}
                 text1Style={[{
-                    fontSize: 20,
-                    fontWeight: '600',
-                    color: 'white',
+                    fontSize: size.label,
+                    color: Colors.white,
                 }, props.text1Style]}
                 text2Style={[{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    color: 'white',
+                    fontSize: size.medium,
+                    color: Colors.white,
                 }, props.text2Style]}
                 text1={props.props.text1}
                 text2={props.props.text2}

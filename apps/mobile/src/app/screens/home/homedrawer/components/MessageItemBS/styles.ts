@@ -19,8 +19,8 @@ export const styles = StyleSheet.create({
 		paddingVertical: size.s_12
 	},
 	icon: {
-		width: 20,
-		height: 20,
+		width: size.s_20,
+		height: size.s_20,
 	},
 	actionText: {
 		color: Colors.white

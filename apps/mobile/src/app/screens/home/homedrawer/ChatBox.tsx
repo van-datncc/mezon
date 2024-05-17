@@ -1,26 +1,34 @@
 import { useChatSending } from '@mezon/core';
+import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
+import { IMessageWithUser } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable } from 'react-native';
+import {DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform} from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
-import { styles } from './styles';
-import EmojiSwitcher, { IMode } from "./components/EmojiPicker";
-import AttachmentPicker from "./components/AttachmentPicker";
+import { IModeKeyboardPicker } from './components';
+import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
+import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
+import { styles } from './styles';
+import AttachmentPicker from "./components/AttachmentPicker";
 import { useSelector } from 'react-redux';
 import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import { IMessageActionNeedToResolve } from './types';
-import { IMessageWithUser } from '@mezon/utils';
-import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
-const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: number, onPickerShow: (isShow: boolean, height: number) => void }) => {
+interface IChatBoxProps {
+	channelLabel: string;
+	channelId: string;
+	mode: number;
+	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
+}
+const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<any>();
-	const [mode, setMode] = useState<IMode>("text");
+	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
@@ -30,6 +38,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 	const [isFocus, setIsFocus] = useState<boolean>(false);
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 
 	const { t } = useTranslation(['message']);
 
@@ -129,8 +138,14 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
 		}
 	}, [messageActionListNeedToResolve])
-
+	
+	function keyboardWillShow(event: KeyboardEvent) {
+		if (keyboardHeight !== event.endCoordinates.height) {
+			setKeyboardHeight(event.endCoordinates.height);
+		}
+	}
 	useEffect(() => {
+		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(
 			'@SHOW_KEYBOARD',
 			(value) => {
@@ -144,6 +159,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 		return () => {
 			showKeyboard.remove();
 			resetInput();
+			keyboardListener.remove();
 		};
 	}, [pushMessageActionIntoStack]);
 
@@ -152,7 +168,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 			inputRef.current.focus();
 			setIsFocus(true);
 		}, 300);
-	}
+	};
 
 	const resetInput = () => {
 		setIsFocus(false);
@@ -162,20 +178,24 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 		}
 	};
 
-	function handleInputMode(mode: IMode, height) {
-		setMode(mode)
-		if (mode === "emoji") {
-			props.onPickerShow(true, height);
+	function handleKeyboardBottomSheetMode(mode: IModeKeyboardPicker) {
+		setModeKeyBoardBottomSheet(mode);
+		if (mode === 'emoji' || mode === 'attachment') {
+			props.onShowKeyboardBottomSheet(true, keyboardHeight, mode);
 		} else {
 			inputRef && inputRef.current && inputRef.current.focus();
-			props.onPickerShow(false, 0)
+			props.onShowKeyboardBottomSheet(false, 0);
 		}
 	}
 
 	function handleInputFocus() {
-		setMode("text");
+		setModeKeyBoardBottomSheet('text');
 		inputRef && inputRef.current && inputRef.current.focus();
-		props.onPickerShow(false, 0)
+		props.onShowKeyboardBottomSheet(false, keyboardHeight);
+	}
+
+	function handleInputBlur() {
+		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
 	}
 
 	return (
@@ -184,9 +204,11 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 				{senderMessage?.user?.username ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.Reply)}>
-							<Feather size={25} name='x' style={styles.closeIcon} />
+							<Feather size={25} name="x" style={styles.closeIcon} />
 						</Pressable>
-						<Text style={styles.aboveTextBoxText}>{t('chatBox.replyingTo')} {senderMessage?.user?.username}</Text>
+						<Text style={styles.aboveTextBoxText}>
+							{t('chatBox.replyingTo')} {senderMessage?.user?.username}
+						</Text>
 					</View>
 				): null}
 				{currentSelectedEditMessage ? (
@@ -206,7 +228,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 				) : (
 					<>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
-							<AttachmentPicker />
+							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						</View>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 							<GiftIcon width={22} height={22} />
@@ -228,6 +250,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						ref={inputRef}
 						onSubmitEditing={handleSendMessage}
 						onFocus={handleInputFocus}
+						onBlur={handleInputBlur}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
@@ -235,7 +258,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						]}
 					/>
 					<View style={styles.iconEmoji}>
-						<EmojiSwitcher onChange={handleInputMode} mode={mode} />
+						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 					</View>
 				</View>
 
