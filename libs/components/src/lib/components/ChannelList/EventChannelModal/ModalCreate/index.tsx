@@ -100,7 +100,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, [currentModal, topic]);
 
 	return (
-		<div className="bg-[#313339] rounded-lg overflow-hidden text-sm p-4">
+		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4">
 			<div className="flex gap-x-4 mb-4">
 				{tabs.map((item, index) => {
 					const isCurrent = currentModal === index;

@@ -76,7 +76,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	};
 
 	return (
-		<div className="p-2 absolute w-full bottom-[57px] bg-bgSecondary600 border-b-[1px] border-borderDivider">
+		<div className="p-2 absolute w-full bottom-[57px] dark:bg-bgSecondary600 bg-bgLightModeThird border-b-[1px] border-borderDivider">
 			<div className="flex items-center gap-2 iconHover justify-between">
 				<div className="">
 					<div className="flex items-center whitespace-nowrap text-ellipsis overflow-hidden pb-[2px]">
@@ -102,22 +102,22 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 				</div>
 			</div>
 			<div className="actionButtons">
-				<div className="flex items-center button-icon bg-bgPrimary hover:bg-bgSecondary">
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight dark:hover:bg-bgSecondary">
 					<button className="w-[18px] h-[20px]" onClick={openCamera}>
 						<Icons.CameraIcon />
 					</button>
 				</div>
-				<div className="flex items-center button-icon bg-bgPrimary hover:bg-bgSecondary">
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight dark:hover:bg-bgSecondary">
 					<button className="w-[18px] h-[20px]" onClick={showScreen ? stopScreenShare : startScreenShare}>
 						<Icons.ShareIcon />
 					</button>
 				</div>
-				<div className="flex items-center button-icon bg-bgPrimary hover:bg-bgSecondary">
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight dark:hover:bg-bgSecondary">
 					<button className="w-[18px] h-[20px]">
 						<Icons.RocketIcon />
 					</button>
 				</div>
-				<div className="flex items-center button-icon bg-bgPrimary hover:bg-bgSecondary">
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight dark:hover:bg-bgSecondary">
 					<button className="w-[18px] h-[20px]">
 						<Icons.BellIcon />
 					</button>

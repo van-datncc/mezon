@@ -14,21 +14,21 @@ const TableMemberItem = ({ name, roleId, avatar, clanJoinTime, discordJoinTime }
 					<img src={avatar} alt={name} className="w-[36px] h-[36px] min-w-[36px] rounded-full object-cover" />
 					<div className="flex flex-col">
 						<p className="text-base font-medium">{name}</p>
-						<p className="text-[11px] text-contentSecondary">{name}</p>
+						<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{name}</p>
 					</div>
 				</div>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs text-textPrimary font-bold uppercase">{clanJoinTime ?? '-'}</span>
+				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{clanJoinTime ?? '-'}</span>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs text-textPrimary font-bold uppercase">{discordJoinTime ?? '-'}</span>
+				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{discordJoinTime ?? '-'}</span>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs text-textPrimary font-bold uppercase">{roleId ?? '-'}</span>
+				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{roleId ?? '-'}</span>
 			</div>
 			<div className="flex-3 p-1 text-center">
-				<span className="text-xs text-textPrimary font-bold uppercase">Signals</span>
+				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Signals</span>
 			</div>
 		</div>
 	);

@@ -4,10 +4,9 @@ import { Pressable, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import MemberItem from "./MemberItem";
-import RightIcon from "../../../assets/svg/angle-right.svg";
-import AddMemberIcon from "../../../assets/svg/addMember.svg";
 
 import style from "./style";
+import { AddMemberIcon, AngleRightIcon } from "@mezon/mobile-components";
 
 export default function MemberListStatus() {
     const currentChannelId = useSelector(selectCurrentChannelId);
@@ -24,7 +23,7 @@ export default function MemberListStatus() {
                         <Text style={style.text}>Invite Members</Text>
                     </View>
                     <View>
-                        <RightIcon height={22} width={22} />
+                        <AngleRightIcon height={22} width={22} />
                     </View>
                 </View>
             </Pressable>

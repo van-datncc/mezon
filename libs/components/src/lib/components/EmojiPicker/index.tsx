@@ -31,6 +31,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const categoriesWithIcons = dataCategories
 		.map((category, index) => ({ name: category, icon: categoryIcons[index] }))
 		.filter((category) => category.name !== '' && category.name !== 'Component');
+	[categoriesWithIcons[0], categoriesWithIcons[1]] = [categoriesWithIcons[1], categoriesWithIcons[0]];
 
 	const {
 		reactionMessageDispatch,
@@ -76,7 +77,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		setEmojiHoverShortCode(emojiHover.shortname);
 	};
 
-	const scrollToCategory = (categoryName: string) => {
+	const scrollToCategory = (event: React.MouseEvent, categoryName: string) => {
+		event.stopPropagation();
 		setSelectedCategory(categoryName);
 		const categoryDiv = categoryRefs.current[categoryName];
 		if (categoryDiv && containerRef.current) {
@@ -114,7 +116,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	return (
 		<div className={`flex max-h-full flex-row w-full md:w-[500px] ${props.isReaction && 'border border-black rounded overflow-hidden'}`}>
-			<div className={`w-[10%] md:w-[10%] md:max-w-[10%] flex flex-col gap-y-1 max-w-[90%] dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1 px-1 md:items-start h-[25rem] pb-1 rounded ${!props.isReaction && 'md:ml-2 mb-2'}`}>
+			<div
+				className={`w-[10%] md:w-[10%] md:max-w-[10%] flex flex-col gap-y-1 max-w-[90%] dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1 px-1 md:items-start h-[25rem] pb-1 rounded ${!props.isReaction && 'md:ml-2 mb-2'}`}
+			>
 				<div className="w-9 h-9  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.Star defaultSize="w-7 h-7" />
 				</div>
@@ -126,8 +130,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					return (
 						<button
 							key={index}
-							className={`w-9 h-9 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'dark:hover:bg-[#41434A] hover:bg-bgLightModeButton'} rounded-md`}
-							onClick={() => scrollToCategory(item.name)}
+							className={`w-9 h-9 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
+							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}
 						</button>
@@ -135,7 +139,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				})}
 			</div>
 			<div className="flex flex-col">
-				<div ref={containerRef} className="w-full max-h-[352px] overflow-y-scroll overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode">
+				<div
+					ref={containerRef}
+					className="w-full max-h-[352px] overflow-y-scroll overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
+				>
 					{categoriesWithIcons.map((item, index) => {
 						return (
 							<div className="w-full" key={item.name} ref={(el) => (categoryRefs.current[item.name] = el)}>
@@ -144,7 +151,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						);
 					})}
 				</div>
-				<div className={`w-full min-h-12  dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!props.isReaction && 'mb-2'}`}>
+				<div
+					className={`w-full min-h-12  dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!props.isReaction && 'mb-2'}`}
+				>
 					<span className="text-3xl"> {emojiHoverNative}</span>
 					{emojiHoverShortCode}
 				</div>
@@ -177,18 +186,16 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 
 	return (
 		<div>
-			{categoryName !== '' && (
-				<button
-					onClick={() => setEmojisPanelStatus(!emojisPanel)}
-					className="w-full flex flex-row justify-start items-center pl-1 mb-1 py-1 sticky top-0 dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black rounded"
-				>
-					{categoryName}
-					<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
-						{' '}
-						<Icons.ArrowRight />
-					</span>
-				</button>
-			)}
+			<button
+				onClick={() => setEmojisPanelStatus(!emojisPanel)}
+				className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 bg-[#2B2D31] z-10"
+			>
+				{categoryName}
+				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
+					{' '}
+					<Icons.ArrowRight />
+				</span>
+			</button>
 			{emojisPanel && (
 				<div className=" grid grid-cols-12 ml-1 gap-1">
 					{emojisByCategoryName.map((item, index) => (

@@ -66,7 +66,7 @@ const SettingPermissions = () => {
 		<>
 			<div className="w-full flex">
 				<input
-					className="flex-grow bg-black p-[7px] border rounded-lg"
+					className="flex-grow dark:bg-black bg-white p-[7px] border rounded-lg"
 					type="text"
 					placeholder="Search Permissions"
 					value={searchTerm}

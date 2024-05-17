@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { getAppInfo } from '@mezon/mobile-components';
 import { fcmActions } from '@mezon/store';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,11 +9,11 @@ import { useDispatch } from 'react-redux';
 import { handleFCMToken, setupNotificationListeners } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigator from './BottomNavigator';
+import { MenuClanStacks } from './stacks/MenuSererStack';
 import { MenuThreadDetailStacks } from './stacks/MenuThreadDetailStacks';
 import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
-import { MenuClanStacks } from './stacks/MenuSererStack';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
@@ -26,9 +27,11 @@ export const Authentication = () => {
 	const loadFRMConfig = async () => {
 		const fcmtoken = await handleFCMToken();
 		if (fcmtoken) {
+			const deviceId = getAppInfo().app_device_id;
+			const platform = getAppInfo().app_platform;
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
-			dispatch(fcmActions.registFcmDeviceToken(fcmtoken));
+			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: deviceId, platform: platform }));
 		}
 		setupNotificationListeners(navigation, dispatch);
 	};
@@ -63,10 +66,7 @@ export const Authentication = () => {
 				/>
 				<RootStack.Screen
 					name={APP_SCREEN.MENU_THREAD.STACK}
-					children={props =>
-					(
-						<MenuThreadDetailStacks {...props} />
-					)}
+					children={(props) => <MenuThreadDetailStacks {...props} />}
 					options={{
 						gestureEnabled: true,
 						gestureDirection: 'horizontal',
@@ -75,9 +75,7 @@ export const Authentication = () => {
 
 				<RootStack.Screen
 					name={APP_SCREEN.MENU_CLAN.STACK}
-					children={props => (
-						<MenuClanStacks {...props} />
-					)}
+					children={(props) => <MenuClanStacks {...props} />}
 					options={{
 						gestureEnabled: true,
 						gestureDirection: 'horizontal',

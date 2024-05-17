@@ -83,8 +83,8 @@ export default function FriendsPage() {
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgPrimary h-[100%]">
-			<div className="flex min-w-0 items-center bg-bgPrimary shadow border-b-[1px] border-bgTertiary px-6 py-3 justify-start h-heightHeader">
+		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
+			<div className="flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader">
 				{closeMenu ? (
 					statusMenu ? (
 						<></>
@@ -97,15 +97,15 @@ export default function FriendsPage() {
 					<></>
 				)}
 				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenu && !statusMenu ? 'ml-7' : ''}`}>
-					<div className="flex flex-row gap-2 items-center">
+					<div className="flex flex-row gap-2 items-center dark:text-white text-black">
 						<Icons.IconFriends />
 						Friend
 					</div>
-					<div className="flex flex-row gap-4 border-l-[1px] pl-6 border-bgModifierHover">
+					<div className="flex flex-row gap-4 border-l-[1px] pl-6 dark:border-bgModifierHover border-[#bbb]">
 						{tabData.map((tab, index) => (
 							<div key={index} className="relative">
 								<button
-									className={`px-3 py-[6px] rounded-[4px] ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-[#151C2B]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
+									className={`px-3 py-[6px] rounded-[4px] dark:text-white text-black ${currentTabStatus === tab.value && !openModalAddFriend ? 'dark:bg-[#151C2B] bg-[#cfdefd]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
 									tabIndex={index}
 									onClick={() => handleChangeTab(tab.value)}
 								>
@@ -129,7 +129,7 @@ export default function FriendsPage() {
 				</div>
 			</div>
 			<div className="flex-1 flex w-full">
-				<div className="px-8 py-6 flex-1 bg-bgPrimary">
+				<div className="px-8 py-6 flex-1 dark:bg-bgPrimary bg-[#F0F0F0]">
 					{!openModalAddFriend && (
 						<div className="flex flex-col text-[#AEAEAE]">
 							<div className="relative">
@@ -137,13 +137,13 @@ export default function FriendsPage() {
 									type="text"
 									onChange={(e) => setTextSearch(e.target.value)}
 									placeholder="Search"
-									className="mb-6 py-[10px] bg-bgTertiary text-[16px] font-normal h-[44px] text-textPrimary placeholder-textPrimary"
+									className="mb-6 py-[10px] dark:bg-bgTertiary bg-white text-[16px] font-normal h-[44px] dark:text-textDarkTheme text-textLightTheme placeholder-textPrimary"
 								/>
 								<div className="absolute top-3 right-5">
 									<Icons.Search />
 								</div>
 							</div>
-							<span className="text-[14px] text-contentSecondary mb-4 font-bold px-[14px]">
+							<span className="text-[14px] dark:text-contentSecondary text-black mb-4 font-bold px-[14px]">
 								{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 							</span>
 							<FriendList listFriendFilter={listFriendFilter} />
@@ -151,14 +151,14 @@ export default function FriendsPage() {
 					)}
 					{openModalAddFriend && (
 						<div className="w-full flex flex-col gap-3">
-							<span className="font-[700]">ADD FRIEND</span>
-							<span className="font-[400] text-[14px] text-contentTertiary">You can add friends with their Mezon usernames</span>
+							<span className="font-[700] dark:text-white text-black">ADD FRIEND</span>
+							<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">You can add friends with their Mezon usernames</span>
 
 							<div className="relative">
 								<InputField
 									onChange={(e) => handleChange('username', e.target.value)}
 									type="text"
-									className="bg-bgSurface mb-2 mt-1 py-3"
+									className="dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3"
 									value={requestAddFriend.usernames}
 									placeholder="Usernames"
 								/>
@@ -172,7 +172,7 @@ export default function FriendsPage() {
 						</div>
 					)}
 				</div>
-				<div className="w-[416px] max-w-2/5 bg-bgTertiary lg:flex hidden"></div>
+				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-[#F7F7F7] lg:flex hidden"></div>
 			</div>
 		</div>
 	);
