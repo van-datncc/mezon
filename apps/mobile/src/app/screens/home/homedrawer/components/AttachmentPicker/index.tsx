@@ -11,6 +11,7 @@ function AttachmentPicker(props: AttachmentPickerProps) {
 		// TODO: add logic here
 		// 	Allow select video, images
 	};
+
 	return (
 		<TouchableOpacity onPress={onPicker}>
 			<PlusIcon width={22} height={22} />
