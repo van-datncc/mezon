@@ -8,8 +8,8 @@ const MemberClan = () => {
 
 	const onPageChange = (page: number) => setCurrentPage(page);
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 w-full bg-bgSecondaryHover h-[100%] overflow-y-auto z-0 p-4">
-			<div className="flex flex-col bg-bgPrimary rounded-lg">
+		<div className="flex flex-col flex-1 shrink min-w-0 w-full dark:bg-bgSecondaryHover bg-bgLightModeThird h-[100%] overflow-y-auto z-0 p-4">
+			<div className="flex flex-col dark:bg-bgPrimary bg-bgLightMode rounded-lg dark:text-textDarkTheme text-textLightTheme">
 				<MemberTopBar />
 
 				<TableMember />

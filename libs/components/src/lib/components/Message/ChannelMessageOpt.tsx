@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
-import { useChatReaction, useReference, useThreads } from '@mezon/core';
+import { useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import { messagesActions, referencesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
-import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { EmojiPlaces, IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { Ref, forwardRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -16,6 +16,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
@@ -41,20 +42,21 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
-	const handleClickReact = (event: React.MouseEvent<HTMLDivElement>) => {
+	const handleClickReact = (event: any) => {
+		event.stopPropagation();
 		dispatch(reactionActions.setReactionRightState(true));
 		dispatch(referencesActions.setReferenceMessage(message));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION));
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionBottomState(false));
-		const rect = (event.target as HTMLElement).getBoundingClientRect(); 
-		const distanceToBottom = window.innerHeight - rect.bottom; 
-		if(distanceToBottom > 550){
+		setSubPanelActive(SubPanelName.NONE);
+		const rect = (event.target as HTMLElement).getBoundingClientRect();
+		const distanceToBottom = window.innerHeight - rect.bottom;
+		if (distanceToBottom > 550) {
 			dispatch(reactionActions.setReactionTopState(true));
 		} else {
 			dispatch(reactionActions.setReactionTopState(false));
 		}
-		event.stopPropagation();
 	};
 
 	const handleThread = () => {

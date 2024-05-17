@@ -1,5 +1,5 @@
 import { EMaxUserCanInvite } from "../enums";
-import { IExpireLinkOption } from "../models";
+import { IExpireLinkOption } from "../types";
 
 //TODO: update later when BE is ready
 export const LINK_EXPIRE_OPTION: IExpireLinkOption[] = [

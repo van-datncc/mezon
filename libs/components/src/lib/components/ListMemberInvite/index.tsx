@@ -1,4 +1,4 @@
-import { useDMInvite } from "@mezon/core";
+import { useApp, useDMInvite } from "@mezon/core";
 import { ChangeEvent, useMemo, useState } from "react";
 import ListMemberInviteItem from "./ListMemberInviteItem"
 import { DirectEntity } from "@mezon/store";
@@ -7,6 +7,7 @@ export type ModalParam = {
     channelID?: string;
 }
 const ListMemberInvite = (props: ModalParam) => {
+    const {appearanceTheme} = useApp();
     const { listDMInvite, listUserInvite } = useDMInvite(props.channelID);
     const [searchTerm, setSearchTerm] = useState('');
     const [sendIds, setSendIds] = useState<Record<string, boolean>>({});
@@ -49,11 +50,11 @@ const ListMemberInvite = (props: ModalParam) => {
                 value={searchTerm}
                 onChange={handleInputChange}
                 placeholder="Search..."
-                className="w-full h-10 border border-solid border-black bg-black rounded-[5px] px-[16px] py-[13px] text-[14px]"
+                className="w-full h-10 border border-solid dark:border-black dark:bg-black bg-bgLightModeSecond rounded-[5px] px-[16px] py-[13px] text-[14px]"
             />
-            <p className="ml-[0px] mt-[16px] mb-[16px] text-[#AEAEAE] text-[15px] cursor-default">This channel is private, only select members and roles can view this channel.</p>
-            <hr className="border-solid border-borderDefault rounded-t "></hr>
-            <div className='py-[10px] cursor-default overflow-y-auto max-h-[250px]'>
+            <p className="ml-[0px] mt-[16px] mb-[16px] dark:text-[#AEAEAE] text-black text-[15px] cursor-default">This channel is private, only select members and roles can view this channel.</p>
+            <hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t "></hr>
+            <div className={`py-[10px] cursor-default overflow-y-auto max-h-[250px] ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
                 {listDMInvite ? (
                     <div>
                         {filteredListDMBySearch?.map((dmGroup) => (
@@ -68,7 +69,7 @@ const ListMemberInvite = (props: ModalParam) => {
                     </div>
                 )}
             </div>
-            <hr className='border-solid border-borderDefault rounded-t ' />
+            <hr className='border-solid dark:border-borderDefault border-gray-200 rounded-t ' />
         </>
     )
 }

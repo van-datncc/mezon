@@ -133,3 +133,16 @@ export function SendIcon({ width = 60, height = 60, ...props }: SvgProps) {
 		</Svg>
 	)
 }
+export function ReplyIcon({ width = 20, height = 20, ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			viewBox="0 0 32 10"
+			fill="none"
+			{...props}
+		>
+			<Path d="M1 9V6a5 5 0 015-5h25" stroke="#535353" />
+		</Svg>
+	)
+}

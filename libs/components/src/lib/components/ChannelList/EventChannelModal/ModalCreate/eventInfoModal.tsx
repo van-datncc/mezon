@@ -64,14 +64,14 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					placeholder="What's your event?"
 					onChange={(e) => handleTopic(e.target.value)}
 					value={topic}
-					className="font-[400] rounded w-full text-white outline-none text-[15px]border border-black p-2 focus:outline-none focus:border-white-500 bg-black"
+					className="font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight"
 				/>
 			</div>
 			<div className="mb-4 flex gap-x-4">
 				<div className="w-1/2">
 					<h3 className="uppercase text-[11px] font-semibold ">Start Date</h3>
 					<DatePicker
-						className="bg-black p-2 rounded outline-none w-full"
+						className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 						wrapperClassName="w-full"
 						selected={selectedDate}
 						onChange={handleDateChange}
@@ -84,7 +84,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<select
 						name="time"
 						onChange={handleChangeTime}
-						className="block w-full bg-black border border-black text-white rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+						className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 					>
 						{renderOptions()}
 					</select>
@@ -94,7 +94,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<h3 className="uppercase text-[11px] font-semibold">Event Frequency</h3>
 				<select
 					name="frequency"
-					className="block w-full bg-black border border-black text-white rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 				>
 					{frequencies.map((frequency) => (
 						<option key={frequency} value={frequency}>
@@ -108,7 +108,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<div className="relative">
 					<TextArea
 						placeholder="Let everyone know how to use this channel!"
-						className="resize-none h-auto min-h-[87px] w-full bg-black overflow-y-hidden outline-none py-2 pl-3 pr-5"
+						className="resize-none h-auto min-h-[87px] w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black overflow-y-hidden outline-none py-2 pl-3 pr-5"
 						value={description}
 						onChange={handleChangeTextArea}
 						rows={1}

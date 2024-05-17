@@ -109,7 +109,7 @@ export default function ChannelLayout() {
 				onDragEnter={handleDragEnter}
 			>
 				<div className="flex h-heightWithoutTopBar flex-row ">
-					<div className={`flex flex-col flex-1 w-full h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
+					<div className={`flex flex-col flex-1 w-widthMessageViewChat h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}>
 						<div
 							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 							ref={messagesContainerRef}
@@ -136,7 +136,7 @@ export default function ChannelLayout() {
 							</div>
 						) : (
 							<div
-								className={`flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-widthMessageViewChat' : 'w-widthThumnailAttachment'}`}
+								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
 								{currentChannel && (
 									<ChannelTyping

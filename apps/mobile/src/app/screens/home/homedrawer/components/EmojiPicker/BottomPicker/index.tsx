@@ -13,7 +13,7 @@ export default forwardRef(function BottomPicker({ height = 0 }: IProps, ref: Ref
     return (
         <BottomSheet
             ref={ref}
-            snapPoints={[height === 0 ? 1 : height, '100%']}
+            snapPoints={[278, '100%']}
             animateOnMount
         >
             <BottomSheetView style={styles.contentContainer}>

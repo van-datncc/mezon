@@ -1,3 +1,4 @@
+
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
@@ -62,14 +63,18 @@ const HomeDefault = React.memo((props: any) => {
 const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation: any; channelTitle: string }) => {
 	const navigateMenuThreadDetail = () => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
-	}
+	};
 	return (
 		<View style={styles.homeDefaultHeader}>
 			<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={() => {
-						navigation.openDrawer()
-					}}>
+					<TouchableOpacity
+						activeOpacity={0.8}
+						style={styles.iconBar}
+						onPress={() => {
+							navigation.openDrawer();
+						}}
+					>
 						<BarsLogo width={20} height={20} />
 					</TouchableOpacity>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
