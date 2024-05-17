@@ -50,7 +50,7 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 						<p className="font-semibold tracking-wider text-xl one-line">{userById?.user?.username}</p>
 						<p className="font-medium tracking-wide text-sm">{userById?.user?.display_name}</p>
 					</div>
-					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center"></div>
+					<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
 					{isFooterProfile ? <StatusProfile userById={userById} /> : <RoleUserProfile userID={userID} />}
 

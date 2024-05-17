@@ -1,19 +1,21 @@
 import { useChatSending } from '@mezon/core';
 import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, Keyboard, KeyboardEvent, Platform, Pressable, Text, TextInput, View } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
-import { useSelector } from 'react-redux';
+import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { IModeKeyboardPicker } from './components';
 import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
 import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
+import AttachmentPicker from "./components/AttachmentPicker";
+import { useSelector } from 'react-redux';
+import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import Feather from 'react-native-vector-icons/Feather';
+import { useTranslation } from 'react-i18next';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 import { IMessageActionNeedToResolve } from './types';
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
@@ -28,42 +30,67 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<any>();
 	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({
-		channelId: props.channelId,
-		channelLabel: props.channelLabel,
-		mode: props.mode,
-	});
-	// const [messageRefId, setMessageId] = useState<string>('')
+	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
-	const [currentSelectedMessage, setCurrentSelectedMessage] = useState<IMessageWithUser | null>(null); //TODO: update later
-	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
+	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
+	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
+	const [isFocus, setIsFocus] = useState<boolean>(false);
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 
 	const { t } = useTranslation(['message']);
 
-	const handleSendMessage = useCallback(() => {
-		// sendMessage(text, mentions, attachments, references, anonymous);
-		const reference = currentSelectedMessage
-			? [
-					{
-						message_id: '',
-						message_ref_id: currentSelectedMessage.id,
-						ref_type: 0,
-						message_sender_id: currentSelectedMessage.user.id,
-						content: JSON.stringify(currentSelectedMessage.content),
-						has_attachment: Boolean(currentSelectedMessage.attachments.length),
-					},
-				]
-			: undefined;
+	const editMessage = useCallback(
+		(editMessage: string, messageId: string) => {
+			EditSendMessage(editMessage, messageId);
+		},
+		[EditSendMessage],
+	);
 
-		sendMessage({ t: text }, [], [], reference, false);
+	const removeMessageActionByType = useCallback((type: EMessageActionType) => {
+		const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== type)];
+		setMessageActionListNeedToResolve(newStack);
+	}, [messageActionListNeedToResolve])
+
+	const removeAction = useCallback((actionType: EMessageActionType) => {
+		switch (actionType) {
+			case EMessageActionType.Reply:
+				setSenderId('');
+				removeMessageActionByType(EMessageActionType.Reply);
+				setCurrentSelectedReplyMessage(null);
+				break;
+			case EMessageActionType.EditMessage:
+				setCurrentSelectedEditMessage(null);
+				removeMessageActionByType(EMessageActionType.EditMessage);
+				setText('');
+				break;
+			default:
+				break;
+		}
+	}, [removeMessageActionByType])
+
+	const handleSendMessage = useCallback(() => {
+		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
+		if (isEditMessage) {
+			editMessage(text, currentSelectedEditMessage.id);
+			removeAction(EMessageActionType.EditMessage);
+		} else {
+			const reference = currentSelectedReplyMessage ? [{
+				message_id: '',
+				message_ref_id: currentSelectedReplyMessage.id,
+				ref_type: 0,
+				message_sender_id: currentSelectedReplyMessage.user.id,
+				content: JSON.stringify(currentSelectedReplyMessage.content),
+				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
+			}]: undefined;
+	
+			sendMessage({ t: text }, [], [], reference, false);
+			removeAction(EMessageActionType.Reply);
+		}
 		setText('');
-		setSenderId('');
-		setCurrentSelectedMessage(null);
-	}, [sendMessage, text, currentSelectedMessage]);
+	}, [sendMessage, text, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -71,48 +98,65 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
-	const removeAction = (actionType: EMessageActionType) => {
-		//TODO: need remove from stack
-		switch (actionType) {
-			case EMessageActionType.Reply:
-				setSenderId('');
-				setCurrentSelectedMessage(null);
-				break;
-			case EMessageActionType.EditMessage:
-				//TODO:
-				break;
-			default:
-				break;
-		}
-	};
+	useEffect(() => {
+		messageActionListNeedToResolve.forEach((item) => {
+			const { targetMessage, type } = item;
+			switch (type) {
+				case EMessageActionType.Reply:
+					setCurrentSelectedReplyMessage(targetMessage);
+					setSenderId(targetMessage.sender_id);
+					break;
+				case EMessageActionType.EditMessage:
+					setCurrentSelectedEditMessage(targetMessage);
+					setText(targetMessage.content.t);
+					break;
+				default:
+					setSenderId('');
+					break;
+			}
+		})
+	}, [messageActionListNeedToResolve])
 
-	const pushMessageActionIntoStack = (messagePayload: IMessageActionNeedToResolve) => {
-		const { message } = messagePayload;
-		setCurrentSelectedMessage(message);
-		setSenderId(message?.sender_id);
-	};
+	
 
-	function keyboardWillShow(event: KeyboardEvent) {
-		if (keyboardHeight !== event.endCoordinates.height) {
-			setKeyboardHeight(event.endCoordinates.height);
+	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
+		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
+		  return 1;
 		}
+		if (a.type !== EMessageActionType.EditMessage && b.type === EMessageActionType.EditMessage) {
+		  return -1;
+		}
+		return 0;
 	}
+
+	const pushMessageActionIntoStack = useCallback((messagePayload: IMessageActionNeedToResolve) => {
+		const isExistingAction = messageActionListNeedToResolve.some(it => it.type === messagePayload.type);
+		if (isExistingAction) {
+			const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== messagePayload.type), {...messagePayload}].sort(sortMessageActionList);
+			setMessageActionListNeedToResolve(newStack);
+		} else {
+			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
+		}
+	}, [messageActionListNeedToResolve])
 
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
-		const showKeyboard = DeviceEventEmitter.addListener('@SHOW_KEYBOARD', (value) => {
-			//NOTE: trigger from message action 'MessageItemBS component'
-			resetInput();
-			openKeyBoard();
-			pushMessageActionIntoStack(value);
-		});
+		const showKeyboard = DeviceEventEmitter.addListener(
+			'@SHOW_KEYBOARD',
+			(value) => {
+				//NOTE: trigger from message action 'MessageItemBS component'
+				resetInput();
+				pushMessageActionIntoStack(value);
+				openKeyBoard();
+			},
+		);
 
 		return () => {
 			showKeyboard.remove();
 			resetInput();
 			keyboardListener.remove();
 		};
-	}, []);
+	}, [pushMessageActionIntoStack]);
 
 	const openKeyBoard = () => {
 		timeoutRef.current = setTimeout(() => {
@@ -122,8 +166,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	};
 
 	const resetInput = () => {
-		inputRef.current?.blur();
 		setIsFocus(false);
+		inputRef.current?.blur();
 		if (timeoutRef) {
 			clearTimeout(timeoutRef.current);
 		}
@@ -151,8 +195,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	return (
 		<View style={styles.wrapperChatBox}>
-			{senderMessage?.user?.username ? (
-				<View style={styles.aboveTextBoxWrapper}>
+			<View style={styles.aboveTextBoxWrapper}>
+				{senderMessage?.user?.username ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.Reply)}>
 							<Feather size={25} name="x" style={styles.closeIcon} />
@@ -161,14 +205,17 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							{t('chatBox.replyingTo')} {senderMessage?.user?.username}
 						</Text>
 					</View>
-					{/* TODO: edit case */}
-					{/* <View style={styles.aboveTextBoxItem}>
-						<Feather size={25} name='x' style={styles.closeIcon} />
-						<Text style={styles.aboveTextBoxText}>{senderMessage?.user?.username}</Text>
-					</View> */}
-				</View>
-			) : null}
-			<View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10 }}>
+				): null}
+				{currentSelectedEditMessage ? (
+					<View style={styles.aboveTextBoxItem}>
+						<Pressable onPress={() => removeAction(EMessageActionType.EditMessage)}>
+							<Feather size={25} name='x' style={styles.closeIcon} />
+						</Pressable>
+						<Text style={styles.aboveTextBoxText}>{t('chatBox.editingMessage')}</Text>
+					</View>
+				): null}
+			</View>
+			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<AngleRightIcon width={18} height={18} />
