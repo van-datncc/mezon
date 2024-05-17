@@ -70,17 +70,19 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
 			{isFetching && hasMoreMessage && <p className=" text-center">Loading messages...</p>}
 
-			{reverseArray(messages).map((message, i) => (
-				<ChannelMessage
-					mode={mode}
-					key={message.id}
-					lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-					message={message}
-					preMessage={reverseArray(messages).length > 0 ? reverseArray(messages)[i - 1] : undefined}
-					channelId={channelId}
-					channelLabel={channelLabel ?? ''}
-				/>
-			))}
+			{reverseArray(messages).map((message, i) => {
+				return (
+					<ChannelMessage
+						mode={mode}
+						key={message.id}
+						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+						message={message}
+						preMessage={reverseArray(messages).length > 0 ? reverseArray(messages)[i - 1] : undefined}
+						channelId={channelId}
+						channelLabel={channelLabel ?? ''}
+					/>
+				);
+			})}
 		</div>
 	);
 }

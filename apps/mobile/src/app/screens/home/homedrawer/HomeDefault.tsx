@@ -1,4 +1,4 @@
-import { SearchIcon } from '@mezon/mobile-components';
+
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
@@ -7,13 +7,31 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
 import { styles } from './styles';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { SearchIcon, remove } from '@mezon/mobile-components';
+import BottomPicker from './components/EmojiPicker/BottomPicker';
+import { useState } from 'react';
+import { useRef } from 'react';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
+
+	const [padding, setPadding] = useState<number>(0);
+	const bottomPickerRef = useRef<BottomSheet>(null);
+
+	function handlePickerShow(isShow: boolean, height: number) {
+		if (isShow) {
+			setPadding(height)
+			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.collapse();
+		} else {
+			setPadding(0)
+			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
+		}
+	}
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -31,7 +49,10 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label || ''}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						onPickerShow={handlePickerShow}
 					/>
+					<View style={{ height: padding }}></View>
+					<BottomPicker height={padding} ref={bottomPickerRef} />
 				</View>
 			)}
 		</View>

@@ -1,5 +1,5 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useAppNavigation, useFriends, useMenu } from '@mezon/core';
+import { useApp, useAppNavigation, useFriends, useMenu } from '@mezon/core';
 import {
 	gifsStickerEmojiActions,
 	messagesActions,
@@ -44,8 +44,10 @@ function MyApp() {
 		dispatch(reactionActions.setReactionBottomStateResponsive(false));
 	};
 
+	const { setAppearanceTheme, appearanceTheme } = useApp();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
+		setAppearanceTheme(appearanceTheme);
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
 				setCloseMenu(true);
@@ -106,6 +108,7 @@ function MyApp() {
 			window.removeEventListener('keydown', handleKeyDown);
 		};
 	}, []);
+
 
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">

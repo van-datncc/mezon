@@ -3,12 +3,8 @@ import { Colors } from '@mezon/mobile-ui';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
-import AngleRightIcon from '../../../../assets/svg/angle-right.svg';
-import ChatGiftIcon from '../../../../assets/svg/chatGiftNitro.svg';
-import MicrophoneIcon from '../../../../assets/svg/microphone.svg';
-import SendButtonIcon from '../../../../assets/svg/sendButton.svg';
 import { styles } from './styles';
-import EmojiPicker from "./components/EmojiPicker";
+import EmojiSwitcher, { IMode } from "./components/EmojiPicker";
 import AttachmentPicker from "./components/AttachmentPicker";
 import { EMessageActionType } from './enums';
 import { useSelector } from 'react-redux';
@@ -18,14 +14,15 @@ import { useTranslation } from 'react-i18next';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import { IMessageActionNeedToResolve } from './types';
 import { IMessageWithUser } from '@mezon/utils';
+import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
-const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: number }) => {
+const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: number, onPickerShow: (isShow: boolean, height: number) => void }) => {
 	const inputRef = useRef<any>();
+	const [mode, setMode] = useState<IMode>("text");
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
-
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
@@ -143,9 +140,9 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 				openKeyBoard();
 			},
 		);
-	
+
 		return () => {
-		  	showKeyboard.remove();
+			showKeyboard.remove();
 			resetInput();
 		};
 	}, [pushMessageActionIntoStack]);
@@ -164,6 +161,22 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 			clearTimeout(timeoutRef.current);
 		}
 	};
+
+	function handleInputMode(mode: IMode, height) {
+		setMode(mode)
+		if (mode === "emoji") {
+			props.onPickerShow(true, height);
+		} else {
+			inputRef && inputRef.current && inputRef.current.focus();
+			props.onPickerShow(false, 0)
+		}
+	}
+
+	function handleInputFocus() {
+		setMode("text");
+		inputRef && inputRef.current && inputRef.current.focus();
+		props.onPickerShow(false, 0)
+	}
 
 	return (
 		<View style={styles.wrapperChatBox}>
@@ -196,14 +209,15 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 							<AttachmentPicker />
 						</View>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
-							<ChatGiftIcon width={22} height={22} />
+							<GiftIcon width={22} height={22} />
 						</View>
 					</>
 				)}
+
 				<View style={{ position: 'relative', justifyContent: 'center' }}>
 					<TextInput
 						autoFocus={isFocus}
-						placeholder={'Write your thoughs here...'}
+						placeholder={'Write your thoughts here...'}
 						placeholderTextColor={Colors.textGray}
 						onChangeText={(text: string) => {
 							setText(text);
@@ -213,6 +227,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						blurOnSubmit={false}
 						ref={inputRef}
 						onSubmitEditing={handleSendMessage}
+						onFocus={handleInputFocus}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
@@ -220,13 +235,14 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						]}
 					/>
 					<View style={styles.iconEmoji}>
-						<EmojiPicker />
+						<EmojiSwitcher onChange={handleInputMode} mode={mode} />
 					</View>
 				</View>
+
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
 					{text.length > 0 ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
-							<SendButtonIcon width={18} height={18} />
+							<SendIcon width={18} height={18} />
 						</View>
 					) : (
 						<MicrophoneIcon width={22} height={22} />
