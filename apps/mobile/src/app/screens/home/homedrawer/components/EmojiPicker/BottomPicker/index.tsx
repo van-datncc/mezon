@@ -14,6 +14,7 @@ export default forwardRef(function BottomPicker({ height = 0 }: IProps, ref: Ref
         <BottomSheet
             ref={ref}
             snapPoints={[height === 0 ? 1 : height, '100%']}
+            enablePanDownToClose={height === 0}
             animateOnMount
         >
             <BottomSheetView style={styles.contentContainer}>
