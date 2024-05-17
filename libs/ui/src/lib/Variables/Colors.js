@@ -7,7 +7,8 @@ module.exports = {
   contentBrandLight: '#528BFF',
 
   /* status */
-  colorDanger: '#DC2626',
+  colorDanger: '#DA373C',
+  colorDangerHover: '#DA373C',
   colorSuccess: '#16A34A',
   colorWarning: '#EAB308',
   colorNeutral: '#AEAEAE',

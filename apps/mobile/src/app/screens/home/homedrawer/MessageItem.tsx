@@ -207,8 +207,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const setMessageSelected = (type: EMessageBSToShow) => {
 		setOpenBottomSheet(type)
-		console.log('nguoi gui', repliedSender);
-		console.log('message selected:', messageRefFetchFromServe);
 	}
 
 	const jumpToRepliedMesage = () => {

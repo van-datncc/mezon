@@ -132,7 +132,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 						onFocus={handleFocus}
 						ref={textareaRef}
 						defaultValue={mess.content.t}
-						className="w-[83%] bg-black rounded p-[10px]"
+						className="w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black"
 						onKeyDown={onSend}
 						onChange={(e) => {
 							onchange(e);

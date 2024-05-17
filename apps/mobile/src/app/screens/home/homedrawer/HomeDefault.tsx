@@ -1,19 +1,38 @@
+import BottomSheet from '@gorhom/bottom-sheet';
 import { SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
+import AttachmentPicker from './components/AttachmentPicker';
+import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
+import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
+
+	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
+	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
+	const bottomPickerRef = useRef<BottomSheet>(null);
+
+	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+		setHeightKeyboardShow(height);
+		if (isShow) {
+			setTypeKeyboardBottomSheet(type);
+			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.collapse();
+		} else {
+			setTypeKeyboardBottomSheet('text');
+			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
+		}
+	};
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -31,7 +50,25 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label || ''}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
+					<View
+						style={{
+							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
+							backgroundColor: Colors.secondary,
+						}}
+					/>
+					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
+						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
+							{typeKeyboardBottomSheet === 'emoji' ? (
+								<EmojiPicker />
+							) : typeKeyboardBottomSheet === 'attachment' ? (
+								<AttachmentPicker />
+							) : (
+								<View />
+							)}
+						</BottomKeyboardPicker>
+					)}
 				</View>
 			)}
 		</View>

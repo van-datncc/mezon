@@ -81,9 +81,9 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
 				</div>
 				<div className="flex items-center gap-2">
-					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-[#a1a1a1]" />
-					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-[#a1a1a1]" />
-					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-[#a1a1a1]" onClick={openSetting} />
+					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton" />
+					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton" />
+					<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton" onClick={openSetting} />
 				</div>
 			</button>
 			{showModalCustomStatus && <ModalCustomStatus name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}

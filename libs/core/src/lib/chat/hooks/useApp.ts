@@ -1,11 +1,13 @@
 import { appActions, selectIsShowMemberList, selectTheme, useAppDispatch } from '@mezon/store';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useApp() {
 	const dispatch = useAppDispatch();
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const appearanceTheme = useSelector(selectTheme);
+	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
+	const elementHTML = document.documentElement;
 
 	const setAppearanceTheme = useCallback(
 		(value: string) => {
@@ -20,6 +22,19 @@ export function useApp() {
 		},
 		[dispatch],
 	);
+	
+	useEffect(()=>{
+		switch(appearanceTheme){
+			case "dark":
+				elementHTML.classList.add('dark');
+				break;
+			case "light":
+				elementHTML.classList.remove('dark');
+				break;
+			default:
+				break;
+		}
+	}, [appearanceTheme])
 
 	return useMemo(
 		() => ({
@@ -27,7 +42,9 @@ export function useApp() {
 			setIsShowMemberList,
 			appearanceTheme,
 			setAppearanceTheme,
+			systemIsDark,
+			elementHTML,
 		}),
-		[isShowMemberList, setIsShowMemberList, appearanceTheme, setAppearanceTheme],
+		[isShowMemberList, setIsShowMemberList, appearanceTheme, setAppearanceTheme, systemIsDark, elementHTML],
 	);
 }

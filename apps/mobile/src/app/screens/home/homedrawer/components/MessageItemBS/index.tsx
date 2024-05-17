@@ -5,22 +5,25 @@ import { styles } from './styles';
 import { useRef } from 'react';
 import { useEffect } from 'react';
 import Feather from 'react-native-vector-icons/Feather';
-import { IReplyBottomSheet } from '../../types/message.interface';
+import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { useTranslation } from 'react-i18next';
 import { getMessageActions } from '../../constants';
+import { useAuth } from '@mezon/core';
+import { useMemo } from 'react';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     const { type, onClose, message } = props;
     const ref = useRef(null);
     const [content, setContent] = useState<React.ReactNode>(<View />);
     const { t } = useTranslation(['message']);
+    const { userProfile } = useAuth();
 
     const handleActionEditMessage = () => {
         onClose();
-        const payload = {
+        const payload: IMessageActionNeedToResolve = {
             type: EMessageActionType.EditMessage,
-            message
+            targetMessage: message
         }
         //Note: trigger to ChatBox.tsx
         DeviceEventEmitter.emit('@SHOW_KEYBOARD', payload);
@@ -28,11 +31,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
     const handleActionReply = () => {
         onClose();
-        //Note: trigger to ChatBox.tsx
-        const payload = {
+        const payload: IMessageActionNeedToResolve = {
             type: EMessageActionType.Reply,
-            message
+            targetMessage: message
         }
+        //Note: trigger to ChatBox.tsx
         DeviceEventEmitter.emit('@SHOW_KEYBOARD', payload);
     }
 
@@ -98,6 +101,14 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
         }
     }
 
+    const messageActionList = useMemo(() => {
+        const isMyMessage = userProfile?.user?.id === message?.user?.id;
+        if (!isMyMessage) {
+            return getMessageActions(t).filter(action => action.type !== EMessageActionType.EditMessage);
+        }
+        return getMessageActions(t);
+    }, [t, userProfile, message])
+
     const renderUserInformation = () => {
         return (
             <View>
@@ -110,7 +121,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
         return (
             <View style={styles.messageActionsWrapper}>
                 <FlatList
-                    data={getMessageActions(t)}
+                    data={messageActionList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <Pressable style={styles.actionItem} onPress={() => implementAction(item.type)}>
