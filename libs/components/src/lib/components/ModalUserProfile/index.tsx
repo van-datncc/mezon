@@ -40,7 +40,10 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 	return (
 		<div>
 			<div className="h-[60px] bg-[#8CBC4F] rounded-tr-[10px] rounded-tl-[10px]"></div>
-			<AvatarProfile />
+			<AvatarProfile
+				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
+				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
+			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col gap-3 text-justify">
 					<div>

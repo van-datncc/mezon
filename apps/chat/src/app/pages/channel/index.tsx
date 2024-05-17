@@ -136,7 +136,7 @@ export default function ChannelLayout() {
 							</div>
 						) : (
 							<div
-								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
+								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'xl:w-widthThumnailAttachment sbm:w-full'}`}
 							>
 								{currentChannel && (
 									<ChannelTyping
@@ -160,6 +160,7 @@ export default function ChannelLayout() {
 					</div>
 					{isShowMemberList && (
 						<div
+							onContextMenu={(event) => event.preventDefault()}
 							className={` dark:bg-bgSecondary bg-bgLightModeSecond text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
 							id="memberList"
 						>

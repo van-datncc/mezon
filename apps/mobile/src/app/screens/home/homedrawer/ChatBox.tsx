@@ -3,12 +3,8 @@ import { Colors } from '@mezon/mobile-ui';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
-import AngleRightIcon from '../../../../assets/svg/angle-right.svg';
-import ChatGiftIcon from '../../../../assets/svg/chatGiftNitro.svg';
-import MicrophoneIcon from '../../../../assets/svg/microphone.svg';
-import SendButtonIcon from '../../../../assets/svg/sendButton.svg';
 import { styles } from './styles';
-import EmojiPicker from "./components/EmojiPicker";
+import EmojiSwitcher, { IMode } from "./components/EmojiPicker";
 import AttachmentPicker from "./components/AttachmentPicker";
 import { EChatBoxAction, EMessageActionType } from './enums';
 import { useSelector } from 'react-redux';
@@ -18,15 +14,17 @@ import { useTranslation } from 'react-i18next';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import { IMessageActionNeedToResolve } from './types';
 import { IMessageWithUser } from '@mezon/utils';
+import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
 
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
-const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: number }) => {
+const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: number, onPickerShow: (isShow: boolean, height: number) => void }) => {
 	const inputRef = useRef<any>();
+	const [mode, setMode] = useState<IMode>("text");
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	// const [messageRefId, setMessageId] = useState<string>('')
-	const [ messageActionListNeedToResolve, setMessageActionListNeedToResolve ] = useState<IMessageActionNeedToResolve[]>([]);
+	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
 	const [currentSelectedMessage, setCurrentSelectedMessage] = useState<IMessageWithUser | null>(null); //TODO: update later
 	const [isFocus, setIsFocus] = useState<boolean>(false);
@@ -45,7 +43,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 			message_sender_id: currentSelectedMessage.user.id,
 			content: JSON.stringify(currentSelectedMessage.content),
 			has_attachment: Boolean(currentSelectedMessage.attachments.length),
-		}]: undefined;
+		}] : undefined;
 
 		sendMessage({ t: text }, [], [], reference, false);
 		setText('');
@@ -90,9 +88,9 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 				pushMessageActionIntoStack(value);
 			},
 		);
-	
+
 		return () => {
-		  	showKeyboard.remove();
+			showKeyboard.remove();
 			resetInput();
 		};
 	}, []);
@@ -112,6 +110,22 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 		}
 	};
 
+	function handleInputMode(mode: IMode, height) {
+		setMode(mode)
+		if (mode === "emoji") {
+			props.onPickerShow(true, height);
+		} else {
+			inputRef && inputRef.current && inputRef.current.focus();
+			props.onPickerShow(false, 0)
+		}
+	}
+
+	function handleInputFocus() {
+		setMode("text");
+		inputRef && inputRef.current && inputRef.current.focus();
+		props.onPickerShow(false, 0)
+	}
+
 	return (
 		<View style={styles.wrapperChatBox}>
 			{senderMessage?.user?.username ? (
@@ -128,8 +142,8 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						<Text style={styles.aboveTextBoxText}>{senderMessage?.user?.username}</Text>
 					</View> */}
 				</View>
-			): null}
-			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
+			) : null}
+			<View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10 }}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<AngleRightIcon width={18} height={18} />
@@ -140,14 +154,15 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 							<AttachmentPicker />
 						</View>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
-							<ChatGiftIcon width={22} height={22} />
+							<GiftIcon width={22} height={22} />
 						</View>
 					</>
 				)}
+
 				<View style={{ position: 'relative', justifyContent: 'center' }}>
 					<TextInput
 						autoFocus={isFocus}
-						placeholder={'Write your thoughs here...'}
+						placeholder={'Write your thoughts here...'}
 						placeholderTextColor={Colors.textGray}
 						onChangeText={(text: string) => {
 							setText(text);
@@ -157,6 +172,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						blurOnSubmit={false}
 						ref={inputRef}
 						onSubmitEditing={handleSendMessage}
+						onFocus={handleInputFocus}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
@@ -164,13 +180,14 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						]}
 					/>
 					<View style={styles.iconEmoji}>
-						<EmojiPicker />
+						<EmojiSwitcher onChange={handleInputMode} mode={mode} />
 					</View>
 				</View>
+
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
 					{text.length > 0 ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
-							<SendButtonIcon width={18} height={18} />
+							<SendIcon width={18} height={18} />
 						</View>
 					) : (
 						<MicrophoneIcon width={22} height={22} />
