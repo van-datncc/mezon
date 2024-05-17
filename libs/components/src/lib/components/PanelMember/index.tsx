@@ -44,7 +44,7 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 				bottom: positionTop ? '12px' : 'auto',
 				top: positionTop ? 'auto' : coords.mouseY,
 			}}
-			className="fixed top-full bg-bgProfileBody rounded-sm shadow z-10 w-[250px] py-[10px] px-[10px]"
+			className="fixed top-full bg-bgProfileBody rounded-sm shadow z-20 w-[250px] py-[10px] px-[10px]"
 		>
 			<GroupPanelMember>
 				<ItemPanelMember children="Profile" />

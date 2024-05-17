@@ -26,7 +26,6 @@ const ModalRemoveMemberClan = ({ openModal, username, onClose }: ModalRemoveMemb
 						<textarea
 							rows={2}
 							className="text-[#B5BAC1] outline-none w-full h-16 p-[10px] bg-[#26262B] text-base rounded placeholder:text-sm"
-							placeholder="Support has arrived!"
 						/>
 					</div>
 
