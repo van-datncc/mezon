@@ -191,7 +191,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 									<div
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
-									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#313338] bg-bgLightMode border-[#313338]'}
+									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 										onClick={() =>
 											reactOnExistEmoji(
