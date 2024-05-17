@@ -12,6 +12,11 @@ enum Tabs_Option {
 	REVIEW = 2,
 }
 
+enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}
+
 export type ModalCreateProps = {
 	onClose: () => void;
 	onCloseEventModal: () => void;
@@ -21,11 +26,13 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const { onClose, onCloseEventModal } = props;
 	const [currentModal, setCurrentModal] = useState(0);
 	const [topic, setTopic] = useState('');
-	const [time, setTime] = useState('00:00');
+	const [timeStart, setTimeStart] = useState('00:00');
+	const [timeEnd, setTimeEnd] = useState('00:00');
 	const [voiceChannel, setVoiceChannel] = useState('');
 	const [buttonWork, setButtonWork] = useState(true);
 	const [titleEvent, setTitleEvent] = useState('');
 	const [option, setOption] = useState('');
+	const [logo, setLogo] = useState('');
 	const [description, setDescription] = useState('');
 	const { createEventManagement } = useEventManagement();
 	const { currentClanId } = useClans();
@@ -47,8 +54,12 @@ const ModalCreate = (props: ModalCreateProps) => {
 		setTopic(topic);
 	};
 
-	const handleTime = (time: string) => {
-		setTime(time);
+	const handleTimeStart = (time: string) => {
+		setTimeStart(time);
+	};
+
+	const handleTimeEnd = (time: string) => {
+		setTimeEnd(time);
 	};
 
 	const handleVoiceChannel = (channel: string) => {
@@ -74,8 +85,22 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}
 
 	const handleSubmit = async ()=>{
-		const timeValue = handleTimeISO(time);
-		await createEventManagement(currentClanId || '', voiceChannel, titleEvent, topic, timeValue, timeValue, description);
+		const timeValueStart = handleTimeISO(timeStart);
+		const timeValueEnd = handleTimeISO(timeEnd);
+
+		const voice = option === OptionEvent.OPTION_SPEAKER ? voiceChannel : '';
+		const title = option === OptionEvent.OPTION_LOCATION ? titleEvent : '';
+
+		if(!timeValueEnd){
+			await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueStart, description, logo);
+			hanldeCloseModal();
+			return;
+		}
+		await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueEnd, description, logo);
+		hanldeCloseModal();
+	}
+
+	const hanldeCloseModal = () =>{
 		onClose();
 		onCloseEventModal();
 	}
@@ -124,8 +149,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 						handleTitleEvent={handleTitleEvent}
 					/>
 				)}
-				{currentModal === Tabs_Option.EVENT_INFO && <EventInfoModal topic={topic} handleTopic={handleTopic} handleTime={handleTime} description={description} handleDescription={handleDescription}/>}
-				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} />}
+				{currentModal === Tabs_Option.EVENT_INFO && <EventInfoModal option={option} topic={topic} handleTopic={handleTopic} handleTimeStart={handleTimeStart} handleTimeEnd={handleTimeEnd} description={description} handleDescription={handleDescription} logo={logo} setLogo={setLogo} />}
+				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} logo={logo}/>}
 			</div>
 			<div className="flex justify-between mt-4 w-full">
 				<button
