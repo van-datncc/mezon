@@ -18,6 +18,10 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_16,
 		paddingVertical: size.s_12
 	},
+	icon: {
+		width: 20,
+		height: 20,
+	},
 	actionText: {
 		color: Colors.white
 	},

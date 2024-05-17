@@ -5,12 +5,12 @@ export interface IReplyBottomSheet {
     message: IMessageWithUser;
     onClose: () => void;
     type: EMessageBSToShow | null;
+    onConfirmDeleteMessage: () => void;
 }
 
 export interface IMessageAction {
     id: number;
     title: string;
-    icon: string;
     type: EMessageActionType;
 }
 
