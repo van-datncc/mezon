@@ -9,12 +9,12 @@ interface IProps {
     height: number;
 }
 
-export default forwardRef(function BottomPicker({ height = 0 }: IProps, ref: Ref<BottomSheetMethods>) {
+export default forwardRef(function BottomPicker({ height = 1 }: IProps, ref: Ref<BottomSheetMethods>) {
     return (
         <BottomSheet
             ref={ref}
+            index={-1}
             snapPoints={[height === 0 ? 1 : height, '100%']}
-            enablePanDownToClose={height === 0}
             animateOnMount
         >
             <BottomSheetView style={styles.contentContainer}>
