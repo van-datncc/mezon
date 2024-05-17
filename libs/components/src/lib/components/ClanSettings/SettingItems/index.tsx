@@ -33,8 +33,7 @@ const ServerSettingItems = ({ onItemClick }: { onItemClick?: (settingName: strin
 				</button>
 				<br />
 				<button
-					className={`p-2 text-[#AEAEAE] text-[16px] font-medium pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-bgLightModeButton' : ''} w-[170px] text-left rounded-[5px] hover:text-white`}
-					onClick={() => {}}
+					className={`p-2 text-[#AEAEAE] text-[16px] font-medium pl-2 ml-[-8px]  mt-1 w-[170px] text-left rounded-[5px]${selectedButton === 'LogOut' ? 'bg-bgLightModeButton' : ''} w-[170px] text-left rounded-[5px] dark:hover:text-white hover:text-black`}
 				>
 					Delete Server
 				</button>

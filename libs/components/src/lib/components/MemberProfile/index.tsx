@@ -104,7 +104,7 @@ function MemberProfile({
 			</div>
 			{isShowPanelChannel && listProfile ? (
 				<div
-					className={`dark:bg-black bg-[#e4e4e4] mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed right-[245px] w-[360px]`}
+					className={`dark:bg-black bg-gray-200 mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed right-[245px] w-[360px]`}
 					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
 					onMouseDown={handleDefault}
 				>

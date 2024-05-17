@@ -188,7 +188,7 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 		<div>
 			<button
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
-				className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 bg-[#2B2D31] z-10"
+				className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
 				{categoryName}
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
