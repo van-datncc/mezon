@@ -50,7 +50,6 @@ const EventModal = (props: EventModalProps) => {
 							{ allEventManagement.length !== 0 ? 
 								<div className='dark:bg-[#313339] bg-white max-h-80 h-80 overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col'>
 									{allEventManagement.map((event, index)=>{
-										console.log(event);
 										return <div key={index}>
 											<ItemEventManagement topic={event.title || ''} voiceChannel={event.channel_id || ''} titleEvent={event.title || ''} address={event.address} option={event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER} logoRight={event.logo}/>
 										</div>

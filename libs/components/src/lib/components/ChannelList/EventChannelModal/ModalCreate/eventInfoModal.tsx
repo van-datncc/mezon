@@ -14,6 +14,10 @@ export type EventInfoModalProps = {
 	description: string;
 	option: string;
 	logo: string;
+	selectedDateStart: Date;
+	selectedDateEnd: Date;
+	setSelectedDateStart: (value: Date) => void;
+	setSelectedDateEnd: (value: Date) => void;
 	setLogo: (value: string) => void;
 	handleTopic: (content: string) => void;
 	handleTimeStart: (time: string) => void;
@@ -22,8 +26,7 @@ export type EventInfoModalProps = {
 };
 
 const EventInfoModal = (props: EventInfoModalProps) => {
-	const { topic, description, option, logo, setLogo, handleTopic, handleTimeStart, handleTimeEnd, handleDescription } = props;
-	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const { topic, description, option, logo, selectedDateStart, selectedDateEnd, setSelectedDateStart, setSelectedDateEnd, setLogo, handleTopic, handleTimeStart, handleTimeEnd, handleDescription } = props;
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1024);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,8 +39,12 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		'Every weekday (Monday to Friday)',
 	];
 
-	const handleDateChange = (date: Date) => {
-		setSelectedDate(date);
+	const handleDateChangeStart = (date: Date) => {
+		setSelectedDateStart(date);
+	};
+
+	const handleDateChangeEnd = (date: Date) => {
+		setSelectedDateEnd(date);
 	};
 
 	const renderOptions = () => {
@@ -102,8 +109,8 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<DatePicker
 						className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 						wrapperClassName="w-full"
-						selected={selectedDate}
-						onChange={handleDateChange}
+						selected={selectedDateStart}
+						onChange={handleDateChangeStart}
 						dateFormat="dd/MM/yyyy"
 						minDate={new Date()}
 					/>
@@ -111,7 +118,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<div className="w-1/2">
 					<h3 className="uppercase text-[11px] font-semibold ">Start Time</h3>
 					<select
-						name="time"
+						name="timeStart"
 						onChange={handleChangeTimeStart}
 						className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 					>
@@ -126,8 +133,8 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 						<DatePicker
 							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
 							wrapperClassName="w-full"
-							selected={selectedDate}
-							onChange={handleDateChange}
+							selected={selectedDateEnd}
+							onChange={handleDateChangeEnd}
 							dateFormat="dd/MM/yyyy"
 							minDate={new Date()}
 						/>
@@ -135,7 +142,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					<div className="w-1/2">
 						<h3 className="uppercase text-[11px] font-semibold ">End Time</h3>
 						<select
-							name="time"
+							name="timeEnd"
 							onChange={handleChangeTimeEnd}
 							className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
 						>
