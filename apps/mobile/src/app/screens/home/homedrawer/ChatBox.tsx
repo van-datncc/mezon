@@ -3,7 +3,7 @@ import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobil
 import { Colors } from '@mezon/mobile-ui';
 import { IMessageWithUser } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable } from 'react-native';
+import {DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform} from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { IModeKeyboardPicker } from './components';
 import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
@@ -138,7 +138,12 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
 		}
 	}, [messageActionListNeedToResolve])
-
+	
+	function keyboardWillShow(event: KeyboardEvent) {
+		if (keyboardHeight !== event.endCoordinates.height) {
+			setKeyboardHeight(event.endCoordinates.height);
+		}
+	}
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(
