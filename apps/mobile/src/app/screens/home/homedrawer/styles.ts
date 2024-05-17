@@ -44,7 +44,9 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingHorizontal: size.tiny,
 		padding: size.tiny,
-		gap: 10
+		gap: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: Colors.bgDarkSlate
 	},
 	closeIcon: {
 		color: Colors.bgDarkSlate,
