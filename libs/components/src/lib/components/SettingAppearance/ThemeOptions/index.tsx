@@ -3,25 +3,17 @@ import { Icons } from '../../../components';
 import { useApp } from '@mezon/core';
 
 const ThemeOptions = () => {
-	const { appearanceTheme, setAppearanceTheme } = useApp();
+	const { appearanceTheme, setAppearanceTheme, systemIsDark } = useApp();
 	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
-	const elementHTML = document.documentElement;
-	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
+	
 
 	const onWindowMatch = () =>{
 		if(themeChosen === "system"){
 			if(systemIsDark.matches){
 				setAppearanceTheme("dark");
-				elementHTML.classList.add('dark');
 			}else{
 				setAppearanceTheme("light");
-				elementHTML.classList.remove('dark');
 			}
-		}
-		if(themeChosen === "dark"){
-			elementHTML.classList.add('dark');
-		} else {
-			elementHTML.classList.remove('dark');
 		}
 	}
 	useEffect(() => {
@@ -34,19 +26,6 @@ const ThemeOptions = () => {
 			systemIsDark.removeEventListener('change', handleChange);
 		};
 	}, [themeChosen, systemIsDark]);
-
-	useEffect(()=>{
-		switch(appearanceTheme){
-			case "dark":
-				elementHTML.classList.add('dark');
-				break;
-			case "light":
-				elementHTML.classList.remove('dark');
-				break;
-			default:
-				break;
-		}
-	}, [appearanceTheme])
 
     useEffect(()=>{
 		if(themeChosen !== "system"){
