@@ -4,24 +4,26 @@ import { useState } from 'react';
 import { Keyboard, KeyboardEvent, TouchableOpacity, View } from 'react-native';
 import { useEffect } from 'react';
 
-export type EmojiPickerOptions = {
-	mode?: number;
-	onShow: (isShow: boolean, padding?: number) => void;
+export type IMode = "text" | "emoji"
+
+export type IProps = {
+	mode: IMode;
+	onChange: (mode: IMode, height?: number) => void;
 };
 
-function EmojiPicker(props: EmojiPickerOptions) {
-	const [mode, setMode] = useState<"text" | "emoji">("text");
-	const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
+	// TODO: Assume height is 274
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(274);
+	const [mode, setMode] = useState<IMode>(_mode);
 
 	const onPickerPress = () => {
 		if (mode === "text") {
 			Keyboard.dismiss();
-			console.log(",,,", keyboardHeight);
-			props.onShow && props.onShow(true, keyboardHeight)
+			onChange && onChange("emoji", keyboardHeight)
 			setMode("emoji");
 		} else {
 			setMode("text");
-			props.onShow && props.onShow(false)
+			onChange && onChange("text", keyboardHeight);
 		}
 	};
 
@@ -35,6 +37,11 @@ function EmojiPicker(props: EmojiPickerOptions) {
 		Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 	}, [])
 
+	useEffect(() => {
+		setMode(_mode)
+		console.log(_mode);
+	}, [_mode])
+
 	return (
 		<View>
 			<TouchableOpacity onPress={onPickerPress}>
@@ -46,4 +53,4 @@ function EmojiPicker(props: EmojiPickerOptions) {
 	);
 }
 
-export default EmojiPicker;
+export default EmojiSwitcher;

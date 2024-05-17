@@ -4,7 +4,7 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { styles } from './styles';
-import EmojiPicker from "./components/EmojiPicker";
+import EmojiSwitcher, { IMode } from "./components/EmojiPicker";
 import AttachmentPicker from "./components/AttachmentPicker";
 import { EChatBoxAction, EMessageActionType } from './enums';
 import { useSelector } from 'react-redux';
@@ -20,7 +20,7 @@ const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 
 const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: number, onPickerShow: (isShow: boolean, height: number) => void }) => {
 	const inputRef = useRef<any>();
-	const [padding, setPadding] = useState<number>(0)
+	const [mode, setMode] = useState<IMode>("text");
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	// const [messageRefId, setMessageId] = useState<string>('')
@@ -110,15 +110,20 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 		}
 	};
 
-	function handlePaddingBottom(isShow: boolean, padding: number = 0) {
-		if (isShow) {
-			setPadding(padding)
-			props.onPickerShow(true, padding);
+	function handleInputMode(mode: IMode, height) {
+		setMode(mode)
+		if (mode === "emoji") {
+			props.onPickerShow(true, height);
 		} else {
-			setPadding(0)
 			inputRef && inputRef.current && inputRef.current.focus();
 			props.onPickerShow(false, 0)
 		}
+	}
+
+	function handleInputFocus() {
+		setMode("text");
+		inputRef && inputRef.current && inputRef.current.focus();
+		props.onPickerShow(false, 0)
 	}
 
 	return (
@@ -153,10 +158,11 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						</View>
 					</>
 				)}
+
 				<View style={{ position: 'relative', justifyContent: 'center' }}>
 					<TextInput
 						autoFocus={isFocus}
-						placeholder={'Write your thoughs here...'}
+						placeholder={'Write your thoughts here...'}
 						placeholderTextColor={Colors.textGray}
 						onChangeText={(text: string) => {
 							setText(text);
@@ -166,7 +172,7 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						blurOnSubmit={false}
 						ref={inputRef}
 						onSubmitEditing={handleSendMessage}
-						onFocus={() => handlePaddingBottom(false)}
+						onFocus={handleInputFocus}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
@@ -174,9 +180,10 @@ const ChatBox = memo((props: { channelLabel: string; channelId: string; mode: nu
 						]}
 					/>
 					<View style={styles.iconEmoji}>
-						<EmojiPicker onShow={handlePaddingBottom} />
+						<EmojiSwitcher onChange={handleInputMode} mode={mode} />
 					</View>
 				</View>
+
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
 					{text.length > 0 ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>

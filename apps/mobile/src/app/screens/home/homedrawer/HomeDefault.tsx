@@ -21,7 +21,6 @@ const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 
 	const [padding, setPadding] = useState<number>(0);
-	const [keyBoardHeight, setKeyboardHeigh] = useState<number>(0);
 	const bottomPickerRef = useRef<BottomSheet>(null);
 
 	function handlePickerShow(isShow: boolean, height: number) {
