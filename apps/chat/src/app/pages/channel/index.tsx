@@ -136,7 +136,7 @@ export default function ChannelLayout() {
 							</div>
 						) : (
 							<div
-								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
+								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'xl:w-widthThumnailAttachment sbm:w-full'}`}
 							>
 								{currentChannel && (
 									<ChannelTyping
