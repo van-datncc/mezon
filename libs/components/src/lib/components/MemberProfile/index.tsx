@@ -2,7 +2,10 @@ import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { useRef, useState } from 'react';
+import { Coords } from '../ChannelLink';
 import { OfflineStatus, OnlineStatus } from '../Icons';
+import PanelMember from '../PanelMember';
+import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -34,28 +37,62 @@ function MemberProfile({
 	isOffline,
 	isHideAnimation,
 }: MemberProfileProps) {
-	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
+	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
 	const [positionTop, setPositionTop] = useState(false);
 	const [top, setTop] = useState(0);
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0,
+	});
+	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
+
 	const panelRef = useRef<HTMLDivElement | null>(null);
+
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY;
+		const windowHeight = window.innerHeight;
+
+		const distanceToBottom = windowHeight - mouseY;
+
 		if (event.button === 0) {
-			setIsShowPanelChannel(true);
-			const clickY = event.clientY;
-			const windowHeight = window.innerHeight;
-			const distanceToBottom = windowHeight - clickY;
+			console.log(1);
+			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
-			setTop(clickY - 50);
+			setTop(mouseY - 50);
 			if (distanceToBottom < heightElementShortUserProfileMin) {
 				setPositionTop(true);
 			}
 		}
+		if (event.button === 2) {
+			setCoords({ mouseX, mouseY, distanceToBottom });
+			setIsShowPanelMember(!isShowPanelMember);
+		}
 	};
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	const handleDefault = (e: any) => {
 		e.stopPropagation();
 	};
+
+	const handleClosePannelMember = () => {
+		setIsShowPanelMember(false);
+	};
+
+	const handleClickRemoveMember = () => {
+		setOpenModalRemoveMember(true);
+		setIsShowPanelMember(false);
+		setIsShowUserProfile(false);
+	};
+
+	const handleClickOutSide = () => {
+		setIsShowUserProfile(false);
+		setIsShowPanelMember(false);
+	};
+
+	useOnClickOutside(panelRef, handleClickOutSide);
+
 	return (
 		<div className="relative group">
 			<div
@@ -87,7 +124,9 @@ function MemberProfile({
 					>
 						{!isHideStatus && (
 							<>
-								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>{!status ? 'Offline' : 'Online'}</span>
+								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>
+									{!status ? 'Offline' : 'Online'}
+								</span>
 								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode">{name}</p>
 							</>
 						)}
@@ -102,15 +141,27 @@ function MemberProfile({
 					)}
 				</div>
 			</div>
-			{isShowPanelChannel && listProfile ? (
+			{isShowPanelMember && (
+				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} />
+			)}
+			{isShowUserProfile && listProfile ? (
 				<div
 					className={`dark:bg-black bg-gray-200 mt-[10px]  rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed right-[245px] w-[360px]`}
 					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
 					onMouseDown={handleDefault}
+					onClick={(e) => e.stopPropagation()}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>
 			) : null}
+
+			{openModalRemoveMember && (
+				<ModalRemoveMemberClan
+					onClose={() => setOpenModalRemoveMember(false)}
+					openModal={openModalRemoveMember}
+					username={user?.user?.username}
+				/>
+			)}
 		</div>
 	);
 }

@@ -70,7 +70,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					)}
 					label=""
 					placement="right-start"
-					className="dark:bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+					className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemPanel children="For 15 Minutes" />
 					<ItemPanel children="For 1 Hour" />

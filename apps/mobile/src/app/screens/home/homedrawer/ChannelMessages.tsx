@@ -59,6 +59,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			<FlatList
 				inverted
 				data={sortedMessages || []}
+				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={({ item, index }) => {
 					return (

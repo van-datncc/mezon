@@ -19,7 +19,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 	}, [dispatch, openModal]);
 	return (
 		<Modal theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="bg-[#313338] pt-4 rounded">
+			<div className="bg-bgPrimary pt-4 rounded">
 				<div>
 					<h1 className="text-white text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
