@@ -1,7 +1,6 @@
-import { GifStickerEmojiPopup, Icons } from '@mezon/components';
+import { Icons } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
 import { useState } from 'react';
 
 type ReactionBottomProps = {
@@ -19,10 +18,14 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 		reactionPlaceActive,
 		setReactionBottomStateResponsive,
 		reactionBottomStateResponsive,
+		setMessageMatchWithRef,
+		setPositionOfSmileButton,
+		positionOfSmileButton,
 	} = useChatReaction();
 	const { setReferenceMessage, referenceMessage } = useReference();
 
 	const handleClickOpenEmojiBottom = (event: React.MouseEvent<HTMLDivElement>) => {
+		setMessageMatchWithRef(true);
 		checkMessageMatched(message);
 		setReactionRightState(false);
 		setReferenceMessage(message);
@@ -49,6 +52,12 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 	};
 
 	const handleHoverSmileButton = () => {
+		setPositionOfSmileButton({
+			top: smileButtonRef.current?.getBoundingClientRect().top,
+			right: smileButtonRef.current?.getBoundingClientRect().right,
+			left: smileButtonRef.current?.getBoundingClientRect().left,
+			bottom: smileButtonRef.current?.getBoundingClientRect().bottom,
+		});
 		setUserReactionPanelState(false);
 		// setReferenceMessage(null);
 	};
@@ -60,15 +69,15 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 				<div
 					onMouseEnter={handleHoverSmileButton}
 					onClick={handleClickOpenEmojiBottom}
-					className="absolute w-8  h-4 pl-2 left-[100%] duration-100"
+					className="absolute w-8  h-4 pl-2 left-[100%] duration-100 border border-green-600"
 					ref={smileButtonRef}
 				>
 					<Icons.Smile defaultSize="w-4 h-4" defaultFill={setColorForIconSmile(message)} />
-					{reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM && checkMessageMatched(message) && (
+					{/* {reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM && checkMessageMatched(message) && (
 						<div
 							className={`hidden md:block w-fit ${isFixed ? 'fixed' : 'absolute'} ${moveToTop ? 'right-[-2rem] bottom-[-1rem]' : 'left-[-2rem] bottom-[-5rem]'}  z-20`}
 						>
-							<div className="scale-75 transform mb-0 z-10">
+							<div className="transform mb-0 z-10">
 								<GifStickerEmojiPopup
 									messageEmoji={message}
 									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
@@ -76,7 +85,7 @@ const ReactionBottom = ({ message, smileButtonRef, moveToTop }: ReactionBottomPr
 								/>
 							</div>
 						</div>
-					)}
+					)} */}
 				</div>
 			)}
 		</>
