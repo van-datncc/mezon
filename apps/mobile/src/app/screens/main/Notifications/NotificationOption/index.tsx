@@ -4,8 +4,8 @@ import { Colors } from '@mezon/mobile-ui'
 import { styles as s } from './NotificationOption.styles'
 import { EActionDataNotify } from '../types'
 import { MuteIcon, SettingIcon, } from "@mezon/mobile-components";
-import MezonRadioButton from '../../../../temp-ui/MezonRadioButton'
 import { useTranslation } from 'react-i18next'
+import MezonToggleButton from '../../../../temp-ui/MezonRadioButton'
 
 
 const NotificationOption = ({onChange}) => {
@@ -48,14 +48,14 @@ const NotificationOption = ({onChange}) => {
                 <View key={option.id} style={s.option}>
                   {option.icon}
                   <Text style={s.textOption}>{option.title}</Text>
-                  <MezonRadioButton onChange={(isSelected) => handleTabChange(option.value, isSelected)}
+                  <MezonToggleButton onChange={(isSelected) => handleTabChange(option.value, isSelected)}
                   height={30} width={60}
                   toggleOnColor={Colors.white}
                   value={true}
                   toggleBgOffColor={Colors.gray48}
                   toggleBgOnColor={Colors.bgButton}
                   toggleOffColor={Colors.gray72}>
-                  </MezonRadioButton>
+                  </MezonToggleButton>
                 </View>
               ))
             }

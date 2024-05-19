@@ -352,6 +352,7 @@ export type MentionDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
+  name?: string;
 };
 
 export type MentionsInputChangeEvent = {
