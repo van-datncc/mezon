@@ -14,7 +14,7 @@ module.exports = {
   colorNeutral: '#AEAEAE',
   colorTextLightMode: '#535353',
 
-  /* background */
+  /* background dark*/
   bgPrimary: '#313338',
   bgPrimary1: '#2E3035',
   bgSecondary: '#2B2D31',
@@ -29,15 +29,27 @@ module.exports = {
   bgProfileBody: '#111214',
   bgSelectItem: '#505cdc',
   bgSelectItemHover: '#4752C4',
+  bgModalDark: 'rgba(0, 0, 0, 0.7)',
+
+  /* background light*/
+  bgLightPrimary: '#FFFFFF',
+  bgLightSecondary: '#F2F3F5',
   bgLightMode: '#f7f7f7',
   bgLightModeSecond: '#F0F0F0',
   bgLightModeThird: 'rgb(235, 237, 239)',
   bgLightModeButton: '#155EEF1A',
-  bgModifierHoverLight: '#D7D9DC',
+  bgModifierHoverLight: '#DFE1E5',
+  bgModalLight: 'rgba(0, 0, 0, 0.54)',
+  bgTextarea: '#EBEBEB',
 
   /* text */
   channelTextarea: '#383A40',
+  channelTextareaLight: '#80848E',
   textPrimary: '#DBDEE1',
+  textPrimaryLight: '#313338',
+  textSecondary: '#B5BaC1',
+  textSecondary400: '#060607',
+  textSecondary800: '#4E5058',
   textLightTheme: "#000000",
   textDarkTheme: "#ffffff",
 

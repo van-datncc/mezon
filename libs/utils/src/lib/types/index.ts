@@ -406,3 +406,17 @@ export type SortChannel = {
 	isSortChannelByCategoryId: boolean;
 	categoryId: string | null;
 };
+
+export type UpdateClan = {
+	bearerToken: string;
+	clanId: string;
+	creatorId?: string;
+	clanName?: string;
+	logo?: string;
+	banner?: string;
+};
+
+export type RemoveChannelUsers = {
+	channelId: string;
+	ids?: string[];
+};
