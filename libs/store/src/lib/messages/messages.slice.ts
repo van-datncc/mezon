@@ -112,7 +112,7 @@ export const fetchMessages = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
+		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
 			if (!message.reactions) return [];
