@@ -42,6 +42,7 @@ function MyApp() {
 		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 		dispatch(reactionActions.setReactionBottomStateResponsive(false));
+		dispatch(reactionActions.setMessageMatchWithRef(false));
 	};
 
 	const { setAppearanceTheme, appearanceTheme } = useApp();
@@ -109,7 +110,6 @@ function MyApp() {
 		};
 	}, []);
 
-
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
 			<div
@@ -118,7 +118,7 @@ function MyApp() {
 				id="menu"
 			>
 				<NavLink to="/chat/direct/friends">
-					<NavLinkComponent active={pathName.includes('direct')} clanName='DM'>
+					<NavLinkComponent active={pathName.includes('direct')} clanName="DM">
 						<div>
 							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} className="clan" />
 							{quantityPendingRequest !== 0 && (
