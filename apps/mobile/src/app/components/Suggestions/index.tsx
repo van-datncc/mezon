@@ -31,7 +31,7 @@ const Suggestions: FC<MentionSuggestionsProps> = ({
   return (
       <FlatList
             style={{maxHeight: 200}}
-            data={suggestions.filter(item => item.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()))}
+            data={suggestions?.filter(item => item?.name.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
             renderItem={({item}) => <Pressable onPress={()=> handleSuggestionPress(item)}>
             <SuggestItem name={item.display ?? ''} avatarUrl={(item).avatarUrl} subText="" />
             </Pressable>
@@ -78,7 +78,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({
   return (
     <FlatList
             style={{maxHeight: 200}}
-            data={listChannelsMention.filter(item => item.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()))}
+            data={listChannelsMention?.filter(item => item?.name.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
             renderItem={({item}) => <Pressable onPress={()=> handleSuggestionPress(item)}>
             <SuggestItem name={item.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText} />
             </Pressable>

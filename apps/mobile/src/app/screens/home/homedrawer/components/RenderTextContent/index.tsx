@@ -18,9 +18,7 @@ const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) =
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         onTouchEnd={() => {
-          if (matchesMention.includes(part)) {
-            alert('aaa')
-          }
+          if (matchesMention.includes(part)) {}
         }}
         key={index}
         style={matchesMention.includes(part) ? styles.contentMessageMention : styles.contentMessageBox}
