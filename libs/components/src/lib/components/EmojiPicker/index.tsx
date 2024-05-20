@@ -64,6 +64,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		setReactionPlaceActive,
 		setUserReactionPanelState,
 		setReactionBottomStateResponsive,
+		setMessageMatchWithRef,
 	} = useChatReaction();
 	const { setReferenceMessage } = useReference();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
@@ -89,6 +90,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setReferenceMessage(null);
 			setUserReactionPanelState(false);
 			setReactionBottomStateResponsive(false);
+			setMessageMatchWithRef(false);
 		} else if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR) {
 			setEmojiSuggestion(emojiPicked);
 			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);

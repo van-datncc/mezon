@@ -20,15 +20,18 @@ const ChannelLayout = () => {
 
 	const HEIGHT_EMOJI_PANEL: number = 457;
 	const WIDTH_EMOJI_PANEL: number = 500;
-	// const [emojiTopDist, setEmojiTopDist] = useState<number>();
-	// const [emojiBottomDist, setEmojiBottomDist] = useState<number>();
-	// const [emojiRightDist, setEmojiRightDist] = useState();
 
-	// useEffect(() => {
-	// 	if (positionOfSmileButton.bottom < HEIGHT_EMOJI_PANEL) {
-	// 		setEmojiBottomDist(emojiBottomDist);
-	// 	}
-	// }, [positionOfSmileButton]);
+	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
+	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
+	let topPosition: string;
+
+	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
+		topPosition = 'auto';
+	} else if (positionOfSmileButton.top < 100) {
+		topPosition = `${positionOfSmileButton.top}px`;
+	} else {
+		topPosition = `${positionOfSmileButton.top - 100}px`;
+	}
 
 	return (
 		<div
@@ -55,9 +58,12 @@ const ChannelLayout = () => {
 				<div
 					className="fixed"
 					style={{
-						top: positionOfSmileButton.bottom < HEIGHT_EMOJI_PANEL ? 'auto' : `${positionOfSmileButton.top}px`,
-						bottom: positionOfSmileButton.bottom < HEIGHT_EMOJI_PANEL ? `0` : 'auto',
-						left: `${positionOfSmileButton.right}px`,
+						top: topPosition,
+						bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
+						left:
+							distanceToRight < WIDTH_EMOJI_PANEL
+								? `${positionOfSmileButton.left - WIDTH_EMOJI_PANEL}px`
+								: `${positionOfSmileButton.right}px`,
 					}}
 				>
 					<div className="mb-0 z-10 h-full">
