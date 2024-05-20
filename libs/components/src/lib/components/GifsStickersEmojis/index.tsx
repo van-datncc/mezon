@@ -40,6 +40,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 		if (tab === SubPanelName.EMOJI) {
 			setReactionPlaceActive(EmojiPlaces.EMOJI_EDITOR);
 		}
+
 		setSubPanelActive(tab);
 	};
 
@@ -91,8 +92,8 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<TenorGifCategories
 							activeTab={SubPanelName.EMOJI}
-							channelId={currentChannel?.id || ''}
-							channelLabel={currentChannel?.channel_label || ''}
+							channelId={currentChannel?.id ?? ''}
+							channelLabel={currentChannel?.channel_label ?? ''}
 							mode={mod}
 						/>
 					</div>
@@ -100,7 +101,7 @@ const GifStickerEmojiPopup = ({ messageEmoji, emojiAction, mode }: GifStickerEmo
 
 				{subPanelActive === SubPanelName.STICKERS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
-						<ImageSquare channelId={currentChannel?.id || ''} channelLabel={currentChannel?.channel_label || ''} mode={mod} />
+						<ImageSquare channelId={currentChannel?.id ?? ''} channelLabel={currentChannel?.channel_label ?? ''} mode={mod} />
 					</div>
 				)}
 				{subPanelActive === SubPanelName.EMOJI && (
