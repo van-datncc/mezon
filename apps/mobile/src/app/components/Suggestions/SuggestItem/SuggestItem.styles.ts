@@ -4,7 +4,7 @@ export const styles = StyleSheet.create({
   wrapperItem: {
     flexDirection: 'row',
     borderBottomColor: Colors.gray48,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     paddingHorizontal: 10,
     paddingVertical: 10,
     backgroundColor: Colors.secondary,
@@ -35,5 +35,17 @@ export const styles = StyleSheet.create({
     fontSize: size.medium,
     fontWeight: '500',
     color: Colors.gray72
-  }
+  },
+  avatarMessageBoxDefault: {
+		width: 40,
+		height: 40,
+		borderRadius: size.s_50,
+		backgroundColor: Colors.titleReset,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+  textAvatarMessageBoxDefault: {
+		fontSize: size.s_22,
+		color: Colors.white,
+	},
 })
