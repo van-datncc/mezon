@@ -1,4 +1,4 @@
-import { useApp, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useApp, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import { appActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -24,6 +24,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
 	));
 	const { appearanceTheme } = useApp();
+	const { setTurnOffThreadMessage } = useThreads();
 
 	return (
 		<div
@@ -60,8 +61,10 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<div className="relative justify-start items-center gap-[15px] flex mr-4">
 									<ThreadButton isLightMode={appearanceTheme==='light'}/>
 									<MuteButton isLightMode={appearanceTheme==='light'}/>
-									<PinButton isLightMode={appearanceTheme==='light'}/>
-									<ChannelListButton isLightMode={appearanceTheme==='light'}/>
+									<PinButton isLightMode={appearanceTheme==='light'} />
+									<div onClick={() => setTurnOffThreadMessage()}>
+										<ChannelListButton isLightMode={appearanceTheme==='light'}/>
+									</div>
 								</div>
 								<SearchMessage />
 							</div>

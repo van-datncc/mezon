@@ -40,7 +40,7 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 					{option === OptionEvent.OPTION_SPEAKER && (
 						<>
 							<Icons.Speaker />
-							<p>{channelVoice.channel_label}</p>
+							<p>{channelVoice?.channel_label}</p>
 						</>
 					)}
 					{option === OptionEvent.OPTION_LOCATION  && 
