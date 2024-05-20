@@ -106,17 +106,21 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	const scrollToCategory = (event: React.MouseEvent, categoryName: string) => {
 		event.stopPropagation();
-		setSelectedCategory(categoryName);
-		const categoryDiv = categoryRefs.current[categoryName];
-		if (categoryDiv && containerRef.current) {
-			categoryDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		if (categoryName !== selectedCategory) {
+			setSelectedCategory(categoryName);
+			const categoryDiv = categoryRefs.current[categoryName];
+			if (categoryDiv && containerRef.current) {
+				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' }); // Thay đổi behavior thành smooth để cuộn mượt hơn
+			}
 		}
 	};
 
 	useEffect(() => {
 		const handleScroll = () => {
 			if (containerRef.current) {
-				const containerTop = containerRef.current.getBoundingClientRect().top;
+				const containerRect = containerRef.current.getBoundingClientRect();
+				const containerTop = containerRect.top;
+				const containerBottom = containerRect.bottom;
 
 				let closestCategory = '';
 				let minDistance = Number.MAX_VALUE;
@@ -124,13 +128,22 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				Object.keys(categoryRefs.current).forEach((category) => {
 					const ref = categoryRefs.current[category];
 					if (ref) {
-						const distance = Math.abs(ref.getBoundingClientRect().top - containerTop);
+						const refRect = ref.getBoundingClientRect();
+						const refTop = refRect.top;
+						const refBottom = refRect.bottom;
+
+						const distanceTop = Math.abs(refTop - containerTop);
+						const distanceBottom = Math.abs(refBottom - containerBottom);
+
+						const distance = Math.min(distanceTop, distanceBottom);
+
 						if (distance < minDistance) {
 							minDistance = distance;
 							closestCategory = category;
 						}
 					}
 				});
+				setSelectedCategory(closestCategory);
 			}
 		};
 
@@ -226,7 +239,7 @@ function DisplayByCategories({ categoryName, onEmojiSelect, onEmojiHover }: Disp
 		<div>
 			<button
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
-				className="w-full flex flex-row justify-start items-center pl-1 my-1 py-1 sticky top-0 dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
+				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-0 dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
 				{categoryName}
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
@@ -244,13 +257,13 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 
 	return (
 		<div
-			className={`grid grid-cols-12 ml-1 gap-1  ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
+			className={`grid grid-cols-9 ml-1 gap-1  ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className="text-2xl emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-8 h-8 flex items-center justify-center w-full"
+					className="text-3xl emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10 h-10 p-1 flex items-center justify-center w-full"
 					onClick={() => onEmojiSelect(item.emoji)}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
