@@ -531,11 +531,11 @@ input:-webkit-autofill:active {
 }
 
 .customScrollLightMode::-webkit-scrollbar-track {
-  background: #e4e3e3;
+  background: #ffffff;
 }
 
 .customScrollLightMode::-webkit-scrollbar-thumb {
-  background-color: white;
+  background-color: rgb(205, 205, 205);
   border-radius: 4px;
 }
 
