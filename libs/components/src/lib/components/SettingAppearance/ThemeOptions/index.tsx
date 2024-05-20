@@ -3,9 +3,12 @@ import { Icons } from '../../../components';
 import { useApp } from '@mezon/core';
 
 const ThemeOptions = () => {
-	const { appearanceTheme, setAppearanceTheme, systemIsDark } = useApp();
+	const { appearanceTheme, setAppearanceTheme } = useApp();
+
+	const elementHTML = document.documentElement;
 	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
-	
+
+	const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 	const onWindowMatch = () =>{
 		if(themeChosen === "system"){

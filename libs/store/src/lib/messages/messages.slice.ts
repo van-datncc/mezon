@@ -79,6 +79,13 @@ export const fetchMessagesCached = memoize(
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
+			// set default value
+			if (args[2] === undefined) {
+				args[2] = "";
+			}
+			if (args[3] === undefined) {
+				args[3] = 1;
+			}
 			return args[1] + args[2] + args[3];
 		},
 	},
@@ -105,7 +112,7 @@ export const fetchMessages = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 
-		const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
+		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
 			if (!message.reactions) return [];
