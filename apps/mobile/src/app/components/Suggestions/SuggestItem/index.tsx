@@ -17,9 +17,9 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText }: SuggestItemProps) => 
                 uri: avatarUrl,
               }}
             /> :
-          <View style={s.avatarMessageBoxDefault}>
-          <Text style={s.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
-          </View>
+           !name.startsWith('here') && <View style={s.avatarMessageBoxDefault}>
+           <Text style={s.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
+            </View>
             }
 				{symbol && <Text style={s.symbol}>{symbol}</Text>}
 				<Text style={s.title}>{name}</Text>

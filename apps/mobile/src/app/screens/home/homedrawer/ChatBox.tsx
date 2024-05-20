@@ -1,4 +1,4 @@
-import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
+import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
 import { useChannelMembers, useChannels, useChatSending } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, UserMentionsOpt } from '@mezon/utils';
@@ -212,35 +212,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
     handleTypingDebounced();
     setMentionTextValue(text);
   }
-
-  const convertMentionsToText = (text) => {
-    const mentionPattern = /{@}\[([^\]]+)\]\(\d+\)|{#}\[([^\]]+)\]\(\d+\)/g;
-    return text.replace(mentionPattern, (match, userMention, hashtagMention) => {
-        if (userMention) {
-            return `@${userMention}`;
-        } else if (hashtagMention) {
-            return `#${hashtagMention}`;
-        } else {
-            return match;
-        }
-    });
-};
-
-const convertMentionsToData = (text) => {
-  const mentionPattern = /({@}|{#})\[([^\]]+)\]\((\d+)\)/g;
-  const result = [];
-  let match;
-  while ((match = mentionPattern.exec(text)) !== null) {
-      const prefix = match[1];
-      const mention = match[2];
-      const id = match[3];
-      result.push({
-          id: id,
-          display: `${prefix === '{@}' ? '@' : '#'}${mention}`,
-      });
-  }
-  return result;
-};
 
 const handleMentionInput = () => {
   const mentionedUsers: UserMentionsOpt[] = [];
