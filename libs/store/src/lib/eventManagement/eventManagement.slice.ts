@@ -37,7 +37,9 @@ export const fetchEventManagement = createAsyncThunk(
 	async ({ clanId }: fetchEventManagementPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listEvents(mezon.session, clanId);
+		
 		if (!response.events) {
+			thunkAPI.dispatch(eventManagementActions.clearEntities());
 			return thunkAPI.rejectWithValue([]);
 		}
 
@@ -54,11 +56,12 @@ type CreateEventManagementyload = {
 	start_time: string, 
 	end_time: string, 
 	description: string,
+	logo: string,
 };
 
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
-	async ({ clan_id, channel_id, address, title, start_time, end_time, description }: CreateEventManagementyload, thunkAPI) => {
+	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementyload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			clan_id: clan_id,
@@ -66,9 +69,9 @@ export const fetchCreateEventManagement = createAsyncThunk(
 			address: address || '',
 			title: title,
 			start_time: start_time,
-			description: description || '',
 			end_time: end_time,
-			logo: 'logo',
+			description: description || '',
+			logo: logo || '',
 		}
 		const response = await mezon.client.createEvent(mezon.session, body);
 		if (!response) {
@@ -95,6 +98,9 @@ export const eventManagementSlice = createSlice({
 		add: eventManagementAdapter.addOne,
 		addMany: eventManagementAdapter.addMany,
 		remove: eventManagementAdapter.removeOne,
+		clearEntities: (state) => {
+			eventManagementAdapter.removeAll(state);
+		},
 	},
 	extraReducers: (builder) => {
 		builder

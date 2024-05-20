@@ -28,12 +28,31 @@ export const styles = StyleSheet.create({
 		textTransform: 'uppercase',
 	},
 	wrapperChatBox: {
-		minHeight: 80,
 		backgroundColor: Colors.secondary,
-		flexDirection: 'row',
-		paddingHorizontal: 10,
-		alignItems: 'center',
+		flexDirection: 'column',
 		justifyContent: 'space-between',
+	},
+	aboveTextBoxWrapper: {
+		flexDirection: 'column',
+		backgroundColor: Colors.bgCharcoal
+	},
+	aboveTextBoxText: {
+		color: Colors.white,
+		fontSize: size.s_12
+	},
+	aboveTextBoxItem: {
+		flexDirection: 'row',
+		paddingHorizontal: size.tiny,
+		padding: size.tiny,
+		gap: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: Colors.bgDarkSlate
+	},
+	closeIcon: {
+		color: Colors.bgDarkSlate,
+		backgroundColor: Colors.white,
+		borderRadius: 50,
+		fontSize: 19
 	},
 	iconContainer: {
 		width: 35,
@@ -257,9 +276,38 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginTop: size.s_24,
-		marginBottom: size.s_6,
+		marginBottom: size.s_20,
 		paddingRight: size.s_50,
+	},
+	aboveMessage: {
+		flexDirection: 'row',
+		paddingLeft: size.s_10,
+		gap: 15,
+	},
+	iconReply: {
+		width: 35,
+		height: '100%',
+		alignItems: 'center',
+		paddingLeft: 30
+	},
+	replyAvatar: {
+		width: 25,
+		height: 25,
+		borderRadius: 50,
+	},
+	messageWrapper: {
+		flexDirection: 'column',
+	},
+	repliedTextAvatar: {
+		fontSize: size.s_16,
+		color: Colors.white,
+	},
+	repliedContentText: {
+		color: Colors.white
+	},
+	repliedMessageWrapper: {
+		flexDirection: 'row',
+		gap: 8
 	},
 	wrapperMessageBoxCombine: {
 		marginTop: size.s_2,
@@ -267,6 +315,7 @@ export const styles = StyleSheet.create({
 	rowMessageBox: {
 		marginLeft: 15,
 		justifyContent: 'space-between',
+		width: '100%'
 	},
 	messageBoxTop: {
 		flexDirection: 'row',
@@ -274,25 +323,26 @@ export const styles = StyleSheet.create({
 		marginBottom: size.s_6,
 	},
 	userNameMessageBox: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		marginRight: size.s_10,
 		fontWeight: '600',
 		color: Colors.white,
 	},
 	dateMessageBox: {
-		fontSize: size.s_12,
+		fontSize: size.small,
 		color: Colors.gray72,
 	},
 	contentMessageBox: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		color: Colors.tertiary,
+		marginTop: -5
 	},
 	contentMessageLink: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		color: Colors.textLink,
 	},
 	contentMessageMention: {
-		fontSize: size.s_16,
+		fontSize: size.medium,
 		fontWeight: '600',
 		color: Colors.textLink,
 	},

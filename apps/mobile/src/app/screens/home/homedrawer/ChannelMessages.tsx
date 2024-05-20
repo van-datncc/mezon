@@ -59,10 +59,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			<FlatList
 				inverted
 				data={sortedMessages || []}
+				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={({ item, index }) => {
 					return (
-						<MessageItem message={item} mode={mode} preMessage={sortedMessages.length > 0 ? sortedMessages?.[index - 1] : undefined} />
+						<MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} preMessage={sortedMessages.length > 0 ? sortedMessages?.[index - 1] : undefined} />
 					);
 				}}
 				keyExtractor={(item) => `${item?.id}`}

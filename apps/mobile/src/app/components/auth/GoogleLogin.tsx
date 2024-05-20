@@ -7,12 +7,14 @@ import React, { useEffect } from 'react';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const GoogleLogin = () => {
 	const GOOGLE_WEB_ID = '648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com';
+	const IOS_CLIENT_ID = '648946579638-funno2n4iiib3idaa0pqt2js4u1nal26.apps.googleusercontent.com';
 	const dispatch = useAppDispatch();
 	const { loginByGoogle } = useAuth();
 
 	useEffect(() => {
 		GoogleSignin.configure({
 			webClientId: GOOGLE_WEB_ID,
+			iosClientId: IOS_CLIENT_ID,
 			offlineAccess: true,
 			forceCodeForRefreshToken: true,
 		});
@@ -22,6 +24,7 @@ const GoogleLogin = () => {
 		try {
 			// Cheat fake request
             // fetch('https://5f831a256b97440016f4e334.mockapi.io/api/post');
+
 			await GoogleSignin.hasPlayServices();
 			const { idToken } = await GoogleSignin.signIn();
 			await loginByGoogle(idToken);

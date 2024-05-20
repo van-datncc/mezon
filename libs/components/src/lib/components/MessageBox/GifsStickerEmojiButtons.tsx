@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useGifs, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { useChatReaction, useGifs, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback } from 'react';
 
@@ -10,7 +10,9 @@ export type GifStickerEmojiButtonsProps = {
 function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const { setReferenceMessage } = useReference();
-	const { setShowCategories, setValueInputSearch } = useGifs();
+	const { setReactionRightState, setReactionBottomState } = useChatReaction();
+	const { setShowCategories } = useGifs();
+	const { setValueInputSearch } = useGifsStickersEmoji();
 	const handleOpenGifs = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
@@ -40,6 +42,8 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
+			setReactionRightState(false);
+			setReactionBottomState(false);
 		},
 		[setSubPanelActive],
 	);
@@ -47,15 +51,15 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	return (
 		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 absolute right-0">
 			<div onClick={handleOpenGifs} className="cursor-pointer">
-				<Icons.Gif defaultFill={`${subPanelActive === SubPanelName.GIFS ? '#FFFFFF' : '#AEAEAE'}`} />
+				<Icons.Gif defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.GIFS} />
 			</div>
 
 			<div onClick={handleOpenStickers} className="cursor-pointer">
-				<Icons.Sticker defaultFill={`${subPanelActive === SubPanelName.STICKERS ? '#FFFFFF' : '#AEAEAE'}`} />
+				<Icons.Sticker defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.STICKERS} />
 			</div>
 
 			<div onClick={handleOpenEmoji} className="cursor-pointer">
-				<Icons.Smile defaultSize='w-6 h-6' defaultFill={`${subPanelActive === SubPanelName.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
+				<Icons.Smile defaultSize="w-6 h-6" defaultFill={`${subPanelActive === SubPanelName.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
 			</div>
 		</div>
 	);

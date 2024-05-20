@@ -74,7 +74,7 @@ const ModalInvite = (props: ModalParam) => {
 					</p>
 					<input
 						type="text"
-						className="w-full h-11 border border-solid border-black bg-black rounded-[5px] px-[16px] py-[13px] text-[14px] "
+						className="w-full h-11 border border-solid border-black dark:bg-black bg-bgLightModeSecond rounded-[5px] px-[16px] py-[13px] text-[14px] "
 						value={urlInvite}
 						readOnly
 					/>
@@ -91,7 +91,7 @@ const ModalInvite = (props: ModalParam) => {
 					</button>
 				</div>
 				<p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] ">
-					<span className="cursor-default">Your invite link expires in 7 days </span>
+					<span className="cursor-default dark:text-white text-black">Your invite link expires in 7 days </span>
 					<a href="" className="text-blue-300">
 						Edit invite link.
 					</a>

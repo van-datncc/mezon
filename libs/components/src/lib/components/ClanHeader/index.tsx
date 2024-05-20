@@ -90,11 +90,11 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	return (
 		<>
 			{type === 'direct' ? (
-				<div className="px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] border-bgTertiary">
+				<div className="px-3 font-semibold text-white h-heightHeader flex items-center shadow border-b-[1px] dark:border-bgTertiary border-gray-200">
 					<input
 						ref={inputRef}
 						placeholder="Find or start a conversation"
-						className={`font-[400] px-[16px] rounded text-white outline-none text-[14px] w-full bg-bgTertiary border-borderDefault h-[36px]`}
+						className={`font-[400] px-[16px] rounded dark:text-white text-black outline-none text-[14px] w-full dark:bg-bgTertiary bg-[#E1E1E1] dark:border-borderDefault h-[36px]`}
 						type="text"
 						onFocus={handleInputFocus}
 					/>
@@ -102,22 +102,22 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			) : (
 				<div className={`${bannerImage ? 'h-[136px]' : 'h-[60px]'} relative bg-gray-950`}>
 					{bannerImage && <img src={bannerImage} alt="imageCover" className="h-full w-full" />}
-					<div ref={modalRef} className="relative h-full" onClick={handleShowModalClan}>
+					<div ref={modalRef} className="relative h-[60px]" onClick={handleShowModalClan}>
 						<div className="cursor-pointer w-[272px] p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-white">
-							<p className="dark:text-white text-black text-base font-semibold select-none ">{name?.toLocaleUpperCase()}</p>
-							<button className="w-6 h-8 flex flex-col justify-center iconHove">
+							<p className="dark:text-white text-black text-base font-semibold select-none">{name?.toLocaleUpperCase()}</p>
+							<button className="w-6 h-8 flex flex-col justify-center">
 								<Icons.ArrowDown />
 							</button>
 						</div>
 						{isShowModalPannelClan && (
 							<div
 								onClick={(e) => e.stopPropagation()}
-								className="bg-bgProfileBody p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
+								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
 									<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />
-									<ItemModal onClick={handleShowInviteClanModal} children="Invite People" endIcon={<Icons.AddPerson />} />
-									<ItemModal onClick={handleShowServerSettings} children="Clan Settings" endIcon={<Icons.SettingProfile />} />
+									<ItemModal onClick={handleShowInviteClanModal} children="Invite People" endIcon={<Icons.AddPerson className='dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white'/>} />
+									<ItemModal onClick={handleShowServerSettings} children="Clan Settings" endIcon={<Icons.SettingProfile className='dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white'/>} />
 								</div>
 							</div>
 						)}
@@ -132,21 +132,21 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				}}
 			/>
 
-			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] text-contentPrimary bg-opacity-80" size="lg">
-				<div className="bg-[#1E1E1E] flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
+			<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111] dark:text-contentPrimary text-black bg-opacity-80" size="lg">
+				<div className="dark:bg-[#1E1E1E] bg-bgLightMode flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-bold uppercase">Create Category</div>
 					<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-						<span className="text-4xl hover:text-white">×</span>
+						<span className="text-4xl dark:hover:text-white hover:text-black">×</span>
 					</button>
 				</div>
-				<Modal.Body className="bg-[#1E1E1E] px-6 py-4">
+				<Modal.Body className="dark:bg-[#1E1E1E] bg-bgLightMode px-6 py-4">
 					<div className="flex flex-col">
 						<span className="font-[600] text-sm ">What is category's name?</span>
 						<InputField
 							type="text"
 							onChange={handleInputChange}
 							placeholder="Enter the category's name"
-							className="py-[8px] bg-black text-[14px] mt-2 mb-0 border-blue-600 border"
+							className="py-[8px] dark:bg-black bg-bgLightModeSecond text-[14px] mt-2 mb-0 border-blue-600 border"
 							value={nameCate}
 						/>
 					</div>
@@ -156,7 +156,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 						</p>
 					)}
 				</Modal.Body>
-				<div className=" text-white font-semibold text-sm flex bg-bgTertiary justify-end flex-row items-center gap-4 py-4 px-6 bg-bgDisable rounded-bl-[5px] rounded-br-[5px]">
+				<div className=" text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
 					<button onClick={onClose}>Cancel</button>
 					<button
 						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkvalidate ? 'opacity-50 cursor-not-allowed' : ''}`}

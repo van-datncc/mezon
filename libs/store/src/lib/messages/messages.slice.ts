@@ -79,6 +79,13 @@ export const fetchMessagesCached = memoize(
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
+			// set default value
+			if (args[2] === undefined) {
+				args[2] = "";
+			}
+			if (args[3] === undefined) {
+				args[3] = 1;
+			}
 			return args[1] + args[2] + args[3];
 		},
 	},
@@ -309,7 +316,7 @@ export const messagesSlice = createSlice({
 				case 1:
 					messagesAdapter.updateOne(state, {
 						id: action.payload.id,
-						changes: action.payload,
+						changes: { content: action.payload.content },
 					});
 					break;
 				case 2:
@@ -471,7 +478,7 @@ export const selectMessageByUserId = (channelId?: string | null, senderId?: stri
 
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
-		return messages.pop();
+		return messages.shift();
 	});
 
 export const selectLastMessageIdByChannelId = (channelId?: string | null) =>

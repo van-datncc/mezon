@@ -1,5 +1,5 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useAppNavigation, useFriends, useMenu } from '@mezon/core';
+import { useApp, useAppNavigation, useFriends, useMenu } from '@mezon/core';
 import {
 	gifsStickerEmojiActions,
 	messagesActions,
@@ -42,10 +42,13 @@ function MyApp() {
 		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 		dispatch(reactionActions.setReactionBottomStateResponsive(false));
+		dispatch(reactionActions.setMessageMatchWithRef(false));
 	};
 
+	const { setAppearanceTheme, appearanceTheme } = useApp();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
+		setAppearanceTheme(appearanceTheme);
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
 				setCloseMenu(true);
@@ -110,12 +113,12 @@ function MyApp() {
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
 			<div
-				className={`overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
 				<NavLink to="/chat/direct/friends">
-					<NavLinkComponent active={pathName.includes('direct')}>
+					<NavLinkComponent active={pathName.includes('direct')} clanName="DM">
 						<div>
 							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} className="clan" />
 							{quantityPendingRequest !== 0 && (
@@ -131,7 +134,7 @@ function MyApp() {
 					<NavLink
 						to={`${currentChannel?.id ? `/chat/clans/${currentClan.id}/channels/${currentChannel?.id}` : `/chat/clans/${currentClan.id}`}`}
 					>
-						<NavLinkComponent active={!pathName.includes('direct')}>
+						<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || ''}>
 							{currentClan?.logo ? (
 								<Image
 									src={currentClan?.logo || ''}

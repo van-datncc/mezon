@@ -1,5 +1,5 @@
-import { ChannelMessageOpt, EmojiPickerComp, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
-import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useMenu, useReference } from '@mezon/core';
+import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { useChatMessage, useChatReaction, useChatSending, useDeleteMessage, useDirect, useEscapeKey, useReference } from '@mezon/core';
 import { directActions, messagesActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -103,7 +103,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	};
 
 	useEscapeKey(handleCancelEdit);
-
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser
@@ -125,7 +124,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 					/>
 				}
 			/>
-
 			{lastSeen && <UnreadMessageBreak />}
 
 			{openEditMessageState && mess.id === referenceMessage?.id && (
@@ -134,7 +132,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 						onFocus={handleFocus}
 						ref={textareaRef}
 						defaultValue={mess.content.t}
-						className="w-[83%] bg-black rounded p-[10px]"
+						className="w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black"
 						onKeyDown={onSend}
 						onChange={(e) => {
 							onchange(e);

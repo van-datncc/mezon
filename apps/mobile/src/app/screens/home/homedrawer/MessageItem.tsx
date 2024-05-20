@@ -1,15 +1,9 @@
-import { Metrics } from '@mezon/mobile-ui';
-import { selectMemberByUserId } from '@mezon/store';
-import {
-	IChannelMember,
-	IMessageWithUser,
-	convertTimeString,
-	notImplementForGifOrStickerSendFromPanel,
-	getTimeDifferenceInSeconds, TIME_COMBINE, checkSameDay
-} from '@mezon/utils';
+import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
-import { Linking, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Metrics, size } from '@mezon/mobile-ui';
+import { IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-viewing';
 import VideoPlayer from 'react-native-video-player';
@@ -18,6 +12,10 @@ import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
 import { FastImageRes } from './Reusables';
 import { styles } from './styles';
+import { MessageItemBS } from './components';
+import { EMessageBSToShow } from './enums';
+import { ReplyIcon } from '@mezon/mobile-components';
+import { useDeleteMessage } from '@mezon/core';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -29,6 +27,8 @@ export type MessageItemProps = {
 	newMessage?: string;
 	child?: JSX.Element;
 	isMention?: boolean;
+	channelLabel?: string;
+	channelId?: string;
 };
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { attachments, lines } = useMessageParser(props.message);
@@ -38,10 +38,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [visibleImage, setIsVisibleImage] = useState<boolean>(false);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
+	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null)
+	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
+	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
+	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 
 	// TODO: add logic here
 	const isCombine = true;
-	
+
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
 		const images: ApiMessageAttachment[] = [];
@@ -73,6 +77,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
+							key={index}
 							isControlsVisible={false}
 							disableFullscreen={false}
 							video={{ uri: video?.url }}
@@ -96,7 +101,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 
 					return (
-						<TouchableOpacity activeOpacity={0.8} onPress={() => setIsVisibleImage(true)}>
+						<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => setIsVisibleImage(true)}>
 							<FastImage
 								style={[
 									styles.imageMessageRender,
@@ -203,40 +208,79 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return <Text style={styles.contentMessageBox}>{lines}</Text>;
 	};
 
+	const onConfirmDeleteMessage = () => {
+		DeleteSendMessage(props.message.id);
+	}
+
+	const setMessageSelected = (type: EMessageBSToShow) => {
+		setOpenBottomSheet(type)
+	}
+
+	const jumpToRepliedMesage = () => {
+		console.log('message to jump', messageRefFetchFromServe);
+	}
+
 	return (
-		<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-			<View style={{ width: 40, height: 40, borderRadius: 50, overflow: 'hidden' }}>
-				{isCombine &&
-					(user?.user?.avatar_url ? (
-						<FastImageRes uri={user?.user?.avatar_url} />
-					) : (
-						<View style={styles.avatarMessageBoxDefault}>
-							<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
-						</View>
-					))}
-			</View>
-			<View style={styles.rowMessageBox}>
-				{isCombine && (
-					<View style={styles.messageBoxTop}>
-						<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
-						<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
+		<View style={styles.messageWrapper}>
+			{messageRefFetchFromServe ? (
+				<View style={styles.aboveMessage}>
+					<View style={styles.iconReply}>
+						<ReplyIcon width={34} height={30} />
 					</View>
-				)}
-				{videos.length > 0 && renderVideos()}
-				{images.length > 0 && renderImages()}
-				{images.length > 0 && (
-					<ImageView
-						images={images.map((i) => {
-							return { uri: i.url };
-						})}
-						imageIndex={0}
-						visible={visibleImage}
-						onRequestClose={() => setIsVisibleImage(false)}
-					/>
-				)}
-				{documents.length > 0 && renderDocuments()}
-				{renderTextContent()}
+					<Pressable onPress={() => jumpToRepliedMesage()} style={styles.repliedMessageWrapper}>
+						{repliedSender?.user?.avatar_url ? (
+							<View style={styles.replyAvatar}>
+								<FastImageRes uri={repliedSender?.user?.avatar_url} isCirle />
+							</View>
+						) : (
+							<View style={styles.replyAvatar}>
+								<View style={styles.avatarMessageBoxDefault}>
+									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+								</View>
+							</View>
+						)}
+						<Text style={styles.repliedContentText}>{messageRefFetchFromServe.content.t}</Text>
+					</Pressable>
+				</View>
+			): null}
+			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+				<Pressable
+					onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)}
+					style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden' }}
+				>
+					{isCombine &&
+						(user?.user?.avatar_url ? (
+							<FastImageRes uri={user?.user?.avatar_url} />
+						) : (
+							<View style={styles.avatarMessageBoxDefault}>
+								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+							</View>
+						))}
+				</Pressable>
+				<Pressable style={styles.rowMessageBox} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
+					{isCombine && (
+						<View style={styles.messageBoxTop}>
+							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
+							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
+						</View>
+					)}
+					{videos.length > 0 && renderVideos()}
+					{images.length > 0 && renderImages()}
+					{images.length > 0 && (
+						<ImageView
+							images={images.map((i) => {
+								return { uri: i.url };
+							})}
+							imageIndex={0}
+							visible={visibleImage}
+							onRequestClose={() => setIsVisibleImage(false)}
+						/>
+					)}
+					{documents.length > 0 && renderDocuments()}
+					{renderTextContent()}
+				</Pressable>
 			</View>
+			<MessageItemBS message={props.message} onConfirmDeleteMessage={onConfirmDeleteMessage} type={openBottomSheet} onClose={() => setOpenBottomSheet(null)} />
 		</View>
 	);
 });

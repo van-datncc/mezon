@@ -37,109 +37,114 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	};
 
 	return (
-		<div
-			key={friend.user?.id}
-			className="border-t-[1px] border-borderDefault py-3 flex justify-between items-center px-[12px] cursor-pointer hover:bg-gray-800 rounded-lg"
-		>
-			<div key={friend.user?.id}>
-				<MemberProfile
-					avatar={friend?.user?.avatar_url ?? ''}
-					name={friend?.user?.username ?? ''}
-					status={userStatus}
-					isHideStatus={friend.state !== 0 ? true : false}
-					isHideIconStatus={friend.state !== 0 ? true : false}
-					isHideAnimation={true}
-					key={friend.user?.id}
-					numberCharacterCollapse={100}
-					classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList'}
-				/>
-			</div>
-			<div>
-				{friend.state === 0 && (
-					<div className="flex gap-3 items-center">
-						<button onClick={() => directMessageWithUser(friend.user?.id ?? '')} className="bg-bgTertiary rounded-full p-2 iconHover">
-							<Icons.IconChat />
-						</button>
-						<Dropdown
-							label=""
-							className="bg-bgPrimary border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
-							dismissOnClick={true}
-							placement="right-start"
-							renderTrigger={() => (
-								<button className="bg-bgTertiary rounded-full p-2 iconHover">
-									<Icons.IconEditThreeDot />
-								</button>
-							)}
-						>
-							<Dropdown.Item
-								theme={{
-									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex',
-								}}
+		<div className="border-t-[1px] dark:border-borderDefault border-gray-300">
+			<div
+				key={friend.user?.id}
+				className=" py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-gray-800 hover:bg-white rounded-lg"
+			>
+				<div key={friend.user?.id}>
+					<MemberProfile
+						avatar={friend?.user?.avatar_url ?? ''}
+						name={friend?.user?.username ?? ''}
+						status={userStatus}
+						isHideStatus={friend.state !== 0 ? true : false}
+						isHideIconStatus={friend.state !== 0 ? true : false}
+						isHideAnimation={true}
+						key={friend.user?.id}
+						numberCharacterCollapse={100}
+						classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList'}
+					/>
+				</div>
+				<div>
+					{friend.state === 0 && (
+						<div className="flex gap-3 items-center">
+							<button
+								onClick={() => directMessageWithUser(friend.user?.id ?? '')}
+								className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2"
 							>
-								Start Video Call
-							</Dropdown.Item>
-							<Dropdown.Item
-								theme={{
-									base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex',
-								}}
+								<Icons.IconChat className='dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black'/>
+							</button>
+							<Dropdown
+								label=""
+								className="bg-bgPrimary border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
+								dismissOnClick={true}
+								placement="right-start"
+								renderTrigger={() => (
+									<button className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2">
+										<Icons.IconEditThreeDot className='dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black'/>
+									</button>
+								)}
 							>
-								Start Voice Call
-							</Dropdown.Item>
-							<Dropdown.Item
-								theme={{
-									base: 'hover:bg-colorDanger hover:text-contentSecondary p-2 rounded-[5px] w-full text-colorDanger flex',
-								}}
+								<Dropdown.Item
+									theme={{
+										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex',
+									}}
+								>
+									Start Video Call
+								</Dropdown.Item>
+								<Dropdown.Item
+									theme={{
+										base: 'hover:bg-hoverPrimary p-2 rounded-[5px] w-full flex',
+									}}
+								>
+									Start Voice Call
+								</Dropdown.Item>
+								<Dropdown.Item
+									theme={{
+										base: 'hover:bg-colorDanger hover:text-contentSecondary p-2 rounded-[5px] w-full text-colorDanger flex',
+									}}
+									onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
+								>
+									Remove Friend
+								</Dropdown.Item>
+								<Dropdown.Item
+									theme={{
+										base: 'hover:bg-colorDanger hover:text-contentSecondary p-2 rounded-[5px] w-full text-colorDanger flex',
+									}}
+									onClick={() => handleBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
+								>
+									Block
+								</Dropdown.Item>
+							</Dropdown>
+						</div>
+					)}
+					{friend.state === 1 && (
+						<div className="flex gap-3 items-center">
+							<button
+								className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
 								onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
 							>
-								Remove Friend
-							</Dropdown.Item>
-							<Dropdown.Item
-								theme={{
-									base: 'hover:bg-colorDanger hover:text-contentSecondary p-2 rounded-[5px] w-full text-colorDanger flex',
-								}}
-								onClick={() => handleBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
+								✕
+							</button>
+						</div>
+					)}
+					{friend.state === 2 && (
+						<div className="flex gap-3 items-center">
+							<button
+								className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
+								onClick={() => handleAcceptFriend(friend?.user?.username as string, friend.user?.id as string)}
 							>
-								Block
-							</Dropdown.Item>
-						</Dropdown>
-					</div>
-				)}
-				{friend.state === 1 && (
-					<div className="flex gap-3 items-center">
-						<button
-							className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
-							onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
-						>
-							✕
-						</button>
-					</div>
-				)}
-				{friend.state === 2 && (
-					<div className="flex gap-3 items-center">
-						<button
-							className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
-							onClick={() => handleAcceptFriend(friend?.user?.username as string, friend.user?.id as string)}
-						>
-							✓
-						</button>
-						<button
-							className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
-							onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
-						>
-							✕
-						</button>
-					</div>
-				)}
-				{friend.state === 3 && (
-					<div className="flex gap-3 items-center">
-						<button
-							className="bg-bgTertiary text-contentSecondary rounded-[6px] text-[14px] p-2 flex items-center justify-center hover:bg-bgPrimary"
-							onClick={() => handleUnBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
-						>
-							UnBlock
-						</button>
-					</div>
-				)}
+								✓
+							</button>
+							<button
+								className="bg-bgTertiary text-contentSecondary rounded-full w-8 h-8 flex items-center justify-center"
+								onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
+							>
+								✕
+							</button>
+						</div>
+					)}
+					{friend.state === 3 && (
+						<div className="flex gap-3 items-center">
+							<button
+								className="bg-bgTertiary text-contentSecondary rounded-[6px] text-[14px] p-2 flex items-center justify-center hover:bg-bgPrimary"
+								onClick={() => handleUnBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
+							>
+								UnBlock
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

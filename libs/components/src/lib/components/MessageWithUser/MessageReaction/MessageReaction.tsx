@@ -1,4 +1,4 @@
-import { EmojiPickerComp, ReactionBottom, UserReactionPanel } from '@mezon/components';
+import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
 import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser, SenderInfoOptionals, calculateTotalCount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -162,7 +162,11 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
 				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
 					<div className="scale-75 transform mb-0 z-20">
-						<EmojiPickerComp messageEmoji={message} emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM} />
+						<GifStickerEmojiPopup
+							messageEmoji={message}
+							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							emojiAction={EmojiPlaces.EMOJI_REACTION_BOTTOM}
+						/>
 					</div>
 				</div>
 			)}
@@ -187,7 +191,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 									<div
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
-									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-bgLightMode border-blue-600 border' : 'dark:bg-[#313338] bg-bgLightMode border-[#313338]'}
+									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 										onClick={() =>
 											reactOnExistEmoji(

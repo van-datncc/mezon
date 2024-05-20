@@ -1,5 +1,6 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useChatMessages, useJumpToMessage, useReference, useMessages } from '@mezon/core';
+import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useReference } from '@mezon/core';
+import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -9,7 +10,7 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
-}
+};
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const chatRef = useRef<HTMLDivElement>(null);
@@ -20,9 +21,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageReplied } = useReference();
+	const { appearanceTheme } = useApp();
 
 	// share logic to load more message
-	useMessages({ chatRef, hasMoreMessage, loadMoreMessage });
+	const isFetching = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
 
 	useEffect(() => {
 		if (idMessageReplied) {
@@ -50,27 +52,38 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		};
 	}, [messageid, jumpToMessage]);
 
+	function reverseArray(array: IMessageWithUser[]) {
+		return array.slice().reverse();
+	}
+
 	return (
 		<div
-			className="dark:bg-bgPrimary bg-bgLightModeSecond relative h-full overflow-y-scroll overflow-x-hidden flex-col-reverse flex"
+			className={`dark:bg-bgPrimary
+			bg-bgLightModeSecond
+			relative h-full overflow-y-scroll
+			overflow-x-hidden flex-col flex
+			
+			${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{messages.map((message, i) => (
-				<ChannelMessage
-					mode={mode}
-					key={message.id}
-					lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-					message={message}
-					preMessage={messages.length > 0 ? messages[i - 1] : undefined}
-					channelId={channelId}
-					channelLabel={channelLabel || ''}
-				/>
-			))}
-
 			{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-		</div>
+			{isFetching && hasMoreMessage && <p className=" text-center">Loading messages...</p>}
 
+			{reverseArray(messages).map((message, i) => {
+				return (
+					<ChannelMessage
+						mode={mode}
+						key={message.id}
+						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
+						message={message}
+						preMessage={reverseArray(messages).length > 0 ? reverseArray(messages)[i - 1] : undefined}
+						channelId={channelId}
+						channelLabel={channelLabel ?? ''}
+					/>
+				);
+			})}
+		</div>
 	);
 }
 

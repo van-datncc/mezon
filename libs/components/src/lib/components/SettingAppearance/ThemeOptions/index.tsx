@@ -14,16 +14,9 @@ const ThemeOptions = () => {
 		if(themeChosen === "system"){
 			if(systemIsDark.matches){
 				setAppearanceTheme("dark");
-				elementHTML.classList.add('dark');
 			}else{
 				setAppearanceTheme("light");
-				elementHTML.classList.remove('dark');
 			}
-		}
-		if(themeChosen === "dark"){
-			elementHTML.classList.add('dark');
-		} else {
-			elementHTML.classList.remove('dark');
 		}
 	}
 	useEffect(() => {
@@ -36,19 +29,6 @@ const ThemeOptions = () => {
 			systemIsDark.removeEventListener('change', handleChange);
 		};
 	}, [themeChosen, systemIsDark]);
-
-	useEffect(()=>{
-		switch(appearanceTheme){
-			case "dark":
-				elementHTML.classList.add('dark');
-				break;
-			case "light":
-				elementHTML.classList.remove('dark');
-				break;
-			default:
-				break;
-		}
-	}, [appearanceTheme])
 
     useEffect(()=>{
 		if(themeChosen !== "system"){

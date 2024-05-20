@@ -1,26 +1,22 @@
-import { ChannelList, ChannelTopbar, ClanHeader, EmojiPickerComp, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useApp, useAuth, useClans, useMenu, useReference, useThreads } from '@mezon/core';
-import { selectCurrentChannel, selectCurrentVoiceChannel, selectReactionRightState, selectReactionTopState } from '@mezon/store';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
+import { MezonPolicyProvider, useApp, useAuth, useClans, useMenu, useThreads } from '@mezon/core';
+import { selectCurrentChannel, selectCurrentVoiceChannel } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData } from 'react-router-dom';
 import { ClanLoaderData } from '../loaders/clanLoader';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
-import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 
 const ClanLayout = () => {
-	const reactionRightState = useSelector(selectReactionRightState);
 	const { clanId } = useLoaderData() as ClanLoaderData;
 	const { currentClan } = useClans();
 	const { userProfile } = useAuth();
 	const { closeMenu, statusMenu } = useMenu();
 
 	const { isShowCreateThread } = useThreads();
-	const { isShowMemberList, setIsShowMemberList } = useApp();
-	const { referenceMessage } = useReference();
-	const reactionTopState = useSelector(selectReactionTopState);
+	const { setIsShowMemberList } = useApp();
 
 	const [openSetting, setOpenSetting] = useState(false);
 
@@ -30,11 +26,11 @@ const ClanLayout = () => {
 		setOpenSetting(true);
 	};
 
-	useEffect(()=>{
-		if(isShowCreateThread){
+	useEffect(() => {
+		if (isShowCreateThread) {
 			setIsShowMemberList(false);
 		}
-	},[isShowCreateThread])
+	}, [isShowCreateThread]);
 
 	return (
 		<div className="flex flex-row flex-1 bg-bgSurface">
@@ -57,21 +53,12 @@ const ClanLayout = () => {
 					className={`flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 				>
 					<ChannelTopbar channel={currentChannel} />
-					<div className="flex h-heightWithoutTopBar flex-row">
-						<Outlet />
-					</div>
-					{ reactionRightState &&  
-						<div id="emojiPicker" className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}>
-							<div className="mb-0 z-10 h-full">
-								<EmojiPickerComp messageEmoji={referenceMessage as IMessageWithUser} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
-							</div>
-						</div>
-					}
+					<Outlet />
 				</div>
 				{isShowCreateThread && (
 					<>
-						<div className="w-2 cursor-ew-resize bg-bgTertiary" />
-						<div className="w-[480px] bg-bgPrimary rounded-l-lg">
+						<div className="w-2 cursor-ew-resize dark:bg-bgTertiary bg-white" />
+						<div className="w-[480px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-l-lg">
 							<ThreadsMain />
 						</div>
 					</>

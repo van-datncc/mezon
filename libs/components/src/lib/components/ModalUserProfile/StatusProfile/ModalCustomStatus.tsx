@@ -19,7 +19,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 	}, [dispatch, openModal]);
 	return (
 		<Modal theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="bg-[#313338] pt-4 rounded">
+			<div className="bg-bgPrimary pt-4 rounded">
 				<div>
 					<h1 className="text-white text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
@@ -83,13 +83,16 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 					</div>
 					<div className="flex justify-end p-4 rounded-b bg-[#2B2D31]">
 						<Button
-							className="h-10 px-4 rounded bg-transparent hover:!bg-transparent hover:!underline focus:ring-transparent"
+							className="h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent"
 							type="button"
 							onClick={onClose}
 						>
 							Cancel
 						</Button>
-						<Button className="h-10 px-4 rounded bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent" type="submit">
+						<Button
+							className="h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent"
+							type="submit"
+						>
 							Save
 						</Button>
 					</div>

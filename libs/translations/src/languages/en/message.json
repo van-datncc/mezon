@@ -1,0 +1,21 @@
+{
+    "actions": {
+        "editMessage": "Edit Message",
+        "reply": "Reply",
+        "createThread": "Create Thread",
+        "copyText": "Copy Text",
+        "deleteMessage": "Delete Message",
+        "pinMessage": "Pin Message",
+        "markUnRead": "Mark UnRead",
+        "mention": "Mention",
+        "copyMessageLink": "Copy Message Link",
+        "report": "Report"
+    },
+    "chatBox": {
+        "replyingTo": "Replying to",
+        "editingMessage": "Editing Message"
+    },
+    "toast": {
+        "copyText": "Copied Message Text"
+    }
+}

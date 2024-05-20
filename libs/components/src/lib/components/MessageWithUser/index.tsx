@@ -69,10 +69,10 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					className={`dark:bg-bgPrimary bg-bgLightModeSecond relative rounded-sm  overflow-visible ${checkReplied || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
 				>
 					<div
-						className={`${checkReplied || checkMessageTargetToMoved ? ' bg-blue-500 group-hover:none' : 'dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-bgLightModeButton'} absolute w-1 h-full left-0`}
+						className={`${checkReplied || checkMessageTargetToMoved ? ' dark:bg-blue-500 bg-[#EAB308] group-hover:none' : 'dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]'} absolute w-1 h-full left-0`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-[2px] dark:group-hover:bg-bgPrimary1 group-hover:bg-bgLightModeButton ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
+						className={`flex h-15 flex-col w-auto px-3 py-[2px] dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
 						{' '}
 						<MessageReply message={message} />

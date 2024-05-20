@@ -31,14 +31,14 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 				<div
 					onClick={(e) => e.stopPropagation()}
 					className={`absolute z-50  bottom-7 w-[18rem]
-				bg-[#313338] border-[#313338] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
+				dark:bg-[#313338] bg-white border-[#313338] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
 				>
 					<div>
 						<div className="flex flex-row items-center m-2">
 							<div className="">{emojiShowPanel.emoji}</div>
 							<p className="text-sm ml-2">{calculateTotalCount(emojiShowPanel.senders)}</p>
 						</div>
-						<hr className="h-[0.1rem] bg-blue-900 border-none"></hr>
+						<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none"></hr>
 					</div>
 
 					{emojiShowPanel.senders.map((sender: SenderInfoOptionals, index: number) => {

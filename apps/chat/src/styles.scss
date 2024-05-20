@@ -85,19 +85,19 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #151515;
+  background: #2B2D31;
   border-radius: 5px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #000;
+  background: #1A1B1E;
   border-radius: 5px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #000;
+  background: #1A1B1E;
 }
 
 html,
@@ -330,17 +330,10 @@ input:-webkit-autofill:active {
   }
 }
 
-// css InfiniteScroll
-#scrollLoading {
-  .infinite-scroll-component {
-    margin-bottom: 20px;
-    overflow: visible !important;
-  }
-}
 
 #scrollLoading::-webkit-scrollbar {
-  width: 12px;
-  padding-right: 5px;
+  width: 8px;
+  margin-right: 0;
 }
 
 // css mainChat
@@ -457,6 +450,10 @@ input:-webkit-autofill:active {
 }
 
 // thread-scroll
+.thread-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
 .thread-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
@@ -469,13 +466,17 @@ input:-webkit-autofill:active {
   background: #151515;
 }
 
-// message-channel-scroll
-.message-channel-scroll::-webkit-scrollbar-track {
+// attachment-scroll
+.attachment-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.attachment-scroll::-webkit-scrollbar-track {
   background: #2B2D31;
 }
 
 .message-channel-scroll::-webkit-scrollbar-thumb {
-  background: #1A1B1E;
+  background: #2B2D31;
 }
 
 // css tagLink of markdown
@@ -520,8 +521,8 @@ input:-webkit-autofill:active {
 
 // custom dark - light mode
 .customScrollLightMode {
-  scrollbar-width: thin; 
-  scrollbar-color: white #E1E1E1; 
+  scrollbar-width: thin;
+  scrollbar-color: white #E1E1E1;
 }
 
 .customScrollLightMode::-webkit-scrollbar {
@@ -530,10 +531,10 @@ input:-webkit-autofill:active {
 }
 
 .customScrollLightMode::-webkit-scrollbar-track {
-  background: #E1E1E1; 
+  background: #E1E1E1;
 }
 
 .customScrollLightMode::-webkit-scrollbar-thumb {
-  background-color: white; 
+  background-color: white;
   border-radius: 4px;
 }

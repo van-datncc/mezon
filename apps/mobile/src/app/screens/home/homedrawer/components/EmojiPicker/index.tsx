@@ -1,20 +1,13 @@
-import { SmilingFaceIcon } from '@mezon/mobile-components';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Text, View } from 'react-native';
 
-export type EmojiPickerOptions = {
-	mode?: number;
-};
+export type IProps = {};
 
-function EmojiPicker(props: EmojiPickerOptions) {
-	const onPicker = () => {
-		// TODO: add logic here
-		// 	Emoji, Gif, sticker
-	};
+function EmojiPicker({}: IProps) {
 	return (
-		<TouchableOpacity onPress={onPicker}>
-			<SmilingFaceIcon width={25} height={25} />
-		</TouchableOpacity>
+		<View>
+			<Text>Handel Emoji, Gif, Sticker picker here!!!</Text>
+		</View>
 	);
 }
 

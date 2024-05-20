@@ -76,9 +76,9 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	};
 
 	return (
-		<div className="p-2 absolute w-full bottom-[57px] bg-bgSurface border-borderDefault ">
-			<div className="flex items-center gap-2 iconHover justify-between">
-				<div className="">
+		<div className="p-2 absolute w-full bottom-[57px] dark:bg-bgSecondary600 bg-bgLightModeThird border-b-[1px] border-borderDivider">
+			<div className="flex items-center gap-2 justify-between">
+				<div>
 					<div className="flex items-center whitespace-nowrap text-ellipsis overflow-hidden pb-[2px]">
 						<WifiButton />
 						<button>
@@ -86,7 +86,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 						</button>
 					</div>
 
-					<button className="text-[12px] font-normal text-gray-400 hover:underline" onClick={handleClick}>
+					<button className="text-[12px] font-normal dark:text-gray-400 text-colorTextLightMode hover:underline" onClick={handleClick}>
 						<Link to={channelPath}>
 							{currentVoiceChannel?.channel_label}/ {currentClan?.clan_name}
 						</Link>
@@ -102,34 +102,26 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 				</div>
 			</div>
 			<div className="actionButtons">
-				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
-					<div className="flex items-center">
-						<button className=" w-[18px] h-[20px]" onClick={openCamera}>
-							<Icons.CameraIcon />
-						</button>
-					</div>
-				</button>
-				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
-					<div>
-						<button className="flex w-[18px] h-[20px]" onClick={showScreen ? stopScreenShare : startScreenShare}>
-							<Icons.ShareIcon defaultFill={showScreen ? 'white' : '#AEAEAE'} />
-						</button>
-					</div>
-				</button>
-				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
-					<div>
-						<div className="flex w-[18px] h-[20px]">
-							<Icons.RocketIcon />
-						</div>
-					</div>
-				</button>
-				<button className="button-icon bg-[#2B2D31] hover:bg-gray-600">
-					<div>
-						<div className="flex w-[18px] h-[20px]">
-							<Icons.BellIcon />
-						</div>
-					</div>
-				</button>
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight hover:bg-bgLightModeButton dark:hover:bg-bgSecondary group">
+					<button className="w-[18px] h-[20px]" onClick={openCamera}>
+						<Icons.CameraIcon />
+					</button>
+				</div>
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight hover:bg-bgLightModeButton dark:hover:bg-bgSecondary group">
+					<button className="w-[18px] h-[20px]" onClick={showScreen ? stopScreenShare : startScreenShare}>
+						<Icons.ShareIcon />
+					</button>
+				</div>
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight hover:bg-bgLightModeButton dark:hover:bg-bgSecondary group">
+					<button className="w-[18px] h-[20px]">
+						<Icons.RocketIcon />
+					</button>
+				</div>
+				<div className="flex items-center button-icon dark:bg-bgPrimary bg-bgModifierHoverLight hover:bg-bgLightModeButton dark:hover:bg-bgSecondary group">
+					<button className="w-[18px] h-[20px]">
+						<Icons.BellIcon />
+					</button>
+				</div>
 			</div>
 		</div>
 	);

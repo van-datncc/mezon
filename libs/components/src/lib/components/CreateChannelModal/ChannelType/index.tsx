@@ -46,15 +46,15 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 
 	return (
 		<div
-			className={`Frame403 self-stretch px-2 py-2 bg-bgSecondary rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'hover:bg-bgHover'}  ${error ? 'border border-red-500' : ' border border-none'}`}
+			className={`Frame403 self-stretch px-2 py-2 dark:bg-bgSecondary bg-bgModifierHoverLight rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'dark:hover:bg-bgHover hover:bg-[#bababa]'}  ${error ? 'border border-red-500' : ' border border-none'}`}
 		>
 			<div className="ChannelChat w-6 h-6 relative">{iconMap[type as ChannelType]}</div>
-			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
+			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">
 				<div className="Text self-stretch text-stone-300 text-sm font-bold leading-normal text-[10px]">
-					<p>{labelMap[type as ChannelType]}</p>
+					<p className='dark:text-white text-black'>{labelMap[type as ChannelType]}</p>
 				</div>
 				<div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal leading-[18.20px] text-[10px] w-widthChannelTypeText">
-					<p className="one-line">{descriptionMap[type as ChannelType]}</p>
+					<p className="one-line dark:text-white text-black">{descriptionMap[type as ChannelType]}</p>
 				</div>
 			</div>
 			<div className={`RadioButton p-0.5 justify-start items-start flex `}>
