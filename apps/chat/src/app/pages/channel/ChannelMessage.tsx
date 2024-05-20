@@ -278,18 +278,18 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	};
 	const checkUser = userId === message.sender_id;
 	return (
-		<div className={`bg-[#151515] rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
+		<div className={`dark:bg-[#151515] bg-bgLightMode rounded-[10px] p-2 absolute right-8 w-[180px] z-10 ${checkUser ? '-top-[150px]' : 'top-[-66px]'}`}>
 			<ul className="flex flex-col gap-1">
 				{checkUser && (
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit} role="button" aria-hidden>
+					<li className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer" onClick={handleClickEdit} role="button" aria-hidden>
 						Edit Message
 					</li>
 				)}
-				<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply} role="button" aria-hidden>
+				<li className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer" onClick={handleClickReply} role="button" aria-hidden>
 					Reply
 				</li>
 				<li
-					className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer"
+					className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer"
 					onClick={() => {
 						handleClickForward();
 					}}
@@ -299,14 +299,14 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 					Forward message
 				</li>
 				<CopyToClipboard text={message.content.t || ''}>
-					<li className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy} role="button" aria-hidden>
+					<li className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme rounded-lg text-[15px] cursor-pointer" onClick={handleClickCopy} role="button" aria-hidden>
 						Copy Text
 					</li>
 				</CopyToClipboard>
 
 				{checkUser && (
 					<li
-						className="p-2 hover:bg-black rounded-lg text-[15px] cursor-pointer text-[#ff0000]"
+						className="p-2 dark:hover:bg-black hover:bg-bgLightModeThird rounded-lg text-[15px] cursor-pointer text-[#ff0000]"
 						onClick={handleClickDelete}
 						role="button"
 						aria-hidden
