@@ -166,13 +166,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if ((!valueTextInput && attachmentDataRef.length === 0) || (valueTextInput.trim() === '' && attachmentDataRef.length === 0)) {
+			if ((!valueTextInput && attachmentDataRef.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef.length === 0)) {
 				return;
 			}
 			if (
 				valueTextInput &&
 				typeof valueTextInput === 'string' &&
-				!valueTextInput.trim() &&
+				!(valueTextInput || '').trim() &&
 				attachmentDataRef.length === 0 &&
 				mentionData.length === 0
 			) {

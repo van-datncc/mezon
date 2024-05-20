@@ -72,7 +72,7 @@ export const InviteToChannel = React.memo(() => {
     }
 
 	const getListOfUser = () => {
-		if (!searchUserText.trim()) {
+		if (!(searchUserText || '').trim()) {
 			return friendList;
 		}
 		const filteredUserList = friendList.filter((user: IUser) => normalizeString(user.name).includes(normalizeString(searchUserText)));
