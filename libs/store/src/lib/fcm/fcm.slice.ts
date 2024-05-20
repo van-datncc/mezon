@@ -24,8 +24,7 @@ export const registFcmDeviceTokenCached = memoize(
 
 export const registFcmDeviceToken = createAsyncThunk('fcm/registFcmDeviceToken', async ( {tokenId, deviceId, platform}:FcmDeviceTokenPayload, thunkAPI) => {
 	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));		
-
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await registFcmDeviceTokenCached(mezon, tokenId, deviceId, platform || "");
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
