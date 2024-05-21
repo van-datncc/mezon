@@ -138,7 +138,7 @@ const SettingRightUser = ({
 								>
 									Change avatar
 								</div>
-								<input type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
+								<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
 							</label>
 							<button
 								className="dark:text-white text-black dark:bg-[#1E1E1E] bg-gray-300 font-medium rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"

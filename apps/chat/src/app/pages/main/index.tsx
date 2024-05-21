@@ -17,6 +17,8 @@ import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 
 function MyApp() {
 	const clans = useSelector(selectAllClans);
@@ -42,6 +44,7 @@ function MyApp() {
 		dispatch(messagesActions.setOpenOptionMessageState(false));
 		dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 		dispatch(reactionActions.setReactionBottomStateResponsive(false));
+		dispatch(reactionActions.setMessageMatchWithRef(false));
 	};
 
 	const { setAppearanceTheme, appearanceTheme } = useApp();
@@ -109,16 +112,21 @@ function MyApp() {
 		};
 	}, []);
 
+	const openPopupForward = useSelector(getIsShowPopupForward);
+	const handleCloseModalForward = () => {
+		dispatch(toggleIsShowPopupForwardFalse());
+	};
 
 	return (
 		<div onClick={handleClickOutside} className="flex h-screen text-gray-100 overflow-hidden relative">
+			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
 				<NavLink to="/chat/direct/friends">
-					<NavLinkComponent active={pathName.includes('direct')} clanName='DM'>
+					<NavLinkComponent active={pathName.includes('direct')} clanName="DM">
 						<div>
 							<Image src={`/assets/images/icon-logo-mezon.svg`} alt={'logoMezon'} width={48} height={48} className="clan" />
 							{quantityPendingRequest !== 0 && (

@@ -1,7 +1,7 @@
-import { useChatSending } from '@mezon/core';
-import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon } from '@mezon/mobile-components';
+import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
+import { useChannelMembers, useChannels, useChatSending } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
-import { IMessageWithUser } from '@mezon/utils';
+import { ChannelMembersEntity, IMessageWithUser, UserMentionsOpt } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform} from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
@@ -12,14 +12,33 @@ import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import AttachmentPicker from "./components/AttachmentPicker";
 import { useSelector } from 'react-redux';
-import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
-import { ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageMention } from 'mezon-js/api.gen';
 import { IMessageActionNeedToResolve } from './types';
+import UseMentionList from '../../../hooks/useUserMentionList';
+import { renderTextContent } from './components/RenderTextContent';
+import { ChannelsMention, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
+import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 
+export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
+  mention: {
+    trigger: '@',
+    allowedSpacesCount: 0,
+    isInsertSpaceAfterMention: true,
+  },
+  hashtag: {
+    trigger: '#',
+    allowedSpacesCount: 0,
+    isInsertSpaceAfterMention: true,
+    textStyle: {
+      fontWeight: 'bold',
+      color: Colors.white,
+    },
+  },
+};
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
-
 interface IChatBoxProps {
 	channelLabel: string;
 	channelId: string;
@@ -30,6 +49,19 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<any>();
 	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [mentionTextValue, setMentionTextValue] = useState('');
+  const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const { members } = useChannelMembers({ channelId: props.channelId });
+  const textInput = useRef(null);
+  const currentChannel = useSelector(selectCurrentChannel);
+  const  listMentions  = UseMentionList(currentChannel?.id);
+  const { listChannels } = useChannels();
+  const { textInputProps, triggers } = useMentions({
+    value: mentionTextValue,
+    onChange: (newValue) => handleTextInputChange(newValue),
+    triggersConfig,
+  });
+  const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([])
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
@@ -85,12 +117,12 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				content: JSON.stringify(currentSelectedReplyMessage.content),
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}]: undefined;
-	
-			sendMessage({ t: text }, [], [], reference, false);
+
+			sendMessage({ t: text }, mentionData , [], reference, false);
 			removeAction(EMessageActionType.Reply);
 		}
 		setText('');
-	}, [sendMessage, text, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction]);
+	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -117,7 +149,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		})
 	}, [messageActionListNeedToResolve])
 
-	
+
 
 	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
 		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
@@ -138,7 +170,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
 		}
 	}, [messageActionListNeedToResolve])
-	
+
 	function keyboardWillShow(event: KeyboardEvent) {
 		if (keyboardHeight !== event.endCoordinates.height) {
 			setKeyboardHeight(event.endCoordinates.height);
@@ -162,6 +194,63 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			keyboardListener.remove();
 		};
 	}, [pushMessageActionIntoStack]);
+
+  useEffect(()=>{
+    const listChannelsMention: ChannelsMention[] = listChannels.map((item) => {
+      return {
+        id: item?.channel_id ?? '',
+        display: item?.channel_label ?? '',
+        subText: item?.category_name ?? '',
+      };
+    });
+    setListChannelsMention(listChannelsMention)
+  },[listChannels])
+
+
+  const handleTextInputChange = (text) => {
+    setText(convertMentionsToText(text));
+    handleTypingDebounced();
+    setMentionTextValue(text);
+  }
+
+const handleMentionInput = () => {
+  const mentionedUsers: UserMentionsOpt[] = [];
+  const mentions = convertMentionsToData(mentionTextValue);
+  const mentionList =
+    members[0].users?.map((item: ChannelMembersEntity) => ({
+      id: item?.user?.id ?? '',
+      display: item?.user?.username ?? '',
+      avatarUrl: item?.user?.avatar_url ?? '',
+    })) ?? [];
+  const convertedMentions: UserMentionsOpt[] = mentionList
+    ? mentionList.map((mention) => ({
+        user_id: mention.id.toString() ?? '',
+        username: mention.display ?? '',
+      }))
+    : [];
+  if (mentions.length > 0) {
+    if (mentions.some((mention) => mention.display === '@here')) {
+      mentionedUsers.splice(0, mentionedUsers.length);
+      convertedMentions.forEach((item) => {
+        mentionedUsers.push(item);
+      });
+    } else {
+      for (const mention of mentions) {
+        if (mention.display.startsWith('@')) {
+          mentionedUsers.push({
+            user_id: mention.id.toString() ?? '',
+            username: mention.display ?? '',
+          });
+        }
+      }
+    }
+    setMentionData(mentionedUsers);
+  }
+};
+
+useEffect(() => {
+  handleMentionInput();
+}, [mentionTextValue]);
 
 	const openKeyBoard = () => {
 		timeoutRef.current = setTimeout(() => {
@@ -220,6 +309,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 					</View>
 				): null}
 			</View>
+      <Suggestions suggestions={listMentions} {...triggers.mention} />
+        <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
 			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
@@ -238,25 +329,23 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 				<View style={{ position: 'relative', justifyContent: 'center' }}>
 					<TextInput
+            ref={textInput}
 						autoFocus={isFocus}
 						placeholder={'Write your thoughts here...'}
 						placeholderTextColor={Colors.textGray}
-						onChangeText={(text: string) => {
-							setText(text);
-							handleTypingDebounced();
-						}}
-						defaultValue={text}
 						blurOnSubmit={false}
-						ref={inputRef}
 						onSubmitEditing={handleSendMessage}
 						onFocus={handleInputFocus}
 						onBlur={handleInputBlur}
+            {...textInputProps}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
 							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 						]}
-					/>
+					>
+            {renderTextContent(text)}
+          </TextInput>
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 					</View>

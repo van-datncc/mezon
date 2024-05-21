@@ -7,9 +7,13 @@ import { appActions } from '../app/app.slice';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { threadsActions } from '../threads/threads.slice';
+import memoize from 'memoizee';
+
+
+const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
 export const CHANNELS_FEATURE_KEY = 'channels';
 
@@ -134,9 +138,22 @@ function extractChannelMeta(channel: ChannelsEntity): ChannelMeta {
 	};
 }
 
+
+export const fetchChannelsCached = memoize(
+	(mezon: MezonValueContext, limit: number, state: number, clanId: string, channelType: number) =>
+		mezon.client.listChannelDescs(mezon.session, limit, state, '', clanId, channelType),
+	{
+		promise: true,
+		maxAge: LIST_CHANNEL_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[2] + args[3] + args[4];
+		},
+	},
+);
+
 export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({ clanId, channelType = 1 }: fetchChannelsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listChannelDescs(mezon.session, 100, 1, '', clanId, channelType);
+	const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
 
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
