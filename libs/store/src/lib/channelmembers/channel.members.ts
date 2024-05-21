@@ -1,4 +1,4 @@
-import { IChannelMember, LoadingStatus } from '@mezon/utils';
+import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -152,6 +152,18 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 	}
 });
 
+export const removeMemberChannel = createAsyncThunk('channelMembers/removeChannelUser', async ({ channelId, ids }: RemoveChannelUsers, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.removeChannelUsers(mezon.session, channelId, ids);
+		if (response) {
+			await thunkAPI.dispatch(fetchChannelMembers({ clanId: '', channelId: channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 export const initialChannelMembersState: ChannelMembersState = channelMembersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
@@ -245,6 +257,7 @@ export const channelMembersActions = {
 	fetchChannelMembersPresence,
 	followUserStatus,
 	updateStatusUser,
+	removeMemberChannel,
 };
 
 /*
