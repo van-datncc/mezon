@@ -10,7 +10,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { useNavigation } from '@react-navigation/native';
-import { ThreadIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, ThreadIcon } from '@mezon/mobile-components';
 import ChatBox from '../../../screens/home/homedrawer/ChatBox';
 import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
 import { useEffect } from 'react';
@@ -19,7 +19,6 @@ import { useMezon } from '@mezon/transport';
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
-import { ActionEmitEvent } from '../../../screens/home/homedrawer/constants';
 
 
 export default function CreateThreadForm() {

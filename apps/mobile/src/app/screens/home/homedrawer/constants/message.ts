@@ -57,7 +57,3 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
     ];
 }
 
-export const ActionEmitEvent = {
-  SEND_MESSAGE: '@SEND_MESSAGE',
-  SHOW_KEYBOARD: '@SHOW_KEYBOARD'
-}

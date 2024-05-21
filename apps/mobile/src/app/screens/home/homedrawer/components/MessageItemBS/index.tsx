@@ -5,11 +5,11 @@ import { styles } from './styles';
 import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { useTranslation } from 'react-i18next';
-import { ActionEmitEvent, getMessageActions } from '../../constants';
+import { getMessageActions } from '../../constants';
 import { useAuth } from '@mezon/core';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
-import { CopyIcon, FlagIcon, HashtagIcon, LinkIcon, MarkUnreadIcon, MentionIcon, PenIcon, PinMessageIcon, ReplyMessageIcon, TrashIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, CopyIcon, FlagIcon, HashtagIcon, LinkIcon, MarkUnreadIcon, MentionIcon, PenIcon, PinMessageIcon, ReplyMessageIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {

@@ -1,4 +1,4 @@
-import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
+import { ActionEmitEvent, AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
 import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, UserMentionsOpt } from '@mezon/utils';
@@ -22,7 +22,6 @@ import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { useNavigation } from '@react-navigation/native';
-import { ActionEmitEvent } from './constants';
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
   mention: {
