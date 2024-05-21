@@ -123,8 +123,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			setAttachmentData([]);
 			removeAction(EMessageActionType.Reply);
 		}
+		textInput?.current?.clear?.();
 		setText('');
-	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef]);
+	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, textInput]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
