@@ -352,6 +352,7 @@ export type MentionDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
+  name?: string;
 };
 
 export type MentionsInputChangeEvent = {
@@ -404,4 +405,18 @@ export interface ChannelMembersEntity extends IChannelMember {
 export type SortChannel = {
 	isSortChannelByCategoryId: boolean;
 	categoryId: string | null;
+};
+
+export type UpdateClan = {
+	bearerToken: string;
+	clanId: string;
+	creatorId?: string;
+	clanName?: string;
+	logo?: string;
+	banner?: string;
+};
+
+export type RemoveChannelUsers = {
+	channelId: string;
+	ids?: string[];
 };

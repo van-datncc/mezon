@@ -56,11 +56,12 @@ type CreateEventManagementyload = {
 	start_time: string, 
 	end_time: string, 
 	description: string,
+	logo: string,
 };
 
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
-	async ({ clan_id, channel_id, address, title, start_time, end_time, description }: CreateEventManagementyload, thunkAPI) => {
+	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementyload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			clan_id: clan_id,
@@ -68,9 +69,9 @@ export const fetchCreateEventManagement = createAsyncThunk(
 			address: address || '',
 			title: title,
 			start_time: start_time,
-			description: description || '',
 			end_time: end_time,
-			logo: 'logo',
+			description: description || '',
+			logo: logo || '',
 		}
 		const response = await mezon.client.createEvent(mezon.session, body);
 		if (!response) {
@@ -132,5 +133,7 @@ export const getEventManagementState = (rootState: { [EVENT_MANAGEMENT_FEATURE_K
 export const selectAllEventManagement = createSelector(getEventManagementState, selectAll);
 
 export const selectEventManagementEntities = createSelector(getEventManagementState, selectEntities);
+
+export const selectNumberEvent = createSelector(selectAllEventManagement, (events) => events.length);
 
 
