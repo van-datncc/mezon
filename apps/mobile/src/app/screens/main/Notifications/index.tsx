@@ -80,8 +80,8 @@ const Notifications = () => {
                   renderItem={({item}) =>{
                     return (
                       item.code === -9 ?
-                      <NotificationItem  notify={item} key={item.id} />:
-                      <NotificationIndividualItem notify={item}  key={item.id}/>
+                      <NotificationItem  notify={item} />:
+                      <NotificationIndividualItem notify={item} />
                     )
                   }}
                   keyExtractor={item => item.id}
