@@ -1,5 +1,5 @@
-import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
-import { useChannelMembers, useChannels, useChatSending, useReference } from '@mezon/core';
+import { ActionEmitEvent, AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
+import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, UserMentionsOpt } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -10,18 +10,19 @@ import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher
 import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
-import AttachmentPicker from "./components/AttachmentPicker";
 import { useSelector } from 'react-redux';
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageMention, ApiMessageAttachment } from 'mezon-js/api.gen';
-import { IMessageActionNeedToResolve } from './types';
 import AttachmentPreview from './components/AttachmentPreview';
 import UseMentionList from '../../../hooks/useUserMentionList';
 import { renderTextContent } from './components/RenderTextContent';
 import { ChannelsMention, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
+import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { useNavigation } from '@react-navigation/native';
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
   mention: {
@@ -44,6 +45,7 @@ interface IChatBoxProps {
 	channelLabel: string;
 	channelId: string;
 	mode: number;
+  messageAction?: EMessageActionType,
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
@@ -72,6 +74,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
+  const navigation = useNavigation();
+  const { setValueThread } = useThreads();
+  const { setOpenThreadMessageState } = useReference();
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const { t } = useTranslation(['message']);
 
@@ -105,6 +110,13 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}, [removeMessageActionByType])
 
 	const handleSendMessage = useCallback(() => {
+    const payloadThreadSendMessage: IPayloadThreadSendMessage = {
+      content: { t: text },
+			mentions: mentionData,
+			attachments: [],
+			references: [],
+    }
+
 		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
 		if (isEditMessage) {
 			editMessage(text, currentSelectedEditMessage.id);
@@ -119,11 +131,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}]: undefined;
 
-			sendMessage({ t: text }, mentionData , attachmentDataRef || [], reference, false);
-			setAttachmentData([]);
-			removeAction(EMessageActionType.Reply);
+	    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
+				sendMessage({ t: text }, mentionData , attachmentDataRef || [], reference, false);
+		    setAttachmentData([]);
+				removeAction(EMessageActionType.Reply);
+	    }
 		}
 		textInput?.current?.clear?.();
+		setText('');
+    [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 		setText('');
 	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, textInput]);
 
@@ -151,8 +167,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			}
 		})
 	}, [messageActionListNeedToResolve])
-
-
 
 	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
 		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
@@ -182,15 +196,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(
-			'@SHOW_KEYBOARD',
+			ActionEmitEvent.SHOW_KEYBOARD,
 			(value) => {
 				//NOTE: trigger from message action 'MessageItemBS component'
 				resetInput();
-				pushMessageActionIntoStack(value);
+        handleMessageAction(value)
 				openKeyBoard();
 			},
 		);
-
 		return () => {
 			showKeyboard.remove();
 			resetInput();
@@ -255,9 +268,24 @@ useEffect(() => {
   handleMentionInput();
 }, [mentionTextValue]);
 
+  const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
+    switch (messageAction.type) {
+      case EMessageActionType.EditMessage:
+      case EMessageActionType.Reply:
+        pushMessageActionIntoStack(messageAction);
+        break;
+      case EMessageActionType.CreateThread:
+      setOpenThreadMessageState(true);
+      setValueThread(messageAction.targetMessage);
+      navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL});
+      break;
+      default:
+        break;
+    }
+  }
 	const openKeyBoard = () => {
 		timeoutRef.current = setTimeout(() => {
-			inputRef.current.focus();
+			inputRef.current?.focus();
 			setIsFocus(true);
 		}, 300);
 	};

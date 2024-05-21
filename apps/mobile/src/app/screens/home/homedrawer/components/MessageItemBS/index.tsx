@@ -9,7 +9,7 @@ import { getMessageActions } from '../../constants';
 import { useAuth } from '@mezon/core';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
-import { CopyIcon, FlagIcon, HashtagIcon, LinkIcon, MarkUnreadIcon, MentionIcon, PenIcon, PinMessageIcon, ReplyMessageIcon, TrashIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, CopyIcon, FlagIcon, HashtagIcon, LinkIcon, MarkUnreadIcon, MentionIcon, PenIcon, PinMessageIcon, ReplyMessageIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
@@ -26,7 +26,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             targetMessage: message
         }
         //Note: trigger to ChatBox.tsx
-        DeviceEventEmitter.emit('@SHOW_KEYBOARD', payload);
+        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
     }
 
     const handleActionReply = () => {
@@ -36,11 +36,16 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             targetMessage: message
         }
         //Note: trigger to ChatBox.tsx
-        DeviceEventEmitter.emit('@SHOW_KEYBOARD', payload);
+        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
     }
 
     const handleActionCreateThread = () => {
-        console.log('CreateThread');
+      onClose();
+      const payload: IMessageActionNeedToResolve = {
+        type: EMessageActionType.CreateThread,
+        targetMessage: message
+    }
+      DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
     }
 
     const handleActionCopyText = () => {
