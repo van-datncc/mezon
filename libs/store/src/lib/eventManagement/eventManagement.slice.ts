@@ -134,4 +134,6 @@ export const selectAllEventManagement = createSelector(getEventManagementState, 
 
 export const selectEventManagementEntities = createSelector(getEventManagementState, selectEntities);
 
+export const selectNumberEvent = createSelector(selectAllEventManagement, (events) => events.length);
+
 

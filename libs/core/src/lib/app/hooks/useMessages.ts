@@ -47,7 +47,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
     };
 
     const currentChatRef = chatRef.current;
-    currentChatRef?.addEventListener('wheel', handleWheel);
+    currentChatRef?.addEventListener('wheel', handleWheel, {passive: true});
     return () => {
       currentChatRef?.removeEventListener('wheel', handleWheel);
     };
