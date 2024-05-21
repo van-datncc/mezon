@@ -34,11 +34,11 @@ export const styles = StyleSheet.create({
 	},
 	aboveTextBoxWrapper: {
 		flexDirection: 'column',
-		backgroundColor: Colors.bgCharcoal
+		backgroundColor: Colors.bgCharcoal,
 	},
 	aboveTextBoxText: {
 		color: Colors.white,
-		fontSize: size.s_12
+		fontSize: size.s_12,
 	},
 	aboveTextBoxItem: {
 		flexDirection: 'row',
@@ -46,13 +46,13 @@ export const styles = StyleSheet.create({
 		padding: size.tiny,
 		gap: 10,
 		borderBottomWidth: 1,
-		borderBottomColor: Colors.bgDarkSlate
+		borderBottomColor: Colors.bgDarkSlate,
 	},
 	closeIcon: {
 		color: Colors.bgDarkSlate,
 		backgroundColor: Colors.white,
 		borderRadius: 50,
-		fontSize: 19
+		fontSize: 19,
 	},
 	iconContainer: {
 		width: 35,
@@ -61,14 +61,24 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
+	containerInput: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		alignItems: 'center',
+		paddingVertical: size.s_10,
+	},
+	wrapperInput: {
+		position: 'relative',
+		justifyContent: 'center',
+	},
 	inputStyle: {
-		height: 40,
+		height: size.s_40,
 		width: inputWidth,
 		borderBottomWidth: 0,
 		borderRadius: 20,
 		paddingLeft: 15,
 		paddingRight: 40,
-		fontSize: verticalScale(15),
+		fontSize: size.medium,
 	},
 	iconEmoji: {
 		position: 'absolute',
@@ -239,21 +249,21 @@ export const styles = StyleSheet.create({
 		paddingVertical: 12,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.borderPrimary
+		borderBottomWidth: 1,
+		borderBottomColor: Colors.borderPrimary,
 	},
 	friendItemContent: {
-		flexDirection: 'row'
+		flexDirection: 'row',
 	},
 	friendItemName: {
 		paddingTop: 10,
 		paddingLeft: 10,
 		lineHeight: 20,
-		color: Colors.white
+		color: Colors.white,
 	},
 	inviteButton: {
 		paddingVertical: 8,
-		paddingHorizontal: 12
+		paddingHorizontal: 12,
 	},
 	threadItem: {
 		flexDirection: 'row',
@@ -288,7 +298,7 @@ export const styles = StyleSheet.create({
 		width: 35,
 		height: '100%',
 		alignItems: 'center',
-		paddingLeft: 30
+		paddingLeft: 30,
 	},
 	replyAvatar: {
 		width: 25,
@@ -303,11 +313,11 @@ export const styles = StyleSheet.create({
 		color: Colors.white,
 	},
 	repliedContentText: {
-		color: Colors.white
+		color: Colors.white,
 	},
 	repliedMessageWrapper: {
 		flexDirection: 'row',
-		gap: 8
+		gap: 8,
 	},
 	wrapperMessageBoxCombine: {
 		marginTop: size.s_2,
@@ -315,7 +325,7 @@ export const styles = StyleSheet.create({
 	rowMessageBox: {
 		marginLeft: 15,
 		justifyContent: 'space-between',
-		width: '100%'
+		width: '100%',
 	},
 	messageBoxTop: {
 		flexDirection: 'row',
@@ -335,7 +345,7 @@ export const styles = StyleSheet.create({
 	contentMessageBox: {
 		fontSize: size.medium,
 		color: Colors.tertiary,
-		marginTop: -5
+		marginTop: -5,
 	},
 	contentMessageLink: {
 		fontSize: size.medium,
@@ -365,6 +375,7 @@ export const styles = StyleSheet.create({
 	},
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
+		marginBottom: size.s_10,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
@@ -411,5 +422,10 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_14,
 		color: Colors.tertiary,
 		marginBottom: size.s_10,
+	},
+	wrapperAttachmentPreview: {
+		backgroundColor: Colors.secondary,
+		borderTopColor: Colors.gray72,
+		paddingVertical: size.s_10,
 	},
 });

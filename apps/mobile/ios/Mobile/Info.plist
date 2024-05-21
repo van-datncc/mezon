@@ -46,8 +46,16 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Give Mezon permission to select photos</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Give Mezon permission to select photos</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Give Mezon permission to select photos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Give Mezon permission to select photos</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>processing</string>

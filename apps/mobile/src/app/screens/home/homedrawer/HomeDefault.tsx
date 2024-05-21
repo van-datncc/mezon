@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useRef, useState } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
@@ -63,7 +63,7 @@ const HomeDefault = React.memo((props: any) => {
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker />
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker />
+								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel.clan_id} />
 							) : (
 								<View />
 							)}
