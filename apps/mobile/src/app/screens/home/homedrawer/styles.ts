@@ -303,11 +303,14 @@ export const styles = StyleSheet.create({
 		color: Colors.white,
 	},
 	repliedContentText: {
-		color: Colors.white
+		color: Colors.white,
+		overflow: 'hidden',
+		width: '80%',
 	},
 	repliedMessageWrapper: {
 		flexDirection: 'row',
-		gap: 8
+		gap: 8,
+		marginRight: 0
 	},
 	wrapperMessageBoxCombine: {
 		marginTop: size.s_2,

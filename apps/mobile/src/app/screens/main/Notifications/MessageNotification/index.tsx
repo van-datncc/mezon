@@ -49,6 +49,7 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
+							key={index}
 							isControlsVisible={false}
 							disableFullscreen={false}
 							video={{ uri: video?.url }}
@@ -71,6 +72,7 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 				{images.map((image, index) => {
 					return (
 							<FastImage
+								key={index}
 								style={[
 									s.imageMessageRender,
 								]}
