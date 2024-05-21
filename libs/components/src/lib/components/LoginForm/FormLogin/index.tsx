@@ -82,9 +82,12 @@ function LoginForm(props: LoginFormProps) {
 			<div className="flex-col justify-start items-start flex w-full h-fit gap-y-5">
 				<div className="flex-col justify-start items-start flex w-full h-fit gap-y-5 ">
 					<div className="flex-col justify-start items-start flex w-full h-fit gap-y-3 relative">
-						<div className="flex-row justify-start items-center flex w-full h-fit gap-x-1 ">
-							<p className="w-fit h-fit text-left text-sm font-medium dark:text-[#cccccc] text-black leading-[150%]">Email or Phone number</p>
-							<p className="w-fit h-fit text-left text-xs font-medium text-[#dc2626] leading-[150%]">✱</p>
+						<div className="flex-row justify-start items-center flex w-full h-fit gap-x-1">
+							<p className={`w-fit h-fit text-left text-sm font-medium leading-[150%] ${errors.userEmail ? 'dark:text-colorTextError text-[#dc2626]' : 'dark:text-[#cccccc] text-black'}`}>Email or Phone number</p>
+							<p className={`w-fit h-fit text-left text-xs font-medium leading-[150%] ${errors.userEmail ? 'dark:text-colorTextError text-[#dc2626]' : 'text-[#dc2626]'}`}>{errors.userEmail ? '-' : '✱'}</p>
+							<span className='dark:text-colorTextError text-[#dc2626] italic text-xs'>
+								{errors.userEmail && toast.error(errors.userEmail.message, { toastId: 'Email or Phone number invalid' })}
+							</span>
 						</div>
 						<div
 							className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] dark:bg-[#000000] bg-white relative dark:border-[1px] dark:border-[#1e1e1e] ${
@@ -104,8 +107,11 @@ function LoginForm(props: LoginFormProps) {
 
 					<div className="flex-col justify-start items-start flex w-full h-fit gap-y-3">
 						<div className="flex-row justify-start items-center flex w-full h-fit gap-x-1 ">
-							<p className="w-fit h-fit text-left text-sm font-medium dark:text-[#cccccc] text-black leading-[150%]">Password</p>
-							<p className="w-fit h-fit text-left text-xs font-medium text-[#dc2626] leading-[150%]">✱</p>
+							<p className={`w-fit h-fit text-left text-sm font-medium leading-[150%] ${errors.userEmail ? 'dark:text-colorTextError text-[#dc2626]' : 'dark:text-[#cccccc] text-black'}`}>Password</p>
+							<p className={`w-fit h-fit text-left text-xs font-medium leading-[150%] ${errors.userEmail ? 'dark:text-colorTextError text-[#dc2626]' : 'text-[#dc2626]'}`}>{errors.password ? '-' : '✱'}</p>
+							<span className='dark:text-colorTextError text-[#dc2626] italic text-xs'>
+								{errors.password && toast.error(errors.password.message, { toastId: 'login or password is invalid.' })}
+							</span>
 						</div>
 
 						<div className="flex-col justify-start items-start flex w-full h-fit ">
@@ -158,11 +164,6 @@ function LoginForm(props: LoginFormProps) {
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div className="absolute">
-				{errors.password && toast.error(errors.password.message, { toastId: 'errorPassword' })}
-				{errors.userEmail && toast.error(errors.userEmail.message, { toastId: 'errorUserEmail' })}
 			</div>
 		</div>
 	);

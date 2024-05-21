@@ -36,7 +36,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 					</p>
 				</div>
 				<button
-					className={`dark:text-[#AEAEAE] text-black w-[170px] text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4 hover:bg-bgModifierHoverLight ${selectedButton === 'Overview' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight' : ''}`}
+					className={`dark:text-[#AEAEAE] text-black w-[170px] text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4 hover:bg-bgModalLight ${selectedButton === 'Overview' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight' : ''}`}
 					onClick={() => {
 						handleButtonClick('Overview');
 						onItemClick && onItemClick('Overview');
@@ -46,7 +46,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight ${selectedButton === 'Permissions' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModalLight ${selectedButton === 'Permissions' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Permissions');
 						onItemClick && onItemClick('Permissions');
@@ -56,7 +56,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight ${selectedButton === 'Invites' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight  ' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModalLight ${selectedButton === 'Invites' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight  ' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Invites');
 						onItemClick && onItemClick('Invites');
@@ -66,7 +66,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight ${selectedButton === 'Integrations' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight  ' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModalLight ${selectedButton === 'Integrations' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight  ' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Integrations');
 						onItemClick && onItemClick('Integrations');
@@ -76,7 +76,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				</button>
 				<hr className="border-t border-solid dark:border-borderDefault my-4" />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight  ' : ''} w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModalLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgModifierHoverLight  ' : ''} w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Delete');
 						setShowModal(true);
