@@ -8,7 +8,6 @@ import { Icons } from '../../components';
 
 export type EmojiCustomPanelOptions = {
 	messageEmojiId?: string | undefined;
-	// emojiAction?: EmojiPlaces;
 	mode?: number;
 	isReaction?: boolean;
 };
