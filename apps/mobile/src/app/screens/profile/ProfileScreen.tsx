@@ -15,6 +15,9 @@ import {
 import { useMemo } from 'react'
 import { useCallback } from 'react'
 import SearchInput from '../../components/SearchInput'
+import { useAuth } from '@mezon/core'
+import FastImage from 'react-native-fast-image'
+import { APP_SCREEN } from '../../navigation/ScreenTypes'
 const friendData = [
     {
         image: 'https://gcs.tripi.vn/public-tripi/tripi-feed/img/474053MSU/anh-cute-nguoi-that-dep-nhat_022606213.jpg',
@@ -68,7 +71,9 @@ const friendData = [
     }
 ];
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }: { navigation: any }) => {
+    const user = useAuth();
+    console.log('user:', user);
     const [text, setText] = React.useState<string>('');
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ['50%', '98%'], []);
@@ -94,6 +99,11 @@ const ProfileScreen = () => {
         acc[firstLetter].push(friend);
         return acc;
     }, {});
+
+    const navigateToSettingScreen = () => {
+		navigation.navigate(APP_SCREEN.PROFILE.STACK, { screen: APP_SCREEN.PROFILE.SETTING });
+	};
+
     return (
         <BottomSheetModalProvider>
             <View style={styles.container}>
@@ -103,22 +113,32 @@ const ProfileScreen = () => {
                             <Entypo name='rdio' size={20} style={styles.icon} />
                             <Text style={styles.text}>Nitro</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.backgroundSetting}>
+                        <TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
                             <Feather name='settings' size={20} style={styles.icon} />
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.viewImageProfile}>
-                        <Image source={Images.ANH} style={styles.imageProfile} />
+                        {user?.userProfile?.user?.avatar_url ? (
+                            <FastImage
+                                style={[{ width: '100%', height: '100%', borderRadius: 50 }]}
+                                source={{
+                                    uri: user?.userProfile?.user?.avatar_url,
+                                    headers: { Authorization: 'someAuthToken' },
+                                    priority: FastImage.priority.normal,
+                                }}
+                                resizeMode={FastImage.resizeMode.cover}
+                            />
+                        ): <Text style={styles.textAvatar}>{user?.userProfile?.user?.display_name.charAt(0)}</Text>}
                         <View style={styles.dotOnline} />
                     </View>
                 </View>
                 <View style={styles.contentContainer}>
                     <TouchableOpacity style={styles.viewInfo}>
-                        <Text style={styles.textName}>son.NguyenHoai1</Text>
+                        <Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
                         <Feather name="chevron-down" style={styles.icon} />
                     </TouchableOpacity>
-                    <Text style={styles.text}>son1522001</Text>
+                    <Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
                     <View style={styles.buttonList}>
                         <TouchableOpacity style={styles.viewButton}>
                             <Feather name="message-circle" size={20} style={styles.icon} />
