@@ -314,10 +314,13 @@ export const styles = StyleSheet.create({
 	},
 	repliedContentText: {
 		color: Colors.white,
+		overflow: 'hidden',
+		width: '80%',
 	},
 	repliedMessageWrapper: {
 		flexDirection: 'row',
 		gap: 8,
+		marginRight: 0
 	},
 	wrapperMessageBoxCombine: {
 		marginTop: size.s_2,
