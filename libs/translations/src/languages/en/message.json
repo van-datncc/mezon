@@ -9,7 +9,9 @@
         "markUnRead": "Mark UnRead",
         "mention": "Mention",
         "copyMessageLink": "Copy Message Link",
-        "report": "Report"
+        "report": "Report",
+        "polls": "Polls",
+        "files": "Files"
     },
     "chatBox": {
         "replyingTo": "Replying to",

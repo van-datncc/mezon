@@ -1,4 +1,4 @@
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';

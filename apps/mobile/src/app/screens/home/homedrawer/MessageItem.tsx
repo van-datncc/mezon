@@ -1,4 +1,4 @@
-import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
 import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
@@ -82,7 +82,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderVideos = () => {
 		return (
-			<View>
+			<View style={{
+				width: widthMedia,
+				marginBottom: size.s_10,
+			}}>
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
