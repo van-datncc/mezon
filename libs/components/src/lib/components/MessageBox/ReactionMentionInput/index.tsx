@@ -91,7 +91,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
 	const {
-		// referenceMessage,
 		dataReferences,
 		setReferenceMessage,
 		setDataReferences,
