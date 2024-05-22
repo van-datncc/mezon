@@ -18,6 +18,7 @@
         "editingMessage": "Editing Message"
     },
     "toast": {
-        "copyText": "Copied Message Text"
+        "copyText": "Copied Message Text",
+        "attachmentIsLoading": "Attachment is loading, please wait a moment"
     }
 }

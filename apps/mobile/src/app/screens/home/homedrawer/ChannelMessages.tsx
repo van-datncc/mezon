@@ -41,7 +41,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	}, [markMessageAsSeen, messages]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
-	const sortedMessages = messages.sort((a, b) => moment(b.create_time).valueOf() - moment(a.create_time).valueOf());
 	const onLoadMore = () => {
 		if (hasMoreMessage) {
 			setIsLoadMore(true);
@@ -72,10 +71,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
-			{!sortedMessages?.length && <WelcomeMessage channelTitle={channelLabel} />}
+			{!messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 			<FlatList
 				inverted
-				data={sortedMessages || []}
+				data={messages || []}
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}

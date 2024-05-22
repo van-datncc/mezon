@@ -1,4 +1,13 @@
-import { ActionEmitEvent, AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	AngleRightIcon,
+	GiftIcon,
+	MicrophoneIcon,
+	SendIcon,
+	convertMentionsToData,
+	convertMentionsToText,
+	getAttachmentUnique
+} from '@mezon/mobile-components';
 import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, UserMentionsOpt } from '@mezon/utils';
@@ -23,6 +32,7 @@ import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { useNavigation } from '@react-navigation/native';
+import Toast from "react-native-toast-message";
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
   mention: {
@@ -116,7 +126,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			attachments: [],
 			references: [],
     }
-
+		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
+		const checkAttachmentLoading = attachmentDataUnique.some((attachment) => !attachment?.size);
+		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
+			Toast.show({
+				type: 'error',
+				text1: t('toast.attachmentIsLoading'),
+			});
+			return;
+		}
 		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
 		if (isEditMessage) {
 			editMessage(text, currentSelectedEditMessage.id);
@@ -132,7 +150,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			}]: undefined;
 
 	    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
-				sendMessage({ t: text }, mentionData , attachmentDataRef || [], reference, false);
+				sendMessage({ t: text }, mentionData , attachmentDataUnique || [], reference, false);
 		    setAttachmentData([]);
 				removeAction(EMessageActionType.Reply);
 	    }
@@ -318,16 +336,14 @@ useEffect(() => {
 		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
 	}
 	
-	function removeAttachmentByUrl(urlToRemove: string) {
-		const removedAttachment: ApiMessageAttachment[] = attachmentDataRef.reduce(
-			(acc: ApiMessageAttachment[], attachment: ApiMessageAttachment) => {
-				if (attachment.url !== urlToRemove) {
-					acc.push(attachment);
-				}
-				return acc;
-			},
-			[],
-		);
+	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
+		const removedAttachment = attachmentDataRef.filter((attachment) => {
+			if (attachment.url === urlToRemove) {
+				return false;
+			}
+			return !(fileName && attachment.filename === fileName);
+		});
+
 		setAttachmentData(removedAttachment);
 	}
 	
@@ -356,7 +372,7 @@ useEffect(() => {
       <Suggestions suggestions={listMentions} {...triggers.mention} />
       <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
 			{
-				!!attachmentDataRef?.length && <AttachmentPreview attachments={attachmentDataRef} onRemove={removeAttachmentByUrl} />
+				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
 			}
 			<View style={styles.containerInput}>
 				{text.length > 0 ? (

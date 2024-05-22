@@ -4,7 +4,7 @@ import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useRef, useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -88,6 +88,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 						style={styles.iconBar}
 						onPress={() => {
 							navigation.openDrawer();
+							Keyboard.dismiss();
 						}}
 					>
 						<BarsLogo width={20} height={20} />

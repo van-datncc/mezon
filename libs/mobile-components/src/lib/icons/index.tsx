@@ -235,6 +235,14 @@ export function FaceIcon({ width = 20, height = 20, color='white' , ...props }: 
 	)
 }
 
+export function LogoutIcon({ width = 20, height = 20, color='white' , ...props }: SvgProps) {
+	return (
+	  <Svg viewBox="0 0 512 512" {...props}>
+		<Path fill={color} d="M377.9 105.9l122.8 122.8c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9-18.7 0-33.9-15.2-33.9-33.9V320H192c-17.7 0-32-14.3-32-32v-64c0-17.7 14.3-32 32-32h128v-62.1c0-18.7 15.2-33.9 33.9-33.9 9 0 17.6 3.6 24 9.9zM160 96H96c-17.7 0-32 14.3-32 32v256c0 17.7 14.3 32 32 32h64c17.7 0 32 14.3 32 32s-14.3 32-32 32H96c-53 0-96-43-96-96V128c0-53 43-96 96-96h64c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
+	  </Svg>
+	)
+}
+
 export function PollIcon({ width = 16, height = 16, color='white' , ...props }: SvgProps) {
 	return (
 		<Svg width={width} height={height} fill={color} viewBox="0 0 512 512" {...props}>
@@ -289,6 +297,20 @@ export function CheckIcon({ width = 20, height = 20, color='white' , ...props }:
 			{...props}
 		>
 			<Path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7l233.4-233.3c12.5-12.5 32.8-12.5 45.3 0z" />
+		</Svg>
+	)
+}
+
+export function FileIcon({ width = 20, height = 20, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 384 512"
+			{...props}
+		>
+			<Path d="M0 64C0 28.7 28.7 0 64 0h160v128c0 17.7 14.3 32 32 32h128v288c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0l128 128z" />
 		</Svg>
 	)
 }
