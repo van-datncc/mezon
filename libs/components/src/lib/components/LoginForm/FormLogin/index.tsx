@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import * as Icons from '../../Icons';
+import { useApp } from '@mezon/core';
 
 export type LoginFormPayload = {
 	userEmail: string;
@@ -72,6 +73,8 @@ function LoginForm(props: LoginFormProps) {
 		dispatch(authActions.refreshStatus());
 	};
 
+	const {appearanceTheme} = useApp();
+
 	return (
 		<div className="flex-col justify-start items-center flex lg:w-[496px] h-fit lg:px-0 w-450 max-w-full">
 			<div className=" flex-row justify-start items-center flex w-full h-fit gap-x-4 pb-6">
@@ -95,7 +98,7 @@ function LoginForm(props: LoginFormProps) {
 							}`}
 						>
 							<input
-								className="w-full h-6  dark:bg-transparent bg-white outline-none relative dark:text-white text-colorTextLightMode"
+								className={`w-full h-6  dark:bg-transparent bg-white outline-none relative dark:text-white text-colorTextLightMode ${appearanceTheme === "light" ? "lightInputAutoFill" : "darkInputAutoFill"}`}
 								{...register('userEmail')}
 								name="userEmail"
 								id="userEmail"
@@ -122,7 +125,7 @@ function LoginForm(props: LoginFormProps) {
 							>
 								<input
 									type={showPassword ? 'text' : 'password'}
-									className="w-full h-6 dark:bg-transparent bg-white outline-none dark:text-white text-colorTextLightMode pl-0 border-none placeholder"
+									className={`w-full h-6 dark:bg-transparent bg-white outline-none dark:text-white text-colorTextLightMode pl-0 border-none placeholder ${appearanceTheme === "light" ? "lightInputAutoFill" : "darkInputAutoFill"}`}
 									{...register('password')}
 									name="password"
 									id="password"
