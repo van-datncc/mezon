@@ -2,8 +2,8 @@ import { useReference } from '@mezon/core';
 import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Image, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
@@ -85,16 +85,14 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		}
 	};
 
-	function removeAttachmentByUrl(urlToRemove: string) {
-		const removedAttachment: ApiMessageAttachment[] = attachmentDataRef.reduce(
-			(acc: ApiMessageAttachment[], attachment: ApiMessageAttachment) => {
-				if (attachment.url !== urlToRemove) {
-					acc.push(attachment);
-				}
-				return acc;
-			},
-			[],
-		);
+	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
+		const removedAttachment = attachmentDataRef.filter((attachment) => {
+			if (attachment?.url === urlToRemove) {
+				return false;
+			}
+			return !(fileName && attachment?.filename === fileName);
+		});
+
 		setAttachmentData(removedAttachment);
 	}
 
@@ -116,7 +114,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				onPress={() => {
 					if (isSelected) {
 						const infoAttachment = attachmentDataRef.find((attachment) => attachment.filename === fileName);
-						removeAttachmentByUrl(infoAttachment.url);
+						removeAttachmentByUrl(infoAttachment.url, infoAttachment.filename);
 					} else {
 						handleGalleryPress(item);
 					}
@@ -157,7 +155,11 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				size: image?.fileSize,
 				fileData,
 			};
-
+			setAttachmentData({
+				url: filePath,
+				filename: image?.filename || image?.uri,
+				filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
+			});
 			onPickGallery([fileFormat]);
 		} catch (err) {
 			console.log('Error: ', err);
@@ -178,7 +180,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 			} else {
 				const file = response.assets[0];
 				const fileData = await RNFS.readFile(file.uri, 'base64');
-				
+
 				const fileFormat: IFile = {
 					uri: file?.uri,
 					name: file?.fileName,
