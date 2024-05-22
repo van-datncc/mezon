@@ -4,10 +4,10 @@ import { NotifyProps } from '../types';
 import { selectChannelById, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 import { styles as s } from './NotificationItem.styles';
-import { useMessageSender } from '../../../../hooks/useMessageSender';
 import MessageNotification from '../MessageNotification';
-import { useMessageParser } from '../../../../../app/hooks/useMessageParser';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useMessageSender } from '../../../hooks/useMessageSender';
+import { useMessageParser } from '../../../hooks/useMessageParser';
 
 function parseObject(obj: any) {
 	let attachments;
@@ -58,7 +58,7 @@ const NotificationItem = React.memo(({ notify }: NotifyProps)=>{
             <View style={s.notifyHeader}>
               {
                 hasAvatar ? <View style={s.boxImage}><Image source={{uri: avatarImg,}} style={s.image}/></View> :
-                <View style={s.boxImageChar}><Text>{avatarChar}</Text></View>
+                <View style={s.boxImageChar}><Text style={{color: 'white'}}>{avatarChar}</Text></View>
               }
               <View style={s.notifyContent}>
                 <Text numberOfLines={2} style={s.notifyHeaderTitle}>{notify?.subject} - {channelInfo?.channel_label}:</Text>

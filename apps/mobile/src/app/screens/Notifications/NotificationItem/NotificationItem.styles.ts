@@ -23,8 +23,8 @@ export const styles = StyleSheet.create({
     color: Colors.titleSteelGray,
   },
   boxImage: {
-    width: 60,
-    height: 60,
+    width: size.s_40,
+    height: size.s_40,
     borderRadius: 50,
     marginBottom: 10
   },
