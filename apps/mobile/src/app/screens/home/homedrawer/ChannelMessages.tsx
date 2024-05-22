@@ -1,7 +1,7 @@
-import { useChatMessage, useChatMessages, useChatTypings } from '@mezon/core';
+import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import moment from 'moment';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
@@ -19,6 +19,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
 	const { markMessageAsSeen } = useChatMessage(unreadMessageId);
+
+	const {
+		dataReactionCombine,
+	} = useChatReaction();
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
@@ -53,6 +57,19 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		);
 	};
 
+	const renderItem = useCallback(({ item, index }) => {
+		return (
+			<MessageItem
+				message={item}
+				mode={mode}
+				channelId={channelId}
+				dataReactionCombine={dataReactionCombine}
+				channelLabel={channelLabel}
+				preMessage={messages.length > 0 ? messages?.[index - 1] : undefined}
+			/>
+		);
+	}, [dataReactionCombine]);
+
 	return (
 		<View style={styles.wrapperChannelMessage}>
 			{!sortedMessages?.length && <WelcomeMessage channelTitle={channelLabel} />}
@@ -61,11 +78,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				data={sortedMessages || []}
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
-				renderItem={({ item, index }) => {
-					return (
-						<MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} preMessage={sortedMessages.length > 0 ? sortedMessages?.[index - 1] : undefined} />
-					);
-				}}
+				renderItem={renderItem}
 				keyExtractor={(item) => `${item?.id}`}
 				windowSize={10}
 				removeClippedSubviews={true}

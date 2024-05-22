@@ -21,6 +21,7 @@ const ThreadListChannel = React.memo(({ threads, currentChanel, onPress }: Threa
 
 				return (
 					<TouchableOpacity
+						key={thread.id}
 						activeOpacity={1}
 						onPress={() => {
 							onPress(thread);
