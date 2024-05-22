@@ -18,6 +18,7 @@
         "editingMessage": "Đang chỉnh sửa tin nhắn"
     },
     "toast": {
-        "copyText": "Đã sao chép nội dung tin nhắn"
+        "copyText": "Đã sao chép nội dung tin nhắn",
+        "attachmentIsLoading": "Attachment is loading, please wait a moment"
     }
 }

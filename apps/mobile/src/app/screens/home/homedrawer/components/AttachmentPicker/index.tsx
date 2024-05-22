@@ -2,10 +2,11 @@ import { useReference } from '@mezon/core';
 import { FilesIcon, PollIcon } from '@mezon/mobile-components';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 import Gallery, { IFile } from './Gallery';
 import { styles } from './styles';
 
@@ -17,7 +18,6 @@ export type AttachmentPickerProps = {
 
 function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentPickerProps) {
 	const { t } = useTranslation(['message']);
-	const [file, setFile] = useState(null);
 	const { sessionRef, clientRef } = useMezon();
 	const { setAttachmentData } = useReference();
 
@@ -26,7 +26,18 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 			const res = await DocumentPicker.pick({
 				type: [DocumentPicker.types.allFiles],
 			});
-			setFile(res[0]);
+			const file = res?.[0];
+			const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
+
+			const fileFormat: IFile = {
+				uri: file?.uri || file?.fileCopyUri,
+				name: file?.name,
+				type: file?.type,
+				size: file?.size?.toString(),
+				fileData,
+			};
+
+			handleFiles([fileFormat]);
 		} catch (err) {
 			if (DocumentPicker.isCancel(err)) {
 				// User cancelled the picker
@@ -53,9 +64,12 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 		});
 	};
 
-	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
-		setAttachmentData(attachment);
-	}, []);
+	const handleFinishUpload = useCallback(
+		(attachment: ApiMessageAttachment) => {
+			setAttachmentData(attachment);
+		},
+		[setAttachmentData],
+	);
 
 	return (
 		<View style={styles.container}>

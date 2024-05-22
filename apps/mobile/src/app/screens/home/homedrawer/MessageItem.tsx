@@ -2,7 +2,7 @@ import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mob
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
 import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Metrics, size } from '@mezon/mobile-ui';
+import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-viewing';
@@ -14,7 +14,7 @@ import { FastImageRes } from './Reusables';
 import { styles } from './styles';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
-import { ReplyIcon } from '@mezon/mobile-components';
+import  {FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { useDeleteMessage } from '@mezon/core';
 
 const widthMedia = Metrics.screenWidth - 150;
@@ -29,7 +29,7 @@ export type MessageItemProps = {
 	isMention?: boolean;
 	channelLabel?: string;
 	channelId?: string;
-	dataReactionCombine?: EmojiDataOptionals[]; 
+	dataReactionCombine?: EmojiDataOptionals[];
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -137,8 +137,29 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			return <View />;
+			
+			return (
+				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
+					<View style={styles.fileViewer}>
+						<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
+						<View style={{ maxWidth: '75%' }}>
+							<Text style={styles.fileName} numberOfLines={2}>
+								{document.filename}
+							</Text>
+						</View>
+					</View>
+				</TouchableOpacity>
+			)
 		});
+	};
+	
+	const onOpenDocument = async (document: ApiMessageAttachment) => {
+		await Linking.openURL(document.url);
+		try {
+			await Linking.openURL(document.url);
+		} catch (error) {
+			console.log('OpenDocument error', error);
+		}
 	};
 
 	const onOpenLink = async (link: string) => {

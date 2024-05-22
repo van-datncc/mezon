@@ -1,5 +1,6 @@
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
+import {Colors, horizontalScale, size, verticalScale} from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
+import homeDefault from "../../HomeDefault";
 
 const styles = StyleSheet.create({
 	container: {
@@ -10,12 +11,11 @@ const styles = StyleSheet.create({
 	attachmentItem: {
 		marginRight: size.s_14,
 		borderRadius: size.s_6,
-		width: verticalScale(70),
 		height: verticalScale(80),
 		paddingTop: size.s_10,
 	},
 	attachmentItemImage: {
-		width: '100%',
+		width: verticalScale(70),
 		height: '100%',
 		borderRadius: size.s_6,
 	},
@@ -40,6 +40,25 @@ const styles = StyleSheet.create({
 		width: '100%',
 		borderRadius: size.s_6,
 	},
+	fileViewer: {
+		gap: size.s_6,
+		paddingHorizontal: size.s_10,
+		maxWidth: horizontalScale(150),
+		height: '100%',
+		alignItems: 'center',
+		borderRadius: size.s_6,
+		flexDirection: 'row',
+		backgroundColor: Colors.bgPrimary
+	},
+	fileName: {
+		fontSize: size.small,
+		color: Colors.white,
+	},
+	typeFile: {
+		fontSize: size.small,
+		color: Colors.textGray,
+		textTransform: 'uppercase'
+	}
 });
 
 export default styles;
