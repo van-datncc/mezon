@@ -39,7 +39,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 
     return (
         <View style={styles.reactionWrapper}>
-            {dataReactionCombine.filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id).map((emojiItemData: EmojiDataOptionals, index) => {
+            {(dataReactionCombine || []).filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id).map((emojiItemData: EmojiDataOptionals, index) => {
                     const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
                     const isMyReaction = userSender?.count && userSender.count > 0;
                     return (
@@ -64,13 +64,13 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
                 })
             }
 
-            {dataReactionCombine.filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id).length ? (
+            {(dataReactionCombine || []).filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id).length ? (
                 <Pressable onPress={() => openEmojiPicker()} style={styles.addEmojiIcon}>
                     <FaceIcon color={Colors.bgCharcoal} />
                 </Pressable>
             ): null}
 
-            <ReactionDetail allReactionDataOnOneMessage={dataReactionCombine.filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id)} emojiSelectedId={currentEmojiSelectedId} onClose={() => setCurrentEmojiSelectedId(null)} />
+            <ReactionDetail allReactionDataOnOneMessage={(dataReactionCombine || []).filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id)} emojiSelectedId={currentEmojiSelectedId} onClose={() => setCurrentEmojiSelectedId(null)} />
         </View>
     )
 })

@@ -1,5 +1,6 @@
-import { EmojiDataOptionals, IMessageWithUser } from "@mezon/utils";
+import { EmojiDataOptionals, IMessageWithUser, IMessageSendPayload } from "@mezon/utils";
 import { EMessageActionType, EMessageBSToShow } from "../enums";
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from "mezon-js/api.gen";
 
 export interface IReplyBottomSheet {
     message: IMessageWithUser;
@@ -30,4 +31,10 @@ export interface IDetailReactionBottomSheet {
     allReactionDataOnOneMessage: EmojiDataOptionals[];
     emojiSelectedId: string | null;
     onClose: () => void;
+}
+export interface IPayloadThreadSendMessage {
+  content: IMessageSendPayload,
+  mentions?: Array<ApiMessageMention>,
+  attachments?: Array<ApiMessageAttachment>,
+  references?: Array<ApiMessageRef>,
 }

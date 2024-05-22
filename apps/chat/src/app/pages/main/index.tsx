@@ -50,7 +50,7 @@ function MyApp() {
 	const { setAppearanceTheme, appearanceTheme } = useApp();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
-		setAppearanceTheme(appearanceTheme);
+		setAppearanceTheme(appearanceTheme === 'system' ? 'dark' : appearanceTheme);
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
 				setCloseMenu(true);
