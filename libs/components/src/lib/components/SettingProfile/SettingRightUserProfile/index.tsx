@@ -29,6 +29,7 @@ const SettingRightUser = ({
 	const [flags, setFlags] = useState(true);
 	const [flagsRemoveAvartar, setFlagsRemoveAvartar] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
+	const [openModalType, setOpenModalType] = useState(false);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -58,6 +59,13 @@ const SettingRightUser = ({
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+
+		const allowedTypes = ['image/jpeg', 'image/png'];
+		if (!allowedTypes.includes(file.type)) {
+			setOpenModalType(true);
+			e.target.value = null;
+			return;
 		}
 
 		if (sizeImage > 1000000) {
@@ -210,6 +218,19 @@ const SettingRightUser = ({
 						/>
 						<h3 className="text-white text-4xl font-semibold">Your files are too powerful</h3>
 						<h4 className="text-white text-xl">Max file size is 1MB, please!</h4>
+					</div>
+				</Modal.Body>
+			</Modal>
+			<Modal dismissible show={openModalType} onClose={() => setOpenModalType(false)}>
+				<Modal.Body className="bg-red-500 rounded-lg">
+					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
+						<img
+							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
+							src="/assets/images/file-and-folder.png"
+							alt="file"
+						/>
+						<h3 className="text-white text-4xl font-semibold">Only image files are allowed</h3>
+						<h4 className="text-white text-xl">Just uploaf type file (JPEG, PNG), please!</h4>
 					</div>
 				</Modal.Body>
 			</Modal>

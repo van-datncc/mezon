@@ -16,7 +16,7 @@ export interface AppState {
 
 export const initialAppState: AppState = {
 	loadingStatus: 'not loaded',
-	theme: 'dark',
+	theme: 'system',
 	isShowMemberList: true,
 	initialPath: '/',
 	closeMenu: false,

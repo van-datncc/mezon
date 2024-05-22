@@ -1,5 +1,14 @@
-import { AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
-import { useChannelMembers, useChannels, useChatSending } from '@mezon/core';
+import {
+	ActionEmitEvent,
+	AngleRightIcon,
+	GiftIcon,
+	MicrophoneIcon,
+	SendIcon,
+	convertMentionsToData,
+	convertMentionsToText,
+	getAttachmentUnique
+} from '@mezon/mobile-components';
+import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, UserMentionsOpt } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -10,17 +19,20 @@ import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher
 import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
-import AttachmentPicker from "./components/AttachmentPicker";
 import { useSelector } from 'react-redux';
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
-import { ApiMessageMention } from 'mezon-js/api.gen';
-import { IMessageActionNeedToResolve } from './types';
+import { ApiMessageMention, ApiMessageAttachment } from 'mezon-js/api.gen';
+import AttachmentPreview from './components/AttachmentPreview';
 import UseMentionList from '../../../hooks/useUserMentionList';
 import { renderTextContent } from './components/RenderTextContent';
 import { ChannelsMention, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
+import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { useNavigation } from '@react-navigation/native';
+import Toast from "react-native-toast-message";
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
   mention: {
@@ -43,6 +55,7 @@ interface IChatBoxProps {
 	channelLabel: string;
 	channelId: string;
 	mode: number;
+  messageAction?: EMessageActionType,
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
@@ -71,7 +84,10 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
-
+  const navigation = useNavigation();
+  const { setValueThread } = useThreads();
+  const { setOpenThreadMessageState } = useReference();
+	const { attachmentDataRef, setAttachmentData } = useReference();
 	const { t } = useTranslation(['message']);
 
 	const editMessage = useCallback(
@@ -104,6 +120,21 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}, [removeMessageActionByType])
 
 	const handleSendMessage = useCallback(() => {
+    const payloadThreadSendMessage: IPayloadThreadSendMessage = {
+      content: { t: text },
+			mentions: mentionData,
+			attachments: [],
+			references: [],
+    }
+		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
+		const checkAttachmentLoading = attachmentDataUnique.some((attachment) => !attachment?.size);
+		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
+			Toast.show({
+				type: 'error',
+				text1: t('toast.attachmentIsLoading'),
+			});
+			return;
+		}
 		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
 		if (isEditMessage) {
 			editMessage(text, currentSelectedEditMessage.id);
@@ -118,11 +149,17 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}]: undefined;
 
-			sendMessage({ t: text }, mentionData , [], reference, false);
-			removeAction(EMessageActionType.Reply);
+	    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
+				sendMessage({ t: text }, mentionData , attachmentDataUnique || [], reference, false);
+		    setAttachmentData([]);
+				removeAction(EMessageActionType.Reply);
+	    }
 		}
+		textInput?.current?.clear?.();
 		setText('');
-	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction]);
+    [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+		setText('');
+	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, textInput]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -148,8 +185,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			}
 		})
 	}, [messageActionListNeedToResolve])
-
-
 
 	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
 		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
@@ -179,15 +214,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(
-			'@SHOW_KEYBOARD',
+			ActionEmitEvent.SHOW_KEYBOARD,
 			(value) => {
 				//NOTE: trigger from message action 'MessageItemBS component'
 				resetInput();
-				pushMessageActionIntoStack(value);
+        handleMessageAction(value)
 				openKeyBoard();
 			},
 		);
-
 		return () => {
 			showKeyboard.remove();
 			resetInput();
@@ -252,9 +286,24 @@ useEffect(() => {
   handleMentionInput();
 }, [mentionTextValue]);
 
+  const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
+    switch (messageAction.type) {
+      case EMessageActionType.EditMessage:
+      case EMessageActionType.Reply:
+        pushMessageActionIntoStack(messageAction);
+        break;
+      case EMessageActionType.CreateThread:
+      setOpenThreadMessageState(true);
+      setValueThread(messageAction.targetMessage);
+      navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL});
+      break;
+      default:
+        break;
+    }
+  }
 	const openKeyBoard = () => {
 		timeoutRef.current = setTimeout(() => {
-			inputRef.current.focus();
+			inputRef.current?.focus();
 			setIsFocus(true);
 		}, 300);
 	};
@@ -286,7 +335,18 @@ useEffect(() => {
 	function handleInputBlur() {
 		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
 	}
+	
+	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
+		const removedAttachment = attachmentDataRef.filter((attachment) => {
+			if (attachment.url === urlToRemove) {
+				return false;
+			}
+			return !(fileName && attachment.filename === fileName);
+		});
 
+		setAttachmentData(removedAttachment);
+	}
+	
 	return (
 		<View style={styles.wrapperChatBox}>
 			<View style={styles.aboveTextBoxWrapper}>
@@ -310,8 +370,11 @@ useEffect(() => {
 				): null}
 			</View>
       <Suggestions suggestions={listMentions} {...triggers.mention} />
-        <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
-			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
+      <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
+			{
+				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
+			}
+			<View style={styles.containerInput}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<AngleRightIcon width={18} height={18} />
@@ -327,7 +390,7 @@ useEffect(() => {
 					</>
 				)}
 
-				<View style={{ position: 'relative', justifyContent: 'center' }}>
+				<View style={styles.wrapperInput}>
 					<TextInput
             ref={textInput}
 						autoFocus={isFocus}
@@ -352,7 +415,7 @@ useEffect(() => {
 				</View>
 
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
-					{text.length > 0 ? (
+					{text.length > 0 || !!attachmentDataRef?.length ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
 							<SendIcon width={18} height={18} />
 						</View>

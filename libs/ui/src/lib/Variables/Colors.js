@@ -13,6 +13,7 @@ module.exports = {
   colorWarning: '#EAB308',
   colorNeutral: '#AEAEAE',
   colorTextLightMode: '#535353',
+  colorTextError: '#FA787C',
 
   /* background dark*/
   bgPrimary: '#313338',

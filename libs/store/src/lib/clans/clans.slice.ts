@@ -106,7 +106,7 @@ export const updateClan = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-			const request = {
+			const request: ApiUpdateClanDescRequest = {
 				clan_id,
 				creator_id,
 				clan_name,
@@ -119,6 +119,8 @@ export const updateClan = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
+
+			thunkAPI.dispatch(fetchClans());
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();

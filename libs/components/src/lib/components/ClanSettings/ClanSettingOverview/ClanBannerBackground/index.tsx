@@ -8,7 +8,7 @@ const ClanBannerBackground = () => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentClan, updateClan } = useClans();
 
-	const [urlImage, setUrlImage] = useState();
+	const [urlImage, setUrlImage] = useState<string>(currentClan?.banner ?? '');
 
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
@@ -28,15 +28,18 @@ const ClanBannerBackground = () => {
 	};
 
 	const handleUpload = async () => {
-		if (urlImage) {
-			await updateClan({
-				banner: urlImage,
-				clan_id: currentClan?.clan_id ?? '',
-				clan_name: currentClan?.clan_name ?? '',
-				creator_id: currentClan?.creator_id ?? '',
-				logo: currentClan?.logo ?? '',
-			});
-		}
+		await updateClan({
+			banner: urlImage,
+			clan_id: currentClan?.clan_id ?? '',
+			clan_name: currentClan?.clan_name ?? '',
+			creator_id: currentClan?.creator_id ?? '',
+			logo: currentClan?.logo ?? '',
+		});
+	};
+
+	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		setUrlImage('');
 	};
 
 	return (
@@ -52,22 +55,29 @@ const ClanBannerBackground = () => {
 				<Button
 					className="h-10 w-fit px-4 mt-4 rounded bg-bgSelectItem hover:!bg-bgSelectItemHover dark:bg-bgSelectItem dark:hover:!bg-bgSelectItemHover focus:!ring-transparent"
 					onClick={handleUpload}
+					disabled={currentClan?.banner === urlImage}
 				>
 					Upload Background
 				</Button>
 			</div>
 			<div className="flex flex-1">
-				<label>
-					<div
-						style={{ backgroundImage: `url(${urlImage})` }}
-						className={`bg-contain w-[320px] h-[180px] bg-buttonProfile rounded relative cursor-pointer`}
-					>
-						<div className="absolute top-4 right-4 w-7 h-7 rounded-full bg-[#A7A8AC] flex items-center justify-center">
-							<Icons.ImageUploadIcon />
+				<div className="relative w-[320px] h-[180px]">
+					<label>
+						<div
+							style={{ backgroundImage: `url(${urlImage})` }}
+							className={`bg-cover bg-no-repeat w-full h-full bg-buttonProfile rounded relative cursor-pointer`}
+						>
+							{!urlImage && <p className="text-white text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
 						</div>
-					</div>
-					<input id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
-				</label>
+						<input id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
+					</label>
+					<button
+						onClick={handleCloseFile}
+						className="absolute top-4 right-4 w-7 h-7 rounded-full bg-[#A7A8AC] hover:bg-[#919193] flex items-center justify-center"
+					>
+						{urlImage ? <Icons.Close /> : <Icons.ImageUploadIcon />}
+					</button>
+				</div>
 			</div>
 		</div>
 	);
