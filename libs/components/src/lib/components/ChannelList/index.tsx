@@ -54,7 +54,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
-			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
+			className={`overflow-y-scroll overflow-x-hidden w-[100%] h-[100%] pb-[10px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			id="channelList"
 			role="button"
 		>
