@@ -58,7 +58,7 @@ const NotificationItem = React.memo(({ notify }: NotifyProps)=>{
             <View style={s.notifyHeader}>
               {
                 hasAvatar ? <View style={s.boxImage}><Image source={{uri: avatarImg,}} style={s.image}/></View> :
-                <View style={s.boxImageChar}><Text style={{color: 'white'}}>{avatarChar}</Text></View>
+                <View style={s.boxImageChar}><Text>{avatarChar}</Text></View>
               }
               <View style={s.notifyContent}>
                 <Text numberOfLines={2} style={s.notifyHeaderTitle}>{notify?.subject} - {channelInfo?.channel_label}:</Text>

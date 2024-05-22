@@ -162,11 +162,11 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				removeAction(EMessageActionType.Reply);
 	    }
 		}
-		textInput?.current?.clear?.();
+		inputRef?.current?.clear?.();
 		setText('');
     [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 		setText('');
-	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, textInput]);
+	  }, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -268,7 +268,7 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
         username: mention.display ?? '',
       }))
     : [];
-  if (mentions.length > 0) {
+    if (mentions?.length > 0) {
     if (mentions.some((mention) => mention.display === '@here')) {
       mentionedUsers.splice(0, mentionedUsers.length);
       convertedMentions.forEach((item) => {
@@ -288,20 +288,24 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
   }
 };
 
-useEffect(() => {
-  const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
-  const validMentions = text?.match(mentionRegex);
-  const mentionsSelected = mentions.current.filter(mention =>{
-    return validMentions?.includes(`@${mention.display}` || '')
-  });
-  const mentionsSelectedConvertData = mentionsSelected.map(mention =>({
-    id: mention.id,
-    display: `@${mention.display}`
-  }))
+  useEffect(() => {
 
-  handleMentionInput(mentionsSelectedConvertData);
+  const mentionsSelected = getListMentionSelected();
+    handleMentionInput(mentionsSelected);
+  }, [mentionTextValue]);
 
-}, [mentionTextValue]);
+  const getListMentionSelected = () => {
+    if(!mentionTextValue || !mentions?.current?.length) return ;
+    const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
+    const validMentions = text?.match(mentionRegex);
+    const mentionsSelected = mentions?.current?.filter(mention =>{
+      return validMentions?.includes(`@${mention.display}` || '')
+    });
+    return mentionsSelected.map(mention =>({
+      id: mention.id,
+      display: `@${mention.display}`
+    }))
+  }
 
   const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
     const { type, targetMessage } = messageAction;
@@ -331,8 +335,8 @@ useEffect(() => {
 	};
 
   const handleInsertMentionTextInput = (mentionMessage) =>{
-    const cursorPosition = cursorPositionRef.current;
-    const inputValue = currentTextInput.current;
+    const cursorPosition = cursorPositionRef?.current;
+    const inputValue = currentTextInput?.current;
     if(!mentionMessage?.display) return;
     const textMentions = `@${mentionMessage?.display} `;
     const textArray = inputValue.split('');
@@ -347,7 +351,7 @@ useEffect(() => {
   }, [text])
 
   const selectMentionMessage = (message: IMessageWithUser) => {
-    const mention = mentions.current.find(mention =>{
+    const mention = mentions?.current?.find(mention =>{
       return  mention.id === message.sender_id
     });
     handleInsertMentionTextInput(mention)
