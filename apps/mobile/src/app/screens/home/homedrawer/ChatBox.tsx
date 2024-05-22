@@ -80,7 +80,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [text, setText] = useState<string>('');
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
-	const [isFocus, setIsFocus] = useState<boolean>(false);
+	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
