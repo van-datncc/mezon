@@ -13,8 +13,6 @@ import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { routes } from './routes/index';
 
-const GOOGLE_CLIENT_ID = '1089303247801-qp0lhju8efratqkuk2murphealgdcseu.apps.googleusercontent.com';
-
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
 	port: process.env.NX_CHAT_APP_API_PORT as string,
@@ -47,7 +45,7 @@ function AppWrapper() {
 	}, []);
 
 	return (
-		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<VoiceContextProvider>
 					<StrictMode>

@@ -6,18 +6,24 @@ import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/mess
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { useTranslation } from 'react-i18next';
 import { getMessageActions } from '../../constants';
-import { useAuth } from '@mezon/core';
+import { useAuth, useChatReaction } from '@mezon/core';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import { ActionEmitEvent, CopyIcon, FlagIcon, HashtagIcon, LinkIcon, MarkUnreadIcon, MentionIcon, PenIcon, PinMessageIcon, ReplyMessageIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
+import { emojiFakeData } from '../fakeData';
+import { IEmoji } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
-    const { type, onClose, message, onConfirmDeleteMessage } = props;
+    const { type, onClose, message, onConfirmDeleteMessage, mode } = props;
     const ref = useRef(null);
     const [content, setContent] = useState<React.ReactNode>(<View />);
     const { t } = useTranslation(['message']);
     const { userProfile } = useAuth();
+    const {
+		reactionMessageDispatch
+	} = useChatReaction();
 
     const handleActionEditMessage = () => {
         onClose();
@@ -186,9 +192,35 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
         )
     }
 
+    const handleReact = async (mode, messageId, emoji: IEmoji, senderId) => {
+        await reactionMessageDispatch(
+            '',
+            mode,
+            messageId || '',
+            emoji.emoji,
+            1,
+            senderId ?? '',
+            false,
+        );
+        onClose();
+    }
+
     const renderMessageItemActions = () => {
         return (
             <View style={styles.messageActionsWrapper}>
+                <View style={styles.reactWrapper}>
+                    {emojiFakeData.map((item, index) => {
+                        return (
+                            <Pressable key={index} onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item, userProfile.user.id)}>
+                                <Text style={styles.reactIcon}>{item.emoji}</Text>
+                            </Pressable>
+                        )
+                    })}
+
+                {/* <Pressable onPress={() => openEmojiPicker()} style={{width: 20, height: 20, backgroundColor: 'red', borderRadius: 50}}>
+                    <FaceIcon color={Colors.white} />
+                </Pressable> */}
+                </View>
                 <FlatList
                     data={messageActionList}
                     keyExtractor={(item) => item.id.toString()}

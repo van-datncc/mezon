@@ -1,9 +1,9 @@
-import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
 import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Metrics, size } from '@mezon/mobile-ui';
-import { IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-viewing';
 import VideoPlayer from 'react-native-video-player';
@@ -12,9 +12,9 @@ import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
 import { FastImageRes } from './Reusables';
 import { styles } from './styles';
-import { MessageItemBS } from './components';
+import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
-import { ReplyIcon } from '@mezon/mobile-components';
+import  {FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { useDeleteMessage } from '@mezon/core';
 
 const widthMedia = Metrics.screenWidth - 150;
@@ -29,8 +29,18 @@ export type MessageItemProps = {
 	isMention?: boolean;
 	channelLabel?: string;
 	channelId?: string;
+	dataReactionCombine?: EmojiDataOptionals[];
 };
+
+const arePropsEqual = (prevProps, nextProps) => {
+	return (
+	  prevProps.message === nextProps.message &&
+	  prevProps.dataReactionCombine === nextProps.dataReactionCombine
+	);
+};
+
 const MessageItem = React.memo((props: MessageItemProps) => {
+	const { message, mode, dataReactionCombine } = props;
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -42,7 +52,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
-
 	// TODO: add logic here
 	const isCombine = true;
 
@@ -73,7 +82,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderVideos = () => {
 		return (
-			<View>
+			<View style={{
+				width: widthMedia,
+				marginBottom: size.s_10,
+			}}>
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
@@ -125,8 +137,29 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			return <View />;
+			
+			return (
+				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
+					<View style={styles.fileViewer}>
+						<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
+						<View style={{ maxWidth: '75%' }}>
+							<Text style={styles.fileName} numberOfLines={2}>
+								{document.filename}
+							</Text>
+						</View>
+					</View>
+				</TouchableOpacity>
+			)
 		});
+	};
+	
+	const onOpenDocument = async (document: ApiMessageAttachment) => {
+		await Linking.openURL(document.url);
+		try {
+			await Linking.openURL(document.url);
+		} catch (error) {
+			console.log('OpenDocument error', error);
+		}
 	};
 
 	const onOpenLink = async (link: string) => {
@@ -239,7 +272,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								</View>
 							</View>
 						)}
-						<Text style={styles.repliedContentText}>{messageRefFetchFromServe.content.t}</Text>
+						<Text style={styles.repliedContentText} numberOfLines={2} ellipsizeMode='head'>{messageRefFetchFromServe.content.t}</Text>
 					</Pressable>
 				</View>
 			): null}
@@ -278,11 +311,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					)}
 					{documents.length > 0 && renderDocuments()}
 					{renderTextContent()}
+					<MessageAction message={message} dataReactionCombine={dataReactionCombine} mode={mode} />
 				</Pressable>
 			</View>
-			<MessageItemBS message={props.message} onConfirmDeleteMessage={onConfirmDeleteMessage} type={openBottomSheet} onClose={() => setOpenBottomSheet(null)} />
+			<MessageItemBS mode={mode} message={message} onConfirmDeleteMessage={onConfirmDeleteMessage} type={openBottomSheet} onClose={() => setOpenBottomSheet(null)} />
 		</View>
 	);
-});
+}, arePropsEqual);
 
 export default MessageItem;

@@ -1,4 +1,13 @@
-import { ActionEmitEvent, AngleRightIcon, GiftIcon, MicrophoneIcon, SendIcon, convertMentionsToData, convertMentionsToText } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	AngleRightIcon,
+	GiftIcon,
+	MicrophoneIcon,
+	SendIcon,
+	convertMentionsToData,
+	convertMentionsToText,
+	getAttachmentUnique
+} from '@mezon/mobile-components';
 import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
@@ -14,7 +23,8 @@ import { useSelector } from 'react-redux';
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
-import { ApiMessageMention } from 'mezon-js/api.gen';
+import { ApiMessageMention, ApiMessageAttachment } from 'mezon-js/api.gen';
+import AttachmentPreview from './components/AttachmentPreview';
 import UseMentionList from '../../../hooks/useUserMentionList';
 import { renderTextContent } from './components/RenderTextContent';
 import { ChannelsMention, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
@@ -22,6 +32,7 @@ import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { useNavigation } from '@react-navigation/native';
+import Toast from "react-native-toast-message";
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
   mention: {
@@ -76,6 +87,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
   const navigation = useNavigation();
   const { setValueThread } = useThreads();
   const { setOpenThreadMessageState } = useReference();
+	const { attachmentDataRef, setAttachmentData } = useReference();
 	const { t } = useTranslation(['message']);
   const cursorPositionRef = useRef(0);
   const currentTextInput = useRef('');
@@ -121,7 +133,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			attachments: [],
 			references: [],
     }
-
+		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
+		const checkAttachmentLoading = attachmentDataUnique.some((attachment) => !attachment?.size);
+		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
+			Toast.show({
+				type: 'error',
+				text1: t('toast.attachmentIsLoading'),
+			});
+			return;
+		}
 		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
 		if (isEditMessage) {
 			editMessage(text, currentSelectedEditMessage.id);
@@ -136,14 +156,17 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}]: undefined;
 
-    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
-			sendMessage({ t: text }, mentionData , [], reference, false);
-			removeAction(EMessageActionType.Reply);
-    }
+	    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
+				sendMessage({ t: text }, mentionData , attachmentDataUnique || [], reference, false);
+		    setAttachmentData([]);
+				removeAction(EMessageActionType.Reply);
+	    }
 		}
+		textInput?.current?.clear?.();
+		setText('');
     [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 		setText('');
-	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction]);
+	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, textInput]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -365,6 +388,17 @@ useEffect(() => {
 		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
 	}
 
+	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
+		const removedAttachment = attachmentDataRef.filter((attachment) => {
+			if (attachment.url === urlToRemove) {
+				return false;
+			}
+			return !(fileName && attachment.filename === fileName);
+		});
+
+		setAttachmentData(removedAttachment);
+	}
+
 	return (
 		<View style={styles.wrapperChatBox}>
 			<View style={styles.aboveTextBoxWrapper}>
@@ -389,7 +423,10 @@ useEffect(() => {
 			</View>
       <Suggestions suggestions={listMentions} {...triggers.mention} />
       <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
-			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
+			{
+				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
+			}
+			<View style={styles.containerInput}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<AngleRightIcon width={18} height={18} />
@@ -405,7 +442,7 @@ useEffect(() => {
 					</>
 				)}
 
-				<View style={{ position: 'relative', justifyContent: 'center' }}>
+				<View style={styles.wrapperInput}>
 					<TextInput
             ref={inputRef}
 						autoFocus={isFocus}
@@ -430,7 +467,7 @@ useEffect(() => {
 				</View>
 
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
-					{text.length > 0 ? (
+					{text.length > 0 || !!attachmentDataRef?.length ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
 							<SendIcon width={18} height={18} />
 						</View>
