@@ -9,7 +9,9 @@
         "markUnRead": "Đánh dấu chưa đọc",
         "mention": "Đề cập",
         "copyMessageLink": "Sao chép đường dẫn tin nhắn",
-        "report": "Báo cáo"
+        "report": "Báo cáo",
+        "polls": "Polls",
+        "files": "Files"
     },
     "chatBox": {
         "replyingTo": "Đang phản hổi",

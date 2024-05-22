@@ -14,7 +14,8 @@ import { useSelector } from 'react-redux';
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
-import { ApiMessageMention } from 'mezon-js/api.gen';
+import { ApiMessageMention, ApiMessageAttachment } from 'mezon-js/api.gen';
+import AttachmentPreview from './components/AttachmentPreview';
 import UseMentionList from '../../../hooks/useUserMentionList';
 import { renderTextContent } from './components/RenderTextContent';
 import { ChannelsMention, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
@@ -76,6 +77,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
   const navigation = useNavigation();
   const { setValueThread } = useThreads();
   const { setOpenThreadMessageState } = useReference();
+	const { attachmentDataRef, setAttachmentData } = useReference();
 	const { t } = useTranslation(['message']);
 
 	const editMessage = useCallback(
@@ -129,14 +131,17 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}]: undefined;
 
-    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
-			sendMessage({ t: text }, mentionData , [], reference, false);
-			removeAction(EMessageActionType.Reply);
-    }
+	    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
+				sendMessage({ t: text }, mentionData , attachmentDataRef || [], reference, false);
+		    setAttachmentData([]);
+				removeAction(EMessageActionType.Reply);
+	    }
 		}
+		textInput?.current?.clear?.();
+		setText('');
     [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 		setText('');
-	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction]);
+	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, textInput]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -312,7 +317,20 @@ useEffect(() => {
 	function handleInputBlur() {
 		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
 	}
-
+	
+	function removeAttachmentByUrl(urlToRemove: string) {
+		const removedAttachment: ApiMessageAttachment[] = attachmentDataRef.reduce(
+			(acc: ApiMessageAttachment[], attachment: ApiMessageAttachment) => {
+				if (attachment.url !== urlToRemove) {
+					acc.push(attachment);
+				}
+				return acc;
+			},
+			[],
+		);
+		setAttachmentData(removedAttachment);
+	}
+	
 	return (
 		<View style={styles.wrapperChatBox}>
 			<View style={styles.aboveTextBoxWrapper}>
@@ -336,8 +354,11 @@ useEffect(() => {
 				): null}
 			</View>
       <Suggestions suggestions={listMentions} {...triggers.mention} />
-        <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
-			<View style={{flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10}}>
+      <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
+			{
+				!!attachmentDataRef?.length && <AttachmentPreview attachments={attachmentDataRef} onRemove={removeAttachmentByUrl} />
+			}
+			<View style={styles.containerInput}>
 				{text.length > 0 ? (
 					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 						<AngleRightIcon width={18} height={18} />
@@ -353,7 +374,7 @@ useEffect(() => {
 					</>
 				)}
 
-				<View style={{ position: 'relative', justifyContent: 'center' }}>
+				<View style={styles.wrapperInput}>
 					<TextInput
             ref={textInput}
 						autoFocus={isFocus}
@@ -378,7 +399,7 @@ useEffect(() => {
 				</View>
 
 				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
-					{text.length > 0 ? (
+					{text.length > 0 || !!attachmentDataRef?.length ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
 							<SendIcon width={18} height={18} />
 						</View>

@@ -242,3 +242,61 @@ export function LogoutIcon({ width = 20, height = 20, color='white' , ...props }
 	  </Svg>
 	)
 }
+
+export function PollIcon({ width = 16, height = 16, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="0 0 512 512" {...props}>
+			<Path d="M40 48c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zm152 16c-17.7 0-32 14.3-32 32s14.3 32 32 32h288c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h288c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32h288c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24v-48c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zm24 136c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24v-48c0-13.3-10.7-24-24-24H40z" />
+		</Svg>
+	)
+}
+
+export function FilesIcon({ width = 16, height = 16, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="0 0 512 512" {...props}>
+				<Path d="M364.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z" />
+		</Svg>
+	)
+}
+
+export function CameraIcon({ width = 16, height = 16, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="0 0 512 512" {...props}>
+			<Path d="M149.1 64.8L138.7 96H64c-35.3 0-64 28.7-64 64v256c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64h-74.7l-10.4-31.2C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 110 192 96 96 0 110-192z" />
+		</Svg>
+	)
+}
+
+export function PlayIcon({ width = 16, height = 16, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} fill={color} viewBox="0 0 512 512" {...props}>
+			<Path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80v352c0 17.4 9.4 33.4 24.5 41.9S58.2 482 73 473l288-176c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z" />
+		</Svg>
+	)
+}
+export function CloseIcon({ width = 16, height = 16, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 384 512"
+			{...props}
+		>
+			<Path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3l105.4 105.3c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256l105.3-105.4z" />
+		</Svg>
+	)
+}
+export function CheckIcon({ width = 20, height = 20, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 448 512"
+			{...props}
+		>
+			<Path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7l233.4-233.3c12.5-12.5 32.8-12.5 45.3 0z" />
+		</Svg>
+	)
+}
