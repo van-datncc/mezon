@@ -93,7 +93,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     }
 
     const handleActionMention = () => {
-        console.log('Mention');
+      onClose();
+      const payload: IMessageActionNeedToResolve = {
+        type: EMessageActionType.Mention,
+        targetMessage: message
+    }
+      DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
     }
 
     const handleActionCopyMessageLink = () => {
@@ -181,8 +186,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
     const renderUserInformation = () => {
         return (
-            <View>
-                <Text>user information</Text>
+            <View style={{ padding: 20 }}>
+                <Text style={{ color: 'white', textAlign: 'center' }}>User information updating...</Text>
             </View>
         )
     }

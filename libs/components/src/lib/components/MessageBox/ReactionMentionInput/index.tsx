@@ -90,14 +90,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const {
-		dataReferences,
-		setReferenceMessage,
-		setDataReferences,
-		openThreadMessageState,
-		setOpenThreadMessageState,
-		idMessageRefReply,
-	} = useReference();
+	const { dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState, setOpenThreadMessageState, idMessageRefReply } =
+		useReference();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 
@@ -176,15 +170,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if ((!valueTextInput && attachmentDataRef.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef.length === 0)) {
+			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
 				return;
 			}
 			if (
 				valueTextInput &&
 				typeof valueTextInput === 'string' &&
 				!(valueTextInput || '').trim() &&
-				attachmentDataRef.length === 0 &&
-				mentionData.length === 0
+				attachmentDataRef?.length === 0 &&
+				mentionData?.length === 0
 			) {
 				if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
@@ -202,7 +196,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences.length > 0 && openReplyMessageState) {
+			if (getRefMessageReply !== null && dataReferences?.length > 0 && openReplyMessageState) {
 				props.onSend(
 					{ t: content },
 					mentionData,
