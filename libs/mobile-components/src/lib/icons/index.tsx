@@ -314,3 +314,31 @@ export function FileIcon({ width = 20, height = 20, color='white' , ...props }: 
 		</Svg>
 	)
 }
+
+export function UserPlusIcon({ width = 20, height = 20, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 384 512"
+			{...props}
+		>
+			<Path d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" />
+	  </Svg>
+	)
+}
+
+export function MessageIcon({ width = 20, height = 20, color='white' , ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 384 512"
+			{...props}
+		>
+		<Path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z" />
+	  </Svg>
+	)
+}

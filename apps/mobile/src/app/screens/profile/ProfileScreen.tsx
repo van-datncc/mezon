@@ -80,12 +80,13 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     const snapPoints = useMemo(() => ['50%', '98%'], []);
 
     // callbacks
-    const handlePresentModalPress = useCallback(() => {
-        bottomSheetModalRef.current?.present();
-    }, []);
+    const handlePresentModalPress = () => {
+        navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.HOME });
+    };
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
     }, []);
+
     const CustomBottomSheetHandle = () => (
         <BottomSheetHandle style={styles.container_customBottomSheet} >
             <Text style={styles.textBold}>Friends</Text>
