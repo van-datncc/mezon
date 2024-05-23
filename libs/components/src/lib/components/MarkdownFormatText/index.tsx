@@ -79,8 +79,18 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 
 	const { appearanceTheme } = useApp();
 
+	const extractUsername = (str: string) => {
+		const match = str.match(/@\[([a-zA-Z0-9_]+)\]\(\d+\)/);
+		if (match) {
+			return match[1];
+		}
+		return '';
+	};
+
 	return (
-		<article className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === "light" ? 'lightMode' : ''}`}>
+		<article
+			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
+		>
 			{showProfileUser ? (
 				<div
 					className="bg-black mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
@@ -96,6 +106,8 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 			) : null}
 			{mentions.map((part, index) => {
 				const tagName = part.matchedText;
+				extractUsername(tagName);
+				console.log(tagName);
 				const markdown = (part.nonMatchText && part.nonMatchText.trim()) ?? '';
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
@@ -118,7 +130,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 											style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 											className="tagLink"
 										>
-											{children}
+											{children}112
 										</span>
 									),
 								}}
@@ -129,7 +141,9 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							<span
 								style={{ borderRadius: '4px', padding: '0 2px' }}
 								className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
-								onClick={() => handMention(tagName)}
+								onClick={() => {
+									handMention(tagName);
+								}}
 								ref={panelRef}
 								onMouseDown={(event) => handleMouseClick(event)}
 							>

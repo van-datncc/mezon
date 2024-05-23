@@ -1,4 +1,5 @@
 import {
+	useApp,
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
@@ -43,7 +44,8 @@ import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
-import mentionsInputStyle from './RmentionInputStyle';
+import darkMentionsInputStyle from './RmentionInputStyle';
+import lightMentionsInputStyle from './LightRmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 
@@ -418,7 +420,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
-
+	const { appearanceTheme } = useApp();
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -445,7 +447,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
-				style={mentionsInputStyle}
+				style={appearanceTheme === "light" ? lightMentionsInputStyle : darkMentionsInputStyle}
 				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
