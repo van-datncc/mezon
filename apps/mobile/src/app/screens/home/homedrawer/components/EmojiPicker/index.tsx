@@ -6,7 +6,7 @@ export type IProps = {};
 function EmojiPicker({}: IProps) {
 	return (
 		<View>
-			<Text>Handel Emoji, Gif, Sticker picker here!!!</Text>
+			<Text style={{ color: 'white', textAlign: 'center' }}>Updating...</Text>
 		</View>
 	);
 }
