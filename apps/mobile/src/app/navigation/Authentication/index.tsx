@@ -15,6 +15,7 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import { FriendStacks } from './stacks/FriendStacks';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
@@ -86,6 +87,15 @@ export const Authentication = () => {
 				<RootStack.Screen
 					name={APP_SCREEN.PROFILE.STACK}
 					children={(props) => <SettingStacks {...props} />}
+					options={{
+						gestureEnabled: true,
+						gestureDirection: 'horizontal',
+					}}
+				/>
+
+				<RootStack.Screen
+					name={APP_SCREEN.FRIENDS.STACK}
+					children={(props) => <FriendStacks {...props} />}
 					options={{
 						gestureEnabled: true,
 						gestureDirection: 'horizontal',
