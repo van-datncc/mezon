@@ -11,7 +11,6 @@ export default {
 			outline: 'none',
 		},
 		highlighter: {
-			padding: 9,
 			maxWidth: 'calc(100% - 100px)',
 			border: '1px solid transparent',
 		},

@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
+import { useMessageLine } from 'libs/components/src/lib/components/MessageWithUser/useMessageLine';
 type MessageProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
@@ -66,8 +67,27 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		return message;
 	}, [message]);
 
+	const convertToPlainTextHashtag = (text: string) => {
+		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
+		const result = text.replace(regex, (match, symbol, p1, p2) => {
+			return symbol === '#' ? `#${p2}` : `@${p1}`;
+		});
+		return result;
+	};
+	
 	const [editMessage, setEditMessage] = useState(mess.content.t);
+	const [content, setContent] = useState(editMessage);
+	useEffect(()=>{
+		setContent(editMessage);
+	}, [editMessage])
 	const [newMessage, setNewMessage] = useState('');
+
+	useEffect(() => {
+		if (editMessage) {
+			const convertedHashtag = convertToPlainTextHashtag(editMessage);
+			setContent(convertedHashtag);
+		}
+	}, [editMessage]);
 
 	const messPre = useMemo(() => {
 		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
@@ -84,9 +104,9 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (editMessage) {
-				handleSend(editMessage, message.id);
-				setNewMessage(editMessage);
+			if (content) {
+				handleSend(content, message.id);
+				setNewMessage(content);
 				handleCancelEdit();
 			}
 		}
@@ -97,9 +117,9 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		}
 	};
 	const handelSave = () => {
-		if (editMessage) {
-			handleSend(editMessage, message.id);
-			setNewMessage(editMessage);
+		if (content) {
+			handleSend(content, message.id);
+			setNewMessage(content);
 			handleCancelEdit();
 		}
 	};
