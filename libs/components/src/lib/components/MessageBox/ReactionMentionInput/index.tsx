@@ -18,6 +18,7 @@ import {
 	referencesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectMessageByMessageId,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -91,8 +92,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { referenceMessage, dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState, setOpenThreadMessageState } =
-		useReference();
+	const {
+		dataReferences,
+		setReferenceMessage,
+		setDataReferences,
+		openThreadMessageState,
+		setOpenThreadMessageState,
+		idMessageRefReply,
+	} = useReference();
+
+	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
+
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -120,21 +130,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	useEffect(() => {
-		if (referenceMessage && referenceMessage.attachments) {
+		if (getRefMessageReply && getRefMessageReply.attachments) {
 			dispatch(
 				referencesActions.setDataReferences([
 					{
 						message_id: '',
-						message_ref_id: referenceMessage.id,
+						message_ref_id: getRefMessageReply.id,
 						ref_type: 0,
-						message_sender_id: referenceMessage.sender_id,
-						content: JSON.stringify(referenceMessage.content),
-						has_attachment: referenceMessage.attachments?.length > 0,
+						message_sender_id: getRefMessageReply.sender_id,
+						content: JSON.stringify(getRefMessageReply.content),
+						has_attachment: getRefMessageReply.attachments?.length > 0,
 					},
 				]),
 			);
 		}
-	}, [referenceMessage]);
+	}, [getRefMessageReply]);
 
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey } = event;
@@ -194,7 +204,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (referenceMessage !== null && dataReferences.length > 0 && openReplyMessageState) {
+			if (getRefMessageReply !== null && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
 					{ t: content },
 					mentionData,
@@ -258,7 +268,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			mentions,
 			isPrivate,
 			content,
-			referenceMessage,
+			getRefMessageReply,
 			dataReferences,
 			openThreadMessageState,
 		],
@@ -356,10 +366,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if ((referenceMessage !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
+		if ((getRefMessageReply !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
 			return focusToElement(editorRef);
 		}
-	}, [referenceMessage, openReplyMessageState, openEditMessageState, emojiPicked]);
+	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
 
 	const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
@@ -464,7 +474,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
 					)}
 					style={mentionStyle}
-					className='dark:bg-[#3B416B] bg-bgLightModeButton'
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					markup="#[__display__](__id__)"
@@ -478,7 +488,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					renderSuggestion={(suggestion) => (
 						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
 					)}
-					className='dark:bg-[#3B416B] bg-bgLightModeButton'
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					trigger=":"
@@ -486,7 +496,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					regex={neverMatchingRegex}
 					data={queryEmojis}
 					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
-					className='dark:bg-[#3B416B] bg-bgLightModeButton'
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 			</MentionsInput>
 		</div>

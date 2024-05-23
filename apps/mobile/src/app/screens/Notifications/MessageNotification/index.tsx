@@ -1,14 +1,14 @@
  import  React, { useEffect, useState } from 'react';
 import { IMessageNotifyProps } from '../types';
 import { View , Text, Linking} from 'react-native';
-import { useMessageParser } from '../../../../hooks/useMessageParser';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-viewing';
 import VideoPlayer from 'react-native-video-player';
 import { Metrics } from '@mezon/mobile-ui';
 import { styles as s } from './MessageNotification.styles';
-import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../../utils/helpers';
+import { useMessageParser } from '../../../hooks/useMessageParser';
+import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
 const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
   const widthMedia = Metrics.screenWidth - 150;
   const { message , newMessage} = messageProps;
@@ -49,6 +49,7 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
+							key={index}
 							isControlsVisible={false}
 							disableFullscreen={false}
 							video={{ uri: video?.url }}
@@ -71,6 +72,7 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 				{images.map((image, index) => {
 					return (
 							<FastImage
+								key={index}
 								style={[
 									s.imageMessageRender,
 								]}

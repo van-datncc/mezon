@@ -2,7 +2,6 @@ import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '
 import React from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import DiscoveryIcon from '../../../../assets/svg/discoveryStudentHubs.svg';
 import PlusGreenIcon from '../../../../assets/svg/guildAddCategoryChannel.svg';
 import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
@@ -23,10 +22,9 @@ const ServerList = React.memo((props: any) => {
 				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
 			</View>
 			{clans.map((server) => (
-				<ClanIcon data={server} onPress={handleChangeClan} isActive={currentClan?.clan_id === server?.clan_id} />
+				<ClanIcon data={server} key={server.id} onPress={handleChangeClan} isActive={currentClan?.clan_id === server?.clan_id} />
 			))}
 			<ClanIcon icon={<PlusGreenIcon width={30} height={30} />} data={{}} />
-			<ClanIcon icon={<DiscoveryIcon width={30} height={30} />} data={{}} />
 		</View>
 	);
 });
