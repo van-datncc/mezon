@@ -18,6 +18,7 @@ import SearchInput from '../../components/SearchInput'
 import { useAuth } from '@mezon/core'
 import FastImage from 'react-native-fast-image'
 import { APP_SCREEN } from '../../navigation/ScreenTypes'
+import Toast from "react-native-toast-message";
 const friendData = [
     {
         image: 'https://gcs.tripi.vn/public-tripi/tripi-feed/img/474053MSU/anh-cute-nguoi-that-dep-nhat_022606213.jpg',
@@ -110,10 +111,6 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
             <View style={styles.container}>
                 <View style={styles.containerBackground}>
                     <View style={styles.backgroundListIcon}>
-                        <TouchableOpacity style={styles.backgroundNitro}>
-                            <Entypo name='rdio' size={20} style={styles.icon} />
-                            <Text style={styles.text}>Nitro</Text>
-                        </TouchableOpacity>
                         <TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
                             <Feather name='settings' size={20} style={styles.icon} />
                         </TouchableOpacity>
@@ -130,22 +127,22 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                                 }}
                                 resizeMode={FastImage.resizeMode.cover}
                             />
-                        ): <Text style={styles.textAvatar}>{user?.userProfile?.user?.display_name.charAt(0)}</Text>}
+                        ): <Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>}
                         <View style={styles.dotOnline} />
                     </View>
                 </View>
                 <View style={styles.contentContainer}>
                     <TouchableOpacity style={styles.viewInfo}>
-                        <Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
+                        <Text style={styles.textName}>{user?.userProfile?.user?.username}</Text>
                         <Feather name="chevron-down" style={styles.icon} />
                     </TouchableOpacity>
                     <Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
                     <View style={styles.buttonList}>
-                        <TouchableOpacity style={styles.viewButton}>
+                        <TouchableOpacity style={styles.viewButton} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
                             <Feather name="message-circle" size={20} style={styles.icon} />
                             <Text style={styles.textBold}>Add status</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.viewButton}>
+                        <TouchableOpacity style={styles.viewButton} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
                             <MaterialIcons style={styles.icon} name="edit" size={20} />
                             <Text style={styles.textBold}>Edit Profile</Text>
                         </TouchableOpacity>
@@ -153,7 +150,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
                 </View>
                 <View style={styles.memberView}>
-                    <Text style={styles.text}>Discord Member Since</Text>
+                    <Text style={styles.text}>Mezon Member Since</Text>
                     <Text style={styles.text}>Jan 26, 2024</Text>
                 </View>
                 <TouchableOpacity style={styles.viewFriend} onPress={handlePresentModalPress}>
