@@ -1,7 +1,7 @@
 import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
-import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, Pressable, Text, TouchableOpacity, View, Image } from 'react-native';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import FastImage from 'react-native-fast-image';
@@ -263,10 +263,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<Pressable onPress={() => jumpToRepliedMesage()} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
-								<FastImageRes uri={repliedSender?.user?.avatar_url} isCirle />
+								<Image source={{uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
 							</View>
 						) : (
-							<View style={styles.replyAvatar}>
+							<View style={[styles.replyAvatar]}>
 								<View style={styles.avatarMessageBoxDefault}>
 									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase()}</Text>
 								</View>
@@ -283,7 +283,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				>
 					{isCombine &&
 						(user?.user?.avatar_url ? (
-							<FastImageRes uri={user?.user?.avatar_url} />
+							<Image source={{uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
 							<View style={styles.avatarMessageBoxDefault}>
 								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>

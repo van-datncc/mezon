@@ -301,9 +301,11 @@ export const styles = StyleSheet.create({
 		paddingLeft: 30,
 	},
 	replyAvatar: {
-		width: 25,
-		height: 25,
-		borderRadius: 50,
+		width: size.s_24,
+		height: size.s_24,
+		borderRadius: size.s_50,
+		backgroundColor: Colors.gray48,
+		overflow: 'hidden',
 	},
 	messageWrapper: {
 		flexDirection: 'column',
@@ -450,5 +452,9 @@ export const styles = StyleSheet.create({
 		fontSize: size.small,
 		color: Colors.textGray,
 		textTransform: 'uppercase'
+	},
+	logoUser: {
+		width: '100%',
+		height: '100%',
 	}
 });
