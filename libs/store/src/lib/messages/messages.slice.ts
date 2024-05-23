@@ -545,7 +545,4 @@ export const selectMessageByMessageId = (messageId: string) =>
 
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
-// export const selectQuantitiesMessageRemainByChannelId = (channelId: string) =>
-// 	createSelector(selectMessageParams, (param) => {
-// 		return param?.[channelId];
-// 	});
+
