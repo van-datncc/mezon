@@ -15,6 +15,7 @@ import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
+import Toast from "react-native-toast-message";
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -99,7 +100,9 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					</View>
 				</View>
 			</TouchableOpacity>
-			<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
+			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}>
+				<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
+			</TouchableOpacity>
 		</View>
 	);
 });

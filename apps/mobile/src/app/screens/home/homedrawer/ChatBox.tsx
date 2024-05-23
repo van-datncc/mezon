@@ -9,10 +9,20 @@ import {
 	getAttachmentUnique
 } from '@mezon/mobile-components';
 import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import {DeviceEventEmitter, Dimensions, Keyboard, TextInput, View, Text, Pressable, Platform} from 'react-native';
+import {
+	DeviceEventEmitter,
+	Dimensions,
+	Keyboard,
+	TextInput,
+	View,
+	Text,
+	Pressable,
+	Platform,
+	TouchableOpacity
+} from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { IModeKeyboardPicker } from './components';
 import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
@@ -78,6 +88,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
+	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
 	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
@@ -252,6 +263,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
     setText(convertMentionsToText(text));
     handleTypingDebounced();
     setMentionTextValue(text);
+	  setIsShowAttachControl(false);
   }
 
 const handleMentionInput = (mentions: MentionDataProps[]) => {
@@ -389,6 +401,7 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 	}
 
 	function handleInputBlur() {
+		setIsShowAttachControl(false);
 		if (modeKeyBoardBottomSheet === 'text') props.onShowKeyboardBottomSheet(false, 0);
 	}
 
@@ -431,18 +444,24 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
 			}
 			<View style={styles.containerInput}>
-				{text.length > 0 ? (
-					<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
+				{text.length > 0 && !isShowAttachControl ? (
+					<TouchableOpacity
+						style={[styles.iconContainer, { backgroundColor: '#333333' }]}
+						onPress={() => setIsShowAttachControl(!isShowAttachControl)}
+					>
 						<AngleRightIcon width={18} height={18} />
-					</View>
+					</TouchableOpacity>
 				) : (
 					<>
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						</View>
-						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
+						<TouchableOpacity
+							style={[styles.iconContainer, { backgroundColor: '#333333', marginRight: isShowAttachControl ? size.s_10 : 0 }]}
+							onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}
+						>
 							<GiftIcon width={22} height={22} />
-						</View>
+						</TouchableOpacity>
 					</>
 				)}
 
@@ -476,7 +495,9 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 							<SendIcon width={18} height={18} />
 						</View>
 					) : (
-						<MicrophoneIcon width={22} height={22} />
+						<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}>
+							<MicrophoneIcon width={22} height={22} />
+						</TouchableOpacity>
 					)}
 				</View>
 			</View>

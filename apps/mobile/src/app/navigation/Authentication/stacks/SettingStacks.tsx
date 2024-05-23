@@ -13,7 +13,8 @@ export const SettingStacks = ({ }: any) => {
                 headerShown: true,
                 headerShadowVisible: false,
                 gestureEnabled: true,
-                gestureDirection: 'horizontal'
+                gestureDirection: 'horizontal',
+                headerBackTitleVisible: false,
             }}>
 
             <Stack.Screen
@@ -24,7 +25,7 @@ export const SettingStacks = ({ }: any) => {
                     headerTitleAlign: "center",
                     headerTintColor: Colors.white,
                     headerStyle: {
-                        backgroundColor: Colors.primary
+                      backgroundColor: Colors.primary
                     }
                 }}
             />
