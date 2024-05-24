@@ -1,18 +1,22 @@
 import { Icons } from '@mezon/components';
 import { useClans } from '@mezon/core';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Button } from 'flowbite-react';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const ClanBannerBackground = () => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentClan, updateClan } = useClans();
+	
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
 	const [urlImage, setUrlImage] = useState<string>(currentClan?.banner ?? '');
 
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
-		const fullfilename = file?.name;
 		const session = sessionRef.current;
 		const client = clientRef.current;
 
@@ -22,7 +26,7 @@ const ClanBannerBackground = () => {
 			throw new Error('Client or file is not initialized');
 		}
 
-		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
 		});
 	};
