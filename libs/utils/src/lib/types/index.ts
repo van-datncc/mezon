@@ -17,6 +17,9 @@ import {
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
+	ApiNotificationUserChannel,
+	ApiNotificationSetting,
+	ApiNotificationChannelCategoySetting,
 } from 'mezon-js/api.gen';
 
 export * from './permissions';
@@ -51,6 +54,18 @@ export type IRolesClan = ApiRole & {
 	id: string;
 };
 
+export type INotificationSetting = ApiNotificationUserChannel
+
+export type IDefaultNotificationClan = ApiNotificationSetting
+
+export type IDefaultNotificationCategory = ApiNotificationSetting
+
+export type IDefaultNotification = ApiNotificationSetting & {
+	id: string;
+};
+export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
+	id: string;
+};
 export type IEventManagement = ApiEventManagement & {
 	id: string;
 };
