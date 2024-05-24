@@ -71,6 +71,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			{isFetching && hasMoreMessage && <p className=" text-center">Loading messages...</p>}
 
 			{reverseArray(messages).map((message, i) => {
+				console.log(message);
 				return (
 					<ChannelMessage
 						mode={mode}
