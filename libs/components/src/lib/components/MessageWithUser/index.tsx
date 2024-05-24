@@ -79,7 +79,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	}, [idMessageNotifed, message.id]);
 	useEffect(() => {
 		if (checkReplied || checkMessageTargetToMoved) {
-			setClassNameHightlightReplyParentDiv('dark:bg-[#383B47]');
+			setClassNameHightlightReplyParentDiv('dark:bg-[#393B47]');
 			setClassNameHightlightReplyChildDiv(' dark:bg-blue-500 bg-[#EAB308] group-hover:none');
 		} else {
 			setClassNameHightlightReplyParentDiv('bg-[#26262b]');
