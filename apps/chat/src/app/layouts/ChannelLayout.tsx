@@ -37,7 +37,7 @@ const ChannelLayout = () => {
 
 	return (
 		<div
-			className={`flex flex-col flex-1 shrink min-w-0 dark:bg-bgSecondary bg-bgLightModeSecond h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+			className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 		>
 			<div className="flex h-heightWithoutTopBar flex-row">
 				<Outlet />
