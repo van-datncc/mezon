@@ -31,8 +31,8 @@ const SettingRightUser = ({
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
 	const dispatch = useAppDispatch();
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
+	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const handleUpdateUser = async () => {
 		if (name || urlImage || displayName || editAboutUser) {
 			await updateUser(name, urlImage, displayName, editAboutUser);
@@ -52,7 +52,6 @@ const SettingRightUser = ({
 
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
-		const fullfilename = file?.name;
 		const sizeImage = file?.size;
 		const session = sessionRef.current;
 		const client = clientRef.current;
@@ -73,7 +72,7 @@ const SettingRightUser = ({
 			e.target.value = null;
 			return;
 		}
-		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
 		});
 		setFlags(true);
