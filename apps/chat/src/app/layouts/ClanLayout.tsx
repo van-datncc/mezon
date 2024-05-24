@@ -33,7 +33,7 @@ const ClanLayout = () => {
 	}, [isShowCreateThread]);
 
 	return (
-		<div className="flex flex-row flex-1 bg-bgSurface">
+		<div className="flex flex-row flex-1 bg-transparent">
 			<MezonPolicyProvider clanId={clanId}>
 				<div
 					className={` flex-col flex max-w-[272px] dark:bg-bgSecondary bg-bgLightMode relative overflow-hidden ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
@@ -50,7 +50,7 @@ const ClanLayout = () => {
 					/>
 				</div>
 				<div
-					className={`flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+					className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 				>
 					<ChannelTopbar channel={currentChannel} />
 					<Outlet />

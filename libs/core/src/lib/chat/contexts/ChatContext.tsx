@@ -102,8 +102,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(notification: Notification) => {
 			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			if (notification.code === -2 || notification.code === -3) {
-				dispatch(friendsActions.fetchListFriends());
 				toast.info(notification.subject);
+				dispatch(friendsActions.fetchListFriends({noCache: true}));
 			}
 		},
 		[dispatch],
