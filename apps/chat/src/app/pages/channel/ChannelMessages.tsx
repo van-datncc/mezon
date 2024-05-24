@@ -27,7 +27,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const isFetching = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
 
 	useEffect(() => {
-		if (idMessageNotifed) setMessageIdToJump(idMessageNotifed);
+		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
 		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
 		if (idMessageToJump !== '') setMessageIdToJump(idMessageToJump);
 		setTimeToJump(0);
