@@ -64,10 +64,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				channelId={channelId}
 				dataReactionCombine={dataReactionCombine}
 				channelLabel={channelLabel}
-				preMessage={messages.length > 0 ? messages?.[index - 1] : undefined}
+        preMessage={messages.length > 0 ? messages[index + 1] : undefined}
 			/>
 		);
-	}, [dataReactionCombine]);
+	}, [dataReactionCombine, messages]);
 
 	return (
 		<View style={styles.wrapperChannelMessage}>

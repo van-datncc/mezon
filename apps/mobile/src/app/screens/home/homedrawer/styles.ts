@@ -325,13 +325,16 @@ export const styles = StyleSheet.create({
 		marginRight: 0
 	},
 	wrapperMessageBoxCombine: {
-		marginTop: size.s_2,
+		marginBottom: size.s_10,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
 		justifyContent: 'space-between',
 		width: '100%',
 	},
+  rowMessageBoxCombine: {
+    marginLeft: size.s_50,
+  },
 	messageBoxTop: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
@@ -350,8 +353,11 @@ export const styles = StyleSheet.create({
 	contentMessageBox: {
 		fontSize: size.medium,
 		color: Colors.tertiary,
-		marginTop: -5,
 	},
+  contentMessageCombine: {
+    paddingLeft: size.s_10,
+    marginBottom: -5,
+  },
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
@@ -456,5 +462,10 @@ export const styles = StyleSheet.create({
 	logoUser: {
 		width: '100%',
 		height: '100%',
-	}
+	},
+  wrapperAvatar: {
+    width: size.s_40,
+    height: size.s_40,
+    borderRadius: size.s_40,
+    overflow: 'hidden' }
 });
