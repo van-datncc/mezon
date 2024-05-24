@@ -30,13 +30,19 @@ export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?
 
 type fetchEventManagementPayload = {
 	clanId: string;
+	noCache?: boolean;
 };
 
 export const fetchEventManagement = createAsyncThunk(
 	'eventManagement/fetchEventManagement',
-	async ({ clanId }: fetchEventManagementPayload, thunkAPI) => {
+	async ({ clanId, noCache }: fetchEventManagementPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listEvents(mezon.session, clanId);
+
+		if (noCache) {
+			fetchEventManagementCached.clear(mezon, clanId);
+		}
+
+		const response = await fetchEventManagementCached(mezon, clanId);
 		
 		if (!response.events) {
 			thunkAPI.dispatch(eventManagementActions.clearEntities());
@@ -74,7 +80,10 @@ export const fetchCreateEventManagement = createAsyncThunk(
 			logo: logo || '',
 		}
 		const response = await mezon.client.createEvent(mezon.session, body);
-		if (!response) {
+		if(response){
+			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true}));
+		}
+		else {
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response;
