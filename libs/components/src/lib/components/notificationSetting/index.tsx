@@ -84,7 +84,6 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const [selectedOption, setSelectedOption] = useState(null);
 	const handleChange = (newValue: any) => {
 		setSelectedOption(newValue);
-		console.log('selectedOption: ', newValue.label);
 		if (newValue.title === 'category') {
 			dispatch(
 				defaultNotificationCategoryActions.setDefaultNotificationCategory({
