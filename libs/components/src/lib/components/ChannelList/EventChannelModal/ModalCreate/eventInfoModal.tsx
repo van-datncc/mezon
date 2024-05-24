@@ -3,6 +3,8 @@ import { useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { useSelector } from 'react-redux';
 
 enum OptionEvent {
 	OPTION_SPEAKER = 'Speaker',
@@ -29,6 +31,9 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const { topic, description, option, logo, selectedDateStart, selectedDateEnd, setSelectedDateStart, setSelectedDateEnd, setLogo, handleTopic, handleTimeStart, handleTimeEnd, handleDescription } = props;
 	const [countCharacterDescription, setCountCharacterDescription] = useState(1024);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
 	const frequencies = [
 		'Does not repeat',
@@ -78,14 +83,13 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
-		const fullfilename = file?.name;
 		const session = sessionRef.current;
 		const client = clientRef.current;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
 		}
-		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setLogo(attachment.url ?? '');
 		});
 	};
