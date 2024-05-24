@@ -198,7 +198,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences?.length > 0 && openReplyMessageState) {
+			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
 					{ t: content },
 					mentionData,

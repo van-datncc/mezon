@@ -104,8 +104,8 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				</TouchableOpacity>
 			);
 		}
-		const fileName = item.node?.image?.filename || item.node?.image?.uri;
-		const isVideo = item.node.type.startsWith('video');
+		const fileName = item?.node?.image?.filename || item?.node?.image?.uri;
+		const isVideo = item?.node?.type?.startsWith?.('video');
 		const isSelected = attachmentsFileName?.includes(fileName);
 
 		return (
@@ -113,8 +113,8 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				style={styles.itemGallery}
 				onPress={() => {
 					if (isSelected) {
-						const infoAttachment = attachmentDataRef.find((attachment) => attachment.filename === fileName);
-						removeAttachmentByUrl(infoAttachment.url, infoAttachment.filename);
+						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === fileName);
+						removeAttachmentByUrl(infoAttachment.url, infoAttachment?.filename);
 					} else {
 						handleGalleryPress(item);
 					}

@@ -16,9 +16,12 @@ export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
 	return fetch(url, { method: 'PUT', body: stream });
 }
 
-export async function handleUploadFile(client: Client, session: Session, fullfilename: string, file: File): Promise<ApiMessageAttachment> {
+export async function handleUploadFile(client: Client, session: Session, currentClanId: string, currentChannelId: string, filename: string, file: File): Promise<ApiMessageAttachment> {
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
+			const ms = (new Date()).getTime();
+			const fullfilename = currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g,"_");
+
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
 				filename: fullfilename,

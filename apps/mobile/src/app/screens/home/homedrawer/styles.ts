@@ -309,6 +309,7 @@ export const styles = StyleSheet.create({
 	},
 	messageWrapper: {
 		flexDirection: 'column',
+		marginTop: size.s_10,
 	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
@@ -325,13 +326,16 @@ export const styles = StyleSheet.create({
 		marginRight: 0
 	},
 	wrapperMessageBoxCombine: {
-		marginTop: size.s_2,
+		marginBottom: size.s_10,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
 		justifyContent: 'space-between',
-		width: '100%',
+		width: '90%',
 	},
+  rowMessageBoxCombine: {
+    marginLeft: verticalScale(44),
+  },
 	messageBoxTop: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
@@ -350,8 +354,10 @@ export const styles = StyleSheet.create({
 	contentMessageBox: {
 		fontSize: size.medium,
 		color: Colors.tertiary,
-		marginTop: -5,
 	},
+  contentMessageCombine: {
+    marginBottom: -5,
+  },
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
@@ -380,7 +386,7 @@ export const styles = StyleSheet.create({
 	},
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
-		marginBottom: size.s_10,
+		marginVertical: size.s_10,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
@@ -456,5 +462,14 @@ export const styles = StyleSheet.create({
 	logoUser: {
 		width: '100%',
 		height: '100%',
+	},
+  wrapperAvatar: {
+    width: size.s_40,
+    height: size.s_40,
+    borderRadius: size.s_40,
+    overflow: 'hidden'
+  },
+	wrapperAvatarCombine: {
+		width: size.s_40,
 	}
 });

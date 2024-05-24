@@ -10,6 +10,7 @@ import ModalInvite from '../ListMemberInvite/modalInvite';
 import SearchModal from '../SearchModal';
 import ItemModal from './ItemModal';
 import ModalCreateCategory from './ModalCreateCategory';
+import ModalNotificationSetting from '../notificationSetting';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -21,9 +22,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useAppDispatch();
-	const { userProfile } = useAuth();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { currentClan } = useClans();
 	const { categorizedChannels } = useCategory();
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
@@ -33,7 +32,10 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const [isShowModalPannelClan, setIsShowModalPannelClan] = useState<boolean>(false);
-
+	
+	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => (
+		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
+	));
 	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
 
 	const onClose = () => {
@@ -109,15 +111,17 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										children="Invite People"
 										endIcon={<Icons.AddPerson className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
-									{userProfile?.user?.id === currentClan?.creator_id && (
-										<ItemModal
-											onClick={handleShowServerSettings}
-											children="Server Settings"
-											endIcon={
-												<Icons.SettingProfile className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />
-											}
-										/>
-									)}
+									<ItemModal
+										onClick={handleShowServerSettings}
+										children="Server Settings"
+										endIcon={
+											<Icons.SettingProfile className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />
+										}
+									/>
+									<ItemModal 
+									onClick={openNotiSettingModal} 
+									children="Notification Settings" 
+									endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white"/>} />
 								</div>
 							</div>
 						)}

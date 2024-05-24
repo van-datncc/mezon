@@ -34,7 +34,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const now = Date.now();
 			const filename = now + '.txt';
 			const file = new File([fileContent], filename, { type: 'text/plain' });
-			const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
 
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -42,7 +41,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (!client || !session || !currentChannelId) {
 				throw new Error('Client is not initialized');
 			}
-			handleUploadFile(client, session, fullfilename, file)
+			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
 				.then((attachment) => {
 					handleFinishUpload(attachment);
 					return 'handled';
@@ -88,14 +87,13 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					const blob = new Blob(files, { type: files[0].type });
 					const filename = Date.now() + '.png';
 					const file = new File([blob], filename, { type: blob.type });
-					const fullfilename = ('' + currentClanId + '/' + currentChannelId).replace(/-/g, '_') + '/' + filename;
 					const session = sessionRef.current;
 					const client = clientRef.current;
 
 					if (!client || !session || !currentClanId) {
 						throw new Error('Client is not initialized');
 					}
-					handleUploadFile(client, session, fullfilename, file)
+					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
 							return 'handled';

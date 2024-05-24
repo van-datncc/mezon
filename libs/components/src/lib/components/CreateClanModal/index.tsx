@@ -1,5 +1,5 @@
 import { useAppNavigation, useClans } from '@mezon/core';
-import { selectAllAccount } from '@mezon/store';
+import { selectAllAccount, selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
 import { useState } from 'react';
@@ -19,16 +19,20 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { navigate, toClanPage } = useAppNavigation();
 	const { createClans } = useClans();
 	const userProfile = useSelector(selectAllAccount);
+
+	
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
+
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
-		const fullfilename = file?.name;
 		const session = sessionRef.current;
 		const client = clientRef.current;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
 		}
-		handleUploadFile(client, session, fullfilename, file).then((attachment: any) => {
+		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
 		});
 	};
