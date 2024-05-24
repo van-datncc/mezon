@@ -98,7 +98,7 @@ function MyApp() {
 
 	const { appearanceTheme } = useApp();
 	return (
-		<div className="flex h-screen text-gray-100 overflow-hidden relative">
+		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond">
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}

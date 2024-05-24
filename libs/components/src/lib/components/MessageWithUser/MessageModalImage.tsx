@@ -50,7 +50,7 @@ const MessageModalImage = () => {
 	return (
 		<div>
 			{openModalAttachment ? (
-				<div className="justify-center items-center flex flex-col md:flex-row fixed inset-0 z-50 outline-none focus:outline-none bg-black text-white">
+				<div className="justify-center items-center flex flex-col md:flex-row fixed inset-0 z-50 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
 					<div className="flex-1 flex justify-center items-center p-5 overflow-hidden h-full w-full">
 						<img
 							src={urlImg}
@@ -74,8 +74,8 @@ const MessageModalImage = () => {
 						<Icons.ArrowDown defaultFill="white" defaultSize="w-[20px] h-[30px]" />
 					</button>
 					{showList && (
-						<div className="w-full md:w-[250px] h-[120px] md:h-full bg-[#0B0B0B] flex md:flex-col px-[10px] md:px-0 md:py-5 overflow-y-hidden gap-x-2 md:gap-y-5">
-							<div className="bg-slate-700 border flex items-center md:block">
+						<div className="w-full md:w-[250px] h-[120px] md:h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col px-[10px] md:px-0 md:py-5 overflow-y-hidden gap-x-2 md:gap-y-5">
+							<div className="dark:bg-slate-700 bg-bgLightModeButton border flex items-center md:block">
 								<img
 									src={urlImg}
 									alt={urlImg}
@@ -83,7 +83,7 @@ const MessageModalImage = () => {
 									onDragStart={handleDrag}
 								/>
 							</div>
-							<div className="w-full h-full bg-[#0B0B0B] flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
+							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
 								{attachments.map((img, index) => {
 									const url = `https://cdn.mezon.vn/${img.clanId}/${img.channelId}/${img.filename}`;
 									return (

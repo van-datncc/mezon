@@ -93,16 +93,16 @@ export default function ChannelLayout() {
 		<>
 			{draggingState && <FileUploadByDnD />}
 			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden z-0"
+				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-0"
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 			>
-				<div className="flex h-heightWithoutTopBar flex-row ">
+				<div className="flex h-heightWithoutTopBar flex-row">
 					<div
 						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
 					>
 						<div
-							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
+							className="overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 							ref={messagesContainerRef}
 						>
 							{renderChannelMedia()}

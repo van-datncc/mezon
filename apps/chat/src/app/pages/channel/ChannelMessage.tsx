@@ -130,9 +130,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		},
 		[EditSendMessage],
 	);
-	// const onchange = (e: any) => {
-	// 	setEditMessage(e.target.value);
-	// };
 
 	const textareaRef = useRef<any>(null);
 	useEffect(() => {
@@ -170,8 +167,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	useEscapeKey(handleCancelEdit);
 
 	const { appearanceTheme } = useApp();
-
-
 
 	return (
 		<div className="fullBoxText relative group">
