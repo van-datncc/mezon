@@ -186,8 +186,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
     const renderUserInformation = () => {
         return (
-            <View>
-                <Text>user information</Text>
+            <View style={{ padding: 20 }}>
+                <Text style={{ color: 'white', textAlign: 'center' }}>User information updating...</Text>
             </View>
         )
     }

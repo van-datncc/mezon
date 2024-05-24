@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Colors } from '@mezon/mobile-ui'
 import { styles as s } from './NotificationOption.styles'
@@ -6,6 +6,7 @@ import { EActionDataNotify } from '../types'
 import { MuteIcon, SettingIcon, } from "@mezon/mobile-components";
 import { useTranslation } from 'react-i18next'
 import MezonToggleButton from '../../../temp-ui/MezonRadioButton'
+import Toast from "react-native-toast-message";
 
 
 const NotificationOption = ({onChange}) => {
@@ -61,10 +62,10 @@ const NotificationOption = ({onChange}) => {
             }
             </View>
             <View style={s.notifySetting}>
-            <View style={s.option}>
-                  <SettingIcon width={22} height={22} />
-                  <Text style={s.textOption}>{t('tabNotify.notificationSettings')}</Text>
-                </View>
+            <TouchableOpacity style={s.option} onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}>
+                <SettingIcon width={22} height={22} />
+                <Text style={s.textOption}>{t('tabNotify.notificationSettings')}</Text>
+            </TouchableOpacity>
             </View>
         </View >
     )

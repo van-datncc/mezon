@@ -7,18 +7,17 @@ import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 const GoogleLogin = () => {
-	const GOOGLE_WEB_ID = '648946579638-331cst20cdecpef6ov0o0qauupfhq41n.apps.googleusercontent.com';
-	const IOS_CLIENT_ID = '648946579638-funno2n4iiib3idaa0pqt2js4u1nal26.apps.googleusercontent.com';
 	const dispatch = useAppDispatch();
 	const { loginByGoogle } = useAuth();
 
 	useEffect(() => {
-		GoogleSignin.configure({
-			webClientId: GOOGLE_WEB_ID,
-			iosClientId: IOS_CLIENT_ID,
+		const config = {
+			webClientId: process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string,
+			iosClientId: process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string,
 			offlineAccess: true,
 			forceCodeForRefreshToken: true,
-		});
+		};
+		GoogleSignin.configure(config);
 	}, []);
 
 	async function onGoogleButtonPress() {

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
+import Toast from 'react-native-toast-message';
 import Gallery, { IFile } from './Gallery';
 import { styles } from './styles';
 
@@ -74,7 +75,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 	return (
 		<View style={styles.container}>
 			<View style={styles.wrapperHeader}>
-				<TouchableOpacity activeOpacity={0.8} style={styles.buttonHeader}>
+				<TouchableOpacity activeOpacity={0.8} style={styles.buttonHeader} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
 					<PollIcon />
 					<Text style={styles.titleButtonHeader}>{t('message:actions.polls')}</Text>
 				</TouchableOpacity>
