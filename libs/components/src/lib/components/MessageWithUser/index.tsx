@@ -53,9 +53,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	}, [message.attachments]);
 
 	const propsChild = { isCombine };
-	const checkReplied = idMessageRefReply === message.id && openReplyMessageState;
+	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 
-	const checkMessageTargetToMoved = idMessageToJump === message.id;
+	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 
 	const [classNameHighlightNoti, setClassNameHightlightNoti] = useState<string>('dark:bg-bgPrimary bg-bgLightModeSecond');
 	const [classNameHighligntReplyParentDiv, setClassNameHightlightReplyParentDiv] = useState<string>('bg-[#26262b]');
