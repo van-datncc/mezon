@@ -10,7 +10,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useChatMessages, useNotification, useReference } from '@mezon/core';
+import { useAuth, useChatMessages, useNotification, useReference } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
 
@@ -38,6 +38,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { referenceMessage, openReplyMessageState, idMessageRefReply, idMessageToJump } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
+	const userLogin = useAuth();
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -56,10 +57,11 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
+	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 
 	const [classNameHighlightNoti, setClassNameHightlightNoti] = useState<string>('dark:bg-bgPrimary bg-bgLightModeSecond');
-	const [classNameHighligntReplyParentDiv, setClassNameHightlightReplyParentDiv] = useState<string>('bg-[#26262b]');
-	const [classNameHighligntReplyChildDiv, setClassNameHightlightReplyChildDiv] = useState<string>(
+	const [classNameHighligntParentDiv, setClassNameHightlightParentDiv] = useState<string>('bg-[#26262b]');
+	const [classNameHighligntChildDiv, setClassNameHightlightChildDiv] = useState<string>(
 		'dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]',
 	);
 	useEffect(() => {
@@ -79,11 +81,14 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	}, [idMessageNotifed, message.id]);
 	useEffect(() => {
 		if (checkReplied || checkMessageTargetToMoved) {
-			setClassNameHightlightReplyParentDiv('dark:bg-[#393B47]');
-			setClassNameHightlightReplyChildDiv(' dark:bg-blue-500 bg-[#EAB308] group-hover:none');
+			setClassNameHightlightParentDiv('dark:bg-[#383B47]');
+			setClassNameHightlightChildDiv(' dark:bg-blue-500 bg-[#EAB308] group-hover:none');
+		} else if (hasIncludeMention) {
+			setClassNameHightlightParentDiv('dark:bg-[#444037] dark:group-hover:none');
+			setClassNameHightlightChildDiv(' dark:bg-[#F0B132] bg-[#EAB308] dark:group-hover:none');
 		} else {
-			setClassNameHightlightReplyParentDiv('bg-[#26262b]');
-			setClassNameHightlightReplyChildDiv(' dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]');
+			setClassNameHightlightParentDiv('bg-[#26262b]');
+			setClassNameHightlightChildDiv(' dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]');
 		}
 	}, [checkReplied, checkMessageTargetToMoved]);
 
@@ -97,10 +102,10 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				</div>
 			)}
 			<div className={`relative ${isCombine ? '' : 'mt-2'} ${classNameHighlightNoti}`}>
-				<div className={` relative rounded-sm  overflow-visible ${classNameHighlightNoti} ${classNameHighligntReplyParentDiv}`}>
-					<div className={`${classNameHighlightNoti} ${classNameHighligntReplyChildDiv} absolute w-1 h-full left-0`}></div>
+				<div className={` relative rounded-sm  overflow-visible ${classNameHighlightNoti} ${classNameHighligntParentDiv}`}>
+					<div className={`${classNameHighlightNoti} ${classNameHighligntChildDiv} absolute w-0.5 h-full left-0`}></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-[2px] dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
+						className={`flex h-15 flex-col w-auto px-3 py-[2px] ${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? '' : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}  ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>
 						{' '}
 						<MessageReply message={message} />
