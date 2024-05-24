@@ -9,7 +9,8 @@ export const useEscapeKey = (handler: () => void) => {
 			if (event.key === 'Escape') {
 				// disable reply
 				dispatch(referencesActions.setOpenReplyMessageState(false));
-				dispatch(referencesActions.setReferenceMessage(null));
+				dispatch(referencesActions.setIdReferenceMessageReply(''));
+				dispatch(referencesActions.setIdMessageToJump(''));
 				dispatch(referencesActions.setDataReferences(null));
 				dispatch(reactionActions.setMessageMatchWithRef(false));
 				handler();

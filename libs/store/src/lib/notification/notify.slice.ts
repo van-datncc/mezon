@@ -19,6 +19,7 @@ export const mapNotificationToEntity = (notifyRes: Notification): INotification 
 export interface NotificationState extends EntityState<NotificationEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	messageNotifedId: string;
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -47,6 +48,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	loadingStatus: 'not loaded',
 	notificationMentions: [],
 	error: null,
+	messageNotifedId: '',
 });
 const NOTIFICATION_CODE = -9;
 
@@ -56,6 +58,9 @@ export const notificationSlice = createSlice({
 	reducers: {
 		add: notificationAdapter.addOne,
 		remove: notificationAdapter.removeOne,
+		setMessageNotifedId(state, action) {
+			state.messageNotifedId = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -110,3 +115,5 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
 			).length,
 	);
+
+export const selectMessageNotifed = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifedId);

@@ -9,7 +9,7 @@ export type NotifyProps = {
 };
 
 function NotificationItem({ notify }: NotifyProps) {
-	const { deleteNotify } = useNotification();
+	const { deleteNotify, setMessageNotifedId } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 
 	const userName = notify?.content?.username;
@@ -21,9 +21,13 @@ function NotificationItem({ notify }: NotifyProps) {
 		notice = notify?.subject?.slice(userNameLenght);
 	}
 
+	const handleClickNotification = () => {
+		setMessageNotifedId(notify.content.message_id);
+	};
+
 	return (
 		<div className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton py-3 px-3 w-full cursor-pointer">
-			<div className="flex items-center gap-2">
+			<div onClick={handleClickNotification} className="flex items-center gap-2">
 				<MemberProfile
 					isHideUserName={true}
 					avatar={user?.user?.avatar_url || ''}

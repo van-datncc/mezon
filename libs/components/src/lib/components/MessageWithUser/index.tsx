@@ -1,7 +1,7 @@
 import { MessageReaction } from '@mezon/components';
 import { selectCurrentChannelId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -10,7 +10,7 @@ import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
-import { useChatMessages, useReference } from '@mezon/core';
+import { useChatMessages, useNotification, useReference } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
 
@@ -35,8 +35,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { referenceMessage, openReplyMessageState, idMessageReplied } = useReference();
+	const { referenceMessage, openReplyMessageState, idMessageRefReply, idMessageToJump } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
+	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -52,8 +53,39 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	}, [message.attachments]);
 
 	const propsChild = { isCombine };
-	const checkReplied = referenceMessage && referenceMessage.id === message.id && openReplyMessageState;
-	const checkMessageTargetToMoved = idMessageReplied === message.id && message.id !== lastMessageId;
+	const checkReplied = idMessageRefReply === message.id && openReplyMessageState;
+
+	const checkMessageTargetToMoved = idMessageToJump === message.id;
+
+	const [classNameHighlightNoti, setClassNameHightlightNoti] = useState<string>('dark:bg-bgPrimary bg-bgLightModeSecond');
+	const [classNameHighligntReplyParentDiv, setClassNameHightlightReplyParentDiv] = useState<string>('bg-[#26262b]');
+	const [classNameHighligntReplyChildDiv, setClassNameHightlightReplyChildDiv] = useState<string>(
+		'dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]',
+	);
+	useEffect(() => {
+		let resetTimeoutId: NodeJS.Timeout | null = null;
+		if (idMessageNotifed === message.id) {
+			setClassNameHightlightNoti('bg-[#383B47]');
+			resetTimeoutId = setTimeout(() => {
+				setClassNameHightlightNoti('bg-[#313338]');
+				setMessageNotifedId('');
+			}, 2000);
+		}
+		return () => {
+			if (resetTimeoutId) {
+				clearTimeout(resetTimeoutId);
+			}
+		};
+	}, [idMessageNotifed, message.id]);
+	useEffect(() => {
+		if (checkReplied || checkMessageTargetToMoved) {
+			setClassNameHightlightReplyParentDiv('dark:bg-[#383B47]');
+			setClassNameHightlightReplyChildDiv(' dark:bg-blue-500 bg-[#EAB308] group-hover:none');
+		} else {
+			setClassNameHightlightReplyParentDiv('bg-[#26262b]');
+			setClassNameHightlightReplyChildDiv(' dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]');
+		}
+	}, [checkReplied, checkMessageTargetToMoved]);
 
 	return (
 		<>
@@ -64,13 +96,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className={`relative ${isCombine ? '' : 'mt-2'}`}>
-				<div
-					className={`dark:bg-bgPrimary bg-bgLightModeSecond relative rounded-sm  overflow-visible ${checkReplied || checkMessageTargetToMoved ? 'bg-[#393C47] group-hover:none' : 'bg-[#26262b]'}`}
-				>
-					<div
-						className={`${checkReplied || checkMessageTargetToMoved ? ' dark:bg-blue-500 bg-[#EAB308] group-hover:none' : 'dark:bg-bgPrimary bg-bgLightModeSecond dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB308]'} absolute w-1 h-full left-0`}
-					></div>
+			<div className={`relative ${isCombine ? '' : 'mt-2'} ${classNameHighlightNoti}`}>
+				<div className={` relative rounded-sm  overflow-visible ${classNameHighlightNoti} ${classNameHighligntReplyParentDiv}`}>
+					<div className={`${classNameHighlightNoti} ${classNameHighligntReplyChildDiv} absolute w-1 h-full left-0`}></div>
 					<div
 						className={`flex h-15 flex-col w-auto px-3 py-[2px] dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A] ${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}`}
 					>

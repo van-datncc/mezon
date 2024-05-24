@@ -111,8 +111,6 @@ export const selectReferenceMessage = createSelector(getReferencesState, (state:
 
 export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);
 
-export const selectIdMessageReplied = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
-
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
@@ -122,3 +120,5 @@ export const selectAttachmentData = createSelector(getReferencesState, (state: R
 export const selectIdMessageRefReply = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReply);
 
 export const selectIdMessageRefReaction = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReaction);
+
+export const selectIdMessageToJump = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);

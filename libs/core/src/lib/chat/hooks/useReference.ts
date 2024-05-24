@@ -4,7 +4,7 @@ import {
 	selectDataReferences,
 	selectIdMessageRefReaction,
 	selectIdMessageRefReply,
-	selectIdMessageReplied,
+	selectIdMessageToJump,
 	selectOpenEditMessageState,
 	selectOpenOptionMessageState,
 	selectOpenReplyMessageState,
@@ -22,7 +22,6 @@ export function useReference() {
 	const dispatch = useAppDispatch();
 	const referenceMessage = useSelector(selectReferenceMessage);
 	const dataReferences = useSelector(selectDataReferences);
-	const idMessageReplied = useSelector(selectIdMessageReplied);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
@@ -30,6 +29,7 @@ export function useReference() {
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
 
 	const setReferenceMessage = useCallback(
 		(message: IMessageWithUser | null) => {
@@ -104,7 +104,6 @@ export function useReference() {
 			setOpenThreadMessageState,
 			referenceMessage,
 			dataReferences,
-			idMessageReplied,
 			openEditMessageState,
 			openReplyMessageState,
 			openThreadMessageState,
@@ -115,6 +114,7 @@ export function useReference() {
 			setIdReferenceMessageReply,
 			idMessageRefReaction,
 			setIdReferenceMessageReaction,
+			idMessageToJump,
 		}),
 		[
 			setReferenceMessage,
@@ -125,7 +125,6 @@ export function useReference() {
 			setOpenThreadMessageState,
 			referenceMessage,
 			dataReferences,
-			idMessageReplied,
 			openEditMessageState,
 			openReplyMessageState,
 			openThreadMessageState,
@@ -136,6 +135,7 @@ export function useReference() {
 			setIdReferenceMessageReply,
 			idMessageRefReaction,
 			setIdReferenceMessageReaction,
+			idMessageToJump,
 		],
 	);
 }
