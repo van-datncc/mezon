@@ -28,10 +28,8 @@ function MyApp() {
 
 	const dispatch = useDispatch();
 
-	const { setAppearanceTheme, appearanceTheme } = useApp();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
-		setAppearanceTheme(appearanceTheme === 'system' ? 'dark' : appearanceTheme);
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
 				setCloseMenu(true);
@@ -98,6 +96,7 @@ function MyApp() {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
+	const { appearanceTheme } = useApp();
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative">
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
