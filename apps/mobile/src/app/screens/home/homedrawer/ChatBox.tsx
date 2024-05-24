@@ -176,7 +176,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		inputRef?.current?.clear?.();
 		setText('');
     [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-		setText('');
 	  }, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
 
 	const handleTyping = useCallback(() => {
@@ -245,7 +244,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			resetInput();
 			keyboardListener.remove();
 		};
-	}, [pushMessageActionIntoStack]);
+	}, []);
 
   useEffect(()=>{
     const listChannelsMention: ChannelsMention[] = listChannels.map((item) => {
