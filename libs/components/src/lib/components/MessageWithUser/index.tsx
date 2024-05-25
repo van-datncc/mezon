@@ -70,15 +70,15 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 
 	const [classNameHighligntParentDiv, setClassNameHightlightParentDiv] = useState<string>('');
 	const [classNameHighligntChildDiv, setClassNameHightlightChildDiv] = useState<string>('');
+	const [classNameNotification, setClassNameNotification] = useState<string>('');
 
 	useEffect(() => {
 		let resetTimeoutId: NodeJS.Timeout | null = null;
+
 		if (idMessageNotifed === message.id) {
-			setClassNameHightlightParentDiv('dark:bg-[#383B47]');
-			setClassNameHightlightChildDiv('dark:bg-[#383B47]');
+			setClassNameNotification('bg-[#383B47]');
 			resetTimeoutId = setTimeout(() => {
-				setClassNameHightlightParentDiv('');
-				setClassNameHightlightChildDiv('');
+				setClassNameNotification('');
 				setMessageNotifedId('');
 			}, 2000);
 		}
@@ -87,7 +87,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 				clearTimeout(resetTimeoutId);
 			}
 		};
-	}, [idMessageNotifed]);
+	}, [idMessageNotifed, message.id]);
 
 	useEffect(() => {
 		if (checkMessageReply || checkMessageToMove) {
@@ -108,7 +108,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className={`relative ${isCombine ? '' : 'mt-2'}`}>
+			<div className={`relative ${isCombine ? '' : 'mt-2'} ${classNameNotification}`}>
 				<div className={` relative rounded-sm  overflow-visible `}>
 					<div
 						className={` absolute w-0.5 h-full left-0 

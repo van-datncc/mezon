@@ -62,6 +62,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
+			console.log(props.mode);
+			console.log(props.messageEmojiId);
+			console.log(emojiPicked);
+			console.log(messageEmoji.sender_id);
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
