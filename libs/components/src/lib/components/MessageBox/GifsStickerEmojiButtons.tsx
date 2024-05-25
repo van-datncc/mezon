@@ -9,7 +9,7 @@ export type GifStickerEmojiButtonsProps = {
 
 function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
-	const { setReferenceMessage } = useReference();
+	// const { setReferenceMessage } = useReference();
 	const { setReactionRightState, setReactionBottomState } = useChatReaction();
 	const { setShowCategories } = useGifs();
 	const { setValueInputSearch } = useGifsStickersEmoji();
@@ -17,7 +17,7 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.GIFS);
-			setReferenceMessage(null);
+			// setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
 			setReactionRightState(false);
@@ -30,7 +30,7 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.STICKERS);
-			setReferenceMessage(null);
+			// setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
 			setReactionRightState(false);
@@ -43,7 +43,7 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.EMOJI);
-			setReferenceMessage(null);
+			// setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
 			setReactionRightState(false);

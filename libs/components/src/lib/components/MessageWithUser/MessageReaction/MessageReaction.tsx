@@ -17,22 +17,12 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		reactionMessageDispatch,
 		reactionBottomState,
 		dataReactionCombine,
-		setReactionBottomState,
 		setUserReactionPanelState,
 		userReactionPanelState,
 		reactionBottomStateResponsive,
 	} = useChatReaction();
 
-	const {
-		referenceMessage,
-		setReferenceMessage,
-		setOpenReplyMessageState,
-		setIdReferenceMessageReply,
-		idMessageRefReply,
-		openReplyMessageState,
-		idMessageRefReaction,
-		setIdReferenceMessageReaction,
-	} = useReference();
+	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
 

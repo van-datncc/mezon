@@ -9,6 +9,7 @@ export type NotifyProps = {
 };
 
 function NotificationItem({ notify }: NotifyProps) {
+	console.log(notify)
 	const { deleteNotify, setMessageNotifedId } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 

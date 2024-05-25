@@ -94,7 +94,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const {
 		dataReferences,
-		setReferenceMessage,
+		// setReferenceMessage,
 		setDataReferences,
 		openThreadMessageState,
 		setOpenThreadMessageState,
@@ -256,7 +256,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setContent('');
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
-				setReferenceMessage(null);
+				// setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
 		},
@@ -419,7 +419,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
-			dispatch(referencesActions.setReferenceMessage(lastMessageByUserId));
+			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 		}
 	};
 
