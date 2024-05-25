@@ -12,14 +12,14 @@ type ChannelMessageOptProps = {
 const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: Ref<HTMLDivElement>) => {
 	const dispatch = useAppDispatch();
 	const { reactionActions, userId } = useChatReaction();
-	const { openOptionMessageState, setOpenThreadMessageState } = useReference();
+	const { openOptionMessageState, setOpenThreadMessageState, idMessageRefReply, openReplyMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
-		dispatch(referencesActions.setOpenReplyMessageState(true));
+		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		event.stopPropagation();
 	};
 
@@ -42,9 +42,8 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 	const handleOnEnterSmileIcon = () => {
 		dispatch(referencesActions.setIdReferenceMessageReaction(message.id));
 	};
-
 	const handleOnEnterReplyIcon = () => {
-		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+		dispatch(referencesActions.setOpenReplyMessageState(true));
 	};
 
 	const handleClickReact = useCallback(

@@ -55,7 +55,7 @@ type fetchDmGroupArgs = {
 };
 
 export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2 }: fetchDmGroupArgs, thunkAPI) => {
-	thunkAPI.dispatch(friendsActions.fetchListFriends());
+	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
 	

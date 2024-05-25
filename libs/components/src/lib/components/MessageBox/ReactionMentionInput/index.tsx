@@ -45,8 +45,8 @@ import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
-import darkMentionsInputStyle from './RmentionInputStyle';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
+import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 
@@ -92,8 +92,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { dataReferences, setReferenceMessage, setDataReferences, openThreadMessageState, setOpenThreadMessageState, idMessageRefReply } =
-		useReference();
+	const {
+		dataReferences,
+		setReferenceMessage,
+		setDataReferences,
+		openThreadMessageState,
+		setOpenThreadMessageState,
+		idMessageRefReply,
+		setIdReferenceMessageReply,
+		setOpenReplyMessageState,
+	} = useReference();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 
@@ -198,7 +206,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences?.length > 0 && openReplyMessageState) {
+			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
 					{ t: content },
 					mentionData,
@@ -211,13 +219,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setValueTextInput('', props.isThread);
 
 				setAttachmentData([]);
-				setReferenceMessage(null);
+				setIdReferenceMessageReply('');
+				setOpenReplyMessageState(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
-				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
 				if (openThreadMessageState) {
@@ -451,7 +459,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
-				style={appearanceTheme === "light" ? lightMentionsInputStyle : darkMentionsInputStyle}
+				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}

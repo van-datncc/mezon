@@ -19,8 +19,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 		}
 
 		const promises = Array.from(files).map((file) => {
-			const fullfilename = `${currentClanId}/${currentChannelId}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFile(client, session, fullfilename, file);
+			return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
 
 		Promise.all(promises).then((attachments) => {

@@ -41,8 +41,15 @@ export const fetchListFriendsCached = memoize(
 	},
 );
 
-export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', async (_, thunkAPI) => {
+type fetchListFriendsArgs = {
+	noCache?: boolean;
+};
+
+export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', async ({ noCache }: fetchListFriendsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if(noCache) {
+		fetchListFriendsCached.clear(mezon, -1, 100, '');
+	}
 	const response = await fetchListFriendsCached(mezon, -1, 100, '');
 	if (!response.friends) {
 		return thunkAPI.rejectWithValue([]);
@@ -70,7 +77,7 @@ export const sendRequestAddFriend = createAsyncThunk('friends/requestFriends', a
 		})
 		.then((data) => {
 			if (data) {
-				thunkAPI.dispatch(friendsActions.fetchListFriends());
+				thunkAPI.dispatch(friendsActions.fetchListFriends({noCache: true}));
 			}
 		})
 		.catch((e) => {
@@ -86,7 +93,7 @@ export const sendRequestDeleteFriend = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(friendsActions.fetchListFriends());
+		thunkAPI.dispatch(friendsActions.fetchListFriends({noCache: true}));
 		return response;
 	},
 );
@@ -97,7 +104,7 @@ export const sendRequestBlockFriend = createAsyncThunk('friends/requestBlockFrie
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	thunkAPI.dispatch(friendsActions.fetchListFriends());
+	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	return response;
 });
 
