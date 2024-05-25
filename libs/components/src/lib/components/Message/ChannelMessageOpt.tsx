@@ -30,7 +30,6 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
-
 		event.stopPropagation();
 	};
 
