@@ -12,6 +12,7 @@ export interface AppState {
 	closeMenu: boolean;
 	statusMenu: boolean;
 	hiddenBottomTabMobile: boolean;
+	hasInternetMobile: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -22,6 +23,7 @@ export const initialAppState: AppState = {
 	closeMenu: false,
 	statusMenu: true,
 	hiddenBottomTabMobile: true,
+	hasInternetMobile: false,
 };
 
 export const appSlice = createSlice({
@@ -48,6 +50,9 @@ export const appSlice = createSlice({
 		},
 		setHiddenBottomTabMobile: (state, action) => {
 			state.hiddenBottomTabMobile = action.payload;
+		},
+		setHasInternetMobile: (state, action) => {
+			state.hasInternetMobile = action.payload;
 		},
 	},
 });
@@ -77,3 +82,4 @@ export const selectStatusMenu = createSelector(getAppState, (state: AppState) =>
 
 export const selectHiddenBottomTabMobile = createSelector(getAppState, (state: AppState) => state.hiddenBottomTabMobile);
 
+export const setHasInternetMobile = createSelector(getAppState, (state: AppState) => state.hasInternetMobile);
