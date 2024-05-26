@@ -88,10 +88,10 @@ const HomeScreen = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
 
 	useEffect(() => {
-		if (clans?.length) {
+		if (clans?.length && !currentClan) {
 			setCurrentClanLoader();
 		}
-	}, [clans]);
+	}, [clans, currentClan]);
 
 	useEffect(() => {
 		mainLoader();
@@ -100,7 +100,7 @@ const HomeScreen = React.memo((props: any) => {
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
 		store.dispatch(notificationActions.fetchListNotification());
-		store.dispatch(friendsActions.fetchListFriends());
+		store.dispatch(friendsActions.fetchListFriends({}));
 		store.dispatch(directActions.fetchDirectMessage({}));
 		store.dispatch(clansActions.fetchClans());
 		store.dispatch(gifsActions.fetchGifCategories());

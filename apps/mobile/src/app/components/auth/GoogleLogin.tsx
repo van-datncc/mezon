@@ -6,14 +6,18 @@ import Images from 'apps/mobile/src/assets/Images';
 import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+
+const WEB_CLIENT_ID = '285548761692-l9bdt00br2jg1fgh4c23dlb9rvkvqqs0.apps.googleusercontent.com';
+const IOS_CLIENT_ID = '285548761692-3k9ubkdhl8bbvbal78j9v2905kjhg3tj.apps.googleusercontent.com';
+
 const GoogleLogin = () => {
 	const dispatch = useAppDispatch();
 	const { loginByGoogle } = useAuth();
 
 	useEffect(() => {
 		const config = {
-			webClientId: process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string,
-			iosClientId: process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string,
+			webClientId: (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
+			iosClientId: (process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string) || IOS_CLIENT_ID,
 			offlineAccess: true,
 			forceCodeForRefreshToken: true,
 		};
@@ -29,11 +33,13 @@ const GoogleLogin = () => {
 			const { idToken } = await GoogleSignin.signIn();
 			await loginByGoogle(idToken);
 		} catch (error) {
-			Toast.show({
-				type: 'error',
-				text1: 'Login Failed',
-				text2: 'Unable to login with Google',
-			});
+			if (error.message !== 'Sign in action cancelled') {
+				Toast.show({
+					type: 'error',
+					text1: 'Login Failed',
+					text2: error.message,
+				});
+			}
 		}
 	}
 	return (

@@ -10,7 +10,6 @@ import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
-import { FastImageRes } from './Reusables';
 import { styles } from './styles';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
