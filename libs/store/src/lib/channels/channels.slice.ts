@@ -12,6 +12,7 @@ import { messagesActions } from '../messages/messages.slice';
 import { threadsActions } from '../threads/threads.slice';
 import memoize from 'memoizee';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
+import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
@@ -73,6 +74,7 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting(channelId));
+			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage(channelId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
