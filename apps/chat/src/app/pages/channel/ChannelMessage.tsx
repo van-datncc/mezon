@@ -288,7 +288,6 @@ type PopupOptionProps = {
 function PopupMessage({
 	reactionRightState,
 	mess,
-	// idMessageRefOpt,
 	reactionBottomState,
 	openEditMessageState,
 	openOptionMessageState,
