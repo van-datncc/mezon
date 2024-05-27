@@ -29,7 +29,7 @@ export function useMessageValue(channelId?: string) {
 			}
 			
 		},
-		[currentChannelId, dispatch],
+		[currentChannelId, currentDmGroupId, mode, dispatch],
 	);
 
 	const setMode = useCallback(
