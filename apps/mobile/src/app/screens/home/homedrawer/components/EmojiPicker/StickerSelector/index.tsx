@@ -4,6 +4,7 @@ import FastImage from 'react-native-fast-image';
 import styles from './styles';
 import { useEffect } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useState } from 'react';
 
 type StickerSelectorProps = {
 	onSelected?: (url: string) => void;
@@ -90,12 +91,14 @@ const images = [
 	{ url: 'https://cdn.mezon.vn/sticker/EmojiDom/emojibest_com_emojidom_anim_13.gif', type: 'cat' },
 ];
 
-const stickers = [...new Set(images.map(item => item.type))].map((item => ({
+const _stickers = [...new Set(images.map(item => item.type))].map((item => ({
 	title: item,
 	data: images.filter(_item => _item.type == item).map(_item => _item.url)
 })))
 
 export default function StickerSelector({ onSelected, searchText }: StickerSelectorProps) {
+	const [stickers, setStickers] = useState(_stickers);
+
 	useEffect(() => {
 		// TODO:
 	}, [searchText]);
@@ -112,29 +115,20 @@ export default function StickerSelector({ onSelected, searchText }: StickerSelec
 			>
 				{cates.map((item, index) => (
 					<TouchableOpacity
-						// onPress={}
+						onPress={() => setStickers(_stickers.filter((sticker) => sticker.title === item.type))}
 						style={styles.btnEmo}
 						key={index.toString()}>
 						<FastImage
-							source={{ uri: item.url }}
+							resizeMode={FastImage.resizeMode.cover}
+							source={{
+								uri: item.url,
+								cache: FastImage.cacheControl.web,
+								priority: FastImage.priority.high
+							}}
 							style={{ height: "100%", width: "100%" }} />
 					</TouchableOpacity>
 				))}
 			</ScrollView>
-
-			{/* <SectionList
-				sections={stickers}
-				keyExtractor={(_, index) => index.toString()}
-				renderItem={({ item }) => (
-					<View >
-						<Text>{item}</Text>
-					</View>
-				)}
-				renderSectionHeader={({ section: { title } }) => (
-					<Text style={styles.sessionTitle}>{title}</Text>
-				)}
-			/> */}
-
 
 			{stickers.map((emojisCate, indexCate) =>
 				<View

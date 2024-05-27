@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
 		width: 110,
 		borderRadius: 10,
 		overflow: 'hidden',
-		backgroundColor: "red"
+		backgroundColor: Colors.black
 	},
 
 	btnEmo: {
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
 		height: 30,
 		borderRadius: 50,
 		overflow: 'hidden',
-		backgroundColor: "red"
+		backgroundColor: Colors.black
 	},
 
 	btnWrap: {

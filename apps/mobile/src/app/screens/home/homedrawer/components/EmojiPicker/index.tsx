@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import GifSelector from './GifSelector';
 import StickerSelector from './StickerSelector';
 import styles from './styles';
-import { TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
+import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 
 export type IProps = {
 	onDone: () => void;
@@ -22,12 +22,15 @@ export type IProps = {
 interface TextTabProps {
 	selected?: boolean;
 	title: string;
+	onPress: () => void;
 }
-function TextTab({ selected, title }: TextTabProps) {
+function TextTab({ selected, title, onPress }: TextTabProps) {
 	return (
-		<View style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
+		<TouchableOpacity
+			onPress={onPress}
+			style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
 			<Text style={{ color: selected ? Colors.white : Colors.gray72, fontSize: Fonts.size.small, textAlign: 'center' }}>{title}</Text>
-		</View>
+		</TouchableOpacity>
 	);
 }
 
@@ -35,7 +38,7 @@ type ExpressionType = 'emoji' | 'gif' | 'sticker';
 
 function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [mode, setMode] = useState<ExpressionType>('sticker');
+	const [mode, setMode] = useState<ExpressionType>('gif');
 	const [channelMode, setChannelMode] = useState(0);
 	const [searchText, setSearchText] = useState<string>('');
 
@@ -85,9 +88,9 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
 			<View style={styles.container}>
 				<View style={styles.tabContainer}>
-					<TextTab title="GIFs" />
-					<TextTab selected title="Emoji" />
-					<TextTab title="Stickers" />
+					<TextTab title="GIFs" selected={mode === "gif"} onPress={() => setMode("gif")} />
+					<TextTab title="Emoji" selected={mode === "emoji"} onPress={() => setMode("emoji")} />
+					<TextTab title="Stickers" selected={mode === "sticker"} onPress={() => setMode("sticker")} />
 				</View>
 
 				<View style={styles.textInputWrapper}>
