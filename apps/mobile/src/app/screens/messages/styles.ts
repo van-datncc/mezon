@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
         color: Colors.white
     },
     dmMessageListContainer: {
-        marginTop: 20
+        marginTop: size.s_18
     },
     searchMessage: {
 		backgroundColor: Colors.primary,

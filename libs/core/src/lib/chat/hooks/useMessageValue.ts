@@ -1,29 +1,55 @@
-import { channelsActions, selectCurrentChannelId, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectAllTextInput, selectCurrentChannelId, selectDmGroupCurrentId, selectMode, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useMessageValue(channelId?: string) {
 	const dispatch = useAppDispatch();
+	const mode = useSelector(selectMode);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const valueTextInput = useSelector(selectValueTextInputByChannelId(channelId ?? ''));
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
+	const valueTextInput = useSelector(selectValueTextInputByChannelId(mode === 'clan' ? (channelId || '') : (currentDmGroupId || '')));
+	const allTextInput = useSelector(selectAllTextInput);
 
 	const setValueTextInput = useCallback(
 		(value: string, isThread?: boolean) => {
+			if(mode === 'clan'){
+				dispatch(
+					channelsActions.setValueTextInput({
+						channelId: isThread ? currentChannelId + String(isThread) : (currentChannelId as string),
+						value,
+					}),
+				);
+			} else {
+				dispatch(
+					channelsActions.setValueTextInput({
+						channelId: currentDmGroupId || '',
+						value,
+					}),
+				);
+			}
+			
+		},
+		[currentChannelId, currentDmGroupId, mode, dispatch],
+	);
+
+	const setMode = useCallback(
+		(value: string) => {
 			dispatch(
-				channelsActions.setValueTextInput({
-					channelId: isThread ? currentChannelId + String(isThread) : (currentChannelId as string),
-					value,
-				}),
+				channelsActions.setMode(value)
 			);
 		},
-		[currentChannelId, dispatch],
+		[dispatch],
 	);
 
 	return useMemo(
 		() => ({
+			mode,
+			currentDmGroupId,
+			allTextInput,
 			valueTextInput,
 			setValueTextInput,
+			setMode,
 		}),
-		[setValueTextInput, valueTextInput],
+		[setValueTextInput, setMode, valueTextInput, allTextInput, currentDmGroupId, mode],
 	);
 }
