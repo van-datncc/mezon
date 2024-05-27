@@ -7,6 +7,8 @@ import { useAuth, useFriends } from '@mezon/core';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@mezon/mobile-ui';
 import { requestAddFriendParam } from '@mezon/store-mobile';
+import Toast from 'react-native-toast-message';
+import { UserPlusIcon } from '@mezon/mobile-components';
 
 interface IAddFriendModal {
     type: EAddFriendWays;
@@ -18,7 +20,6 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
     const { userProfile } = useAuth();
     const { addFriend } = useFriends();
     const [visibleModal, setVisibleModal] = useState<boolean>(false);
-    const [searchUsername, setSearchUsername] = useState<string>('');
     const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({
 		usernames: [],
 		ids: [],
@@ -30,13 +31,13 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
         let timeoutId: NodeJS.Timeout;
         setVisibleModal(type !== null);
 
-        // if (type === EAddFriendWays.UserName) {
-        //     timeoutId = setTimeout(() => {
-        //         if (inputRef?.current) {
-        //             inputRef.current.focus();
-        //         }
-        //     }, 300)
-        // }
+        if (type === EAddFriendWays.UserName) {
+            timeoutId = setTimeout(() => {
+                if (inputRef?.current) {
+                    inputRef.current.focus();
+                }
+            }, 300)
+        }
 
         return () => {
             if (timeoutId) {
@@ -76,7 +77,18 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	};
 
     const sentFriendRequest = async () => {
-        const res = await addFriend(requestAddFriend);
+        if (!(requestAddFriend.usernames[0] || '').trim().length) return null;
+        if (inputRef?.current) {
+            inputRef.current.blur();
+        }
+        await addFriend(requestAddFriend);
+        Toast.show({
+            type: 'success',
+            props: {
+                text2: t('addFriend.addFriendToast'),
+                leadingIcon: <UserPlusIcon color={Colors.green} width={30} height={17} />
+            }
+        });
         resetField();
     }
 
@@ -87,22 +99,29 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
                 style={styles.addByUsernameContainer}
             >
                 <View style={styles.fill}>
-                    <Text>{t('addFriend.addByUserName')}</Text>
-                    <Text>{t('addFriend.whoYouWantToAddFriend')}</Text>
-                    <Text>{searchUsername}</Text>
+                    <Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
+                    <Text style={styles.defaultText}>{t('addFriend.whoYouWantToAddFriend')}</Text>
                     <View style={styles.searchUsernameWrapper}>
                         <TextInput
                             ref={inputRef}
+                            value={requestAddFriend.usernames[0]}
                             placeholder={t('addFriend.searchUsernamePlaceholder')}
                             placeholderTextColor={Colors.tertiary}
                             style={styles.searchInput}
                             onChangeText={(text) => handleTextChange(EAddFriendBy.Username, text)}
                         />
                     </View>
-                    <Text>{t('addFriend.byTheWay')} {userProfile?.user?.username}</Text>
+                    <View style={styles.byTheWayText}>
+                        <Text style={styles.defaultText}>{t('addFriend.byTheWay')}</Text>
+                        <Text style={styles.whiteText}>{userProfile?.user?.username}</Text>
+                    </View>
                 </View>
-                <View style={{paddingBottom: 50}}>
-                    <MezonButton onPress={() => sentFriendRequest()} viewContainerStyle={{padding: 40}}>{t('addFriend.sendRequestButton')}</MezonButton>
+                <View style={styles.buttonWrapper}>
+                    <MezonButton
+                        disabled={!requestAddFriend.usernames[0]?.length}
+                        onPress={() => sentFriendRequest()}
+                        viewContainerStyle={styles.sendButton}
+                    >{t('addFriend.sendRequestButton')}</MezonButton>
                 </View>
             </KeyboardAvoidingView>
         )
@@ -127,7 +146,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
             default:
                 return <View />
         }
-    }, [type])
+    }, [type, requestAddFriend])
 
     return (
         <MezonModal

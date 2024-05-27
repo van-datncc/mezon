@@ -28,3 +28,5 @@ export * from './lib/store-mobile';
 export * from './lib/threads/threads.slice';
 export * from './lib/users/users.slice';
 export * from './lib/voice/voice.slice';
+export * from './lib/giftStickerEmojiPanel/gifs.slice';
+export * from './lib/giftStickerEmojiPanel/stickers.slice';

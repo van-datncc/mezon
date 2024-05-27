@@ -12,14 +12,13 @@ type ChannelMessageOptProps = {
 const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: Ref<HTMLDivElement>) => {
 	const dispatch = useAppDispatch();
 	const { reactionActions, userId } = useChatReaction();
-	const { openOptionMessageState, setOpenThreadMessageState } = useReference();
+	const { openOptionMessageState, setOpenThreadMessageState, idMessageRefReply, openReplyMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
-		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		event.stopPropagation();
 	};
@@ -40,8 +39,11 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setReferenceMessage(message));
 	};
 
-	const handleOnEnter = () => {
+	const handleOnEnterSmileIcon = () => {
 		dispatch(referencesActions.setIdReferenceMessageReaction(message.id));
+	};
+	const handleOnEnterReplyIcon = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(true));
 	};
 
 	const handleClickReact = useCallback(
@@ -68,7 +70,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	return (
 		<div ref={ref} className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
-			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer" onMouseEnter={handleOnEnter}>
+			<div onClick={handleClickReact} className="h-full p-1 cursor-pointer" onMouseEnter={handleOnEnterSmileIcon}>
 				<Icons.Smile defaultSize="w-5 h-5" />
 			</div>
 
@@ -77,7 +79,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 					<Icons.PenEdit />
 				</button>
 			) : (
-				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180">
+				<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180" onMouseEnter={handleOnEnterReplyIcon}>
 					<Icons.Reply />
 				</button>
 			)}

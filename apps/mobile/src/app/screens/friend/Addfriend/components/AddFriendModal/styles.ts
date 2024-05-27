@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     searchInput: {
         borderRadius: size.s_10,
 		color: Colors.white,
-        paddingVertical: size.s_6   
+        paddingVertical: size.s_12  
     },
     searchUsernameWrapper: {
         backgroundColor: Colors.primary,
@@ -27,5 +27,27 @@ export const styles = StyleSheet.create({
     },
     fill: {
         flex: 1
+    },
+    headerTitle: {
+        color: Colors.white,
+        fontSize: size.h5,
+        textAlign: 'center',
+    },
+    defaultText: {
+        color: Colors.textGray,
+        paddingVertical: size.s_14
+    },
+    byTheWayText: {
+        flexDirection: 'row',
+        gap: size.s_4,
+        alignItems: 'center'
+    },
+    buttonWrapper: {
+        marginBottom: size.s_40
+    },
+    sendButton: {
+        paddingVertical: size.s_14,
+        backgroundColor: Colors.bgViolet,
+        borderRadius: 50
     }
 })

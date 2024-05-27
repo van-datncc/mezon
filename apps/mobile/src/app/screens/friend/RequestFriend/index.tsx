@@ -50,27 +50,14 @@ export const RequestFriendScreen = () => {
             </View>
 
             <View>
-                {selectedTab === EFriendRequest.Received ? (
-                    <View style={styles.groupWrapper}>
-                        <FlatList
-                            data={receivedFriendRequestList}
-                            ItemSeparatorComponent={SeparatorWithLine}
-                            keyExtractor={(friend) => friend.id.toString()}
-                            renderItem={({ item }) => <UserItem friend={item} />}
-                        />
-                    </View>
-                ): (
-                    <View>
-                        <View style={styles.groupWrapper}>
-                            <FlatList
-                                data={sentFriendRequestList}
-                                ItemSeparatorComponent={SeparatorWithLine}
-                                keyExtractor={(friend) => friend.id.toString()}
-                                renderItem={({ item }) => <UserItem friend={item} />}
-                            />
-                        </View>
-                    </View>
-                )}
+                <View style={styles.groupWrapper}>
+                    <FlatList
+                        data={selectedTab === EFriendRequest.Received ? receivedFriendRequestList : sentFriendRequestList}
+                        ItemSeparatorComponent={SeparatorWithLine}
+                        keyExtractor={(friend) => friend.id.toString()}
+                        renderItem={({ item }) => <UserItem friend={item} />}
+                    />
+                </View>
             </View>
         </View>
     )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, Pressable } from 'react-native';
 import { styles } from './styles';
 import Feather from 'react-native-vector-icons/Feather';
@@ -11,9 +11,6 @@ import { SeparatorWithLine, SeparatorWithSpace, UserItem } from './UserItem';
 import { ChevronIcon, PaperPlaneIcon } from '@mezon/mobile-components';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { IFriendGroupByCharacter } from './types';
-import { useMemo } from 'react';
-import { useEffect } from 'react';
-import { friendsActions, getStoreAsync } from '@mezon/store-mobile';
 
 export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => {
     const [searchText, setSearchText] = useState<string>('');
@@ -21,7 +18,15 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
     const { friends: allUser } = useFriends();
     const friendList = allUser.filter((user) => user.state === 0);
 
-    const groupFriendByAlphabet = (): IFriendGroupByCharacter[] => {
+    const navigateToRequestFriendScreen = () => {
+        navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND })
+    }
+
+    const filteredFriendList = useMemo(() => {
+        return friendList.filter(friend => normalizeString(friend.user.username).includes(normalizeString(searchText)));
+    }, [friendList]);
+
+    const allFriendGroupByAlphabet = useMemo(() => {
         const groupedByCharacter = friendList.reduce((acc, friend) => {
             const firstUserNameCharacter = friend.user.username.charAt(0).toUpperCase();
             if (!acc[firstUserNameCharacter]) {
@@ -35,23 +40,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
             character,
             friendList: groupedByCharacter[character]
         }));
-    }
-
-    useEffect(() => {
-        loader();
-    }, [])
-
-    const loader = async () => {
-        const store = await getStoreAsync();
-        store.dispatch(friendsActions.fetchListFriends());
-    }
-
-    const filteredFriendList = friendList.filter(friend => normalizeString(friend.user.username).includes(normalizeString(searchText)));
-    const allFriendGroupByAlphabet = groupFriendByAlphabet();
-
-    const navigateToRequestFriendScreen = () => {
-        navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND })
-    }
+    }, [friendList]);
 
     const friendRequestCount = useMemo(() => {
         return {

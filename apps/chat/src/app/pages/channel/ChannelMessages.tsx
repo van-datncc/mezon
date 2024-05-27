@@ -1,5 +1,5 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useReference } from '@mezon/core';
+import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { ChannelMessage } from './ChannelMessage';
@@ -14,29 +14,25 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
 	const chatRef = useRef<HTMLDivElement>(null);
-
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
 	const { jumpToMessage } = useJumpToMessage();
-	const { idMessageReplied } = useReference();
+	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump } = useReference();
 	const { appearanceTheme } = useApp();
+	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 
 	// share logic to load more message
 	const isFetching = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
 
 	useEffect(() => {
-		if (idMessageReplied) {
-			setMessageIdToJump(idMessageReplied);
-			setTimeToJump(0);
-			setPositionToJump('center');
-		} else {
-			setMessageIdToJump(getJumpToMessageId());
-			setTimeToJump(1000);
-			setPositionToJump('start');
-		}
-	}, [getJumpToMessageId, idMessageReplied]);
+		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
+		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
+		if (idMessageToJump !== '') setMessageIdToJump(idMessageToJump);
+		setTimeToJump(0);
+		setPositionToJump('center');
+	}, [getJumpToMessageId, idMessageNotifed, idMessageRefReply, idMessageToJump]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout | null = null;

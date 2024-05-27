@@ -116,5 +116,15 @@ export const styles = StyleSheet.create({
     },
     whiteText: {
         color: Colors.white
+    },
+    textAvatar: {
+        backgroundColor: Colors.bgGrayDark,
+        width: size.s_40,
+        height: size.s_40,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        borderRadius: 50,
+        fontSize: size.h5,
+        color: Colors.white
     }
 })

@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 import { View, ViewStyle, Text, Modal, Pressable, ModalBaseProps } from 'react-native';
 import { styles } from './style';
 import Feather from 'react-native-vector-icons/Feather';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../../configs/toastConfig';
 
 interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
     visible: boolean;
@@ -73,6 +75,7 @@ export const MezonModal = (props: IMezonModalProps) => {
                     {children}
                 </View>
             </View>
+            <Toast config={toastConfig} />
     </Modal>
   );
 };

@@ -11,7 +11,8 @@
         "searchUsernamePlaceholder": "Enter a username",
         "whoYouWantToAddFriend": "Who would you like to add as a friends",
         "byTheWay": "By the way, your username is",
-        "sendRequestButton": "Send Friend Request"
+        "sendRequestButton": "Send Friend Request",
+        "addFriendToast": "Sent a friend request"
     },
     "friends": "Friends",
     "noFriendsResultsFound": "No friends results found"

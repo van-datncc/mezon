@@ -2,7 +2,6 @@ import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mez
 import { useAuth, useClans, useDragAndDrop, useMenu, useThreads } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, selectShowScreen, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { useMezonVoice } from '@mezon/voice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -33,30 +32,20 @@ export default function ChannelLayout() {
 
 	useChannelSeen(currentChannel?.id || '');
 	const dispatch = useAppDispatch();
-	const voice = useMezonVoice();
 	const showScreen = useSelector(selectShowScreen);
 	const statusCall = useSelector(selectStatusCall);
 
 	const startScreenShare = useCallback(() => {
-		voice.createScreenShare();
-		dispatch(voiceActions.setShowScreen(true));
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const stopScreenShare = useCallback(() => {
-		voice.stopScreenShare();
-		dispatch(voiceActions.setShowScreen(false));
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
-		stopScreenShare();
-		voice.voiceDisconnect();
-		voice.setVoiceOptions((prev) => ({
-			...prev,
-			voiceStart: false,
-		}));
-		dispatch(voiceActions.setStatusCall(false));
-		dispatch(channelsActions.setCurrentVoiceChannelId(''));
-	}, [voice]);
+		console.log("not implemented");
+	}, []);
 
 	const renderChannelMedia = () => {
 		if (currentChannel && currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT) {
@@ -104,16 +93,16 @@ export default function ChannelLayout() {
 		<>
 			{draggingState && <FileUploadByDnD />}
 			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%] overflow-hidden z-0"
+				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-0"
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 			>
-				<div className="flex h-heightWithoutTopBar flex-row ">
+				<div className="flex h-heightWithoutTopBar flex-row">
 					<div
 						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
 					>
 						<div
-							className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
+							className="overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
 							ref={messagesContainerRef}
 						>
 							{renderChannelMedia()}

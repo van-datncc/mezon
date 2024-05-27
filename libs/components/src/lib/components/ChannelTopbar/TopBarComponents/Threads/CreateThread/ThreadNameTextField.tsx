@@ -36,7 +36,7 @@ const ThreadNameTextField = ({ label, error, placeholder, value, className, onCh
 
 	return (
 		<div className="flex flex-col mt-4 mb-4">
-			<span className="text-xs font-semibold uppercase mb-2">{label}</span>
+			<span className="text-xs font-semibold uppercase mb-2 dark:text-textDarkTheme text-textLightTheme">{label}</span>
 			<input value={value} onChange={handleInputChange} type="text" placeholder={placeholder} className={className} onKeyDown={handleKeyDown} />
 			{nameThreadError && <span className="text-xs text-[#B91C1C] mt-1 ml-1">{nameThreadError}</span>}
 		</div>

@@ -12,7 +12,7 @@ function ReplyMessageBox() {
 
 	const handleRemoveReply = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
-		dispatch(referencesActions.setReferenceMessage(null));
+		dispatch(referencesActions.setIdReferenceMessageReply(''));
 		dispatch(referencesActions.setDataReferences(null));
 	};
 

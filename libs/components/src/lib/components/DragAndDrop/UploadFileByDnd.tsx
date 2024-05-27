@@ -1,5 +1,5 @@
-import { useClans, useDragAndDrop, useReference } from '@mezon/core';
-import { selectCurrentChannelId } from '@mezon/store';
+import { useDragAndDrop, useReference } from '@mezon/core';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { DragEvent } from 'react';
 import { useSelector } from 'react-redux';
@@ -9,8 +9,9 @@ function FileUploadByDnD() {
 	const { setDraggingState } = useDragAndDrop();
 	const { setAttachmentData } = useReference();
 	const { sessionRef, clientRef } = useMezon();
-	const { currentClanId } = useClans();
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -41,8 +42,7 @@ function FileUploadByDnD() {
 		}
 
 		const promises = Array.from(files).map((file) => {
-			const fullfilename = `${currentClanId}/${currentChannelId}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFile(client, session, fullfilename, file);
+			return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
 		Promise.all(promises).then((attachments) => {
 			attachments.forEach((attachment) => setAttachmentData(attachment));

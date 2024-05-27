@@ -5,7 +5,6 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { useFriends, useMemberStatus } from '@mezon/core';
 import { CallIcon, CheckIcon, CloseIcon, MessageIcon } from '@mezon/mobile-components';
 import { IUserItem } from './types';
-import { friendsActions, getStoreAsync } from '@mezon/store-mobile';
 
 export const UserItem = React.memo(({ friend }: IUserItem) => {
 	const userStatus = useMemberStatus(friend.id || '');
@@ -16,12 +15,10 @@ export const UserItem = React.memo(({ friend }: IUserItem) => {
 
 	const deleteFriendRequest = () => {
 		deleteFriend(friend.user.username, friend.user.id);
-		refetchUser();
 	}
 
 	const approveFriendRequest = () => {
 		acceptFriend(friend.user.username, friend.user.id);
-		refetchUser();
 	}
 
     const handlePhoneCall = () => {
@@ -39,15 +36,14 @@ export const UserItem = React.memo(({ friend }: IUserItem) => {
 		console.log('showUserInformation', friend);
 	}
 
-	const refetchUser = async () => {
-		const store = await getStoreAsync();
-		store.dispatch(friendsActions.fetchListFriends());
-	}
-
 	return (
 		<TouchableOpacity style={styles.friendItem} onPress={() => showUserInformation()}>
 			<View>
-				<Image source={{ uri: friend.user.avatar_url }} style={styles.friendAvatar} />
+				{friend.user.avatar_url ? (
+					<Image source={{ uri: friend.user.avatar_url }} style={styles.friendAvatar} />
+				): (
+					<Text style={styles.textAvatar}>{friend?.user?.username?.charAt?.(0)}</Text>
+				)}
 				{!isPendingFriendRequest ? (
 					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 				): null}
@@ -55,7 +51,7 @@ export const UserItem = React.memo(({ friend }: IUserItem) => {
 			<View style={styles.fill}>
 				<View style={styles.friendItemContent}>
 					<View style={styles.textContent}>
-						{isPendingFriendRequest ? (
+						{isPendingFriendRequest && friend?.user?.display_name ? (
 							<Text style={[styles.defaultText, isPendingFriendRequest && styles.whiteText]}>{friend.user.display_name}</Text>
 						): null}
 						<Text style={styles.defaultText}>{friend.user.username}</Text>

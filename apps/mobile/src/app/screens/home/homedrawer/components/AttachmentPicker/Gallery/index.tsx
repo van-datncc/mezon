@@ -3,7 +3,6 @@ import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Image, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
@@ -70,14 +69,16 @@ const Gallery = ({ onPickGallery }: IProps) => {
 
 		setLoading(true);
 		try {
-			const res = await CameraRoll.getPhotos({
-				first: 10,
-				assetType: 'All',
-				after,
-				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
-			});
-			setPhotos(after ? [...photos, ...res.edges] : res.edges);
-			setPageInfo(res.page_info);
+			if (Platform.OS !== 'ios') {
+				const res = await CameraRoll.getPhotos({
+					first: 10,
+					assetType: 'All',
+					after,
+					include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
+				});
+				setPhotos(after ? [...photos, ...res.edges] : res.edges);
+				setPageInfo(res.page_info);
+			}
 		} catch (error) {
 			console.log('Error loading photos', error);
 		} finally {
@@ -104,8 +105,8 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				</TouchableOpacity>
 			);
 		}
-		const fileName = item.node?.image?.filename || item.node?.image?.uri;
-		const isVideo = item.node.type.startsWith('video');
+		const fileName = item?.node?.image?.filename || item?.node?.image?.uri;
+		const isVideo = item?.node?.type?.startsWith?.('video');
 		const isSelected = attachmentsFileName?.includes(fileName);
 
 		return (
@@ -113,8 +114,8 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				style={styles.itemGallery}
 				onPress={() => {
 					if (isSelected) {
-						const infoAttachment = attachmentDataRef.find((attachment) => attachment.filename === fileName);
-						removeAttachmentByUrl(infoAttachment.url, infoAttachment.filename);
+						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === fileName);
+						removeAttachmentByUrl(infoAttachment.url, infoAttachment?.filename);
 					} else {
 						handleGalleryPress(item);
 					}

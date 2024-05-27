@@ -1,16 +1,15 @@
 import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, {useEffect, useMemo, useState} from 'react';
-import { Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, Pressable, Text, TouchableOpacity, View, Image } from 'react-native';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { EmojiDataOptionals, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, convertTimeString, getTimeDifferenceInSeconds, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-viewing';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
-import { FastImageRes } from './Reusables';
 import { styles } from './styles';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
@@ -40,7 +39,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, dataReactionCombine } = props;
+	const { message, mode, dataReactionCombine, preMessage } = props;
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -52,8 +51,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
-	// TODO: add logic here
-	const isCombine = true;
+
+  const isCombine = useMemo(()=>{
+    const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
+		return (
+			timeDiff < TIME_COMBINE &&
+			preMessage?.user?.id === message?.user?.id &&
+			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
+		);
+  }, [message, preMessage])
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -84,7 +90,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<View style={{
 				width: widthMedia,
-				marginBottom: size.s_10,
+				marginVertical: size.s_10,
 			}}>
 				{videos.map((video, index) => {
 					return (
@@ -137,7 +143,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			
 			return (
 				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
 					<View style={styles.fileViewer}>
@@ -152,7 +157,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			)
 		});
 	};
-	
+
 	const onOpenDocument = async (document: ApiMessageAttachment) => {
 		await Linking.openURL(document.url);
 		try {
@@ -232,13 +237,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		const matchesMention = lines.match(mentionRegex);
 		if (matchesMention?.length) {
-			return <Text>{renderTextWithMention(lines, matchesMention)}</Text>;
+			return <Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>;
 		}
 		const matches = lines.match(urlPattern);
 		if (isLinkPreview) {
-			return <Text>{renderTextWithLinks(lines, matches)}</Text>;
+			return <Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithLinks(lines, matches)}</Text>;
 		}
-		return <Text style={styles.contentMessageBox}>{lines}</Text>;
+		return <Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{lines}</Text>;
 	};
 
 	const onConfirmDeleteMessage = () => {
@@ -254,7 +259,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}
 
 	return (
-		<View style={styles.messageWrapper}>
+		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }]}>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
@@ -263,10 +268,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<Pressable onPress={() => jumpToRepliedMesage()} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
-								<FastImageRes uri={repliedSender?.user?.avatar_url} isCirle />
+								<Image source={{uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
 							</View>
 						) : (
-							<View style={styles.replyAvatar}>
+							<View style={[styles.replyAvatar]}>
 								<View style={styles.avatarMessageBoxDefault}>
 									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase()}</Text>
 								</View>
@@ -276,22 +281,24 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					</Pressable>
 				</View>
 			): null}
-			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+        {!isCombine ?
 				<Pressable
 					onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)}
-					style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden' }}
+					style={styles.wrapperAvatar}
 				>
-					{isCombine &&
+					{
 						(user?.user?.avatar_url ? (
-							<FastImageRes uri={user?.user?.avatar_url} />
+							<Image source={{uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
 							<View style={styles.avatarMessageBoxDefault}>
 								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
 							</View>
 						))}
-				</Pressable>
-				<Pressable style={styles.rowMessageBox} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
-					{isCombine && (
+				</Pressable> : <View style={styles.wrapperAvatarCombine} />
+					}
+				<Pressable style={[styles.rowMessageBox]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
+					{!isCombine && (
 						<View style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>

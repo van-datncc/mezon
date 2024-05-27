@@ -57,7 +57,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								<div className=" flex flex-row items-center">
 									<div
 										onClick={(e) => getIdMessageToJump(messageRefId, e)}
-										className="text-[13px] pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-1"
+										className="text-[13px] pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-0"
 									>
 										Click to see attachment
 									</div>
@@ -66,7 +66,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 							) : (
 								<span
 									onClick={(e) => getIdMessageToJump(messageRefId, e)}
-									className="text-[13px] hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-1"
+									className="text-[13px] hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-0"
 								>
 									{messageRefFetchFromServe?.content?.t}
 								</span>

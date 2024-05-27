@@ -4,7 +4,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 export const APP_FEATURE_KEY = 'app';
 
 export interface AppState {
-	theme: 'light' | 'dark' | 'system';
+	themeApp: 'light' | 'dark' | 'system';
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowMemberList: boolean;
@@ -12,16 +12,18 @@ export interface AppState {
 	closeMenu: boolean;
 	statusMenu: boolean;
 	hiddenBottomTabMobile: boolean;
+	hasInternetMobile: boolean;
 }
 
 export const initialAppState: AppState = {
 	loadingStatus: 'not loaded',
-	theme: 'system',
+	themeApp: 'dark',
 	isShowMemberList: true,
 	initialPath: '/',
 	closeMenu: false,
 	statusMenu: true,
 	hiddenBottomTabMobile: true,
+	hasInternetMobile: false,
 };
 
 export const appSlice = createSlice({
@@ -29,7 +31,7 @@ export const appSlice = createSlice({
 	initialState: initialAppState,
 	reducers: {
 		setTheme: (state, action) => {
-			state.theme = action.payload;
+			state.themeApp = action.payload;
 		},
 		setIsShowMemberList: (state, action) => {
 			state.isShowMemberList = action.payload;
@@ -49,6 +51,9 @@ export const appSlice = createSlice({
 		setHiddenBottomTabMobile: (state, action) => {
 			state.hiddenBottomTabMobile = action.payload;
 		},
+		setHasInternetMobile: (state, action) => {
+			state.hasInternetMobile = action.payload;
+		},
 	},
 });
 
@@ -63,7 +68,7 @@ export const getAppState = (rootState: { [APP_FEATURE_KEY]: AppState }): AppStat
 
 export const selectAllApp = createSelector(getAppState, (state: AppState) => state);
 
-export const selectTheme = createSelector(getAppState, (state: AppState) => state.theme);
+export const selectTheme = createSelector(getAppState, (state: AppState) => state.themeApp);
 
 export const selectError = createSelector(getAppState, (state: AppState) => state.error);
 
@@ -76,3 +81,5 @@ export const selectCloseMenu = createSelector(getAppState, (state: AppState) => 
 export const selectStatusMenu = createSelector(getAppState, (state: AppState) => state.statusMenu);
 
 export const selectHiddenBottomTabMobile = createSelector(getAppState, (state: AppState) => state.hiddenBottomTabMobile);
+
+export const setHasInternetMobile = createSelector(getAppState, (state: AppState) => state.hasInternetMobile);

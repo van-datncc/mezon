@@ -1,4 +1,5 @@
 import {
+	useApp,
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
@@ -44,7 +45,8 @@ import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
-import mentionsInputStyle from './RmentionInputStyle';
+import lightMentionsInputStyle from './LightRmentionInputStyle';
+import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 
@@ -97,6 +99,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		openThreadMessageState,
 		setOpenThreadMessageState,
 		idMessageRefReply,
+		setIdReferenceMessageReply,
+		setOpenReplyMessageState,
 	} = useReference();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
@@ -176,15 +180,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
-			if ((!valueTextInput && attachmentDataRef.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef.length === 0)) {
+			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
 				return;
 			}
 			if (
 				valueTextInput &&
 				typeof valueTextInput === 'string' &&
 				!(valueTextInput || '').trim() &&
-				attachmentDataRef.length === 0 &&
-				mentionData.length === 0
+				attachmentDataRef?.length === 0 &&
+				mentionData?.length === 0
 			) {
 				if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
 					dispatch(threadsActions.setMessageThreadError(threadError.message));
@@ -202,7 +206,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences.length > 0 && openReplyMessageState) {
+			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
 					{ t: content },
 					mentionData,
@@ -215,13 +219,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setValueTextInput('', props.isThread);
 
 				setAttachmentData([]);
-				setReferenceMessage(null);
+				setIdReferenceMessageReply('');
+				setOpenReplyMessageState(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
-				setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
 				if (openThreadMessageState) {
@@ -428,7 +432,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
-
+	const { appearanceTheme } = useApp();
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -455,7 +459,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
-				style={mentionsInputStyle}
+				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}

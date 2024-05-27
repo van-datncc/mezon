@@ -12,6 +12,8 @@ import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
+import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
+import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -47,6 +49,8 @@ export const changeCurrentClan = createAsyncThunk('clans/changeCurrentClan', asy
 	thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermission());
+	thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({clanId}));
+	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan(clanId));
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
 	thunkAPI.dispatch(
