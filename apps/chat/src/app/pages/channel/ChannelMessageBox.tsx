@@ -16,10 +16,11 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
 	const { isShowMemberList } = useMenu();
 	const { subPanelActive } = useGifsStickersEmoji();
-	const [classNamePopup, setClassNamePopup] = useState<string>(`fixed bottom-[66px] z-10 ${isShowMemberList ? 'right-64' : 'right-4'}`);
+	const [classNamePopup, setClassNamePopup] = useState<string>(
+		`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`,
+	);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const [isReactionEmojiRight, setIsReactionEmojiRight] = useState<boolean>(false);
-	const [isReactionEmojiBottom, setIsReactionEmojiBottom] = useState<boolean>(false);
+	const [isReactionRes, setIsReactionRes] = useState<boolean>(false);
 
 	const handleSend = useCallback(
 		(
@@ -52,8 +53,19 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 		}
 	}, [subPanelActive]);
 
+	useEffect(() => {
+		console.log(subPanelActive);
+
+		if (
+			subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT ||
+			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth < 640)
+		) {
+			setIsEmojiOnChat(true);
+		}
+	}, [subPanelActive]);
+
 	return (
-		<div className="mx-4 relative" role="button" aria-hidden>
+		<div className="mx-2 relative " role="button" aria-hidden>
 			{isEmojiOnChat && (
 				<div
 					className={classNamePopup}
@@ -72,6 +84,16 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 				currentChannelId={channelId}
 				currentClanId={clanId}
 			/>
+			{isEmojiOnChat && (
+				<div
+					className={`relative h-[300px]  overflow-y-scroll w-full hidden max-sm:block animate-slideUp`}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)}
 		</div>
 	);
 }

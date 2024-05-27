@@ -45,7 +45,7 @@ const ChannelLayout = () => {
 			{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
 				<div
 					id="emojiPicker"
-					className={`fixed size-[500px] right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
+					className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 				>
 					<div className="mb-0 z-10 h-full">
 						<GifStickerEmojiPopup
@@ -58,7 +58,7 @@ const ChannelLayout = () => {
 			)}
 			{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
 				<div
-					className="fixed"
+					className="fixed max-sm:hidden"
 					style={{
 						top: topPosition,
 						bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
