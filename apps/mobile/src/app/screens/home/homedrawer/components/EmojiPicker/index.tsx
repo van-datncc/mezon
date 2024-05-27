@@ -91,14 +91,19 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 
 				<View style={styles.textInputWrapper}>
 					<SearchIcon height={18} width={18} />
-					<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={setSearchText} />
+					<TextInput
+						style={styles.textInput}
+						onFocus={handleInputSearchFocus}
+						onChangeText={setSearchText} />
 				</View>
 
 				<View>
 					{mode === 'emoji' ? (
 						<Text>Emoji</Text>
 					) : mode === 'gif' ? (
-						<GifSelector onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
+						<GifSelector
+							onSelected={(url) => handleSelected('gif', url)}
+							searchText={searchText} />
 					) : (
 						<StickerSelector onSelected={(url) => handleSelected('sticker', url)} />
 					)}
