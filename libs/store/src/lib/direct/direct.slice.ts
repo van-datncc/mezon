@@ -37,7 +37,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
 			thunkAPI.dispatch(directActions.fetchDirectMessage({}));
-			thunkAPI.dispatch(directActions.selectDmGroupCurrentId(response.channel_id ?? ''));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -76,7 +76,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	'direct/joinDirectMessage',
 	async ({ directMessageId, channelName, type }, thunkAPI) => {
 		try {
-			thunkAPI.dispatch(directActions.selectDmGroupCurrentId(directMessageId));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
@@ -101,7 +101,7 @@ export const directSlice = createSlice({
 	reducers: {
 		add: directAdapter.addOne,
 		remove: directAdapter.removeOne,
-		selectDmGroupCurrentId: (state, action: PayloadAction<string>) => {
+		setDmGroupCurrentId: (state, action: PayloadAction<string>) => {
 			state.currentDirectMessageId = action.payload;
 		},
 	},
