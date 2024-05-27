@@ -46,7 +46,6 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 			setEmojiDivWidth(width);
 		}
 	}, [emojiRefParentDiv]);
-
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}

@@ -54,10 +54,8 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 	}, [subPanelActive]);
 
 	useEffect(() => {
-		console.log(subPanelActive);
-
 		if (
-			subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT ||
+			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth < 640) ||
 			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth < 640)
 		) {
 			setIsEmojiOnChat(true);
