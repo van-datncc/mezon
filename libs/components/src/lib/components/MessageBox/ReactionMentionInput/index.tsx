@@ -94,7 +94,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const {
 		dataReferences,
-		// setReferenceMessage,
 		setDataReferences,
 		openThreadMessageState,
 		setOpenThreadMessageState,
@@ -256,7 +255,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setContent('');
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
-				// setReferenceMessage(null);
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
 		},
