@@ -43,6 +43,7 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setValueInputSearch('');
 			setReactionRightState(false);
 			setReactionBottomState(false);
+			
 			if (subPanelActive === SubPanelName.EMOJI) {
 				setSubPanelActive(SubPanelName.NONE);
 			} else {

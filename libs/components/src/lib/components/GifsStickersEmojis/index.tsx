@@ -46,6 +46,7 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 			setEmojiDivWidth(width);
 		}
 	}, [emojiRefParentDiv]);
+
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
@@ -54,7 +55,7 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 			 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
 		>
 			<div className="w-full">
-				{emojiAction !== EmojiPlaces.EMOJI_REACTION && emojiAction !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
+				{emojiAction !== EmojiPlaces.EMOJI_REACTION && (
 					<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1 max-sm:justify-evenly">
 						<button
 							className={` relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}

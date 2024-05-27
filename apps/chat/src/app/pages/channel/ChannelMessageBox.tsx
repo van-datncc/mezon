@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useGifsStickersEmoji, useMenu } from '@mezon/core';
-import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
 import { useThrottledCallback } from 'use-debounce';
@@ -20,7 +20,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 		`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`,
 	);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const [isReactionRes, setIsReactionRes] = useState<boolean>(false);
+	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 
 	const handleSend = useCallback(
 		(
@@ -62,6 +62,15 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 		}
 	}, [subPanelActive]);
 
+	useEffect(() => {
+		if (subPanelActive === SubPanelName.EMOJI) {
+			setEmojiAction(EmojiPlaces.EMOJI_EDITOR);
+		}
+		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
+			setEmojiAction(EmojiPlaces.EMOJI_REACTION);
+		}
+	}, [subPanelActive]);
+
 	return (
 		<div className="mx-2 relative " role="button" aria-hidden>
 			{isEmojiOnChat && (
@@ -89,7 +98,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 						e.stopPropagation();
 					}}
 				>
-					<GifStickerEmojiPopup />
+					<GifStickerEmojiPopup emojiAction={emojiAction} />
 				</div>
 			)}
 		</div>
