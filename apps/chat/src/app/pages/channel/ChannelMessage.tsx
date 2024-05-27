@@ -97,6 +97,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 
 	const handleCancelEdit = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setIdReferenceMessageEdit(''));
 	};
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
@@ -296,7 +297,7 @@ function PopupMessage({
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const {idMessageRefOpt} = useReference()
+	const { idMessageRefOpt } = useReference();
 	const { reactionPlaceActive } = useChatReaction();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
