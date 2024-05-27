@@ -63,7 +63,7 @@ const HomeDefault = React.memo((props: any) => {
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
-									onDone={() => { setTypeKeyboardBottomSheet("text") }}
+									onDone={() => onShowKeyboardBottomSheet(false, heightKeyboardShow, typeKeyboardBottomSheet)}
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
