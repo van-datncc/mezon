@@ -74,8 +74,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setEmojiSuggestion(emojiPicked);
-			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
-			setSubPanelActive(SubPanelName.NONE);
+			if (window.innerWidth > 640) {
+				setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+				setSubPanelActive(SubPanelName.NONE);
+			}
 		}
 	};
 

@@ -1,5 +1,5 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending, useGifsStickersEmoji, useMenu } from '@mezon/core';
+import { useChatSending, useGifsStickersEmoji, useMenu, useReference } from '@mezon/core';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
@@ -21,6 +21,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 	);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
+	const { idMessageRefReaction } = useReference();
 
 	const handleSend = useCallback(
 		(
@@ -98,7 +99,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 						e.stopPropagation();
 					}}
 				>
-					<GifStickerEmojiPopup emojiAction={emojiAction} />
+					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} messageEmojiId={idMessageRefReaction} />
 				</div>
 			)}
 		</div>
