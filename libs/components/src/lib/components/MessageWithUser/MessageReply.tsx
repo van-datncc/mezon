@@ -30,6 +30,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 			e.stopPropagation();
 			if (idRefMessage) {
 				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+				dispatch(referencesActions.setIdReferenceMessageReply(''));
 			}
 		},
 		[dispatch],

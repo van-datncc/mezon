@@ -1,7 +1,7 @@
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
-import { Dimensions, StyleSheet } from 'react-native';
-
-const inputWidth = Dimensions.get('window').width * 0.6;
+import { Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
+import { Dimensions, Platform, StyleSheet } from 'react-native';
+const width = Dimensions.get('window').width;
+const inputWidth = width * 0.6;
 export const styles = StyleSheet.create({
 	mainList: {
 		height: '100%',
@@ -190,6 +190,8 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.tertiaryWeight,
+		borderWidth: 1,
+		borderColor: Colors.borderDim,
 	},
 	logoClan: {
 		height: verticalScale(70),
@@ -323,7 +325,7 @@ export const styles = StyleSheet.create({
 	repliedMessageWrapper: {
 		flexDirection: 'row',
 		gap: 8,
-		marginRight: 0
+		marginRight: 0,
 	},
 	wrapperMessageBoxCombine: {
 		marginBottom: size.s_10,
@@ -333,9 +335,9 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		width: '90%',
 	},
-  rowMessageBoxCombine: {
-    marginLeft: verticalScale(44),
-  },
+	rowMessageBoxCombine: {
+		marginLeft: verticalScale(44),
+	},
 	messageBoxTop: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
@@ -355,9 +357,9 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		color: Colors.tertiary,
 	},
-  contentMessageCombine: {
-    marginBottom: -5,
-  },
+	contentMessageCombine: {
+		marginBottom: -5,
+	},
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
@@ -448,7 +450,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderRadius: size.s_6,
 		flexDirection: 'row',
-		backgroundColor: Colors.bgPrimary
+		backgroundColor: Colors.bgPrimary,
 	},
 	fileName: {
 		fontSize: size.small,
@@ -457,19 +459,74 @@ export const styles = StyleSheet.create({
 	typeFile: {
 		fontSize: size.small,
 		color: Colors.textGray,
-		textTransform: 'uppercase'
+		textTransform: 'uppercase',
 	},
 	logoUser: {
 		width: '100%',
 		height: '100%',
 	},
-  wrapperAvatar: {
-    width: size.s_40,
-    height: size.s_40,
-    borderRadius: size.s_40,
-    overflow: 'hidden'
-  },
+	wrapperAvatar: {
+		width: size.s_40,
+		height: size.s_40,
+		borderRadius: size.s_40,
+		overflow: 'hidden',
+	},
 	wrapperAvatarCombine: {
 		width: size.s_40,
-	}
+	},
+	btnScrollDown: {
+		position: 'absolute',
+		right: size.s_10,
+		bottom: size.s_20,
+		backgroundColor: Colors.borderPrimary,
+		width: size.s_50,
+		height: size.s_50,
+		borderRadius: size.s_50,
+		justifyContent: 'center',
+		alignItems: 'center',
+		shadowColor: Colors.black,
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 4.65,
+		elevation: 8,
+		zIndex: 1000,
+	},
+	wrapperFooterImagesModal: {
+		flex: 1,
+		alignSelf: 'center',
+		alignItems: 'center',
+		width: width,
+		marginBottom: verticalScale(60),
+	},
+	footerImagesModal: {
+		maxWidth: '70%',
+	},
+	imageFooterModal: {
+		width: horizontalScale(40),
+		height: verticalScale(50),
+		marginHorizontal: horizontalScale(5),
+		borderRadius: horizontalScale(5),
+		borderWidth: 1,
+		borderColor: Colors.tertiaryWeight,
+	},
+	imageFooterModalActive: {
+		width: horizontalScale(80),
+		height: verticalScale(50),
+		borderWidth: 1,
+		borderColor: Colors.bgViolet,
+	},
+	headerImagesModal: {
+		padding: size.s_10,
+		position: 'absolute',
+		zIndex: 1000,
+		top: Platform.OS === 'ios' ? size.s_40 : size.s_20,
+		right: size.s_10,
+		width: size.s_50,
+		height: size.s_50,
+		borderRadius: size.s_50,
+		backgroundColor: 'rgba(0,0,0,0.5)',
+	},
 });

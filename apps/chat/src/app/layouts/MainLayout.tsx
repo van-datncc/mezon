@@ -1,10 +1,15 @@
-import { ChatContextProvider } from '@mezon/core';
+import { ChatContextProvider, useGifsStickersEmoji } from '@mezon/core';
 import { MezonSuspense } from '@mezon/transport';
+import { SubPanelName } from '@mezon/utils';
 import { Outlet } from 'react-router-dom';
 
 const MainLayout = () => {
+	const { setSubPanelActive } = useGifsStickersEmoji();
+	const handleClickingOutside = () => {
+		setSubPanelActive(SubPanelName.NONE);
+	};
 	return (
-		<div id="main-layout">
+		<div id="main-layout" onClick={handleClickingOutside}>
 			<Outlet />
 		</div>
 	);

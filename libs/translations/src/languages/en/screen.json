@@ -1,5 +1,12 @@
 {
     "headerTitle": {
-        "settings": "Settings"
+        "settings": "Settings",
+        "Friends": "Friends",
+        "addFriends": "Add Friends",
+        "requestFriend": "Friend Requests",
+        "friendRequestSettings": "Friend Request Settings"
+    },
+    "headerRight": {
+        "addFriends": "Add Friends"
     }
 }

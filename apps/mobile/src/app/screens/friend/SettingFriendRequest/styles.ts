@@ -2,7 +2,9 @@ import { Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    addFriendContainer: {
-        paddingHorizontal: size.s_20
+    settingFriendRequestContainer: {
+        backgroundColor: Colors.secondary,
+        flex: 1,
+        paddingHorizontal: size.s_18
     },
 })

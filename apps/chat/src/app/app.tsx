@@ -48,19 +48,19 @@ function AppWrapper() {
 		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<VoiceContextProvider>
-					<App />
-					<ToastContainer
-						position="top-right"
-						autoClose={2200}
-						hideProgressBar={false}
-						newestOnTop={false}
-						closeOnClick
-						rtl={false}
-						pauseOnFocusLoss
-						draggable
-						pauseOnHover
-						theme="light"
-					/>
+						<App />
+						<ToastContainer
+							position="top-right"
+							autoClose={2200}
+							hideProgressBar={false}
+							newestOnTop={false}
+							closeOnClick
+							rtl={false}
+							pauseOnFocusLoss
+							draggable
+							pauseOnHover
+							theme="light"
+						/>
 				</VoiceContextProvider>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
