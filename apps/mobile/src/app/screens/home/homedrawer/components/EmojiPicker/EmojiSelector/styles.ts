@@ -5,7 +5,10 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         gap: 10,
-        backgroundColor: "red"
+    },
+
+    cateItem: {
+        padding: 5
     }
 })
 
