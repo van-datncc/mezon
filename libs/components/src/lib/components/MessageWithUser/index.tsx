@@ -110,7 +110,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<MessageHead message={message} user={user} isCombine={isCombine} />
 								<div className={`justify-start items-center inline-flex w-full h-full ${isCombine ? '' : 'pt-[2px]'} textChat`}>
 									<div
-										className="flex flex-col text-[#CCCCCC] whitespace-pre-wrap text-base w-fit cursor-text"
+										className="flex flex-col text-[#CCCCCC] whitespace-pre-wrap text-base w-full cursor-text"
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
