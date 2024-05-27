@@ -62,7 +62,10 @@ const HomeDefault = React.memo((props: any) => {
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
 							{typeKeyboardBottomSheet === 'emoji' ? (
-								<EmojiPicker />
+								<EmojiPicker
+									onDone={()  => {}}
+									bottomSheetRef={bottomPickerRef}
+								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
 								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel.clan_id} />
 							) : (

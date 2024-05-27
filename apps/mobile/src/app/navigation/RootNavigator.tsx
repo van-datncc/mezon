@@ -1,4 +1,4 @@
-import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin } from '@mezon/store-mobile';
+import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin, setHasInternetMobile } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -14,13 +14,16 @@ import { IWithError } from '@mezon/utils';
 import { Colors, darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
 import { SafeAreaView } from 'react-native';
+import NetInfoComp from '../components/NetworkInfo';
 import { createLocalNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
-	const [isDarkMode] = useState(true); //TODO: move to custom hook
+	const [isDarkMode] = useState(true); //TODO: move to custom hook\
+	const hasInternet = useSelector(setHasInternetMobile);
+
 	useEffect(() => {
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			createLocalNotification(remoteMessage?.notification?.title, remoteMessage?.notification?.body, remoteMessage?.data);
@@ -30,10 +33,10 @@ const NavigationMain = () => {
 	}, []);
 
 	useEffect(() => {
-		if (isLoggedIn) {
+		if (isLoggedIn && hasInternet) {
 			authLoader();
 		}
-	}, [isLoggedIn]);
+	}, [isLoggedIn, hasInternet]);
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
@@ -76,6 +79,7 @@ const NavigationMain = () => {
 	return (
 		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
 			<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+				<NetInfoComp />
 				<RootStack.Navigator screenOptions={{ headerShown: false }}>
 					{isLoggedIn ? (
 						<RootStack.Group
