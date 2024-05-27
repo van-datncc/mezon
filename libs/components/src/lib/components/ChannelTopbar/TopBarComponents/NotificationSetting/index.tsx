@@ -1,4 +1,4 @@
-import { selectDefaultNotificationCategory, selectDefaultNotificationClan, selectnotificatonSelected } from '@mezon/store';
+import { selectDefaultNotificationCategory, selectDefaultNotificationClan, selectNotifiReactMessage, selectnotificatonSelected } from '@mezon/store';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
 import { useEffect, useState } from 'react';
@@ -9,6 +9,8 @@ const NotificationSetting = () => {
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const notifiReactMessage = useSelector(selectNotifiReactMessage);
+	
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
 	const notificationTypes = Object.values(NotificationType);
 	useEffect(() => {
@@ -55,6 +57,14 @@ const NotificationSetting = () => {
 						<ItemNotificationSetting children="For 24 Hours" onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)} />
 						<ItemNotificationSetting children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
 					</Dropdown>
+				</div>
+				<div className="flex flex-col pb-2 mb-1 border-b-[0.08px] dark:border-b-[#6A6A6A] border-b-[#E1E1E1] last:border-b-0 last:mb-0 last:pb-0">
+					<ItemNotificationSetting
+						children="Reaction Message"
+						type="checkbox"
+						name="NotifiReactionSetting"
+						notifiSelected={notifiReactMessage?.id !== '0'}
+					/>
 				</div>
 				<ItemNotificationSetting
 					children="Use Category Default"
