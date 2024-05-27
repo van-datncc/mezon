@@ -1,6 +1,5 @@
 
-import { MemberListIcon, SmilingFaceIcon } from "@mezon/mobile-components";
-import { BicycleIcon, BowlIcon, GameControllerIcon, HeartIcon, LeafIcon, ObjectIcon, RibbonIcon } from "libs/mobile-components/src/lib/icons";
+import { BicycleIcon, BowlIcon, GameControllerIcon, HeartIcon, LeafIcon, MemberListIcon, ObjectIcon, RibbonIcon, SmilingFaceIcon } from "@mezon/mobile-components";
 import { ScrollView } from "react-native-gesture-handler";
 import styles from "./styles";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
@@ -37,7 +36,7 @@ export default function EmojiSelector({ }: EmojiSelectorProps) {
             <ScrollView horizontal contentContainerStyle={styles.cateContainer}>
                 {cate.map((item, index) => (
                     <TouchableOpacity
-                        key={index} style={styles.cateItem}>
+                        key={index} style={{...styles.cateItem, }}>
                         {item}
                     </TouchableOpacity>
                 ))}
