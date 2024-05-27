@@ -1,7 +1,17 @@
-import { differenceInDays, differenceInHours, differenceInMonths, differenceInSeconds, format, formatDistanceToNowStrict, isSameDay, parseISO, startOfDay, subDays } from 'date-fns';
+import {
+	differenceInDays,
+	differenceInHours,
+	differenceInMonths,
+	differenceInSeconds,
+	format,
+	formatDistanceToNowStrict,
+	isSameDay,
+	startOfDay,
+	subDays,
+} from 'date-fns';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import { ChannelMembersEntity, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -87,40 +97,63 @@ export const calculateTotalCount = (senders: SenderInfoOptionals[]) => {
 	return senders.reduce((sum: number, item: SenderInfoOptionals) => sum + (item.count ?? 0), 0);
 };
 
-
-export const notImplementForGifOrStickerSendFromPanel = (data:ApiMessageAttachment) => {
-	if(data.url?.includes('tenor.com') || data.filetype === 'image/gif'){
-		return true
+export const notImplementForGifOrStickerSendFromPanel = (data: ApiMessageAttachment) => {
+	if (data.url?.includes('tenor.com') || data.filetype === 'image/gif') {
+		return true;
 	} else {
-		return false
+		return false;
 	}
-}
+};
 
 export const getVoiceChannelName = (clanName?: string, channelLabel?: string) => {
 	return clanName?.replace(' ', '-') + '-' + channelLabel?.replace(' ', '-');
-}
+};
 
 export const removeDuplicatesById = (array: any) => {
 	return array.reduce((acc: any, current: any) => {
-	  const isDuplicate = acc.some((item:any) => item.id === current.id);
-  	  if (!isDuplicate) {
-		acc.push(current);
-	  }
-	  	  return acc;
+		const isDuplicate = acc.some((item: any) => item.id === current.id);
+		if (!isDuplicate) {
+			acc.push(current);
+		}
+		return acc;
 	}, []);
-  };
+};
 
 export const getTimeDifferenceDate = (dateString: string) => {
-  const now = new Date();
-  const codeTime = new Date(dateString);
-  const hoursDifference = differenceInHours(now, codeTime);
-  const daysDifference = differenceInDays(now, codeTime);
-  const monthsDifference = differenceInMonths(now, codeTime);
-  if(hoursDifference < 24) {
-    return `${hoursDifference}h`
-  } else if(daysDifference < 30) {
-    return `${daysDifference}d`
-  } else {
-    return `${monthsDifference}mo`
-  }
-}
+	const now = new Date();
+	const codeTime = new Date(dateString);
+	const hoursDifference = differenceInHours(now, codeTime);
+	const daysDifference = differenceInDays(now, codeTime);
+	const monthsDifference = differenceInMonths(now, codeTime);
+	if (hoursDifference < 24) {
+		return `${hoursDifference}h`;
+	} else if (daysDifference < 30) {
+		return `${daysDifference}d`;
+	} else {
+		return `${monthsDifference}mo`;
+	}
+};
+
+export const convertMarkdown = (markdown: string): string => {
+	return markdown
+		.split('```')
+		.map((part, index) => {
+			if (part.length === 0) {
+				return '```';
+			}
+			const start = part.startsWith('\n');
+			const end = part.endsWith('\n');
+
+			if (start && end) {
+				return part;
+			}
+			if (start) {
+				return part + '\n';
+			}
+			if (end) {
+				return '\n' + part;
+			}
+			return '\n' + part + '\n';
+		})
+		.join('');
+};
