@@ -1,0 +1,19 @@
+{
+    "friendRequest": {
+        "title": "Yêu cầu kết bạn",
+        "received": "đã nhận",
+        "sent": "đã gửi"
+    },
+    "addFriend": {
+        "incomingFriendRequest": "Yêu Cầu Kết Bạn Được Nhận",
+        "findYourFriend": "Tìm bạn bè",
+        "addByUserName": "Thêm bằng tên người dùng",
+        "searchUsernamePlaceholder": "Nhập tên người dùng",
+        "whoYouWantToAddFriend": "Bạn muốn thêm ai làm bạn bè",
+        "byTheWay": "À nhân tiện, tên người dùng của bạn là",
+        "sendRequestButton": "Gửi Yêu Cầu Kết Bạn",
+        "addFriendToast": "Đã gửi yêu cầu kết bạn"
+    },
+    "friends": "Bạn bè",
+    "noFriendsResultsFound": "không tìm thấy kết quả bạn bè"
+}
