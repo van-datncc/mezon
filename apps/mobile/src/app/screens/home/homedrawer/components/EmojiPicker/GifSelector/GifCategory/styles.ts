@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		alignItems: 'center',
 		justifyContent: 'space-around',
-		gap: 10,
+		gap: 10
 	},
 });
 
