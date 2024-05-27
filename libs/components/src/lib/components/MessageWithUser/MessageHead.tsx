@@ -1,7 +1,7 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import { useMessageSender } from './useMessageSender';
 type IMessageHeadProps = {
@@ -15,6 +15,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	const { messageTime } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const panelRefShort = useRef<HTMLDivElement>(null);
 	const [positionLeft, setPositionLeft] = useState(0);
 	const [positionTop, setPositionTop] = useState(0);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -41,6 +42,28 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		e.stopPropagation();
 	};
 
+	useEffect(() => {
+		const updatePosition = () => {
+			const width = window.innerWidth;
+			if(panelRefShort.current){
+				if (width >= 910) {
+					panelRefShort.current.style.left = `${positionLeft}px`;
+				} else if (width >= 480 && width <910) {
+					panelRefShort.current.style.left = `42px`;
+				} else {
+					panelRefShort.current.style.left = `20px`;
+				}
+			}
+		};
+
+		updatePosition();
+		window.addEventListener('resize', updatePosition);
+
+		return () => {
+			window.removeEventListener('resize', updatePosition);
+		};
+	}, [positionLeft]);
+
 	if (isCombine && message.references?.length === 0) {
 		return <></>;
 	}
@@ -60,15 +83,16 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 			</div>
 			{isShowPanelChannel && (
 				<div
-					className={`dark:bg-[#151515] bg-gray-200 mt-[10px] w-[360px] rounded-lg flex flex-col z-10 opacity-100 fixed `}
+					className={`dark:bg-black bg-gray-200 mt-[10px] w-[360px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
-						left: `${positionLeft}px`,
+						left: `20px`,
 						top: positionBottom ? '' : `${positionTop}px`,
 						bottom: positionBottom ? '64px' : '',
 
 					}}
 					onMouseDown={handleDefault}
 					role="button"
+					ref={panelRefShort}
 				>
 					<ShortUserProfile userID={user?.user?.id || ''} />
 				</div>

@@ -62,7 +62,10 @@ const HomeDefault = React.memo((props: any) => {
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
 							{typeKeyboardBottomSheet === 'emoji' ? (
-								<EmojiPicker />
+								<EmojiPicker
+									onDone={() => onShowKeyboardBottomSheet(false, heightKeyboardShow, typeKeyboardBottomSheet)}
+									bottomSheetRef={bottomPickerRef}
+								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
 								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel.clan_id} />
 							) : (
@@ -100,7 +103,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					</View>
 				</View>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}>
+			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
 				<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
 			</TouchableOpacity>
 		</View>

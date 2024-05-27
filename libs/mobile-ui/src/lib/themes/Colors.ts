@@ -116,7 +116,7 @@ const colors = {
 	textGray: isDarkTheme ? '#c7c7c7' : '#c7c7c7',
 	titleReset: isDarkTheme ? 'rgba(148, 154, 164, 1)' : 'rgb(44,44,45)',
 	gray72: isDarkTheme ? '#727272' : '#727272',
-	tertiary: isDarkTheme ? '#AEAEAE' : '#AEAEAE',
+	tertiary: isDarkTheme ? '#bcbcbc' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
 	textLink: '#007AFF',
@@ -129,6 +129,7 @@ const colors = {
 	header2: '#676b73',
   	titleSteelGray: '#939292',
 	textRed: '#E53935',
+	textViolet: '#5a62f4',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',

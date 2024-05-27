@@ -190,6 +190,8 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.tertiaryWeight,
+		borderWidth: 1,
+		borderColor: Colors.borderDim
 	},
 	logoClan: {
 		height: verticalScale(70),
@@ -471,5 +473,25 @@ export const styles = StyleSheet.create({
   },
 	wrapperAvatarCombine: {
 		width: size.s_40,
+	},
+	btnScrollDown: {
+		position: 'absolute',
+		right: size.s_10,
+		bottom: size.s_20,
+		backgroundColor: Colors.borderPrimary,
+		width: size.s_50,
+		height: size.s_50,
+		borderRadius: size.s_50,
+		justifyContent: 'center',
+		alignItems: 'center',
+		shadowColor: Colors.black,
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.30,
+		shadowRadius: 4.65,
+		elevation: 8,
+		zIndex: 1000,
 	}
 });
