@@ -2,6 +2,8 @@ import {
 	referencesActions,
 	selectAttachmentData,
 	selectDataReferences,
+	selectIdMessageRefEdit,
+	selectIdMessageRefOption,
 	selectIdMessageRefReaction,
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
@@ -9,18 +11,15 @@ import {
 	selectOpenOptionMessageState,
 	selectOpenReplyMessageState,
 	selectOpenThreadMessageState,
-	selectReferenceMessage,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useReference() {
 	const dispatch = useAppDispatch();
-	const referenceMessage = useSelector(selectReferenceMessage);
 	const dataReferences = useSelector(selectDataReferences);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
@@ -30,13 +29,8 @@ export function useReference() {
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-
-	const setReferenceMessage = useCallback(
-		(message: IMessageWithUser | null) => {
-			dispatch(referencesActions.setReferenceMessage(message));
-		},
-		[dispatch],
-	);
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
+	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
 
 	const setDataReferences = useCallback(
 		(dataReference: ApiMessageRef[]) => {
@@ -94,15 +88,27 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setIdReferenceMessageEdit = useCallback(
+		(idMessageRefEdit: string) => {
+			dispatch(referencesActions.setIdReferenceMessageEdit(idMessageRefEdit));
+		},
+		[dispatch],
+	);
+
+	const setIdReferenceMessageOption = useCallback(
+		(idMessageRefOpt: string) => {
+			dispatch(referencesActions.setIdReferenceMessageOption(idMessageRefOpt));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
-			setReferenceMessage,
 			setDataReferences,
 			setIdMessageToJump,
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
 			setOpenThreadMessageState,
-			referenceMessage,
 			dataReferences,
 			openEditMessageState,
 			openReplyMessageState,
@@ -115,15 +121,17 @@ export function useReference() {
 			idMessageRefReaction,
 			setIdReferenceMessageReaction,
 			idMessageToJump,
+			idMessageRefEdit,
+			setIdReferenceMessageEdit,
+			idMessageRefOpt,
+			setIdReferenceMessageOption,
 		}),
 		[
-			setReferenceMessage,
 			setDataReferences,
 			setIdMessageToJump,
 			setOpenEditMessageState,
 			setOpenReplyMessageState,
 			setOpenThreadMessageState,
-			referenceMessage,
 			dataReferences,
 			openEditMessageState,
 			openReplyMessageState,
@@ -136,6 +144,10 @@ export function useReference() {
 			idMessageRefReaction,
 			setIdReferenceMessageReaction,
 			idMessageToJump,
+			idMessageRefEdit,
+			setIdReferenceMessageEdit,
+			idMessageRefOpt,
+			setIdReferenceMessageOption,
 		],
 	);
 }

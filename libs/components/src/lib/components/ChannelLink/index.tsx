@@ -48,7 +48,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		distanceToBottom: 0,
 	});
 
-	const { setReferenceMessage, setOpenReplyMessageState, setOpenEditMessageState } = useReference();
+	const { setOpenReplyMessageState, setOpenEditMessageState } = useReference();
 
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
@@ -86,7 +86,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
 		voice.setVoiceOptions((prev) => ({
 			...prev,
-			voiceChannelName: voiceChannelName
+			voiceChannelName: voiceChannelName,
 		}));
 
 		dispatch(channelsActions.setCurrentVoiceChannelId(id));
@@ -102,7 +102,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = () => {
 		setTurnOffThreadMessage();
-		setReferenceMessage(null);
 		setOpenEditMessageState(false);
 		setOpenReplyMessageState(false);
 		if (closeMenu) {

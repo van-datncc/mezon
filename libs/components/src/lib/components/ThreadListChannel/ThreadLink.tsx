@@ -22,7 +22,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const { setIsShowCreateThread } = useThreads();
-	const { setReferenceMessage, setOpenReplyMessageState, setOpenEditMessageState } = useReference();
+	const { setOpenReplyMessageState, setOpenEditMessageState } = useReference();
 
 	const panelRef = useRef<HTMLAnchorElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
@@ -61,7 +61,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const { closeMenu, setStatusMenu } = useMenu();
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = (thread: IChannel) => {
-		setReferenceMessage(null);
 		setOpenEditMessageState(false);
 		setOpenReplyMessageState(false);
 		if (currentChanel?.channel_id === thread.parrent_id) {
@@ -90,7 +89,10 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full overflow-x-hidden whitespace-nowrap ${(active || isUnReadChannel) ? 'dark:font-medium font-semibold dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
-				onClick={() => {handleClick(thread); setTurnOffThreadMessage();}}
+				onClick={() => {
+					handleClick(thread);
+					setTurnOffThreadMessage();
+				}}
 			>
 				{thread.channel_label}
 				{isShowPanelChannel && (
