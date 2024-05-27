@@ -179,7 +179,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 					<PopupMessage
 						reactionRightState={reactionRightState}
 						mess={mess as IMessageWithUser}
-						idMessageRefOpt={mess.id}
 						reactionBottomState={reactionBottomState}
 						openEditMessageState={openEditMessageState}
 						openOptionMessageState={openOptionMessageState}
@@ -270,8 +269,6 @@ ChannelMessage.Skeleton = () => {
 type PopupMessageProps = {
 	reactionRightState: boolean;
 	mess: IMessageWithUser;
-
-	idMessageRefOpt: string;
 	reactionBottomState: boolean;
 	openEditMessageState: boolean;
 	openOptionMessageState: boolean;
@@ -296,7 +293,7 @@ function PopupMessage({
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const {idMessageRefOpt} = useReference()
+	const { idMessageRefOpt } = useReference();
 	const { reactionPlaceActive } = useChatReaction();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
