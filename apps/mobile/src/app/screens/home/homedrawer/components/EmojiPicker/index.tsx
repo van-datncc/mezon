@@ -13,6 +13,7 @@ import GifSelector from './GifSelector';
 import StickerSelector from './StickerSelector';
 import styles from './styles';
 import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
+import EmojiSelector from './EmojiSelector';
 
 export type IProps = {
 	onDone: () => void;
@@ -26,11 +27,13 @@ interface TextTabProps {
 }
 function TextTab({ selected, title, onPress }: TextTabProps) {
 	return (
-		<TouchableOpacity
-			onPress={onPress}
-			style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
-			<Text style={{ color: selected ? Colors.white : Colors.gray72, fontSize: Fonts.size.small, textAlign: 'center' }}>{title}</Text>
-		</TouchableOpacity>
+		<View style={{ flex: 1 }}>
+			<TouchableOpacity
+				onPress={onPress}
+				style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
+				<Text style={{ color: selected ? Colors.white : Colors.gray72, fontSize: Fonts.size.small, textAlign: 'center' }}>{title}</Text>
+			</TouchableOpacity>
+		</View>
 	);
 }
 
@@ -102,7 +105,9 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 				</View>
 
 				{mode === 'emoji' ? (
-					<Text>Emoji</Text>
+					<EmojiSelector
+						onSelected={(url) => handleSelected('emoji', url)}
+						searchText={searchText} />
 				) : mode === 'gif' ? (
 					<GifSelector
 						onSelected={(url) => handleSelected('gif', url)}
@@ -110,8 +115,7 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 				) : (
 					<StickerSelector
 						onSelected={(url) => handleSelected('sticker', url)}
-						searchText={searchText}
-					/>
+						searchText={searchText} />
 				)}
 			</View>
 		</TouchableWithoutFeedback>
