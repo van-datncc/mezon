@@ -1,8 +1,8 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending, useGifsStickersEmoji, useMenu } from '@mezon/core';
+import { useChatSending, useGifsStickersEmoji, useMenu, useOnClickOutside } from '@mezon/core';
 import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
@@ -16,10 +16,12 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
 	const { isShowMemberList } = useMenu();
 	const { subPanelActive } = useGifsStickersEmoji();
-	const [classNamePopup, setClassNamePopup] = useState<string>(`fixed bottom-[66px] z-10 ${isShowMemberList ? 'right-64' : 'right-4'}`);
+	const [classNamePopup, setClassNamePopup] = useState<string>(
+		`fixed bottom-[66px] z-10 max-sm:hidden  ${isShowMemberList ? 'right-64' : 'right-4'}`,
+	);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const [isReactionEmojiRight, setIsReactionEmojiRight] = useState<boolean>(false);
-	const [isReactionEmojiBottom, setIsReactionEmojiBottom] = useState<boolean>(false);
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [showPanel, setShowPanel] = useState(false);
 
 	const handleSend = useCallback(
 		(
@@ -46,16 +48,25 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
 			subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM
 		) {
+			console.log(isEmojiOnChat)
+			console.log(showPanel)
 			setIsEmojiOnChat(true);
+			setShowPanel(true);
 		} else {
 			setIsEmojiOnChat(false);
 		}
 	}, [subPanelActive]);
 
+	useOnClickOutside(panelRef, (event) => {
+		event.stopPropagation();
+		setShowPanel(false);
+	});
+
 	return (
-		<div className="mx-4 relative" role="button" aria-hidden>
-			{isEmojiOnChat && (
+		<div className="mx-2 relative " role="button" aria-hidden>
+			{isEmojiOnChat && showPanel && (
 				<div
+					ref={panelRef}
 					className={classNamePopup}
 					onClick={(e) => {
 						e.stopPropagation();
@@ -72,6 +83,16 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 				currentChannelId={channelId}
 				currentClanId={clanId}
 			/>
+			{isEmojiOnChat && (
+				<div
+					className={`relative h-[300px] overflow-y-scroll w-full hidden max-sm:block`}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<GifStickerEmojiPopup />
+				</div>
+			)}
 		</div>
 	);
 }

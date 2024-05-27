@@ -62,10 +62,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
-			console.log(props.mode);
-			console.log(props.messageEmojiId);
-			console.log(emojiPicked);
-			console.log(messageEmoji.sender_id);
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -95,7 +91,12 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSelectedCategory(categoryName);
 			const categoryDiv = categoryRefs.current[categoryName];
 			if (categoryDiv && containerRef.current) {
-				categoryDiv.scrollIntoView({ behavior: 'auto', block: 'start' });
+				const options: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
+				const containerTop = containerRef.current.getBoundingClientRect().top;
+				const categoryTop = categoryDiv.getBoundingClientRect().top;
+				const offset = 0;
+				const scrollTop = categoryTop - containerTop - offset;
+				containerRef.current.scrollTop += scrollTop;
 			}
 		}
 	};
@@ -140,22 +141,28 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	}, []);
 
 	return (
-		<div className={`flex max-h-full flex-row w-full md:w-[500px] ${props.isReaction && 'border border-black rounded overflow-hidden'}`}>
+		<div
+			className={`flex max-h-full max-sm:h-32 flex-row max-sm:flex-col w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
+		>
 			<div
-				className={`w-[10%] md:w-[10%] md:max-w-[10%] flex flex-col gap-y-1 max-w-[90%] dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1 px-1 md:items-start h-[25rem] pb-1 rounded ${!props.isReaction && 'md:ml-2 mb-2'}`}
+				className={`w-[10%] max-sm:gap-x-1
+				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1 
+				max-sm:w-full dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
+				px-1 md:items-start h-[25rem] pb-1 rounded 
+				${!props.isReaction && 'md:ml-2 mb-2'}`}
 			>
-				<div className="w-9 h-9  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
+				<div className="w-9 h-9 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.Star defaultSize="w-7 h-7" />
 				</div>
-				<div className="w-9 h-9  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
+				<div className="w-9 h-9 max-sm:hidden  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.ClockHistory defaultSize="w-7 h-7" />
 				</div>
-				<hr className=" bg-gray-200  border w-full" />
+				<hr className=" bg-gray-200 border w-full max-sm:h-full max-sm:w-[1px] max-sm:hidden" />
 				{categoriesWithIcons.map((item, index) => {
 					return (
 						<button
 							key={index}
-							className={`w-9 h-9 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
+							className={`w-9 h-9 max-sm:px-1 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
 							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}
@@ -175,7 +182,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				<div className="flex flex-col">
 					<div
 						ref={containerRef}
-						className="w-full  max-h-[352px]  overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
+						className="w-full  max-h-[352px] overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
 					>
 						{categoriesWithIcons.map((item, index) => {
 							return (
@@ -227,7 +234,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 		<div>
 			<button
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
-				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-0 dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
+				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
 				{categoryName}
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
@@ -245,13 +252,13 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 
 	return (
 		<div
-			className={`grid grid-cols-9 ml-1 gap-1  ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
+			className={`grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className="text-3xl emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10 h-10 p-1 flex items-center justify-center w-full"
+					className="text-3xl  emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10 h-10 p-1 flex items-center justify-center w-full"
 					onClick={() => onEmojiSelect(item.emoji)}
 					onMouseEnter={() => onEmojiHover(item)}
 				>

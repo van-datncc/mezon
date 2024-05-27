@@ -47,33 +47,35 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 			setEmojiDivWidth(width);
 		}
 	}, [emojiRefParentDiv]);
-	useOnClickOutside(panelRef, (event) => {
-		event.stopPropagation();
-		setSubPanelActive(SubPanelName.NONE);
-	});
+	// useOnClickOutside(panelRef, (event) => {
+	// 	event.stopPropagation();
+	// 	setSubPanelActive(SubPanelName.NONE);
+	// });
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
-			className={`w-[370px] sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
+			className={`w-[370px] max-sm:w-full max-sm:pt-0 max-sm:rounded-none max-sm:mt-[-0.5rem] 
+			sbm:w-[500px] h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900
+			 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
 			ref={panelRef}
 		>
 			<div className="w-full">
 				{emojiAction !== EmojiPlaces.EMOJI_REACTION && emojiAction !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
-					<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1">
+					<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1 max-sm:justify-evenly">
 						<button
-							className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
+							className={` relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
 							onClick={() => handleTabClick(SubPanelName.GIFS)}
 						>
 							Gifs
 						</button>
 						<button
-							className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.STICKERS ? 'font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
+							className={` relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.STICKERS ? 'font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
 							onClick={() => handleTabClick(SubPanelName.STICKERS)}
 						>
 							Stickers
 						</button>
 						<button
-							className={`relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.EMOJI ? 'font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
+							className={` relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.EMOJI ? 'font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}
 							onClick={() => handleTabClick(SubPanelName.EMOJI)}
 						>
 							Emoji
@@ -83,7 +85,7 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 				<InputSearch />
 			</div>
 
-			<div className="w-full min-h-[400px] text-center md:w-[500px] " ref={emojiRefParentDiv}>
+			<div className="w-full min-h-[400px] text-center md:w-[500px]" ref={emojiRefParentDiv}>
 				{subPanelActive === SubPanelName.GIFS && (
 					<div className="flex h-full pr-1 w-full md:w-[500px]">
 						<TenorGifCategories
