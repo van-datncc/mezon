@@ -1,5 +1,15 @@
 import { ChatContextProvider } from '@mezon/core';
-import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, notificationActions, friendsActions, directActions } from '@mezon/store-mobile';
+import {
+	appActions,
+	clansActions,
+	directActions,
+	friendsActions,
+	getStoreAsync,
+	gifsActions,
+	notificationActions,
+	selectAllClans,
+	selectCurrentClan,
+} from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
@@ -78,10 +88,10 @@ const HomeScreen = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
 
 	useEffect(() => {
-		if (clans?.length) {
+		if (clans?.length && !currentClan) {
 			setCurrentClanLoader();
 		}
-	}, [clans]);
+	}, [clans, currentClan]);
 
 	useEffect(() => {
 		mainLoader();
@@ -89,10 +99,12 @@ const HomeScreen = React.memo((props: any) => {
 
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
-    	store.dispatch(notificationActions.fetchListNotification());
-		store.dispatch(friendsActions.fetchListFriends());
+		store.dispatch(notificationActions.fetchListNotification());
+		store.dispatch(friendsActions.fetchListFriends({}));
 		store.dispatch(directActions.fetchDirectMessage({}));
 		store.dispatch(clansActions.fetchClans());
+		store.dispatch(gifsActions.fetchGifCategories());
+		store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		if (currentClan) {
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
 		}
