@@ -362,6 +362,9 @@ export interface IGif {
 		gif: {
 			url: string;
 		};
+		tinygif: {
+			url: string;
+		};
 	};
 }
 
