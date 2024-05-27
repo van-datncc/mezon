@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { notifiReactMessageActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Checkbox, Radio } from 'flowbite-react';
 import { notificationSettingActions } from 'libs/store/src/lib/notificationSetting/notificationSettingChannel.slice';
 import { useSelector } from 'react-redux';
@@ -33,12 +33,20 @@ const ItemNotificationSetting = ({ children, dropdown, type, onClick, name, noti
 			dispatch(notificationSettingActions.setNotificationSetting(body))
 		}
 	}
+	const setNotiReactMess = (event:any) => {
+		const isChecked = event.target.checked;
+		if(isChecked){
+			dispatch(notifiReactMessageActions.setNotifiReactMessage({channel_id: currentChannelId || ""}))
+		}else{
+			dispatch(notifiReactMessageActions.deleteNotifiReactMessage({channel_id: currentChannelId || ""}))
+		}
+	  };
 	return (
 		<div className=' hover:bg-bgSelectItem hover:[&>*]:text-[#fff]'>
 			<div onClick={onClick} className="flex items-center justify-between rounded-sm hover:bg-bgSelectItem group pr-2">
 			<li className="text-[14px] dark:text-[#B5BAC1] text-black group-hover:text-white w-full py-[6px] px-[8px] cursor-pointer list-none ">{children}</li>
 				{dropdown && <Icons.RightIcon defaultFill="#fff" />}
-				{type === 'checkbox' && <Checkbox id="accept" defaultChecked />}
+				{type === 'checkbox' && <Checkbox id="accept" defaultChecked={notifiSelected} onClick={setNotiReactMess}/>}
 				{type === 'radio' && <Radio className="" name={name} value="change here" onClick={setNotification} defaultChecked={notifiSelected}/>}
 			</div>
 			{defaultNotifi && 

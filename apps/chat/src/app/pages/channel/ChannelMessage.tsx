@@ -288,7 +288,6 @@ type PopupOptionProps = {
 function PopupMessage({
 	reactionRightState,
 	mess,
-	// idMessageRefOpt,
 	reactionBottomState,
 	openEditMessageState,
 	openOptionMessageState,
@@ -354,6 +353,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	};
 
 	const handleClickReply = (event: React.MouseEvent<HTMLLIElement>) => {
+		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(messagesActions.setOpenOptionMessageState(false));

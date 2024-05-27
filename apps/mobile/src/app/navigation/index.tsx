@@ -1,5 +1,5 @@
 import React from 'react';
-import {CreateMezonClientOptions, MezonContextProvider} from "@mezon/transport";
+import { CreateMezonClientOptions, MezonContextProvider } from "@mezon/transport";
 import RootNavigation from "./RootNavigator";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -11,8 +11,8 @@ import { toastConfig } from '../configs/toastConfig';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
-	port: process.env.NX_CHAT_APP_API_PORT as string,
 	key: process.env.NX_CHAT_APP_API_KEY as string,
+	port: process.env.NX_CHAT_APP_API_PORT as string,
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
 
