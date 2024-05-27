@@ -10,6 +10,7 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { useDirect, useMemberStatus } from '@mezon/core';
 import { IChannel } from '@mezon/utils';
 import { normalizeString } from '../../utils/helpers';
+import { useThrottledCallback } from 'use-debounce';
 
 const SeparatorListFriend = () => {
 	return (
@@ -52,7 +53,7 @@ const DmListItem = (props: { directMessage: IChannel}) => {
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const { listDM: dmGroupChatList } = useDirect();
-	const { t } = useTranslation(['dmMessage']);
+	const { t } = useTranslation(['dmMessage', 'common']);
 
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
@@ -69,23 +70,25 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.ADD_FRIEND });
 	}
 
+	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerWrapper}>
-				<Text style={styles.headerTitle}>{t('title')}</Text>
+				<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
 				<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
 					<UserPlusIcon height={15} width={30} />
-					<Text style={styles.addFriendText}>{t('addFriend')}</Text>
+					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
 			
 			<View style={styles.searchMessage}>
 				<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 				<TextInput
-					placeholder={t('searchPlaceHolder')}
+					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={Colors.tertiary}
 					style={styles.searchInput}
-					onChangeText={setSearchText}
+					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
 			</View>
 

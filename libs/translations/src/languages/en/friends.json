@@ -1,0 +1,18 @@
+{
+    "friendRequest": {
+        "title": "Friend Requests",
+        "received": "received",
+        "sent": "sent"
+    },
+    "addFriend": {
+        "incomingFriendRequest": "Incoming Friend Request",
+        "findYourFriend": "Find your friends",
+        "addByUserName": "Add by Username",
+        "searchUsernamePlaceholder": "Enter a username",
+        "whoYouWantToAddFriend": "Who would you like to add as a friends",
+        "byTheWay": "By the way, your username is",
+        "sendRequestButton": "Send Friend Request"
+    },
+    "friends": "Friends",
+    "noFriendsResultsFound": "No friends results found"
+}

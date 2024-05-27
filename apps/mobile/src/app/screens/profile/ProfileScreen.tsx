@@ -130,7 +130,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                                 }}
                                 resizeMode={FastImage.resizeMode.cover}
                             />
-                        ): <Text style={styles.textAvatar}>{user?.userProfile?.user?.display_name.charAt(0)}</Text>}
+                        ): <Text style={styles.textAvatar}>{user?.userProfile?.user?.display_name?.charAt(0)}</Text>}
                         <View style={styles.dotOnline} />
                     </View>
                 </View>
