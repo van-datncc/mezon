@@ -152,7 +152,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 							{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 						</div>
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${currentURL === channelPath || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(currentURL === channelPath || isUnReadChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20

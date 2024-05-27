@@ -38,6 +38,7 @@ import { eventManagementReducer } from './eventManagement/eventManagement.slice'
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
+import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -89,6 +90,7 @@ const reducer = {
 	defaultnotificationclan: defaultNotificationClanReducer,
 	defaultnotificationcategory: defaultNotificationCategoryReducer,
 	notichannelcategorysetting: channelCategorySettingReducer,
+	notifireactmessage: notifiReactMessageReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,

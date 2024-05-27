@@ -64,7 +64,7 @@ module.exports = {
       },
       height: {
         heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
-        heightMessageViewChatDM: `calc(100vh - ${topBarHeight} - 75px)`,
+        heightMessageViewChatDM: `calc(100vh - ${topBarHeight})`,
         heightMessageViewChatThread: `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`,
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
         heightTopBar: topBarHeight,

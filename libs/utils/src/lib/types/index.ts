@@ -20,6 +20,7 @@ import {
 	ApiNotificationUserChannel,
 	ApiNotificationSetting,
 	ApiNotificationChannelCategoySetting,
+	ApiNotifiReactMessage,
 } from 'mezon-js/api.gen';
 
 export * from './permissions';
@@ -55,6 +56,8 @@ export type IRolesClan = ApiRole & {
 };
 
 export type INotificationSetting = ApiNotificationUserChannel
+
+export type INotifiReactMessage = ApiNotifiReactMessage
 
 export type IDefaultNotificationClan = ApiNotificationSetting
 

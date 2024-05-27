@@ -1,5 +1,5 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useFriends, useMenu } from '@mezon/core';
+import { useApp, useAppNavigation, useFriends, useMenu, useMessageValue } from '@mezon/core';
 import { selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
@@ -97,6 +97,7 @@ function MyApp() {
 	};
 
 	const { appearanceTheme } = useApp();
+	const { setMode } = useMessageValue();
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond">
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
@@ -105,8 +106,8 @@ function MyApp() {
 				onClick={handleMenu}
 				id="menu"
 			>
-				<NavLink to="/chat/direct/friends">
-					<NavLinkComponent active={pathName.includes('direct')} clanName="DM">
+				<NavLink to="/chat/direct/friends" onClick={() => setMode('dm')}>
+					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>
 							<Image src={`/assets/images/${appearanceTheme === "dark" ? "mezon-logo-black.svg" : "mezon-logo-white.svg"}`} alt={'logoMezon'} width={48} height={48} className="clan w-full aspect-square" />
 							{quantityPendingRequest !== 0 && (
