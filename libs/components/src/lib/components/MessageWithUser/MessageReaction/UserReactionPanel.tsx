@@ -31,7 +31,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 				<div
 					onClick={(e) => e.stopPropagation()}
 					className={`absolute z-50  bottom-7 w-[18rem]
-				dark:bg-[#313338] bg-white border-[#313338] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
+				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
 				>
 					<div>
 						<div className="flex flex-row items-center m-2">
