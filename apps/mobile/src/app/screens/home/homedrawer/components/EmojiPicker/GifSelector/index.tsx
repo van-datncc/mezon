@@ -3,6 +3,7 @@ import { GifCategoriesEntity } from '@mezon/store-mobile';
 import { useEffect, useState } from 'react';
 import GifCategory from './GifCategory';
 import GiftItem from './GifItem';
+import { View } from 'react-native';
 
 type GifSelectorProps = {
 	onSelected: (url: string) => void;
@@ -35,16 +36,20 @@ export default function GifSelector({ onSelected, searchText }: GifSelectorProps
 		onSelected && onSelected(url);
 	}
 
-	return valueInputToCheckHandleSearch === '' ? (
-		<GifCategory
-			loading={loadingStatusGifs === 'loading'}
-			data={dataGifCategories as unknown as GifCategoriesEntity[]}
-		/>
-	) : (
-		<GiftItem
-			loading={loadingStatusGifs === 'loading'}
-			data={gifData}
-			onPress={handleGifPress}
-		/>
-	);
+	return (
+		<View>
+			{valueInputToCheckHandleSearch === '' ? (
+				<GifCategory
+					loading={loadingStatusGifs === 'loading'}
+					data={dataGifCategories as unknown as GifCategoriesEntity[]}
+				/>
+			) : (
+				<GiftItem
+					loading={loadingStatusGifs === 'loading'}
+					data={gifData}
+					onPress={handleGifPress}
+				/>
+			)}
+		</View>
+	)
 }

@@ -7,11 +7,12 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
-import { Keyboard, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import GifSelector from './GifSelector';
 import StickerSelector from './StickerSelector';
 import styles from './styles';
+import { TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 
 export type IProps = {
 	onDone: () => void;
@@ -34,7 +35,7 @@ type ExpressionType = 'emoji' | 'gif' | 'sticker';
 
 function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [mode, setMode] = useState<ExpressionType>('gif');
+	const [mode, setMode] = useState<ExpressionType>('sticker');
 	const [channelMode, setChannelMode] = useState(0);
 	const [searchText, setSearchText] = useState<string>('');
 
@@ -84,8 +85,8 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
 			<View style={styles.container}>
 				<View style={styles.tabContainer}>
-					<TextTab selected title="Emoji" />
 					<TextTab title="GIFs" />
+					<TextTab selected title="Emoji" />
 					<TextTab title="Stickers" />
 				</View>
 
@@ -97,17 +98,18 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 						onChangeText={setSearchText} />
 				</View>
 
-				<View>
-					{mode === 'emoji' ? (
-						<Text>Emoji</Text>
-					) : mode === 'gif' ? (
-						<GifSelector
-							onSelected={(url) => handleSelected('gif', url)}
-							searchText={searchText} />
-					) : (
-						<StickerSelector onSelected={(url) => handleSelected('sticker', url)} />
-					)}
-				</View>
+				{mode === 'emoji' ? (
+					<Text>Emoji</Text>
+				) : mode === 'gif' ? (
+					<GifSelector
+						onSelected={(url) => handleSelected('gif', url)}
+						searchText={searchText} />
+				) : (
+					<StickerSelector
+						onSelected={(url) => handleSelected('sticker', url)}
+						searchText={searchText}
+					/>
+				)}
 			</View>
 		</TouchableWithoutFeedback>
 	);

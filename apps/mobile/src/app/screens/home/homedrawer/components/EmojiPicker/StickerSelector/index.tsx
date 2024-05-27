@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+
+import { SectionList, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import styles from './styles';
+import { useEffect } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 
 type StickerSelectorProps = {
 	onSelected?: (url: string) => void;
+	searchText: string
 };
 
 // TODO: hard-code?
@@ -12,6 +15,35 @@ const cates = [
 	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
 	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
 	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
+	{ url: 'https://cdn.mezon.vn/sticker/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	{ url: 'https://cdn.mezon.vn/sticker/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+
 ];
 const images = [
 	{ url: 'https://cdn.mezon.vn/sticker/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
@@ -58,8 +90,15 @@ const images = [
 	{ url: 'https://cdn.mezon.vn/sticker/EmojiDom/emojibest_com_emojidom_anim_13.gif', type: 'cat' },
 ];
 
-export default function StickerSelector({ onSelected }: StickerSelectorProps) {
-	const [stickers, setStickers] = useState<any>(images);
+const stickers = [...new Set(images.map(item => item.type))].map((item => ({
+	title: item,
+	data: images.filter(_item => _item.type == item).map(_item => _item.url)
+})))
+
+export default function StickerSelector({ onSelected, searchText }: StickerSelectorProps) {
+	useEffect(() => {
+		// TODO:
+	}, [searchText]);
 
 	function handlePressSticker(url: string) {
 		onSelected && onSelected(url);
@@ -67,28 +106,56 @@ export default function StickerSelector({ onSelected }: StickerSelectorProps) {
 
 	return (
 		<>
-			{/* <View style={styles.bottomCategory}>
-                {cates.map((item, index) => (
-                    <TouchableOpacity
-                        // onPress={() => handlePressSticker(item.url)}
-                        // style={styles.content}
-                        key={index.toString()}>
-                        <FastImage
-                            source={{ uri: item.url }}
-                            style={{ height: "100%", width: "100%" }} />
-                    </TouchableOpacity>
-                ))}
-            </View> */}
-			<View style={styles.session}>
-				<Text style={styles.sessionTitle}>aaaa</Text>
-				<View style={styles.sessionContent}>
-					{stickers.map((item, index) => (
-						<TouchableOpacity onPress={() => handlePressSticker(item.url)} style={styles.content} key={index.toString()}>
-							<FastImage source={{ uri: item.url }} style={{ height: '100%', width: '100%' }} />
-						</TouchableOpacity>
-					))}
+			<ScrollView
+				horizontal
+				contentContainerStyle={styles.btnWrap}
+			>
+				{cates.map((item, index) => (
+					<TouchableOpacity
+						// onPress={}
+						style={styles.btnEmo}
+						key={index.toString()}>
+						<FastImage
+							source={{ uri: item.url }}
+							style={{ height: "100%", width: "100%" }} />
+					</TouchableOpacity>
+				))}
+			</ScrollView>
+
+			{/* <SectionList
+				sections={stickers}
+				keyExtractor={(_, index) => index.toString()}
+				renderItem={({ item }) => (
+					<View >
+						<Text>{item}</Text>
+					</View>
+				)}
+				renderSectionHeader={({ section: { title } }) => (
+					<Text style={styles.sessionTitle}>{title}</Text>
+				)}
+			/> */}
+
+
+			{stickers.map((emojisCate, indexCate) =>
+				<View
+					style={styles.session}
+					key={indexCate.toString()}
+				>
+					<Text style={styles.sessionTitle}>{emojisCate.title}</Text>
+					<View style={styles.sessionContent}>
+						{emojisCate.data.map((item, index) => (
+							<TouchableOpacity
+								onPress={() => handlePressSticker(item)}
+								style={styles.content}
+								key={index.toString()}>
+								<FastImage
+									source={{ uri: item }}
+									style={{ height: '100%', width: '100%' }} />
+							</TouchableOpacity>
+						))}
+					</View>
 				</View>
-			</View>
+			)}
 		</>
 	);
 }
