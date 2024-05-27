@@ -47,6 +47,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	channelMetadata: EntityState<ChannelMeta, string>;
 	currentVoiceChannelId: string;
 	valueTextInput: Record<string, string>;
+	mode: 'clan' | 'dm';
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -73,11 +74,11 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting(channelId));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
-			thunkAPI.dispatch(appActions.setIsShowMemberList(true));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			thunkAPI.dispatch(channelsActions.setMode('clan'));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
 			await mezon.joinChatChannel(channelId);
@@ -196,6 +197,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
 	valueTextInput: {},
+	mode: 'dm',
 });
 
 export const channelsSlice = createSlice({
@@ -205,6 +207,9 @@ export const channelsSlice = createSlice({
 		add: channelsAdapter.addOne,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
+		setMode: (state, action) => {
+			state.mode = action.payload;
+		},
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
 		},
@@ -366,6 +371,8 @@ export const selectCurrentChannelId = createSelector(getChannelsState, (state) =
 
 export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
 
+export const selectMode = createSelector(getChannelsState, (state) => state.mode);
+
 export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
@@ -409,3 +416,5 @@ export const selectValueTextInputByChannelId = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
 		return state.valueTextInput[channelId];
 	});
+
+export const selectAllTextInput = createSelector(getChannelsState, (state) => state.valueTextInput);
