@@ -9,6 +9,12 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.bgCharcoal
     },
+    bgDefault: {
+        backgroundColor: Colors.bgCharcoal
+    },
+    fill: {
+        flex: 1
+    },
     headerWrapper: {
         flexDirection: 'row',
         justifyContent: 'space-between',

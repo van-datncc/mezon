@@ -62,7 +62,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
 	const { reactionRightState, reactionBottomState } = useChatReaction();
-	const { referenceMessage, openEditMessageState, openOptionMessageState } = useReference();
+	const { openEditMessageState, openOptionMessageState, idMessageRefEdit } = useReference();
 
 	useEffect(() => {
 		markMessageAsSeen(message);
@@ -150,10 +150,10 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 
 	const textareaRef = useRef<any>(null);
 	useEffect(() => {
-		if (openEditMessageState && mess.id === referenceMessage?.id) {
+		if (openEditMessageState && mess.id === idMessageRefEdit) {
 			textareaRef.current?.focus();
 		}
-	}, [openEditMessageState, mess, referenceMessage]);
+	}, [openEditMessageState, mess, idMessageRefEdit]);
 	const handleFocus = () => {
 		if (textareaRef.current) {
 			const length = textareaRef.current.value.length;
@@ -197,7 +197,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 					<PopupMessage
 						reactionRightState={reactionRightState}
 						mess={mess as IMessageWithUser}
-						referenceMessage={referenceMessage}
 						reactionBottomState={reactionBottomState}
 						openEditMessageState={openEditMessageState}
 						openOptionMessageState={openOptionMessageState}
@@ -208,7 +207,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 			/>
 			{lastSeen && <UnreadMessageBreak />}
 
-			{openEditMessageState && mess.id === referenceMessage?.id && (
+			{openEditMessageState && mess.id === idMessageRefEdit && (
 				<div className="inputEdit relative left-[66px] top-[-21px]">
 					<MentionsInput
 						onFocus={handleFocus}
@@ -288,7 +287,6 @@ ChannelMessage.Skeleton = () => {
 type PopupMessageProps = {
 	reactionRightState: boolean;
 	mess: IMessageWithUser;
-	referenceMessage: IMessageWithUser | null;
 	reactionBottomState: boolean;
 	openEditMessageState: boolean;
 	openOptionMessageState: boolean;
@@ -305,7 +303,6 @@ type PopupOptionProps = {
 function PopupMessage({
 	reactionRightState,
 	mess,
-	referenceMessage,
 	reactionBottomState,
 	openEditMessageState,
 	openOptionMessageState,
@@ -314,6 +311,7 @@ function PopupMessage({
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
+	const { idMessageRefOpt } = useReference();
 	const { reactionPlaceActive } = useChatReaction();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
@@ -327,7 +325,7 @@ function PopupMessage({
 	};
 
 	useEffect(() => {
-		if (reactionRightState && referenceMessage?.id === mess.id) {
+		if (reactionRightState && idMessageRefOpt === mess.id) {
 			getDivHeightToTop();
 		}
 	}, [reactionRightState]);
@@ -338,10 +336,10 @@ function PopupMessage({
 				<div
 					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block top-0 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
 				${
-					(reactionRightState && mess.id === referenceMessage?.id) ||
-					(reactionBottomState && mess.id === referenceMessage?.id) ||
-					(openEditMessageState && mess.id === referenceMessage?.id) ||
-					(openOptionMessageState && mess.id === referenceMessage?.id)
+					(reactionRightState && mess.id === idMessageRefOpt) ||
+					(reactionBottomState && mess.id === idMessageRefOpt) ||
+					(openEditMessageState && mess.id === idMessageRefOpt) ||
+					(openOptionMessageState && mess.id === idMessageRefOpt)
 						? ''
 						: 'hidden group-hover:block'
 				} `}
@@ -350,9 +348,7 @@ function PopupMessage({
 						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
 					</div>
 
-					{openOptionMessageState && mess.id === referenceMessage?.id && (
-						<PopupOption message={mess} deleteSendMessage={deleteSendMessage} />
-					)}
+					{openOptionMessageState && mess.id === idMessageRefOpt && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
 				</div>
 			)}
 		</>
@@ -367,22 +363,22 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(messagesActions.setOpenOptionMessageState(false));
-		dispatch(referencesActions.setReferenceMessage(message));
+		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
 		event.stopPropagation();
 	};
 
 	const handleClickReply = (event: React.MouseEvent<HTMLLIElement>) => {
+		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(messagesActions.setOpenOptionMessageState(false));
-		dispatch(referencesActions.setReferenceMessage(message));
+		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		event.stopPropagation();
 	};
 
 	const handleClickCopy = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(messagesActions.setOpenOptionMessageState(false));
-		dispatch(referencesActions.setReferenceMessage(null));
 		dispatch(referencesActions.setDataReferences(null));
 	};
 

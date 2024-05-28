@@ -7,11 +7,13 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
-import { Keyboard, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import GifSelector from './GifSelector';
 import StickerSelector from './StickerSelector';
 import styles from './styles';
+import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
+import EmojiSelector from './EmojiSelector';
 
 export type IProps = {
 	onDone: () => void;
@@ -21,11 +23,16 @@ export type IProps = {
 interface TextTabProps {
 	selected?: boolean;
 	title: string;
+	onPress: () => void;
 }
-function TextTab({ selected, title }: TextTabProps) {
+function TextTab({ selected, title, onPress }: TextTabProps) {
 	return (
-		<View style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
-			<Text style={{ color: selected ? Colors.white : Colors.gray72, fontSize: Fonts.size.small, textAlign: 'center' }}>{title}</Text>
+		<View style={{ flex: 1 }}>
+			<TouchableOpacity
+				onPress={onPress}
+				style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
+				<Text style={{ color: selected ? Colors.white : Colors.gray72, fontSize: Fonts.size.small, textAlign: 'center' }}>{title}</Text>
+			</TouchableOpacity>
 		</View>
 	);
 }
@@ -84,25 +91,32 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
 			<View style={styles.container}>
 				<View style={styles.tabContainer}>
-					<TextTab selected title="Emoji" />
-					<TextTab title="GIFs" />
-					<TextTab title="Stickers" />
+					<TextTab title="GIFs" selected={mode === "gif"} onPress={() => setMode("gif")} />
+					<TextTab title="Emoji" selected={mode === "emoji"} onPress={() => setMode("emoji")} />
+					<TextTab title="Stickers" selected={mode === "sticker"} onPress={() => setMode("sticker")} />
 				</View>
 
 				<View style={styles.textInputWrapper}>
 					<SearchIcon height={18} width={18} />
-					<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={setSearchText} />
+					<TextInput
+						style={styles.textInput}
+						onFocus={handleInputSearchFocus}
+						onChangeText={setSearchText} />
 				</View>
 
-				<View>
-					{mode === 'emoji' ? (
-						<Text>Emoji</Text>
-					) : mode === 'gif' ? (
-						<GifSelector onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
-					) : (
-						<StickerSelector onSelected={(url) => handleSelected('sticker', url)} />
-					)}
-				</View>
+				{mode === 'emoji' ? (
+					<EmojiSelector
+						onSelected={(url) => handleSelected('emoji', url)}
+						searchText={searchText} />
+				) : mode === 'gif' ? (
+					<GifSelector
+						onSelected={(url) => handleSelected('gif', url)}
+						searchText={searchText} />
+				) : (
+					<StickerSelector
+						onSelected={(url) => handleSelected('sticker', url)}
+						searchText={searchText} />
+				)}
 			</View>
 		</TouchableWithoutFeedback>
 	);

@@ -26,10 +26,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 							<SettingSidebar onClickItem={handleSettingItemClick} />
 						</div>
 
-						<div className="flex-3 bg-white dark:bg-bgPrimary">
-							<div className="flex flex-row flex-1 justify-start h-full">
+						<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto">
+							<div className="flex flex-row flex-1 justify-start">
 								<div className="w-[740px] px-[40px] pt-[60px] pb-[80px]">
-									<div className="relative h-full">
+									<div className="relative">
 										<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme">
 											{currentSetting.name}
 										</h2>
@@ -40,6 +40,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								<ExitSetting onClose={onClose} />
 							</div>
 						</div>
+						<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightModeSecond"></div>
 					</div>
 				</div>
 			) : null}

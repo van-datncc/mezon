@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useChatReaction, useGifs, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { useChatReaction, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback } from 'react';
 
@@ -9,7 +9,6 @@ export type GifStickerEmojiButtonsProps = {
 
 function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
-	const { setReferenceMessage } = useReference();
 	const { setReactionRightState, setReactionBottomState } = useChatReaction();
 	const { setShowCategories } = useGifs();
 	const { setValueInputSearch } = useGifsStickersEmoji();
@@ -17,7 +16,6 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.GIFS);
-			setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
 			setReactionRightState(false);
@@ -30,7 +28,6 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
 			setSubPanelActive(SubPanelName.STICKERS);
-			setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
 			setReactionRightState(false);
@@ -42,23 +39,27 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	const handleOpenEmoji = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			e.stopPropagation();
-			setSubPanelActive(SubPanelName.EMOJI);
-			setReferenceMessage(null);
 			setShowCategories(true);
 			setValueInputSearch('');
 			setReactionRightState(false);
 			setReactionBottomState(false);
+			
+			if (subPanelActive === SubPanelName.EMOJI) {
+				setSubPanelActive(SubPanelName.NONE);
+			} else {
+				setSubPanelActive(SubPanelName.EMOJI);
+			}
 		},
-		[setSubPanelActive],
+		[setSubPanelActive, subPanelActive],
 	);
 
 	return (
-		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3 absolute right-0">
-			<div onClick={handleOpenGifs} className="cursor-pointer">
+		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3  absolute right-0">
+			<div onClick={handleOpenGifs} className="cursor-pointer block max-sm:hidden">
 				<Icons.Gif defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.GIFS} />
 			</div>
 
-			<div onClick={handleOpenStickers} className="cursor-pointer">
+			<div onClick={handleOpenStickers} className="cursor-pointer block max-sm:hidden">
 				<Icons.Sticker defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.STICKERS} />
 			</div>
 

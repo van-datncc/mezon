@@ -129,6 +129,7 @@ const colors = {
 	header2: '#676b73',
   	titleSteelGray: '#939292',
 	textRed: '#E53935',
+	textViolet: '#5a62f4',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',

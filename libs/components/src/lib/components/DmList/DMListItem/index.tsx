@@ -24,7 +24,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				type: type,
 			}),
 		);
-		await dispatch(directActions.selectDmGroupCurrentId(DMid));
+		await dispatch(directActions.setDmGroupCurrentId(DMid));
 		if (result) {
 			navigate(toDmGroupPage(DMid, type));
 		}

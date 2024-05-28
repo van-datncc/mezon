@@ -12,12 +12,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		gap: 10,
 		padding: 6,
-		// width: "100%",
 		backgroundColor: Colors.primary,
 		borderRadius: 50,
 	},
 	selected: {
 		flex: 1,
+		flexBasis: 100,
 		borderRadius: 50,
 		paddingHorizontal: 20,
 		paddingVertical: 6,

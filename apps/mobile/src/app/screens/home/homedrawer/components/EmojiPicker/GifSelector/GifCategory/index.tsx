@@ -24,7 +24,10 @@ export default function GifCategory({ loading, data }: GifCategoryProps) {
 	return (
 		<View style={styles.container}>
 			{data?.map((item, index) => (
-				<TouchableOpacity onPress={() => handlePressCategory(item.searchterm)} style={styles.content} key={index.toString()}>
+				<TouchableOpacity
+					onPress={() => handlePressCategory(item.searchterm)}
+					style={styles.content}
+					key={index.toString()}>
 					<FastImage source={{ uri: item.image }} style={{ height: '100%', width: '100%' }} />
 					<View style={styles.textWrapper}>
 						<Text style={styles.textTitle}>{item.name}</Text>

@@ -63,7 +63,7 @@ const HomeDefault = React.memo((props: any) => {
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
-									onDone={()  => {}}
+									onDone={() => onShowKeyboardBottomSheet(false, heightKeyboardShow, typeKeyboardBottomSheet)}
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
@@ -103,7 +103,7 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					</View>
 				</View>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}>
+			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
 				<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
 			</TouchableOpacity>
 		</View>

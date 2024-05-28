@@ -59,9 +59,11 @@ module.exports = {
   borderSelected: '#155EEF',
   borderFocus: '#535353',
   borderDivider: '#3B3D44',
+  borderClan: '#484C52',
 
   /* button */
   buttonProfile: '#4E5058',
+  buttonProfileHover: '#41434A',
 
   primary: '#155EEF',
   hoverPrimary: '#124FC9',
