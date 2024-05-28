@@ -6,6 +6,7 @@ import setting from './setting.json';
 import dmMessage from './dmMessage.json';
 import common from './common.json';
 import friends from './friends.json';
+import clan from './clan.json';
 
 export default {
     inviteToChannel,
@@ -15,5 +16,6 @@ export default {
     setting,
     dmMessage,
     common,
-    friends
+    friends,
+    clan
 }

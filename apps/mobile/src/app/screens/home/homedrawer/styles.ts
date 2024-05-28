@@ -245,6 +245,7 @@ export const styles = StyleSheet.create({
 		width: '22%',
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.primary,
+    alignItems: 'center'
 	},
 	friendItemWrapper: {
 		marginHorizontal: 20,
@@ -288,7 +289,7 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginBottom: size.s_20,
+		marginBottom: size.s_10,
 		paddingRight: size.s_50,
 	},
 	aboveMessage: {
@@ -358,7 +359,7 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 	},
 	contentMessageCombine: {
-		marginBottom: -5,
+    marginTop: -5
 	},
 	contentMessageLink: {
 		fontSize: size.medium,
@@ -529,4 +530,13 @@ export const styles = StyleSheet.create({
 		borderRadius: size.s_50,
 		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
+  wrapperPlusClan: {
+    height: verticalScale(50),
+		width: verticalScale(50),
+		borderRadius: verticalScale(15),
+		overflow: 'hidden',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: Colors.tertiaryWeight,
+  }
 });
