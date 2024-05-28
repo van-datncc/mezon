@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 
 export function useMessageLine(line: string): IMessageLine {
 	const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
+	const mentionDetectEmoji = /:\b[^:]*\b:/g;
 
 	const matches = useMemo(() => {
 		if (line) {
@@ -24,7 +25,6 @@ export function useMessageLine(line: string): IMessageLine {
 			const matchedText = line.substring(startIndex, endIndex);
 			nonMatchText = line.substring(lastIndex, startIndex);
 			lastIndex = endIndex;
-
 			return {
 				nonMatchText,
 				matchedText,

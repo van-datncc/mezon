@@ -1,6 +1,6 @@
 import { useApp, useClans, useInvite, useOnClickOutside } from '@mezon/core';
 import { ILineMention, convertMarkdown } from '@mezon/utils';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
 import remarkGFM from 'remark-gfm';
@@ -8,6 +8,12 @@ import ExpiryTimeModal from '../ExpiryTime';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 import ChannelHashtag from './HashTag';
 import PreClass from './PreClass';
+
+import aNhan from 'libs/assets/src/assets/emojisSvg/aNhan_1.png';
+import heart from 'libs/assets/src/assets/emojisSvg/heart.png';
+import joy from 'libs/assets/src/assets/emojisSvg/joy.png';
+import unamused from 'libs/assets/src/assets/emojisSvg/unamused.png';
+
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 };
@@ -79,9 +85,35 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 
 	const { appearanceTheme } = useApp();
 
+	const objectEmoji = [
+		{
+			shortname: ':aNhan:',
+			src: aNhan,
+		},
+		{
+			shortname: ':joy:',
+			src: joy,
+		},
+		{
+			shortname: ':heart:',
+			src: heart,
+		},
+		{
+			shortname: ':unamused:',
+			src: unamused,
+		},
+	];
+
+	const getSrcEmoji = (shortname: string) => {
+		const emoji = objectEmoji.find((emoji) => emoji.shortname === shortname);
+		return emoji ? emoji.src : undefined;
+	};
+
 	return (
 		<article
-			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
+			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
+			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose 
+			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
 			{showProfileUser ? (
 				<div
@@ -97,13 +129,31 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				</div>
 			) : null}
 			{mentions.map((part, index) => {
+				const regex = /:\b[^:]*\b:/g;
 				const tagName = part.matchedText;
 				const markdown = (part.nonMatchText && part.nonMatchText.trim()) ?? '';
+				const result = convertMarkdown(markdown);
+
+				const [checkMarkdownIncludeEmoji, setMarkdownIncludeEmoji] = useState<string>('');
+
+				const splitTextMarkdown = markdown.split(' ');
+
+				const getMatchedElements = (markdown: string) => {
+					const splitTextMarkdown = markdown.split(' ');
+					return splitTextMarkdown.filter((item) => item.match(regex));
+				};
+				const matchedElements = getMatchedElements(markdown);
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
 				const onlyBackticks = /^```$/.test(markdown);
 
-				const result = convertMarkdown(markdown);
+				useEffect(() => {
+					if (matchedElements.length === 0) {
+						setMarkdownIncludeEmoji(markdown);
+					} else {
+						setMarkdownIncludeEmoji('');
+					}
+				}, [markdown]);
 
 				return (
 					<div key={index} className="lineText contents">
@@ -111,7 +161,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							<span>{markdown}</span>
 						) : (
 							<Markdown
-								children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : markdown}
+								children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : checkMarkdownIncludeEmoji}
 								remarkPlugins={[remarkGFM]}
 								components={{
 									pre: PreClass,
@@ -129,18 +179,46 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								}}
 							/>
 						)}
-						{markdown && ' '}
-						{tagName && (
-							<span
-								style={{ borderRadius: '4px', padding: '0 2px' }}
-								className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
-								onClick={() => handMention(tagName)}
-								ref={panelRef}
-								onMouseDown={(event) => handleMouseClick(event)}
-							>
-								{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
-							</span>
-						)}{' '}
+
+						{matchedElements.length === 0 ? (
+							markdown + tagName && (
+								<>
+									{' '}
+									<span
+										className={`font-medium w-0 cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
+											tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
+										}`}
+										onClick={() => handMention(tagName)}
+										ref={panelRef}
+										onMouseDown={(event) => handleMouseClick(event)}
+									>
+										{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
+									</span>
+								</>
+							)
+						) : (
+							<div className="flex flex-row gap-x-1 items-center w-fit">
+								{splitTextMarkdown.map((item, index) => {
+									const srcEmoji = getSrcEmoji(item);
+									if (item.match(regex)) {
+										return <img key={index} src={srcEmoji} alt={item} className="w-7 h-7 p-0 m-0" />;
+									}
+									return <span key={index}>{item}</span>;
+								})}
+								{tagName && (
+									<span
+										className={`font-medium cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
+											tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
+										}`}
+										onClick={() => handMention(tagName)}
+										ref={panelRef}
+										onMouseDown={(event) => handleMouseClick(event)}
+									>
+										{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
+									</span>
+								)}
+							</div>
+						)}
 					</div>
 				);
 			})}

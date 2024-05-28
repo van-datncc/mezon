@@ -224,7 +224,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 				category: emoji.category.replace(/ *\([^)]*\) */g, ''),
 			}));
 
-		const first50Emojis = filteredEmojis.slice(0, 72);
+		const first50Emojis = filteredEmojis.slice(0, 27);
 
 		return first50Emojis;
 	};
@@ -261,7 +261,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 				<button
 					key={index}
 					className="text-3xl  emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10 h-10 p-1 flex items-center justify-center w-full"
-					onClick={() => onEmojiSelect(item.emoji)}
+					onClick={() => onEmojiSelect(item.shortname)}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					{item.emoji}

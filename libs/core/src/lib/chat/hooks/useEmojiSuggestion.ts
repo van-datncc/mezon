@@ -12,9 +12,9 @@ import { useSelector } from 'react-redux';
 
 export function useEmojiSuggestion() {
 	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
-
 	function filterEmojiData(emojis: IEmoji[]) {
-		return emojis.map(({ emoji, shortname, category }) => ({
+		return emojis.map(({ emoji, shortname, category, name }) => ({
+			name,
 			emoji,
 			shortname,
 			category,
