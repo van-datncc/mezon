@@ -2,12 +2,13 @@ import { useAuth, useDirect, useSendInviteMessage } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelType } from 'mezon-js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import AboutUserProfile from './AboutUserProfile';
 import AvatarProfile from './AvatarProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
+import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -37,9 +38,27 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 		return userId === userProfile?.user?.google_id;
 	};
 
+	const checkUrl = (url: string | undefined) => {
+		if(url !== undefined && url !== '') return true;
+		return false;
+	};
+	const [color, setColor] = useState<string>('#323232');
+
+	const getColor = async () => {
+		if(checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)){
+			const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
+			const colorImg = await getColorAverageFromURL(url || '');
+			if(colorImg) setColor(colorImg);
+		}		
+	}
+
+	useEffect(()=>{
+		getColor();
+	},[]);
+
 	return (
 		<div>
-			<div className="h-[60px] bg-[#8CBC4F] rounded-tr-[10px] rounded-tl-[10px]"></div>
+			<div className="h-[60px] rounded-tr-[10px] rounded-tl-[10px]" style={{backgroundColor: color}}></div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
@@ -47,8 +66,8 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col gap-3 text-justify">
 					<div>
-						<p className="font-semibold tracking-wider text-xl one-line">{userById?.user?.username}</p>
-						<p className="font-medium tracking-wide text-sm">{userById?.user?.display_name}</p>
+						<p className="font-semibold tracking-wider text-xl one-line my-0">{userById?.user?.username}</p>
+						<p className="font-medium tracking-wide text-sm my-0">{userById?.user?.display_name}</p>
 					</div>
 					<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}

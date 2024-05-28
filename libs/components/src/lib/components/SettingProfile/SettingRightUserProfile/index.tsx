@@ -114,7 +114,7 @@ const SettingRightUser = ({
 		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="dark:text-white text-black">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
-				<button className="pt-1 font-semibold text-base border-b-2 border-[#1f2020] pb-2 tracking-wider">User Profile</button>
+				<button className="pt-1 font-semibold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
 				<button className="pt-1 text-[#AEAEAE] text-base ml-[16px] font-semibold tracking-wider" onClick={handleClanProfileButtonClick}>
 					Clan Profiles
 				</button>
