@@ -11,7 +11,15 @@ import {
 	useEscapeKey,
 	useReference,
 } from '@mezon/core';
-import { directActions, messagesActions, referencesActions, selectCurrentChannel, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import {
+	directActions,
+	messagesActions,
+	referencesActions,
+	selectChannelById,
+	selectCurrentChannel,
+	selectMemberByUserId,
+	useAppDispatch,
+} from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -22,7 +30,7 @@ import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
-import { useMessageLine } from 'libs/components/src/lib/components/MessageWithUser/useMessageLine';
+
 type MessageProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
@@ -74,19 +82,28 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		});
 		return result;
 	};
-	
+	const [newMessage, setNewMessage] = useState('');
 	const [editMessage, setEditMessage] = useState(mess.content.t);
 	const [content, setContent] = useState(editMessage);
-	useEffect(()=>{
-		setContent(editMessage);
-	}, [editMessage])
-	const [newMessage, setNewMessage] = useState('');
+
+	const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
+	    const regex = /#[0-9]{19}\b/g;
+	    const replacedText = text.replace(regex, (match) => {
+	        const channelId = match.substring(1); 
+	        const channel = listInput.find((item) => item.id === channelId);
+	        return channel ? `#[${channel.display}](${channelId})` : match; 
+	    });
+
+	    return replacedText;
+	};
 
 	useEffect(() => {
-		if (editMessage) {
-			const convertedHashtag = convertToPlainTextHashtag(editMessage);
+	    if (editMessage) {
+	        const convertedHashtag = convertToPlainTextHashtag(editMessage);
+	        const replacedText = replaceChannelIdsWithDisplay(convertedHashtag, listChannelsMention);
+	        setEditMessage(replacedText);
 			setContent(convertedHashtag);
-		}
+	    }
 	}, [editMessage]);
 
 	const messPre = useMemo(() => {

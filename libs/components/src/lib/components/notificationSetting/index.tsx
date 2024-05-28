@@ -1,4 +1,4 @@
-import { useCategory, useClans } from '@mezon/core';
+import { useApp, useCategory, useClans } from '@mezon/core';
 import {
 	defaultNotificationActions,
 	defaultNotificationCategoryActions,
@@ -52,7 +52,40 @@ const customStyles = {
 	}),
 };
 
+const lightCustomStyles = {
+	control: (provided: any) => ({
+		...provided,
+		backgroundColor: 'white',
+	}),
+	menu: (provided: any) => ({
+		...provided,
+		backgroundColor: 'bg-[#d5d6d7]',
+	}),
+	option: (provided: any, state: any) => ({
+		...provided,
+		backgroundColor: state.isFocused ? 'white' : '#e8e9e9',
+		color: 'black',
+	}),
+	multiValue: (provided: any) => ({
+		...provided,
+		backgroundColor: '#c5c6c7',
+	}),
+	multiValueLabel: (provided: any) => ({
+		...provided,
+		color: 'black',
+	}),
+	multiValueRemove: (provided: any) => ({
+		...provided,
+		color: 'red',
+		':hover': {
+			backgroundColor: '#cecfd0',
+			color: 'white',
+		},
+	}),
+};
+
 const ModalNotificationSetting = (props: ModalParam) => {
+	const { appearanceTheme } = useApp();
 	const { currentClan } = useClans();
 	const notificationTypes = Object.values(NotificationType);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
@@ -146,7 +179,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 		>
 			<div>
 				<hr />
-				<div>
+				<div className={`${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}>
 					<div>CLAN NOTIFICATION SETTINGS</div>
 					<div>
 						{notificationTypes.map((notificationType, index) => (
@@ -173,9 +206,9 @@ const ModalNotificationSetting = (props: ModalParam) => {
 						options={options}
 						value={selectedOption}
 						placeholder="Select or create an option..."
-						styles={customStyles}
+						styles={appearanceTheme === "dark" ? customStyles : lightCustomStyles}
 					/>
-					<div className="mt-4 overflow-y-auto max-h-[200px]">
+					<div className={`mt-4 overflow-y-auto max-h-[200px] ${appearanceTheme === "light" ? "customScrollLightMode" : ""} `}>
 						<table className="w-full mt-4">
 							<thead>
 								<tr>

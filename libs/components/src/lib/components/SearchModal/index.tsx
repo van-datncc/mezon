@@ -1,4 +1,4 @@
-import { useAppNavigation, useAuth, useChannels, useClans, useDirect, useFriends } from '@mezon/core';
+import { useApp, useAppNavigation, useAuth, useChannels, useClans, useDirect, useFriends } from '@mezon/core';
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
@@ -26,6 +26,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
 	const itemRef = useRef<HTMLDivElement | null>(null);
+
+	const {appearanceTheme} = useApp();
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
@@ -223,18 +225,18 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			onClose={onClose}
 			className="bg-[#111111] text-contentPrimary bg-opacity-90 focus-visible:[&>*]:outline-none"
 		>
-			<Modal.Body className="bg-[#36393e] px-6 py-4 rounded-[6px] h-[200px] w-full">
+			<Modal.Body className="dark:bg-[#36393e] bg-bgLightMode px-6 py-4 rounded-[6px] h-[200px] w-full">
 				<div className="flex flex-col">
 					<InputField
 						type="text"
 						placeholder="Where would you like to go?"
-						className="py-[18px] bg-bgTertiary text-[16px] mt-2 mb-[15px]"
+						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
 						value={searchText}
 						onChange={(e) => setSearchText(e.target.value)}
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
 				</div>
-				<div ref={boxRef} className="w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px]">
+				<div ref={boxRef} className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
 						<>
 							{listMemSearch.length
@@ -249,7 +251,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 													onClick={() => handleSelectMem(item)}
 													onMouseEnter={() => setIdActive(item.id)}
 													onMouseLeave={() => setIdActive(item.id)}
-													className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 												>
 													<SuggestItem name={item?.name} avatarUrl={item.avatarUser} />
 												</div>
@@ -335,7 +337,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					)}
 				</div>
 				<div className="pt-2">
-					<span className="text-[13px] font-medium text-contentTertiary">
+					<span className="text-[13px] font-medium dark:text-contentTertiary text-textLightTheme">
 						<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
 					</span>
 				</div>
