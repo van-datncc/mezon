@@ -60,7 +60,6 @@ function MemberProfile({
 		const distanceToBottom = windowHeight - mouseY;
 
 		if (event.button === 0) {
-			console.log(1);
 			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
 			setTop(mouseY - 50);
