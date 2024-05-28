@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ActivityIndicator, FlatList, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import ImageView from 'react-native-image-view';
+import ImageViewIOS from 'react-native-image-viewing';
 import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
@@ -41,6 +42,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				width: Metrics.screenWidth - 100,
 				height: Metrics.screenHeight - 100,
 				url: url,
+				uri: url,
 			};
 		});
 	}, [attachments]);
@@ -197,30 +199,43 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				</TouchableOpacity>
 			)}
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
-			<ImageView
-				animationType={'none'}
-				images={formatAttachments}
-				imageIndex={idxSelectedImageModal}
-				isVisible={visibleImageModal}
-				glideAlways
-				isSwipeCloseEnabled
-				isPinchZoomEnabled
-				isTapZoomEnabled
-				onImageChange={(idx: number) => {
-					setIdxSelectedImageModal(idx);
-					footerImagesModalRef?.current?.scrollTo({
-						y: idx * 150,
-						animated: true,
-					});
-				}}
-				controls={{
-					next: true,
-					prev: true,
-					close: Platform.OS === 'android',
-				}}
-				onClose={() => setVisibleImageModal(false)}
-				renderFooter={() => <RenderFooterModal />}
-			/>
+			{visibleImageModal && <View style={styles.overlay} />}
+			{Platform.OS === 'ios' ? (
+				<ImageViewIOS
+					backgroundColor={Colors.secondary}
+					images={formatAttachments}
+					imageIndex={idxSelectedImageModal}
+					visible={visibleImageModal}
+					onRequestClose={() => setVisibleImageModal(false)}
+					FooterComponent={RenderFooterModal}
+					onImageIndexChange={(idx) => setIdxSelectedImageModal(idx)}
+				/>
+			) : (
+				<ImageView
+					animationType={'none'}
+					images={formatAttachments}
+					imageIndex={idxSelectedImageModal}
+					isVisible={visibleImageModal}
+					glideAlways
+					isSwipeCloseEnabled
+					isPinchZoomEnabled
+					isTapZoomEnabled
+					onImageChange={(idx: number) => {
+						setIdxSelectedImageModal(idx);
+						footerImagesModalRef?.current?.scrollTo({
+							y: idx * 150,
+							animated: true,
+						});
+					}}
+					controls={{
+						next: true,
+						prev: true,
+						close: Platform.OS === 'android',
+					}}
+					onClose={() => setVisibleImageModal(false)}
+					renderFooter={() => <RenderFooterModal />}
+				/>
+			)}
 		</View>
 	);
 });
