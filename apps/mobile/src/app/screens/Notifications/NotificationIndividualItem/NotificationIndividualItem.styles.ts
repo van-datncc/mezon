@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
   },
   notifyContent: {
     flex: 1,
+    marginLeft: size.s_10
   },
   notifyHeaderTitle: {
     color: Colors.textGray,
@@ -23,8 +24,8 @@ export const styles = StyleSheet.create({
     color: Colors.textGray,
   },
   boxImage: {
-    width: size.s_40,
-    height: size.s_40,
+    width: size.s_50,
+    height: size.s_50,
     borderRadius: 50,
     marginBottom: 10
   },
@@ -34,8 +35,8 @@ export const styles = StyleSheet.create({
     borderRadius: 50
   },
   boxImageChar: {
-    width: size.s_40,
-    height: size.s_40,
+    width: size.s_50,
+    height: size.s_50,
     borderRadius: 50,
     backgroundColor: Colors.bgDarkCharcoal,
     display: 'flex',

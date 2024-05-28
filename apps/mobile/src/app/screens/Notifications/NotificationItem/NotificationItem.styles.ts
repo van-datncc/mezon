@@ -2,16 +2,18 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   notifyContainer: {
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    marginBottom: size.s_10
   },
   notifyHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 10
+    gap: 10,
   },
   notifyContent: {
     flex: 1,
+    marginLeft: size.s_10
   },
   notifyHeaderTitle: {
     color: Colors.textGray,
@@ -23,8 +25,8 @@ export const styles = StyleSheet.create({
     color: Colors.textGray,
   },
   boxImage: {
-    width: size.s_40,
-    height: size.s_40,
+    width: size.s_50,
+    height: size.s_50,
     borderRadius: 50,
     marginBottom: 10
   },
@@ -34,8 +36,8 @@ export const styles = StyleSheet.create({
     borderRadius: 50
   },
   boxImageChar: {
-    width: size.s_40,
-    height: size.s_40,
+    width: size.s_50,
+    height: size.s_50,
     borderRadius: size.s_40,
     backgroundColor: Colors.bgDarkCharcoal,
     display: 'flex',
