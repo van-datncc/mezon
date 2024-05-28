@@ -180,7 +180,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 					<PopupMessage
 						reactionRightState={reactionRightState}
 						mess={mess as IMessageWithUser}
-						idMessageRefOpt={mess.id}
 						reactionBottomState={reactionBottomState}
 						openEditMessageState={openEditMessageState}
 						openOptionMessageState={openOptionMessageState}
@@ -271,8 +270,6 @@ ChannelMessage.Skeleton = () => {
 type PopupMessageProps = {
 	reactionRightState: boolean;
 	mess: IMessageWithUser;
-
-	idMessageRefOpt: string;
 	reactionBottomState: boolean;
 	openEditMessageState: boolean;
 	openOptionMessageState: boolean;

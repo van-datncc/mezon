@@ -1,20 +1,28 @@
-import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, {useEffect, useMemo, useState} from 'react';
-import { Linking, Pressable, Text, TouchableOpacity, View, Image } from 'react-native';
+import { useDeleteMessage } from '@mezon/core';
+import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { EmojiDataOptionals, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, convertTimeString, getTimeDifferenceInSeconds, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
+import {
+	EmojiDataOptionals,
+	IChannelMember,
+	IMessageWithUser,
+	TIME_COMBINE,
+	checkSameDay,
+	convertTimeString,
+	getTimeDifferenceInSeconds,
+	notImplementForGifOrStickerSendFromPanel,
+} from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import ImageView from 'react-native-image-viewing';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
-import { styles } from './styles';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
-import  {FileIcon, ReplyIcon } from '@mezon/mobile-components';
-import { useDeleteMessage } from '@mezon/core';
+import { styles } from './styles';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -29,37 +37,33 @@ export type MessageItemProps = {
 	channelLabel?: string;
 	channelId?: string;
 	dataReactionCombine?: EmojiDataOptionals[];
+	onOpenImage?: (image: ApiMessageAttachment) => void;
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
-	return (
-	  prevProps.message === nextProps.message &&
-	  prevProps.dataReactionCombine === nextProps.dataReactionCombine
-	);
+	return prevProps.message === nextProps.message && prevProps.dataReactionCombine === nextProps.dataReactionCombine;
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, dataReactionCombine, preMessage } = props;
+	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
-	const [visibleImage, setIsVisibleImage] = useState<boolean>(false);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
-	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null)
+	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
-
-  const isCombine = useMemo(()=>{
-    const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
+	const isCombine = useMemo(() => {
+		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
 			timeDiff < TIME_COMBINE &&
 			preMessage?.user?.id === message?.user?.id &&
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
-  }, [message, preMessage])
+	}, [message, preMessage]);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -88,10 +92,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderVideos = () => {
 		return (
-			<View style={{
-				width: widthMedia,
-				marginVertical: size.s_10,
-			}}>
+			<View
+				style={{
+					width: widthMedia,
+					marginVertical: size.s_10,
+				}}
+			>
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
@@ -119,7 +125,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 
 					return (
-						<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => setIsVisibleImage(true)}>
+						<TouchableOpacity
+							disabled={checkImage}
+							activeOpacity={0.8}
+							key={index}
+							onPress={() => {
+								onOpenImage(image);
+							}}
+						>
 							<FastImage
 								style={[
 									styles.imageMessageRender,
@@ -154,7 +167,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						</View>
 					</View>
 				</TouchableOpacity>
-			)
+			);
 		});
 	};
 
@@ -248,15 +261,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
-	}
+	};
 
 	const setMessageSelected = (type: EMessageBSToShow) => {
-		setOpenBottomSheet(type)
-	}
+		setOpenBottomSheet(type);
+	};
 
 	const jumpToRepliedMesage = () => {
 		console.log('message to jump', messageRefFetchFromServe);
-	}
+	};
 
 	return (
 		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }]}>
@@ -268,7 +281,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<Pressable onPress={() => jumpToRepliedMesage()} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
-								<Image source={{uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
+								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
 							</View>
 						) : (
 							<View style={[styles.replyAvatar]}>
@@ -277,26 +290,26 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								</View>
 							</View>
 						)}
-						<Text style={styles.repliedContentText} numberOfLines={2} ellipsizeMode='head'>{messageRefFetchFromServe.content.t}</Text>
+						<Text style={styles.repliedContentText} numberOfLines={2} ellipsizeMode="head">
+							{messageRefFetchFromServe.content.t}
+						</Text>
 					</Pressable>
 				</View>
-			): null}
-				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-        {!isCombine ?
-				<Pressable
-					onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)}
-					style={styles.wrapperAvatar}
-				>
-					{
-						(user?.user?.avatar_url ? (
-							<Image source={{uri: user?.user?.avatar_url }} style={styles.logoUser} />
+			) : null}
+			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+				{!isCombine ? (
+					<Pressable onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)} style={styles.wrapperAvatar}>
+						{user?.user?.avatar_url ? (
+							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
 							<View style={styles.avatarMessageBoxDefault}>
 								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
 							</View>
-						))}
-				</Pressable> : <View style={styles.wrapperAvatarCombine} />
-					}
+						)}
+					</Pressable>
+				) : (
+					<View style={styles.wrapperAvatarCombine} />
+				)}
 				<Pressable style={[styles.rowMessageBox]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
 					{!isCombine && (
 						<View style={styles.messageBoxTop}>
@@ -306,22 +319,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					)}
 					{videos.length > 0 && renderVideos()}
 					{images.length > 0 && renderImages()}
-					{images.length > 0 && (
-						<ImageView
-							images={images.map((i) => {
-								return { uri: i.url };
-							})}
-							imageIndex={0}
-							visible={visibleImage}
-							onRequestClose={() => setIsVisibleImage(false)}
-						/>
-					)}
+
 					{documents.length > 0 && renderDocuments()}
 					{renderTextContent()}
 					<MessageAction message={message} dataReactionCombine={dataReactionCombine} mode={mode} />
 				</Pressable>
 			</View>
-			<MessageItemBS mode={mode} message={message} onConfirmDeleteMessage={onConfirmDeleteMessage} type={openBottomSheet} onClose={() => setOpenBottomSheet(null)} />
+			<MessageItemBS
+				mode={mode}
+				message={message}
+				onConfirmDeleteMessage={onConfirmDeleteMessage}
+				type={openBottomSheet}
+				onClose={() => setOpenBottomSheet(null)}
+			/>
 		</View>
 	);
 }, arePropsEqual);
