@@ -111,7 +111,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
     const handleForwardMessage = () => {
         onClose();
-        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL);
+        const payload: IMessageActionNeedToResolve = {
+            type: EMessageActionType.ForwardMessage,
+            targetMessage: message
+        }
+        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
     }
 
     const implementAction = (type: EMessageActionType) => {

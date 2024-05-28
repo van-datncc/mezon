@@ -1,18 +1,19 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, Image, Modal, ScrollView, Dimensions, TouchableOpacity, } from "react-native";
+import { View, Text, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Colors, Fonts } from "@mezon/mobile-ui";
 import { useState } from "react";
 import { useAuth, useChannels, useDirect, useSendForwardMessage } from "@mezon/core";
-import { ChannelStatusEnum, removeDuplicatesById } from '@mezon/utils';
+import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
 import { CrossIcon, HashSignIcon, HashSignLockIcon } from "@mezon/mobile-components";
 import { default as CheckBox } from "react-native-bouncy-checkbox";
 import { ChannelStreamMode, ChannelType } from "mezon-js";
 import { useMezon } from "@mezon/transport";
 import { useSelector } from "react-redux";
-import { getSelectedMessage, toggleIsShowPopupForwardFalse } from "libs/store/src/lib/forwardMessage/forwardMessage.slice";
+import { getSelectedMessage } from "libs/store/src/lib/forwardMessage/forwardMessage.slice";
 import { useAppDispatch } from "@mezon/store-mobile";
 import { useEffect } from "react";
+import MessageItem from "../../MessageItem";
 
 type OpjectSend = {
     id: string;
@@ -24,9 +25,10 @@ type OpjectSend = {
 interface ForwardMessageModalProps {
     show?: boolean;
     onClose: () => void;
+    message: IMessageWithUser;
 }
 
-const ForwardMessageModal = ({ show, onClose }: ForwardMessageModalProps) => {
+const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProps) => {
     const [searchText, setSearchText] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
@@ -212,6 +214,10 @@ const ForwardMessageModal = ({ show, onClose }: ForwardMessageModalProps) => {
         )
     }
 
+    useEffect(() => {
+        console.log("vvv", message);
+    }, [message])
+
     return (
         <Modal
             animationType="slide"
@@ -262,6 +268,10 @@ const ForwardMessageModal = ({ show, onClose }: ForwardMessageModalProps) => {
                             </>
                         )}
                 </ScrollView>
+                {message && (<MessageItem
+                    message={message}
+                    mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+                />)}
 
                 <TouchableOpacity style={styles.btn} onPress={() => sentToMessage()}>
                     <Text style={styles.btnText}>Send</Text>

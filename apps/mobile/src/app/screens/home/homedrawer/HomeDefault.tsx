@@ -18,6 +18,7 @@ import { styles } from './styles';
 import Toast from "react-native-toast-message";
 import ForwardMessageModal from './components/ForwardMessage';
 import { useEffect } from 'react';
+import { IMessageWithUser } from '@mezon/utils';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -25,6 +26,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
 	const [showForwardModal, setShowForwardModal] = useState(false);
+	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -39,8 +41,10 @@ const HomeDefault = React.memo((props: any) => {
 
 	useEffect(() => {
 		const showKeyboard = DeviceEventEmitter.addListener(
-			ActionEmitEvent.SHOW_FORWARD_MODAL, () => {
+			ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
+				setMessageForward(payload.message);
 				setShowForwardModal(true);
+				console.log("aaa", messageForward);
 			},
 		);
 		return () => {
@@ -87,7 +91,11 @@ const HomeDefault = React.memo((props: any) => {
 						</BottomKeyboardPicker>
 					)}
 
-					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} />
+					<ForwardMessageModal
+						show={showForwardModal}
+						onClose={() => setShowForwardModal(false)}
+						message={messageForward}
+					/>
 				</View>
 			)}
 		</View>
