@@ -10,6 +10,7 @@ import { IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+
 export function useEmojiSuggestion() {
 	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
 	function filterEmojiData(emojis: IEmoji[]) {
