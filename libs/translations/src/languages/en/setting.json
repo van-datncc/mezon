@@ -1,7 +1,9 @@
 {
     "accountSetting": {},
     "paymentSettings": {},
-    "App Settings": {},
+    "appSettings": {
+        "language": "Language"
+    },
     "support": {},
     "whatsNew": {},
     "logOut": "Log Out",

@@ -103,7 +103,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     }, {});
 
     const navigateToSettingScreen = () => {
-		navigation.navigate(APP_SCREEN.PROFILE.STACK, { screen: APP_SCREEN.PROFILE.SETTING });
+		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
 	};
 
     return (
