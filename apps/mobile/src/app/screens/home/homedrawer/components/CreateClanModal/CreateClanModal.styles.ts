@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   input: {
     height: 40,
     padding: 10,
-    backgroundColor: '#1e1f22',
+    backgroundColor: Colors.charcoalBlack,
     borderRadius: 8,
     color: Colors.white,
     marginBottom: size.s_6
@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
     marginBottom: size.s_6
   },
   communityGuideLines: {
-    color: '#4173c3'
+    color: Colors.azureBlue
   },
   button: {
     width: '100%',
