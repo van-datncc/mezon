@@ -270,7 +270,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 													onClick={() => handleSelectChannel(item)}
 													onMouseEnter={() => setIdActive(item.id)}
 													onMouseLeave={() => setIdActive(item.id)}
-													className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-bgModifierHover w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 												>
 													<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} />
 												</div>

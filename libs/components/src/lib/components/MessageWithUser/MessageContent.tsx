@@ -88,7 +88,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 					<div id={message.id} className="w-full">
 						<MessageLine line={newMessage as string} />
 					</div>
-					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme">(edit)</p>
+					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">(edit)</p>
 				</div>
 			) : (
 				<div className="flex w-full">
@@ -98,7 +98,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 					{message.update_time ? (
 						<div className="self-center">
 							{message.create_time < message.update_time ? (
-								<p className="ml-[5px] opacity-50 text-[9px] font-semibold dark:text-textDarkTheme text-textLightTheme">(edited)</p>
+								<p className="ml-[5px] opacity-50 text-[9px] font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">(edited)</p>
 							) : null}
 						</div>
 					) : null}
