@@ -110,7 +110,6 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     }
 
     const handleForwardMessage = () => {
-        console.log('ForwardMessage');
         onClose();
         DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL);
     }

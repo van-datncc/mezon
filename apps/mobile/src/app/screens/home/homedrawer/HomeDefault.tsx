@@ -4,7 +4,7 @@ import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -24,7 +24,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
-	const ref = useRef<BottomSheet>();
+	const [showForwardModal, setShowForwardModal] = useState(false);
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -40,7 +40,7 @@ const HomeDefault = React.memo((props: any) => {
 	useEffect(() => {
 		const showKeyboard = DeviceEventEmitter.addListener(
 			ActionEmitEvent.SHOW_FORWARD_MODAL, () => {
-				ref.current?.expand();
+				setShowForwardModal(true);
 			},
 		);
 		return () => {
@@ -87,7 +87,7 @@ const HomeDefault = React.memo((props: any) => {
 						</BottomKeyboardPicker>
 					)}
 
-					<ForwardMessageModal ref={ref} />
+					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} />
 				</View>
 			)}
 		</View>

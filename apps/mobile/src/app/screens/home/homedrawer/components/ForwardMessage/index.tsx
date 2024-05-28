@@ -1,21 +1,18 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, Image, } from "react-native";
-import BottomSheet, { BottomSheetScrollView, BottomSheetView, TouchableOpacity } from "@gorhom/bottom-sheet";
-import { Ref } from "react";
-import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { forwardRef } from "react";
+import { View, Text, StyleSheet, Image, Modal, ScrollView, Dimensions, TouchableOpacity, } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Colors, Fonts } from "@mezon/mobile-ui";
 import { useState } from "react";
 import { useAuth, useChannels, useDirect, useSendForwardMessage } from "@mezon/core";
 import { ChannelStatusEnum, removeDuplicatesById } from '@mezon/utils';
-import { HashSignIcon, HashSignLockIcon } from "@mezon/mobile-components";
+import { CrossIcon, HashSignIcon, HashSignLockIcon } from "@mezon/mobile-components";
 import { default as CheckBox } from "react-native-bouncy-checkbox";
 import { ChannelStreamMode, ChannelType } from "mezon-js";
 import { useMezon } from "@mezon/transport";
 import { useSelector } from "react-redux";
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from "libs/store/src/lib/forwardMessage/forwardMessage.slice";
 import { useAppDispatch } from "@mezon/store-mobile";
+import { useEffect } from "react";
 
 type OpjectSend = {
     id: string;
@@ -24,8 +21,14 @@ type OpjectSend = {
     channel_label?: string;
 };
 
-const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>) => {
+interface ForwardMessageModalProps {
+    show?: boolean;
+    onClose: () => void;
+}
+
+const ForwardMessageModal = ({ show, onClose }: ForwardMessageModalProps) => {
     const [searchText, setSearchText] = useState("");
+    const [showModal, setShowModal] = useState(false);
     const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
     const { listDM: dmGroupChatList } = useDirect();
     const { listChannels } = useChannels();
@@ -37,7 +40,14 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
     const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
     const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
     const accountId = userProfile?.user?.id ?? '';
-    const snapPoints = useMemo(() => ["90%"], []);
+
+    useEffect(() => {
+        setShowModal(show || false)
+    }, [show])
+
+    function handleClose() {
+        onClose();
+    }
 
     const listMemSearch = useMemo(() => {
         const listDMSearch = listDM.length
@@ -92,6 +102,13 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
         }
     };
 
+    const isChecked = (id: string, type: number,) => {
+        const existingIndex = selectedObjectIdSends.findIndex((item) => item.id === id && item.type === type);
+        // console.log(id, type, existingIndex);
+
+        return existingIndex !== -1;
+    }
+
     const sentToMessage = async () => {
         for (const selectedObjectIdSend of selectedObjectIdSends) {
             if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
@@ -113,7 +130,7 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
         }
         // dispatch(toggleIsShowPopupForwardFalse());
         // @ts-ignore
-        ref && ref.current && ref.current.close();
+        // ref && ref.current && ref.current.close();
     };
 
     const renderMember = () => {
@@ -137,6 +154,7 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
 
                             <View>
                                 <CheckBox
+                                    isChecked={isChecked(item.idDM, item.typeChat || 0)}
                                     size={24}
                                     fillColor={Colors.green}
                                     unFillColor={Colors.bgGrayLight}
@@ -173,7 +191,7 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
 
                             <View>
                                 <CheckBox
-                                    isChecked={false}
+                                    isChecked={isChecked(channel.id, channel.type || 0)}
                                     size={24}
                                     fillColor={Colors.green}
                                     unFillColor={Colors.bgGrayLight}
@@ -195,20 +213,20 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
     }
 
     return (
-        <BottomSheet
-            ref={ref}
-            snapPoints={snapPoints}
-            bottomInset={150}
-            detached={true}
-            index={-1}
-            containerStyle={styles.sheetWrapper}
-            backgroundStyle={styles.sheetBackground}
-            style={styles.sheetContainer}
-            enablePanDownToClose
-            animateOnMount
+        <Modal
+            animationType="slide"
+            transparent
+            visible={showModal}
         >
-            <BottomSheetScrollView>
-                <Text style={styles.headerText}>Forward Message</Text>
+            <View style={styles.sheetContainer}>
+                <View style={styles.headerModal}>
+                    <TouchableOpacity onPress={handleClose}>
+                        <CrossIcon height={16} width={16} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>Forward Message</Text>
+                    <View style={{ width: 16 }}></View>
+                </View>
+
                 <View style={styles.inputWrapper}>
                     <TextInput
                         style={styles.input}
@@ -218,48 +236,58 @@ const ForwardMessageModal = forwardRef((props: {}, ref: Ref<BottomSheetMethods>)
                     />
                 </View>
 
-                {!searchText.startsWith('@') && !searchText.startsWith('#')
-                    ? (
-                        <>
-                            {renderMember()}
-                            {renderChannel()}
-                        </>
-                    )
-                    : (
-                        <>
-                            {searchText.startsWith('@') && (
-                                <>
-                                    <Text style={{ color: "white" }}>Search friend and users</Text>
-                                    {renderMember()}
-                                </>
-                            )}
+                <ScrollView style={{ marginVertical: 10 }}>
+                    {!searchText.startsWith('@') && !searchText.startsWith('#')
+                        ? (
+                            <>
+                                {renderMember()}
+                                {renderChannel()}
+                            </>
+                        )
+                        : (
+                            <>
+                                {searchText.startsWith('@') && (
+                                    <>
+                                        <Text style={{ color: "white" }}>Search friend and users</Text>
+                                        {renderMember()}
+                                    </>
+                                )}
 
-                            {searchText.startsWith('#') && (
-                                <>
-                                    <Text style={{ color: "white" }}>Searching channel</Text>
-                                    {renderChannel()}
-                                </>
-                            )}
-                        </>
-                    )}
+                                {searchText.startsWith('#') && (
+                                    <>
+                                        <Text style={{ color: "white" }}>Searching channel</Text>
+                                        {renderChannel()}
+                                    </>
+                                )}
+                            </>
+                        )}
+                </ScrollView>
 
                 <TouchableOpacity style={styles.btn} onPress={() => sentToMessage()}>
                     <Text style={styles.btnText}>Send</Text>
                 </TouchableOpacity>
-            </BottomSheetScrollView>
-        </BottomSheet>
+            </View>
+        </Modal>
     );
-});
+}
 
 const styles = StyleSheet.create({
-    sheetWrapper: {
-        marginHorizontal: 24,
-    },
     sheetContainer: {
         padding: 24,
+        backgroundColor: Colors.primary,
+        marginHorizontal: 20,
+        marginTop: 60,
+        borderRadius: 10,
+        maxHeight: 500,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
     },
-    sheetBackground: {
-        backgroundColor: Colors.bgCharcoal,
+    headerModal: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
     },
     headerText: {
         color: Colors.white,
