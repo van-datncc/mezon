@@ -215,7 +215,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
     }
 
     useEffect(() => {
-        console.log("vvv", message);
+        // console.log("vvv", message);
     }, [message])
 
     return (
