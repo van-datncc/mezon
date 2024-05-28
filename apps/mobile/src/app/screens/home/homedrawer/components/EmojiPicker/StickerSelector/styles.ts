@@ -3,16 +3,32 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
 	content: {
-		height: 100,
-		width: 100,
+		height: 110,
+		width: 110,
 		borderRadius: 10,
 		overflow: 'hidden',
+		backgroundColor: Colors.black
+	},
+
+	btnEmo: {
+		width: 30,
+		height: 30,
+		borderRadius: 50,
+		overflow: 'hidden',
+		backgroundColor: Colors.black
+	},
+
+	btnWrap: {
+		display: "flex",
+		flexDirection: "row",
+		gap: 10
 	},
 
 	session: {},
 
 	sessionTitle: {
 		color: Colors.white,
+		marginVertical: 10
 	},
 
 	sessionContent: {
@@ -21,17 +37,8 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		gap: 10,
 		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-
-	bottomCategory: {
-		position: 'relative',
-		bottom: 0,
-		left: 0,
-		width: '100%',
-		backgroundColor: 'black',
-		height: 50,
-	},
+		alignItems: 'center'
+	}
 });
 
 export default styles;

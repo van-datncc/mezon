@@ -1,4 +1,4 @@
-import { IMessage, IMessageWithUser } from '@mezon/utils';
+import { IMessage } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
@@ -14,7 +14,6 @@ export interface ReferencesEntity extends IMessage {
 export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	reference: IMessageWithUser | null;
 	dataReferences: ApiMessageRef[];
 	idMessageToJump: string;
 	openEditMessageState: boolean;
@@ -22,6 +21,8 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	attachmentDataRef: ApiMessageAttachment[];
 	idMessageRefReply: string;
 	idMessageRefReaction: string;
+	idMessageRefEdit: string;
+	idMessageRefOption: string;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -33,7 +34,6 @@ export const fetchReferences = createAsyncThunk<ReferencesEntity[]>('references/
 export const initialReferencesState: ReferencesState = referencesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	reference: null,
 	dataReferences: [],
 	idMessageToJump: '',
 	openEditMessageState: false,
@@ -41,6 +41,8 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	attachmentDataRef: [],
 	idMessageRefReply: '',
 	idMessageRefReaction: '',
+	idMessageRefEdit: '',
+	idMessageRefOption: '',
 });
 
 export const referencesSlice = createSlice({
@@ -49,9 +51,7 @@ export const referencesSlice = createSlice({
 	reducers: {
 		add: referencesAdapter.addOne,
 		remove: referencesAdapter.removeOne,
-		setReferenceMessage(state, action) {
-			state.reference = action.payload;
-		},
+
 		setDataReferences(state, action) {
 			state.dataReferences = action.payload;
 		},
@@ -77,6 +77,12 @@ export const referencesSlice = createSlice({
 		},
 		setIdReferenceMessageReaction(state, action) {
 			state.idMessageRefReaction = action.payload;
+		},
+		setIdReferenceMessageEdit(state, action) {
+			state.idMessageRefEdit = action.payload;
+		},
+		setIdReferenceMessageOption(state, action) {
+			state.idMessageRefOption = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -107,8 +113,6 @@ export const selectAllReferences = createSelector(getReferencesState, selectAll)
 
 export const selectReferencesEntities = createSelector(getReferencesState, selectEntities);
 
-export const selectReferenceMessage = createSelector(getReferencesState, (state: ReferencesState) => state.reference);
-
 export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);
 
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
@@ -122,3 +126,7 @@ export const selectIdMessageRefReply = createSelector(getReferencesState, (state
 export const selectIdMessageRefReaction = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReaction);
 
 export const selectIdMessageToJump = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
+
+export const selectIdMessageRefEdit = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefEdit);
+
+export const selectIdMessageRefOption = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefOption);

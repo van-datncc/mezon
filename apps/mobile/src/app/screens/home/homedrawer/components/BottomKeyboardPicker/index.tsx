@@ -21,7 +21,10 @@ export default forwardRef(function BottomKeyboardPicker({ height = 1, children }
 				backgroundColor: Colors.secondary,
 			}}
 		>
-			<BottomSheetScrollView style={styles.contentContainer}>{children}</BottomSheetScrollView>
+			<BottomSheetScrollView
+				style={styles.contentContainer}>
+				{children}
+			</BottomSheetScrollView>
 		</BottomSheet>
 	);
 });

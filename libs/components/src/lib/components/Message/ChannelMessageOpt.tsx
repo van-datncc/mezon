@@ -20,6 +20,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+		dispatch(referencesActions.setIdMessageToJump(''));
 		event.stopPropagation();
 	};
 
@@ -27,7 +28,8 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
-		dispatch(referencesActions.setReferenceMessage(message));
+		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
+		dispatch(referencesActions.setIdMessageToJump(''));
 		event.stopPropagation();
 	};
 
@@ -36,7 +38,10 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(messagesActions.setOpenOptionMessageState(!openOptionMessageState));
-		dispatch(referencesActions.setReferenceMessage(message));
+	};
+
+	const handleOnEnterOptionIcon = () => {
+		dispatch(referencesActions.setIdReferenceMessageOption(message.id));
 	};
 
 	const handleOnEnterSmileIcon = () => {
@@ -88,7 +93,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 					<Icons.ThreadIcon isWhite={thread} />
 				</button>
 			)}
-			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
+			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer" onMouseEnter={handleOnEnterOptionIcon}>
 				<Icons.ThreeDot />
 			</button>
 		</div>

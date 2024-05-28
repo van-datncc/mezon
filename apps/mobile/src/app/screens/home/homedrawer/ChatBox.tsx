@@ -21,7 +21,8 @@ import {
 	Text,
 	Pressable,
 	Platform,
-	TouchableOpacity
+	TouchableOpacity,
+	KeyboardEvent
 } from 'react-native';
 import { useThrottledCallback } from 'use-debounce';
 import { IModeKeyboardPicker } from './components';
@@ -45,46 +46,46 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
-  mention: {
-    trigger: '@',
-    allowedSpacesCount: 0,
-    isInsertSpaceAfterMention: true,
-  },
-  hashtag: {
-    trigger: '#',
-    allowedSpacesCount: 0,
-    isInsertSpaceAfterMention: true,
-    textStyle: {
-      fontWeight: 'bold',
-      color: Colors.white,
-    },
-  },
+	mention: {
+		trigger: '@',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true,
+	},
+	hashtag: {
+		trigger: '#',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true,
+		textStyle: {
+			fontWeight: 'bold',
+			color: Colors.white,
+		},
+	},
 };
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
 interface IChatBoxProps {
 	channelLabel: string;
 	channelId: string;
 	mode: number;
-  messageAction?: EMessageActionType,
+	messageAction?: EMessageActionType,
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<TextInput>();
 	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [mentionTextValue, setMentionTextValue] = useState('');
-  const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const [mentionTextValue, setMentionTextValue] = useState('');
+	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: props.channelId });
-  const currentChannel = useSelector(selectCurrentChannel);
-  const  listMentions  = UseMentionList(currentChannel?.id);
-  const { listChannels } = useChannels();
-  const { textInputProps, triggers } = useMentions({
-    value: mentionTextValue,
-    onChange: (newValue) => handleTextInputChange(newValue),
-    onSelectionChange: (position) => {handleSelectionChange(position)},
-    triggersConfig,
-  });
-  const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([])
+	const currentChannel = useSelector(selectCurrentChannel);
+	const listMentions = UseMentionList(currentChannel?.id);
+	const { listChannels } = useChannels();
+	const { textInputProps, triggers } = useMentions({
+		value: mentionTextValue,
+		onChange: (newValue) => handleTextInputChange(newValue),
+		onSelectionChange: (position) => { handleSelectionChange(position) },
+		triggersConfig,
+	});
+	const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([])
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
@@ -95,18 +96,18 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
-  const navigation = useNavigation();
-  const { setValueThread } = useThreads();
-  const { setOpenThreadMessageState } = useReference();
+	const navigation = useNavigation();
+	const { setValueThread } = useThreads();
+	const { setOpenThreadMessageState } = useReference();
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const { t } = useTranslation(['message']);
-  const cursorPositionRef = useRef(0);
-  const currentTextInput = useRef('');
-  const mentions = useRef([]);
+	const cursorPositionRef = useRef(0);
+	const currentTextInput = useRef('');
+	const mentions = useRef([]);
 
-  useEffect(()=>{
-    mentions.current = listMentions || [];
-  },[listMentions])
+	useEffect(() => {
+		mentions.current = listMentions || [];
+	}, [listMentions])
 
 	const editMessage = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -138,13 +139,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}, [removeMessageActionByType])
 
 	const handleSendMessage = useCallback(() => {
-    const payloadThreadSendMessage: IPayloadThreadSendMessage = {
-      content: { t: text },
+		const payloadThreadSendMessage: IPayloadThreadSendMessage = {
+			content: { t: text },
 			mentions: mentionData,
 			attachments: [],
 			references: [],
-    }
+		}
 		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
+		// @ts-ignore
 		const checkAttachmentLoading = attachmentDataUnique.some((attachment) => !attachment?.size);
 		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
 			Toast.show({
@@ -165,18 +167,18 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				message_sender_id: currentSelectedReplyMessage.user.id,
 				content: JSON.stringify(currentSelectedReplyMessage.content),
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
-			}]: undefined;
+			}] : undefined;
 
-	    if(![EMessageActionType.CreateThread].includes(props.messageAction)){
-				sendMessage({ t: text }, mentionData , attachmentDataUnique || [], reference, false);
-		    setAttachmentData([]);
+			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
+				sendMessage({ t: text }, mentionData, attachmentDataUnique || [], reference, false);
+				setAttachmentData([]);
 				removeAction(EMessageActionType.Reply);
-	    }
+			}
 		}
 		inputRef?.current?.clear?.();
 		setText('');
-    [EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-	  }, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
+		[EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+	}, [sendMessage, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -205,10 +207,10 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
 		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
-		  return 1;
+			return 1;
 		}
 		if (a.type !== EMessageActionType.EditMessage && b.type === EMessageActionType.EditMessage) {
-		  return -1;
+			return -1;
 		}
 		return 0;
 	}
@@ -216,7 +218,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const pushMessageActionIntoStack = useCallback((messagePayload: IMessageActionNeedToResolve) => {
 		const isExistingAction = messageActionListNeedToResolve.some(it => it.type === messagePayload.type);
 		if (isExistingAction) {
-			const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== messagePayload.type), {...messagePayload}].sort(sortMessageActionList);
+			const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== messagePayload.type), { ...messagePayload }].sort(sortMessageActionList);
 			setMessageActionListNeedToResolve(newStack);
 		} else {
 			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
@@ -235,7 +237,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			(value) => {
 				//NOTE: trigger from message action 'MessageItemBS component'
 				resetInput();
-        handleMessageAction(value)
+				handleMessageAction(value)
 				openKeyBoard();
 			},
 		);
@@ -246,97 +248,98 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		};
 	}, []);
 
-  useEffect(()=>{
-    const listChannelsMention: ChannelsMention[] = listChannels.map((item) => {
-      return {
-        id: item?.channel_id ?? '',
-        display: item?.channel_label ?? '',
-        subText: item?.category_name ?? '',
-      };
-    });
-    setListChannelsMention(listChannelsMention)
-  },[listChannels])
+	useEffect(() => {
+		const listChannelsMention: ChannelsMention[] = listChannels.map((item) => {
+			return {
+				id: item?.channel_id ?? '',
+				display: item?.channel_label ?? '',
+				subText: item?.category_name ?? '',
+			};
+		});
+		setListChannelsMention(listChannelsMention)
+	}, [listChannels])
 
 
-  const handleTextInputChange = (text) => {
-    setText(convertMentionsToText(text));
-    handleTypingDebounced();
-    setMentionTextValue(text);
-	  setIsShowAttachControl(false);
-  }
+	const handleTextInputChange = (text) => {
+		setText(convertMentionsToText(text));
+		handleTypingDebounced();
+		setMentionTextValue(text);
+		setIsShowAttachControl(false);
+	}
 
-const handleMentionInput = (mentions: MentionDataProps[]) => {
-  const mentionedUsers: UserMentionsOpt[] = [];
-  const mentionList =
-    members[0].users?.map((item: ChannelMembersEntity) => ({
-      id: item?.user?.id ?? '',
-      display: item?.user?.username ?? '',
-      avatarUrl: item?.user?.avatar_url ?? '',
-    })) ?? [];
-  const convertedMentions: UserMentionsOpt[] = mentionList
-    ? mentionList.map((mention) => ({
-        user_id: mention.id.toString() ?? '',
-        username: mention.display ?? '',
-      }))
-    : [];
-    if (mentions?.length > 0) {
-    if (mentions.some((mention) => mention.display === '@here')) {
-      mentionedUsers.splice(0, mentionedUsers.length);
-      convertedMentions.forEach((item) => {
-        mentionedUsers.push(item);
-      });
-    } else {
-      for (const mention of mentions) {
-        if (mention.display.startsWith('@')) {
-          mentionedUsers.push({
-            user_id: mention.id.toString() ?? '',
-            username: mention.display ?? '',
-          });
-        }
-      }
-    }
-    setMentionData(mentionedUsers);
-  }
-};
+	const handleMentionInput = (mentions: MentionDataProps[]) => {
+		const mentionedUsers: UserMentionsOpt[] = [];
+		const mentionList =
+			members[0].users?.map((item: ChannelMembersEntity) => ({
+				id: item?.user?.id ?? '',
+				display: item?.user?.username ?? '',
+				avatarUrl: item?.user?.avatar_url ?? '',
+			})) ?? [];
+		const convertedMentions: UserMentionsOpt[] = mentionList
+			? mentionList.map((mention) => ({
+				user_id: mention.id.toString() ?? '',
+				username: mention.display ?? '',
+			}))
+			: [];
+		if (mentions?.length > 0) {
+			if (mentions.some((mention) => mention.display === '@here')) {
+				mentionedUsers.splice(0, mentionedUsers.length);
+				convertedMentions.forEach((item) => {
+					mentionedUsers.push(item);
+				});
+			} else {
+				for (const mention of mentions) {
+					if (mention.display.startsWith('@')) {
+						mentionedUsers.push({
+							user_id: mention.id.toString() ?? '',
+							username: mention.display ?? '',
+						});
+					}
+				}
+			}
+			setMentionData(mentionedUsers);
+		}
+	};
 
-  useEffect(() => {
+	useEffect(() => {
 
-  const mentionsSelected = getListMentionSelected();
-    handleMentionInput(mentionsSelected);
-  }, [mentionTextValue]);
+		const mentionsSelected = getListMentionSelected();
+		handleMentionInput(mentionsSelected);
+	}, [mentionTextValue]);
 
-  const getListMentionSelected = () => {
-    if(!mentionTextValue || !mentions?.current?.length) return ;
-    const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
-    const validMentions = text?.match(mentionRegex);
-    const mentionsSelected = mentions?.current?.filter(mention =>{
-      return validMentions?.includes(`@${mention.display}` || '')
-    });
-    return mentionsSelected.map(mention =>({
-      id: mention.id,
-      display: `@${mention.display}`
-    }))
-  }
+	const getListMentionSelected = () => {
+		if (!mentionTextValue || !mentions?.current?.length) return;
+		const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
+		const validMentions = text?.match(mentionRegex);
+		const mentionsSelected = mentions?.current?.filter(mention => {
+			return validMentions?.includes(`@${mention.display}` || '')
+		});
+		return mentionsSelected.map(mention => ({
+			id: mention.id,
+			display: `@${mention.display}`
+		}))
+	}
 
-  const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
-    const { type, targetMessage } = messageAction;
-    switch (type) {
-      case EMessageActionType.EditMessage:
-      case EMessageActionType.Reply:
-        pushMessageActionIntoStack(messageAction);
-        break;
-      case EMessageActionType.CreateThread:
-        setOpenThreadMessageState(true);
-        setValueThread(targetMessage);
-        navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL});
-      break;
-      case EMessageActionType.Mention:
-        selectMentionMessage(targetMessage)
-      break;
-      default:
-        break;
-    }
-  }
+	const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
+		const { type, targetMessage } = messageAction;
+		switch (type) {
+			case EMessageActionType.EditMessage:
+			case EMessageActionType.Reply:
+				pushMessageActionIntoStack(messageAction);
+				break;
+			case EMessageActionType.CreateThread:
+				setOpenThreadMessageState(true);
+				setValueThread(targetMessage);
+				// @ts-ignore
+				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
+				break;
+			case EMessageActionType.Mention:
+				selectMentionMessage(targetMessage)
+				break;
+			default:
+				break;
+		}
+	}
 
 	const openKeyBoard = () => {
 		timeoutRef.current = setTimeout(() => {
@@ -345,35 +348,35 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 		}, 300);
 	};
 
-  const handleInsertMentionTextInput = (mentionMessage) =>{
-    const cursorPosition = cursorPositionRef?.current;
-    const inputValue = currentTextInput?.current;
-    if(!mentionMessage?.display) return;
-    const textMentions = `@${mentionMessage?.display} `;
-    const textArray = inputValue.split('');
-    textArray.splice(cursorPosition,0,textMentions)
-    const textConverted = textArray.join('')
-    setText(textConverted)
-    setMentionTextValue(textConverted)
-  }
+	const handleInsertMentionTextInput = (mentionMessage) => {
+		const cursorPosition = cursorPositionRef?.current;
+		const inputValue = currentTextInput?.current;
+		if (!mentionMessage?.display) return;
+		const textMentions = `@${mentionMessage?.display} `;
+		const textArray = inputValue.split('');
+		textArray.splice(cursorPosition, 0, textMentions)
+		const textConverted = textArray.join('')
+		setText(textConverted)
+		setMentionTextValue(textConverted)
+	}
 
-  useEffect(()=>{
-    currentTextInput.current = text;
-  }, [text])
+	useEffect(() => {
+		currentTextInput.current = text;
+	}, [text])
 
-  const selectMentionMessage = (message: IMessageWithUser) => {
-    const mention = mentions?.current?.find(mention =>{
-      return  mention.id === message.sender_id
-    });
-    handleInsertMentionTextInput(mention)
-  }
+	const selectMentionMessage = (message: IMessageWithUser) => {
+		const mention = mentions?.current?.find(mention => {
+			return mention.id === message.sender_id
+		});
+		handleInsertMentionTextInput(mention)
+	}
 
-  const handleSelectionChange = ( selection : {
-    start: number;
-    end: number;
-}) => {
-    cursorPositionRef.current = selection.start;
-  };
+	const handleSelectionChange = (selection: {
+		start: number;
+		end: number;
+	}) => {
+		cursorPositionRef.current = selection.start;
+	};
 
 	const resetInput = () => {
 		setIsFocus(false);
@@ -427,7 +430,7 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 							{t('chatBox.replyingTo')} {senderMessage?.user?.username}
 						</Text>
 					</View>
-				): null}
+				) : null}
 				{currentSelectedEditMessage ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.EditMessage)}>
@@ -435,10 +438,10 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 						</Pressable>
 						<Text style={styles.aboveTextBoxText}>{t('chatBox.editingMessage')}</Text>
 					</View>
-				): null}
+				) : null}
 			</View>
-      <Suggestions suggestions={listMentions} {...triggers.mention} />
-      <HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
+			<Suggestions suggestions={listMentions} {...triggers.mention} />
+			<HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
 			{
 				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
 			}
@@ -457,7 +460,7 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 						</View>
 						<TouchableOpacity
 							style={[styles.iconContainer, { backgroundColor: '#333333', marginRight: isShowAttachControl ? size.s_10 : 0 }]}
-							onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}
+							onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}
 						>
 							<GiftIcon width={22} height={22} />
 						</TouchableOpacity>
@@ -466,7 +469,7 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 
 				<View style={styles.wrapperInput}>
 					<TextInput
-            ref={inputRef}
+						ref={inputRef}
 						autoFocus={isFocus}
 						placeholder={'Write your thoughts here...'}
 						placeholderTextColor={Colors.textGray}
@@ -474,15 +477,15 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 						onSubmitEditing={handleSendMessage}
 						onFocus={handleInputFocus}
 						onBlur={handleInputBlur}
-            {...textInputProps}
+						{...textInputProps}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
 							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 						]}
 					>
-            {renderTextContent(text)}
-          </TextInput>
+						{renderTextContent(text)}
+					</TextInput>
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 					</View>
@@ -494,7 +497,7 @@ const handleMentionInput = (mentions: MentionDataProps[]) => {
 							<SendIcon width={18} height={18} />
 						</View>
 					) : (
-						<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...'})}>
+						<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
 							<MicrophoneIcon width={22} height={22} />
 						</TouchableOpacity>
 					)}

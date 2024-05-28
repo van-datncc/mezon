@@ -3,17 +3,23 @@ import { useClans } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Button } from 'flowbite-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-const ClanBannerBackground = () => {
+type ClanBannerBackgroundProps = {
+	onUpload: (urlImage: string) => void;
+	onHasChanges: (hasChanges: boolean) => void;
+};
+
+const ClanBannerBackground = ({ onUpload, onHasChanges }: ClanBannerBackgroundProps) => {
 	const { sessionRef, clientRef } = useMezon();
-	const { currentClan, updateClan } = useClans();
-	
+	const { currentClan } = useClans();
+
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
-	const [urlImage, setUrlImage] = useState<string>(currentClan?.banner ?? '');
+	const [urlImage, setUrlImage] = useState<string | undefined>(currentClan?.banner ?? undefined);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
@@ -28,17 +34,14 @@ const ClanBannerBackground = () => {
 
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
+			onUpload(attachment.url ?? '');
 		});
 	};
 
-	const handleUpload = async () => {
-		await updateClan({
-			banner: urlImage,
-			clan_id: currentClan?.clan_id ?? '',
-			clan_name: currentClan?.clan_name ?? '',
-			creator_id: currentClan?.creator_id ?? '',
-			logo: currentClan?.logo ?? '',
-		});
+	const handleOpenFile = () => {
+		if (fileInputRef.current) {
+			fileInputRef.current.click();
+		}
 	};
 
 	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,9 +49,17 @@ const ClanBannerBackground = () => {
 		setUrlImage('');
 	};
 
+	useEffect(() => {
+		if (urlImage !== currentClan?.banner) {
+			onHasChanges(true);
+		} else {
+			onHasChanges(false);
+		}
+	}, [urlImage]);
+
 	return (
-		<div className="flex flex-row">
-			<div className="flex flex-col flex-1 text-textSecondary">
+		<div className="flex flex-row pt-10 mt-10 border-t border-borderClan">
+			<div className="flex flex-col flex-1 text-textSecondary mr-[10px]">
 				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Server Banner Background</h3>
 				<p className="text-sm font-normal mb-2 dark:text-textSecondary text-textSecondary800">
 					This image will display at the top of your channels list.
@@ -57,23 +68,22 @@ const ClanBannerBackground = () => {
 					The recommended minimum size is 960x540 and recommended aspect ratio is 16:9.
 				</p>
 				<Button
-					className="h-10 w-fit px-4 mt-4 rounded bg-bgSelectItem hover:!bg-bgSelectItemHover dark:bg-bgSelectItem dark:hover:!bg-bgSelectItemHover focus:!ring-transparent"
-					onClick={handleUpload}
-					disabled={currentClan?.banner === urlImage}
+					className="h-10 w-fit px-4 mt-4 rounded bg-transparent border border-buttonProfile hover:!bg-buttonProfileHover dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
+					onClick={handleOpenFile}
 				>
 					Upload Background
 				</Button>
 			</div>
-			<div className="flex flex-1">
+			<div className="flex flex-1 ml-[10px]">
 				<div className="relative w-[320px] h-[180px]">
 					<label>
 						<div
 							style={{ backgroundImage: `url(${urlImage})` }}
-							className={`bg-cover bg-no-repeat w-full h-full bg-buttonProfile rounded relative cursor-pointer`}
+							className={`bg-cover bg-no-repeat bg-center w-full h-full bg-buttonProfile rounded relative cursor-pointer`}
 						>
 							{!urlImage && <p className="text-white text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
 						</div>
-						<input id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
+						<input ref={fileInputRef} id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 					</label>
 					<button
 						onClick={handleCloseFile}
