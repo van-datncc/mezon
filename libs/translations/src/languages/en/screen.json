@@ -4,7 +4,8 @@
         "Friends": "Friends",
         "addFriends": "Add Friends",
         "requestFriend": "Friend Requests",
-        "friendRequestSettings": "Friend Request Settings"
+        "friendRequestSettings": "Friend Request Settings",
+        "language": "Language"
     },
     "headerRight": {
         "addFriends": "Add Friends"

@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     logoutButton: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: Colors.bgDarkCharcoal,
         flexDirection: 'row',
         alignItems: 'center',
         padding: size.s_10,
@@ -22,7 +22,9 @@ export const styles = StyleSheet.create({
         fontSize: size.label
     },
     settingContainer: {
-        padding: size.s_20
+        padding: size.s_20,
+        backgroundColor: Colors.secondary,
+        flex: 1
     },
     logoutIconWrapper: {
         height: 20,
