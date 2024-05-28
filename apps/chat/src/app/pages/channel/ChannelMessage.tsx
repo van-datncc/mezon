@@ -97,6 +97,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 
 	const handleCancelEdit = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setIdReferenceMessageEdit(''));
 	};
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
