@@ -283,12 +283,13 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 const styles = StyleSheet.create({
     sheetContainer: {
+        overflow: "hidden",
         padding: 24,
         backgroundColor: Colors.primary,
         marginHorizontal: 20,
         marginTop: 60,
         borderRadius: 10,
-        maxHeight: 500,
+        maxHeight: 600,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between"

@@ -42,9 +42,8 @@ const HomeDefault = React.memo((props: any) => {
 	useEffect(() => {
 		const showKeyboard = DeviceEventEmitter.addListener(
 			ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
-				setMessageForward(payload.message);
+				setMessageForward(payload.targetMessage);
 				setShowForwardModal(true);
-				console.log("aaa", messageForward);
 			},
 		);
 		return () => {
