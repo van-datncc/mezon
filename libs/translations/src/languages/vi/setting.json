@@ -1,7 +1,9 @@
 {
     "accountSetting": {},
     "paymentSettings": {},
-    "App Settings": {},
+    "appSettings": {
+        "language": "Ngôn ngữ"
+    },
     "support": {},
     "whatsNew": {},
     "logOut": "Đăng Xuất",

@@ -60,7 +60,6 @@ function MemberProfile({
 		const distanceToBottom = windowHeight - mouseY;
 
 		if (event.button === 0) {
-			console.log(1);
 			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
 			setTop(mouseY - 50);
@@ -144,7 +143,7 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px]'} nameMemberProfile`}
+							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-bgLightMode'} nameMemberProfile`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}

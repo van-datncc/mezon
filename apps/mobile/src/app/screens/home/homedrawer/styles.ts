@@ -538,5 +538,13 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.tertiaryWeight,
-  }
+  },
+	overlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		width: '100%',
+		height: '100%',
+		backgroundColor: Colors.secondary
+	}
 });

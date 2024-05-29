@@ -7,8 +7,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Text, View } from 'react-native';
 import { styles } from './styles';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 
-export const Setting = React.memo(() => {
+export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['setting']);
 	const dispatch = useAppDispatch();
 	const logout = () => {
@@ -47,8 +48,15 @@ export const Setting = React.memo(() => {
 		);
 	};
 
+	const navigateToLanguageSetting = () => {
+		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.LANGUAGE });
+	} 
+
 	return (
 		<View style={styles.settingContainer}>
+            <MezonButton onPress={() => navigateToLanguageSetting()} viewContainerStyle={styles.logoutButton}>
+				<Text style={styles.title}>{t('appSettings.language')}</Text>
+			</MezonButton>
 			<MezonButton onPress={() => confirmRemoveAccount()} viewContainerStyle={styles.logoutButton}>
 				<View style={styles.logoutIconWrapper}>
 					<CloseIcon width={20} height={20} color={Colors.tertiary} />
@@ -63,4 +71,4 @@ export const Setting = React.memo(() => {
 			</MezonButton>
 		</View>
 	);
-});
+};
