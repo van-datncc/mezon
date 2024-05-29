@@ -2,13 +2,7 @@ import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, 
 import styles from "./style"
 import MemberListStatus from "../../MemberStatus";
 import AssetsHeader from "../AssetsHeader";
-import { useState } from "react";
-import { useRef } from "react";
-import { IChannel } from "@mezon/utils";
-
-interface IProps {
-    directMessage: IChannel
-}
+import { useState, useRef } from "react";
 
 const TabList = [
     "Members",
@@ -18,8 +12,7 @@ const TabList = [
     "Files"
 ]
 
-export default function AssetsViewer(props: IProps) {
-    const { directMessage } = props;
+export default function AssetsViewer() {
     const [pageID, setPageID] = useState<number>(0);
     const ref = useRef<ScrollView>();
 
@@ -43,7 +36,7 @@ export default function AssetsViewer(props: IProps) {
             <AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} titles={TabList} />
             <View style={styles.container}>
                 <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
-                    <MemberListStatus directMessage={directMessage} />
+                    <MemberListStatus />
                     <Page2 /> 
                     <Page2 /> 
                     <Page2 /> 
@@ -59,7 +52,7 @@ export default function AssetsViewer(props: IProps) {
 function Page2() {
     return (
         <View style={{ width: Dimensions.get("screen").width }}>
-            <Text style={{ color: "white" }}>sdcsx</Text>
+            <Text style={{ color: "white" }}>tab content</Text>
         </View>
     )
 }

@@ -382,6 +382,20 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		});
 		return result;
 	};
+
+	const replaceChannelIdsWithDisplay = (text: string, listInput: any[]) => {
+		// Regex to match 19-digit numbers preceded by '#'
+		const regex = /#[0-9]{19}\b/g;
+		// Replace channelId with display name
+		const replacedText = text.replace(regex, (match) => {
+			const channelId = match.substring(1); // Remove '#' from channelId
+			const channel = listInput.find((item) => item.id === channelId);
+			return channel ? `#${channel.display}` : match; // Replace with display name or original match if not found
+		});
+
+		return replacedText;
+	};
+
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
@@ -418,6 +432,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
+			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 		}
 	};
 

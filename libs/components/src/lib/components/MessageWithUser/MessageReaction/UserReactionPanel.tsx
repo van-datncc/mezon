@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useAuth, useChatReaction } from '@mezon/core';
+import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount } from '@mezon/utils';
 import { Fragment } from 'react';
@@ -12,6 +12,7 @@ type UserReactionPanelProps = {
 };
 
 const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserReactionPanelProps) => {
+	const { emojis, categoriesEmoji, emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
@@ -24,18 +25,21 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 		}
 		return emojiData;
 	};
-
+	const getSrcEmoji = (shortname: string) => {
+		const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
+		return emoji ? emoji.src : undefined;
+	};
 	return (
 		<>
 			{calculateTotalCount(emojiShowPanel.senders) > 0 && (
 				<div
 					onClick={(e) => e.stopPropagation()}
 					className={`absolute z-50  bottom-7 w-[18rem]
-				dark:bg-[#313338] bg-white border-[#313338] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
+				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
 				>
 					<div>
 						<div className="flex flex-row items-center m-2">
-							<div className="">{emojiShowPanel.emoji}</div>
+							<img src={getSrcEmoji(emojiShowPanel.emoji ?? '')} className="w-5 h-5"></img>{' '}
 							<p className="text-sm ml-2">{calculateTotalCount(emojiShowPanel.senders)}</p>
 						</div>
 						<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none"></hr>

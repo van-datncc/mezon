@@ -1,10 +1,10 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import { SearchIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useRef, useState } from 'react';
-import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { DeviceEventEmitter, Keyboard, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -16,13 +16,19 @@ import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKe
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
 import Toast from "react-native-toast-message";
+import ForwardMessageModal from './components/ForwardMessage';
+import { useEffect } from 'react';
+import { IMessageWithUser } from '@mezon/utils';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
-
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	const [showForwardModal, setShowForwardModal] = useState(false);
+	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
+	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -35,11 +41,32 @@ const HomeDefault = React.memo((props: any) => {
 		}
 	};
 
+	useEffect(() => {
+		const showKeyboard = DeviceEventEmitter.addListener(
+			ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
+				setMessageForward(payload.targetMessage);
+				setShowForwardModal(true);
+			},
+		);
+		return () => {
+			showKeyboard.remove();
+		};
+	}, [])
+
+	useFocusEffect(
+		useCallback(() => {
+		  	setIsFocusChannelView(true);
+		  	return () => {
+				setIsFocusChannelView(false);
+		  	};
+		}, [])
+	  );
+
 	return (
 		<View style={[styles.homeDefault]}>
 			<HomeDefaultHeader navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
 
-			{currentChannel && (
+			{currentChannel && isFocusChannelView && (
 				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
 					<ChannelMessages
 						channelId={currentChannel.channel_id}
@@ -73,6 +100,12 @@ const HomeDefault = React.memo((props: any) => {
 							)}
 						</BottomKeyboardPicker>
 					)}
+
+					<ForwardMessageModal
+						show={showForwardModal}
+						onClose={() => setShowForwardModal(false)}
+						message={messageForward}
+					/>
 				</View>
 			)}
 		</View>

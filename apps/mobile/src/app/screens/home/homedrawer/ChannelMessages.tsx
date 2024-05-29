@@ -1,13 +1,13 @@
 import { useChatMessage, useChatMessages, useChatReaction, useChatTypings, useDirectMessages } from '@mezon/core';
 import { ArrowDownIcon, CloseIcon } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, Metrics, useAnimatedState, size } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, FlatList, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import ImageViewer from 'react-native-image-zoom-viewer';
-import { IImageInfo } from 'react-native-image-zoom-viewer/src/image-viewer.type';
+import ImageView from 'react-native-image-view';
+import ImageViewIOS from 'react-native-image-viewing';
 import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
@@ -31,15 +31,21 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const footerImagesModalRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const attachments = useSelector(selectAttachmentPhoto());
-	const formatAttachments: IImageInfo[] = useMemo(() => {
-		const data = attachments.map((attachment) => {
+	const formatAttachments: any[] = useMemo(() => {
+		return attachments.map((attachment) => {
 			const url = `https://cdn.mezon.vn/${attachment.clanId}/${attachment.channelId}/${attachment.filename}`;
 			return {
+				source: {
+					uri: url,
+				},
 				filename: attachment.filename,
+				title: attachment.filename,
+				width: Metrics.screenWidth - 100,
+				height: Metrics.screenHeight - 100,
 				url: url,
+				uri: url,
 			};
 		});
-		return data;
 	}, [attachments]);
 	const [visibleImageModal, setVisibleImageModal] = useAnimatedState<boolean>(false);
 	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
@@ -104,7 +110,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const getIndexAttachments = (url: string) => {
 		const idx = formatAttachments?.findIndex((item) => item.url?.toString() === url?.toString());
 
-		setIdxSelectedImageModal(idx);
+		setIdxSelectedImageModal(idx <= 0 ? 0 : idx);
 		timeOutRef.current = setTimeout(() => {
 			footerImagesModalRef?.current?.scrollTo({
 				y: idx * 50,
@@ -141,9 +147,18 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				<ScrollView ref={footerImagesModalRef} horizontal showsHorizontalScrollIndicator={false} style={styles.footerImagesModal}>
 					{formatAttachments?.map((attachment, idx) => {
 						return (
-							<TouchableOpacity key={idx} activeOpacity={0.8} onPress={() => setIdxSelectedImageModal(idx)}>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								key={`${attachment.url}_${idx}_ImagesModal`}
+								onPress={() => {
+									setVisibleImageModal(false);
+									setIdxSelectedImageModal(idx);
+									timeOutRef.current = setTimeout(() => {
+										setVisibleImageModal(true);
+									}, 100);
+								}}
+							>
 								<FastImage
-									key={`${attachment.url}_${idx}_ImagesModal`}
 									style={[styles.imageFooterModal, idx === idxSelectedImageModal && styles.imageFooterModalActive]}
 									source={{
 										uri: attachment.url,
@@ -156,14 +171,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 					})}
 				</ScrollView>
 			</View>
-		);
-	};
-
-	const RenderHeaderModal = () => {
-		return (
-			<TouchableOpacity activeOpacity={0.8} style={styles.headerImagesModal} onPress={() => setVisibleImageModal(false)}>
-				<CloseIcon width={size.s_30} height={size.s_30} color={Colors.tertiary} />
-			</TouchableOpacity>
 		);
 	};
 
@@ -193,37 +200,42 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				</TouchableOpacity>
 			)}
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
-			{visibleImageModal && (
-				<View style={{ flex: 1 }}>
-					<Modal animationType="slide" transparent={true} visible={visibleImageModal}>
-						<ImageViewer
-							style={{ flex: 1, backgroundColor: Colors.secondary }}
-							imageUrls={formatAttachments}
-							index={idxSelectedImageModal}
-							show={visibleImageModal}
-							renderFooter={RenderFooterModal}
-							renderHeader={RenderHeaderModal}
-							renderIndicator={() => <View />}
-							onChange={(idx) => {
-								setIdxSelectedImageModal(idx);
-								footerImagesModalRef?.current?.scrollTo({
-									y: idx * 150,
-									animated: true,
-								});
-							}}
-							renderImage={(props) => {
-								return (
-									<FastImage
-										key={`${props.source.uri}_ImageViewModal`}
-										style={{ flex: 1 }} // Apply your desired styles
-										source={{ uri: props.source.uri }}
-										resizeMode="contain"
-									/>
-								);
-							}}
-						/>
-					</Modal>
-				</View>
+			{visibleImageModal && <View style={styles.overlay} />}
+			{Platform.OS === 'ios' ? (
+				<ImageViewIOS
+					backgroundColor={Colors.secondary}
+					images={formatAttachments}
+					imageIndex={idxSelectedImageModal}
+					visible={visibleImageModal}
+					onRequestClose={() => setVisibleImageModal(false)}
+					FooterComponent={RenderFooterModal}
+					onImageIndexChange={(idx) => setIdxSelectedImageModal(idx)}
+				/>
+			) : (
+				<ImageView
+					animationType={'none'}
+					images={formatAttachments}
+					imageIndex={idxSelectedImageModal}
+					isVisible={visibleImageModal}
+					glideAlways
+					isSwipeCloseEnabled
+					isPinchZoomEnabled
+					isTapZoomEnabled
+					onImageChange={(idx: number) => {
+						setIdxSelectedImageModal(idx);
+						footerImagesModalRef?.current?.scrollTo({
+							y: idx * 150,
+							animated: true,
+						});
+					}}
+					controls={{
+						next: true,
+						prev: true,
+						close: Platform.OS === 'android',
+					}}
+					onClose={() => setVisibleImageModal(false)}
+					renderFooter={() => <RenderFooterModal />}
+				/>
 			)}
 		</View>
 	);

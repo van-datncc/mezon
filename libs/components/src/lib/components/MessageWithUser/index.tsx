@@ -38,6 +38,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { openReplyMessageState, idMessageRefReply, idMessageToJump } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
+	const { openEditMessageState } = useReference();
 	const userLogin = useAuth();
 
 	const isCombine = useMemo(() => {
@@ -98,7 +99,6 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 			setClassNameHightlightChildDiv(' dark:bg-[#F0B132]');
 		}
 	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
-
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
@@ -131,6 +131,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
+										{child?.props.children[1] && React.isValidElement(child?.props.children[1]) && React.cloneElement(child?.props.children[1], propsChild)}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
@@ -146,7 +147,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						)}
 					</div>
 				</div>
-				{child && React.isValidElement(child) && React.cloneElement(child, propsChild)}
+				{child?.props.children[0] && React.isValidElement(child?.props.children[0]) && React.cloneElement(child?.props.children[0], propsChild)}
 			</div>
 		</>
 	);

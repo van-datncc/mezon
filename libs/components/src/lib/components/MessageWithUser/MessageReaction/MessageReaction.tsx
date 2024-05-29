@@ -1,5 +1,5 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
-import { useChatReaction, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -25,6 +25,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
+	const { emojis, categoriesEmoji, emojiListPNG } = useEmojiSuggestion();
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -142,6 +143,11 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [showSenderPanelIn1s]);
 
+	const getSrcEmoji = (shortname: string) => {
+		const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
+		return emoji ? emoji.src : undefined;
+	};
+
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
@@ -192,7 +198,10 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											handleOnleaveEmoji();
 										}}
 									>
-										<span className=" absolute left-[2px] ">{emoji.emoji}</span>
+										<span className=" absolute left-[5px] ">
+											{' '}
+											<img src={getSrcEmoji(emoji.emoji ?? '')} className="w-4 h-4"></img>{' '}
+										</span>
 										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
 											<p>{calculateTotalCount(emoji.senders)}</p>
 										</div>

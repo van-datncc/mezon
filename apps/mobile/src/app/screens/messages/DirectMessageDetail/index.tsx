@@ -1,24 +1,21 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { View, Text, Pressable, Image, Platform } from 'react-native';
 import { styles } from './styles';
 import { Colors } from '@mezon/mobile-ui';
-import { ArrowLeftIcon, ChevronIcon, UserGroupIcon, VideoIcon } from '@mezon/mobile-components';
-import { useChatMessages, useDirectMessages, useMemberStatus } from '@mezon/core';
+import { ArrowLeftIcon, ChevronIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { useMemberStatus } from '@mezon/core';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 import { ChannelStreamMode } from 'mezon-js';
 import ChatBox from '../../home/homedrawer/ChatBox';
 import { useSelector } from 'react-redux';
-import { RootState, directActions, getStoreAsync, selectDmGroupCurrent, selectMembersByChannelId } from '@mezon/store-mobile';
-import { useEffect } from 'react';
+import { directActions, getStoreAsync, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
 import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
-import { IMessageSendPayload, IChannel } from '@mezon/utils';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useThrottledCallback } from 'use-debounce';
+import { IChannel } from '@mezon/utils';
+import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 
 export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any, route: any}) => {
     const directMessage = route.params?.directMessage as IChannel;
@@ -26,7 +23,6 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
     const currentDmGroup = useSelector(selectDmGroupCurrent(directMessage.id ?? ''));
-
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -45,7 +41,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
     }
   
     useEffect(() => {
-        if (directMessage.channel_id) {
+        if (directMessage.id) {
             directMessageLoader()
         }
     }, [directMessage])
@@ -54,9 +50,9 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         const store = await getStoreAsync();
         store.dispatch(
             directActions.joinDirectMessage({
-                directMessageId: directMessage.channel_id,
-                channelName: '',
-                type: Number(directMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP),
+                directMessageId: directMessage.id,
+                channelName: directMessage.channel_label,
+                type: directMessage.type,
             }),
         );
     
@@ -89,16 +85,16 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
                 </View>
             </View>
 
-            {directMessage.channel_id ? (
+            {directMessage?.id ? (
 				<View style={styles.content}>
 					<ChannelMessages
-						channelId={directMessage.channel_id}
+						channelId={directMessage.id}
 						type={currentDmGroup?.user_id?.length === 1 ? 'DM' : 'GROUP'}
 						channelLabel={directMessage?.channel_label}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 					/>
 					<ChatBox
-						channelId={directMessage.channel_id}
+						channelId={directMessage.id}
 						channelLabel={currentDmGroup?.channel_label || ''}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
@@ -117,7 +113,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={directMessage.channel_id} currentClanId={directMessage.clan_id} />
+								<AttachmentPicker currentChannelId={directMessage.id} currentClanId={directMessage.clan_id} />
 							) : (
 								<View />
 							)}

@@ -127,9 +127,10 @@ const colors = {
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
-  	titleSteelGray: '#939292',
+  titleSteelGray: '#939292',
 	textRed: '#E53935',
 	textViolet: '#5a62f4',
+  azureBlue: '#4173c3',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
@@ -143,6 +144,7 @@ const colors = {
 	bgButton: "#5865f2",
   bgToggleOnBtn: '#008ECC',
   bgToggleOffBtn: '#c3c3c3',
+  charcoalBlack: '#1e1f22',
 };
 
 export { colors, lightThemeColor, darkThemeColor };

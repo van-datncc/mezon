@@ -4,20 +4,24 @@ import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon } from '@mezon/mobile-com
 import { Pressable, Text, View } from 'react-native';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import styles from './style';
-import { IChannel } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
+import { threadDetailContext } from '../MenuThreadDetail';
+import { ChannelType } from 'mezon-js';
 
-export default function ActionRow({directMessage} : {directMessage: IChannel}) {
+export default function ActionRow() {
 	const navigation = useNavigation();
+	const currentChannel = useContext(threadDetailContext);
 
 	const actionList = useMemo(() => {
 		const actions = [
 			{
+				key: 1,
 				title: 'Search',
 				action: () => {},
 				icon: <SearchIcon width={22} height={22} />,
 			},
 			{
+				key: 2,
 				title: 'Threads',
 				action: () => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -27,27 +31,29 @@ export default function ActionRow({directMessage} : {directMessage: IChannel}) {
 				icon: <ThreadIcon width={22} height={22} />,
 			},
 			{
+				key: 3,
 				title: 'Mute',
 				action: () => {},
 				icon: <MuteIcon width={22} height={22} />,
 			},
 			{
+				key: 4,
 				title: 'Settings',
 				action: () => {},
 				icon: <SettingIcon width={22} height={22} />,
 			},
 		];
 
-		if (directMessage?.id) {
+		if ([ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)) {
 			return actions.filter((action) => ['Search', 'Mute'].includes(action.title))
 		}
 		return actions;
-	}, [directMessage])
+	}, [currentChannel])
 
 	return (
 		<View style={styles.container}>
-			{actionList.map((action, index) => (
-				<Pressable key={index.toString()} onPress={action.action}>
+			{actionList.map((action) => (
+				<Pressable key={action.key} onPress={action.action}>
 					<View style={styles.iconBtn}>
 						<View style={styles.iconWrapper}>{action.icon}</View>
 
