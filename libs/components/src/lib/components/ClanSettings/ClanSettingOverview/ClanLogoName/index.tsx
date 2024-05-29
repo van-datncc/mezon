@@ -65,9 +65,9 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 	}, [clanName, urlLogo]);
 
 	return (
-		<div className="flex flex-row">
-			<div className="flex flex-row flex-1 text-textSecondary mr-[10px]">
-				<div className="flex flex-2 mr-[10px]">
+		<div className="flex sbm:flex-row flex-col gap-[10px]">
+			<div className="flex flex-row flex-1 text-textSecondary gap-x-[10px]">
+				<div className="flex flex-2 gap-x-[10px]">
 					<div className="flex flex-col">
 						<div className="relative flex items-center justify-center w-[100px] h-[100px] rounded-full shadow-lg shadow-neutral-800">
 							<label className="w-full h-full">
@@ -99,7 +99,7 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 					</Button>
 				</div>
 			</div>
-			<div className="flex flex-1 flex-col ml-[10px]">
+			<div className="flex flex-1 flex-col">
 				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Server Name</h3>
 				<div className="w-full">
 					<input

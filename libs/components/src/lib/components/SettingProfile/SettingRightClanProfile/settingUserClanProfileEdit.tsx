@@ -156,7 +156,7 @@ const SettingRightClanEdit = ({
 				</div>
 				<div className="w-1/2 text-white">
 					<p className="mt-[20px] text-[#CCCCCC] font-bold tracking-wide text-sm">PREVIEW</p>
-					<SettingRightClanCard profiles={editProfile} clan={true}/>
+					<SettingRightClanCard profiles={editProfile}/>
 				</div>
 			</div>
 			<SettingUserClanProfileSave PropsSave={saveProfile} />
