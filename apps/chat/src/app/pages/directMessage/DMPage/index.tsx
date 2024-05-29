@@ -68,7 +68,7 @@ export default function DirectMessage() {
 					</div>
 				</div>
 				{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
-					<div className="w-[268px] bg-bgSurface  lg:flex hidden">
+					<div className="w-[268px] dark:bg-bgSurface bg-bgLightModeSecond  lg:flex hidden">
 						<MemberListGroupChat directMessageId={directId} />
 					</div>
 				)}

@@ -7,17 +7,16 @@ export type Profilesform = {
 };
 export type propProfilesform = {
 	profiles: Profilesform;
-	clan?: boolean;
 };
 const SettingUserClanProfileCard = (props: propProfilesform) => {
 	const { userProfile } = useAuth();
-	const { profiles, clan = false } = props;
+	const { profiles } = props;
 	const checkUrl = profiles.urlImage === undefined || profiles.urlImage === '';
 
 	const [color, setColor] = useState<string>('#323232');
 
 	const getColor = async () => {
-		if(!checkUrl && !clan){
+		if(!checkUrl){
 			const colorImg = await getColorAverageFromURL(profiles.urlImage);
 			if(colorImg) setColor(colorImg);
 		}		

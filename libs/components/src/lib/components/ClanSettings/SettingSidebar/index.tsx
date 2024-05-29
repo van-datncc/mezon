@@ -7,9 +7,10 @@ import SettingItem from '../SettingItem';
 
 type SettingSidebarProps = {
 	onClickItem?: (settingItem: ItemObjProps) => void;
+	handleMenu: (value: boolean) => void;
 };
 
-const SettingSidebar = ({ onClickItem }: SettingSidebarProps) => {
+const SettingSidebar = ({ onClickItem, handleMenu }: SettingSidebarProps) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>(ItemSetting.OVERVIEW);
 	const { currentClan } = useClans();
 
@@ -38,6 +39,7 @@ const SettingSidebar = ({ onClickItem }: SettingSidebarProps) => {
 						name={setting.name}
 						active={selectedButton === setting.id}
 						onClick={() => handleClickButtonSidebar(setting)}
+						handleMenu={handleMenu}
 					/>
 				))}
 				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
