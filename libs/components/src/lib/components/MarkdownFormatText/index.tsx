@@ -186,7 +186,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							<div className="flex flex-row gap-x-1 items-center w-fit">
 								{splitTextMarkdown.map((item, index) => {
 									const srcEmoji = getSrcEmoji(item);
-									if (item.match(regex)) {
+									if (item.match(regex) && srcEmoji) {
 										return (
 											<img
 												key={index}
