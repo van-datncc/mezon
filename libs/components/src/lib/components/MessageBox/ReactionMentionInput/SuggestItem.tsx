@@ -1,3 +1,6 @@
+import { getSrcEmoji } from '@mezon/utils';
+import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
+
 type SuggestItemProps = {
 	avatarUrl?: string;
 	symbol?: string;
@@ -6,10 +9,14 @@ type SuggestItemProps = {
 };
 
 const SuggestItem = ({ avatarUrl, symbol, name, subText }: SuggestItemProps) => {
+	const { emojiListPNG } = useDataEmojiSvg();
+	const urlEmoji = getSrcEmoji(name, emojiListPNG);
+
 	return (
 		<div className="flex flex-row items-center justify-between h-[38px]">
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{avatarUrl && <img src={avatarUrl} alt={name} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />}
+				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px' }} />}
 				{symbol && <span className="text-[17px] dark:text-textDarkTheme text-textLightTheme">{symbol}</span>}
 				<span className="text-[15px] font-medium dark:text-white text-textLightTheme">{name}</span>
 			</div>

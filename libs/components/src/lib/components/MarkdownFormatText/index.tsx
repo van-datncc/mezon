@@ -1,5 +1,5 @@
 import { useApp, useClans, useInvite, useOnClickOutside } from '@mezon/core';
-import { ILineMention, convertMarkdown } from '@mezon/utils';
+import { ILineMention, convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -83,11 +83,6 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 
 	const { appearanceTheme } = useApp();
 
-	const getSrcEmoji = (shortname: string) => {
-		const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-		return emoji ? emoji.src : undefined;
-	};
-
 	return (
 		<article
 			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
@@ -135,7 +130,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				}, [splitTextMarkdown, getMatchedElements]);
 
 				useEffect(() => {
-					if (getSrcEmoji(matchedElements[0]) !== undefined) {
+					if (getSrcEmoji(matchedElements[0], emojiListPNG) !== undefined) {
 						setHasEmoji(true);
 					} else {
 						setHasEmoji(false);
@@ -186,7 +181,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						) : (
 							<div className="flex flex-row gap-x-1 items-center w-fit">
 								{splitTextMarkdown.map((item, index) => {
-									const srcEmoji = getSrcEmoji(item);
+									const srcEmoji = getSrcEmoji(item, emojiListPNG);
 									if (item.match(regex) && srcEmoji) {
 										return (
 											<img
