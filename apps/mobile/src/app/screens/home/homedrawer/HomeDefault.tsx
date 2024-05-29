@@ -1,10 +1,10 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import { SearchIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, SearchIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useRef, useState } from 'react';
-import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -16,13 +16,17 @@ import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKe
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
 import Toast from "react-native-toast-message";
+import ForwardMessageModal from './components/ForwardMessage';
+import { useEffect } from 'react';
+import { IMessageWithUser } from '@mezon/utils';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
-
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	const [showForwardModal, setShowForwardModal] = useState(false);
+	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -34,6 +38,18 @@ const HomeDefault = React.memo((props: any) => {
 			bottomPickerRef && bottomPickerRef.current && bottomPickerRef.current.close();
 		}
 	};
+
+	useEffect(() => {
+		const showKeyboard = DeviceEventEmitter.addListener(
+			ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
+				setMessageForward(payload.targetMessage);
+				setShowForwardModal(true);
+			},
+		);
+		return () => {
+			showKeyboard.remove();
+		};
+	}, [])
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -73,6 +89,12 @@ const HomeDefault = React.memo((props: any) => {
 							)}
 						</BottomKeyboardPicker>
 					)}
+
+					<ForwardMessageModal
+						show={showForwardModal}
+						onClose={() => setShowForwardModal(false)}
+						message={messageForward}
+					/>
 				</View>
 			)}
 		</View>

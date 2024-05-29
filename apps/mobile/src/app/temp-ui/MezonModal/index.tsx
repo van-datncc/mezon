@@ -14,6 +14,7 @@ interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
     confirmText?: string;
     onConfirm?: () => void | undefined;
     style?: ViewStyle;
+    headerStyles?: ViewStyle
 }
 
 export const MezonModal = (props: IMezonModalProps) => {
@@ -26,7 +27,8 @@ export const MezonModal = (props: IMezonModalProps) => {
     title,
     titleStyle = {},
     style = {},
-    animationType = 'slide'
+    animationType = 'slide',
+    headerStyles = {}
   } = props;
 
   const setVisible = (value: boolean) => {
@@ -51,7 +53,7 @@ export const MezonModal = (props: IMezonModalProps) => {
         statusBarTranslucent={true}
         >
             <View style={styles.container}>
-                <View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault]}>
+                <View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault , headerStyles]}>
                     <View style={styles.headerContent}>
                         <Pressable  onPress={() => setVisible(false)}>
                             <Feather size={27} name="x" style={styles.closeIcon} />

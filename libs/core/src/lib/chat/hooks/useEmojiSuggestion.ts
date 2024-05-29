@@ -9,12 +9,15 @@ import {
 import { IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import useDataEmojiSvg from './useDataEmojiSvg';
 
 export function useEmojiSuggestion() {
 	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
+	const { emojiListPNG } = useDataEmojiSvg();
 
 	function filterEmojiData(emojis: IEmoji[]) {
-		return emojis.map(({ emoji, shortname, category }) => ({
+		return emojis.map(({ emoji, shortname, category, name }) => ({
+			name,
 			emoji,
 			shortname,
 			category,
@@ -47,11 +50,7 @@ export function useEmojiSuggestion() {
 		[dispatch],
 	);
 
-	const categoriesEmoji = (emojis: IEmoji[]) => {
-		const categories = emojis.map((emoji) => emoji.category.replace(/ *\([^)]*\) */g, ''));
-		return [...new Set(categories)];
-	};
-
+	const categoriesEmoji = ['People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	return useMemo(
 		() => ({
 			emojis,
@@ -62,6 +61,7 @@ export function useEmojiSuggestion() {
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
+			emojiListPNG,
 		}),
 		[
 			emojis,
@@ -72,6 +72,7 @@ export function useEmojiSuggestion() {
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
+			emojiListPNG,
 		],
 	);
 }
