@@ -1,4 +1,5 @@
 import {
+	messagesActions,
 	referencesActions,
 	selectAttachmentData,
 	selectDataReferences,
@@ -102,6 +103,13 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setOpenOptionMessageState = useCallback(
+		(status: boolean) => {
+			dispatch(messagesActions.setOpenOptionMessageState(status));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			setDataReferences,
@@ -125,6 +133,7 @@ export function useReference() {
 			setIdReferenceMessageEdit,
 			idMessageRefOpt,
 			setIdReferenceMessageOption,
+			setOpenOptionMessageState,
 		}),
 		[
 			setDataReferences,
@@ -148,6 +157,7 @@ export function useReference() {
 			setIdReferenceMessageEdit,
 			idMessageRefOpt,
 			setIdReferenceMessageOption,
+			setOpenOptionMessageState,
 		],
 	);
 }

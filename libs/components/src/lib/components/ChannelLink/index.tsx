@@ -3,7 +3,7 @@ import { channelsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
 import { ChannelType } from 'mezon-js';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
@@ -108,12 +108,19 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 			setStatusMenu(false);
 		}
 	};
+
+	const openModalJoinVoiceChannel = useCallback(
+		(url: string) => {
+			const urlVoice = `https://meet.google.com/${url}`;
+			window.open(urlVoice, "_blank", "noreferrer");
+		},[]
+	);
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
 					className={`${classes[state]} cursor-pointer ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
-					onClick={() => handleVoiceChannel(channel.id)}
+					onClick={() => {handleVoiceChannel(channel.id); openModalJoinVoiceChannel(channel.meeting_code || '')}}
 					role="link"
 				>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}

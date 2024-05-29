@@ -22,8 +22,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     const { t } = useTranslation(['message']);
     const { userProfile } = useAuth();
     const {
-		reactionMessageDispatch
-	} = useChatReaction();
+        reactionMessageDispatch
+    } = useChatReaction();
 
     const handleActionEditMessage = () => {
         onClose();
@@ -46,12 +46,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     }
 
     const handleActionCreateThread = () => {
-      onClose();
-      const payload: IMessageActionNeedToResolve = {
-        type: EMessageActionType.CreateThread,
-        targetMessage: message
-    }
-      DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
+        onClose();
+        const payload: IMessageActionNeedToResolve = {
+            type: EMessageActionType.CreateThread,
+            targetMessage: message
+        }
+        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
     }
 
     const handleActionCopyText = () => {
@@ -73,12 +73,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             "Delete Message",
             "Are you sure you want to delete this message?",
             [
-              {
-                text: "No",
-                onPress: () => console.log("Cancel Pressed"),
-                style: "cancel"
-              },
-              { text: "Yes", onPress: () => onConfirmDeleteMessage() }
+                {
+                    text: "No",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => onConfirmDeleteMessage() }
             ],
             { cancelable: false }
         );
@@ -93,12 +93,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     }
 
     const handleActionMention = () => {
-      onClose();
-      const payload: IMessageActionNeedToResolve = {
-        type: EMessageActionType.Mention,
-        targetMessage: message
-    }
-      DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
+        onClose();
+        const payload: IMessageActionNeedToResolve = {
+            type: EMessageActionType.Mention,
+            targetMessage: message
+        }
+        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
     }
 
     const handleActionCopyMessageLink = () => {
@@ -107,6 +107,15 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
     const handleActionReportMessage = () => {
         console.log('CopyMessageLink');
+    }
+
+    const handleForwardMessage = () => {
+        onClose();
+        const payload: IMessageActionNeedToResolve = {
+            type: EMessageActionType.ForwardMessage,
+            targetMessage: message
+        }
+        DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
     }
 
     const implementAction = (type: EMessageActionType) => {
@@ -141,6 +150,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             case EMessageActionType.Report:
                 handleActionReportMessage();
                 break;
+            case EMessageActionType.ForwardMessage:
+                handleForwardMessage();
+                break;
             default:
                 break;
         }
@@ -151,6 +163,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             case EMessageActionType.EditMessage:
                 return <PenIcon />;
             case EMessageActionType.Reply:
+                return <ReplyMessageIcon />;
+            case EMessageActionType.ForwardMessage:
                 return <ReplyMessageIcon />;
             case EMessageActionType.CreateThread:
                 return <HashtagIcon />;
@@ -176,11 +190,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
     const messageActionList = useMemo(() => {
         const isMyMessage = userProfile?.user?.id === message?.user?.id;
 
-        const listOfActionOnlyMyMessage =  [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
-        const listOfActionOnlyOtherMessage =  [EMessageActionType.Report];
+        const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
+        const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
         if (isMyMessage) {
             return getMessageActions(t).filter(action => !listOfActionOnlyOtherMessage.includes(action.type));
         }
+
         return getMessageActions(t).filter(action => !listOfActionOnlyMyMessage.includes(action.type));
     }, [t, userProfile, message])
 
@@ -217,7 +232,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
                         )
                     })}
 
-                {/* <Pressable onPress={() => openEmojiPicker()} style={{width: 20, height: 20, backgroundColor: 'red', borderRadius: 50}}>
+                    {/* <Pressable onPress={() => openEmojiPicker()} style={{width: 20, height: 20, backgroundColor: 'red', borderRadius: 50}}>
                     <FaceIcon color={Colors.white} />
                 </Pressable> */}
                 </View>
@@ -271,10 +286,10 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
             draggable
             dragOnContent
             customStyles={{
-            container: {
-                backgroundColor: 'transparent'
-            }
-        }}>
+                container: {
+                    backgroundColor: 'transparent'
+                }
+            }}>
             <View style={styles.bottomSheetWrapper}>
                 {content}
             </View>

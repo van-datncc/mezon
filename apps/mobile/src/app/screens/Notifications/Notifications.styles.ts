@@ -19,7 +19,9 @@ notificationHeaderTitle: {
   color: Colors.white
 },
 notificationHeaderIcon: { alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.black, borderRadius: 50, height: 35, width: 35 },
-notificationsList: {},
+notificationsList: {
+  paddingBottom: 200
+},
 container: {
   flex: 1,
   padding: 24,
