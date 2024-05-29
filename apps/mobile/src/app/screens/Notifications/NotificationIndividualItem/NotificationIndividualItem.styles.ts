@@ -1,4 +1,4 @@
-import { horizontalScale, size, verticalScale, Colors } from '@mezon/mobile-ui';
+import { size, Colors } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   notifyContainer: {
@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
   },
   notifyContent: {
     flex: 1,
+    marginLeft: size.s_10
   },
   notifyHeaderTitle: {
     color: Colors.textGray,
@@ -23,8 +24,8 @@ export const styles = StyleSheet.create({
     color: Colors.textGray,
   },
   boxImage: {
-    width: horizontalScale(60),
-    height: verticalScale(60),
+    width: size.s_50,
+    height: size.s_50,
     borderRadius: 50,
     marginBottom: 10
   },
@@ -34,8 +35,8 @@ export const styles = StyleSheet.create({
     borderRadius: 50
   },
   boxImageChar: {
-    width: horizontalScale(60),
-    height: verticalScale(60),
+    width: size.s_50,
+    height: size.s_50,
     borderRadius: 50,
     backgroundColor: Colors.bgDarkCharcoal,
     display: 'flex',

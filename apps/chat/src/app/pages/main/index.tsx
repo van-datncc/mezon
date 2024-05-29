@@ -1,11 +1,11 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useFriends, useMenu, useMessageValue } from '@mezon/core';
+import { useApp, useAppNavigation, useChatMessages, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import { selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -98,8 +98,15 @@ function MyApp() {
 
 	const { appearanceTheme } = useApp();
 	const { setMode } = useMessageValue();
+	const { setOpenOptionMessageState } = useReference();
+
+	const handleClick = useCallback(
+		() => {
+			setOpenOptionMessageState(false);
+		}, []
+	);
 	return (
-		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond">
+		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-white duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}

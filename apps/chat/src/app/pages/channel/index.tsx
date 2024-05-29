@@ -1,5 +1,5 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
-import { useAuth, useClans, useDragAndDrop, useMenu, useThreads } from '@mezon/core';
+import { useAuth, useClans, useDragAndDrop, useMenu, useThreads, useVoice } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, selectShowScreen, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -31,9 +31,8 @@ export default function ChannelLayout() {
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 
 	useChannelSeen(currentChannel?.id || '');
-	const dispatch = useAppDispatch();
 	const showScreen = useSelector(selectShowScreen);
-	const statusCall = useSelector(selectStatusCall);
+	const {statusCall} = useVoice();
 
 	const startScreenShare = useCallback(() => {
 		console.log("not implemented");

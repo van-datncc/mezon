@@ -65,6 +65,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
+    const isShowInfoUser = useMemo(()=> !isCombine || message.references.length && !!user ,
+    [isCombine,  message.references , user])
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -305,7 +307,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				</View>
 			) : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-				{!isCombine ? (
+				{isShowInfoUser ? (
 					<Pressable onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)} style={styles.wrapperAvatar}>
 						{user?.user?.avatar_url ? (
 							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
@@ -319,12 +321,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<View style={styles.wrapperAvatarCombine} />
 				)}
 				<Pressable style={[styles.rowMessageBox]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
-					{!isCombine && (
+					{isShowInfoUser ? (
 						<View style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
 						</View>
-					)}
+					): null}
 					{videos.length > 0 && renderVideos()}
 					{images.length > 0 && renderImages()}
 

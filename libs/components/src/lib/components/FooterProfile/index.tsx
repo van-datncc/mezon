@@ -1,4 +1,4 @@
-import { useApp, useOnClickOutside } from '@mezon/core';
+import { useApp, useOnClickOutside, useVoice } from '@mezon/core';
 import {
 	ChannelsEntity,
 	selectShowModalCustomStatus,
@@ -29,7 +29,7 @@ export type FooterProfileProps = {
 
 function FooterProfile({ name, status, avatar, userId, openSetting, channelCurrent }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
-	const showScreen = useSelector(selectStatusCall);
+	const {statusCall} = useVoice();
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const { appearanceTheme } = useApp();
@@ -60,7 +60,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 
 	return (
 		<>
-			{showScreen && <VoiceControlPanel channelCurrent={channelCurrent} />}
+			{statusCall && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
 				className={`flex items-center justify-between border-t-2
 			 dark:border-borderDefault border-white px-4 py-2 font-title text-[15px]
