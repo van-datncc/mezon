@@ -1,3 +1,13 @@
+import { useMemo } from 'react';
+
+import anhan from 'libs/assets/src/assets/emojisSvg/Custom/anhan.png';
+import che from 'libs/assets/src/assets/emojisSvg/Custom/che.png';
+import da from 'libs/assets/src/assets/emojisSvg/Custom/da.png';
+import frog_tear from 'libs/assets/src/assets/emojisSvg/Custom/frog_tear.png';
+import o from 'libs/assets/src/assets/emojisSvg/Custom/o.png';
+import panda from 'libs/assets/src/assets/emojisSvg/Custom/panda.png';
+import pikachu_w from 'libs/assets/src/assets/emojisSvg/Custom/pikachu_w.png';
+
 import badminton from 'libs/assets/src/assets/emojisSvg/Activities/badminton.png';
 import baseball from 'libs/assets/src/assets/emojisSvg/Activities/baseball.png';
 import basketball from 'libs/assets/src/assets/emojisSvg/Activities/basketball.png';
@@ -16,7 +26,6 @@ import softball from 'libs/assets/src/assets/emojisSvg/Activities/softball.png';
 import tennis from 'libs/assets/src/assets/emojisSvg/Activities/tennis.png';
 import volleyball from 'libs/assets/src/assets/emojisSvg/Activities/volleyball.png';
 import yo_yo from 'libs/assets/src/assets/emojisSvg/Activities/yo_yo.png';
-import { useMemo } from 'react';
 
 import checkered_flag from 'libs/assets/src/assets/emojisSvg/Flags/checkered_flag.png';
 import flag_ad from 'libs/assets/src/assets/emojisSvg/Flags/flag_ad.png';
@@ -94,6 +103,7 @@ import trackball from 'libs/assets/src/assets/emojisSvg/Objects/trackball.png';
 import vhs from 'libs/assets/src/assets/emojisSvg/Objects/vhs.png';
 import watch from 'libs/assets/src/assets/emojisSvg/Objects/watch.png';
 
+import oneHundred from 'libs/assets/src/assets/emojisSvg/People/100.png';
 import blush from 'libs/assets/src/assets/emojisSvg/People/blush.png';
 import face_holding_back_tears from 'libs/assets/src/assets/emojisSvg/People/face_holding_back_tears.png';
 import grin from 'libs/assets/src/assets/emojisSvg/People/grin.png';
@@ -102,6 +112,7 @@ import heart_eyes from 'libs/assets/src/assets/emojisSvg/People/heart_eyes.png';
 import innocent from 'libs/assets/src/assets/emojisSvg/People/innocent.png';
 import joy from 'libs/assets/src/assets/emojisSvg/People/joy.png';
 import laughing from 'libs/assets/src/assets/emojisSvg/People/laughing.png';
+import like from 'libs/assets/src/assets/emojisSvg/People/like.png';
 import relaxed from 'libs/assets/src/assets/emojisSvg/People/relaxed.png';
 import relieved from 'libs/assets/src/assets/emojisSvg/People/relieved.png';
 import rofl from 'libs/assets/src/assets/emojisSvg/People/rofl.png';
@@ -152,6 +163,13 @@ import trolleybus from 'libs/assets/src/assets/emojisSvg/Travel/trolleybus.png';
 import truck from 'libs/assets/src/assets/emojisSvg/Travel/truck.png';
 function useDataEmojiSvg() {
 	const emojiListPNG = [
+		{ src: anhan, shortname: ':anhan:', category: 'Custom' },
+		{ src: che, shortname: ':che:', category: 'Custom' },
+		{ src: da, shortname: ':da:', category: 'Custom' },
+		{ src: frog_tear, shortname: ':frog_tear:', category: 'Custom' },
+		{ src: o, shortname: ':o:', category: 'Custom' },
+		{ src: panda, shortname: ':panda:', category: 'Custom' },
+		{ src: pikachu_w, shortname: ':pikachu_w:', category: 'Custom' },
 		{ src: badminton, shortname: ':badminton:', category: 'Activities' },
 		{ src: baseball, shortname: ':baseball:', category: 'Activities' },
 		{ src: basketball, shortname: ':basketball:', category: 'Activities' },
@@ -260,6 +278,9 @@ function useDataEmojiSvg() {
 		{ src: sweat_smile, shortname: ':sweat_smile:', category: 'People' },
 		{ src: upside_down, shortname: ':upside_down:', category: 'People' },
 		{ src: wink, shortname: ':wink:', category: 'People' },
+		{ src: oneHundred, shortname: ':100:', category: 'People' },
+		{ src: like, shortname: ':like:', category: 'People' },
+
 		{ src: black_heart, shortname: ':black_heart:', category: 'Symbols' },
 		{ src: blue_heart, shortname: ':blue_heart:', category: 'Symbols' },
 		{ src: broken_heart, shortname: ':broken_heart:', category: 'Symbols' },

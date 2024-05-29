@@ -198,9 +198,9 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											handleOnleaveEmoji();
 										}}
 									>
-										<span className=" absolute left-[2px] ">
+										<span className=" absolute left-[5px] ">
 											{' '}
-											<img src={getSrcEmoji(emoji.emoji ?? '')} className="w-5 h-5"></img>{' '}
+											<img src={getSrcEmoji(emoji.emoji ?? '')} className="w-4 h-4"></img>{' '}
 										</span>
 										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
 											<p>{calculateTotalCount(emoji.senders)}</p>

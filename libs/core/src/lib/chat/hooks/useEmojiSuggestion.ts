@@ -50,7 +50,7 @@ export function useEmojiSuggestion() {
 		[dispatch],
 	);
 
-	const categoriesEmoji = ['People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+	const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	return useMemo(
 		() => ({
 			emojis,
