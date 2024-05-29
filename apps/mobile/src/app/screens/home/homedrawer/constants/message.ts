@@ -5,6 +5,11 @@ import { EMessageActionType } from "../enums";
 export const getMessageActions = (t: TFunction): IMessageAction[] => {
     return [
         {
+            id: 11,
+            title: t('message:actions.forward'),
+            type: EMessageActionType.ForwardMessage
+        },
+        {
             id: 1,
             title: t('message:actions.editMessage'),
             type: EMessageActionType.EditMessage
@@ -53,7 +58,7 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
             id: 10,
             title: t('message:actions.report'),
             type: EMessageActionType.Report
-        }
+        },
     ];
 }
 
