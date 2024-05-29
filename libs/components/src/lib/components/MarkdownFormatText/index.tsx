@@ -209,6 +209,18 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								)}
 							</div>
 						)}
+						{tagName && (
+							<span
+								className={`font-medium cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
+									tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
+								}`}
+								onClick={() => handMention(tagName)}
+								ref={panelRef}
+								onMouseDown={(event) => handleMouseClick(event)}
+							>
+								{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
+							</span>
+						)}
 					</div>
 				);
 			})}
