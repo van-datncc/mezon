@@ -16,10 +16,11 @@ import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
+import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -96,23 +97,30 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<View
 				style={{
-					width: widthMedia,
+					width: widthMedia + size.s_50,
 					marginVertical: size.s_10,
 				}}
 			>
 				{videos.map((video, index) => {
 					return (
 						<VideoPlayer
-							key={index}
+							key={`${video?.url}_${index}`}
 							isControlsVisible={false}
 							disableFullscreen={false}
 							video={{ uri: video?.url }}
-							videoWidth={widthMedia}
-							videoHeight={150}
+							videoWidth={widthMedia + size.s_50}
+							videoHeight={160}
+							hideControlsOnStart={true}
+							resizeMode="cover"
 							style={{
-								width: widthMedia,
+								width: widthMedia + size.s_50,
+								height: 160,
+								borderRadius: size.s_4,
+								overflow: 'hidden',
+								backgroundColor: Colors.borderDim,
 							}}
-							thumbnail={{ uri: video?.url }}
+							endWithThumbnail={true}
+							thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
 						/>
 					);
 				})}
@@ -248,17 +256,17 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const renderTextContent = () => {
-		const isLinkPreview = validURL(lines);
-
 		const matchesMention = lines.match(mentionRegex);
-		if (matchesMention?.length) {
-			return <Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>;
-		}
-		const matches = lines.match(urlPattern);
-		if (isLinkPreview) {
-			return <Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithLinks(lines, matches)}</Text>;
-		}
-		return <Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{lines}</Text>;
+
+		return (
+			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
+				{matchesMention?.length ? (
+					<Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>
+				) : (
+					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{lines}</Text>
+				)}
+			</Hyperlink>
+		);
 	};
 
 	const onConfirmDeleteMessage = () => {

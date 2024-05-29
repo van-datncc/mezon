@@ -113,7 +113,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { mentions } = useMessageLine(content);
 	const { usersClan } = useClans();
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
-	const { emojis } = useEmojiSuggestion();
+	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked } = useEmojiSuggestion();
 	const { reactionRightState } = useChatReaction();
@@ -121,12 +121,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
 
-	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
+	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
-		const matches = emojis
+		const matches = emojiListPNG
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.emoji, emoji: emojiDisplay?.emoji, display: emojiDisplay?.shortname }));
+			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
 
