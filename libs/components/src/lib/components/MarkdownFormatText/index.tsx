@@ -112,7 +112,6 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const tagName = part.matchedText;
 				const markdown = (part.nonMatchText && part.nonMatchText.trim()) ?? '';
 				const result = convertMarkdown(markdown);
-
 				const [checkMarkdownIncludeEmoji, setMarkdownIncludeEmoji] = useState<string>('');
 
 				const splitTextMarkdown = markdown.split(' ');
@@ -127,13 +126,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 				const [checkOnlyEmoji, setCheckOnlyEmoji] = useState<boolean>(false);
 
-				useEffect(() => {
-					if (matchedElements.length === 0) {
-						setMarkdownIncludeEmoji(markdown);
-					} else {
-						setMarkdownIncludeEmoji('');
-					}
-				}, [markdown]);
+				const [hasEmoji, setHasEmoji] = useState<boolean>(false);
 
 				useEffect(() => {
 					if (splitTextMarkdown.length === 1 && getMatchedElements(markdown).length === 1) {
@@ -141,32 +134,40 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 					}
 				}, [splitTextMarkdown, getMatchedElements]);
 
+				useEffect(() => {
+					if (getSrcEmoji(matchedElements[0]) !== undefined) {
+						setHasEmoji(true);
+					} else {
+						setHasEmoji(false);
+					}
+				}, [matchedElements[0]]);
+
 				return (
 					<div key={index} className="lineText contents">
-						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
-							<span>{markdown}</span>
-						) : (
-							<Markdown
-								children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : checkMarkdownIncludeEmoji}
-								remarkPlugins={[remarkGFM]}
-								components={{
-									pre: PreClass,
-									p: 'span',
-									a: ({ children }) => (
-										<span
-											onClick={() => getLinkinvite(children)}
-											rel="noopener noreferrer"
-											style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
-											className="tagLink"
-										>
-											{children}
-										</span>
-									),
-								}}
-							/>
-						)}
-
-						{(matchedElements.length === 0 && !startsWithTripleBackticks && !endsWithNoTripleBackticks) || !onlyBackticks ? (
+						{!hasEmoji ? (
+							(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
+								<span>{markdown}</span>
+							) : (
+								<Markdown
+									children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : markdown}
+									remarkPlugins={[remarkGFM]}
+									components={{
+										pre: PreClass,
+										p: 'span',
+										a: ({ children }) => (
+											<span
+												onClick={() => getLinkinvite(children)}
+												rel="noopener noreferrer"
+												style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+												className="tagLink"
+											>
+												{children}
+											</span>
+										),
+									}}
+								/>
+							)
+						) : matchedElements.length === 0 ? (
 							markdown + tagName && (
 								<>
 									{' '}
