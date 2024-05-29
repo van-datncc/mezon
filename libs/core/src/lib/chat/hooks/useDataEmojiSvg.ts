@@ -8,6 +8,35 @@ import o from 'libs/assets/src/assets/emojisSvg/Custom/o.png';
 import panda from 'libs/assets/src/assets/emojisSvg/Custom/panda.png';
 import pikachu_w from 'libs/assets/src/assets/emojisSvg/Custom/pikachu_w.png';
 
+import dance from 'libs/assets/src/assets/emojisSvg/Custom/_dance_.gif';
+import aawyeag from 'libs/assets/src/assets/emojisSvg/Custom/aawyeag.gif';
+import amongus from 'libs/assets/src/assets/emojisSvg/Custom/amongus.gif';
+import anime from 'libs/assets/src/assets/emojisSvg/Custom/anime.gif';
+import awkwardkid from 'libs/assets/src/assets/emojisSvg/Custom/awkwardkid.gif';
+import communist from 'libs/assets/src/assets/emojisSvg/Custom/communist.gif';
+import discordrainbow from 'libs/assets/src/assets/emojisSvg/Custom/discordrainbow.gif';
+import excusume from 'libs/assets/src/assets/emojisSvg/Custom/excusume.gif';
+import hakcan from 'libs/assets/src/assets/emojisSvg/Custom/hakcan.gif';
+import hehe from 'libs/assets/src/assets/emojisSvg/Custom/hehe.gif';
+import huh from 'libs/assets/src/assets/emojisSvg/Custom/huh.png';
+import lel from 'libs/assets/src/assets/emojisSvg/Custom/lel.png';
+import madblob from 'libs/assets/src/assets/emojisSvg/Custom/madblob.gif';
+import memes from 'libs/assets/src/assets/emojisSvg/Custom/memes.gif';
+import meow from 'libs/assets/src/assets/emojisSvg/Custom/meow.gif';
+import ordegaming from 'libs/assets/src/assets/emojisSvg/Custom/ordegaming.gif';
+import pepeOK from 'libs/assets/src/assets/emojisSvg/Custom/pepeOK.png';
+import pepecry from 'libs/assets/src/assets/emojisSvg/Custom/pepecry.png';
+import pepelmfaoooo from 'libs/assets/src/assets/emojisSvg/Custom/pepelmfaoooo.gif';
+import pepemad from 'libs/assets/src/assets/emojisSvg/Custom/pepemad.png';
+import pepesaber from 'libs/assets/src/assets/emojisSvg/Custom/pepesaber.gif';
+import pikachu from 'libs/assets/src/assets/emojisSvg/Custom/pikachu.gif';
+import pokeball from 'libs/assets/src/assets/emojisSvg/Custom/pokeball.png';
+import ranifiesta from 'libs/assets/src/assets/emojisSvg/Custom/ranifiesta.gif';
+import sadcat from 'libs/assets/src/assets/emojisSvg/Custom/sadcat.png';
+import verify from 'libs/assets/src/assets/emojisSvg/Custom/verify.gif';
+import whatthe from 'libs/assets/src/assets/emojisSvg/Custom/whatthe.png';
+import wow from 'libs/assets/src/assets/emojisSvg/Custom/wow.gif';
+
 import badminton from 'libs/assets/src/assets/emojisSvg/Activities/badminton.png';
 import baseball from 'libs/assets/src/assets/emojisSvg/Activities/baseball.png';
 import basketball from 'libs/assets/src/assets/emojisSvg/Activities/basketball.png';
@@ -170,6 +199,36 @@ function useDataEmojiSvg() {
 		{ src: o, shortname: ':o:', category: 'Custom' },
 		{ src: panda, shortname: ':panda:', category: 'Custom' },
 		{ src: pikachu_w, shortname: ':pikachu_w:', category: 'Custom' },
+
+		{ src: pepelmfaoooo, shortname: ':pepelmfaoooo:', category: 'Custom' },
+		{ src: pepesaber, shortname: ':pepesaber:', category: 'Custom' },
+		{ src: memes, shortname: ':memes:', category: 'Custom' },
+		{ src: dance, shortname: ':dance:', category: 'Custom' },
+		{ src: anime, shortname: ':anime:', category: 'Custom' },
+		{ src: verify, shortname: ':verify:', category: 'Custom' },
+		{ src: pepecry, shortname: ':pepecry:', category: 'Custom' },
+		{ src: wow, shortname: ':wow:', category: 'Custom' },
+		{ src: amongus, shortname: ':amongus:', category: 'Custom' },
+		{ src: huh, shortname: ':huh:', category: 'Custom' },
+		{ src: whatthe, shortname: ':whatthe:', category: 'Custom' },
+		{ src: pepeOK, shortname: ':pepeOK:', category: 'Custom' },
+		{ src: lel, shortname: ':lel:', category: 'Custom' },
+		{ src: madblob, shortname: ':madblob:', category: 'Custom' },
+		{ src: pikachu, shortname: ':pikachu:', category: 'Custom' },
+		{ src: meow, shortname: ':meow:', category: 'Custom' },
+		{ src: hehe, shortname: ':hehe:', category: 'Custom' },
+		{ src: hakcan, shortname: ':hakcan:', category: 'Custom' },
+		{ src: awkwardkid, shortname: ':awkwardkid:', category: 'Custom' },
+		{ src: pepemad, shortname: ':pepemad:', category: 'Custom' },
+		{ src: communist, shortname: ':communist:', category: 'Custom' },
+		{ src: ordegaming, shortname: ':ordegaming:', category: 'Custom' },
+		{ src: ranifiesta, shortname: ':ranifiesta:', category: 'Custom' },
+		{ src: pokeball, shortname: ':pokeball:', category: 'Custom' },
+		{ src: aawyeag, shortname: ':aawyeag:', category: 'Custom' },
+		{ src: discordrainbow, shortname: ':discordrainbow:', category: 'Custom' },
+		{ src: excusume, shortname: ':excusume:', category: 'Custom' },
+		{ src: sadcat, shortname: ':sadcat:', category: 'Custom' },
+
 		{ src: badminton, shortname: ':badminton:', category: 'Activities' },
 		{ src: baseball, shortname: ':baseball:', category: 'Activities' },
 		{ src: basketball, shortname: ':basketball:', category: 'Activities' },
