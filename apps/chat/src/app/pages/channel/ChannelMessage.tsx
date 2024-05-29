@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
+
 type MessageProps = {
 	message: IMessageWithUser;
 	preMessage?: IMessageWithUser;
@@ -73,17 +74,26 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		});
 		return result;
 	};
-
+	const [newMessage, setNewMessage] = useState('');
 	const [editMessage, setEditMessage] = useState(mess.content.t);
 	const [content, setContent] = useState(editMessage);
-	useEffect(() => {
-		setContent(editMessage);
-	}, [editMessage]);
-	const [newMessage, setNewMessage] = useState('');
+
+	const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
+		const regex = /#[0-9]{19}\b/g;
+		const replacedText = text.replace(regex, (match) => {
+			const channelId = match.substring(1);
+			const channel = listInput.find((item) => item.id === channelId);
+			return channel ? `#[${channel.display}](${channelId})` : match;
+		});
+
+		return replacedText;
+	};
 
 	useEffect(() => {
 		if (editMessage) {
 			const convertedHashtag = convertToPlainTextHashtag(editMessage);
+			const replacedText = replaceChannelIdsWithDisplay(convertedHashtag, listChannelsMention);
+			setEditMessage(replacedText);
 			setContent(convertedHashtag);
 		}
 	}, [editMessage]);
@@ -177,84 +187,89 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 				mode={mode}
 				newMessage={newMessage}
 				child={
-					<PopupMessage
-						reactionRightState={reactionRightState}
-						mess={mess as IMessageWithUser}
-						reactionBottomState={reactionBottomState}
-						openEditMessageState={openEditMessageState}
-						openOptionMessageState={openOptionMessageState}
-						mode={mode}
-						deleteSendMessage={DeleteSendMessage}
-					/>
+					<>
+						<PopupMessage
+							reactionRightState={reactionRightState}
+							mess={mess as IMessageWithUser}
+							reactionBottomState={reactionBottomState}
+							openEditMessageState={openEditMessageState}
+							openOptionMessageState={openOptionMessageState}
+							mode={mode}
+							deleteSendMessage={DeleteSendMessage}
+						/>
+						{openEditMessageState && mess.id === idMessageRefEdit && (
+							<div className="inputEdit relative top-[-25px]">
+								<MentionsInput
+									onFocus={handleFocus}
+									inputRef={textareaRef}
+									value={editMessage}
+									className="w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black"
+									onKeyDown={onSend}
+									onChange={(e, newValue) => {
+										setEditMessage(newValue);
+									}}
+									rows={editMessage?.split('\n').length}
+									forceSuggestionsAboveCursor={true}
+									style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
+								>
+									<Mention
+										appendSpaceOnAdd={true}
+										data={mentionList ?? []}
+										trigger="@"
+										displayTransform={(id: any, display: any) => {
+											return `@${display}`;
+										}}
+										renderSuggestion={(suggestion) => (
+											<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+										)}
+										className="dark:bg-[#3B416B] bg-bgLightModeButton"
+										style={mentionStyle}
+									/>
+									<Mention
+										markup="#[__display__](__id__)"
+										appendSpaceOnAdd={true}
+										data={listChannelsMention ?? []}
+										trigger="#"
+										displayTransform={(id: any, display: any) => {
+											return `#${display}`;
+										}}
+										style={mentionStyle}
+										renderSuggestion={(suggestion) => (
+											<SuggestItem
+												name={suggestion.display ?? ''}
+												symbol="#"
+												subText={(suggestion as ChannelsMentionProps).subText}
+											/>
+										)}
+										className="dark:bg-[#3B416B] bg-bgLightModeButton"
+									/>
+									<Mention
+										trigger=":"
+										markup="__id__"
+										regex={neverMatchingRegex}
+										data={queryEmojis}
+										renderSuggestion={(suggestion) => (
+											<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
+										)}
+										className="dark:bg-[#3B416B] bg-bgLightModeButton"
+									/>
+								</MentionsInput>
+								<div className="text-xs flex">
+									<p className="pr-[3px]">escape to</p>
+									<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+										cancel
+									</p>
+									<p className="pr-[3px]">• enter to</p>
+									<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
+										save
+									</p>
+								</div>
+							</div>
+						)}
+					</>
 				}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-
-			{openEditMessageState && mess.id === idMessageRefEdit && (
-				<div className="inputEdit relative left-[66px] top-[-21px]">
-					<MentionsInput
-						onFocus={handleFocus}
-						inputRef={textareaRef}
-						value={editMessage}
-						className="w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black"
-						onKeyDown={onSend}
-						onChange={(e, newValue) => {
-							setEditMessage(newValue);
-						}}
-						rows={editMessage?.split('\n').length}
-						forceSuggestionsAboveCursor={true}
-						style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
-					>
-						<Mention
-							appendSpaceOnAdd={true}
-							data={mentionList ?? []}
-							trigger="@"
-							displayTransform={(id: any, display: any) => {
-								return `@${display}`;
-							}}
-							renderSuggestion={(suggestion) => (
-								<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
-							)}
-							className="dark:bg-[#3B416B] bg-bgLightModeButton"
-							style={mentionStyle}
-						/>
-						<Mention
-							markup="#[__display__](__id__)"
-							appendSpaceOnAdd={true}
-							data={listChannelsMention ?? []}
-							trigger="#"
-							displayTransform={(id: any, display: any) => {
-								return `#${display}`;
-							}}
-							style={mentionStyle}
-							renderSuggestion={(suggestion) => (
-								<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
-							)}
-							className="dark:bg-[#3B416B] bg-bgLightModeButton"
-						/>
-						<Mention
-							trigger=":"
-							markup="__id__"
-							regex={neverMatchingRegex}
-							data={queryEmojis}
-							renderSuggestion={(suggestion) => (
-								<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
-							)}
-							className="dark:bg-[#3B416B] bg-bgLightModeButton"
-						/>
-					</MentionsInput>
-					<div className="text-xs flex">
-						<p className="pr-[3px]">escape to</p>
-						<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
-							cancel
-						</p>
-						<p className="pr-[3px]">• enter to</p>
-						<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
-							save
-						</p>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }

@@ -85,7 +85,7 @@ export const Authentication = () => {
 				/>
 
 				<RootStack.Screen
-					name={APP_SCREEN.PROFILE.STACK}
+					name={APP_SCREEN.SETTINGS.STACK}
 					children={(props) => <SettingStacks {...props} />}
 					options={{
 						gestureEnabled: true,
