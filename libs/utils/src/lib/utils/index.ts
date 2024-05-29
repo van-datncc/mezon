@@ -157,3 +157,8 @@ export const convertMarkdown = (markdown: string): string => {
 		})
 		.join('');
 };
+
+export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
+	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
+	return emoji ? emoji.src : undefined;
+};
