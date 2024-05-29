@@ -25,7 +25,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
 	};
 
-
 	useEffect(() => {
 		if (
 			(valueInputToCheckHandleSearch !== '' && subPanelActive === SubPanelName.EMOJI) ||
@@ -38,6 +37,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	}, [valueInputToCheckHandleSearch]);
 
 	const categoryIcons = [
+		<Icons.PenEdit defaultSize="w-7 h-7" />,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,

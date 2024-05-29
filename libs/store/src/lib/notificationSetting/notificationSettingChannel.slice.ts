@@ -1,7 +1,7 @@
 import { INotificationSetting, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
 import { ApiNotificationUserChannel } from 'mezon-js/api.gen';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { defaultNotificationCategoryActions } from './notificationSettingCategory.slice';
 
 export const NOTIFICATION_SETTING_FEATURE_KEY = 'notificationsetting';
@@ -27,52 +27,75 @@ export const getNotificationSetting = createAsyncThunk('notificationsetting/getN
 });
 
 type SetNotificationPayload = {
-    channel_id?: string;
-    notification_type?: string;
-    time_mute?: string;
-	clan_id:string;
+	channel_id?: string;
+	notification_type?: string;
+	time_mute?: string;
+	clan_id: string;
 };
 
 export const setNotificationSetting = createAsyncThunk(
 	'notificationsetting/setNotificationSetting',
-	async ({ channel_id, notification_type, time_mute, clan_id}: SetNotificationPayload, thunkAPI) => {
+	async ({ channel_id, notification_type, time_mute, clan_id }: SetNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			channel_id: channel_id,
 			notification_type: notification_type,
 			time_mute: time_mute,
-		}
+		};
 		const response = await mezon.client.setNotificationChannel(mezon.session, body);
 		if (!response) {
-			
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({clanId: clan_id||""}))
-		thunkAPI.dispatch(getNotificationSetting(channel_id || ""));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getNotificationSetting(channel_id || ''));
+		return response;
+	},
+);
+
+type SetMuteNotificationPayload = {
+	channel_id?: string;
+	notification_type?: string;
+	active: number;
+	clan_id: string;
+};
+
+export const setMuteNotificationSetting = createAsyncThunk(
+	'notificationsetting/setMuteNotificationSetting',
+	async ({ channel_id, notification_type, active, clan_id }: SetMuteNotificationPayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const body = {
+			channel_id: channel_id,
+			notification_type: notification_type,
+			active: active,
+		};
+		const response = await mezon.client.setMuteNotificationChannel(mezon.session, body);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getNotificationSetting(channel_id || ''));
 		return response;
 	},
 );
 
 type DeleteNotiChannelSettingPayload = {
-    channel_id?: string;
+	channel_id?: string;
 	clan_id?: string;
 };
 
 export const deleteNotiChannelSetting = createAsyncThunk(
 	'notificationsetting/deleteNotiChannelSetting',
-	async ({ channel_id, clan_id }:DeleteNotiChannelSettingPayload, thunkAPI) => {
+	async ({ channel_id, clan_id }: DeleteNotiChannelSettingPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteNotificationChannel(mezon.session, channel_id||"");
+		const response = await mezon.client.deleteNotificationChannel(mezon.session, channel_id || '');
 		if (!response) {
-			
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({clanId: clan_id||""}))
-		thunkAPI.dispatch(getNotificationSetting(channel_id || ""));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getNotificationSetting(channel_id || ''));
 		return response;
 	},
 );
-
 
 export const notificationSettingSlice = createSlice({
 	name: NOTIFICATION_SETTING_FEATURE_KEY,
@@ -99,8 +122,15 @@ export const notificationSettingSlice = createSlice({
  */
 export const notificationSettingReducer = notificationSettingSlice.reducer;
 
-export const notificationSettingActions = { ...notificationSettingSlice.actions, getNotificationSetting , setNotificationSetting, deleteNotiChannelSetting};
+export const notificationSettingActions = {
+	...notificationSettingSlice.actions,
+	getNotificationSetting,
+	setNotificationSetting,
+	deleteNotiChannelSetting,
+	setMuteNotificationSetting,
+};
 
-export const getNotificationSettingState = (rootState: { [NOTIFICATION_SETTING_FEATURE_KEY]: NotificationSettingState }): NotificationSettingState => rootState[NOTIFICATION_SETTING_FEATURE_KEY];
+export const getNotificationSettingState = (rootState: { [NOTIFICATION_SETTING_FEATURE_KEY]: NotificationSettingState }): NotificationSettingState =>
+	rootState[NOTIFICATION_SETTING_FEATURE_KEY];
 
 export const selectnotificatonSelected = createSelector(getNotificationSettingState, (state: NotificationSettingState) => state.notificationSetting);
