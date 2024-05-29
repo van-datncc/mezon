@@ -1,5 +1,6 @@
 import { useApp, useClans, useInvite, useOnClickOutside } from '@mezon/core';
 import { ILineMention, convertMarkdown } from '@mezon/utils';
+import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
@@ -9,16 +10,12 @@ import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 import ChannelHashtag from './HashTag';
 import PreClass from './PreClass';
 
-import aNhan from 'libs/assets/src/assets/emojisSvg/aNhan_1.png';
-import heart from 'libs/assets/src/assets/emojisSvg/heart.png';
-import joy from 'libs/assets/src/assets/emojisSvg/joy.png';
-import unamused from 'libs/assets/src/assets/emojisSvg/unamused.png';
-
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 };
 
 const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
+	const { emojiListPNG } = useDataEmojiSvg();
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [userID, setUserID] = useState('');
 	const { usersClan } = useClans();
@@ -32,6 +29,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	const [positionBottom, setPositionBottom] = useState(false);
 	const [positionTop, setPositionTop] = useState(0);
 	const [positionLeft, setPositionLeft] = useState(0);
+
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
 		if (event.button === 0) {
 			setIsShowPanelChannel(true);
@@ -85,27 +83,8 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 
 	const { appearanceTheme } = useApp();
 
-	const objectEmoji = [
-		{
-			shortname: ':aNhan:',
-			src: aNhan,
-		},
-		{
-			shortname: ':joy:',
-			src: joy,
-		},
-		{
-			shortname: ':heart:',
-			src: heart,
-		},
-		{
-			shortname: ':unamused:',
-			src: unamused,
-		},
-	];
-
 	const getSrcEmoji = (shortname: string) => {
-		const emoji = objectEmoji.find((emoji) => emoji.shortname === shortname);
+		const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
 		return emoji ? emoji.src : undefined;
 	};
 
@@ -146,6 +125,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const startsWithTripleBackticks = markdown.startsWith('```');
 				const endsWithNoTripleBackticks = !markdown.endsWith('```');
 				const onlyBackticks = /^```$/.test(markdown);
+				const [checkOnlyEmoji, setCheckOnlyEmoji] = useState<boolean>(false);
 
 				useEffect(() => {
 					if (matchedElements.length === 0) {
@@ -154,6 +134,12 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						setMarkdownIncludeEmoji('');
 					}
 				}, [markdown]);
+
+				useEffect(() => {
+					if (splitTextMarkdown.length === 1 && getMatchedElements(markdown).length === 1) {
+						setCheckOnlyEmoji(true);
+					}
+				}, [splitTextMarkdown, getMatchedElements]);
 
 				return (
 					<div key={index} className="lineText contents">
@@ -201,7 +187,15 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 								{splitTextMarkdown.map((item, index) => {
 									const srcEmoji = getSrcEmoji(item);
 									if (item.match(regex)) {
-										return <img key={index} src={srcEmoji} alt={item} className="w-7 h-7 p-0 m-0" />;
+										return (
+											<img
+												key={index}
+												src={srcEmoji}
+												alt={srcEmoji}
+												className={` ${checkOnlyEmoji ? 'w-8 h-8' : 'w-5 h-5'} p-0 m-0`}
+												onDragStart={(e) => e.preventDefault()}
+											/>
+										);
 									}
 									return <span key={index}>{item}</span>;
 								})}

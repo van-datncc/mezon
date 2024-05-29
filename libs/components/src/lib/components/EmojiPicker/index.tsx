@@ -14,17 +14,17 @@ export type EmojiCustomPanelOptions = {
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
-	const { emojis, categoriesEmoji } = useEmojiSuggestion();
+	const { emojis, categoriesEmoji, emojiListPNG } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-	const dataCategories = categoriesEmoji(emojis);
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const { reactionPlaceActive } = useChatReaction();
 
-	const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
+	const searchEmojis = (emojis: any[], searchTerm: string) => {
 		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
 	};
+
 
 	useEffect(() => {
 		if (
@@ -32,31 +32,26 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM ||
 			reactionPlaceActive === EmojiPlaces.EMOJI_REACTION
 		) {
-			const result = searchEmojis(emojis, valueInputToCheckHandleSearch ?? '');
+			const result = searchEmojis(emojiListPNG, valueInputToCheckHandleSearch ?? '');
 			setEmojiSearch(result);
 		}
 	}, [valueInputToCheckHandleSearch]);
 
 	const categoryIcons = [
-		<Icons.MemberList defaultSize="w-7 h-7" />,
 		<Icons.Smile defaultSize="w-7 h-7" />,
-		<Icons.GameController defaultSize="w-7 h-7" />,
-		<Icons.Heart defaultSize="w-7 h-7" />,
-		<Icons.Object defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
-		<Icons.Bicycle defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
+		<Icons.GameController defaultSize="w-7 h-7" />,
+		<Icons.Bicycle defaultSize="w-7 h-7" />,
+		<Icons.Object defaultSize="w-7 h-7" />,
+		<Icons.Heart defaultSize="w-7 h-7" />,
 		<Icons.Ribbon defaultSize="w-7 h-7" />,
 	];
-	const categoriesWithIcons = dataCategories
-		.map((category, index) => ({ name: category, icon: categoryIcons[index] }))
-		.filter((category) => category.name !== '' && category.name !== 'Component');
-	[categoriesWithIcons[0], categoriesWithIcons[1]] = [categoriesWithIcons[1], categoriesWithIcons[0]];
-
+	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: categoryIcons[index] }));
 	const { reactionMessageDispatch, setReactionPlaceActive } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
-	const [emojiHoverNative, setEmojiHoverNative] = useState<string>('');
+	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 
@@ -81,8 +76,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}
 	};
 
-	const handleOnHover = (emojiHover: IEmoji) => {
-		setEmojiHoverNative(emojiHover.emoji);
+	const handleOnHover = (emojiHover: any) => {
+		setEmojiHoverSrc(emojiHover.src);
 		setEmojiHoverShortCode(emojiHover.shortname);
 		setPlaceHolderInput(emojiHover.shortname);
 	};
@@ -119,10 +114,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						const refRect = ref.getBoundingClientRect();
 						const refTop = refRect.top;
 						const refBottom = refRect.bottom;
-
 						const distanceTop = Math.abs(refTop - containerTop);
 						const distanceBottom = Math.abs(refBottom - containerBottom);
-
 						const distance = Math.min(distanceTop, distanceBottom);
 
 						if (distance < minDistance) {
@@ -178,19 +171,19 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						{' '}
 						<EmojisPanel emojisData={emojisSearch} onEmojiSelect={handleEmojiSelect} onEmojiHover={handleOnHover} />
 					</div>
-					<EmojiHover emojiHoverNative={emojiHoverNative} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
+					<EmojiHover emojiHoverSrc={emojiHoverSrc} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
 				</div>
 			) : (
 				<div className="flex flex-col">
 					<div
 						ref={containerRef}
-						className="w-full  max-h-[352px] overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark:bg-bgPrimary bg-bgLightMode"
+						className="w-full  max-h-[352px] overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark: bg-transparent bg-bgLightMode"
 					>
 						{categoriesWithIcons.map((item, index) => {
 							return (
 								<div className="w-full" key={item.name} ref={(el) => (categoryRefs.current[item.name] = el)}>
 									<DisplayByCategories
-										emojisData={emojis}
+										emojisData={emojiListPNG}
 										onEmojiSelect={handleEmojiSelect}
 										onEmojiHover={handleOnHover}
 										categoryName={item.name}
@@ -199,7 +192,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 							);
 						})}
 					</div>
-					<EmojiHover emojiHoverNative={emojiHoverNative} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
+					<EmojiHover emojiHoverSrc={emojiHoverSrc} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
 				</div>
 			)}
 		</div>
@@ -211,27 +204,23 @@ export default EmojiCustomPanel;
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
 	readonly onEmojiSelect: (emoji: string) => void;
-	readonly onEmojiHover: (item: IEmoji) => void;
-	readonly emojisData: IEmoji[];
+	readonly onEmojiHover: (item: any) => void;
+	readonly emojisData: any[];
 };
 
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
-	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
+	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
 			.filter((emoji) => emoji.category.includes(categoryParam))
 			.map((emoji) => ({
 				...emoji,
-				category: emoji.category.replace(/ *\([^)]*\) */g, ''),
+				category: emoji.category,
 			}));
-
-		const first50Emojis = filteredEmojis.slice(0, 27);
-
-		return first50Emojis;
+		return filteredEmojis;
 	};
 	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
 
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
-
 	return (
 		<div>
 			<button
@@ -251,7 +240,6 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
-
 	return (
 		<div
 			className={`grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
@@ -260,11 +248,11 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className="text-3xl  emoji-button border rounded-md border-[#363A53] dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10 h-10 p-1 flex items-center justify-center w-full"
+					className="text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full"
 					onClick={() => onEmojiSelect(item.shortname)}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					{item.emoji}
+					<img src={item.src}></img>
 				</button>
 			))}
 		</div>
@@ -272,17 +260,17 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 };
 
 type EmojiHoverProps = {
-	emojiHoverNative: string;
+	emojiHoverSrc: string;
 	emojiHoverShortCode: string;
 	isReaction: boolean | undefined;
 };
 
-const EmojiHover = ({ emojiHoverNative, emojiHoverShortCode, isReaction }: EmojiHoverProps) => {
+const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHoverProps) => {
 	return (
 		<div
 			className={`w-full min-h-12 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2'}`}
 		>
-			<span className="text-3xl"> {emojiHoverNative}</span>
+			<img className="w-10" src={emojiHoverSrc}></img>
 			{emojiHoverShortCode}
 		</div>
 	);
