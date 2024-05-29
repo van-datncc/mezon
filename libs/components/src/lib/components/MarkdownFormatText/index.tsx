@@ -166,7 +166,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 							/>
 						)}
 
-						{matchedElements.length === 0 ? (
+						{(matchedElements.length === 0 && !startsWithTripleBackticks && !endsWithNoTripleBackticks) || !onlyBackticks ? (
 							markdown + tagName && (
 								<>
 									{' '}
