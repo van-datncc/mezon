@@ -1,4 +1,4 @@
-import { useAppNavigation, useMenu } from '@mezon/core';
+import { useAppNavigation, useMenu, useVoice } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -26,7 +26,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const showScreen = useSelector(selectShowScreen);
 	const currentVoiceChannelId = useSelector(selectCurrentVoiceChannelId);
 	const currentVoiceChannel = useSelector(selectChannelById(currentVoiceChannelId));
-	const statusCall = useSelector(selectStatusCall);
+	const { setStatusCall } = useVoice();
 
 	const startScreenShare = useCallback(() => {
 		console.log("not implemented");
@@ -37,6 +37,7 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
+		setStatusCall(false);
 		console.log("not implemented");
 	}, []);
 
