@@ -20,5 +20,8 @@
     "toast": {
         "copyText": "Copied Message Text",
         "attachmentIsLoading": "Attachment is loading, please wait a moment"
+    },
+    "directMessage": {
+        "you": "You"
     }
 }

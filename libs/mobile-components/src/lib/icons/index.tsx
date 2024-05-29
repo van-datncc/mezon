@@ -399,6 +399,20 @@ export function ArrowDownIcon({ width = 20, height = 20, color = 'white', ...pro
 	)
 }
 
+export function ArrowLeftIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 448 512"
+			{...props}
+		>
+			<Path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H109.3l105.3-105.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+		</Svg>
+	)
+}
+
 export function MemberListIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg
@@ -533,5 +547,33 @@ export function RibbonIcon({ width = 24, height = 24, color = 'white', ...props 
 				d="M3 1a1 1 0 0 1 1 1v.82l8.67-1.45A2 2 0 0 1 15 3.35v1.47l5.67-.95A2 2 0 0 1 23 5.85v7.3a2 2 0 0 1-1.67 1.98l-9 1.5a2 2 0 0 1-1.78-.6c-.2-.21-.08-.54.18-.68a5.01 5.01 0 0 0 1.94-1.94c.18-.32-.1-.66-.46-.6L4 14.18V21a1 1 0 1 1-2 0V2a1 1 0 0 1 1-1Z"
 			></Path>
 		</Svg>
+	)
+}
+
+export function UserGroupIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 640 512"
+			{...props}
+		>
+		<Path d="M96 128a128 128 0 11256 0 128 128 0 11-256 0zM0 482.3C0 383.8 79.8 304 178.3 304h91.4c98.5 0 178.3 79.8 178.3 178.3 0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM609.3 512H471.4c5.4-9.4 8.6-20.3 8.6-32v-8c0-60.7-27.1-115.2-69.8-151.8 2.4-.1 4.7-.2 7.1-.2h61.4c89.1 0 161.3 72.2 161.3 161.3 0 17-13.8 30.7-30.7 30.7zM432 256c-31 0-59-12.6-79.3-32.9 19.7-26.6 31.3-59.5 31.3-95.1 0-26.8-6.6-52.1-18.3-74.3C384.3 40.1 407.2 32 432 32c61.9 0 112 50.1 112 112s-50.1 112-112 112z" />
+	  </Svg>
+	)
+}
+
+export function VideoIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 576 512"
+			{...props}
+		>
+		<Path d="M0 128c0-35.3 28.7-64 64-64h256c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zm559.1-28.2c10.4 5.6 16.9 16.4 16.9 28.2v256c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64-14.2-9.5V174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z" />
+	  </Svg>
 	)
 }
