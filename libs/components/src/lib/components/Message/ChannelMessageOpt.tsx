@@ -37,10 +37,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 		e.stopPropagation();
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
-		dispatch(messagesActions.setOpenOptionMessageState(!openOptionMessageState));
-	};
-
-	const handleOnEnterOptionIcon = () => {
+		dispatch(messagesActions.setOpenOptionMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageOption(message.id));
 	};
 
@@ -93,7 +90,7 @@ const ChannelMessageOpt = forwardRef(({ message }: ChannelMessageOptProps, ref: 
 					<Icons.ThreadIcon isWhite={thread} />
 				</button>
 			)}
-			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer" onMouseEnter={handleOnEnterOptionIcon}>
+			<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
 				<Icons.ThreeDot />
 			</button>
 		</div>
