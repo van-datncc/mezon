@@ -28,6 +28,7 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	const [positionBottom, setPositionBottom] = useState(false);
 	const [positionTop, setPositionTop] = useState(0);
 	const [positionLeft, setPositionLeft] = useState(0);
+
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
 		if (event.button === 0) {
 			setIsShowPanelChannel(true);
@@ -80,6 +81,10 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	};
 	const { appearanceTheme } = useApp();
 	const backtickRegex = /`[^`]*`/g;
+	const titleRegex = /^#{1,6}\s+.+$/;
+	const numberedListRegex = /^\d+\.\s/gm;
+	const italicRegex = /(?:^|\s)(_|\*)[^\s_*].*?\1(?:\s|$)/gm;
+
 	const [isMarkdown, setIsMarkdown] = useState<boolean>(false);
 	const startsWithTripleBackticks = lineMessage.startsWith('```');
 	const endsWithNoTripleBackticks = !lineMessage.endsWith('```');
@@ -88,7 +93,13 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	useEffect(() => {
-		if ((startsWithTripleBackticks && endsWithNoTripleBackticks) || backtickRegex.test(lineMessage)) {
+		if (
+			(startsWithTripleBackticks && endsWithNoTripleBackticks) ||
+			backtickRegex.test(lineMessage) ||
+			titleRegex.test(lineMessage) ||
+			numberedListRegex.test(lineMessage) ||
+			italicRegex.test(lineMessage)
+		) {
 			setIsMarkdown(true);
 			const result = convertMarkdown(lineMessage);
 			setConvertLine(result);
