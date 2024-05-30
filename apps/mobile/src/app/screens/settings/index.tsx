@@ -1,8 +1,6 @@
-import { CloseIcon, LogoutIcon, NittroIcon } from '@mezon/mobile-components';
+import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
 import { authActions, useAppDispatch } from '@mezon/store-mobile';
 import { Colors } from '@mezon/mobile-ui';
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { MezonButton } from 'apps/mobile/src/app/temp-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, Text, View } from 'react-native';
