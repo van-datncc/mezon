@@ -4,23 +4,23 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 type ChannelHashtagProps = {
-	tagName: string;
+	channelHastagId: string;
 };
 
-const ChannelHashtag = ({ tagName }: ChannelHashtagProps) => {
+const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
 
-	const getChannelPath = (tagName: string, clanId: string): string | undefined => {
-		if (tagName.startsWith('#')) {
-			return toChannelPage(tagName.slice(1), clanId || '');
+	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
+		if (channelHastagId.startsWith('#')) {
+			return toChannelPage(channelHastagId.slice(1), clanId || '');
 		}
 		return undefined;
 	};
-	const channelPath = getChannelPath(tagName, clanId ?? '');
+	const channelPath = getChannelPath(channelHastagId, clanId ?? '');
 
-	const getChannelById = (channelId: string) => {
-		const channel = useSelector(selectChannelById(channelId));
+	const getChannelById = (channelHastagId: string) => {
+		const channel = useSelector(selectChannelById(channelHastagId));
 		return channel;
 	};
 	return (
@@ -28,9 +28,9 @@ const ChannelHashtag = ({ tagName }: ChannelHashtagProps) => {
 			<Link
 				style={{ textDecoration: 'none' }}
 				to={channelPath}
-				className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+				className="font-medium px-1 rounded-sm cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 			>
-				{tagName.startsWith('#') && getChannelById(tagName.slice(1)) && `#${getChannelById(tagName.slice(1)).channel_label}`}
+				{channelHastagId.startsWith('#') && getChannelById(channelHastagId.slice(1)) && `#${getChannelById(channelHastagId.slice(1)).channel_label}`}
 			</Link>
 		)
 	);
