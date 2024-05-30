@@ -1,6 +1,6 @@
-import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
-import { ArrowDownIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, useAnimatedState } from '@mezon/mobile-ui';
+import { useChatMessage, useChatMessages, useChatReaction, useChatTypings, useDirectMessages } from '@mezon/core';
+import { ArrowDownIcon, CloseIcon } from '@mezon/mobile-components';
+import { Colors, Metrics, useAnimatedState, size } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -12,13 +12,14 @@ import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import { styles } from './styles';
+import { ChannelStreamMode } from 'mezon-js';
 
 type ChannelMessagesProps = {
 	channelId: string;
 	type: string;
 	channelLabel?: string;
 	avatarDM?: string;
-	mode: number;
+	mode: ChannelStreamMode;
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
@@ -148,6 +149,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 						return (
 							<TouchableOpacity
 								activeOpacity={0.8}
+								key={`${attachment.url}_${idx}_ImagesModal`}
 								onPress={() => {
 									setVisibleImageModal(false);
 									setIdxSelectedImageModal(idx);
@@ -157,7 +159,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 								}}
 							>
 								<FastImage
-									key={`${attachment.url}_${idx}_ImagesModal`}
 									style={[styles.imageFooterModal, idx === idxSelectedImageModal && styles.imageFooterModalActive]}
 									source={{
 										uri: attachment.url,

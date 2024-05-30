@@ -424,6 +424,20 @@ export function ArrowDownIcon({ width = 20, height = 20, color = 'white', ...pro
 	)
 }
 
+export function ArrowLeftIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 448 512"
+			{...props}
+		>
+			<Path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H109.3l105.3-105.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+		</Svg>
+	)
+}
+
 export function MemberListIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg
@@ -581,5 +595,33 @@ export function UploadImage({ width = 20, height = 20, color='white' , ...props 
       {...props}
      >
     <Path fill={color} d="M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"/></Svg>
+	)
+}
+
+export function UserGroupIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 640 512"
+			{...props}
+		>
+		<Path d="M96 128a128 128 0 11256 0 128 128 0 11-256 0zM0 482.3C0 383.8 79.8 304 178.3 304h91.4c98.5 0 178.3 79.8 178.3 178.3 0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM609.3 512H471.4c5.4-9.4 8.6-20.3 8.6-32v-8c0-60.7-27.1-115.2-69.8-151.8 2.4-.1 4.7-.2 7.1-.2h61.4c89.1 0 161.3 72.2 161.3 161.3 0 17-13.8 30.7-30.7 30.7zM432 256c-31 0-59-12.6-79.3-32.9 19.7-26.6 31.3-59.5 31.3-95.1 0-26.8-6.6-52.1-18.3-74.3C384.3 40.1 407.2 32 432 32c61.9 0 112 50.1 112 112s-50.1 112-112 112z" />
+	  </Svg>
+	)
+}
+
+export function VideoIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			fill={color}
+			viewBox="0 0 576 512"
+			{...props}
+		>
+		<Path d="M0 128c0-35.3 28.7-64 64-64h256c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zm559.1-28.2c10.4 5.6 16.9 16.4 16.9 28.2v256c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64-14.2-9.5V174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z" />
+	  </Svg>
 	)
 }
