@@ -96,12 +96,12 @@ export default function ChannelLayout() {
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 			>
-				<div className="flex h-heightWithoutTopBar flex-row">
+				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 					<div
 						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
 					>
 						<div
-							className="overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
+							className={`overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
 							ref={messagesContainerRef}
 						>
 							{renderChannelMedia()}
