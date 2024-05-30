@@ -27,7 +27,7 @@ export interface ChannelsEntity extends IChannel {
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-	return { ...channelRes, id: channelRes.channel_id || '' };
+	return { ...channelRes, id: channelRes.channel_id || '' , state: channelRes.meeting_code};
 };
 
 interface ChannelMeta {
@@ -178,7 +178,6 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	}
 
 	const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
-
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -186,7 +185,6 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 	const channels = response.channeldesc.map(mapChannelToEntity);
 	const meta = channels.map((ch) => extractChannelMeta(ch));
 	thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
-
 	return channels;
 });
 

@@ -39,7 +39,7 @@ const ChannelLayout = () => {
 		<div
 			className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 		>
-			<div className="flex h-heightWithoutTopBar flex-row">
+			<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 				<Outlet />
 			</div>
 			{subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && (
