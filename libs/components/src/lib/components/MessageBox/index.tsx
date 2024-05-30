@@ -1,7 +1,7 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useMenu, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue } from '@mezon/utils';
+import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import * as Icons from '../Icons';
@@ -53,6 +53,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
+		typeConverts.map((typeConvert) => {
+			if (typeConvert.type === attachment.filetype) {
+				return (attachment.filetype = typeConvert.typeConvert);
+			}
+		});
 		setAttachmentData(attachment);
 	}, []);
 
