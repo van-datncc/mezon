@@ -13,3 +13,14 @@ export const threadError: ThreadError = {
 export const regexToDetectGifLink = /\bhttps?:\/\/\S+\.gif\b/g;
 
 export const MIN_THRESHOLD_CHARS = 4096;
+
+export type ITypeConvert = {
+	type: string;
+	typeConvert: string;
+};
+
+export const typeConverts: ITypeConvert[] = [
+	{ type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', typeConvert: 'application/msword' },
+	{ type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', typeConvert: 'application/vnd.ms-powerpoint' },
+	{ type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', typeConvert: 'application/vnd.ms-excel' },
+];

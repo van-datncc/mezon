@@ -38,6 +38,7 @@ module.exports = {
   bgLightMode: '#f7f7f7',
   bgLightModeSecond: '#F0F0F0',
   bgLightModeThird: 'rgb(235, 237, 239)',
+  bgLightTertiary: '#E3E5E8',
   bgLightModeButton: '#155EEF1A',
   bgModifierHoverLight: '#DFE1E5',
   bgModalLight: 'rgba(0, 0, 0, 0.54)',
@@ -45,7 +46,7 @@ module.exports = {
 
   /* text */
   channelTextarea: '#383A40',
-  channelTextareaLight: '#80848E',
+  channelTextareaLight: '#EBEDEF',
   textPrimary: '#DBDEE1',
   textPrimaryLight: '#313338',
   textSecondary: '#B5BaC1',
@@ -59,6 +60,7 @@ module.exports = {
   borderSelected: '#155EEF',
   borderFocus: '#535353',
   borderDivider: '#3B3D44',
+  borderDividerLight: '#80848E',
   borderClan: '#484C52',
 
   /* button */

@@ -17,7 +17,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 
 	return (
-		<div className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white flex-shrink`}>
+		<div
+			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
+		>
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
 					<div onClick={() => setStatusMenu(true)} className="mx-6" role="button">
