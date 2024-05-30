@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/stack';
 
 import { APP_SCREEN } from "../../ScreenTypes";
-import Notifications from '../../../screens/Notifications';
+import { DirectMessageDetailScreen } from '../../../screens/messages/DirectMessageDetail';
 
 // eslint-disable-next-line no-empty-pattern
 export const MessagesStacks = ({ }: any) => {
@@ -25,15 +25,10 @@ export const MessagesStacks = ({ }: any) => {
 				},
 				cardStyle: { backgroundColor: 'white' },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-			}}>
-			{/*Example*/}
+		}}>
 			<Stack.Screen
-				name={APP_SCREEN.NOTIFICATION.HOME}
-				component={Notifications}
-				// component={ListIconScreens}
-				options={{
-					headerShown: false,
-				}}
+				name={APP_SCREEN.MESSAGES.MESSAGE_DETAIL}
+				component={DirectMessageDetailScreen}
 			/>
 		</Stack.Navigator>
 	);

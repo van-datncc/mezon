@@ -473,7 +473,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
-				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
+				className="dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}

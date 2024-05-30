@@ -14,12 +14,14 @@ const SettingRightUser = ({
 	avatar,
 	nameDisplay,
 	aboutMe,
+	menuIsOpen,
 }: {
 	onClanProfileClick?: () => void;
 	name: string;
 	avatar: string;
 	nameDisplay: string;
 	aboutMe: string;
+	menuIsOpen: boolean;
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
@@ -111,7 +113,7 @@ const SettingRightUser = ({
 		setFlags(true);
 	};
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+		<div className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? "min-w-[700px]" : ""} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}>
 			<div className="dark:text-white text-black">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 font-semibold text-base border-b-2 border-[#155EEF] pb-2 tracking-wider">User Profile</button>
@@ -119,8 +121,8 @@ const SettingRightUser = ({
 					Clan Profiles
 				</button>
 			</div>
-			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 flex-row">
-				<div className="w-1/2 dark:text-[#CCCCCC] text-black">
+			<div className="flex-1 flex mt-[20px] z-0 gap-x-8 sbm:flex-row flex-col">
+				<div className="flex-1 dark:text-[#CCCCCC] text-black">
 					<div className="mt-[20px]">
 						<label htmlFor="inputField" className="font-semibold tracking-wide text-sm">
 							DISPLAY NAME
@@ -171,7 +173,7 @@ const SettingRightUser = ({
 						</div>
 					</div>
 				</div>
-				<div className="w-1/2 text-white">
+				<div className="flex-1  text-white">
 					<p className="mt-[20px] text-[#CCCCCC] font-semibold tracking-wide text-sm">PREVIEW</p>
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
