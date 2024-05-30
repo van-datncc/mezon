@@ -28,7 +28,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'dark:bg-bgPrimary bg-bgLightModeSecond shadow border-b-[1px] dark:border-bgTertiary border-white'}`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'}`}
 		>
 			{checkChannelType ? (
 				<>
@@ -69,7 +69,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 								<SearchMessage />
 							</div>
 							<div
-								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightModeSecond'}`}
+								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
 								id="inBox"
 							>
 								<InboxButton isLightMode={appearanceTheme === 'light'} />
