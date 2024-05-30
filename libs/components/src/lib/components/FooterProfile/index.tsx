@@ -3,11 +3,11 @@ import {
 	ChannelsEntity,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
-	selectStatusCall,
 	useAppDispatch,
 	userClanProfileActions,
 	voiceActions,
 } from '@mezon/store';
+import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,6 @@ import MemberProfile from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import VoiceControlPanel from '../VoiceControlPanel';
 import ModalFooterProfile from './ModalFooterProfile';
-import { Tooltip } from 'flowbite-react';
 
 export type FooterProfileProps = {
 	name: string;
@@ -29,7 +28,7 @@ export type FooterProfileProps = {
 
 function FooterProfile({ name, status, avatar, userId, openSetting, channelCurrent }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
-	const {statusCall} = useVoice();
+	const { statusCall } = useVoice();
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const { appearanceTheme } = useApp();
@@ -62,13 +61,13 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 		<>
 			{statusCall && <VoiceControlPanel channelCurrent={channelCurrent} />}
 			<button
-				className={`flex items-center justify-between border-t-2
+				className={`flex items-center justify-between border-t
 			 dark:border-borderDefault border-white px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
-			 shadow-sm transition dark:bg-bgSecondary600 bg-bgLightMode
-			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === "light" && 'lightMode'}`}
+			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
+			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
-				<div className={`footer-profile ${appearanceTheme === "light" && 'lightMode'}`} ref={profileRef} onClick={handleClickFooterProfile}>
+				<div className={`footer-profile ${appearanceTheme === 'light' && 'lightMode'}`} ref={profileRef} onClick={handleClickFooterProfile}>
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
@@ -84,13 +83,11 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 				<div className="flex items-center gap-2">
 					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton" />
 					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton" />
-					<Tooltip
-						content="Settings"
-						trigger="hover"
-						animation="duration-500"
-						style={appearanceTheme === "light" ? 'light' : 'dark'}
-					>
-						<SettingProfile className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton" onClick={openSetting} />
+					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+						<SettingProfile
+							className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton"
+							onClick={openSetting}
+						/>
 					</Tooltip>
 				</div>
 			</button>

@@ -53,7 +53,7 @@ export default function DirectMessage() {
 							/>
 						}
 					</div>
-					<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-[#F0F0F0] h-auto relative">
+					<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 						{directId && (
 							<ChannelTyping
 								channelId={directId}
