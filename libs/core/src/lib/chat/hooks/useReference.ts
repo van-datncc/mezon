@@ -12,6 +12,8 @@ import {
 	selectOpenOptionMessageState,
 	selectOpenReplyMessageState,
 	selectOpenThreadMessageState,
+	selectPositionOfMention,
+	selectUserIdToShowProfile,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -32,6 +34,8 @@ export function useReference() {
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
+	const userIdShowProfile = useSelector(selectUserIdToShowProfile);
+	const positionOfMention = useSelector(selectPositionOfMention);
 
 	const setDataReferences = useCallback(
 		(dataReference: ApiMessageRef[]) => {
@@ -110,8 +114,24 @@ export function useReference() {
 		[dispatch],
 	);
 
+	const setUserIdToShowProfile = useCallback(
+		(userId: string) => {
+			dispatch(referencesActions.setUserIdToShowProfile(userId));
+		},
+		[dispatch],
+	);
+	const setPositionOfMention = useCallback(
+		(state: any) => {
+			dispatch(referencesActions.setPositionOfMention(state));
+		},
+		[dispatch],
+	);
 	return useMemo(
 		() => ({
+			positionOfMention,
+			setPositionOfMention,
+			setUserIdToShowProfile,
+			userIdShowProfile,
 			setDataReferences,
 			setIdMessageToJump,
 			setOpenEditMessageState,
@@ -136,6 +156,10 @@ export function useReference() {
 			setOpenOptionMessageState,
 		}),
 		[
+			positionOfMention,
+			setPositionOfMention,
+			setUserIdToShowProfile,
+			userIdShowProfile,
 			setDataReferences,
 			setIdMessageToJump,
 			setOpenEditMessageState,

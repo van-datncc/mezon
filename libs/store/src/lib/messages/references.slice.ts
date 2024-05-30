@@ -23,6 +23,13 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefReaction: string;
 	idMessageRefEdit: string;
 	idMessageRefOption: string;
+	userIdShowProfile: string;
+	positionOfMention: {
+		top: number;
+		right: number;
+		left: number;
+		bottom: number;
+	};
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -43,6 +50,13 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
 	idMessageRefOption: '',
+	userIdShowProfile: '',
+	positionOfMention: {
+		top: 0,
+		right: 0,
+		left: 0,
+		bottom: 0,
+	},
 });
 
 export const referencesSlice = createSlice({
@@ -83,6 +97,13 @@ export const referencesSlice = createSlice({
 		},
 		setIdReferenceMessageOption(state, action) {
 			state.idMessageRefOption = action.payload;
+		},
+
+		setUserIdToShowProfile(state, action) {
+			state.userIdShowProfile = action.payload;
+		},
+		setPositionOfMention(state, action) {
+			state.positionOfMention = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -130,3 +151,7 @@ export const selectIdMessageToJump = createSelector(getReferencesState, (state: 
 export const selectIdMessageRefEdit = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefEdit);
 
 export const selectIdMessageRefOption = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefOption);
+
+export const selectUserIdToShowProfile = createSelector(getReferencesState, (state: ReferencesState) => state.userIdShowProfile);
+
+export const selectPositionOfMention = createSelector(getReferencesState, (state: ReferencesState) => state.positionOfMention);
