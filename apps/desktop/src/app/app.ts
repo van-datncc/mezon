@@ -4,6 +4,8 @@ import { format } from 'url';
 import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
+import { setup } from 'electron-push-receiver';
+
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
 	// be closed automatically when the JavaScript object is garbage collected.
@@ -47,6 +49,8 @@ export default class App {
 			App.initMainWindow();
 			App.loadMainWindow();
 		}
+
+		setup(App.mainWindow.webContents);
 	}
 
 	private static onActivate() {
@@ -75,6 +79,8 @@ export default class App {
 		});
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
+
+		App.mainWindow.webContents.openDevTools();
 
 		// if main window is ready to show, close the splash window and show the main window
 		App.mainWindow.once('ready-to-show', () => {

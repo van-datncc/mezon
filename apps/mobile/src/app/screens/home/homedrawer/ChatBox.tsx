@@ -11,7 +11,7 @@ import {
 import { useChannelMembers, useChannels, useChatSending, useDirectMessages, useReference, useThreads } from '@mezon/core';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageSendPayload, IMessageWithUser, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
 	DeviceEventEmitter,
 	Dimensions,
@@ -168,8 +168,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				break;
 		}
 	}, [removeMessageActionByType])
+	
+	const isCanSendMessage = useMemo(() => {
+		return !!attachmentDataRef?.length || text.length > 0;
+	}, [attachmentDataRef?.length, text.length]);
 
 	const handleSendMessage = useCallback(() => {
+		if (!isCanSendMessage) {
+			return;
+		}
 		const payloadThreadSendMessage: IPayloadThreadSendMessage = {
 			content: { t: text },
 			mentions: mentionData,

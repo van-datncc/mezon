@@ -1,5 +1,5 @@
 import { useApp, useClans, useInvite, useOnClickOutside } from '@mezon/core';
-import { ILineMention, convertMarkdown } from '@mezon/utils';
+import { ILineMention, convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -83,11 +83,6 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 
 	const { appearanceTheme } = useApp();
 
-	const getSrcEmoji = (shortname: string) => {
-		const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-		return emoji ? emoji.src : undefined;
-	};
-
 	return (
 		<article
 			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
@@ -112,7 +107,6 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const tagName = part.matchedText;
 				const markdown = (part.nonMatchText && part.nonMatchText.trim()) ?? '';
 				const result = convertMarkdown(markdown);
-
 				const [checkMarkdownIncludeEmoji, setMarkdownIncludeEmoji] = useState<string>('');
 
 				const splitTextMarkdown = markdown.split(' ');
@@ -127,13 +121,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 				const onlyBackticks = /^```$/.test(markdown);
 				const [checkOnlyEmoji, setCheckOnlyEmoji] = useState<boolean>(false);
 
-				useEffect(() => {
-					if (matchedElements.length === 0) {
-						setMarkdownIncludeEmoji(markdown);
-					} else {
-						setMarkdownIncludeEmoji('');
-					}
-				}, [markdown]);
+				const [hasEmoji, setHasEmoji] = useState<boolean>(false);
 
 				useEffect(() => {
 					if (splitTextMarkdown.length === 1 && getMatchedElements(markdown).length === 1) {
@@ -141,32 +129,40 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 					}
 				}, [splitTextMarkdown, getMatchedElements]);
 
+				useEffect(() => {
+					if (getSrcEmoji(matchedElements[0], emojiListPNG) !== undefined) {
+						setHasEmoji(true);
+					} else {
+						setHasEmoji(false);
+					}
+				}, [matchedElements[0]]);
+
 				return (
 					<div key={index} className="lineText contents">
-						{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
-							<span>{markdown}</span>
-						) : (
-							<Markdown
-								children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : checkMarkdownIncludeEmoji}
-								remarkPlugins={[remarkGFM]}
-								components={{
-									pre: PreClass,
-									p: 'span',
-									a: ({ children }) => (
-										<span
-											onClick={() => getLinkinvite(children)}
-											rel="noopener noreferrer"
-											style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
-											className="tagLink"
-										>
-											{children}
-										</span>
-									),
-								}}
-							/>
-						)}
-
-						{(matchedElements.length === 0 && !startsWithTripleBackticks && !endsWithNoTripleBackticks) || !onlyBackticks ? (
+						{!hasEmoji ? (
+							(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
+								<span>{markdown}</span>
+							) : (
+								<Markdown
+									children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : markdown}
+									remarkPlugins={[remarkGFM]}
+									components={{
+										pre: PreClass,
+										p: 'span',
+										a: ({ children }) => (
+											<span
+												onClick={() => getLinkinvite(children)}
+												rel="noopener noreferrer"
+												style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+												className="tagLink"
+											>
+												{children}
+											</span>
+										),
+									}}
+								/>
+							)
+						) : matchedElements.length === 0 ? (
 							markdown + tagName && (
 								<>
 									{' '}
@@ -185,7 +181,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 						) : (
 							<div className="flex flex-row gap-x-1 items-center w-fit">
 								{splitTextMarkdown.map((item, index) => {
-									const srcEmoji = getSrcEmoji(item);
+									const srcEmoji = getSrcEmoji(item, emojiListPNG);
 									if (item.match(regex) && srcEmoji) {
 										return (
 											<img
@@ -212,6 +208,18 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 									</span>
 								)}
 							</div>
+						)}
+						{tagName && (
+							<span
+								className={`font-medium cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
+									tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
+								}`}
+								onClick={() => handMention(tagName)}
+								ref={panelRef}
+								onMouseDown={(event) => handleMouseClick(event)}
+							>
+								{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
+							</span>
 						)}
 					</div>
 				);

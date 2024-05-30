@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { Fragment } from 'react';
 
 type UserReactionPanelProps = {
@@ -25,10 +25,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 		}
 		return emojiData;
 	};
-	const getSrcEmoji = (shortname: string) => {
-		const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-		return emoji ? emoji.src : undefined;
-	};
+
 	return (
 		<>
 			{calculateTotalCount(emojiShowPanel.senders) > 0 && (
@@ -39,7 +36,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 				>
 					<div>
 						<div className="flex flex-row items-center m-2">
-							<img src={getSrcEmoji(emojiShowPanel.emoji ?? '')} className="w-5 h-5"></img>{' '}
+							<img src={getSrcEmoji(emojiShowPanel.emoji ?? '', emojiListPNG)} className="w-5 h-5"></img>{' '}
 							<p className="text-sm ml-2">{calculateTotalCount(emojiShowPanel.senders)}</p>
 						</div>
 						<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none"></hr>
