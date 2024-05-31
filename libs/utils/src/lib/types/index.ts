@@ -295,11 +295,6 @@ export enum SubPanelName {
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
-export enum TypeOfMention {
-	HASHTAG = 'HASTAG',
-	MENTION = 'MENTION',
-	EMOJI_SYNTAX = 'EMOJI_SYNTAX',
-}
 
 export type IEmoji = {
 	category: string;
