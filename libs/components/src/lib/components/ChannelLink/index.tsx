@@ -28,6 +28,11 @@ export type Coords = {
 	distanceToBottom: number;
 };
 
+enum StatusVoiceChannel  {
+	Active = 1,
+	No_Active = 0,
+}
+
 export const classes = {
 	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
 	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton',
@@ -84,14 +89,16 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const dispatch = useAppDispatch();
 
 	const handleVoiceChannel = (id: string) => {
-		const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
-		voice.setVoiceOptions((prev) => ({
-			...prev,
-			voiceChannelName: voiceChannelName,
-		}));
+		if(channel.status === StatusVoiceChannel.Active){
+			const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
+			voice.setVoiceOptions((prev) => ({
+				...prev,
+				voiceChannelName: voiceChannelName,
+			}));
 
-		dispatch(channelsActions.setCurrentVoiceChannelId(id));
-		dispatch(voiceActions.setStatusCall(true));
+			dispatch(channelsActions.setCurrentVoiceChannelId(id));
+			dispatch(voiceActions.setStatusCall(true));
+		}
 	};
 
 	const handleDeleteChannel = () => {
@@ -112,17 +119,17 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 
 	const openModalJoinVoiceChannel = useCallback(
 		(url: string) => {
-			if(channel.state){
+			if(channel.status === 1){
 				const urlVoice = `https://meet.google.com/${url}`;
 				window.open(urlVoice, "_blank", "noreferrer");
 			}
-		},[channel.state]
+		},[channel.status]
 	);
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
-					className={`${classes[state]} ${channel.state ? 'cursor-pointer' : 'cursor-not-allowed'} ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
+					className={`${classes[state]} ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
 					onClick={() => {handleVoiceChannel(channel.id); openModalJoinVoiceChannel(channel.meeting_code || '')}}
 					role="link"
 				>
@@ -145,7 +152,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 							? `${channel?.channel_label.substring(0, 20)}...`
 							: channel?.channel_label}
 					</p>
-					{!channel.state &&
+					{channel.status === StatusVoiceChannel.No_Active &&
 						<Spinner aria-label="Loading spinner"/>
 					}
 				</span>

@@ -27,7 +27,7 @@ export interface ChannelsEntity extends IChannel {
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-	return { ...channelRes, id: channelRes.channel_id || '' , state: channelRes.meeting_code};
+	return { ...channelRes, id: channelRes.channel_id || '', status: channelRes.meeting_code ? 1 : 0};
 };
 
 interface ChannelMeta {
@@ -250,7 +250,7 @@ export const channelsSlice = createSlice({
 			const payload = action.payload;
 			channelsAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: {channel_label: payload.channel_label},
+				changes: {channel_label: payload.channel_label, status: payload.status},
 			});
 		},
 		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
