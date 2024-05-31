@@ -39,7 +39,7 @@ import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
-import {selectCurrentChannel, selectEmojiImage, selectMemberByUserId} from '@mezon/store';
+import { selectCurrentChannel, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';

@@ -1,6 +1,13 @@
 import { IEmoji, IEmojiImage } from '@mezon/utils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { MMKV } from 'react-native-mmkv';
+const appName = 'Mezon';
+const AppKey = '7268428d-d814-4eca-8829-176553sad3';
+
+export const AppStorage = new MMKV({
+	id: `user-${appName}-storage`,
+	encryptionKey: AppKey,
+});
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -52,8 +59,8 @@ export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, t
 
 export const fetchEmojiMobile = createAsyncThunk<any>('emoji/fetchStatusMobile', async (_, thunkAPI) => {
 	try {
-		const cachedData = await AsyncStorage.getItem('emojiCache');
-		const cachedEmojiImageData = await AsyncStorage.getItem('emojiImageCache');
+		const cachedData = AppStorage.getString('emojiCache');
+		const cachedEmojiImageData = AppStorage.getString('emojiImageCache');
 		if (!!cachedData && !!cachedEmojiImageData) {
 			const cachedEmojis = JSON.parse(cachedData) as IEmoji[];
 			const cachedEmojiImages = JSON.parse(cachedEmojiImageData) as IEmoji[];
@@ -72,8 +79,8 @@ export const fetchEmojiMobile = createAsyncThunk<any>('emoji/fetchStatusMobile',
 		const responseEmojiImgEmojiImg = await responseEmojiImg.json();
 		emojiCache = data.emojis;
 		emojiImageCache = responseEmojiImgEmojiImg;
-		await AsyncStorage.setItem('emojiCache', JSON.stringify(emojiCache));
-		await AsyncStorage.setItem('emojiImageCache', JSON.stringify(emojiImageCache));
+		AppStorage.set('emojiCache', JSON.stringify(emojiCache));
+		AppStorage.set('emojiImageCache', JSON.stringify(emojiImageCache));
 		return {
 			emoji: emojiCache,
 			emojiImage: emojiImageCache,

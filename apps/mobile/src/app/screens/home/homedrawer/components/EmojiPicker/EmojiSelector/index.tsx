@@ -12,10 +12,11 @@ import {
 	SmilingFaceIcon,
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { selectEmojiImage } from '@mezon/store';
+import { selectEmojiImage } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import React, { useCallback, useRef, useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -113,7 +114,7 @@ export default function EmojiSelector({ onSelected, isReactMessage = false }: Em
 			ref={refScrollView}
 			showsVerticalScrollIndicator={false}
 			stickyHeaderIndices={[0]}
-			style={{ height: Metrics.screenHeight / 1.4, paddingBottom: 100 }}
+			style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
 			contentContainerStyle={{ paddingBottom: size.s_50 }}
 		>
 			<View style={{ backgroundColor: isReactMessage ? Colors.bgCharcoal : Colors.secondary }}>
