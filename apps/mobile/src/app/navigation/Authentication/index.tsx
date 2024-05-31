@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { getAppInfo } from '@mezon/mobile-components';
-import { fcmActions } from '@mezon/store';
+import { fcmActions } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useDispatch } from 'react-redux';

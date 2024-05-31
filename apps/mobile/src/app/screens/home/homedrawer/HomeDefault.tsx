@@ -2,9 +2,11 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { ActionEmitEvent, UnMuteIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
+import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -14,13 +16,10 @@ import ChatBox from './ChatBox';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
-import { styles } from './styles';
-import Toast from "react-native-toast-message";
 import ForwardMessageModal from './components/ForwardMessage';
-import { useEffect } from 'react';
-import { IMessageWithUser } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import NotificationSetting from '../../../components/NotificationSetting';
+import { styles } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -43,16 +42,15 @@ const HomeDefault = React.memo((props: any) => {
 	};
 
 	useEffect(() => {
-		const showKeyboard = DeviceEventEmitter.addListener(
-			ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
-				setMessageForward(payload.targetMessage);
-				setShowForwardModal(true);
-			},
-		);
+		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
+			setMessageForward(payload.targetMessage);
+			setShowForwardModal(true);
+		});
 		return () => {
 			showKeyboard.remove();
 		};
-	}, [])
+	}, []);
+
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "40%"], []);
   const [isShow, setIsShow] = useState<boolean>(false);
@@ -112,7 +110,10 @@ const HomeDefault = React.memo((props: any) => {
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
-									onDone={() => onShowKeyboardBottomSheet(false, heightKeyboardShow, typeKeyboardBottomSheet)}
+									onDone={() => {
+										onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
+										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
+									}}
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
@@ -123,11 +124,7 @@ const HomeDefault = React.memo((props: any) => {
 						</BottomKeyboardPicker>
 					)}
 
-					<ForwardMessageModal
-						show={showForwardModal}
-						onClose={() => setShowForwardModal(false)}
-						message={messageForward}
-					/>
+					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
 				</View>
 			)}
       <BottomSheet
