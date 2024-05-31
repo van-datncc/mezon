@@ -5,10 +5,8 @@ import { Outlet } from 'react-router-dom';
 
 const MainLayout = () => {
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const { setUserIdToShowProfile } = useReference();
 	const handleClickingOutside = () => {
 		setSubPanelActive(SubPanelName.NONE);
-		setUserIdToShowProfile('');
 	};
 	return (
 		<div id="main-layout" onClick={handleClickingOutside}>

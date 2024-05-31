@@ -33,23 +33,31 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	};
 	const { appearanceTheme } = useApp();
 	const backtickRegex = /`[^`]*`/g;
-	const titleRegex = /^#{1,6}\s+.+$/;
+	const headingRegex = /^(#{1,6}) (.*)/gm;
+
 	const numberedListRegex = /^\d+\.\s/gm;
-	const italicRegex = /(?:^|\s)(_|\*)[^\s_*].*?\1(?:\s|$)/gm;
+	const italicRegex = /\*([^*]+)\*/g;
+	const boldRegex = /\*\*([^*]+)\*\*/g;
+	const boldItalicRegex = /\*\*\*([^*]+)\*\*\*/g;
 
 	const [isMarkdown, setIsMarkdown] = useState<boolean>(false);
 	const startsWithTripleBackticks = lineMessage.startsWith('```');
+	const startWithHttpOrHttps = lineMessage.startsWith('https://') || lineMessage.startsWith('http://');
 	const endsWithNoTripleBackticks = !lineMessage.endsWith('```');
 	const onlyBackticks = /^```$/.test(lineMessage);
+	const isQuote = lineMessage.startsWith('>');
 	const [convertedLine, setConvertLine] = useState('');
-
 	useEffect(() => {
 		if (
 			(startsWithTripleBackticks && endsWithNoTripleBackticks) ||
 			backtickRegex.test(lineMessage) ||
-			titleRegex.test(lineMessage) ||
+			headingRegex.test(lineMessage) ||
 			numberedListRegex.test(lineMessage) ||
-			italicRegex.test(lineMessage)
+			italicRegex.test(lineMessage) ||
+			boldRegex.test(lineMessage) ||
+			boldItalicRegex.test(lineMessage) ||
+			startWithHttpOrHttps ||
+			isQuote
 		) {
 			setIsMarkdown(true);
 			const result = convertMarkdown(lineMessage);
@@ -61,7 +69,10 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 
 	return (
 		<article
-			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
+			className={`prose-code:text-sm prose-hr:my-0 
+			prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl
+			whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px]
+			prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
 			{isMarkdown ? (
 				<div className="lineText contents">
@@ -102,37 +113,33 @@ type TextWithMentionHashtagEmojiOpt = {
 };
 
 const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmojiOpt) => {
-	const atMentionRegex = /(?<=(\s|^))@\S+(?=\s|$)/g;
-	const hashMentionRegex = /(?<=(\s|^))#\S+(?=\s|$)/g;
-	const mentionDetectEmoji = /:\b[^:]*\b:/g;
+	const combinedRegex = /(@\S+|#\S+|:\b[^:]*\b:)/g;
 	const { emojiListPNG } = useEmojiSuggestion();
-	const splitText = lineMessage.split(' ');
+	const splitText = lineMessage.split(combinedRegex).filter(Boolean);
 
 	return (
 		<div className="lineText contents">
 			{splitText.map((item, index) => {
-				const isMention = atMentionRegex.test(item);
-				const isHashtag = hashMentionRegex.test(item);
-				const isEmojiSyntax = mentionDetectEmoji.test(item);
+				const isMention = item.startsWith('@');
+				const isHashtag = item.startsWith('#');
+				const isEmojiSyntax = item.match(/:\b[^:]*\b:/);
+
 				if (isMention && !isHashtag && !isEmojiSyntax) {
 					return (
-						<span>
+						<span key={`mention-${index}`}>
 							<MentionUser tagName={item} />{' '}
 						</span>
 					);
-				}
-				if (!isMention && isHashtag && !isEmojiSyntax) {
+				} else if (!isMention && isHashtag && !isEmojiSyntax) {
 					return (
-						<span>
+						<span key={`hashtag-${index}`}>
 							<ChannelHashtag channelHastagId={item} />{' '}
 						</span>
 					);
-				}
-				if (!isMention && !isHashtag && isEmojiSyntax) {
+				} else if (!isMention && !isHashtag && isEmojiSyntax) {
 					return (
-						<span>
+						<span key={`emoji-${index}`}>
 							<img
-								key={index}
 								src={getSrcEmoji(item, emojiListPNG)}
 								alt={getSrcEmoji(item, emojiListPNG)}
 								className={`${splitText.length === 1 ? 'w-10' : 'w-6'}  h-auto  inline-block relative -top-0.5 m-0`}
@@ -141,7 +148,7 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 						</span>
 					);
 				}
-				return <span>{item} </span>;
+				return <span key={`text-${index}`}>{item}</span>;
 			})}
 		</div>
 	);
