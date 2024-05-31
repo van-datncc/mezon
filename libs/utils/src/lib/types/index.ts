@@ -104,6 +104,7 @@ export type IChannelMember = ChannelUserListChannelUser & {
 	channelId?: string;
 	userChannelId?: string;
 	user_id?: string; // use on VoiceChannelList
+	participant?: string; // use on VoiceChannelList
 };
 
 export type IThread = {
@@ -302,6 +303,12 @@ export type IEmoji = {
 	order?: number;
 	shortname: string;
 	unicode?: string;
+};
+
+export type IEmojiImage = {
+	src?: string;
+	shortname: string;
+	category?: string;
 };
 
 export type IEmoticons = {

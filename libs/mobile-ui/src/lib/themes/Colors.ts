@@ -122,8 +122,9 @@ const colors = {
 	textLink: '#007AFF',
 	borderDim: isDarkTheme ? "#5a5b5c30" : "#5a5b5c30",
 	/* border color */
-  	borderNeutralDisable: '#9091931a',
+  borderNeutralDisable: '#9091931a',
 	borderPrimary: '#363940',
+  borderMessageHighlight: '#F0B132',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
@@ -140,6 +141,7 @@ const colors = {
 	bgCharcoal: '#313338',
 	green: "green",
   bgDarkCharcoal: '#323232',
+  bgMessageHighlight: '#c99d072b',
   // background button
 	bgButton: "#5865f2",
   bgToggleOnBtn: '#008ECC',

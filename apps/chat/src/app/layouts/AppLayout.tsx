@@ -10,7 +10,8 @@ const theme = 'dark';
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
-	
+	const fcmTokenObject = JSON.parse(localStorage.getItem('fcmTokenObject') as string);
+
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
 			const parts = payload.notification.body;
@@ -29,16 +30,22 @@ const AppLayout = () => {
 			.catch((error: Error) => {
 				console.error('Error listening for messages:', error);
 			});
-		requestForToken()
-			.then((token) => {
-				if (token) {
-					dispatch(fcmActions.registFcmDeviceToken({tokenId: token, deviceId: userProfile?.user?.id||""}));
-				}
-			})
-			.catch((error: Error) => {
-				console.error('Error fetching token:', error);
-			});
+
+		if (fcmTokenObject?.token) {
+			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmTokenObject.token ?? '', deviceId: fcmTokenObject.deviceId ?? '' }));
+		} else {
+			requestForToken()
+				.then((token) => {
+					if (token) {
+						dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '' }));
+					}
+				})
+				.catch((error: Error) => {
+					console.error('Error fetching token:', error);
+				});
+		}
 	}, []);
+
 	return (
 		<MezonUiProvider themeName={theme}>
 			<div id="app-layout">

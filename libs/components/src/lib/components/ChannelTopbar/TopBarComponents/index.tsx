@@ -86,7 +86,7 @@ export const SearchMessage: React.FC = () => {
 			<div
 				className={`transition-all duration-300 ${
 					expanded ? 'w-80' : 'w-40'
-				} h-8 pl-4 pr-2 py-3 dark:bg-bgTertiary bg-[#F7F7F7] rounded items-center inline-flex`}
+				} h-8 pl-4 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
 			>
 				<input
 					type="text"

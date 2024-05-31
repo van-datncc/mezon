@@ -74,7 +74,6 @@ const friendData = [
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
     const user = useAuth();
-    console.log('user:', user);
     const [text, setText] = React.useState<string>('');
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ['50%', '98%'], []);

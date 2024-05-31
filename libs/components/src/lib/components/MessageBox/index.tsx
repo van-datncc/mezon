@@ -1,7 +1,7 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useMenu, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue } from '@mezon/utils';
+import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import * as Icons from '../Icons';
@@ -53,6 +53,11 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	}, []);
 
 	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
+		typeConverts.map((typeConvert) => {
+			if (typeConvert.type === attachment.filetype) {
+				return (attachment.filetype = typeConvert.typeConvert);
+			}
+		});
 		setAttachmentData(attachment);
 	}, []);
 
@@ -113,8 +118,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			<div
-				className={`w-wrappBoxChatView max-w-wrappBoxChatView ssm:max-w-wrappBoxChatViewMobile 
-				${attachmentDataRef.length > 0 ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-bgLightMode max-h-full`}
+				className={`w-wrappBoxChatView sbm:max-w-wrappBoxChatView max-w-wrappBoxChatViewMobile
+				${attachmentDataRef.length > 0 ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 			>
 				<div className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll`}>
 					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
@@ -128,8 +133,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			</div>
 
 			<div
-				className={`flex flex-inline items-center gap-2 box-content mb-4 max-sm:mb-0 
-				 dark:bg-channelTextarea bg-bgLightMode rounded-lg relative ${attachmentDataRef.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'}
+				className={`flex flex-inline items-center gap-2 box-content mb-4 max-sm:mb-0
+				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${attachmentDataRef.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'}
 				  ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
 				<FileSelectionButton
@@ -138,8 +143,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					onFinishUpload={handleFinishUpload}
 				/>
 
-				<div className={`w-full dark:bg-channelTextarea bg-bgLightMode gap-3 flex items-center rounded-e-md `}>
-					<div className={`w-[96%] dark:bg-channelTextarea bg-bgLightMode gap-3 relative whitespace-pre-wrap`}>
+				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
+					<div className={`w-[96%] dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}
 							listMentions={props.listMentions}

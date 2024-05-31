@@ -15,9 +15,10 @@ export type AttachmentPickerProps = {
 	mode?: number;
 	currentChannelId?: string;
 	currentClanId?: string;
+	onCancel?: () => void;
 };
 
-function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentPickerProps) {
+function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: AttachmentPickerProps) {
 	const { t } = useTranslation(['message']);
 	const { sessionRef, clientRef } = useMezon();
 	const { setAttachmentData } = useReference();
@@ -41,6 +42,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId }: AttachmentP
 			handleFiles([fileFormat]);
 		} catch (err) {
 			if (DocumentPicker.isCancel(err)) {
+				onCancel?.();
 				// User cancelled the picker
 			} else {
 				throw err;
