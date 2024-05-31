@@ -4,6 +4,7 @@ import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Icons } from '../../components';
 
 type ChannelHashtagProps = {
 	channelHastagId: string;
@@ -13,6 +14,11 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
+	const [channelFound, setChannelFound] = useState();
+	const getChannelById = (channelHastagId: string) => {
+		const channel = useSelector(selectChannelById(channelHastagId));
+		return channel;
+	};
 
 	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
 		if (channelHastagId.startsWith('#')) {
@@ -21,11 +27,6 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		return undefined;
 	};
 	const [channelPath, setChannelPath] = useState(getChannelPath(channelHastagId, clanId ?? ''));
-
-	const getChannelById = (channelHastagId: string) => {
-		const channel = useSelector(selectChannelById(channelHastagId));
-		return channel;
-	};
 
 	const channel = getChannelById(channelHastagId.slice(1));
 
@@ -49,11 +50,14 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
 			to={channelPath}
-			className="font-medium px-1 rounded-sm cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+			className="font-medium px-1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 		>
-			{channelHastagId.startsWith('#') &&
-				getChannelById(channelHastagId.slice(1)) &&
-				`#${getChannelById(channelHastagId.slice(1)).channel_label}`}
+			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
+				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill='#3297FF' />
+			) : (
+				<Icons.Hashtag defaultSize="inline-block mt-[-0.4rem] w-4 h-4 " defaultFill='#3297FF' />
+			)}
+			{channel.channel_label}
 		</Link>
 	) : (
 		<span>{channelHastagId}</span>
