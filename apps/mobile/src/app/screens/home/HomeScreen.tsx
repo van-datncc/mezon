@@ -5,11 +5,11 @@ import {
 	directActions,
 	friendsActions,
 	getStoreAsync,
-	gifsActions,
 	notificationActions,
 	selectAllClans,
 	selectCurrentClan,
 } from '@mezon/store-mobile';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
@@ -122,9 +122,7 @@ const HomeScreen = React.memo((props: any) => {
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			<ChatContextProvider>
-				<DrawerScreen navigation={props.navigation} />
-			</ChatContextProvider>
+			<DrawerScreen navigation={props.navigation} />
 		</SafeAreaView>
 	);
 });

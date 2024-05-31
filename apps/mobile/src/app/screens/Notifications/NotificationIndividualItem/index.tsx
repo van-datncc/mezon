@@ -1,4 +1,4 @@
-import { selectMemberClanByUserId } from '@mezon/store';
+import { selectMemberClanByUserId } from '@mezon/store-mobile';
 import { getTimeDifferenceDate } from '@mezon/utils';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useSelector } from 'react-redux';

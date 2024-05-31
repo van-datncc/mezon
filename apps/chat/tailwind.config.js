@@ -64,9 +64,11 @@ module.exports = {
       },
       height: {
         heightMessageViewChat: `calc(100vh - ${topBarHeight} - ${chatBoxHeight})`,
+        heightMessageViewChatMobile: `calc(100vh  - ${chatBoxHeight})`,
         heightMessageViewChatDM: `calc(100vh - ${topBarHeight})`,
         heightMessageViewChatThread: `calc(100vh - ${topBarHeight} - ${chatBoxHeightThread})`,
         heightWithoutTopBar: `calc(100vh - ${topBarHeight})`,
+        heightWithoutTopBarMobile: `calc(100vh)`,
         heightTopBar: topBarHeight,
         heightChatBox: chatBoxHeight,
         heightHeader: "60px",
@@ -78,7 +80,7 @@ module.exports = {
         '2/5': "40%",
         boxChatView: `calc(100vw - 589px)`,
         wrappBoxChatView: `calc(100vw - 377px)`,
-        wrappBoxChatViewMobile: `calc(100vw - 31px)`,
+        wrappBoxChatViewMobile: `calc(100vw)`,
       },
 
       maxHeight: {
@@ -125,6 +127,7 @@ module.exports = {
     },
     animation: {
       rotation: 'rotation 6s linear infinite',
+      spin: 'spin 1s linear infinite',
     },
     screens: {
       ssm: "430px",

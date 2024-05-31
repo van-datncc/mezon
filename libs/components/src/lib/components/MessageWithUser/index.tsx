@@ -102,20 +102,20 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	return (
 		<>
 			{!checkSameDay(preMessage?.create_time as string, message?.create_time as string) && !isMessNotifyMention && (
-				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-bgPrimary bg-bgLightModeSecond">
-					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
+				<div className="flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent">
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
 					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
-					<div className="w-full border-b-[1px] border-[#40444b] opacity-50 text-center"></div>
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
 				</div>
 			)}
 			<div className={`relative ${isCombine ? '' : 'mt-2'} ${classNameNotification}`}>
 				<div className={` relative rounded-sm  overflow-visible `}>
 					<div
-						className={` absolute w-0.5 h-full left-0 
+						className={` absolute w-0.5 h-full left-0
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-[2px] 
+						className={`flex h-15 flex-col w-auto px-3 py-[2px]
 						${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					>
@@ -131,7 +131,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 										style={{ wordBreak: 'break-word' }}
 									>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
-										{child?.props.children[1] && React.isValidElement(child?.props.children[1]) && React.cloneElement(child?.props.children[1], propsChild)}
+										{child?.props.children[1] &&
+											React.isValidElement(child?.props.children[1]) &&
+											React.cloneElement(child?.props.children[1], propsChild)}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
@@ -147,7 +149,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						)}
 					</div>
 				</div>
-				{child?.props.children[0] && React.isValidElement(child?.props.children[0]) && React.cloneElement(child?.props.children[0], propsChild)}
+				{child?.props.children[0] &&
+					React.isValidElement(child?.props.children[0]) &&
+					React.cloneElement(child?.props.children[0], propsChild)}
 			</div>
 		</>
 	);

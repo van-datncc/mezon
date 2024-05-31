@@ -1,5 +1,7 @@
-import { useAppNavigation, useAppParams } from '@mezon/core';
+import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
 import { selectChannelById } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -10,6 +12,7 @@ type ChannelHashtagProps = {
 const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
+	const { currentChannelId } = useMessageValue();
 
 	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
 		if (channelHastagId.startsWith('#')) {
@@ -17,12 +20,29 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		}
 		return undefined;
 	};
-	const channelPath = getChannelPath(channelHastagId, clanId ?? '');
+	const [channelPath, setChannelPath] = useState(getChannelPath(channelHastagId, clanId ?? ''));
 
 	const getChannelById = (channelHastagId: string) => {
 		const channel = useSelector(selectChannelById(channelHastagId));
 		return channel;
 	};
+
+	const channel = getChannelById(channelHastagId.slice(1));
+
+	useEffect(() => {
+		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			setChannelPath(getChannelPath('#' + currentChannelId || '', clanId ?? ''));
+		} else {
+			setChannelPath(getChannelPath(channelHastagId, clanId ?? ''));
+		}
+	}, [channel, currentChannelId, clanId, channelHastagId]);
+
+	const handleClick = useCallback(() => {
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
+			window.open(urlVoice, '_blank', 'noreferrer');
+		}
+	}, [channel]);
 
 	return channelPath && getChannelById(channelHastagId.slice(1)) ? (
 		<Link
@@ -36,6 +56,18 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		</Link>
 	) : (
 		<span>{channelHastagId}</span>
+
+		// return (
+		// 	channelPath && (
+		// 		<Link
+		// 			style={{ textDecoration: 'none' }}
+		// 			to={channelPath}
+		// 			className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+		// 			onClick={handleClick}
+		// 		>
+		// 			{tagName.startsWith('#') && getChannelById(tagName.slice(1)) && `#${getChannelById(tagName.slice(1)).channel_label}`}
+		// 		</Link>
+		// 	)
 	);
 };
 

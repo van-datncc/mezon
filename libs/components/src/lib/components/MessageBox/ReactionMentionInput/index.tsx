@@ -41,7 +41,7 @@ import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState }
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
-import { ThreadNameTextField } from '../../../components';
+import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
@@ -449,17 +449,29 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
-				<div>
-					<ThreadNameTextField
-						onChange={handleChangeNameThread}
-						onKeyDown={onKeyDown}
-						value={nameValueThread ?? ''}
-						label="Thread Name"
-						placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
-						className="h-10 p-[10px] dark:bg-bgTertiary bg-white dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
-					/>
-					{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
-					{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}
+				<div className="flex flex-col overflow-y-auto h-heightMessageViewChatThread">
+					<div className="flex flex-col justify-end flex-grow">
+						{!threadCurrentChannel && (
+							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-[#26262B] bg-bgLightModeButton rounded-full pointer-events-none">
+								<Icons.ThreadIcon defaultSize="w-7 h-7" />
+								{isPrivate === 1 && (
+									<div className="absolute right-4 bottom-4">
+										<Icons.Locked />
+									</div>
+								)}
+							</div>
+						)}
+						<ThreadNameTextField
+							onChange={handleChangeNameThread}
+							onKeyDown={onKeyDown}
+							value={nameValueThread ?? ''}
+							label="Thread Name"
+							placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
+							className="h-10 p-[10px] dark:bg-bgTertiary bg-white dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
+						/>
+						{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
+						{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}
+					</div>
 				</div>
 			)}
 			{props.isThread && messageThreadError && !threadCurrentChannel && (
@@ -473,7 +485,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
-				className="dark:bg-channelTextarea bg-bgLightMode dark:text-white text-colorTextLightMode"
+				className="dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md"
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}

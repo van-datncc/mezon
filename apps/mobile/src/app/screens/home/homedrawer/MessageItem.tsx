@@ -1,7 +1,7 @@
 import { useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
+import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -9,6 +9,7 @@ import {
 	TIME_COMBINE,
 	checkSameDay,
 	convertTimeString,
+	getSrcEmoji,
 	getTimeDifferenceInSeconds,
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
@@ -54,8 +55,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
+	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
+	const emojiListPNG = useSelector(selectEmojiImage);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
@@ -65,8 +68,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
-    const isShowInfoUser = useMemo(()=> !isCombine || message.references.length && !!user ,
-    [isCombine,  message.references , user])
+	const isShowInfoUser = useMemo(() => !isCombine || (message.references.length && !!user), [isCombine, message.references, user]);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -249,7 +251,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					key={index}
 					style={matchesMention.includes(part) ? styles.contentMessageMention : styles.contentMessageBox}
 				>
-					{part}
+					{matchesMention.includes(part) ? `${part} ` : renderTextWithEmoji(part)}
 				</Text>
 			);
 		});
@@ -263,12 +265,33 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				{matchesMention?.length ? (
 					<Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>
 				) : (
-					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{lines}</Text>
+					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{renderTextWithEmoji(lines)}</Text>
 				)}
 			</Hyperlink>
 		);
 	};
 
+	const renderTextWithEmoji = (text: string) => {
+		const splitTextMarkdown = text?.trim()?.split?.(' ');
+
+		return (
+			<Text>
+				{splitTextMarkdown.map((item, index) => {
+					const srcEmoji = getSrcEmoji(item, emojiListPNG || []);
+					const regex = /:\b[^:]*\b:/g;
+					if (item.match(regex) && srcEmoji) {
+						return (
+							<Text>
+								{' '}
+								<FastImage key={index} source={{ uri: srcEmoji }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />{' '}
+							</Text>
+						);
+					}
+					return <Text>{item} </Text>;
+				})}
+			</Text>
+		);
+	};
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
 	};
@@ -300,7 +323,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								</View>
 							</View>
 						)}
-						<Text style={styles.repliedContentText} numberOfLines={2} ellipsizeMode="head">
+						<Text style={styles.repliedContentText} numberOfLines={1}>
 							{messageRefFetchFromServe.content.t}
 						</Text>
 					</Pressable>
@@ -308,7 +331,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			) : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 				{isShowInfoUser ? (
-					<Pressable onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)} style={styles.wrapperAvatar}>
+					<Pressable
+						onPress={() => {
+							setIsOnlyEmojiPicker(false);
+							setMessageSelected(EMessageBSToShow.UserInformation);
+						}}
+						style={styles.wrapperAvatar}
+					>
 						{user?.user?.avatar_url ? (
 							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
@@ -320,19 +349,34 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				) : (
 					<View style={styles.wrapperAvatarCombine} />
 				)}
-				<Pressable style={[styles.rowMessageBox]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
+				<Pressable
+					style={[styles.rowMessageBox]}
+					onLongPress={() => {
+						setIsOnlyEmojiPicker(false);
+						setMessageSelected(EMessageBSToShow.MessageAction);
+					}}
+				>
 					{isShowInfoUser ? (
 						<View style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
 						</View>
-					): null}
+					) : null}
 					{videos.length > 0 && renderVideos()}
 					{images.length > 0 && renderImages()}
 
 					{documents.length > 0 && renderDocuments()}
 					{renderTextContent()}
-					<MessageAction message={message} dataReactionCombine={dataReactionCombine} mode={mode} />
+					<MessageAction
+						message={message}
+						dataReactionCombine={dataReactionCombine}
+						mode={mode}
+						emojiListPNG={emojiListPNG}
+						openEmojiPicker={() => {
+							setIsOnlyEmojiPicker(true);
+							setMessageSelected(EMessageBSToShow.MessageAction);
+						}}
+					/>
 				</Pressable>
 			</View>
 			<MessageItemBS
@@ -340,7 +384,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				message={message}
 				onConfirmDeleteMessage={onConfirmDeleteMessage}
 				type={openBottomSheet}
-				onClose={() => setOpenBottomSheet(null)}
+				isOnlyEmojiPicker={isOnlyEmojiPicker}
+				onClose={() => {
+					setOpenBottomSheet(null);
+				}}
 			/>
 		</View>
 	);
