@@ -2,25 +2,29 @@ import { Icons } from '@mezon/components';
 import { useClans } from '@mezon/core';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { fileTypeImage } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ModalValidateFile from '../../../ModalValidateFile';
 
 type ClanLogoNameProps = {
+	hasChanges: boolean;
 	onUpload: (url: string) => void;
 	onGetClanName: (clanName: string) => void;
 	onHasChanges: (hasChanges: boolean) => void;
 };
 
-const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNameProps) => {
+const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: ClanLogoNameProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentClan } = useClans();
 
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
-	const [urlLogo, setUrlLogo] = useState<string>(currentClan?.logo ?? '');
-	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
+	const [urlLogo, setUrlLogo] = useState<string | undefined>(currentClan?.logo ?? '');
+	const [clanName, setClanName] = useState<string | undefined>(currentClan?.clan_name ?? '');
+	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFile = (e: any) => {
@@ -32,6 +36,12 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+
+		if (!fileTypeImage.includes(file.type)) {
+			setOpenModal(true);
+			e.target.value = null;
+			return;
 		}
 
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
@@ -53,7 +63,14 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 
 	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		setUrlLogo('');
+		if (urlLogo && fileInputRef.current) {
+			setUrlLogo('');
+			fileInputRef.current.value = '';
+		}
+
+		if (fileInputRef.current && !urlLogo) {
+			fileInputRef.current.click();
+		}
 	};
 
 	useEffect(() => {
@@ -62,7 +79,15 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 		} else {
 			onHasChanges(false);
 		}
-	}, [clanName, urlLogo]);
+	}, [clanName, urlLogo, currentClan?.logo, currentClan?.clan_name]);
+
+	useEffect(() => {
+		if (!hasChanges && fileInputRef.current) {
+			setUrlLogo(currentClan?.logo ?? undefined);
+			fileInputRef.current.value = '';
+			setClanName(currentClan?.clan_name ?? '');
+		}
+	}, [hasChanges]);
 
 	return (
 		<div className="flex sbm:flex-row flex-col gap-[10px]">
@@ -83,7 +108,7 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 								onClick={handleCloseFile}
 								className="absolute top-0 right-0 w-7 h-7 rounded-full bg-[#A7A8AC] hover:bg-[#919193] flex items-center justify-center"
 							>
-								{true ? <Icons.Close /> : <Icons.ImageUploadIcon />}
+								{urlLogo ? <Icons.Close /> : <Icons.ImageUploadIcon />}
 							</button>
 						</div>
 						<p className="text-[10px] mt-[10px]">Minimum Size: 128x128</p>
@@ -111,6 +136,14 @@ const ClanLogoName = ({ onUpload, onGetClanName, onHasChanges }: ClanLogoNamePro
 					/>
 				</div>
 			</div>
+
+			<ModalValidateFile
+				openModal={openModal}
+				onClose={() => setOpenModal(false)}
+				image="/assets/images/file-and-folder.png"
+				title="Only image files are allowed"
+				content="Just uploaf type file (JPEG, PNG), please!"
+			/>
 		</div>
 	);
 };

@@ -10,6 +10,7 @@ import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModa
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
+import { Spinner } from 'flowbite-react';
 
 export type ChannelLinkProps = {
 	clanId?: string;
@@ -111,15 +112,17 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 
 	const openModalJoinVoiceChannel = useCallback(
 		(url: string) => {
-			const urlVoice = `https://meet.google.com/${url}`;
-			window.open(urlVoice, "_blank", "noreferrer");
-		},[]
+			if(channel.state){
+				const urlVoice = `https://meet.google.com/${url}`;
+				window.open(urlVoice, "_blank", "noreferrer");
+			}
+		},[channel.state]
 	);
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
-					className={`${classes[state]} cursor-pointer ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
+					className={`${classes[state]} ${channel.state ? 'cursor-pointer' : 'cursor-not-allowed'} ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
 					onClick={() => {handleVoiceChannel(channel.id); openModalJoinVoiceChannel(channel.meeting_code || '')}}
 					role="link"
 				>
@@ -142,6 +145,9 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 							? `${channel?.channel_label.substring(0, 20)}...`
 							: channel?.channel_label}
 					</p>
+					{!channel.state &&
+						<Spinner aria-label="Loading spinner"/>
+					}
 				</span>
 			) : (
 				<Link to={channelPath} onClick={handleClick}>

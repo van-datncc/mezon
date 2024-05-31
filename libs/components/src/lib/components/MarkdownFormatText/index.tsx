@@ -86,7 +86,7 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 	return (
 		<article
 			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
-			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose 
+			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose
 			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
 			{showProfileUser ? (
@@ -158,6 +158,11 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 											>
 												{children}
 											</span>
+										),
+										code: ({ children }) => (
+											<code className="dark:bg-bgSecondary bg-bgLightSecondary border border-[#E3E5E8] dark:border-[#1E1F22]">
+												{children}
+											</code>
 										),
 									}}
 								/>

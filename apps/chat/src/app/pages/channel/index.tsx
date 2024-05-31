@@ -1,6 +1,6 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
 import { useAuth, useClans, useDragAndDrop, useMenu, useThreads, useVoice } from '@mezon/core';
-import { channelsActions, selectCurrentChannel, selectShowScreen, selectStatusCall, useAppDispatch, voiceActions } from '@mezon/store';
+import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
@@ -32,18 +32,18 @@ export default function ChannelLayout() {
 
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
-	const {statusCall} = useVoice();
+	const { statusCall } = useVoice();
 
 	const startScreenShare = useCallback(() => {
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const stopScreenShare = useCallback(() => {
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const renderChannelMedia = () => {
@@ -96,12 +96,12 @@ export default function ChannelLayout() {
 				id="mainChat"
 				onDragEnter={handleDragEnter}
 			>
-				<div className="flex h-heightWithoutTopBar flex-row">
+				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 					<div
 						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
 					>
 						<div
-							className="overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat h-heightMessageViewChat"
+							className={`overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
 							ref={messagesContainerRef}
 						>
 							{renderChannelMedia()}
@@ -126,7 +126,7 @@ export default function ChannelLayout() {
 							</div>
 						) : (
 							<div
-								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
+								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
 								{currentChannel && (
 									<ChannelTyping
@@ -151,10 +151,10 @@ export default function ChannelLayout() {
 					{isShowMemberList && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightModeSecond text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
 							id="memberList"
 						>
-							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightModeSecond"></div>
+							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
 							<MemberList />
 						</div>
 					)}
