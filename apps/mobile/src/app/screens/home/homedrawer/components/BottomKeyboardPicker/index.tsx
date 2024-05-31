@@ -22,6 +22,7 @@ export default forwardRef(function BottomKeyboardPicker({ height = 1, children }
 			}}
 		>
 			<BottomSheetScrollView
+				stickyHeaderIndices={[0]}
 				style={styles.contentContainer}>
 				{children}
 			</BottomSheetScrollView>

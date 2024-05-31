@@ -106,7 +106,7 @@ const HomeScreen = React.memo((props: any) => {
 		store.dispatch(clansActions.fetchClans());
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
-		store.dispatch(emojiSuggestionActions.fetchEmoji());
+		store.dispatch(emojiSuggestionActions.fetchEmojiMobile());
 		if (currentClan) {
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
 		}

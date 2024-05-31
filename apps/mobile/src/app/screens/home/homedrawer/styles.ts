@@ -304,8 +304,8 @@ export const styles = StyleSheet.create({
 		paddingLeft: 30,
 	},
 	replyAvatar: {
-		width: size.s_24,
-		height: size.s_24,
+		width: size.s_20,
+		height: size.s_20,
 		borderRadius: size.s_50,
 		backgroundColor: Colors.gray48,
 		overflow: 'hidden',
@@ -319,6 +319,7 @@ export const styles = StyleSheet.create({
 		color: Colors.white,
 	},
 	repliedContentText: {
+		fontSize: size.small,
 		color: Colors.white,
 		overflow: 'hidden',
 		width: '80%',
@@ -546,5 +547,9 @@ export const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		backgroundColor: Colors.secondary
-	}
+	},
+	iconEmojiInMessage: {
+		width: size.s_18,
+		height: size.s_18,
+	},
 });

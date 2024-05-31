@@ -8,7 +8,14 @@ import {
 	convertMentionsToText,
 	getAttachmentUnique
 } from '@mezon/mobile-components';
-import { useChannelMembers, useChannels, useChatSending, useReference, useThreads } from '@mezon/core';
+import {
+	useChannelMembers,
+	useChannels,
+	useChatSending,
+	useEmojiSuggestion,
+	useReference,
+	useThreads
+} from '@mezon/core';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageWithUser, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,7 +38,7 @@ import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
-import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
+import {selectCurrentChannel, selectEmojiImage, selectMemberByUserId} from '@mezon/store';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageMention, ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -104,10 +111,24 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const cursorPositionRef = useRef(0);
 	const currentTextInput = useRef('');
 	const mentions = useRef([]);
-
+	const { emojiPicked } = useEmojiSuggestion();
+	const emojiListPNG = useSelector(selectEmojiImage);
+	
+	useEffect(() => {
+		handleEventAfterEmojiPicked();
+	}, [emojiPicked]);
+	
 	useEffect(() => {
 		mentions.current = listMentions || [];
 	}, [listMentions])
+	
+	
+	const handleEventAfterEmojiPicked = () => {
+		if (!emojiPicked) {
+			return;
+		}
+		setText(`${text.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
+	}
 
 	const editMessage = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -490,9 +511,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							text.length > 0 && { width: inputWidthWhenHasInput },
 							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 						]}
-					>
-						{renderTextContent(text)}
-					</TextInput>
+						children={renderTextContent(text, emojiListPNG)}
+					/>
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 					</View>

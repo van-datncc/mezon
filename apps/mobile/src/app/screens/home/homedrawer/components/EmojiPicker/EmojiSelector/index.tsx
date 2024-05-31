@@ -1,78 +1,177 @@
-
-import { BicycleIcon, BowlIcon, GameControllerIcon, HeartIcon, LeafIcon, MemberListIcon, ObjectIcon, RibbonIcon, SmilingFaceIcon } from "@mezon/mobile-components";
-import { ScrollView } from "react-native-gesture-handler";
-import styles from "./styles";
-import { TouchableOpacity } from "@gorhom/bottom-sheet";
-import { useState } from "react";
-import { IEmoji } from "@mezon/utils";
-import { useEmojiSuggestion, useGifsStickersEmoji } from "@mezon/core";
-import { useEffect } from "react";
-import { Colors } from "@mezon/mobile-ui";
+import { useEmojiSuggestion } from '@mezon/core';
+import {
+	BicycleIcon,
+	BowlIcon,
+	GameControllerIcon,
+	HeartIcon,
+	LeafIcon,
+	ObjectIcon,
+	PenIcon,
+	RibbonIcon,
+	SearchIcon,
+	SmilingFaceIcon,
+} from '@mezon/mobile-components';
+import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { selectEmojiImage } from '@mezon/store';
+import { IEmoji } from '@mezon/utils';
+import React, { useCallback, useRef, useState } from 'react';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { useSelector } from 'react-redux';
+import { useThrottledCallback } from 'use-debounce';
+import styles from './styles';
 
 type EmojiSelectorProps = {
-    onSelected: (url: string) => void;
-    searchText: string;
+	onSelected: (url: string) => void;
+	searchText?: string;
+	isReactMessage?: boolean;
 };
 
 const cateIcon = [
-    <MemberListIcon />,
-    <SmilingFaceIcon height={24} width={24} />,
-    <GameControllerIcon />,
-    <HeartIcon />,
-    <ObjectIcon />,
-    <LeafIcon />,
-    <BicycleIcon />,
-    <BowlIcon />,
-    <RibbonIcon />,
-    <MemberListIcon />,
-    <SmilingFaceIcon height={24} width={24} />,
-    <GameControllerIcon />,
-    <HeartIcon />,
-    <ObjectIcon />,
-    <LeafIcon />,
-    <BicycleIcon />,
-    <BowlIcon />,
-    <RibbonIcon />
-]
+	<PenIcon />,
+	<SmilingFaceIcon height={24} width={24} />,
+	<LeafIcon />,
+	<BowlIcon />,
+	<GameControllerIcon />,
+	<BicycleIcon />,
+	<ObjectIcon />,
+	<HeartIcon />,
+	<RibbonIcon />,
+];
 
-export default function EmojiSelector({ }: EmojiSelectorProps) {
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
-    const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
-    const { categoriesEmoji, emojiListPNG, setEmojiSuggestion } = useEmojiSuggestion();
+type DisplayByCategoriesProps = {
+	readonly categoryName?: string;
+	readonly onEmojiSelect: (emoji: string) => void;
+	readonly onEmojiHover?: (item: any) => void;
+	readonly emojisData: any[];
+};
 
-    const searchEmojis = (emojis: any[], searchTerm: string) => {
-        return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
-    };
+function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
+	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
+		return emojis
+			.filter((emoji) => emoji.category.includes(categoryParam))
+			.map((emoji) => ({
+				...emoji,
+				category: emoji.category,
+			}));
+	};
+	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
 
-    const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
+	return (
+		<View style={styles.displayByCategories}>
+			<Text style={styles.titleCategories}>{categoryName}</Text>
+			<EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} />
+		</View>
+	);
+}
 
-    useEffect(() => {
-        if (valueInputToCheckHandleSearch !== '') {
-            const result = searchEmojis(emojiListPNG, valueInputToCheckHandleSearch ?? '');
-            setEmojiSearch(result);
-            console.log(result);
-        }
-    }, [valueInputToCheckHandleSearch]);
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect }) => {
+	return (
+		<View style={styles.emojisPanel}>
+			{emojisData.map((item, index) => {
+				return (
+					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item.shortname)}>
+						<FastImage source={{ uri: item.src }} style={styles.iconEmoji} resizeMode={'contain'} />
+					</TouchableOpacity>
+				);
+			})}
+		</View>
+	);
+};
 
-    const handleEmojiSelect = async (emojiPicked: string) => {
-        setEmojiSuggestion(emojiPicked);
-    };
+export default function EmojiSelector({ onSelected, isReactMessage = false }: EmojiSelectorProps) {
+	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
+	const { categoriesEmoji, setEmojiSuggestion } = useEmojiSuggestion();
+	const emojiListPNG = useSelector(selectEmojiImage);
+	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
+	const [keywordSearch, setKeywordSearch] = useState<string>('');
+	const refScrollView = useRef<ScrollView>(null);
+	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
+	const categoryRefs = categoriesWithIcons.reduce((refs, item) => {
+		refs[item.name] = { ref: React.createRef(), position: 0 };
+		return refs;
+	}, {});
+	const handleEmojiSelect = useCallback(async (emojiPicked: string) => {
+		onSelected(emojiPicked);
+		if (!isReactMessage) setEmojiSuggestion(emojiPicked);
+	}, []);
 
-    return (
-        <>
-            <ScrollView horizontal contentContainerStyle={styles.cateContainer}>
-                {categoriesWithIcons.map((item, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        onPress={() => { console.log("heheheh") }}
-                        style={{
-                            ...styles.cateItem,
-                            backgroundColor: item.name === selectedCategory ? Colors.green : 'transparent'
-                        }}>
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
-        </>
-    )
+	const searchEmojis = (emojis: any[], searchTerm: string) => {
+		return emojis.filter((emoji) => emoji.shortname.toLowerCase().includes(searchTerm?.toLowerCase()));
+	};
+
+	const onSearchEmoji = async (keyword: string) => {
+		setKeywordSearch(keyword);
+		const result = searchEmojis(emojiListPNG, keyword);
+		setEmojiSearch(result);
+	};
+
+	const typingSearchDebounce = useThrottledCallback((text) => onSearchEmoji(text), 500);
+
+	return (
+		<ScrollView
+			ref={refScrollView}
+			showsVerticalScrollIndicator={false}
+			stickyHeaderIndices={[0]}
+			style={{ height: Metrics.screenHeight / 1.4, paddingBottom: 100 }}
+			contentContainerStyle={{ paddingBottom: size.s_50 }}
+		>
+			<View style={{ backgroundColor: isReactMessage ? Colors.bgCharcoal : Colors.secondary }}>
+				<View style={styles.textInputWrapper}>
+					<SearchIcon height={18} width={18} />
+					<TextInput style={styles.textInput} onChangeText={(text) => typingSearchDebounce(text)} />
+				</View>
+				<ScrollView
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					style={styles.wrapperCateContainer}
+					contentContainerStyle={styles.cateContainer}
+				>
+					{categoriesWithIcons.map((item, index) => (
+						<TouchableOpacity
+							key={index}
+							onPress={() => {
+								setSelectedCategory(item.name);
+								refScrollView.current?.scrollTo({
+									y: categoryRefs[item.name].position,
+									animated: true,
+								});
+							}}
+							style={{
+								...styles.cateItem,
+								backgroundColor: item.name === selectedCategory ? Colors.bgViolet : 'transparent',
+							}}
+						>
+							{item.icon}
+						</TouchableOpacity>
+					))}
+				</ScrollView>
+			</View>
+
+			{keywordSearch ? (
+				<EmojisPanel emojisData={emojisSearch || []} onEmojiSelect={handleEmojiSelect} />
+			) : (
+				categoriesWithIcons.map((item, index) => {
+					return (
+						<View
+							ref={categoryRefs[item.name].ref} // Pass the ref here
+							onLayout={(event) => {
+								categoryRefs[item.name].position = event.nativeEvent.layout.y;
+							}}
+						>
+							<DisplayByCategories
+								key={index + item.name?.toString()}
+								emojisData={emojiListPNG}
+								onEmojiSelect={handleEmojiSelect}
+								onEmojiHover={(sss) => {
+									console.log('Tom log  => sss', sss);
+								}}
+								categoryName={item.name}
+							/>
+						</View>
+					);
+				})
+			)}
+		</ScrollView>
+	);
 }
