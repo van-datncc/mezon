@@ -76,7 +76,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					),
 				}}
 			/>
-      	<Stack.Screen
+      <Stack.Screen
 				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
 				component={MuteThreadDetailModal}
 				options={{
