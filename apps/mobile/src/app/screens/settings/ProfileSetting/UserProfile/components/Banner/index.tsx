@@ -1,4 +1,4 @@
-import { Image, View } from "react-native";
+import { Image, Platform, View } from "react-native";
 import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { PenIcon } from "@mezon/mobile-components";
@@ -6,17 +6,21 @@ import Toast from "react-native-toast-message";
 import { useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker"
 
+export interface IFile {
+    uri: string;
+    name: string;
+    type: string;
+    size: string;
+    fileData: any;
+}
 interface IBannerAvatarProps {
     avatar: string;
-    onChange?: (url: string)=>void;
+    onChange?: (url: IFile) => void;
 }
 
 export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
     const [bannerColor, setBannerColor] = useState<string>("purple");
     const [imageUrl, setImageUrl] = useState<string>(avatar);
-
-    console.log(avatar);
-    
 
     function reserve() {
         Toast.show({
@@ -26,14 +30,28 @@ export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
     }
 
     async function selectImage() {
-        const result = await launchImageLibrary({
+        const response = await launchImageLibrary({
             mediaType: "photo",
-            includeBase64: true
+            includeBase64: true,
         });
-        if (result.assets) {
+
+        if (response.didCancel) {
+            console.log('User cancelled camera');
+        } else if (response.errorCode) {
+            console.log('Camera Error: ', response.errorMessage);
+        } else {
+            const file = response.assets[0];
+            const fileFormat: IFile = {
+                uri: file?.uri,
+                name: file?.fileName,
+                type: file?.type,
+                size: file?.fileSize?.toString(),
+                fileData: file?.base64,
+            };
+
             // TODO: Update banner color
-            setImageUrl(result.assets[0].uri);
-            onChange && onChange(result.assets[0].uri);
+            setImageUrl(response.assets[0].uri);
+            onChange && onChange(fileFormat);
         }
     }
 

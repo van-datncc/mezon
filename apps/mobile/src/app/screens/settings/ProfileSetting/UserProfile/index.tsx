@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import BannerAvatar from "./components/Banner";
+import BannerAvatar, { IFile } from "./components/Banner";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { HashSignIcon } from "@mezon/mobile-components";
 import styles from "./styles";
@@ -9,6 +9,9 @@ import { useState } from "react";
 import { useAccount, useAuth } from "@mezon/core";
 import { useEffect } from "react";
 import Toast from "react-native-toast-message";
+import { handleUploadFileMobile, useMezon } from "@mezon/transport";
+import { useSelector } from "react-redux";
+import { selectCurrentChannelId, selectCurrentClanId } from "@mezon/store";
 
 interface IUserProfile {
     trigger: number;
@@ -17,14 +20,19 @@ interface IUserProfile {
 export default function UserProfile({ trigger }: IUserProfile) {
     const auth = useAuth();
     const { updateUser } = useAccount();
+    const { sessionRef, clientRef } = useMezon();
+    const currentClanId = useSelector(selectCurrentClanId) || '';
+    const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
     const [avatar, setAvatar] = useState<string>(auth.userProfile.user.avatar_url);
     const [displayName, setDisplayName] = useState<string>(auth.userProfile.user.display_name);
     const [username, setUsername] = useState<string>(auth.userProfile.user.username);
-    const [bio, setBio] = useState<string>();
+    const [bio, setBio] = useState<string>(auth.userProfile.user.about_me);
+    const [file, setFile] = useState<IFile>(null);
 
-    function handleAvatarChange(url: string) {
-        setAvatar(url);
+    function handleAvatarChange(data: IFile) {
+        setAvatar(data.uri);
+        setFile(data);
     }
 
     function handleDetailChange({ displayName, username, bio }: { displayName: string, username: string, bio: string }) {
@@ -33,23 +41,45 @@ export default function UserProfile({ trigger }: IUserProfile) {
         setBio(bio);
     }
 
-    function handleHashtagPress(){
+    function handleHashtagPress() {
         Toast.show({
             type: "info",
             text1: "Original known as " + auth.userProfile.user.username + '#' + auth.userId
         })
     }
 
+    async function handleImageFile() {
+        const session = sessionRef.current;
+        const client = clientRef.current;
+
+        if (!file || !client || !session) {
+            throw new Error('Client is not initialized');
+        }
+
+        const res = await handleUploadFileMobile(
+            client, session, file.name, file);
+
+        return res.url
+    };
+
     async function updateUserProfile() {
-        // updateUser(name, avatar, displayName, editAboutUser);
+        const imgUrl = await handleImageFile();
+        setAvatar(imgUrl);
+        updateUser(username, imgUrl, displayName, bio);
+        Toast.show({
+            type: "info",
+            text1: "Update profile success"
+        })
     }
 
     useEffect(() => {
-        updateUserProfile
+        if (trigger) {
+            updateUserProfile()
+        }
     }, [trigger])
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
             <BannerAvatar
                 avatar={avatar}
                 onChange={handleAvatarChange} />
@@ -61,10 +91,11 @@ export default function UserProfile({ trigger }: IUserProfile) {
                     </TouchableOpacity>
                 </View>
             </View>
+
             <DetailInfo
                 value={{ displayName, username, bio }}
                 onChange={handleDetailChange}
             />
-        </ScrollView>
+        </View>
     )
 }

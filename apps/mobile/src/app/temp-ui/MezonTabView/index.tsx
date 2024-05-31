@@ -38,9 +38,9 @@ export default function MezonTabView({ views, onChange, pageIndex }: IMezonTabVi
             onScroll={handleScrollTabView}
             ref={ref}>
             {views.map((view, index) =>
-                <View key={index.toString()}>
+                <ScrollView key={index.toString()}>
                     {view}
-                </View>
+                </ScrollView>
             )}
         </ScrollView>
     )

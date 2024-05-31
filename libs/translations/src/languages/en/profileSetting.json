@@ -6,7 +6,7 @@
         "userProfile": "User Profile",
         "serverProfile": "Server Profile"
     },
-    "label": {
+    "fields": {
         "displayName": {
             "label": "Display name",
             "placeholder": ""

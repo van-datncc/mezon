@@ -5,10 +5,12 @@ const styles = StyleSheet.create({
     container: {
         marginBottom: 10
     },
-    inputBox: {
+    fakeInput: {
         borderColor: Colors.gray48,
         borderWidth: 1,
         borderRadius: 10,
+    },
+    inputBox: {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -25,12 +27,27 @@ const styles = StyleSheet.create({
 
     input: {
         color: Colors.white,
+        flexBasis: 20,
+        flexGrow: 1
     },
 
     clearBtn: {
         padding: 3,
         borderRadius: 10,
         backgroundColor: Colors.white
+    },
+
+    lineCountWrapper: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        paddingBottom: 10
+    },
+
+    count: {
+        color: Colors.white,
+        fontSize: 14,
+        marginRight: 10
     }
 })
 
