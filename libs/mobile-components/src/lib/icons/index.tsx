@@ -97,9 +97,9 @@ export function ThreadIcon({ width = 60, height = 60 }) {
 	)
 }
 
-export function MuteIcon({ width = 60, height = 60 }) {
+export function MuteIcon({ width = 60, height = 60 , ...props}) {
 	return (
-		<Svg x="0" y="0" role="img" width={width} height={height} fill="white" viewBox="0 0 24 24">
+		<Svg x="0" y="0" role="img" width={width} height={height} fill="white" viewBox="0 0 24 24" {...props}>
 			<Path fill="white" d="M1.3 21.3a1 1 0 1 0 1.4 1.4l20-20a1 1 0 0 0-1.4-1.4l-20 20ZM3.13 16.13c.11.27.46.28.66.08L15.73 4.27a.47.47 0 0 0-.07-.74 6.97 6.97 0 0 0-1.35-.64.62.62 0 0 1-.38-.43 2 2 0 0 0-3.86 0 .62.62 0 0 1-.38.43A7 7 0 0 0 5 9.5v2.09a.5.5 0 0 1-.13.33l-1.1 1.22A3 3 0 0 0 3 15.15v.28c0 .24.04.48.13.7ZM18.64 9.36c.13-.13.36-.05.36.14v2.09c0 .12.05.24.13.33l1.1 1.22a3 3 0 0 1 .77 2.01v.28c0 .67-.34 1.29-.95 1.56-1.31.6-4 1.51-8.05 1.51-.46 0-.9-.01-1.33-.03a.48.48 0 0 1-.3-.83l8.27-8.28ZM9.18 19.84A.16.16 0 0 0 9 20a3 3 0 1 0 6 0c0-.1-.09-.17-.18-.16a24.84 24.84 0 0 1-5.64 0Z">
 			</Path>
 		</Svg>
@@ -497,6 +497,7 @@ export function ObjectIcon({ width = 24, height = 24, color = 'white', ...props 
 			width={width}
 			height={height}
 			viewBox="0 0 24 24"
+      {...props}
 		>
 			<Path
 				fill={color}
@@ -516,6 +517,7 @@ export function LeafIcon({ width = 24, height = 24, color = 'white', ...props }:
 			width={width}
 			height={height}
 			viewBox="0 0 24 24"
+      {...props}
 		>
 			<Path
 				fill={color}
@@ -532,6 +534,7 @@ export function BicycleIcon({ width = 24, height = 24, color = 'white', ...props
 			width={width}
 			height={height}
 			viewBox="0 0 24 24"
+      {...props}
 		>
     <Path
       fill={color}
@@ -550,6 +553,7 @@ export function BowlIcon({ width = 24, height = 24, color = 'white', ...props }:
 			width={width}
 			height={height}
 			viewBox="0 0 24 24"
+      {...props}
 		>
     <Path
       fill={color}
@@ -566,6 +570,7 @@ export function RibbonIcon({ width = 24, height = 24, color = 'white', ...props 
 			width={width}
 			height={height}
 			viewBox="0 0 24 24"
+      {...props}
 		>
 		<Path
       fill={color}
@@ -624,4 +629,30 @@ export function VideoIcon({ width = 20, height = 20, color = 'white', ...props }
 		<Path d="M0 128c0-35.3 28.7-64 64-64h256c35.3 0 64 28.7 64 64v256c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zm559.1-28.2c10.4 5.6 16.9 16.4 16.9 28.2v256c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64-14.2-9.5V174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z" />
 	  </Svg>
 	)
+}
+export function UnMuteIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+  return (
+    <Svg viewBox="0 0 448 512"
+      role="img"
+      width={width}
+      height={height}
+      {...props}
+    >
+    <Path fill={color} d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></Svg>
+  )
+}
+
+
+
+export function AngleRight({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+  return (
+    <Svg
+     viewBox="0 0 320 512"
+     role="img"
+     width={width}
+     height={height}
+     {...props}
+     >
+      <Path fill={color} d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></Svg>
+  )
 }
