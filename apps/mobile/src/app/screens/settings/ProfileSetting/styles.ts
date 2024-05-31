@@ -5,6 +5,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.secondary,
         flex: 1,
+        paddingBottom: 20
     }
 })
 

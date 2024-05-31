@@ -51,8 +51,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
                 onChange={handleTabChange}
                 views={[
                     <UserProfile trigger={triggerTab1} />,
-                    <UserProfile trigger={0}/>,
-                    // <ServerProfile />,
+                    <ServerProfile trigger={0}/>,
                 ]}
             />
         </View>

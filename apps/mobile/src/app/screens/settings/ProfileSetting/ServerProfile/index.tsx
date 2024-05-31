@@ -1,9 +1,13 @@
-import { ScrollView } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 
-export default function ServerProfile() {
+interface IServerProfile {
+    trigger: number;
+}
+
+export default function ServerProfile({ }: IServerProfile) {
     return (
-        <ScrollView>
-            <></>
-        </ScrollView>
+        <View style={{ width: Dimensions.get("screen").width }}>
+            <Text style={{ color: "white" }}>Coming soon</Text>
+        </View>
     )
 }

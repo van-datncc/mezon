@@ -1,5 +1,4 @@
 import { View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import BannerAvatar, { IFile } from "./components/Banner";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { HashSignIcon } from "@mezon/mobile-components";
@@ -10,8 +9,6 @@ import { useAccount, useAuth } from "@mezon/core";
 import { useEffect } from "react";
 import Toast from "react-native-toast-message";
 import { handleUploadFileMobile, useMezon } from "@mezon/transport";
-import { useSelector } from "react-redux";
-import { selectCurrentChannelId, selectCurrentClanId } from "@mezon/store";
 
 interface IUserProfile {
     trigger: number;
@@ -21,8 +18,6 @@ export default function UserProfile({ trigger }: IUserProfile) {
     const auth = useAuth();
     const { updateUser } = useAccount();
     const { sessionRef, clientRef } = useMezon();
-    const currentClanId = useSelector(selectCurrentClanId) || '';
-    const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
     const [avatar, setAvatar] = useState<string>(auth.userProfile.user.avatar_url);
     const [displayName, setDisplayName] = useState<string>(auth.userProfile.user.display_name);
