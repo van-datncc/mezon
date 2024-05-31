@@ -289,7 +289,7 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginBottom: size.s_10,
+		marginBottom: size.s_2,
 		paddingRight: size.s_50,
 	},
 	aboveMessage: {
@@ -304,8 +304,8 @@ export const styles = StyleSheet.create({
 		paddingLeft: 30,
 	},
 	replyAvatar: {
-		width: size.s_24,
-		height: size.s_24,
+		width: size.s_20,
+		height: size.s_20,
 		borderRadius: size.s_50,
 		backgroundColor: Colors.gray48,
 		overflow: 'hidden',
@@ -314,11 +314,18 @@ export const styles = StyleSheet.create({
 		flexDirection: 'column',
 		marginTop: size.s_10,
 	},
+  highlightMessageMention: {
+    backgroundColor: Colors.bgMessageHighlight,
+    borderLeftColor: Colors.borderMessageHighlight,
+    borderLeftWidth: 2,
+    paddingTop: size.s_2
+  },
 	repliedTextAvatar: {
 		fontSize: size.s_16,
 		color: Colors.white,
 	},
 	repliedContentText: {
+		fontSize: size.small,
 		color: Colors.white,
 		overflow: 'hidden',
 		width: '80%',
@@ -359,7 +366,7 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 	},
 	contentMessageCombine: {
-    marginTop: -5
+    padding: size.s_2,
 	},
 	contentMessageLink: {
 		fontSize: size.medium,
@@ -444,7 +451,7 @@ export const styles = StyleSheet.create({
 	},
 	fileViewer: {
 		gap: size.s_6,
-		marginVertical: size.s_6,
+		marginTop: size.s_6,
 		paddingHorizontal: size.s_10,
 		width: '80%',
 		minHeight: verticalScale(50),
@@ -546,5 +553,9 @@ export const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		backgroundColor: Colors.secondary
-	}
+	},
+	iconEmojiInMessage: {
+		width: size.s_18,
+		height: size.s_18,
+	},
 });

@@ -25,7 +25,7 @@ export * from './lib/policies/policies.slice';
 export * from './lib/reactionMessage/reactionMessage.slice';
 export * from './lib/roleclan/roleclan.slice';
 export * from './lib/eventManagement/eventManagement.slice';
-export * from './lib/store';
+export * from './lib/store-mobile';
 export * from './lib/threads/threads.slice';
 export * from './lib/users/users.slice';
 export * from './lib/voice/voice.slice';
