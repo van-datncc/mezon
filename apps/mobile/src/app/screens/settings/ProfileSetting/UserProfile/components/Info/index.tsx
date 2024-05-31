@@ -3,17 +3,27 @@ import styles from "./styles";
 import MezonInput from "apps/mobile/src/app/temp-ui/MezonInput";
 import { useTranslation } from "react-i18next";
 
-export default function DetailInfo() {
+interface IDetailUser {
+    username: string;
+    displayName: string;
+    bio: string;
+}
+
+interface IDetailInfoProps {
+    value: IDetailUser,
+    onChange: (value: IDetailUser) => void
+}
+export default function DetailInfo({ value, onChange }: IDetailInfoProps) {
     const { t } = useTranslation(['profileSetting']);
 
     return (
         <View style={styles.container}>
             <View style={styles.nameWrapper}>
-                <Text style={styles.name}>nghia.dotuan</Text>
-                <Text style={styles.username}>nghiacangao</Text>
+                <Text style={styles.name}>{value.displayName}</Text>
+                <Text style={styles.username}>{value.username}</Text>
             </View>
             <MezonInput
-                placeHolder="nghiacangao"
+                placeHolder={value.displayName}
                 label={t('fields.displayName.label')}
             />
 
@@ -25,7 +35,7 @@ export default function DetailInfo() {
 
             <MezonInput
                 textarea
-                placeHolder="nghiacangao"
+                placeHolder=""
                 label={t("fields.bio.label")}
             />
         </View>

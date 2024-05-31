@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent, Dimensions, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import styles from './styles';
 import { useTranslation } from 'react-i18next';
 import UserProfile from './UserProfile';
@@ -21,13 +21,18 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
     });
 
     const [tab, setTab] = useState<number>(0);
+    const [triggerTab1, setTriggerTab1] = useState<number>(0);
 
     function handleTabChange(index: number) {
         setTab(index);
     }
 
-    function handleSave() {
+    async function handleSave() {
+        if (tab === 0) {
+            setTriggerTab1(prev => prev + 1)
+        } else {
 
+        }
     }
 
     return (
@@ -45,8 +50,8 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
                 pageIndex={tab}
                 onChange={handleTabChange}
                 views={[
-                    <UserProfile />,
-                    <UserProfile />,
+                    <UserProfile trigger={triggerTab1} />,
+                    <UserProfile trigger={0}/>,
                     // <ServerProfile />,
                 ]}
             />

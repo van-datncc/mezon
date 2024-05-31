@@ -4,12 +4,19 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { PenIcon } from "@mezon/mobile-components";
 import Toast from "react-native-toast-message";
 import { useState } from "react";
-import { launchImageLibrary } from "react-native-image-picker";
+import { launchImageLibrary } from "react-native-image-picker"
 
+interface IBannerAvatarProps {
+    avatar: string;
+    onChange?: (url: string)=>void;
+}
 
-export default function BannerAvatar() {
+export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
     const [bannerColor, setBannerColor] = useState<string>("purple");
-    const [imageUrl, setImageUrl] = useState<string>("https://yt3.ggpht.com/yti/ANjgQV-w_YfI5jYAikRqhb_bQ-Japg9HasGI3_OqRNkr6fc=s108-c-k-c0x00ffffff-no-rj");
+    const [imageUrl, setImageUrl] = useState<string>(avatar);
+
+    console.log(avatar);
+    
 
     function reserve() {
         Toast.show({
@@ -19,10 +26,14 @@ export default function BannerAvatar() {
     }
 
     async function selectImage() {
-        const result = await launchImageLibrary({ mediaType: "photo" });
+        const result = await launchImageLibrary({
+            mediaType: "photo",
+            includeBase64: true
+        });
         if (result.assets) {
-            // @ts-ignore
+            // TODO: Update banner color
             setImageUrl(result.assets[0].uri);
+            onChange && onChange(result.assets[0].uri);
         }
     }
 
