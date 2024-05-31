@@ -71,6 +71,7 @@ const MuteThreadDetailModal = () => {
     setIsShowNotifySettingBottomSheet(false)
   };
 	useEffect(() => {
+    let idTimeOut;
 		if (getNotificationChannelSelected?.active === 1) {
 			setMutedUntil('');
 		} else if (getNotificationChannelSelected?.active !== 1) {
@@ -81,7 +82,7 @@ const MuteThreadDetailModal = () => {
 					const timeDifference = timeMute.getTime() - currentTime.getTime();
 					const formattedDate = format(timeMute, 'dd/MM, HH:mm');
 					setMutedUntil(`Muted until ${formattedDate}`);
-					setTimeout(() => {
+          idTimeOut =	setTimeout(() => {
 						const body = {
 							channel_id: currentChannelId || '',
 							notification_type: getNotificationChannelSelected?.notification_setting_type || '',
@@ -93,6 +94,9 @@ const MuteThreadDetailModal = () => {
 				}
 			}
 		}
+    return () =>{
+      clearTimeout(idTimeOut)
+    }
 	}, [getNotificationChannelSelected,
     dispatch,
     currentChannelId,
