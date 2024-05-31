@@ -1,7 +1,7 @@
 import React, { useMemo, createContext } from 'react'
 import { View} from 'react-native'
 import { styles } from './style';
-import { ChannelsEntity, selectCurrentChannel } from '@mezon/store';
+import { ChannelsEntity, selectCurrentChannel } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 
 import ActionRow from '../ActionRow';
@@ -12,7 +12,7 @@ import { ThreadHeader } from '../ThreadHeader';
 export const threadDetailContext = createContext<IChannel | ChannelsEntity>(null);
 
 export default function MenuThreadDetail(props: { route: any }) {
-    //NOTE: from DirectMessageDetail component 
+    //NOTE: from DirectMessageDetail component
     const directMessage = props.route?.params?.directMessage as IChannel;
     const currentChannel = useSelector(selectCurrentChannel);
 

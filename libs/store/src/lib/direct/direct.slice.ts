@@ -62,7 +62,23 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	const channels = response.channeldesc.map(mapDmGroupToEntity);
+	const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => { 
+		if (a === undefined || b === undefined || 
+			a.last_sent_message === undefined ||
+			a.last_seen_message?.id === undefined || 
+			b.last_sent_message === undefined ||
+			b.last_seen_message?.id === undefined
+		) {
+			return 0;
+		}
+		if (a.last_sent_message.id && b.last_sent_message.id && (a.last_sent_message.id < b.last_sent_message.id)) {
+			return 1;
+		}
+
+		return -1
+	});
+	const channels = sorted.map(mapDmGroupToEntity);
+	
 	return channels;
 });
 

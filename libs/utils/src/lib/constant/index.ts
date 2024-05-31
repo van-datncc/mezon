@@ -24,3 +24,7 @@ export const typeConverts: ITypeConvert[] = [
 	{ type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', typeConvert: 'application/vnd.ms-powerpoint' },
 	{ type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', typeConvert: 'application/vnd.ms-excel' },
 ];
+
+export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-msvideo'];
+
+export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
