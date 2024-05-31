@@ -123,7 +123,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										/>
 									)}
 									<ItemModal
-										onClick={openNotiSettingModal}
+										onClick={() => {openNotiSettingModal(); setIsShowModalPannelClan(false);}}
 										children="Notification Settings"
 										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
