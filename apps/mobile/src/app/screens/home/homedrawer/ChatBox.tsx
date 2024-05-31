@@ -116,6 +116,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const mentions = useRef([]);
 	const { emojiPicked } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
+	const { setEmojiSuggestion } = useEmojiSuggestion();
 	
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -229,7 +230,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				content: JSON.stringify(currentSelectedReplyMessage.content),
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}] : undefined;
-
+			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
 				switch (props.mode) {
 					case ChannelStreamMode.STREAM_MODE_CHANNEL:

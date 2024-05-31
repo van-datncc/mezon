@@ -3,14 +3,13 @@ import {
 	appActions,
 	clansActions,
 	directActions,
-	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
-	gifsActions,
 	notificationActions,
 	selectAllClans,
 	selectCurrentClan,
 } from '@mezon/store-mobile';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
@@ -106,7 +105,6 @@ const HomeScreen = React.memo((props: any) => {
 		store.dispatch(clansActions.fetchClans());
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
-		store.dispatch(emojiSuggestionActions.fetchEmojiMobile());
 		if (currentClan) {
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
 		}

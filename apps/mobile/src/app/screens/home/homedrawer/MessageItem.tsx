@@ -331,7 +331,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			) : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 				{isShowInfoUser ? (
-					<Pressable onPress={() => setMessageSelected(EMessageBSToShow.UserInformation)} style={styles.wrapperAvatar}>
+					<Pressable
+						onPress={() => {
+							setIsOnlyEmojiPicker(false);
+							setMessageSelected(EMessageBSToShow.UserInformation);
+						}}
+						style={styles.wrapperAvatar}
+					>
 						{user?.user?.avatar_url ? (
 							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
@@ -343,7 +349,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				) : (
 					<View style={styles.wrapperAvatarCombine} />
 				)}
-				<Pressable style={[styles.rowMessageBox]} onLongPress={() => setMessageSelected(EMessageBSToShow.MessageAction)}>
+				<Pressable
+					style={[styles.rowMessageBox]}
+					onLongPress={() => {
+						setIsOnlyEmojiPicker(false);
+						setMessageSelected(EMessageBSToShow.MessageAction);
+					}}
+				>
 					{isShowInfoUser ? (
 						<View style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
@@ -375,7 +387,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				isOnlyEmojiPicker={isOnlyEmojiPicker}
 				onClose={() => {
 					setOpenBottomSheet(null);
-					setIsOnlyEmojiPicker(false);
 				}}
 			/>
 		</View>

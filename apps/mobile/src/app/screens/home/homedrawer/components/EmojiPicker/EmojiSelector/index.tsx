@@ -163,9 +163,6 @@ export default function EmojiSelector({ onSelected, isReactMessage = false }: Em
 								key={index + item.name?.toString()}
 								emojisData={emojiListPNG}
 								onEmojiSelect={handleEmojiSelect}
-								onEmojiHover={(sss) => {
-									console.log('Tom log  => sss', sss);
-								}}
 								categoryName={item.name}
 							/>
 						</View>

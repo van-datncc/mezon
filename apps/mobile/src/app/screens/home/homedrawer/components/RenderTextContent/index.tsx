@@ -31,7 +31,6 @@ const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) =
 };
 const renderTextWithEmoji = (text: string, emojiListPNG?: IEmojiImage[]) => {
 	const parts = text.split(highlightEmojiRegex);
-	console.log('Tom log  => parts', parts);
 	return parts.map((part, index) => {
 		const isHighlighted = highlightEmojiRegex.test(part);
 		return (
