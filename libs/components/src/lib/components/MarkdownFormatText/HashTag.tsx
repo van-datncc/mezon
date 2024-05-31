@@ -46,6 +46,7 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 
 	return channelPath && getChannelById(channelHastagId.slice(1)) ? (
 		<Link
+			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
 			to={channelPath}
 			className="font-medium px-1 rounded-sm cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
@@ -56,18 +57,6 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		</Link>
 	) : (
 		<span>{channelHastagId}</span>
-
-		// return (
-		// 	channelPath && (
-		// 		<Link
-		// 			style={{ textDecoration: 'none' }}
-		// 			to={channelPath}
-		// 			className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
-		// 			onClick={handleClick}
-		// 		>
-		// 			{tagName.startsWith('#') && getChannelById(tagName.slice(1)) && `#${getChannelById(tagName.slice(1)).channel_label}`}
-		// 		</Link>
-		// 	)
 	);
 };
 
