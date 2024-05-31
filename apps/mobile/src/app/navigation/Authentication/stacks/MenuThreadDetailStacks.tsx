@@ -1,6 +1,6 @@
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from "@react-navigation/stack";
 import { APP_SCREEN } from "../../ScreenTypes";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { selectCurrentChannel } from "libs/store/src/lib/channels/channels.slice";
 import CreateThreadModal from "../../../components/ThreadDetail";
@@ -10,9 +10,12 @@ import MenuThreadDetail from "../../../components/ThreadDetail/MenuThreadDetail"
 import { Colors, size } from "@mezon/mobile-ui";
 import { SearchIcon } from "@mezon/mobile-components";
 import { useReference } from "@mezon/core";
+import MuteThreadDetailModal from "../../../components/MuteThreadDetailModal";
+import { useTranslation } from "react-i18next";
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
+  const { t } = useTranslation(['notificationSetting']);
   const { openThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 	return (
@@ -71,6 +74,27 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					headerRight: () => (
 						<SearchIcon width={22} height={22} />
 					),
+				}}
+			/>
+      	<Stack.Screen
+				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
+				component={MuteThreadDetailModal}
+				options={{
+					headerShown: true,
+					headerTitle: () =>
+            <View>
+            <Text style={{ color: Colors.white, fontSize: size.label, fontWeight: '700' }}>{t("notifySettingThreadModal.headerTitle")}</Text>
+            <Text style={{ color: Colors.textGray, fontSize: size.medium , fontWeight: '400'}}>
+              "{currentChannel?.channel_label}""
+            </Text>
+            </View>,
+					headerTitleStyle: {
+						color: Colors.white,
+					},
+					headerStyle: {
+						backgroundColor: Colors.secondary,
+					},
+					headerTintColor: Colors.white,
 				}}
 			/>
 		</Stack.Navigator>

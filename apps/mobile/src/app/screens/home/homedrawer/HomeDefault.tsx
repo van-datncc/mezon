@@ -1,9 +1,9 @@
-import BottomSheet from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, SearchIcon } from '@mezon/mobile-components';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { ActionEmitEvent, UnMuteIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
@@ -20,6 +20,7 @@ import ForwardMessageModal from './components/ForwardMessage';
 import { useEffect } from 'react';
 import { IMessageWithUser } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
+import NotificationSetting from '../../../components/NotificationSetting';
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -52,6 +53,28 @@ const HomeDefault = React.memo((props: any) => {
 			showKeyboard.remove();
 		};
 	}, [])
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["15%", "40%"], []);
+  const [isShow, setIsShow] = useState<boolean>(false);
+
+  const openBottomSheet = () => {
+    bottomSheetRef.current?.snapToIndex(1);
+    setIsShow(!isShow)
+  };
+
+  const closeBottomSheet = () => {
+    bottomSheetRef.current?.close();
+    setIsShow(false)
+  };
+
+  const renderBackdrop = useCallback((props) => (
+    <BottomSheetBackdrop
+      {...props}
+      opacity={0.5}
+      onPress={closeBottomSheet}
+      appearsOnIndex={1}
+    />
+  ), []);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -64,8 +87,7 @@ const HomeDefault = React.memo((props: any) => {
 
 	return (
 		<View style={[styles.homeDefault]}>
-			<HomeDefaultHeader navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
-
+			<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
 			{currentChannel && isFocusChannelView && (
 				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
 					<ChannelMessages
@@ -108,11 +130,24 @@ const HomeDefault = React.memo((props: any) => {
 					/>
 				</View>
 			)}
+      <BottomSheet
+      ref={bottomSheetRef}
+      enablePanDownToClose={true}
+      backdropComponent={renderBackdrop}
+      index={-1}
+      snapPoints={snapPoints}
+      backgroundStyle ={{backgroundColor:  Colors.secondary}}
+    >
+      <BottomSheetView >
+        {isShow && <NotificationSetting /> }
+      </BottomSheetView>
+    </BottomSheet>
 		</View>
 	);
 });
 
-const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation: any; channelTitle: string }) => {
+const HomeDefaultHeader = React.memo(({ navigation, channelTitle, openBottomSheet }:
+  { navigation: any; channelTitle: string ,openBottomSheet: () => void }) => {
 	const navigateMenuThreadDetail = () => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 	};
@@ -136,8 +171,9 @@ const HomeDefaultHeader = React.memo(({ navigation, channelTitle }: { navigation
 					</View>
 				</View>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
-				<SearchIcon width={22} height={22} style={{ marginRight: 20 }} />
+			<TouchableOpacity onPress={() => openBottomSheet()}>
+				{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
+				<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
 			</TouchableOpacity>
 		</View>
 	);
