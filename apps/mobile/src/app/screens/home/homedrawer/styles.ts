@@ -289,7 +289,7 @@ export const styles = StyleSheet.create({
 	wrapperMessageBox: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
-		marginBottom: size.s_10,
+		marginBottom: size.s_2,
 		paddingRight: size.s_50,
 	},
 	aboveMessage: {
@@ -314,6 +314,12 @@ export const styles = StyleSheet.create({
 		flexDirection: 'column',
 		marginTop: size.s_10,
 	},
+  highlightMessageMention: {
+    backgroundColor: Colors.bgMessageHighlight,
+    borderLeftColor: Colors.borderMessageHighlight,
+    borderLeftWidth: 2,
+    paddingTop: size.s_2
+  },
 	repliedTextAvatar: {
 		fontSize: size.s_16,
 		color: Colors.white,
@@ -360,7 +366,7 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 	},
 	contentMessageCombine: {
-    marginTop: -5
+    padding: size.s_2,
 	},
 	contentMessageLink: {
 		fontSize: size.medium,
