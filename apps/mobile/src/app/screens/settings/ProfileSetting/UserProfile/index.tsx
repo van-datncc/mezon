@@ -8,7 +8,7 @@ import DetailInfo from "./components/Info";
 
 export default function UserProfile() {
     return (
-        <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.container}>
             <BannerAvatar />
             <View style={styles.btnGroup}>
                 <View style={styles.btnIcon}>

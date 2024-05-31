@@ -5,12 +5,11 @@ const styles = StyleSheet.create({
     bannerContainer: {
         height: 150,
         width: "100%",
-        backgroundColor: "purple",
         padding: 20
     },
 
     btnRound: {
-        padding: 10,
+        padding: 7,
         borderRadius: 50,
         backgroundColor: Colors.primary,
     },

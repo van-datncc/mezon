@@ -1,46 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent, Dimensions, Pressable } from 'react-native';
 import styles from './styles';
 import { useTranslation } from 'react-i18next';
 import UserProfile from './UserProfile';
 import ServerProfile from './ServerProfile';
 
-export const ProfileSetting = () => {
-    const [tab, setTab] = useState<"user" | "server">("user");
+import MezonTabView from '../../../temp-ui/MezonTabView';
+import MezonTabHeader from '../../../temp-ui/MezonTabHeader';
+
+export const ProfileSetting = ({ navigation }: { navigation: any }) => {
     const { t } = useTranslation(['profileSetting']);
+    navigation.setOptions({
+        headerRight: () => (
+            <Pressable onPress={handleSave}>
+                <Text style={{ color: "green", paddingHorizontal: 10 }}>
+                    {t("header.save")}
+                </Text>
+            </Pressable>
+        )
+    });
+
+    const [tab, setTab] = useState<number>(0);
+
+    function handleTabChange(index: number) {
+        setTab(index);
+    }
+
+    function handleSave() {
+
+    }
 
     return (
         <View style={styles.container}>
-            <View style={styles.switchContainer}>
-                <View style={styles.switchWrapper}>
-                    <TouchableOpacity
-                        style={[styles.switchButton, tab === "user" && styles.switchButtonActive]}
-                        onPress={() => setTab("user")}
-                    >
-                        <Text style={styles.switchText}>
-                            {t('switch.userProfile')}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+            <MezonTabHeader
+                tabIndex={tab}
+                onChange={handleTabChange}
+                tabs={[
+                    t('switch.userProfile'),
+                    t('switch.serverProfile')
+                ]}
+            />
 
-                <View style={styles.switchWrapper}>
-                    <TouchableOpacity
-                        style={[styles.switchButton, tab === "server" && styles.switchButtonActive]}
-                        onPress={() => setTab("server")}
-                    >
-                        <Text style={styles.switchText}>
-                            {t('switch.serverProfile')}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            <UserProfile />
-            {/* <ScrollView
-                horizontal
-                snapToAlignment='center'>
-                <ServerProfile />
-            </ScrollView> */}
+            <MezonTabView
+                pageIndex={tab}
+                onChange={handleTabChange}
+                views={[
+                    <UserProfile />,
+                    <UserProfile />,
+                    // <ServerProfile />,
+                ]}
+            />
         </View>
     )
 }

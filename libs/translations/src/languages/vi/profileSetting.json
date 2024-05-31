@@ -1,4 +1,7 @@
 {
+    "header": {
+        "save": "Lưu"
+    },
     "switch": {
         "userProfile": "Cá nhân",
         "serverProfile": "Máy chủ"

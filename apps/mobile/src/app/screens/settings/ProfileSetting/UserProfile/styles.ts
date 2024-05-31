@@ -1,12 +1,18 @@
 import { Colors } from "@mezon/mobile-ui";
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        width: Dimensions.get("screen").width
+    },
+
     btnIcon: {
         padding: 7,
         borderRadius: 10,
         backgroundColor: Colors.green
     },
+    
     btnGroup: {
         // backgroundColor: "red",
         display: "flex",
