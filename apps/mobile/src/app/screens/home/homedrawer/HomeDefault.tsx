@@ -53,16 +53,17 @@ const HomeDefault = React.memo((props: any) => {
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "40%"], []);
-  const [isShow, setIsShow] = useState<boolean>(false);
+  const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
   const openBottomSheet = () => {
+    Keyboard.dismiss();
     bottomSheetRef.current?.snapToIndex(1);
-    setIsShow(!isShow)
+    setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet)
   };
 
   const closeBottomSheet = () => {
     bottomSheetRef.current?.close();
-    setIsShow(false)
+    setIsShowSettingNotifyBottomSheet(false)
   };
 
   const renderBackdrop = useCallback((props) => (
@@ -136,7 +137,7 @@ const HomeDefault = React.memo((props: any) => {
       backgroundStyle ={{backgroundColor:  Colors.secondary}}
     >
       <BottomSheetView >
-        {isShow && <NotificationSetting /> }
+        {isShowSettingNotifyBottomSheet && <NotificationSetting /> }
       </BottomSheetView>
     </BottomSheet>
 		</View>

@@ -1,4 +1,4 @@
-import { useDeleteMessage } from '@mezon/core';
+import { useAuth, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
@@ -48,6 +48,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
+  const userLogin = useAuth();
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -60,6 +61,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
+	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -305,7 +307,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }]}>
+		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 } , hasIncludeMention && styles.highlightMessageMention]}>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
