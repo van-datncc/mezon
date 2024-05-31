@@ -69,9 +69,9 @@ export function HashSignLockIcon({ width = 20, height = 20, color = "white", ...
 	)
 }
 
-export function CrossIcon({ width = 60, height = 60 }) {
+export function CrossIcon({ width = 60, height = 60, color = "white", ...props }) {
 	return (
-		<Svg viewBox="0 0 20 20" width={height} height={width} fill="white">
+		<Svg viewBox="0 0 20 20" width={height} height={width} fill={color} {...props}>
 			<G id="Live area">
 				<Path id="Vector" d="M2.29289 16.2929C1.90237 16.6834 1.90237 17.3166 2.29289 17.7071C2.68342 18.0976 3.31658 18.0976 3.70711 17.7071L10 11.4142L16.2929 17.7071C16.6834 18.0976 17.3166 18.0976 17.7071 17.7071C18.0976 17.3166 18.0976 16.6834 17.7071 16.2929L11.4142 10L17.7071 3.70711C18.0976 3.31658 18.0976 2.68342 17.7071 2.29289C17.3166 1.90237 16.6834 1.90237 16.2929 2.29289L10 8.58579L3.70711 2.2929C3.31658 1.90237 2.68342 1.90237 2.29289 2.2929C1.90237 2.68342 1.90237 3.31658 2.29289 3.70711L8.58579 10L2.29289 16.2929Z">
 				</Path>
@@ -230,7 +230,7 @@ export function MarkUnreadIcon({ width = 20, height = 20, color = 'white', ...pr
 
 export function PenIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg viewBox="0 0 512 512" {...props}>
+		<Svg viewBox="0 0 512 512" height={height} width={width} {...props}>
 			<Path fill={color} d="M362.7 19.3l-48.4 48.4 130 130 48.4-48.4c25-25 25-65.5 0-90.5l-39.4-39.5c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2c-2.5 8.5-.2 17.6 6 23.8s15.3 8.5 23.7 6.1L151 475.7c14.1-4.2 27-11.8 37.4-22.2l233.3-233.2-130-130z" />
 		</Svg>
 	)

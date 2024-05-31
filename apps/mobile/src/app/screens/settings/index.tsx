@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { styles } from './styles';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import MezonInput from '../../temp-ui/MezonInput';
+import MezonSearch from '../../temp-ui/MezonSearch';
 import SettingBtn from './components/btn/btn';
 import Toast from 'react-native-toast-message';
 
@@ -216,7 +216,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 
 	return (
 		<ScrollView contentContainerStyle={styles.settingContainer}>
-			<MezonInput />
+			<MezonSearch />
 
 			{menu.map((item, index) => (
 				<View

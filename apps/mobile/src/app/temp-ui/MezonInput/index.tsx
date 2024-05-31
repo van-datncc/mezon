@@ -1,21 +1,34 @@
-import { TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import styles from "./styles";
-import { SearchIcon } from "@mezon/mobile-components";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { CloseIcon, CrossIcon } from "@mezon/mobile-components";
 
-interface MezonInputProps {
-    onChangeText?: (text: string) => void
+interface IMezonInputProps {
+    placeHolder?: string;
+    label?: string;
+    textarea?: boolean;
 }
 
-export default function MezonInput({ onChangeText }: MezonInputProps) {
+export default function MezonInput({ placeHolder, label, textarea }: IMezonInputProps) {
     return (
-        <View style={styles.inputWrapper}>
-            <SearchIcon height={24} width={24}/>
-            <TextInput
-                style={styles.input}
-                onChangeText={onChangeText}
-                placeholderTextColor={"white"}
-                placeholder="Search"
-            />
+        <View style={styles.container}>
+            <Text style={styles.label}>{label}</Text>
+            <View style={styles.inputBox}>
+                <TextInput
+                    multiline={textarea}
+                    numberOfLines={textarea ? 4 : 1}
+                    style={styles.input}
+                    placeholder={placeHolder}
+                    placeholderTextColor="gray"
+                />
+
+                {!textarea &&
+                    <TouchableOpacity style={styles.clearBtn}>
+                        <CloseIcon height={10} width={10} color="black" />
+                    </TouchableOpacity>
+                }
+            </View>
         </View>
+
     )
 }
