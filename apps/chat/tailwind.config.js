@@ -80,7 +80,7 @@ module.exports = {
         '2/5': "40%",
         boxChatView: `calc(100vw - 589px)`,
         wrappBoxChatView: `calc(100vw - 377px)`,
-        wrappBoxChatViewMobile: `calc(100vw - 31px)`,
+        wrappBoxChatViewMobile: `calc(100vw)`,
       },
 
       maxHeight: {
@@ -127,6 +127,7 @@ module.exports = {
     },
     animation: {
       rotation: 'rotation 6s linear infinite',
+      spin: 'spin 1s linear infinite',
     },
     screens: {
       ssm: "430px",

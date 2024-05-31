@@ -118,7 +118,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			<div
-				className={`w-wrappBoxChatView max-w-wrappBoxChatView ssm:max-w-wrappBoxChatViewMobile
+				className={`w-wrappBoxChatView sbm:max-w-wrappBoxChatView max-w-wrappBoxChatViewMobile
 				${attachmentDataRef.length > 0 ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 			>
 				<div className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll`}>

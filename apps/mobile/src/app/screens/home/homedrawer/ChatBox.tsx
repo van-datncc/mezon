@@ -8,7 +8,15 @@ import {
 	convertMentionsToText,
 	getAttachmentUnique
 } from '@mezon/mobile-components';
-import { useChannelMembers, useChannels, useChatSending, useDirectMessages, useReference, useThreads } from '@mezon/core';
+import {
+	useChannelMembers,
+	useChannels,
+	useChatSending,
+	useEmojiSuggestion,
+	useReference,
+	useThreads,
+	useDirectMessages
+} from '@mezon/core';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, IMessageSendPayload, IMessageWithUser, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,7 +39,7 @@ import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
-import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
+import { selectCurrentChannel, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
@@ -106,6 +114,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const cursorPositionRef = useRef(0);
 	const currentTextInput = useRef('');
 	const mentions = useRef([]);
+	const { emojiPicked } = useEmojiSuggestion();
+	const emojiListPNG = useSelector(selectEmojiImage);
+	const { setEmojiSuggestion } = useEmojiSuggestion();
+	
+	useEffect(() => {
+		handleEventAfterEmojiPicked();
+	}, [emojiPicked]);
+	
 
 	//start: DM stuff
 	const { sendDirectMessage, sendMessageTyping: directMessageTyping, messages } = useDirectMessages({
@@ -139,6 +155,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	useEffect(() => {
 		mentions.current = listMentions || [];
 	}, [listMentions])
+	
+	
+	const handleEventAfterEmojiPicked = () => {
+		if (!emojiPicked) {
+			return;
+		}
+		setText(`${text.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
+	}
 
 	const editMessage = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -196,7 +220,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
 		if (isEditMessage) {
 			editMessage(text, currentSelectedEditMessage.id);
-			//TODO: edit for dm
 			removeAction(EMessageActionType.EditMessage);
 		} else {
 			const reference = currentSelectedReplyMessage ? [{
@@ -207,7 +230,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				content: JSON.stringify(currentSelectedReplyMessage.content),
 				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
 			}] : undefined;
-
+			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
 				switch (props.mode) {
 					case ChannelStreamMode.STREAM_MODE_CHANNEL:
@@ -323,7 +346,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				break;
 			default:
 				break;
-		}	
+		}
 	}
 
 	const handleMentionInput = (mentions: MentionDataProps[]) => {
@@ -542,9 +565,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							text.length > 0 && { width: inputWidthWhenHasInput },
 							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 						]}
-					>
-						{renderTextContent(text)}
-					</TextInput>
+						children={renderTextContent(text, emojiListPNG)}
+					/>
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 					</View>

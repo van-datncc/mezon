@@ -97,7 +97,6 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
-	state?: string | undefined;
 };
 
 export type IChannelMember = ChannelUserListChannelUser & {
@@ -304,6 +303,12 @@ export type IEmoji = {
 	order?: number;
 	shortname: string;
 	unicode?: string;
+};
+
+export type IEmojiImage = {
+	src?: string;
+	shortname: string;
+	category?: string;
 };
 
 export type IEmoticons = {

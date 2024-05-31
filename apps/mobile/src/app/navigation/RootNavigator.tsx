@@ -1,4 +1,13 @@
-import { MezonStoreProvider, accountActions, authActions, getStoreAsync, initStore, selectIsLogin, setHasInternetMobile } from '@mezon/store-mobile';
+import {
+	MezonStoreProvider,
+	accountActions,
+	authActions,
+	getStoreAsync,
+	initStore,
+	selectIsLogin,
+	setHasInternetMobile,
+	emojiSuggestionActions
+} from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -40,6 +49,7 @@ const NavigationMain = () => {
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
+		store.dispatch(emojiSuggestionActions.fetchEmojiMobile());
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {
