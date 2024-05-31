@@ -97,7 +97,6 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
-	state?: string | undefined;
 };
 
 export type IChannelMember = ChannelUserListChannelUser & {

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../ModalValidateFile';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
+import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 
 const SettingRightUser = ({
 	onClanProfileClick,
@@ -211,21 +212,9 @@ const SettingRightUser = ({
 				</div>
 			) : null}
 
-			<ModalValidateFile
-				openModal={openModal}
-				onClose={() => setOpenModal(false)}
-				image="/assets/images/file-and-folder.png"
-				title="Your files are too powerful"
-				content="Max file size is 1MB, please!"
-			/>
-
-			<ModalValidateFile
-				openModal={openModalType}
-				onClose={() => setOpenModalType(false)}
-				image="/assets/images/file-and-folder.png"
-				title="Only image files are allowed"
-				content="Just uploaf type file (JPEG, PNG), please!"
-			/>
+			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
+			
+			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
 		</div>
 	);
 };
