@@ -33,7 +33,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 	const [positionLeft, setPositionLeft] = useState(0);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-		if (event.button === 0) {
+		if (event.button === 0 && tagName !== '@here') {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
@@ -75,16 +75,18 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 					<ShortUserProfile userID={foundUser.user.id} />
 				</div>
 			)}
-			{foundUser !== null ? (
+			{foundUser !== null || tagName === '@here' ? (
 				<Link
 					onMouseDown={(event) => handleMouseClick(event)}
 					ref={panelRef}
 					onClick={(e) => dispatchUserIdToShowProfile(e)}
 					style={{ textDecoration: 'none' }}
 					to={''}
-					className="font-medium px-1 rounded-sm cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+					className={`font-medium px-1 rounded-sm 
+					${tagName === '@here' ? 'cursor-text' : 'cursor-pointer hover:!text-white'}
+					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]`}
 				>
-					@{foundUser?.user?.username}
+					@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
 				</Link>
 			) : (
 				<span>{tagName}</span>
