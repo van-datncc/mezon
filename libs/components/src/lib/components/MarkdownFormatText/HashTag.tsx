@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
-import { selectChannelById } from '@mezon/store';
+import { selectChannelById, selectCurrentChannel } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,7 +14,8 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
-	const [channelFound, setChannelFound] = useState();
+	const currentChannel = useSelector(selectCurrentChannel);
+
 	const getChannelById = (channelHastagId: string) => {
 		const channel = useSelector(selectChannelById(channelHastagId));
 		return channel;
@@ -45,7 +46,7 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		}
 	}, [channel]);
 
-	return channelPath && getChannelById(channelHastagId.slice(1)) ? (
+	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && channelPath && getChannelById(channelHastagId.slice(1)) ? (
 		<Link
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
@@ -53,9 +54,9 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 			className="font-medium px-1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 		>
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
-				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill='#3297FF' />
+				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill="#3297FF" />
 			) : (
-				<Icons.Hashtag defaultSize="inline-block mt-[-0.4rem] w-4 h-4 " defaultFill='#3297FF' />
+				<Icons.Hashtag defaultSize="inline-block mt-[-0.4rem] w-4 h-4 " defaultFill="#3297FF" />
 			)}
 			{channel.channel_label}
 		</Link>

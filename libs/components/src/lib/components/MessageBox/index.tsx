@@ -21,6 +21,7 @@ export type MessageBoxProps = {
 	readonly listMentions?: MentionDataProps[];
 	readonly currentChannelId?: string;
 	readonly currentClanId?: string;
+	readonly mode?: number;
 };
 
 function MessageBox(props: MessageBoxProps): ReactElement {

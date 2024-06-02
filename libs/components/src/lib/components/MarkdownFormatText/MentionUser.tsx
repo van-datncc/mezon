@@ -1,5 +1,8 @@
 import { useClans, useOnClickOutside } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
@@ -11,7 +14,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const { usersClan } = useClans();
 	const [foundUser, setFoundUser] = useState<any>(null);
-
+	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -60,6 +63,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+
 	return (
 		<>
 			{showProfileUser && (
@@ -75,7 +79,8 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 					<ShortUserProfile userID={foundUser.user.id} />
 				</div>
 			)}
-			{foundUser !== null || tagName === '@here' ? (
+			{(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && foundUser !== null) ||
+			(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && tagName === '@here') ? (
 				<Link
 					onMouseDown={(event) => handleMouseClick(event)}
 					ref={panelRef}
