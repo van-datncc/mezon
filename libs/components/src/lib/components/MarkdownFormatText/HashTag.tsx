@@ -4,59 +4,63 @@ import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Icons } from '../../components';
 
 type ChannelHashtagProps = {
-	tagName: string;
+	channelHastagId: string;
 };
 
-const ChannelHashtag = ({ tagName }: ChannelHashtagProps) => {
+const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
-
-	const getChannelPath = (tagName: string, clanId: string): string | undefined => {
-		if (tagName.startsWith('#')) {
-			return toChannelPage(tagName.slice(1), clanId || '');
-		}
-		return undefined;
-	};
-	const [channelPath, setChannelPath] = useState(getChannelPath(tagName, clanId ?? ''));
-
-	const getChannelById = (channelId: string) => {
-		const channel = useSelector(selectChannelById(channelId));
+	const [channelFound, setChannelFound] = useState();
+	const getChannelById = (channelHastagId: string) => {
+		const channel = useSelector(selectChannelById(channelHastagId));
 		return channel;
 	};
 
-	const channel = getChannelById(tagName.slice(1));
+	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
+		if (channelHastagId.startsWith('#')) {
+			return toChannelPage(channelHastagId.slice(1), clanId || '');
+		}
+		return undefined;
+	};
+	const [channelPath, setChannelPath] = useState(getChannelPath(channelHastagId, clanId ?? ''));
+
+	const channel = getChannelById(channelHastagId.slice(1));
 
 	useEffect(() => {
 		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			setChannelPath(getChannelPath('#' + currentChannelId || '', clanId ?? ''));
 		} else {
-			setChannelPath(getChannelPath(tagName, clanId ?? ''));
+			setChannelPath(getChannelPath(channelHastagId, clanId ?? ''));
 		}
-	}, [channel, currentChannelId, clanId, tagName]);
+	}, [channel, currentChannelId, clanId, channelHastagId]);
 
-	const handleClick = useCallback(
-		() => {
-			if(channel.type === ChannelType.CHANNEL_TYPE_VOICE){
-				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
-				window.open(urlVoice, "_blank", "noreferrer");
-			}
-		},[channel]
-	)
+	const handleClick = useCallback(() => {
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
+			window.open(urlVoice, '_blank', 'noreferrer');
+		}
+	}, [channel]);
 
-	return (
-		channelPath && (
-			<Link
-				style={{ textDecoration: 'none' }}
-				to={channelPath}
-				className="font-medium cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
-				onClick={handleClick}
-			>
-				{tagName.startsWith('#') && getChannelById(tagName.slice(1)) && `#${getChannelById(tagName.slice(1)).channel_label}`}
-			</Link>
-		)
+	return channelPath && getChannelById(channelHastagId.slice(1)) ? (
+		<Link
+			onClick={handleClick}
+			style={{ textDecoration: 'none' }}
+			to={channelPath}
+			className="font-medium px-1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+		>
+			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
+				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill='#3297FF' />
+			) : (
+				<Icons.Hashtag defaultSize="inline-block mt-[-0.4rem] w-4 h-4 " defaultFill='#3297FF' />
+			)}
+			{channel.channel_label}
+		</Link>
+	) : (
+		<span>{channelHastagId}</span>
 	);
 };
 

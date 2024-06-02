@@ -1,67 +1,18 @@
-import { useApp, useClans, useInvite, useOnClickOutside } from '@mezon/core';
-import { ILineMention, convertMarkdown, getSrcEmoji } from '@mezon/utils';
-import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
-import { useEffect, useRef, useState } from 'react';
+import { useApp, useEmojiSuggestion, useInvite } from '@mezon/core';
+import { convertMarkdown, getSrcEmoji } from '@mezon/utils';
+import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
 import remarkGFM from 'remark-gfm';
 import ExpiryTimeModal from '../ExpiryTime';
-import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 import ChannelHashtag from './HashTag';
+import MentionUser from './MentionUser';
 import PreClass from './PreClass';
-
 type MarkdownFormatTextProps = {
-	mentions: ILineMention[];
+	lineMessage: string;
 };
 
-const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
-	const { emojiListPNG } = useDataEmojiSvg();
-	const [showProfileUser, setIsShowPanelChannel] = useState(false);
-	const [userID, setUserID] = useState('');
-	const { usersClan } = useClans();
-	const handMention = (tagName: string) => {
-		setIsShowPanelChannel(true);
-		const username = tagName.slice(1);
-		const user = usersClan.find((userClan) => userClan.user?.username === username);
-		setUserID(user?.user?.id || '');
-	};
-	const panelRef = useRef<HTMLDivElement | null>(null);
-	const [positionBottom, setPositionBottom] = useState(false);
-	const [positionTop, setPositionTop] = useState(0);
-	const [positionLeft, setPositionLeft] = useState(0);
-
-	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-		if (event.button === 0) {
-			setIsShowPanelChannel(true);
-			const clickY = event.clientY;
-			const windowHeight = window.innerHeight;
-			const distanceToBottom = windowHeight - clickY;
-			const windowWidth = window.innerWidth;
-			const elementTagName = event.target;
-			if (elementTagName instanceof HTMLElement) {
-				const positionRight = elementTagName.getBoundingClientRect().right;
-				const widthElement = elementTagName.offsetWidth;
-				const widthElementShortUserProfileMin = 380;
-				const distanceToRight = windowWidth - positionRight;
-				if (distanceToRight < widthElementShortUserProfileMin) {
-					setPositionLeft(positionRight - widthElement - widthElementShortUserProfileMin);
-				} else {
-					setPositionLeft(positionRight + 20);
-				}
-				setPositionTop(clickY - 50);
-				setPositionBottom(false);
-			}
-			const heightElementShortUserProfileMin = 313;
-			if (distanceToBottom < heightElementShortUserProfileMin) {
-				setPositionBottom(true);
-			}
-		}
-	};
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
-	const handleDefault = (e: any) => {
-		e.stopPropagation();
-	};
+const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	const { getLinkInvite } = useInvite();
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => <ExpiryTimeModal onClose={closeInviteChannelModal} open={true} />);
 	const getLinkinvite = (children: any) => {
@@ -80,8 +31,41 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 			window.open(children, '_blank');
 		}
 	};
-
 	const { appearanceTheme } = useApp();
+	const backtickRegex = /`[^`]*`/g;
+	const headingRegex = /^(#{1,6}) (.*)/gm;
+
+	const numberedListRegex = /^\d+\.\s/gm;
+	const italicRegex = /\*([^*]+)\*/g;
+	const boldRegex = /\*\*([^*]+)\*\*/g;
+	const boldItalicRegex = /\*\*\*([^*]+)\*\*\*/g;
+
+	const [isMarkdown, setIsMarkdown] = useState<boolean>(false);
+	const startsWithTripleBackticks = lineMessage.startsWith('```');
+	const startWithHttpOrHttps = lineMessage.startsWith('https://') || lineMessage.startsWith('http://');
+	const endsWithNoTripleBackticks = !lineMessage.endsWith('```');
+	const onlyBackticks = /^```$/.test(lineMessage);
+	const isQuote = lineMessage.startsWith('>');
+	const [convertedLine, setConvertLine] = useState('');
+	useEffect(() => {
+		if (
+			(startsWithTripleBackticks && endsWithNoTripleBackticks) ||
+			backtickRegex.test(lineMessage) ||
+			headingRegex.test(lineMessage) ||
+			numberedListRegex.test(lineMessage) ||
+			italicRegex.test(lineMessage) ||
+			boldRegex.test(lineMessage) ||
+			boldItalicRegex.test(lineMessage) ||
+			startWithHttpOrHttps ||
+			isQuote
+		) {
+			setIsMarkdown(true);
+			const result = convertMarkdown(lineMessage);
+			setConvertLine(result);
+		} else {
+			setIsMarkdown(false);
+		}
+	}, [lineMessage]);
 
 	return (
 		<article
@@ -89,148 +73,82 @@ const MarkdownFormatText = ({ mentions }: MarkdownFormatTextProps) => {
 			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose
 			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
-			{showProfileUser ? (
-				<div
-					className="dark:bg-black bg-gray-200 mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
-					style={{
-						left: `${positionLeft}px`,
-						top: positionBottom ? '' : `${positionTop}px`,
-						bottom: positionBottom ? '64px' : '',
-					}}
-					onMouseDown={handleDefault}
-				>
-					<ShortUserProfile userID={userID} />
+			{isMarkdown ? (
+				<div className="lineText contents">
+					{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
+						<span>{lineMessage}</span>
+					) : (
+						<Markdown
+							children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? convertedLine : lineMessage}
+							remarkPlugins={[remarkGFM]}
+							components={{
+								pre: PreClass,
+								p: 'span',
+								a: ({ children }) => (
+									<span
+										onClick={() => getLinkinvite(children)}
+										rel="noopener noreferrer"
+										style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+										className="tagLink"
+									>
+										{children}
+									</span>
+								),
+							}}
+						/>
+					)}
 				</div>
-			) : null}
-			{mentions.map((part, index) => {
-				const regex = /:\b[^:]*\b:/g;
-				const tagName = part.matchedText;
-				const markdown = (part.nonMatchText && part.nonMatchText.trim()) ?? '';
-				const result = convertMarkdown(markdown);
-				const [checkMarkdownIncludeEmoji, setMarkdownIncludeEmoji] = useState<string>('');
-
-				const splitTextMarkdown = markdown.split(' ');
-
-				const getMatchedElements = (markdown: string) => {
-					const splitTextMarkdown = markdown.split(' ');
-					return splitTextMarkdown.filter((item) => item.match(regex));
-				};
-				const matchedElements = getMatchedElements(markdown);
-				const startsWithTripleBackticks = markdown.startsWith('```');
-				const endsWithNoTripleBackticks = !markdown.endsWith('```');
-				const onlyBackticks = /^```$/.test(markdown);
-				const [checkOnlyEmoji, setCheckOnlyEmoji] = useState<boolean>(false);
-
-				const [hasEmoji, setHasEmoji] = useState<boolean>(false);
-
-				useEffect(() => {
-					if (splitTextMarkdown.length === 1 && getMatchedElements(markdown).length === 1) {
-						setCheckOnlyEmoji(true);
-					}
-				}, [splitTextMarkdown, getMatchedElements]);
-
-				useEffect(() => {
-					if (getSrcEmoji(matchedElements[0], emojiListPNG) !== undefined) {
-						setHasEmoji(true);
-					} else {
-						setHasEmoji(false);
-					}
-				}, [matchedElements[0]]);
-
-				return (
-					<div key={index} className="lineText contents">
-						{!hasEmoji ? (
-							(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
-								<span>{markdown}</span>
-							) : (
-								<Markdown
-									children={startsWithTripleBackticks && !endsWithNoTripleBackticks ? result : markdown}
-									remarkPlugins={[remarkGFM]}
-									components={{
-										pre: PreClass,
-										p: 'span',
-										a: ({ children }) => (
-											<span
-												onClick={() => getLinkinvite(children)}
-												rel="noopener noreferrer"
-												style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
-												className="tagLink"
-											>
-												{children}
-											</span>
-										),
-										code: ({ children }) => (
-											<code className="dark:bg-bgSecondary bg-bgLightSecondary border border-[#E3E5E8] dark:border-[#1E1F22]">
-												{children}
-											</code>
-										),
-									}}
-								/>
-							)
-						) : matchedElements.length === 0 ? (
-							markdown + tagName && (
-								<>
-									{' '}
-									<span
-										className={`font-medium w-0 cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
-											tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
-										}`}
-										onClick={() => handMention(tagName)}
-										ref={panelRef}
-										onMouseDown={(event) => handleMouseClick(event)}
-									>
-										{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
-									</span>
-								</>
-							)
-						) : (
-							<div className="flex flex-row gap-x-1 items-center w-fit">
-								{splitTextMarkdown.map((item, index) => {
-									const srcEmoji = getSrcEmoji(item, emojiListPNG);
-									if (item.match(regex) && srcEmoji) {
-										return (
-											<img
-												key={index}
-												src={srcEmoji}
-												alt={srcEmoji}
-												className={` ${checkOnlyEmoji ? 'w-8 h-8' : 'w-5 h-5'} p-0 m-0`}
-												onDragStart={(e) => e.preventDefault()}
-											/>
-										);
-									}
-									return <span key={index}>{item}</span>;
-								})}
-								{tagName && (
-									<span
-										className={`font-medium cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
-											tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
-										}`}
-										onClick={() => handMention(tagName)}
-										ref={panelRef}
-										onMouseDown={(event) => handleMouseClick(event)}
-									>
-										{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
-									</span>
-								)}
-							</div>
-						)}
-						{tagName && (
-							<span
-								className={`font-medium cursor-pointer whitespace-nowrap ${tagName ? 'px-1 rounded-md' : ''} ${
-									tagName ? '!text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]' : ''
-								}`}
-								onClick={() => handMention(tagName)}
-								ref={panelRef}
-								onMouseDown={(event) => handleMouseClick(event)}
-							>
-								{tagName.startsWith('#') ? <ChannelHashtag tagName={tagName} /> : tagName}
-							</span>
-						)}
-					</div>
-				);
-			})}
+			) : (
+				<TextWithMentionHashtagEmoji lineMessage={lineMessage} />
+			)}
 		</article>
 	);
 };
 
 export default MarkdownFormatText;
+
+type TextWithMentionHashtagEmojiOpt = {
+	lineMessage: string;
+};
+
+const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmojiOpt) => {
+	const combinedRegex = /(@\S+|#\S+|:\b[^:]*\b:)/g;
+	const { emojiListPNG } = useEmojiSuggestion();
+	const splitText = lineMessage.split(combinedRegex).filter(Boolean);
+
+	return (
+		<div className="lineText contents">
+			{splitText.map((item, index) => {
+				const isMention = item.startsWith('@');
+				const isHashtag = item.startsWith('#');
+				const isEmojiSyntax = item.match(/:\b[^:]*\b:/);
+
+				if (isMention && !isHashtag && !isEmojiSyntax) {
+					return (
+						<span key={`mention-${index}`}>
+							<MentionUser tagName={item} />{' '}
+						</span>
+					);
+				} else if (!isMention && isHashtag && !isEmojiSyntax) {
+					return (
+						<span key={`hashtag-${index}`}>
+							<ChannelHashtag channelHastagId={item} />{' '}
+						</span>
+					);
+				} else if (!isMention && !isHashtag && isEmojiSyntax) {
+					return (
+						<span key={`emoji-${index}`}>
+							<img
+								src={getSrcEmoji(item, emojiListPNG)}
+								alt={getSrcEmoji(item, emojiListPNG)}
+								className={`${splitText.length === 1 ? 'w-10' : 'w-6'}  h-auto  inline-block relative -top-0.5 m-0`}
+								onDragStart={(e) => e.preventDefault()}
+							/>{' '}
+						</span>
+					);
+				}
+				return <span key={`text-${index}`}>{item}</span>;
+			})}
+		</div>
+	);
+};
