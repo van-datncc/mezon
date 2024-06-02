@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useChatReaction, useGifsStickersEmoji, useMenu, useReference, useThreads } from '@mezon/core';
-import { selectCurrentChannel, selectReactionRightState, selectReactionTopState } from '@mezon/store';
+import { selectCurrentChannel, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
