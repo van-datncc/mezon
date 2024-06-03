@@ -24,18 +24,18 @@ const Modal = (props: ModalProps) => {
 					<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black">
 						<div className={`relative w-full max-w-[684px] sm:h-auto ${classNameBox}`}>
 							<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full dark:bg-bgPrimary bg-bgLightModeSecond  outline-none focus:outline-none h-full sm:h-auto">
-								<div className={`flex items-start justify-between pt-[20px] px-[20px]  border-solid dark:border-borderDefault border-border- rounded-t`}>
+								<div className={`flex items-start justify-between py-[20px] px-[20px]  border-solid dark:border-borderDefault border-b rounded-t`}>
 									<div>
 										<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
-									<button className="flex items-center justify-center opacity-50" onClick={onClose}>
+									<button className="flex items-center justify-center opacity-50" onClick={() => {onClose(); console.log(1)}}>
 										<span className="text-5xl leading-3 dark:hover:text-white hover:text-black">×</span>
 									</button>
 								</div>
 
 								{/*body*/}
-								<div className="relative px-5 py-4 flex-auto bg-transparent">
+								<div className="relative px-5 py-4 flex-auto bg-transparent max-h-[500px] overflow-auto hide-scrollbar">
 									<div className="dark:bg-[#323232] bg-bgLightModeSecond rounded-[5px] bg-transparent">{children}</div>
 								</div>
 								{/*footer*/}
