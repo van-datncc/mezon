@@ -1,5 +1,8 @@
 import { useClans, useOnClickOutside } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
@@ -11,7 +14,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const { usersClan } = useClans();
 	const [foundUser, setFoundUser] = useState<any>(null);
-
+	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -33,7 +36,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 	const [positionLeft, setPositionLeft] = useState(0);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-		if (event.button === 0) {
+		if (event.button === 0 && tagName !== '@here') {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
@@ -60,6 +63,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+
 	return (
 		<>
 			{showProfileUser && (
@@ -75,16 +79,19 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 					<ShortUserProfile userID={foundUser.user.id} />
 				</div>
 			)}
-			{foundUser !== null ? (
+			{(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && foundUser !== null) ||
+			(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && tagName === '@here') ? (
 				<Link
 					onMouseDown={(event) => handleMouseClick(event)}
 					ref={panelRef}
 					onClick={(e) => dispatchUserIdToShowProfile(e)}
 					style={{ textDecoration: 'none' }}
 					to={''}
-					className="font-medium px-1 rounded-sm cursor-pointer whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+					className={`font-medium px-1 rounded-sm 
+					${tagName === '@here' ? 'cursor-text' : 'cursor-pointer hover:!text-white'}
+					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]`}
 				>
-					@{foundUser?.user?.username}
+					@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
 				</Link>
 			) : (
 				<span>{tagName}</span>

@@ -3,6 +3,7 @@ import { convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
+import { Link } from 'react-router-dom';
 import remarkGFM from 'remark-gfm';
 import ExpiryTimeModal from '../ExpiryTime';
 import ChannelHashtag from './HashTag';
@@ -47,6 +48,7 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	const onlyBackticks = /^```$/.test(lineMessage);
 	const isQuote = lineMessage.startsWith('>');
 	const [convertedLine, setConvertLine] = useState('');
+
 	useEffect(() => {
 		if (
 			(startsWithTripleBackticks && endsWithNoTripleBackticks) ||
@@ -116,6 +118,15 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 	const { emojiListPNG } = useEmojiSuggestion();
 	const splitText = lineMessage.split(combinedRegex).filter(Boolean);
 
+	const checkMarkdownInText = (text: string) => {
+		if (text.startsWith('```') && !text.endsWith('```')) return true;
+		if (/^```$/.test(text)) return true;
+	};
+
+	const checkIsLink = (text: string) => {
+		if (text.includes('https://') || text.includes('http://')) return true;
+	};
+
 	return (
 		<div className="lineText contents">
 			{splitText.map((item, index) => {
@@ -135,9 +146,39 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 							<ChannelHashtag channelHastagId={item} />{' '}
 						</span>
 					);
+				} else if (checkMarkdownInText(item)) {
+					return (
+						<span key={`markdown-text-${index}`} className="lineText contents">
+							{item}
+						</span>
+					);
+				} else if (checkIsLink(item)) {
+					const extractUrl = (text: string) => {
+						const urlMatch = text.match(/https?:\/\/\S+/);
+						return urlMatch ? urlMatch[0] : '#';
+					};
+					const url = extractUrl(item);
+					if (!url) {
+						return <span key={`no-url-text-${index}`}>{item}</span>;
+					}
+					const parts = item.split(extractUrl(item));
+
+					return (
+						<span key={`url-on-text-${index}`}>
+							{parts[0]}
+							<Link
+								style={{ textDecoration: 'none' }}
+								to={url}
+								className="px-1  cursor-pointer inline whitespace-nowrap !text-[#3B82F6] hover:!underline font-thin "
+							>
+								{url}
+							</Link>
+							{parts[1]}
+						</span>
+					);
 				} else if (!isMention && !isHashtag && isEmojiSyntax) {
 					return (
-						<span key={`emoji-${index}`}>
+						<span key={`emoji-${index}`} style={{ userSelect: 'none' }}>
 							<img
 								src={getSrcEmoji(item, emojiListPNG)}
 								alt={getSrcEmoji(item, emojiListPNG)}
