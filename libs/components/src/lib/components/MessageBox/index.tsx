@@ -16,6 +16,7 @@ export type MessageBoxProps = {
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
 		anonymous?: boolean,
+		mentionEveryone?: boolean,
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[];

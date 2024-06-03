@@ -3,7 +3,7 @@ import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
 import { onMessageListener, requestForToken } from 'libs/components/src/lib/components/Firebase/firebase';
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const theme = 'dark';
@@ -11,11 +11,18 @@ const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const fcmTokenObject = JSON.parse(localStorage.getItem('fcmTokenObject') as string);
-
+	const navigate = useNavigate();
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
 			const parts = payload.notification.body;
-			toast.info(parts);
+			toast.info(parts, {
+				onClick: () => {
+					const fullLink = payload.data.link;
+					const baseUrl = 'https://mezon.vn';
+					const relativeLink = fullLink.replace(baseUrl, '');
+					navigate(relativeLink);
+				},
+			});
 		}
 		onMessageListener()
 			.then(handleNewMessage)
