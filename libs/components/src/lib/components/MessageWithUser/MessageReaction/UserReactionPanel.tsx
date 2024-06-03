@@ -26,7 +26,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 		return emojiData;
 	};
 
-	const count = calculateTotalCount(emojiShowPanel.senders)
+	const count = calculateTotalCount(emojiShowPanel.senders);
 	return (
 		<>
 			{count > 0 && (
@@ -38,7 +38,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 					<div>
 						<div className="flex flex-row items-center m-2">
 							<img src={getSrcEmoji(emojiShowPanel.emoji ?? '', emojiListPNG)} className="w-5 h-5"></img>{' '}
-							<p className="text-sm ml-2">{calculateTotalCount(emojiShowPanel.senders)}</p>
+							<p className="text-sm ml-2">{count}</p>
 						</div>
 						<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none"></hr>
 					</div>
@@ -46,7 +46,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 					{emojiShowPanel.senders.map((sender: SenderInfoOptionals, index: number) => {
 						return (
 							<Fragment key={`${index}_${sender.sender_id}`}>
-								{sender.count && sender.count > 0 && (
+								{count > 0 && sender.count && sender.count > 0 && (
 									<div key={sender.sender_id} className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative ">
 										<AvatarComponent id={sender.sender_id ?? ''} />
 										<NameComponent id={sender.sender_id ?? ''} />
