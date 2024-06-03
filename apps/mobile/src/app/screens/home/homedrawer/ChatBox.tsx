@@ -105,7 +105,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
-	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 316 : 274);
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 	const navigation = useNavigation<any>();
 	const { setValueThread } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
@@ -304,7 +304,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	function keyboardWillShow(event: KeyboardEvent) {
 		if (keyboardHeight !== event.endCoordinates.height) {
-			setKeyboardHeight(event.endCoordinates.height - 30);
+			setKeyboardHeight(event.endCoordinates.height);
 		}
 	}
 	useEffect(() => {
