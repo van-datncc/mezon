@@ -142,10 +142,9 @@ export const reactionSlice = createSlice({
 		},
 
 		setDataReactionFromServe(state, action) {
-			if (state.reactionDataServerAndSocket.length === 0) {
-				state.reactionDataServerAndSocket = action.payload;
-			}
+			state.reactionDataServerAndSocket = action.payload;
 		},
+
 		setUserReactionPanelState(state, action) {
 			state.userReactionPanelState = action.payload;
 		},

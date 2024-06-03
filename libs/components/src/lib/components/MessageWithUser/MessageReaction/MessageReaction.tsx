@@ -1,8 +1,10 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { selectDataReactionGetFromMessage } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
@@ -25,7 +27,13 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
-	const { emojis, categoriesEmoji, emojiListPNG } = useEmojiSuggestion();
+	const { emojiListPNG } = useEmojiSuggestion();
+	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
+
+	console.log(reactDataFirstGetFromMessage);
+	console.log(dataReactionCombine);
+
+	const sum = [...reactDataFirstGetFromMessage, ...dataReactionCombine];
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -104,6 +112,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			emojiIndexMap[emoji.id] = index;
 		}
 	});
+
 	const checkPositionSenderPanel = (emoji: EmojiDataOptionals) => {
 		if (!parentDiv.current || !childRef.current || emoji.id === undefined) return;
 		const parentRect = parentDiv.current.getBoundingClientRect();
@@ -143,6 +152,48 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [showSenderPanelIn1s]);
 
+	const updateEmojiReactionData = (data: any[]) => {
+		const dataItemReaction: Record<string, EmojiDataOptionals> = {};
+
+		data &&
+			data.forEach((item) => {
+				const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
+				if (!dataItemReaction[key]) {
+					dataItemReaction[key] = {
+						id: item.id,
+						emoji: item.emoji,
+						senders: [
+							{
+								sender_id: item.senders[0]?.sender_id ?? '',
+								count: item.senders[0]?.count ?? 0,
+								emojiIdList: [],
+								sender_name: '',
+								avatar: '',
+							},
+						],
+						channel_id: item.channel_id,
+						message_id: item.message_id,
+					};
+				} else {
+					const existingItem = dataItemReaction[key];
+					const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
+
+					if (senderIndex !== -1) {
+						existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
+					} else {
+						existingItem.senders.push({
+							sender_id: item.senders[0]?.sender_id ?? '',
+							count: item.senders[0]?.count ?? 0,
+							emojiIdList: [],
+							sender_name: '',
+							avatar: '',
+						});
+					}
+				}
+			});
+		return Object.values(dataItemReaction);
+	};
+
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
@@ -162,7 +213,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 					</div>
 				)}
 
-				{dataReactionCombine
+				{updateEmojiReactionData(sum)
 					.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
 					?.map((emoji: EmojiDataOptionals, index: number) => {
 						const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);

@@ -407,9 +407,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
 		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked);
+			textFieldEdit.insert(input, emojiPicked + ' ');
 		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked + ' ');
 			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);

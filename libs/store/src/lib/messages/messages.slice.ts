@@ -4,8 +4,8 @@ import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
-import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
+import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -58,6 +58,7 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	paramEntries: Record<string, FetchMessageParam>;
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
+	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
 }
 
 export interface MessagesRootState {
@@ -148,7 +149,11 @@ export const fetchMessages = createAsyncThunk(
 			return Object.values(emojiDataItems);
 		});
 
-		thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
+		// thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
+
+		if (reactionData.length > 0) {
+			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
+		}
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
@@ -294,6 +299,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	paramEntries: {},
 	openOptionMessageState: false,
 	quantitiesMessageRemain: 0,
+	dataReactionGetFromLoadMessage: [],
 });
 
 export type SetCursorChannelArgs = {
@@ -385,6 +391,10 @@ export const messagesSlice = createSlice({
 		},
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
+		},
+
+		setDataReactionGetFromMessage(state, action) {
+			state.dataReactionGetFromLoadMessage = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -545,4 +555,4 @@ export const selectMessageByMessageId = (messageId: string) =>
 
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
-
+export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
