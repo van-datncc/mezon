@@ -3,13 +3,14 @@ import { ActionEmitEvent, UnMuteIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
+import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
+import NotificationSetting from '../../../components/NotificationSetting';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
@@ -17,8 +18,6 @@ import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import ForwardMessageModal from './components/ForwardMessage';
-import { useFocusEffect } from '@react-navigation/native';
-import NotificationSetting from '../../../components/NotificationSetting';
 import { styles } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
@@ -51,38 +50,31 @@ const HomeDefault = React.memo((props: any) => {
 		};
 	}, []);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["15%", "40%"], []);
-  const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
+	const bottomSheetRef = useRef<BottomSheet>(null);
+	const snapPoints = useMemo(() => ['15%', '40%'], []);
+	const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
-  const openBottomSheet = () => {
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(1);
-    setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet)
-  };
+	const openBottomSheet = () => {
+		Keyboard.dismiss();
+		bottomSheetRef.current?.snapToIndex(1);
+		setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet);
+	};
 
-  const closeBottomSheet = () => {
-    bottomSheetRef.current?.close();
-    setIsShowSettingNotifyBottomSheet(false)
-  };
+	const closeBottomSheet = () => {
+		bottomSheetRef.current?.close();
+		setIsShowSettingNotifyBottomSheet(false);
+	};
 
-  const renderBackdrop = useCallback((props) => (
-    <BottomSheetBackdrop
-      {...props}
-      opacity={0.5}
-      onPress={closeBottomSheet}
-      appearsOnIndex={1}
-    />
-  ), []);
+	const renderBackdrop = useCallback((props) => <BottomSheetBackdrop {...props} opacity={0.5} onPress={closeBottomSheet} appearsOnIndex={1} />, []);
 
 	useFocusEffect(
 		useCallback(() => {
-		  	setIsFocusChannelView(true);
-		  	return () => {
+			setIsFocusChannelView(true);
+			return () => {
 				setIsFocusChannelView(false);
-		  	};
-		}, [])
-	  );
+			};
+		}, []),
+	);
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -125,56 +117,59 @@ const HomeDefault = React.memo((props: any) => {
 						</BottomKeyboardPicker>
 					)}
 
-					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
 				</View>
 			)}
-      <BottomSheet
-      ref={bottomSheetRef}
-      enablePanDownToClose={true}
-      backdropComponent={renderBackdrop}
-      index={-1}
-      snapPoints={snapPoints}
-      backgroundStyle ={{backgroundColor:  Colors.secondary}}
-    >
-      <BottomSheetView >
-        {isShowSettingNotifyBottomSheet && <NotificationSetting /> }
-      </BottomSheetView>
-    </BottomSheet>
+			<BottomSheet
+				ref={bottomSheetRef}
+				enablePanDownToClose={true}
+				backdropComponent={renderBackdrop}
+				index={-1}
+				snapPoints={snapPoints}
+				backgroundStyle={{ backgroundColor: Colors.secondary }}
+			>
+				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
+			</BottomSheet>
+			{
+				showForwardModal && (
+					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
+				)
+			}
 		</View>
 	);
 });
 
-const HomeDefaultHeader = React.memo(({ navigation, channelTitle, openBottomSheet }:
-  { navigation: any; channelTitle: string ,openBottomSheet: () => void }) => {
-	const navigateMenuThreadDetail = () => {
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
-	};
-	return (
-		<View style={styles.homeDefaultHeader}>
-			<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<TouchableOpacity
-						activeOpacity={0.8}
-						style={styles.iconBar}
-						onPress={() => {
-							navigation.openDrawer();
-							Keyboard.dismiss();
-						}}
-					>
-						<BarsLogo width={20} height={20} />
-					</TouchableOpacity>
+const HomeDefaultHeader = React.memo(
+	({ navigation, channelTitle, openBottomSheet }: { navigation: any; channelTitle: string; openBottomSheet: () => void }) => {
+		const navigateMenuThreadDetail = () => {
+			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
+		};
+		return (
+			<View style={styles.homeDefaultHeader}>
+				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						{!!channelTitle && <HashSignIcon width={18} height={18} />}
-						<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							style={styles.iconBar}
+							onPress={() => {
+								navigation.openDrawer();
+								Keyboard.dismiss();
+							}}
+						>
+							<BarsLogo width={20} height={20} />
+						</TouchableOpacity>
+						<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+							{!!channelTitle && <HashSignIcon width={18} height={18} />}
+							<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
+						</View>
 					</View>
-				</View>
-			</TouchableOpacity>
-			<TouchableOpacity onPress={() => openBottomSheet()}>
-				{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-				<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
-			</TouchableOpacity>
-		</View>
-	);
-});
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => openBottomSheet()}>
+					{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
+					<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
+				</TouchableOpacity>
+			</View>
+		);
+	},
+);
 
 export default HomeDefault;

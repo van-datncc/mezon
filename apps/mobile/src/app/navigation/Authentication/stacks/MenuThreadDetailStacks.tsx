@@ -1,22 +1,22 @@
-import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from "@react-navigation/stack";
-import { APP_SCREEN } from "../../ScreenTypes";
-import { Text, View } from "react-native";
-import { useSelector } from "react-redux";
-import { selectCurrentChannel } from "libs/store/src/lib/channels/channels.slice";
-import CreateThreadModal from "../../../components/ThreadDetail";
-import ThreadAddButton from "../../../components/ThreadDetail/ThreadAddButton";
-import CreateThreadForm from "../../../components/ThreadDetail/CreateThreadForm";
-import MenuThreadDetail from "../../../components/ThreadDetail/MenuThreadDetail";
-import { Colors, size } from "@mezon/mobile-ui";
-import { SearchIcon } from "@mezon/mobile-components";
-import { useReference } from "@mezon/core";
-import MuteThreadDetailModal from "../../../components/MuteThreadDetailModal";
-import { useTranslation } from "react-i18next";
+import { useReference } from '@mezon/core';
+import { SearchIcon } from '@mezon/mobile-components';
+import { Colors, size } from '@mezon/mobile-ui';
+import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
+import { selectCurrentChannel } from 'libs/store/src/lib/channels/channels.slice';
+import { useTranslation } from 'react-i18next';
+import { Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
+import CreateThreadModal from '../../../components/ThreadDetail';
+import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm';
+import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
+import ThreadAddButton from '../../../components/ThreadDetail/ThreadAddButton';
+import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuThreadDetailStacks = ({ }: any) => {
+export const MenuThreadDetailStacks = ({}: any) => {
 	const Stack = createStackNavigator();
-  const { t } = useTranslation(['notificationSetting']);
-  const { openThreadMessageState } = useReference();
+	const { t } = useTranslation(['notificationSetting']);
+	const { openThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 	return (
 		<Stack.Navigator
@@ -52,10 +52,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					headerStyle: {
 						backgroundColor: Colors.secondary,
 					},
+					headerLeftLabelVisible: false,
 					headerTintColor: Colors.white,
-					headerRight: () => (
-						<ThreadAddButton />
-					),
+					headerRight: () => <ThreadAddButton />,
 				}}
 			/>
 			<Stack.Screen
@@ -70,24 +69,26 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					headerStyle: {
 						backgroundColor: Colors.secondary,
 					},
+					headerLeftLabelVisible: false,
 					headerTintColor: Colors.white,
-					headerRight: () => (
-						<SearchIcon width={22} height={22} />
-					),
+					headerRight: () => <View style={{ padding: size.s_10}}><SearchIcon width={22} height={22} /></View>,
 				}}
 			/>
-      <Stack.Screen
+			<Stack.Screen
 				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
 				component={MuteThreadDetailModal}
 				options={{
 					headerShown: true,
-					headerTitle: () =>
-            <View>
-            <Text style={{ color: Colors.white, fontSize: size.label, fontWeight: '700' }}>{t("notifySettingThreadModal.headerTitle")}</Text>
-            <Text style={{ color: Colors.textGray, fontSize: size.medium , fontWeight: '400'}}>
-              "{currentChannel?.channel_label}""
-            </Text>
-            </View>,
+					headerTitle: () => (
+						<View>
+							<Text style={{ color: Colors.white, fontSize: size.label, fontWeight: '700' }}>
+								{t('notifySettingThreadModal.headerTitle')}
+							</Text>
+							<Text style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400' }}>
+								"{currentChannel?.channel_label}""
+							</Text>
+						</View>
+					),
 					headerTitleStyle: {
 						color: Colors.white,
 					},
@@ -99,5 +100,4 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 			/>
 		</Stack.Navigator>
 	);
-}
-
+};

@@ -1,13 +1,12 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
 import { useApp, useChatReaction, useGifsStickersEmoji, useMenu, useReference, useThreads } from '@mezon/core';
-import { selectCurrentChannel, selectReactionRightState, selectReactionTopState } from '@mezon/store';
+import { selectCurrentChannel, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
 const ChannelLayout = () => {
-	const reactionRightState = useSelector(selectReactionRightState);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { idMessageRefReaction } = useReference();
@@ -31,10 +30,12 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
-
 	return (
 		<div
-			className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+			className={` flex flex-col
+			 flex-1 shrink min-w-0 bg-transparent
+			  h-[100%] overflow-visible
+			   ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 		>
 			<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 				<Outlet />
