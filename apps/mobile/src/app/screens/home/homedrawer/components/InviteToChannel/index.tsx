@@ -1,6 +1,6 @@
 import { useCategory, useClans, useInvite } from '@mezon/core';
 import { LinkIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, Metrics } from '@mezon/mobile-ui';
 import { IUser } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useRef, useState } from 'react';
@@ -27,6 +27,7 @@ export const InviteToChannel = React.memo(() => {
 	const { currentClanId } = useClans();
 	const { createLinkInviteUser } = useInvite();
 	const { t } = useTranslation(['inviteToChannel']);
+	const timeoutRef = useRef(null);
 
 	const refRBSheet = useRef(null);
 	//TODO: get from API
@@ -38,8 +39,10 @@ export const InviteToChannel = React.memo(() => {
 	const renderUserItem = ({ item }) => <FriendListItem user={item} />;
 
 	const openEditLinkModal = () => {
-		refRBSheet.current.close();
-		setIsVisibleEditLinkModal(true);
+		refRBSheet?.current?.close();
+		timeoutRef.current = setTimeout(() => {
+			setIsVisibleEditLinkModal(true);
+		}, 300);
 	};
 
 	const onVisibleEditLinkModalChange = (isVisible: boolean) => {
@@ -95,6 +98,7 @@ export const InviteToChannel = React.memo(() => {
 		return () => {
 			keyboardDidShowListener.remove();
 			keyboardDidHideListener.remove();
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
 		};
 	}, []);
 
@@ -119,7 +123,7 @@ export const InviteToChannel = React.memo(() => {
 			<BottomSheet
 				ref={refRBSheet}
 				onClose={() => resetSearch()}
-				height={700}
+				height={Metrics.screenHeight / 1.35}
 				customStyles={{
 					container: {
 						backgroundColor: 'transparent',
@@ -128,47 +132,42 @@ export const InviteToChannel = React.memo(() => {
 			>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={styles.inviteWrapper}>
-						{!isKeyboardVisible ? (
-							<>
-								<View style={styles.inviteHeader}>
-									<Text style={styles.inviteHeaderText}>Invite a friend</Text>
+						<View style={styles.inviteHeader}>
+							<Text style={styles.inviteHeaderText}>Invite a friend</Text>
+						</View>
+						<View style={styles.iconAreaWrapper}>
+							<Pressable style={styles.inviteIconWrapper}>
+								<View style={styles.shareToInviteIconWrapper}>
+									<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
 								</View>
-								<View style={styles.iconAreaWrapper}>
-									<Pressable style={styles.inviteIconWrapper}>
-										<View style={styles.shareToInviteIconWrapper}>
-											<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
-										</View>
-										<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
-									</Pressable>
-									<Pressable style={styles.inviteIconWrapper}>
-										<View style={styles.shareToInviteIconWrapper}>
-											<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
-										</View>
-										<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
-									</Pressable>
-									<Pressable style={styles.inviteIconWrapper}>
-										<View style={styles.shareToInviteIconWrapper}>
-											<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
-										</View>
-										<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
-									</Pressable>
-									<Pressable style={styles.inviteIconWrapper}>
-										<View style={styles.shareToInviteIconWrapper}>
-											<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
-										</View>
-										<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
-									</Pressable>
-									<Pressable style={styles.inviteIconWrapper}>
-										<View style={styles.shareToInviteIconWrapper}>
-											<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
-										</View>
-										<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
-									</Pressable>
+								<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
+							</Pressable>
+							<Pressable style={styles.inviteIconWrapper}>
+								<View style={styles.shareToInviteIconWrapper}>
+									<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
 								</View>
-							</>
-						) : (
-							<View />
-						)}
+								<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
+							</Pressable>
+							<Pressable style={styles.inviteIconWrapper}>
+								<View style={styles.shareToInviteIconWrapper}>
+									<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
+								</View>
+								<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
+							</Pressable>
+							<Pressable style={styles.inviteIconWrapper}>
+								<View style={styles.shareToInviteIconWrapper}>
+									<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
+								</View>
+								<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
+							</Pressable>
+							<Pressable style={styles.inviteIconWrapper}>
+								<View style={styles.shareToInviteIconWrapper}>
+									<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
+								</View>
+								<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
+							</Pressable>
+						</View>
+
 						<View style={styles.searchInviteFriendWrapper}>
 							<View style={styles.searchFriendToInviteWrapper}>
 								<TextInput
