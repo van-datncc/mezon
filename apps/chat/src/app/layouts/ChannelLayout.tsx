@@ -11,28 +11,25 @@ const ChannelLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { idMessageRefReaction } = useReference();
-	const { reactionBottomState } = useChatReaction();
-
-	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
-
+	const { subPanelActive } = useGifsStickersEmoji();
 	const { closeMenu, statusMenu } = useMenu();
 	const { isShowCreateThread } = useThreads();
 	const { isShowMemberList } = useApp();
-	const { messageMatchWithRefStatus, positionOfSmileButton } = useChatReaction();
+	const { positionOfSmileButton } = useChatReaction();
 
 	const HEIGHT_EMOJI_PANEL: number = 457;
 	const WIDTH_EMOJI_PANEL: number = 500;
 
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
-	let topPosition: string;
+	let topPositionEmojiPanel: string;
 
 	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
-		topPosition = 'auto';
+		topPositionEmojiPanel = 'auto';
 	} else if (positionOfSmileButton.top < 100) {
-		topPosition = `${positionOfSmileButton.top}px`;
+		topPositionEmojiPanel = `${positionOfSmileButton.top}px`;
 	} else {
-		topPosition = `${positionOfSmileButton.top - 100}px`;
+		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
 
 	return (
@@ -60,7 +57,7 @@ const ChannelLayout = () => {
 				<div
 					className="fixed max-sm:hidden"
 					style={{
-						top: topPosition,
+						top: topPositionEmojiPanel,
 						bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
 						left:
 							distanceToRight < WIDTH_EMOJI_PANEL

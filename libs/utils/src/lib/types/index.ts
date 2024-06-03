@@ -11,16 +11,16 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
+	ApiNotifiReactMessage,
+	ApiNotificationChannelCategoySetting,
+	ApiNotificationSetting,
+	ApiNotificationUserChannel,
 	ApiPermission,
 	ApiRole,
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
-	ApiNotificationUserChannel,
-	ApiNotificationSetting,
-	ApiNotificationChannelCategoySetting,
-	ApiNotifiReactMessage,
 } from 'mezon-js/api.gen';
 
 export * from './permissions';
@@ -55,13 +55,13 @@ export type IRolesClan = ApiRole & {
 	id: string;
 };
 
-export type INotificationSetting = ApiNotificationUserChannel
+export type INotificationSetting = ApiNotificationUserChannel;
 
-export type INotifiReactMessage = ApiNotifiReactMessage
+export type INotifiReactMessage = ApiNotifiReactMessage;
 
-export type IDefaultNotificationClan = ApiNotificationSetting
+export type IDefaultNotificationClan = ApiNotificationSetting;
 
-export type IDefaultNotificationCategory = ApiNotificationSetting
+export type IDefaultNotificationCategory = ApiNotificationSetting;
 
 export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
@@ -294,6 +294,7 @@ export enum SubPanelName {
 	EMOJI_REACTION_RIGHT = 'EMOJI_REACTION_RIGHT',
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
+
 
 export type IEmoji = {
 	category: string;
