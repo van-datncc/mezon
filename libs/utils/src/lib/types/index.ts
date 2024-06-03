@@ -451,3 +451,14 @@ export type RemoveChannelUsers = {
 	channelId: string;
 	ids?: string[];
 };
+
+export enum Tabs_Option {
+	LOCATION = 0,
+	EVENT_INFO = 1,
+	REVIEW = 2,
+}
+
+export enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}
