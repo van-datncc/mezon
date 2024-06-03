@@ -102,8 +102,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     }, {});
 
     const navigateToSettingScreen = () => {
-		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
-	};
+        navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
+    };
+
+    const navigateToProfileSetting = () => {
+        navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.PROFILE });
+    }
 
     return (
         <BottomSheetModalProvider>
@@ -126,7 +130,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                                 }}
                                 resizeMode={FastImage.resizeMode.cover}
                             />
-                        ): <Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>}
+                        ) : <Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>}
                         <View style={styles.dotOnline} />
                     </View>
                 </View>
@@ -141,7 +145,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                             <Feather name="message-circle" size={20} style={styles.icon} />
                             <Text style={styles.textBold}>Add status</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.viewButton} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
+                        <TouchableOpacity
+                            style={styles.viewButton}
+                            onPress={() => navigateToProfileSetting()}>
                             <MaterialIcons style={styles.icon} name="edit" size={20} />
                             <Text style={styles.textBold}>Edit Profile</Text>
                         </TouchableOpacity>
