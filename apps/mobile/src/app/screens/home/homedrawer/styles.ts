@@ -42,6 +42,7 @@ export const styles = StyleSheet.create({
 	},
 	aboveTextBoxItem: {
 		flexDirection: 'row',
+		alignItems: 'center',
 		paddingHorizontal: size.tiny,
 		padding: size.tiny,
 		gap: 10,

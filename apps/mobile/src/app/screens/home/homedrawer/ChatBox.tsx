@@ -105,8 +105,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
-	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
-	const navigation = useNavigation();
+	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 316 : 274);
+	const navigation = useNavigation<any>();
 	const { setValueThread } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -155,6 +155,12 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	useEffect(() => {
 		mentions.current = listMentions || [];
 	}, [listMentions])
+	
+	useEffect(() => {
+		if (props?.channelId) {
+			removeAction(EMessageActionType.EditMessage);
+		}
+	}, [props?.channelId])
 	
 	
 	const handleEventAfterEmojiPicked = () => {
@@ -208,8 +214,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			references: [],
 		}
 		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
-		// @ts-ignore
-		const checkAttachmentLoading = attachmentDataUnique.some((attachment) => !attachment?.size);
+		const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
 		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
 			Toast.show({
 				type: 'error',
@@ -299,7 +304,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	function keyboardWillShow(event: KeyboardEvent) {
 		if (keyboardHeight !== event.endCoordinates.height) {
-			setKeyboardHeight(event.endCoordinates.height);
+			setKeyboardHeight(event.endCoordinates.height - 30);
 		}
 	}
 	useEffect(() => {
@@ -412,8 +417,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			case EMessageActionType.CreateThread:
 				setOpenThreadMessageState(true);
 				setValueThread(targetMessage);
-				// @ts-ignore
-				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
+				timeoutRef.current = setTimeout(() => {
+					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
+				}, 500)
 				break;
 			case EMessageActionType.Mention:
 				selectMentionMessage(targetMessage)
