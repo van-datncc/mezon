@@ -1,8 +1,15 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { selectDataReactionGetFromMessage } from '@mezon/store';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import {
+	EmojiDataOptionals,
+	IMessageWithUser,
+	SenderInfoOptionals,
+	SubPanelName,
+	calculateTotalCount,
+	getSrcEmoji,
+	updateEmojiReactionData,
+} from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -18,10 +25,11 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		userId,
 		reactionMessageDispatch,
 		reactionBottomState,
-		dataReactionCombine,
+		// dataReactionCombine,
 		setUserReactionPanelState,
 		userReactionPanelState,
 		reactionBottomStateResponsive,
+		dataReactionServerAndSocket,
 	} = useChatReaction();
 
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
@@ -30,10 +38,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const { emojiListPNG } = useEmojiSuggestion();
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
 
-	console.log(reactDataFirstGetFromMessage);
-	console.log(dataReactionCombine);
-
-	const sum = [...reactDataFirstGetFromMessage, ...dataReactionCombine];
+	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -152,54 +157,12 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [showSenderPanelIn1s]);
 
-	const updateEmojiReactionData = (data: any[]) => {
-		const dataItemReaction: Record<string, EmojiDataOptionals> = {};
-
-		data &&
-			data.forEach((item) => {
-				const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
-				if (!dataItemReaction[key]) {
-					dataItemReaction[key] = {
-						id: item.id,
-						emoji: item.emoji,
-						senders: [
-							{
-								sender_id: item.senders[0]?.sender_id ?? '',
-								count: item.senders[0]?.count ?? 0,
-								emojiIdList: [],
-								sender_name: '',
-								avatar: '',
-							},
-						],
-						channel_id: item.channel_id,
-						message_id: item.message_id,
-					};
-				} else {
-					const existingItem = dataItemReaction[key];
-					const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
-
-					if (senderIndex !== -1) {
-						existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
-					} else {
-						existingItem.senders.push({
-							sender_id: item.senders[0]?.sender_id ?? '',
-							count: item.senders[0]?.count ?? 0,
-							emojiIdList: [],
-							sender_name: '',
-							avatar: '',
-						});
-					}
-				}
-			});
-		return Object.values(dataItemReaction);
-	};
-
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
 				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
 					<div className="scale-75 transform mb-0 z-20">
-						<GifStickerEmojiPopup messageEmojiId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+						<GifStickerEmojiPopup messageEmojiId={message.id} mode={mode} />
 					</div>
 				</div>
 			)}
@@ -213,29 +176,22 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 					</div>
 				)}
 
-				{updateEmojiReactionData(sum)
+				{dataReactionCombine
 					.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id)
 					?.map((emoji: EmojiDataOptionals, index: number) => {
 						const userSender = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 						const checkID = emoji.message_id === message.id;
+						const totalCount = calculateTotalCount(emoji.senders);
 						return (
 							<div key={`${index + message.id}`}>
-								{checkID && (
+								{checkID && totalCount > 0 && (
 									<div
 										ref={(element) => (childRef.current[index] = element)}
 										className={` justify-center items-center relative
 									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 										onClick={() =>
-											reactOnExistEmoji(
-												emoji.id ?? '',
-												ChannelStreamMode.STREAM_MODE_CHANNEL,
-												message.id ?? '',
-												emoji.emoji ?? '',
-												1,
-												userId ?? '',
-												false,
-											)
+											reactOnExistEmoji(emoji.id ?? '', mode, message.id ?? '', emoji.emoji ?? '', 1, userId ?? '', false)
 										}
 										onMouseEnter={() => {
 											handleOnEnterEmoji(emoji);
@@ -248,8 +204,9 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											{' '}
 											<img src={getSrcEmoji(emoji.emoji ?? '', emojiListPNG)} className="w-4 h-4"></img>{' '}
 										</span>
+
 										<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-											<p>{calculateTotalCount(emoji.senders)}</p>
+											<p>{totalCount}</p>
 										</div>
 
 										{checkMessageToMatchMessageRef(message) && showIconSmile && lastPositionEmoji(emoji, message) && (
