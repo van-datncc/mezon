@@ -43,17 +43,25 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center'
 	},
-	shareToInviteIcon: {
-		borderRadius: 50,
-		padding: 10,
+	shareToInviteIconWrapper: {
+		height: size.s_40,
+		width: size.s_40,
+		borderRadius: size.s_40,
+		alignSelf: 'center',
+		justifyContent: 'center',
+		alignItems: 'center',
 		backgroundColor: Colors.bgGrayLight,
+		overflow: 'hidden'
+	},
+	shareToInviteIcon: {
 		color: Colors.white,
 	},
 	inviteIconText: {
 		color: Colors.textGray,
+		paddingTop: size.s_6,
 	},
 	searchFriendToInviteWrapper: {
-		backgroundColor: Colors.primary,
+		backgroundColor: Colors.tertiaryWeight,
 		borderRadius: 8,
 		alignItems: 'center',
 		paddingHorizontal: size.s_6,
@@ -62,7 +70,9 @@ export const styles = StyleSheet.create({
 	searchFriendToInviteInput: {
 		width: '93%',
 		borderRadius: 8,
-		color: Colors.white
+		color: Colors.white,
+		paddingVertical: 0,
+		height: size.s_50,
 	},
 	editInviteLinkWrapper: {
 		paddingTop: 17,
@@ -83,7 +93,7 @@ export const styles = StyleSheet.create({
 		borderBottomWidth: 3
 	},
 	searchInviteFriendWrapper: {
-		padding: 19
+		padding: 19,
 	},
 	defaultText: {
 		color: Colors.white

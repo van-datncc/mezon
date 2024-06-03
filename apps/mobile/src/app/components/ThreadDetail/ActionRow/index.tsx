@@ -14,7 +14,7 @@ const enum EActionMute {
 
 export default function ActionRow() {
   const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
   const actionList = [
 		{
 			title: 'Search',
@@ -24,8 +24,6 @@ export default function ActionRow() {
 		{
 			title: 'Threads',
 			action: () => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
 			},
 			icon: <ThreadIcon width={22} height={22} />,
@@ -33,8 +31,6 @@ export default function ActionRow() {
 		{
 			title: 'Mute',
 			action: () => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL });
       },
 			icon: getNotificationChannelSelected?.active === EActionMute.Mute ?
