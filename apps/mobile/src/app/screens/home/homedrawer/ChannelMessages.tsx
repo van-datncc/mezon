@@ -33,7 +33,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const attachments = useSelector(selectAttachmentPhoto());
 	const formatAttachments: any[] = useMemo(() => {
 		return attachments.map((attachment) => {
-			const url = `https://cdn.mezon.vn/${attachment.clanId}/${attachment.channelId}/${attachment.filename}`;
+			const url = attachment?.url;
 			return {
 				source: {
 					uri: url,
