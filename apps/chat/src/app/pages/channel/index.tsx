@@ -30,7 +30,6 @@ export default function ChannelLayout() {
 	const { sessionRef } = useMezon();
 	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
-	const { statusLoadingAttachment } = useReference();
 
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
@@ -130,12 +129,6 @@ export default function ChannelLayout() {
 							<div
 								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
-								{statusLoadingAttachment && 
-									<div className='flex ml-4 gap-x-3'>
-										<Spinner aria-label="Loading spinner"/>
-										loading file...
-									</div>
-								}
 								{currentChannel && (
 									<ChannelTyping
 										channelId={currentChannel?.id}

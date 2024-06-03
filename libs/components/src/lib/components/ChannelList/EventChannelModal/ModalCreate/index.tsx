@@ -5,17 +5,7 @@ import EventInfoModal from './eventInfoModal';
 import LocationModal from './locationModal';
 import ReviewModal from './reviewModal';
 import { useClans, useEventManagement } from '@mezon/core';
-
-enum Tabs_Option {
-	LOCATION = 0,
-	EVENT_INFO = 1,
-	REVIEW = 2,
-}
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
+import { OptionEvent, Tabs_Option } from '@mezon/utils';
 
 export type ModalCreateProps = {
 	onClose: () => void;
