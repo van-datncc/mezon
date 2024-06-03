@@ -34,7 +34,6 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			console.log("mentionEveryone: ", mentionEveryone);
 
 			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 			const timestamp = Date.now() / 1000;
