@@ -1,7 +1,7 @@
-import { useAuth, useDeleteMessage } from '@mezon/core';
+import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import { FileIcon, HashSignIcon, MuteIcon, ReplyIcon, SpeakerIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
+import { selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -25,6 +25,7 @@ import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/help
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
 
 const widthMedia = Metrics.screenWidth - 150;
@@ -50,6 +51,8 @@ const arePropsEqual = (prevProps, nextProps) => {
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
 	const userLogin = useAuth();
+	const dispatch = useAppDispatch();
+	const [foundUser, setFoundUser] = useState(null);
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -63,6 +66,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+	const { usersClan } = useClans();
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -207,10 +211,23 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const onMention = async (mention: string) => {
 		try {
 			alert('mention ' + mention);
+			const tagName = mention.slice(1);
+			const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
+			userMention && setFoundUser(userMention)
+			if (!mention) return;
+			setMessageSelected(EMessageBSToShow.UserInformation);
 		} catch (error) {
 			console.log('error', error);
 		}
 	};
+
+	const onChannelMention = (mention: string) => {
+		try {
+			alert('mention ' + mention);
+		} catch (error) {
+
+		}
+	}
 
 	const getChannelById = (channelHashtagId: string) => {
 		const channel = useSelector(selectChannelById(channelHashtagId));
@@ -253,14 +270,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<View style={styles.mentionWrapper}>
 				<Text
-					onPress={() => onMention(id)}
+					onPress={() => onChannelMention(id)}
 					style={styles.contentMessageMention}
 				>
 					{type === ChannelType.CHANNEL_TYPE_VOICE
 						? <SpeakerIcon height={16} width={16} />
 						// : <HashSignIcon height={16} width={16} />
-						: "#"
-					}
+						: "#"}
 					{channel.channel_label}
 				</Text>
 			</View>

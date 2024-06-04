@@ -1,7 +1,6 @@
 import { useAuth, useChannels, useDirect, useSendForwardMessage } from '@mezon/core';
 import { CrossIcon, HashSignIcon, HashSignLockIcon } from '@mezon/mobile-components';
 import { Colors, Fonts, size } from '@mezon/mobile-ui';
-import { useAppDispatch } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
 import { getSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -36,7 +35,6 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const { sendForwardMessage } = useSendForwardMessage();
 	const mezon = useMezon();
 	const selectedMessage = useSelector(getSelectedMessage);
-	const dispatch = useAppDispatch();
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const accountId = userProfile?.user?.id ?? '';
@@ -44,25 +42,25 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: any) => {
-					return {
-						id: itemDM?.user_id[0] ?? '',
-						name: itemDM?.channel_label ?? '',
-						avatarUser: itemDM?.channel_avatar[0] ?? '',
-						idDM: itemDM?.id ?? '',
-						typeChat: 3,
-					};
-				})
+				return {
+					id: itemDM?.user_id[0] ?? '',
+					name: itemDM?.channel_label ?? '',
+					avatarUser: itemDM?.channel_avatar[0] ?? '',
+					idDM: itemDM?.id ?? '',
+					typeChat: 3,
+				};
+			})
 			: [];
 		const listGroupSearch = listGroup.length
 			? listGroup.map((itemGr: any) => {
-					return {
-						id: itemGr?.channel_id ?? '',
-						name: itemGr?.channel_label ?? '',
-						avatarUser: '/assets/images/avatar-group.png' ?? '',
-						idDM: itemGr?.id ?? '',
-						typeChat: 2,
-					};
-				})
+				return {
+					id: itemGr?.channel_id ?? '',
+					name: itemGr?.channel_label ?? '',
+					avatarUser: '/assets/images/avatar-group.png' ?? '',
+					idDM: itemGr?.id ?? '',
+					typeChat: 2,
+				};
+			})
 			: [];
 
 		const listSearch = [...listDMSearch, ...listGroupSearch];
@@ -124,6 +122,8 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 		} catch (error) {
 			console.log('Tom log  => error', error);
 		}
+
+		onClose && onClose();
 	};
 
 	const renderMember = () => {
@@ -213,7 +213,11 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 					</View>
 
 					<View style={styles.inputWrapper}>
-						<TextInput style={styles.input} onChangeText={setSearchText} placeholderTextColor={'white'} placeholder="Search" />
+						<TextInput
+							style={styles.input}
+							onChangeText={setSearchText}
+							placeholderTextColor={'white'}
+							placeholder="Search" />
 					</View>
 
 					<ScrollView style={{ marginVertical: 10 }}>
