@@ -21,7 +21,7 @@ import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { mentionRegex, mentionRegexSplit } from '../../../utils/helpers';
+import { isImage, mentionRegex, mentionRegexSplit } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -132,37 +132,41 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
+	const imageItem = ({ image, index, checkImage }) => {
+		return (
+			<TouchableOpacity
+				disabled={checkImage}
+				activeOpacity={0.8}
+				key={index}
+				onPress={() => {
+					onOpenImage(image);
+				}}
+			>
+				<FastImage
+					style={[
+						styles.imageMessageRender,
+						{
+							width: widthMedia,
+							height: calcImgHeight,
+						},
+					]}
+					source={{ uri: image?.url }}
+					resizeMode="contain"
+					onLoad={(evt) => {
+						setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
+					}}
+				/>
+			</TouchableOpacity>
+		);
+	};
+
 	const renderImages = () => {
 		return (
 			<View>
 				{images.map((image, index) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 
-					return (
-						<TouchableOpacity
-							disabled={checkImage}
-							activeOpacity={0.8}
-							key={index}
-							onPress={() => {
-								onOpenImage(image);
-							}}
-						>
-							<FastImage
-								style={[
-									styles.imageMessageRender,
-									{
-										width: widthMedia,
-										height: calcImgHeight,
-									},
-								]}
-								source={{ uri: image?.url }}
-								resizeMode="contain"
-								onLoad={(evt) => {
-									setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
-								}}
-							/>
-						</TouchableOpacity>
-					);
+					return imageItem({ image, index, checkImage });
 				})}
 			</View>
 		);
@@ -170,6 +174,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
+			const checkIsImage = isImage(document?.url);
+			if (checkIsImage) {
+				return imageItem({ image: document, index, checkImage: checkIsImage });
+			}
+
 			return (
 				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
 					<View style={styles.fileViewer}>
