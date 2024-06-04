@@ -1,4 +1,4 @@
-import { useAuth, useDeleteMessage } from '@mezon/core';
+import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
@@ -54,6 +54,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
+  const [foundUser, setFoundUser] = useState(null);
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
@@ -62,6 +63,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+	const { usersClan } = useClans();
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -205,7 +207,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const onMention = async (mention: string) => {
 		try {
-			alert('mention' + mention);
+      const tagName = mention.slice(1);
+      const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
+      userMention && setFoundUser(userMention)
+      if(!mention) return ;
+      setMessageSelected(EMessageBSToShow.UserInformation);
 		} catch (error) {
 			console.log('error', error);
 		}
@@ -337,6 +343,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
+              setFoundUser(user)
 						}}
 						style={styles.wrapperAvatar}
 					>
@@ -390,6 +397,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				onClose={() => {
 					setOpenBottomSheet(null);
 				}}
+        user={foundUser}
 			/>
 		</View>
 	);

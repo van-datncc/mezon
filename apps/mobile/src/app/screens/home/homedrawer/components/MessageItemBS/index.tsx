@@ -29,9 +29,10 @@ import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/mess
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
+import UserProfile from '../UserProfile';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
-	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false } = props;
+	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user } = props;
 	const ref = useRef(null);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -216,9 +217,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const renderUserInformation = () => {
 		return (
-			<View style={{ padding: 20 }}>
-				<Text style={{ color: 'white', textAlign: 'center' }}>User information updating...</Text>
-			</View>
+				<UserProfile userId={user?.user?.id}></UserProfile>
 		);
 	};
 
@@ -291,7 +290,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			}
 		}
 	};
-	
+
 	useEffect(() => {
 		return () => {
 			timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -321,13 +320,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	return (
 		<BottomSheet
 			ref={ref}
-			height={isShowEmojiPicker || isOnlyEmojiPicker ? Metrics.screenHeight / 1.4 : Metrics.screenHeight / 2}
+			height={isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type) ? Metrics.screenHeight / 1.4 : Metrics.screenHeight / 2}
 			onClose={() => {
 				onClose();
 				setIsShowEmojiPicker(false);
 			}}
 			draggable
-			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker)}
+			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type))}
 			customStyles={{
 				container: {
 					backgroundColor: 'transparent',
