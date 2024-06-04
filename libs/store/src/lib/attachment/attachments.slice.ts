@@ -1,21 +1,10 @@
-import { LoadingStatus } from '@mezon/utils';
+import { IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ApiChannelAttachment } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const ATTACHMENT_FEATURE_KEY = 'attachments';
-
-export type IChannelAttachment = {
-	filename?: string;
-	filesize?: string;
-	filetype?: string;
-	id?: string;
-	uploader?: string;
-	url?: string;
-	channelId?: string;
-	clanId?: string;
-};
 
 /*
  * Update these interfaces according to your requirements.
@@ -59,6 +48,7 @@ export const fetchChannelAttachments = createAsyncThunk(
 	async ({ clanId, channelId }: fetchChannelAttachmentsPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
+
 		if (!response.attachments) {
 			return thunkAPI.rejectWithValue([]);
 		}

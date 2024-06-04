@@ -94,6 +94,10 @@ module.exports = {
         600: '600px',
       },
 
+      minWidth:{
+        widthMenuMobile: `calc(100vw - ${clanWidth})`,
+      },
+
       fontFamily: {
         ggSans: ['gg sans', 'sans-serif'],
       },

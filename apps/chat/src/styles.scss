@@ -425,7 +425,7 @@ input:-webkit-autofill:active {
 		ol {
 			display: flex;
 			flex-direction: column;
-			margin: 0 0 -20px 0;
+			margin: -4px 0;
 			padding-left: 14px;
 			line-height: 1.675rem;
 
@@ -437,7 +437,7 @@ input:-webkit-autofill:active {
 		ul {
 			display: flex;
 			flex-direction: column;
-			margin: 0 0 -26px 0;
+			margin: -4px 0;
 			padding-left: 14px;
 			line-height: 1.675rem;
 
@@ -447,7 +447,7 @@ input:-webkit-autofill:active {
 		}
 
 		> blockquote {
-			margin: 0 0 -20px 0;
+			margin: -4px 0;
 
 			span {
 				display: inline-block;

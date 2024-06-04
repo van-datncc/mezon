@@ -53,6 +53,10 @@ function MemberProfile({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		// stop open popup default of web
+		window.oncontextmenu = (e) => {
+			e.preventDefault();
+		};
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
