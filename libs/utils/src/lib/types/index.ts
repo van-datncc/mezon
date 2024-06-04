@@ -17,6 +17,8 @@ import {
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
 	ApiPermission,
+	ApiPinMessage,
+	ApiPinMessageRequest,
 	ApiRole,
 	ApiSearchMessageDocument,
 	ApiUser,
@@ -103,6 +105,10 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
+};
+
+export type IPinMessage = ApiPinMessage & {
+	id: string;
 };
 
 export type IChannelMember = ChannelUserListChannelUser & {
