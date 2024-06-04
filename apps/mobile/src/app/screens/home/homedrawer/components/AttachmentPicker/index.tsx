@@ -29,6 +29,11 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				type: [DocumentPicker.types.allFiles],
 			});
 			const file = res?.[0];
+			setAttachmentData({
+				url: file?.uri || file?.fileCopyUri,
+				filename: file?.name || file?.uri,
+				filetype: file?.type,
+			});
 			const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
 
 			const fileFormat: IFile = {
@@ -58,7 +63,8 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const fullFilename = `${currentClanId}/${currentChannelId}`.replace(/-/g, '_') + '/' + file.name;
+			const ms = new Date().getTime();
+			const fullFilename = `${currentClanId}/${currentChannelId}/${ms}`.replace(/-/g, '_') + '/' + file.name;
 			return handleUploadFileMobile(client, session, fullFilename, file);
 		});
 

@@ -1,17 +1,17 @@
 import { useCategory } from '@mezon/core';
-import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load } from '@mezon/mobile-components';
-import {Colors, useAnimatedState} from '@mezon/mobile-ui';
+import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
+import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, messagesActions, selectCurrentClan } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import Dots from '../../../../assets/svg/guildMoreOptions1.svg';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
-import { useNavigation } from '@react-navigation/native';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { styles } from './styles';
 
 const ChannelList = React.memo((props: any) => {
@@ -22,7 +22,7 @@ const ChannelList = React.memo((props: any) => {
 		if (categorizedChannels?.length) {
 			setDefaultChannelLoader();
 		}
-	}, [categorizedChannels]);
+	}, [categorizedChannels, currentClan]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useAnimatedState([]);
 
@@ -36,15 +36,17 @@ const ChannelList = React.memo((props: any) => {
 
 	const setDefaultChannelLoader = async () => {
 		const firstChannel = categorizedChannels?.[0]?.channels?.[0];
-		
+
 		if (categorizedChannels && !!firstChannel) {
 			const channelIdCache = load(STORAGE_KEY_CHANNEL_ID);
 			const clanIdCache = load(STORAGE_KEY_CLAN_ID);
-			if (channelIdCache && clanIdCache) {
+			if (channelIdCache && clanIdCache && clanIdCache === currentClan?.clan_id) {
 				await jumpToChannel(channelIdCache, clanIdCache);
 			} else {
 				const channelId = firstChannel?.channel_id;
 				const clanId = firstChannel?.clan_id;
+				save(STORAGE_KEY_CHANNEL_ID, channelId);
+				save(STORAGE_KEY_CLAN_ID, clanId);
 				await jumpToChannel(channelId, clanId);
 			}
 		}
