@@ -204,3 +204,9 @@ export const updateEmojiReactionData = (data: any[]) => {
 		});
 	return Object.values(dataItemReaction);
 };
+
+export const checkMarkdownInText = (text: string) => {
+	if (text.startsWith('```') && !text.endsWith('```')) return true;
+	if (/^```$/.test(text)) return true;
+	else return false;
+};

@@ -103,7 +103,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	} = useReference();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
-
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -216,7 +215,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-
 				setAttachmentData([]);
 				setIdReferenceMessageReply('');
 				setOpenReplyMessageState(false);
@@ -315,6 +313,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}))
 			: [];
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
+
 		if (linkGifDirect && linkGifDirect?.length > 0) {
 			const newAttachmentDataRef = linkGifDirect
 				.filter((item) => item !== null)
@@ -322,7 +321,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					filetype: 'image/gif',
 					url: item,
 				}));
-
 			setAttachmentData(newAttachmentDataRef);
 		}
 
@@ -381,19 +379,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return symbol === '#' ? `#${p2}` : `@${p1}`;
 		});
 		return result;
-	};
-
-	const replaceChannelIdsWithDisplay = (text: string, listInput: any[]) => {
-		// Regex to match 19-digit numbers preceded by '#'
-		const regex = /#[0-9]{19}\b/g;
-		// Replace channelId with display name
-		const replacedText = text.replace(regex, (match) => {
-			const channelId = match.substring(1); // Remove '#' from channelId
-			const channel = listInput.find((item) => item.id === channelId);
-			return channel ? `#${channel.display}` : match; // Replace with display name or original match if not found
-		});
-
-		return replacedText;
 	};
 
 	useEffect(() => {

@@ -1,9 +1,8 @@
 import { useApp, useEmojiSuggestion, useInvite } from '@mezon/core';
-import { convertMarkdown, getSrcEmoji } from '@mezon/utils';
+import { checkMarkdownInText, convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
-import { Link } from 'react-router-dom';
 import remarkGFM from 'remark-gfm';
 import ExpiryTimeModal from '../ExpiryTime';
 import ChannelHashtag from './HashTag';
@@ -117,12 +116,6 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 	const combinedRegex = /(@\S+|#\S+|:\b[^:]*\b:)/g;
 	const { emojiListPNG } = useEmojiSuggestion();
 	const splitText = lineMessage.split(combinedRegex).filter(Boolean);
-
-	const checkMarkdownInText = (text: string) => {
-		if (text.startsWith('```') && !text.endsWith('```')) return true;
-		if (/^```$/.test(text)) return true;
-	};
-
 	const checkIsLink = (text: string) => {
 		if (text.includes('https://') || text.includes('http://')) return true;
 	};
@@ -153,27 +146,29 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 						</span>
 					);
 				} else if (checkIsLink(item)) {
-					const extractUrl = (text: string) => {
-						const urlMatch = text.match(/https?:\/\/\S+/);
-						return urlMatch ? urlMatch[0] : '#';
+					const getLinkinvite = (children: any) => {
+						window.location.href = children;
 					};
-					const url = extractUrl(item);
-					if (!url) {
-						return <span key={`no-url-text-${index}`}>{item}</span>;
-					}
-					const parts = item.split(extractUrl(item));
-
 					return (
 						<span key={`url-on-text-${index}`}>
-							{parts[0]}
-							<Link
-								style={{ textDecoration: 'none' }}
-								to={url}
-								className="px-1  cursor-pointer inline whitespace-nowrap !text-[#3B82F6] hover:!underline font-thin "
-							>
-								{url}
-							</Link>
-							{parts[1]}
+							<Markdown
+								children={convertMarkdown(item)}
+								remarkPlugins={[remarkGFM]}
+								components={{
+									pre: PreClass,
+									p: 'span',
+									a: ({ children }) => (
+										<span
+											onClick={() => getLinkinvite(children)}
+											rel="noopener noreferrer"
+											style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+											className="tagLink"
+										>
+											{children}
+										</span>
+									),
+								}}
+							/>
 						</span>
 					);
 				} else if (!isMention && !isHashtag && isEmojiSyntax) {

@@ -25,7 +25,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		userId,
 		reactionMessageDispatch,
 		reactionBottomState,
-		// dataReactionCombine,
 		setUserReactionPanelState,
 		userReactionPanelState,
 		reactionBottomStateResponsive,
