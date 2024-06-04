@@ -66,6 +66,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				messageEmoji?.sender_id ?? '',
 				false,
 			);
+
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setEmojiSuggestion(emojiPicked);

@@ -10,7 +10,7 @@ import {
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, selectCurrentChannel, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState } from '@mezon/store';
+import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
@@ -26,7 +26,6 @@ export default function DirectMessage() {
 	const { navigate } = useAppNavigation();
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-
 	useEffect(() => {
 		if (defaultChannelId) {
 			navigate(`./${defaultChannelId}`);
@@ -34,8 +33,6 @@ export default function DirectMessage() {
 	}, [defaultChannelId, navigate]);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
-
-	console.log('currentDmGroup', currentDmGroup);
 
 	const { messages } = useDirectMessages({
 		channelId: directId ?? '',
@@ -103,7 +100,7 @@ export default function DirectMessage() {
 							<div className="mb-0 z-10 h-full">
 								<GifStickerEmojiPopup
 									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_DM || ChannelStreamMode.STREAM_MODE_GROUP}
+									mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
 									emojiAction={EmojiPlaces.EMOJI_REACTION}
 								/>
 							</div>
@@ -124,7 +121,7 @@ export default function DirectMessage() {
 							<div className="mb-0 z-50 h-full ">
 								<GifStickerEmojiPopup
 									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_DM || ChannelStreamMode.STREAM_MODE_GROUP}
+									mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
 									emojiAction={EmojiPlaces.EMOJI_REACTION}
 								/>
 							</div>

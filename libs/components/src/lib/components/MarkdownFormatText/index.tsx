@@ -47,6 +47,15 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	const onlyBackticks = /^```$/.test(lineMessage);
 	const isQuote = lineMessage.startsWith('>');
 	const [convertedLine, setConvertLine] = useState('');
+	const [includeHashtagMention, setInCludeHashtagMention] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (lineMessage) {
+			const regex = /[@#]/;
+			const hasMentionOrHashtag = regex.test(lineMessage);
+			setInCludeHashtagMention(hasMentionOrHashtag);
+		}
+	}, [lineMessage]);
 
 	useEffect(() => {
 		if (
@@ -74,7 +83,7 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose
 			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
-			{isMarkdown ? (
+			{!includeHashtagMention && isMarkdown ? (
 				<div className="lineText contents">
 					{(startsWithTripleBackticks && endsWithNoTripleBackticks) || onlyBackticks ? (
 						<span>{lineMessage}</span>
