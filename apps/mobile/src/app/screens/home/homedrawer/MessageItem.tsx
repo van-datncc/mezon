@@ -298,7 +298,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						? <SpeakerIcon height={16} width={16} />
 						// : <HashSignIcon height={16} width={16} />
 						: "#"}
-					{channel.channel_label}
+					{channel?.channel_label || ""}
 				</Text>
 			</View>
 
@@ -333,7 +333,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			.filter((i) => i !== '@' && i !== '#');
 
 		return parts.map((part, index) => (
-			<View key={index.toString()} style={{ width: "100%" }}>
+			<Text key={index.toString()}>
 				{!part
 					? <View />
 					: matchesMention.includes(part)
@@ -342,7 +342,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							{renderTextWithEmoji(part)}
 						</Text>
 				}
-			</View>
+			</Text>
 		));
 	};
 

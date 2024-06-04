@@ -379,7 +379,7 @@ export const styles = StyleSheet.create({
 		color: Colors.textLink,
 	},
 	mentionWrapper: {
-		backgroundColor: Colors.gray48,
+		backgroundColor: Colors.mentionBg,
 		borderRadius: 5,
 		paddingHorizontal: 5,
 		marginRight: 5,

@@ -695,6 +695,7 @@ export function SpeakerIcon({ width = 20, height = 20, color = 'white', ...props
 		<Svg
 			width={width}
 			height={height}
+			{...props}
 			viewBox="0 0 18 17"
 			fill="none"
 		>
