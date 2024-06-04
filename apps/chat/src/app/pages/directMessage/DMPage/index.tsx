@@ -100,7 +100,9 @@ export default function DirectMessage() {
 							<div className="mb-0 z-10 h-full">
 								<GifStickerEmojiPopup
 									messageEmojiId={idMessageRefReaction}
-									mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+									mode={
+										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+									}
 									emojiAction={EmojiPlaces.EMOJI_REACTION}
 								/>
 							</div>
@@ -121,7 +123,9 @@ export default function DirectMessage() {
 							<div className="mb-0 z-50 h-full ">
 								<GifStickerEmojiPopup
 									messageEmojiId={idMessageRefReaction}
-									mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+									mode={
+										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+									}
 									emojiAction={EmojiPlaces.EMOJI_REACTION}
 								/>
 							</div>
