@@ -13,7 +13,7 @@ const ModalSaveChanges = ({ onSave, onReset }: ModalSaveChangesProps) => {
 				<div className="flex flex-row justify-end gap-[10px]">
 					<Button
 						onClick={onReset}
-						className="h-10 w-fit rounded bg-transparent border border-buttonProfile hover:!bg-buttonProfileHover dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent text-textLightTheme dark:text-textDarkTheme"
+						className="h-10 w-fit rounded bg-transparent border border-buttonProfile hover:!bg-bgLightModeButton dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent text-textLightTheme dark:text-textDarkTheme"
 					>
 						Reset
 					</Button>
