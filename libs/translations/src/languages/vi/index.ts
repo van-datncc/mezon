@@ -9,17 +9,19 @@ import friends from './friends.json';
 import clan from './clan.json';
 import profileSetting from "./profileSetting.json";
 import notificationSetting from './notificationSetting.json';
+import userProfile from './userProfile.json';
 
 export default {
-    inviteToChannel,
-    notification,
-    message,
-    screen,
-    setting,
-    dmMessage,
-    common,
-    friends,
-    clan,
-    profileSetting,
-    notificationSetting
-}
+	inviteToChannel,
+	notification,
+	message,
+	screen,
+	setting,
+	dmMessage,
+	common,
+	friends,
+	clan,
+	profileSetting,
+	notificationSetting,
+	userProfile,
+};
