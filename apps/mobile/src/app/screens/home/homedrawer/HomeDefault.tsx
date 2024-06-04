@@ -100,7 +100,7 @@ const HomeDefault = React.memo((props: any) => {
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef}>
+						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
 									onDone={() => {
@@ -116,7 +116,6 @@ const HomeDefault = React.memo((props: any) => {
 							)}
 						</BottomKeyboardPicker>
 					)}
-
 				</View>
 			)}
 			<BottomSheet
@@ -129,11 +128,7 @@ const HomeDefault = React.memo((props: any) => {
 			>
 				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
 			</BottomSheet>
-			{
-				showForwardModal && (
-					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
-				)
-			}
+			{showForwardModal && <ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />}
 		</View>
 	);
 });
