@@ -128,7 +128,15 @@ const HomeDefault = React.memo((props: any) => {
 			>
 				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
 			</BottomSheet>
-			{showForwardModal && <ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />}
+			{
+				showForwardModal && (
+					<ForwardMessageModal
+						show={showForwardModal}
+						onClose={() => setShowForwardModal(false)}
+						message={messageForward}
+					/>
+				)
+			}
 		</View>
 	);
 });

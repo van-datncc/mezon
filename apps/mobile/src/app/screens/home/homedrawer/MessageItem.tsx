@@ -1,7 +1,7 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
+import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -25,6 +25,7 @@ import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/help
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -48,7 +49,8 @@ const arePropsEqual = (prevProps, nextProps) => {
 
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
-  const userLogin = useAuth();
+	const userLogin = useAuth();
+	const dispatch = useAppDispatch();
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -313,7 +315,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 } , hasIncludeMention && styles.highlightMessageMention]}>
+		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
@@ -363,6 +365,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					onLongPress={() => {
 						setIsOnlyEmojiPicker(false);
 						setMessageSelected(EMessageBSToShow.MessageAction);
+						dispatch(setSelectedMessage(message));
 					}}
 				>
 					{isShowInfoUser ? (
