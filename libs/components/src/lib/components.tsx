@@ -50,3 +50,5 @@ export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export * from './components/SettingProfile';
+// TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
+export * from './components/Firebase/firebase';

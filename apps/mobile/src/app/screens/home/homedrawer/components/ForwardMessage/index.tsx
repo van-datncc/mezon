@@ -56,7 +56,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 				return {
 					id: itemGr?.channel_id ?? '',
 					name: itemGr?.channel_label ?? '',
-					avatarUser: '/assets/images/avatar-group.png' ?? '',
+					avatarUser: 'assets/images/avatar-group.png' ?? '',
 					idDM: itemGr?.id ?? '',
 					typeChat: 2,
 				};

@@ -29,7 +29,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						numberCharacterCollapse={22}
 						avatar={
 							Array.isArray(currentDmGroup?.channel_avatar) && currentDmGroup?.channel_avatar?.length !== 1
-								? '/assets/images/avatar-group.png'
+								? 'assets/images/avatar-group.png'
 								: currentDmGroup?.channel_avatar?.at(0) ?? ''
 						}
 						name={''}

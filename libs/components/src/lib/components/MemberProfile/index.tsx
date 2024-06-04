@@ -118,7 +118,7 @@ function MemberProfile({
 							{name.charAt(0).toUpperCase()}
 						</div>
 					)}
-					{!isHideIconStatus && avatar !== '/assets/images/avatar-group.png' ? (
+					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
 						<span
 							className={`absolute bottom-[-1px] right-[-1px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-[#111] bg-bgLightMode rounded-full`}
 						>

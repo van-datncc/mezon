@@ -121,7 +121,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 			<ModalValidateFile
 				openModal={openModal}
 				onClose={() => setOpenModal(false)}
-				image="/assets/images/file-and-folder.png"
+				image="assets/images/file-and-folder.png"
 				title="Only image files are allowed"
 				content="Just uploaf type file (JPEG, PNG), please!"
 			/>
