@@ -10,10 +10,11 @@ export type ModalProps = {
 	subTitleBox?: string;
 	classSubTitleBox?: string;
 	borderBottomTitle?: string;
+	classNameWrapperChild?: string;
 };
 
 const Modal = (props: ModalProps) => {
-	const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm, classNameBox, subTitleBox, classSubTitleBox } =
+	const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm, classNameBox, subTitleBox, classSubTitleBox, classNameWrapperChild } =
 		props;
 	return (
 		// TODO: using modal component
@@ -36,7 +37,7 @@ const Modal = (props: ModalProps) => {
 
 								{/*body*/}
 								<div className="relative px-5 py-4 flex-auto bg-transparent max-h-[500px] overflow-auto hide-scrollbar">
-									<div className="dark:bg-[#323232] bg-bgLightModeSecond rounded-[5px] bg-transparent">{children}</div>
+									<div className={`dark:bg-[#323232] bg-bgLightModeSecond rounded-[5px] bg-transparent ${classNameWrapperChild}`}>{children}</div>
 								</div>
 								{/*footer*/}
 								{confirmButton && title !== 'Invite friends to KOMU' && (

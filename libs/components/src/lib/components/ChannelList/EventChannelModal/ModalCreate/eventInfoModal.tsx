@@ -6,12 +6,7 @@ import { handleUploadFile, useMezon } from '@mezon/transport';
 import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
-import { useApp } from '@mezon/core';
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
+import { OptionEvent } from '@mezon/utils';
 
 export type EventInfoModalProps = {
 	topic: string;

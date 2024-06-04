@@ -1,5 +1,5 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
-import { useAuth, useClans, useDragAndDrop, useMenu, useThreads, useVoice } from '@mezon/core';
+import { useAuth, useClans, useDragAndDrop, useMenu, useReference, useThreads, useVoice } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import ChannelMessages from './ChannelMessages';
 import { ChannelTyping } from './ChannelTyping';
+import { Spinner } from 'flowbite-react';
 
 // TODO: move this to core
 function useChannelSeen(channelId: string) {
@@ -101,7 +102,7 @@ export default function ChannelLayout() {
 						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
 					>
 						<div
-							className={`overflow-y-auto dark:bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+							className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
 							ref={messagesContainerRef}
 						>
 							{renderChannelMedia()}

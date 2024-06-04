@@ -33,6 +33,7 @@ import { styles } from './styles';
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false } = props;
 	const ref = useRef(null);
+	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
 	const { userProfile } = useAuth();
@@ -127,7 +128,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			type: EMessageActionType.ForwardMessage,
 			targetMessage: message,
 		};
-		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
+		timeoutRef.current = setTimeout(() => {
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
+		}, 500);
 	};
 
 	const implementAction = (type: EMessageActionType) => {
@@ -288,6 +291,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			}
 		}
 	};
+	
+	useEffect(() => {
+		return () => {
+			timeoutRef.current && clearTimeout(timeoutRef.current);
+		}
+	}, []);
 
 	useEffect(() => {
 		switch (type) {
