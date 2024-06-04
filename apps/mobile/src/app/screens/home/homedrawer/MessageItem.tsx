@@ -1,6 +1,6 @@
 import { useAuth, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Metrics, size, useAnimatedState, verticalScale } from '@mezon/mobile-ui';
 import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
@@ -21,7 +21,7 @@ import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/helpers';
+import { mentionRegex, mentionRegexSplit } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -48,13 +48,13 @@ const arePropsEqual = (prevProps, nextProps) => {
 
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
-  const userLogin = useAuth();
+	const userLogin = useAuth();
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
-	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
+	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
@@ -211,28 +211,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const renderTextWithLinks = (text: string, matches: RegExpMatchArray) => {
-		const parts = text.split(urlPattern);
-		return parts.map((part, index) => {
-			if (!part) return <View />;
-			return (
-				<Text
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					onTouchEnd={() => {
-						if (matches.includes(part)) {
-							onOpenLink(part);
-						}
-					}}
-					key={index}
-					style={matches.includes(part) ? styles.contentMessageLink : styles.contentMessageBox}
-				>
-					{part}
-				</Text>
-			);
-		});
-	};
-
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
 			.split(mentionRegexSplit)
@@ -260,6 +238,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const renderTextContent = () => {
+		if (!lines) return null;
 		const matchesMention = lines.match(mentionRegex);
 
 		return (
@@ -307,7 +286,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 } , hasIncludeMention && styles.highlightMessageMention]}>
+		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>

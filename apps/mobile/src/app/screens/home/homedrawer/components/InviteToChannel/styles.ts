@@ -144,6 +144,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		flexDirection: 'row',
 		paddingTop: 20,
+		paddingRight: 10,
 	},
 	temporaryMemberTitle: {
 		color: Colors.textGray,
