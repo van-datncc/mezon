@@ -2,6 +2,7 @@ import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
+	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
@@ -29,6 +30,10 @@ export * from './thumbnailPos';
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
 export type IClan = ApiClanDesc & {
+	id: string;
+};
+
+export type IChannelAttachment = ApiChannelAttachment & {
 	id: string;
 };
 
