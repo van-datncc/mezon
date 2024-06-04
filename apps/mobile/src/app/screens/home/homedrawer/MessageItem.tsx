@@ -436,6 +436,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					onLongPress={() => {
 						setIsOnlyEmojiPicker(false);
 						setMessageSelected(EMessageBSToShow.MessageAction);
+						dispatch(setSelectedMessage(message));
 					}}
 				>
 					{isShowInfoUser ? (
