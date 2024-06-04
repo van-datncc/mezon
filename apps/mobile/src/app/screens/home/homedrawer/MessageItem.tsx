@@ -1,6 +1,6 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Metrics, size, verticalScale, useAnimatedState } from '@mezon/mobile-ui';
 import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
@@ -21,7 +21,7 @@ import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/helpers';
+import { isImage, mentionRegex, mentionRegexSplit } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -56,8 +56,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
+	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
   const [foundUser, setFoundUser] = useState(null);
-	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
@@ -136,37 +136,41 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
+	const imageItem = ({ image, index, checkImage }) => {
+		return (
+			<TouchableOpacity
+				disabled={checkImage}
+				activeOpacity={0.8}
+				key={index}
+				onPress={() => {
+					onOpenImage(image);
+				}}
+			>
+				<FastImage
+					style={[
+						styles.imageMessageRender,
+						{
+							width: widthMedia,
+							height: calcImgHeight,
+						},
+					]}
+					source={{ uri: image?.url }}
+					resizeMode="contain"
+					onLoad={(evt) => {
+						setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
+					}}
+				/>
+			</TouchableOpacity>
+		);
+	};
+
 	const renderImages = () => {
 		return (
 			<View>
 				{images.map((image, index) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 
-					return (
-						<TouchableOpacity
-							disabled={checkImage}
-							activeOpacity={0.8}
-							key={index}
-							onPress={() => {
-								onOpenImage(image);
-							}}
-						>
-							<FastImage
-								style={[
-									styles.imageMessageRender,
-									{
-										width: widthMedia,
-										height: calcImgHeight,
-									},
-								]}
-								source={{ uri: image?.url }}
-								resizeMode="contain"
-								onLoad={(evt) => {
-									setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
-								}}
-							/>
-						</TouchableOpacity>
-					);
+					return imageItem({ image, index, checkImage });
 				})}
 			</View>
 		);
@@ -174,6 +178,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
+			const checkIsImage = isImage(document?.url);
+			if (checkIsImage) {
+				return imageItem({ image: document, index, checkImage: checkIsImage });
+			}
+
 			return (
 				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
 					<View style={styles.fileViewer}>
@@ -219,28 +228,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const renderTextWithLinks = (text: string, matches: RegExpMatchArray) => {
-		const parts = text.split(urlPattern);
-		return parts.map((part, index) => {
-			if (!part) return <View />;
-			return (
-				<Text
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					onTouchEnd={() => {
-						if (matches.includes(part)) {
-							onOpenLink(part);
-						}
-					}}
-					key={index}
-					style={matches.includes(part) ? styles.contentMessageLink : styles.contentMessageBox}
-				>
-					{part}
-				</Text>
-			);
-		});
-	};
-
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
 			.split(mentionRegexSplit)
@@ -268,6 +255,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const renderTextContent = () => {
+		if (!lines) return null;
 		const matchesMention = lines.match(mentionRegex);
 
 		return (
