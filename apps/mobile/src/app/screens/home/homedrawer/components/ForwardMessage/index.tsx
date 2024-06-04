@@ -1,7 +1,6 @@
 import { useAuth, useChannels, useDirect, useSendForwardMessage } from '@mezon/core';
 import { CrossIcon, HashSignIcon, HashSignLockIcon } from '@mezon/mobile-components';
 import { Colors, Fonts, size } from '@mezon/mobile-ui';
-import { useAppDispatch } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
 import { getSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -36,7 +35,6 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const { sendForwardMessage } = useSendForwardMessage();
 	const mezon = useMezon();
 	const selectedMessage = useSelector(getSelectedMessage);
-	const dispatch = useAppDispatch();
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const accountId = userProfile?.user?.id ?? '';
@@ -102,6 +100,9 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	};
 
 	const sentToMessage = async () => {
+		console.log(selectedMessage);
+		
+
 		try {
 			for (const selectedObjectIdSend of selectedObjectIdSends) {
 				if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
