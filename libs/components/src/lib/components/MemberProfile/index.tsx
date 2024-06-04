@@ -143,7 +143,7 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-bgLightMode'} nameMemberProfile`}
+							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}

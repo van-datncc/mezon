@@ -1,5 +1,6 @@
 import { ChannelsEntity } from '@mezon/store';
 import * as Icons from '../../../Icons';
+import { useApp } from '@mezon/core';
 
 enum OptionEvent {
 	OPTION_SPEAKER = 'Speaker',
@@ -26,7 +27,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const onChangeTitle = (e: any) => {
 		handleTitleEvent(e.target.value);
 	};
-
+	const {appearanceTheme} = useApp();
 	return (
 		<div>
 			<div className="flex flex-col mb-4">
@@ -103,7 +104,7 @@ const LocationModal = (props: LocationModalProps) => {
 						value={titleEvent}
 						onChange={onChangeTitle}
 						placeholder="Add a location, link or something."
-						className="font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight"
+						className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === "light" ? "lightEventInputAutoFill" : ""}`}
 					/>
 				</div>
 			)}

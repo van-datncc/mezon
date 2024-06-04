@@ -118,7 +118,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 					<p className="text-sm mb-2">We recommend an image of at least 512x512 for the server.</p>
 					<Button
 						onClick={handleOpenFile}
-						className="h-10 text-sm w-fit mt-2 rounded bg-transparent border border-buttonProfile hover:!bg-buttonProfileHover dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
+						className="h-10 text-sm w-fit mt-2 rounded bg-bgLightModeThird text-textLightTheme dark:text-textDarkTheme border dark:border-buttonProfile hover:!bg-[#9e9e9e] dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
 					>
 						Upload Image
 					</Button>
@@ -131,7 +131,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 						type="text"
 						value={clanName}
 						onChange={(e) => handleChangeClanName(e.target.value)}
-						className="text-[#B5BAC1] outline-none w-full h-10 p-[10px] bg-[#26262B] text-base rounded placeholder:text-sm"
+						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-[#26262B] bg-bgLightModeThird text-base rounded placeholder:text-sm"
 						placeholder="Support has arrived!"
 					/>
 				</div>
