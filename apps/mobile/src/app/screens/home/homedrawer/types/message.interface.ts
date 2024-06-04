@@ -1,4 +1,4 @@
-import { EmojiDataOptionals, IEmojiImage, IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
+import { EmojiDataOptionals, IChannelMember, IEmojiImage, IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { EMessageActionType, EMessageBSToShow } from '../enums';
 
@@ -9,6 +9,7 @@ export interface IReplyBottomSheet {
 	onConfirmDeleteMessage: () => void;
 	mode?: number;
 	isOnlyEmojiPicker?: boolean;
+	user?: IChannelMember | null;
 }
 
 export interface IMessageAction {

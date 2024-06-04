@@ -1,7 +1,7 @@
-import { useAuth, useDeleteMessage } from '@mezon/core';
+import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState, verticalScale } from '@mezon/mobile-ui';
-import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
+import { Colors, Metrics, size, verticalScale, useAnimatedState } from '@mezon/mobile-ui';
+import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -25,6 +25,7 @@ import { isImage, mentionRegex, mentionRegexSplit } from '../../../utils/helpers
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -49,12 +50,14 @@ const arePropsEqual = (prevProps, nextProps) => {
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
 	const userLogin = useAuth();
+	const dispatch = useAppDispatch();
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
+  const [foundUser, setFoundUser] = useState(null);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
@@ -62,6 +65,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+	const { usersClan } = useClans();
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -214,7 +218,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const onMention = async (mention: string) => {
 		try {
-			alert('mention' + mention);
+      const tagName = mention.slice(1);
+      const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
+      userMention && setFoundUser(userMention)
+      if(!mention) return ;
+      setMessageSelected(EMessageBSToShow.UserInformation);
 		} catch (error) {
 			console.log('error', error);
 		}
@@ -325,6 +333,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
+              setFoundUser(user)
 						}}
 						style={styles.wrapperAvatar}
 					>
@@ -344,6 +353,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					onLongPress={() => {
 						setIsOnlyEmojiPicker(false);
 						setMessageSelected(EMessageBSToShow.MessageAction);
+						dispatch(setSelectedMessage(message));
 					}}
 				>
 					{isShowInfoUser ? (
@@ -378,6 +388,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				onClose={() => {
 					setOpenBottomSheet(null);
 				}}
+        user={foundUser}
 			/>
 		</View>
 	);
