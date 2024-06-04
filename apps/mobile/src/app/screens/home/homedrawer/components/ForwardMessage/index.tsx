@@ -42,25 +42,25 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: any) => {
-					return {
-						id: itemDM?.user_id[0] ?? '',
-						name: itemDM?.channel_label ?? '',
-						avatarUser: itemDM?.channel_avatar[0] ?? '',
-						idDM: itemDM?.id ?? '',
-						typeChat: 3,
-					};
-				})
+				return {
+					id: itemDM?.user_id[0] ?? '',
+					name: itemDM?.channel_label ?? '',
+					avatarUser: itemDM?.channel_avatar[0] ?? '',
+					idDM: itemDM?.id ?? '',
+					typeChat: 3,
+				};
+			})
 			: [];
 		const listGroupSearch = listGroup.length
 			? listGroup.map((itemGr: any) => {
-					return {
-						id: itemGr?.channel_id ?? '',
-						name: itemGr?.channel_label ?? '',
-						avatarUser: '/assets/images/avatar-group.png' ?? '',
-						idDM: itemGr?.id ?? '',
-						typeChat: 2,
-					};
-				})
+				return {
+					id: itemGr?.channel_id ?? '',
+					name: itemGr?.channel_label ?? '',
+					avatarUser: '/assets/images/avatar-group.png' ?? '',
+					idDM: itemGr?.id ?? '',
+					typeChat: 2,
+				};
+			})
 			: [];
 
 		const listSearch = [...listDMSearch, ...listGroupSearch];
@@ -101,7 +101,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 	const sentToMessage = async () => {
 		console.log(selectedMessage);
-		
+
 
 		try {
 			for (const selectedObjectIdSend of selectedObjectIdSends) {
@@ -129,7 +129,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 	const renderMember = () => {
 		return listMemSearch
-			.filter((item: any) => item.name.indexOf(searchText.substring(1)) > -1)
+			.filter((item: any) => item.name.indexOf(searchText.toLowerCase().substring(1)) > -1)
 			.slice(0, 25)
 			.map((item: any, index: number) => {
 				return (
@@ -158,7 +158,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 	const renderChannel = () => {
 		return listChannelSearch
-			.filter((item) => item.name.indexOf(searchText.substring(1)) > -1)
+			.filter((item) => item.name.indexOf(searchText.toLowerCase().substring(1)) > -1)
 			.slice(0, 25)
 			.map((channel: any, index: number) => {
 				return (
@@ -214,7 +214,11 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 					</View>
 
 					<View style={styles.inputWrapper}>
-						<TextInput style={styles.input} onChangeText={setSearchText} placeholderTextColor={'white'} placeholder="Search" />
+						<TextInput
+							style={styles.input}
+							onChangeText={setSearchText}
+							placeholderTextColor={'white'}
+							placeholder="Search" />
 					</View>
 
 					<ScrollView style={{ marginVertical: 10 }}>
