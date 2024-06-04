@@ -163,7 +163,7 @@ const ModalInvite = (props: ModalParam) => {
 			</div>
 			<div className='flex justify-end gap-x-4'>
 				<button className='px-4 py-2 rounded bg-slate-500 hover:bg-opacity-85' onClick={closeModalEdit}>Cancel</button>
-				<button className='px-4 py-2 rounded bg-primary hover:bg-opacity-85' onClick={() => {closeModalEdit(); props.onClose();}}>Generate a New Link</button>
+				<button className='px-4 py-2 rounded bg-primary hover:bg-opacity-85' onClick={() => {props.onClose(); }}>Generate a New Link</button>
 			</div>
 		</Modal>)
 	);

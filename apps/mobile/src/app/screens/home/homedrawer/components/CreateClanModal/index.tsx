@@ -77,8 +77,9 @@ const CreateClanModal = ({visible, setVisible}: ICreateClanProps) => {
 		if (!file || !client || !session) {
 			throw new Error('Client or files are not initialized');
 		}
-		const fullFilename = file.name;
-    const res = await handleUploadFileMobile(client, session, fullFilename, file);
+	  const ms = new Date().getTime();
+		const fullFilename = `${currentChannel?.clan_id}/${currentChannel?.channel_id}/${ms}`.replace(/-/g, '_') + '/' + file.name;
+		const res = await handleUploadFileMobile(client, session, fullFilename, file);
     if(!res.url) return;
     setUrlImage(res.url)
 	};

@@ -73,7 +73,7 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 		<article
 			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
 			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose
-			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
+			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 leading-[0] ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
 			{isMarkdown ? (
 				<div className="lineText contents">

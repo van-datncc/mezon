@@ -39,7 +39,12 @@ import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
-import { selectCurrentChannel, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
+import {
+	selectCurrentChannel,
+	selectEmojiImage,
+	selectHiddenBottomTabMobile,
+	selectMemberByUserId
+} from '@mezon/store-mobile';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
@@ -87,6 +92,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: props.channelId });
 	const currentChannel = useSelector(selectCurrentChannel);
+	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 	const listMentions = UseMentionList(currentChannel?.id);
 	const { listChannels } = useChannels();
 	const { textInputProps, triggers } = useMentions({
@@ -102,7 +108,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
-	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
+	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios' && hiddenBottomTab);
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);

@@ -67,7 +67,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 
 			{(dataReactionCombine || []).filter((emoji: EmojiDataOptionals) => emoji.message_id === message.id).length ? (
 				<Pressable onPress={() => openEmojiPicker?.()} style={styles.addEmojiIcon}>
-					<FaceIcon color={Colors.bgCharcoal} />
+					<FaceIcon color={Colors.gray72} />
 				</Pressable>
 			) : null}
 

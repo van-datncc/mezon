@@ -8,7 +8,7 @@ type MessageLineProps = {
 // TODO: refactor component for message lines
 const MessageLine = ({ line }: MessageLineProps) => {
 	return (
-		<div className="pt-[0.3rem]">
+		<div className="">
 			<MarkdownFormatText lineMessage={line} />
 		</div>
 	);
