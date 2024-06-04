@@ -42,18 +42,19 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 
 	const [isMarkdown, setIsMarkdown] = useState<boolean>(false);
 	const startsWithTripleBackticks = lineMessage.startsWith('```');
-	const startWithHttpOrHttps = lineMessage.startsWith('https://') || lineMessage.startsWith('http://');
 	const endsWithNoTripleBackticks = !lineMessage.endsWith('```');
 	const onlyBackticks = /^```$/.test(lineMessage);
 	const isQuote = lineMessage.startsWith('>');
 	const [convertedLine, setConvertLine] = useState('');
 	const [includeHashtagMention, setInCludeHashtagMention] = useState<boolean>(false);
+	const mentionRegex = /(?<=(\s|^))(?:@|#)\S+(?=\s|$|\b\d{19}\b)/g;
 
 	useEffect(() => {
 		if (lineMessage) {
-			const regex = /[@#]/;
-			const hasMentionOrHashtag = regex.test(lineMessage);
+			const hasMentionOrHashtag = mentionRegex.test(lineMessage);
 			setInCludeHashtagMention(hasMentionOrHashtag);
+		} else {
+			setInCludeHashtagMention(false);
 		}
 	}, [lineMessage]);
 
@@ -66,7 +67,6 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 			italicRegex.test(lineMessage) ||
 			boldRegex.test(lineMessage) ||
 			boldItalicRegex.test(lineMessage) ||
-			startWithHttpOrHttps ||
 			isQuote
 		) {
 			setIsMarkdown(true);
@@ -122,46 +122,65 @@ type TextWithMentionHashtagEmojiOpt = {
 };
 
 const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmojiOpt) => {
-	const combinedRegex = /(@\S+|#\S+|:\b[^:]*\b:)/g;
-	const { emojiListPNG } = useEmojiSuggestion();
-	const splitText = lineMessage.split(combinedRegex).filter(Boolean);
-	const checkIsLink = (text: string) => {
-		if (text.includes('https://') || text.includes('http://')) return true;
-	};
+	const lineMessageWithSpace = lineMessage.replace('\n', '\n ');
 
+	const { emojiListPNG } = useEmojiSuggestion();
+	const splitText = lineMessageWithSpace.split(' ');
+	console.log(splitText);
 	return (
-		<div className="lineText contents">
+		<div className="lineText contents gap-1">
 			{splitText.map((item, index) => {
 				const isMention = item.startsWith('@');
 				const isHashtag = item.startsWith('#');
-				const isEmojiSyntax = item.match(/:\b[^:]*\b:/);
+				const isEmojiSyntax = item.match(/:\b[^:]*\b:/g);
+				const checkItemIsMarkdown = checkMarkdownInText(item);
 
-				if (isMention && !isHashtag && !isEmojiSyntax) {
+				// console.log('---');
+				// console.log(item);
+				// console.log(isMention);
+				// console.log(isHashtag);
+				// console.log(isEmojiSyntax);
+				// console.log(checkItemIsMarkdown);
+
+				if (isMention && !isHashtag && !isEmojiSyntax && !checkItemIsMarkdown) {
 					return (
 						<span key={`mention-${index}`}>
-							<MentionUser tagName={item} />{' '}
+							{splitText[index + 1] === ';' ||
+							splitText[index + 1] === '.' ||
+							splitText[index + 1] === ',' ||
+							splitText[index + 1] === ':' ? (
+								<MentionUser tagName={item} />
+							) : (
+								<>
+									<MentionUser tagName={item} />{' '}
+								</>
+							)}
 						</span>
 					);
-				} else if (!isMention && isHashtag && !isEmojiSyntax) {
+				} else if (!isMention && isHashtag && !isEmojiSyntax && !checkItemIsMarkdown) {
 					return (
 						<span key={`hashtag-${index}`}>
-							<ChannelHashtag channelHastagId={item} />{' '}
+							{splitText[index + 1] === ';' ||
+							splitText[index + 1] === '.' ||
+							splitText[index + 1] === ',' ||
+							splitText[index + 1] === ':' ? (
+								<ChannelHashtag channelHastagId={item} />
+							) : (
+								<>
+									<ChannelHashtag channelHastagId={item} />{' '}
+								</>
+							)}
 						</span>
 					);
-				} else if (checkMarkdownInText(item)) {
-					return (
-						<span key={`markdown-text-${index}`} className="lineText contents">
-							{item}
-						</span>
-					);
-				} else if (checkIsLink(item)) {
+				} else if (!isMention && !isHashtag && !isEmojiSyntax && checkItemIsMarkdown) {
 					const getLinkinvite = (children: any) => {
 						window.location.href = children;
 					};
+
 					return (
-						<span key={`url-on-text-${index}`}>
+						<div key={`url-on-text-${index}`}>
 							<Markdown
-								children={convertMarkdown(item)}
+								children={item}
 								remarkPlugins={[remarkGFM]}
 								components={{
 									pre: PreClass,
@@ -177,10 +196,10 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 										</span>
 									),
 								}}
-							/>
-						</span>
+							/>{' '}
+						</div>
 					);
-				} else if (!isMention && !isHashtag && isEmojiSyntax) {
+				} else if (!isMention && !isHashtag && isEmojiSyntax && !checkItemIsMarkdown) {
 					return (
 						<span key={`emoji-${index}`} style={{ userSelect: 'none' }}>
 							<img
@@ -192,7 +211,7 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 						</span>
 					);
 				}
-				return <span key={`text-${index}`}>{item}</span>;
+				return <span key={`text-${index}`}>{item} </span>;
 			})}
 		</div>
 	);

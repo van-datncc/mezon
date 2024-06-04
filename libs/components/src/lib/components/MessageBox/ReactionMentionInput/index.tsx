@@ -221,7 +221,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setAttachmentData([]);
 				setIdReferenceMessageReply('');
 				setOpenReplyMessageState(false);
-				setMentionEveryone(false)
+				setMentionEveryone(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -253,7 +253,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-				setMentionEveryone(false)
+				setMentionEveryone(false);
 				setAttachmentData([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -341,8 +341,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
-			if (mentions.some((mention) => mention.display === '@here')){
-				setMentionEveryone(true)
+			if (mentions.some((mention) => mention.display === '@here')) {
+				setMentionEveryone(true);
 			}
 			for (const mention of mentions) {
 				if (mention.display.startsWith('@')) {
@@ -404,7 +404,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		const regexEmoji = /:\b[^:]*\b:/g;
 		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
 		if (emojiArray.length > 0) {
 			return emojiArray[0];

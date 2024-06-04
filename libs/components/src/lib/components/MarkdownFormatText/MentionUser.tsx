@@ -1,5 +1,6 @@
 import { useClans, useOnClickOutside } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
+import { checkLastChar } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,15 +21,22 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 		e.preventDefault();
 	};
 
+	const [userRemoveChar, setUserRemoveChar] = useState('');
+	const username = tagName.slice(1);
+
 	useEffect(() => {
-		const username = tagName.slice(1);
-		const user = usersClan.find((userClan) => userClan.user?.username === username);
+		if (checkLastChar(username)) {
+			setUserRemoveChar(username.slice(0, -1));
+		} else {
+			setUserRemoveChar(username);
+		}
+		const user = usersClan.find((userClan) => userClan.user?.username === userRemoveChar);
 		if (user) {
 			setFoundUser(user);
 		} else {
 			setFoundUser(null);
 		}
-	}, [tagName]);
+	}, [tagName, userRemoveChar]);
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -81,18 +89,21 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 			)}
 			{(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && foundUser !== null) ||
 			(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && tagName === '@here') ? (
-				<Link
-					onMouseDown={(event) => handleMouseClick(event)}
-					ref={panelRef}
-					onClick={(e) => dispatchUserIdToShowProfile(e)}
-					style={{ textDecoration: 'none' }}
-					to={''}
-					className={`font-medium px-1 rounded-sm 
-					${tagName === '@here' ? 'cursor-text' : 'cursor-pointer hover:!text-white'}
-					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]`}
-				>
-					@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
-				</Link>
+				<>
+					<Link
+						onMouseDown={(event) => handleMouseClick(event)}
+						ref={panelRef}
+						onClick={(e) => dispatchUserIdToShowProfile(e)}
+						style={{ textDecoration: 'none' }}
+						to={''}
+						className={`font-medium px-0.1 rounded-sm 
+				${tagName === '@here' ? 'cursor-text' : 'cursor-pointer hover:!text-white'}
+				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]`}
+					>
+						@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
+					</Link>
+					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
+				</>
 			) : (
 				<span>{tagName}</span>
 			)}

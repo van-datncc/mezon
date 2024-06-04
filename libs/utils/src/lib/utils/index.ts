@@ -206,7 +206,47 @@ export const updateEmojiReactionData = (data: any[]) => {
 };
 
 export const checkMarkdownInText = (text: string) => {
-	if (text.startsWith('```') && !text.endsWith('```')) return true;
-	if (/^```$/.test(text)) return true;
-	else return false;
+	const backtickRegex = /`[^`]*`/g;
+	const headingRegex = /^(#{1,6}) (.*)/gm;
+
+	const numberedListRegex = /^\d+\.\s/gm;
+	const italicRegex = /\*([^*]+)\*/g;
+	const boldRegex = /\*\*([^*]+)\*\*/g;
+	const boldItalicRegex = /\*\*\*([^*]+)\*\*\*/g;
+	const startWithHttpOrHttps = text.startsWith('https://') || text.startsWith('http://');
+
+	const startsWithTripleBackticks = text.startsWith('\n```') || text.startsWith('```');
+	const endsWithTripleBackticks = text.endsWith('```') || text.endsWith('\n```');
+	const onlyBackticks = /^```$/.test(text);
+	const isQuote = text.startsWith('>');
+
+	if (
+		backtickRegex.test(text) ||
+		headingRegex.test(text) ||
+		numberedListRegex.test(text) ||
+		italicRegex.test(text) ||
+		boldRegex.test(text) ||
+		boldItalicRegex.test(text) ||
+		(startsWithTripleBackticks && endsWithTripleBackticks) ||
+		onlyBackticks ||
+		isQuote ||
+		startWithHttpOrHttps
+	) {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+export const checkLastChar = (text: string) => {
+	if (
+		text.charAt(text.length - 1) === ';' ||
+		text.charAt(text.length - 1) === ',' ||
+		text.charAt(text.length - 1) === '.' ||
+		text.charAt(text.length - 1) === ':'
+	) {
+		return true;
+	} else {
+		return false;
+	}
 };
