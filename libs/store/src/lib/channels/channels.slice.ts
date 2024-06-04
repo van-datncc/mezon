@@ -386,7 +386,7 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 );
 
 export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
-	channels.filter((channel) => channel.type == ChannelType.CHANNEL_TYPE_VOICE),
+	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_VOICE),
 );
 
 export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);
