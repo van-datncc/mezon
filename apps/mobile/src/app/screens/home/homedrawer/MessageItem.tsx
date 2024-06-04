@@ -1,7 +1,7 @@
 import { useAuth, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
+import { FileIcon, HashSignIcon, MuteIcon, ReplyIcon, SpeakerIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
+import { selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -25,6 +25,7 @@ import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/help
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+import { ChannelType } from 'mezon-js';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -48,7 +49,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
-  const userLogin = useAuth();
+	const userLogin = useAuth();
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -205,11 +206,23 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const onMention = async (mention: string) => {
 		try {
-			alert('mention' + mention);
+			alert('mention ' + mention);
 		} catch (error) {
 			console.log('error', error);
 		}
 	};
+
+	const getChannelById = (channelHashtagId: string) => {
+		const channel = useSelector(selectChannelById(channelHashtagId));
+		return channel;
+	};
+
+	// const getChannelPath = (channelHashtagId: string, clanId: string): string | undefined => {
+	// 	if (channelHashtagId.startsWith('#')) {
+	// 		return toChannelPage(channelHashtagId.slice(1), clanId || '');
+	// 	}
+	// 	return undefined;
+	// };
 
 	const renderTextWithLinks = (text: string, matches: RegExpMatchArray) => {
 		const parts = text.split(urlPattern);
@@ -233,30 +246,67 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		});
 	};
 
+	const renderChannelMention = (id: string) => {
+		const channel = getChannelById(id.slice(1));
+		const type = channel?.type;
+
+		return (
+			<View style={styles.mentionWrapper}>
+				<Text
+					onPress={() => onMention(id)}
+					style={styles.contentMessageMention}
+				>
+					{type === ChannelType.CHANNEL_TYPE_VOICE
+						? <SpeakerIcon height={16} width={16} />
+						// : <HashSignIcon height={16} width={16} />
+						: "#"
+					}
+					{channel.channel_label}
+				</Text>
+			</View>
+
+		)
+	}
+
+	const renderUserMention = (id: string) => {
+		return (
+			<View style={styles.mentionWrapper}>
+				<Text
+					onPress={() => onMention(id)}
+					style={styles.contentMessageMention}
+				>
+					{id + " "}
+				</Text>
+			</View>
+		)
+	}
+
+	const renderMention = (id: string) => {
+		return id.startsWith("@")
+			? renderUserMention(id)
+			: id.startsWith("#")
+				? renderChannelMention(id)
+				: <></>
+	}
+
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
 			.split(mentionRegexSplit)
 			.filter(Boolean)
 			.filter((i) => i !== '@' && i !== '#');
 
-		return parts.map((part, index) => {
-			if (!part) return <View />;
-			return (
-				<Text
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					onTouchEnd={() => {
-						if (matchesMention.includes(part)) {
-							onMention(part);
-						}
-					}}
-					key={index}
-					style={matchesMention.includes(part) ? styles.contentMessageMention : styles.contentMessageBox}
-				>
-					{matchesMention.includes(part) ? `${part} ` : renderTextWithEmoji(part)}
-				</Text>
-			);
-		});
+		return parts.map((part, index) => (
+			<View key={index.toString()} style={{ width: "100%" }}>
+				{!part
+					? <View />
+					: matchesMention.includes(part)
+						? renderMention(part)
+						: <Text style={styles.contentMessageBox}>
+							{renderTextWithEmoji(part)}
+						</Text>
+				}
+			</View>
+		));
 	};
 
 	const renderTextContent = () => {
@@ -265,9 +315,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
 				{matchesMention?.length ? (
-					<Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>
+					<Text style={[isCombine && styles.contentMessageCombine]}>
+						{renderTextWithMention(lines, matchesMention)}
+					</Text>
 				) : (
-					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{renderTextWithEmoji(lines)}</Text>
+					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>
+						{renderTextWithEmoji(lines)}
+					</Text>
 				)}
 			</Hyperlink>
 		);
@@ -307,7 +361,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 } , hasIncludeMention && styles.highlightMessageMention]}>
+		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
