@@ -1,5 +1,5 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, HashSignIcon, MuteIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
+import { FileIcon, HashSignIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import { ChannelsEntity, channelsActions, getStoreAsync, messagesActions, selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
@@ -21,7 +21,7 @@ import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { mentionRegex, mentionRegexSplit, urlPattern } from '../../../utils/helpers';
+import { isImage, mentionRegex, mentionRegexSplit } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -138,37 +138,41 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
+	const imageItem = ({ image, index, checkImage }) => {
+		return (
+			<TouchableOpacity
+				disabled={checkImage}
+				activeOpacity={0.8}
+				key={index}
+				onPress={() => {
+					onOpenImage(image);
+				}}
+			>
+				<FastImage
+					style={[
+						styles.imageMessageRender,
+						{
+							width: widthMedia,
+							height: calcImgHeight,
+						},
+					]}
+					source={{ uri: image?.url }}
+					resizeMode="contain"
+					onLoad={(evt) => {
+						setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
+					}}
+				/>
+			</TouchableOpacity>
+		);
+	};
+
 	const renderImages = () => {
 		return (
 			<View>
 				{images.map((image, index) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 
-					return (
-						<TouchableOpacity
-							disabled={checkImage}
-							activeOpacity={0.8}
-							key={index}
-							onPress={() => {
-								onOpenImage(image);
-							}}
-						>
-							<FastImage
-								style={[
-									styles.imageMessageRender,
-									{
-										width: widthMedia,
-										height: calcImgHeight,
-									},
-								]}
-								source={{ uri: image?.url }}
-								resizeMode="contain"
-								onLoad={(evt) => {
-									setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
-								}}
-							/>
-						</TouchableOpacity>
-					);
+					return imageItem({ image, index, checkImage });
 				})}
 			</View>
 		);
@@ -176,6 +180,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
+			const checkIsImage = isImage(document?.url);
+			if (checkIsImage) {
+				return imageItem({ image: document, index, checkImage: checkIsImage });
+			}
+
 			return (
 				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
 					<View style={styles.fileViewer}>
@@ -262,27 +271,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return channel;
 	};
 
-	const renderTextWithLinks = (text: string, matches: RegExpMatchArray) => {
-		const parts = text.split(urlPattern);
-		return parts.map((part, index) => {
-			if (!part) return <View />;
-			return (
-				<Text
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					onTouchEnd={() => {
-						if (matches.includes(part)) {
-							onOpenLink(part);
-						}
-					}}
-					key={index}
-					style={matches.includes(part) ? styles.contentMessageLink : styles.contentMessageBox}
-				>
-					{part}
-				</Text>
-			);
-		});
-	};
 
 	const renderChannelMention = (id: string) => {
 		const channel = getChannelById(id.slice(1));
@@ -347,6 +335,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const renderTextContent = () => {
+		if (!lines) return null;
 		const matchesMention = lines.match(mentionRegex);
 
 		return (

@@ -1,6 +1,6 @@
 import { useCategory, useClans, useInvite } from '@mezon/core';
 import { LinkIcon } from '@mezon/mobile-components';
-import { Colors, Metrics } from '@mezon/mobile-ui';
+import { Colors, Metrics, size } from '@mezon/mobile-ui';
 import { IUser } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,7 +24,7 @@ export const InviteToChannel = React.memo(() => {
 	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 	const [currentInviteLink, setCurrentInviteLink] = useState('');
 	const [searchUserText, setSearchUserText] = useState('');
-	const { currentClanId } = useClans();
+	const { currentClanId, currentClan } = useClans();
 	const { createLinkInviteUser } = useInvite();
 	const { t } = useTranslation(['inviteToChannel']);
 	const timeoutRef = useRef(null);
@@ -58,7 +58,7 @@ export const InviteToChannel = React.memo(() => {
 
 	const saveInviteLinkSettings = () => {
 		//TODO: save invite link
-		setIsVisibleEditLinkModal(false);
+		backToInviteModal();
 	};
 
 	const addInviteLinkToClipboard = () => {
@@ -131,7 +131,7 @@ export const InviteToChannel = React.memo(() => {
 				}}
 			>
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-					<View style={styles.inviteWrapper}>
+					<View style={[styles.inviteWrapper, isKeyboardVisible && { marginTop: size.s_50 }]}>
 						<View style={styles.inviteHeader}>
 							<Text style={styles.inviteHeaderText}>Invite a friend</Text>
 						</View>
@@ -199,7 +199,7 @@ export const InviteToChannel = React.memo(() => {
 			<MezonModal
 				visible={isVisibleEditLinkModal}
 				title="Link Settings"
-				confirmText="SAVE"
+				confirmText="Save"
 				onConfirm={saveInviteLinkSettings}
 				visibleChange={onVisibleEditLinkModalChange}
 			>
@@ -207,7 +207,7 @@ export const InviteToChannel = React.memo(() => {
 					<Text style={styles.inviteChannelListTitle}>INVITE CHANNEL</Text>
 					<View style={styles.channelInviteItem}>
 						{/* <HashSignIcon width={18} height={18} /> */}
-						<Text style={styles.channelInviteTitle}>mezon</Text>
+						<Text style={styles.channelInviteTitle}>{currentClan?.clan_name}</Text>
 					</View>
 				</View>
 				<View style={styles.advancedSettingWrapper}>

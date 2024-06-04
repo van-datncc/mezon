@@ -404,7 +404,7 @@ export const styles = StyleSheet.create({
 	},
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
-		marginVertical: size.s_10,
+		marginVertical: size.s_6,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
