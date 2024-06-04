@@ -100,9 +100,6 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	};
 
 	const sentToMessage = async () => {
-		console.log(selectedMessage);
-
-
 		try {
 			for (const selectedObjectIdSend of selectedObjectIdSends) {
 				if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
@@ -125,6 +122,8 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 		} catch (error) {
 			console.log('Tom log  => error', error);
 		}
+
+		onClose && onClose();
 	};
 
 	const renderMember = () => {

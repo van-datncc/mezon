@@ -131,7 +131,11 @@ const HomeDefault = React.memo((props: any) => {
 			</BottomSheet>
 			{
 				showForwardModal && (
-					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
+					<ForwardMessageModal
+						show={showForwardModal}
+						onClose={() => setShowForwardModal(false)}
+						message={messageForward}
+					/>
 				)
 			}
 		</View>
