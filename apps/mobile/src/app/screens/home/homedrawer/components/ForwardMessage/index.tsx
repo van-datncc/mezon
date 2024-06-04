@@ -129,7 +129,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 	const renderMember = () => {
 		return listMemSearch
-			.filter((item: any) => item.name.indexOf(searchText.toLowerCase().substring(1)) > -1)
+			.filter((item: any) => item.name.indexOf(searchText.substring(1)) > -1)
 			.slice(0, 25)
 			.map((item: any, index: number) => {
 				return (
@@ -158,7 +158,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 	const renderChannel = () => {
 		return listChannelSearch
-			.filter((item) => item.name.indexOf(searchText.toLowerCase().substring(1)) > -1)
+			.filter((item) => item.name.indexOf(searchText.substring(1)) > -1)
 			.slice(0, 25)
 			.map((channel: any, index: number) => {
 				return (
