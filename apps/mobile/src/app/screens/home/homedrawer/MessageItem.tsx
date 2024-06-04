@@ -1,7 +1,7 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, HashSignIcon, MuteIcon, ReplyIcon, SpeakerIcon } from '@mezon/mobile-components';
+import { FileIcon, HashSignIcon, MuteIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelsEntity, channelsActions, getStoreAsync, messagesActions, selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -27,6 +27,7 @@ import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
+import Toast from 'react-native-toast-message';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -210,7 +211,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const onMention = async (mention: string) => {
 		try {
-			alert('mention ' + mention);
 			const tagName = mention.slice(1);
 			const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
 			userMention && setFoundUser(userMention)
@@ -221,11 +221,39 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const onChannelMention = (mention: string) => {
-		try {
-			alert('mention ' + mention);
-		} catch (error) {
+	const jumpToChannel = async (channelId: string, clanId: string) => {
+		alert(channelId)
+		const store = await getStoreAsync();
 
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		store.dispatch(channelsActions.joinChannel({
+			clanId: clanId ?? '',
+			channelId: channelId,
+			noFetchMembers: false
+		}));
+	};
+
+	const onChannelMention = async (channel: ChannelsEntity) => {
+		try {
+			const type = channel?.type;
+			const channelId = channel?.channel_id;
+			const clanId = channel?.clan_id;
+
+			if (type === ChannelType.CHANNEL_TYPE_VOICE) {
+				Toast.show({
+					type: "info",
+					text1: "Updating...",
+				})
+			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+				save(STORAGE_KEY_CHANNEL_ID, channelId);
+				save(STORAGE_KEY_CLAN_ID, clanId);
+				console.log(channelId);
+				console.log(clanId);
+
+				await jumpToChannel(channelId, clanId);
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	}
 
@@ -233,13 +261,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		const channel = useSelector(selectChannelById(channelHashtagId));
 		return channel;
 	};
-
-	// const getChannelPath = (channelHashtagId: string, clanId: string): string | undefined => {
-	// 	if (channelHashtagId.startsWith('#')) {
-	// 		return toChannelPage(channelHashtagId.slice(1), clanId || '');
-	// 	}
-	// 	return undefined;
-	// };
 
 	const renderTextWithLinks = (text: string, matches: RegExpMatchArray) => {
 		const parts = text.split(urlPattern);
@@ -270,7 +291,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<View style={styles.mentionWrapper}>
 				<Text
-					onPress={() => onChannelMention(id)}
+					onPress={() => onChannelMention(channel)}
 					style={styles.contentMessageMention}
 				>
 					{type === ChannelType.CHANNEL_TYPE_VOICE
