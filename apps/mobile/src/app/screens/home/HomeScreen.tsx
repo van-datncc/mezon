@@ -1,4 +1,3 @@
-import { ChatContextProvider } from '@mezon/core';
 import {
 	appActions,
 	clansActions,
@@ -9,8 +8,8 @@ import {
 	selectAllClans,
 	selectCurrentClan,
 } from '@mezon/store-mobile';
-import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import React, { useEffect } from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';

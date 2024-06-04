@@ -56,3 +56,4 @@ export const validURL = (string: string) => {
 };
 
 export const clanAndChannelIdLinkRegex = /clans\/(\d+)\/channels\/(\d+)/;
+export const clanDirectMessageLinkRegex = /chat\/direct\/message\/(\d+)\/(\d+)$/;

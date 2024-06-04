@@ -1,10 +1,6 @@
 import { ChannelsEntity } from '@mezon/store';
 import * as Icons from '../../../Icons';
-
-enum OptionEvent {
-	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
-}
+import { OptionEvent } from '@mezon/utils';
 
 export type LocationModalProps = {
 	option: string;

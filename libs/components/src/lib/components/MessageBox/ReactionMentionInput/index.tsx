@@ -76,6 +76,7 @@ export type MentionReactInputProps = {
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
 		anonymousMessage?: boolean,
+		mentionEveryone?: boolean,
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
@@ -104,6 +105,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const [content, setContent] = useState('');
@@ -212,12 +214,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
+					mentionEveryone,
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
 				setAttachmentData([]);
 				setIdReferenceMessageReply('');
 				setOpenReplyMessageState(false);
+				setMentionEveryone(false)
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -233,6 +237,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						valueThread?.references,
 						{ nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate },
 						anonymousMessage,
+						mentionEveryone,
 					);
 					setOpenThreadMessageState(false);
 				} else {
@@ -243,11 +248,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
 						anonymousMessage,
+						mentionEveryone,
 					);
 				}
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-
+				setMentionEveryone(false)
 				setAttachmentData([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -335,19 +341,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
-			if (mentions.some((mention) => mention.display === '@here')) {
-				mentionedUsers.splice(0, mentionedUsers.length);
-				convertedMentions.forEach((item) => {
-					mentionedUsers.push(item);
-				});
-			} else {
-				for (const mention of mentions) {
-					if (mention.display.startsWith('@')) {
-						mentionedUsers.push({
-							user_id: mention.id.toString() ?? '',
-							username: mention.display ?? '',
-						});
-					}
+			if (mentions.some((mention) => mention.display === '@here')){
+				setMentionEveryone(true)
+			}
+			for (const mention of mentions) {
+				if (mention.display.startsWith('@')) {
+					mentionedUsers.push({
+						user_id: mention.id.toString() ?? '',
+						username: mention.display ?? '',
+					});
 				}
 			}
 			setMentionData(mentionedUsers);
