@@ -42,11 +42,11 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 	const boldItalicRegex = /\*\*\*([^*]+)\*\*\*/g;
 
 	const [isMarkdown, setIsMarkdown] = useState<boolean>(false);
-	const startsWithTripleBackticks = lineMessage.startsWith('```');
-	const startWithHttpOrHttps = lineMessage.startsWith('https://') || lineMessage.startsWith('http://');
-	const endsWithNoTripleBackticks = !lineMessage.endsWith('```');
+	const startsWithTripleBackticks = lineMessage?.startsWith('```');
+	const startWithHttpOrHttps = lineMessage?.startsWith('https://') || lineMessage?.startsWith('http://');
+	const endsWithNoTripleBackticks = !lineMessage?.endsWith('```');
 	const onlyBackticks = /^```$/.test(lineMessage);
-	const isQuote = lineMessage.startsWith('>');
+	const isQuote = lineMessage?.startsWith('>');
 	const [convertedLine, setConvertLine] = useState('');
 
 	useEffect(() => {
@@ -73,7 +73,7 @@ const MarkdownFormatText = ({ lineMessage }: MarkdownFormatTextProps) => {
 		<article
 			className={`prose-code:text-sm prose-hr:my-0 prose-headings:my-0
 			prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose
-			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
+			prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 leading-[0] ${appearanceTheme === 'light' ? 'lightMode' : ''}`}
 		>
 			{isMarkdown ? (
 				<div className="lineText contents">
@@ -116,7 +116,7 @@ type TextWithMentionHashtagEmojiOpt = {
 const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmojiOpt) => {
 	const combinedRegex = /(@\S+|#\S+|:\b[^:]*\b:)/g;
 	const { emojiListPNG } = useEmojiSuggestion();
-	const splitText = lineMessage.split(combinedRegex).filter(Boolean);
+	const splitText = lineMessage?.split(combinedRegex).filter(Boolean);
 
 	const checkMarkdownInText = (text: string) => {
 		if (text.startsWith('```') && !text.endsWith('```')) return true;
@@ -129,7 +129,7 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 
 	return (
 		<div className="lineText contents">
-			{splitText.map((item, index) => {
+			{splitText?.map((item, index) => {
 				const isMention = item.startsWith('@');
 				const isHashtag = item.startsWith('#');
 				const isEmojiSyntax = item.match(/:\b[^:]*\b:/);

@@ -7,6 +7,7 @@ import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
 import { OptionEvent } from '@mezon/utils';
+import { useApp } from '@mezon/core';
 
 export type EventInfoModalProps = {
 	topic: string;
@@ -76,7 +77,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	const handleChangeTimeEnd = (e:any)=>{
 		handleTimeEnd(e.target.value);
 	}
-
+	const {appearanceTheme} = useApp();
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
 	const { sessionRef, clientRef } = useMezon();
@@ -119,7 +120,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					placeholder="What's your event?"
 					onChange={(e) => handleTopic(e.target.value)}
 					value={topic}
-					className="font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight"
+					className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === "light" ? "lightEventInputAutoFill" : ""}`}
 				/>
 			</div>
 			<div className="mb-4 flex gap-x-4">

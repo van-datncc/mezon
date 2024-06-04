@@ -1,5 +1,5 @@
-import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList } from '@mezon/components';
-import { useAuth, useClans, useDragAndDrop, useMenu, useReference, useThreads, useVoice } from '@mezon/core';
+import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
+import { useAuth, useClans, useDragAndDrop, useMenu, useSearchMessages, useThreads, useVoice } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import ChannelMessages from './ChannelMessages';
 import { ChannelTyping } from './ChannelTyping';
-import { Spinner } from 'flowbite-react';
 
 // TODO: move this to core
 function useChannelSeen(channelId: string) {
@@ -30,6 +29,7 @@ export default function ChannelLayout() {
 	const { sessionRef } = useMezon();
 	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const { isSearchMessage } = useSearchMessages();
 
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
@@ -99,7 +99,7 @@ export default function ChannelLayout() {
 			>
 				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 					<div
-						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
+						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
 					>
 						<div
 							className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
@@ -159,6 +159,8 @@ export default function ChannelLayout() {
 							<MemberList />
 						</div>
 					)}
+
+					{isSearchMessage && <SearchMessageChannelRender />}
 				</div>
 			</div>
 		</>

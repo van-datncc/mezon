@@ -1,10 +1,11 @@
 import { useReference } from '@mezon/core';
-import { AngleRight, SearchIcon } from '@mezon/mobile-components';
+import { AngleRight, ArrowLeftIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
 import CreateThreadModal from '../../../components/ThreadDetail';
@@ -17,6 +18,7 @@ export const MenuThreadDetailStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['notificationSetting']);
 	const { openThreadMessageState } = useReference();
+	const navigation = useNavigation();
 	const currentChannel = useSelector(selectCurrentChannel);
 	return (
 		<Stack.Navigator
@@ -64,14 +66,25 @@ export const MenuThreadDetailStacks = ({}: any) => {
 					headerShown: true,
 					headerTitle: () =>
 						openThreadMessageState ? (
-							<View>
-								<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-									<Text style={{ color: Colors.white, fontSize: size.h6 }}>New Thread</Text>
-									<AngleRight width={14} height={14} style={{marginLeft: size.s_10}}></AngleRight>
+							<View></View>
+						) : (
+							<Text style={{ color: Colors.white, fontSize: size.h5 }}>{currentChannel?.channel_label}</Text>
+						),
+					headerLeft: () =>
+						openThreadMessageState ? (
+							<View style={styles.headerLeft}>
+								<TouchableOpacity style={styles.btnBack} onPress={() => navigation.goBack()}>
+									<ArrowLeftIcon />
+								</TouchableOpacity>
+								<View>
+									<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+										<Text style={{ color: Colors.white, fontSize: size.h6 }}>New Thread</Text>
+										<AngleRight width={14} height={14} style={{ marginLeft: size.s_10 }}></AngleRight>
+									</View>
+									<Text style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400' }}>
+										{currentChannel?.channel_label}
+									</Text>
 								</View>
-								<Text style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400' }}>
-									{currentChannel?.channel_label}
-								</Text>
 							</View>
 						) : (
 							<Text style={{ color: Colors.white, fontSize: size.h5 }}>{currentChannel?.channel_label}</Text>
@@ -84,11 +97,6 @@ export const MenuThreadDetailStacks = ({}: any) => {
 					},
 					headerLeftLabelVisible: false,
 					headerTintColor: Colors.white,
-					headerRight: () => (
-						<View style={{ padding: size.s_10 }}>
-							<SearchIcon width={22} height={22} />
-						</View>
-					),
 				}}
 			/>
 			<Stack.Screen
@@ -118,3 +126,16 @@ export const MenuThreadDetailStacks = ({}: any) => {
 		</Stack.Navigator>
 	);
 };
+
+const styles = StyleSheet.create({
+	headerLeft: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	btnBack: {
+		paddingLeft: size.s_16,
+		paddingRight: size.s_14,
+		height: '100%',
+		justifyContent: 'center',
+	},
+});
