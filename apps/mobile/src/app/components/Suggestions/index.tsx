@@ -96,14 +96,14 @@ export type IEmoji = {
 const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	const { emojiListPNG } = useEmojiSuggestion();
 	let emojiData = [];
-	if (keyword === undefined || keyword === '') {
+	if (!keyword) {
 		return;
 	}
 	emojiData = emojiListPNG.map((emoji) => ({
 		...emoji,
-		name: emoji.shortname,
-		id: emoji.shortname,
-		display: emoji.shortname,
+		name: emoji?.shortname,
+		id: emoji?.shortname,
+		display: emoji?.shortname,
 	}));
 
 	const handleEmojiSuggestionPress = (emoji: IEmoji) => {
@@ -113,10 +113,10 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	return (
 		<FlatList
 			style={{ maxHeight: 200 }}
-			data={emojiData.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(keyword.toLowerCase()) > -1).slice(0, 20)}
+			data={emojiData?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item.display ?? ''} />
+					<SuggestItem isDisplayDefaultAvatar={false} name={item?.display ?? ''} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}

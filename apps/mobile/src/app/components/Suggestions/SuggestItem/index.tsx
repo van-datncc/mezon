@@ -33,7 +33,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar 
 						</View>
 					)
 				)}
-				{urlEmoji && <Image style={{ width: 40, height: 40 }} source={{ uri: urlEmoji }} />}
+				{urlEmoji && <Image style={s.emojiImage} source={{ uri: urlEmoji }} />}
 				{symbol && <Text style={s.symbol}>{symbol}</Text>}
 				<Text style={s.title}>{name}</Text>
 			</View>
