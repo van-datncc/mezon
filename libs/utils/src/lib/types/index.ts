@@ -18,6 +18,7 @@ import {
 	ApiNotificationUserChannel,
 	ApiPermission,
 	ApiRole,
+	ApiSearchMessageDocument,
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
@@ -160,6 +161,10 @@ export type IMessage = ChannelMessage & {
 	lastSeen?: boolean;
 };
 
+export type SearchMessage = ApiSearchMessageDocument & {
+	id: string;
+};
+
 export type IMessageWithUser = IMessage & {
 	user: IUser | null;
 };
@@ -300,7 +305,6 @@ export enum SubPanelName {
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
-
 export type IEmoji = {
 	category: string;
 	emoji: string;
@@ -385,6 +389,13 @@ export interface IGif {
 }
 
 export type MentionDataProps = {
+	id: string | number;
+	display?: string;
+	avatarUrl?: string;
+	name?: string;
+};
+
+export type UserSearchDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
