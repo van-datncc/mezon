@@ -1,6 +1,7 @@
 import {
 	channelMembersActions,
 	channelsActions,
+	directActions,
 	friendsActions,
 	mapMessageChannelToEntity,
 	mapNotificationToEntity,
@@ -75,6 +76,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		(message: ChannelMessageEvent) => {
+			dispatch(directActions.updateDMSocket(message));
 			dispatch(referencesActions.setIdMessageToJump(message.id));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(messagesActions.newMessage(mapMessageChannelToEntity(message)));

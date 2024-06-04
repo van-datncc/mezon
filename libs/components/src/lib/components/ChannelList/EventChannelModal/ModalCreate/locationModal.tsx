@@ -1,6 +1,7 @@
 import { ChannelsEntity } from '@mezon/store';
 import * as Icons from '../../../Icons';
 import { OptionEvent } from '@mezon/utils';
+import { useApp } from '@mezon/core';
 
 export type LocationModalProps = {
 	option: string;

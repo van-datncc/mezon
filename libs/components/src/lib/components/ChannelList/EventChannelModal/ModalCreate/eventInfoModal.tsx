@@ -7,6 +7,7 @@ import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
 import { OptionEvent } from '@mezon/utils';
+import { useApp } from '@mezon/core';
 
 export type EventInfoModalProps = {
 	topic: string;
