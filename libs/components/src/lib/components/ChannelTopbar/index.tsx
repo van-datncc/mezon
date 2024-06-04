@@ -1,5 +1,5 @@
 import { useApp, useEscapeKey, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, selectIsShowMemberList } from '@mezon/store';
+import { appActions, messagesActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -213,6 +213,7 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const isActive = useSelector(selectIsShowMemberList);
 	const handleClick = () => {
 		dispatch(appActions.setIsShowMemberList(!isActive));
+		dispatch(messagesActions.setIsSearchMessage(false));
 	};
 	return (
 		<div className="relative leading-5 h-5">
