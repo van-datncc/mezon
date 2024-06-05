@@ -8,17 +8,17 @@ import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChannelStreamMode } from 'mezon-js';
 import ChatBox from '../../home/homedrawer/ChatBox';
 import { useSelector } from 'react-redux';
-import { directActions, getStoreAsync, selectDmGroupCurrent } from '@mezon/store-mobile';
+import { DirectEntity, directActions, getStoreAsync, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
 import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
-import { IChannel } from '@mezon/utils';
 import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 
 export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any, route: any}) => {
-    const directMessage = route.params?.directMessage as IChannel;
+    const directMessage = route.params?.directMessage as DirectEntity;
+    const from = route.params?.from;
     const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
@@ -58,10 +58,18 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
     
         return null;
     };
+
+    const handleBack = () => {
+        if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
+            navigation.navigate(APP_SCREEN.MESSAGES.HOME)
+            return;
+        }
+        navigation.goBack()
+    }
     return (
         <View style={styles.dmMessageContainer}>
             <View style={styles.headerWrapper}>
-                <Pressable onPress={() => navigation.goBack()}>
+                <Pressable onPress={() => handleBack()}>
                     <ArrowLeftIcon color={Colors.textGray} />
                 </Pressable>
                 <Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>

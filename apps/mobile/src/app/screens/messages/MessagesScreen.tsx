@@ -8,11 +8,10 @@ import { styles } from './styles';
 import { useTranslation } from 'react-i18next';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { useAuth, useDirect, useMemberStatus } from '@mezon/core';
-import { IChannel } from '@mezon/utils';
 import { normalizeString } from '../../utils/helpers';
 import { useThrottledCallback } from 'use-debounce';
 import { useSelector } from 'react-redux';
-import { selectMemberByUserId } from '@mezon/store-mobile';
+import { DirectEntity, selectMemberByUserId } from '@mezon/store-mobile';
 
 const SeparatorListFriend = () => {
 	return (
@@ -20,17 +19,26 @@ const SeparatorListFriend = () => {
 	)
 }
 
-const DmListItem = (props: { directMessage: IChannel, navigation: any}) => {
+const DmListItem = (props: { directMessage: DirectEntity, navigation: any}) => {
 	const { directMessage, navigation } = props;
 	const { t } = useTranslation('message');
 	const { userId } = useAuth();
-	const lastMessage = JSON.parse(directMessage.last_sent_message.content);
-	const timestamp = Number(directMessage.last_sent_message.timestamp);
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const senderMessage = useSelector(selectMemberByUserId(directMessage?.last_sent_message?.sender_id || ''));
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessage } })
 	}
+
+	const lastMessage = useMemo(() => {
+		if (directMessage?.last_sent_message) {
+			const timestamp = Number(directMessage?.last_sent_message?.timestamp);
+			return {
+				time: moment.unix(timestamp).format('DD/MM/YYYY HH:mm'),
+				text: JSON.parse(directMessage?.last_sent_message?.content)?.t
+			}
+		}
+		return null;
+	}, [directMessage])
 
 	return (
 		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()}>
@@ -53,13 +61,17 @@ const DmListItem = (props: { directMessage: IChannel, navigation: any}) => {
 					>
 						{directMessage.channel_label}
 					</Text>
-					<Text style={[styles.defaultText, styles.dateTime]}>{moment.unix(timestamp).format('DD/MM/YYYY HH:mm')}</Text>
+					{lastMessage ? (
+						<Text style={[styles.defaultText, styles.dateTime]}>{lastMessage.time}</Text>
+					): null}
 				</View>
 
-				<Text style={[styles.defaultText, styles.lastMessage]}>
-					{directMessage.last_sent_message.sender_id === userId ? t('directMessage.you') : senderMessage?.user?.username}
-					{': ' + lastMessage.t}
-				</Text>
+				{lastMessage ? (
+					<Text style={[styles.defaultText, styles.lastMessage]}>
+						{directMessage?.last_sent_message?.sender_id === userId ? t('directMessage.you') : senderMessage?.user?.username}
+						{': ' + lastMessage?.text}
+					</Text>
+				): null}
 			</View>
 		</TouchableOpacity>
 	)
@@ -70,9 +82,9 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const { listDM: dmGroupChatList } = useDirect();
 	const { t } = useTranslation(['dmMessage', 'common']);
 
-	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
+	const filterDmGroupsByChannelLabel = (data: DirectEntity[]) => {
 		const uniqueLabels = new Set();
-		return data.filter((obj: IChannel) => {
+		return data.filter((obj: DirectEntity) => {
 			const isUnique = !uniqueLabels.has(obj.channel_label);
 			uniqueLabels.add(obj.channel_label);
 			return isUnique;
@@ -85,6 +97,10 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const navigateToAddFriendScreen = () => {
 		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.ADD_FRIEND });
+	}
+
+	const navigateToNewMessageScreen = () => {
+		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.NEW_MESSAGE });
 	}
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)
@@ -117,7 +133,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 				renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
 			/>
 
-			<Pressable style={styles.addMessage}>
+			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
 				<MessageIcon width={32} height={25} style={{marginLeft: -5}} />
 			</Pressable>
 		</View>
