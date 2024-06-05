@@ -50,12 +50,6 @@ import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 
-type Emoji = {
-	emoji: string;
-	name: string;
-	shortname: string;
-};
-
 type ChannelsMentionProps = {
 	id: string;
 	display: string;
@@ -130,6 +124,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
+	const [mentionListUpdate, setMentionListUpdate] = useState(props.listMentions);
 
 	useEffect(() => {
 		if (getRefMessageReply && getRefMessageReply.attachments) {
@@ -433,6 +428,35 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 	const { appearanceTheme } = useApp();
+
+	useEffect(() => {
+		if (valueTextInput && valueTextInput.includes('@')) {
+			const searchValue = valueTextInput.slice(1).toLowerCase(); // Remove '@' and convert to lowercase
+
+			const sortedMentionList = [...(mentionListUpdate ?? [])].sort((a, b) => {
+				const displayA = a?.display?.toLowerCase() ?? '';
+				const displayB = b?.display?.toLowerCase() ?? '';
+
+				// Calculate the index of searchValue in displayA and displayB
+				const indexA = displayA.indexOf(searchValue);
+				const indexB = displayB.indexOf(searchValue);
+
+				// Sort based on the index position (smaller index comes first)
+				if (indexA !== -1 && indexB !== -1) {
+					return indexA - indexB; // Smaller index (closer match) comes first
+				} else if (indexA !== -1) {
+					return -1; // A comes before B (A has the match)
+				} else if (indexB !== -1) {
+					return 1; // B comes before A (B has the match)
+				} else {
+					return displayA.localeCompare(displayB); // Default to alphabetical order
+				}
+			});
+
+			setMentionListUpdate(sortedMentionList);
+		}
+	}, [valueTextInput, mentionListUpdate]);
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -479,7 +503,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			>
 				<Mention
 					appendSpaceOnAdd={true}
-					data={props.listMentions ?? []}
+					data={mentionListUpdate ?? []}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
 						return `@${display}`;

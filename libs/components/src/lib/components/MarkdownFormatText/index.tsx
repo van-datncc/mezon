@@ -117,8 +117,8 @@ const EmojiMarkdown = ({ emojiSyntax, onlyEmoji }: EmojiMarkdownOpt) => {
 	return (
 		<span style={{ userSelect: 'none' }}>
 			<img
-				src={getSrcEmoji(emojiSyntax, emojiListPNG)}
-				alt={getSrcEmoji(emojiSyntax, emojiListPNG)}
+				src={getSrcEmoji(emojiSyntax.trim(), emojiListPNG)}
+				alt={getSrcEmoji(emojiSyntax.trim(), emojiListPNG)}
 				className={`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`}
 				onDragStart={(e) => e.preventDefault()}
 			/>{' '}
