@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
-import { onMessageListener, requestForToken } from 'libs/components/src/lib/components/Firebase/firebase';
+import { onMessageListener, requestForToken } from '@mezon/components';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';

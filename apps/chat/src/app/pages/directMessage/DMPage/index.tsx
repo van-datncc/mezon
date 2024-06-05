@@ -10,7 +10,7 @@ import {
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, selectCurrentChannel, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState } from '@mezon/store';
+import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
@@ -26,7 +26,6 @@ export default function DirectMessage() {
 	const { navigate } = useAppNavigation();
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
-
 	useEffect(() => {
 		if (defaultChannelId) {
 			navigate(`./${defaultChannelId}`);
@@ -34,6 +33,7 @@ export default function DirectMessage() {
 	}, [defaultChannelId, navigate]);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
+
 	const { messages } = useDirectMessages({
 		channelId: directId ?? '',
 		mode: currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
@@ -45,7 +45,6 @@ export default function DirectMessage() {
 		}
 	}, [isSending, [], messages]);
 
-	const currentChannel = useSelector(selectCurrentChannel);
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { idMessageRefReaction } = useReference();
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -87,7 +86,7 @@ export default function DirectMessage() {
 								type={currentDmGroup?.user_id?.length === 1 ? 'DM' : 'GROUP'}
 								mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
 								avatarDM={
-									currentDmGroup?.user_id?.length === 1 ? currentDmGroup.channel_avatar?.at(0) : '/assets/images/avatar-group.png'
+									currentDmGroup?.user_id?.length === 1 ? currentDmGroup.channel_avatar?.at(0) : 'assets/images/avatar-group.png'
 								}
 							/>
 						}
@@ -101,7 +100,9 @@ export default function DirectMessage() {
 							<div className="mb-0 z-10 h-full">
 								<GifStickerEmojiPopup
 									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_DM || ChannelStreamMode.STREAM_MODE_GROUP}
+									mode={
+										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+									}
 									emojiAction={EmojiPlaces.EMOJI_REACTION}
 								/>
 							</div>
@@ -109,7 +110,7 @@ export default function DirectMessage() {
 					)}
 					{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
 						<div
-							className="fixed max-sm:hidden"
+							className="fixed max-sm:hidden z-10"
 							style={{
 								top: topPositionEmojiPanel,
 								bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
@@ -119,17 +120,19 @@ export default function DirectMessage() {
 										: `${positionOfSmileButton.right}px`,
 							}}
 						>
-							<div className="mb-0 z-10 h-full">
+							<div className="mb-0 z-50 h-full ">
 								<GifStickerEmojiPopup
 									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_DM || ChannelStreamMode.STREAM_MODE_GROUP}
+									mode={
+										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+									}
 									emojiAction={EmojiPlaces.EMOJI_REACTION}
 								/>
 							</div>
 						</div>
 					)}
 
-					<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+					<div className="flex-shrink-0 flex flex-col z-0 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 						{directId && (
 							<ChannelTyping
 								channelId={directId}

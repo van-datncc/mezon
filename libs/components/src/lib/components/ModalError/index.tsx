@@ -12,7 +12,7 @@ export const ModalOverData = ({openModal, handleClose}: props) => {
 					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
 						<img
 							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
-							src="/assets/images/file-and-folder.png"
+							src="assets/images/file-and-folder.png"
 							alt="file"
 						/>
 						<h3 className="text-white text-4xl font-semibold">Your files are too powerful</h3>
@@ -30,7 +30,7 @@ export const ModalErrorTypeUpload = ({openModal, handleClose}: props) => {
 					<div className="space-y-6 h-52 border-dashed border-2 flex text-center justify-center flex-col">
 						<img
 							className="w-60 h-60 absolute top-[-130px] left-1/2 translate-x-[-50%]"
-							src="/assets/images/file-and-folder.png"
+							src="assets/images/file-and-folder.png"
 							alt="file"
 						/>
 						<h3 className="text-white text-4xl font-semibold">Only image files are allowed</h3>

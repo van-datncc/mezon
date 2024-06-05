@@ -1,5 +1,5 @@
 import { useApp, useEscapeKey, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, selectIsShowMemberList } from '@mezon/store';
+import { appActions, messagesActions, selectIsShowMemberList } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
-import { ChannelLabel, SearchMessage } from './TopBarComponents';
+import SearchMessageChannel from '../SearchMessageChannel';
+import { ChannelLabel } from './TopBarComponents';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
@@ -29,7 +30,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen z-[1]'} ${(closeMenu && statusMenu) ? 'left-[344px]' : 'left-0'}`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen z-[1]'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
 			{checkChannelType ? (
 				<>
@@ -67,7 +68,7 @@ function ChannelTopbar({ channel }: ChannelTopbarProps) {
 										<ChannelListButton isLightMode={appearanceTheme === 'light'} />
 									</div>
 								</div>
-								<SearchMessage />
+								<SearchMessageChannel />
 							</div>
 							<div
 								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
@@ -212,6 +213,7 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const isActive = useSelector(selectIsShowMemberList);
 	const handleClick = () => {
 		dispatch(appActions.setIsShowMemberList(!isActive));
+		dispatch(messagesActions.setIsSearchMessage(false));
 	};
 	return (
 		<div className="relative leading-5 h-5">
