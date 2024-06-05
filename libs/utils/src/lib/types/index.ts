@@ -295,7 +295,6 @@ export enum SubPanelName {
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
-
 export type IEmoji = {
 	category: string;
 	emoji: string;
@@ -461,4 +460,10 @@ export enum Tabs_Option {
 export enum OptionEvent {
 	OPTION_SPEAKER = 'Speaker',
 	OPTION_LOCATION = 'Location',
+}
+
+export enum MentionTypeEnum {
+	MENTION = 'MENTION',
+	HASHTAG = 'HASHTAG',
+	EMOJI_SYNTAX = 'EMOJI_SYNTAX',
 }
