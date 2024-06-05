@@ -1,33 +1,31 @@
 import { Icons } from '@mezon/components';
 import { useClans, useSearchMessages } from '@mezon/core';
-import { messagesActions, useAppDispatch } from '@mezon/store';
-import { UserSearchDataProps } from '@mezon/utils';
+import { appActions, messagesActions, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { useSelector } from 'react-redux';
 import SelectGroup from './SelectGroup';
 import SelectItem from './SelectItem';
 import darkMentionsInputStyle from './StyleSearchMessages';
 
 const SearchMessageChannel = () => {
 	const dispatch = useAppDispatch();
+	const isActive = useSelector(selectIsShowMemberList);
 
 	const { searchMessages } = useSearchMessages();
 	const { listUserSearch } = useClans();
-
-	const [test, setTest] = useState<UserSearchDataProps[] | []>([]);
+	const { isSearchMessage } = useSearchMessages();
 
 	const [expanded, setExpanded] = useState(false);
-	const [isss, setIsss] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
 	const [value, setValue] = useState<string>('');
 	const [search, setSearch] = useState<ApiSearchMessageRequest | undefined>();
 	const inputRef = useRef<HTMLInputElement>(null);
+	const searchRef = useRef<HTMLInputElement | null>(null);
 
 	const handleInputClick = () => {
 		setExpanded(true);
-		setIsss(true);
-		setTest(listUserSearch);
 		setIsShowSearchMessageModal(true);
 	};
 
@@ -51,13 +49,24 @@ const SearchMessageChannel = () => {
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
 		if (value && event.key === 'Enter') {
-			setTest([]);
 			setIsShowSearchMessageModal(false);
 			dispatch(messagesActions.setIsSearchMessage(true));
+			if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 			if (search) {
 				searchMessages(search);
 			}
 		}
+	};
+
+	const handleSearchIcon = () => {
+		searchRef.current?.focus();
+		setExpanded(true);
+	};
+
+	const handleClose = () => {
+		setValue('');
+		dispatch(messagesActions.setIsSearchMessage(false));
+		if (isSearchMessage) dispatch(appActions.setIsShowMemberList(!isActive));
 	};
 
 	useEffect(() => {
@@ -75,6 +84,7 @@ const SearchMessageChannel = () => {
 				} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
 			>
 				<MentionsInput
+					inputRef={searchRef}
 					placeholder="Search"
 					value={value ?? ''}
 					style={darkMentionsInputStyle}
@@ -122,8 +132,19 @@ const SearchMessageChannel = () => {
 					/>
 				</MentionsInput>
 			</div>
-			<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">
-				<Icons.Search />
+			<div className="w-6 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">
+				<button
+					onClick={handleSearchIcon}
+					className={`${value ? 'z-0 opacity-0 rotate-0' : 'z-10 opacity-100 rotate-90'} w-4 h-4 absolute transition-transform`}
+				>
+					<Icons.Search className="w-4 h-4" />
+				</button>
+				<button
+					onClick={handleClose}
+					className={`${value ? 'z-10 opacity-100 rotate-90' : 'z-0 opacity-0 rotate-0'} w-4 h-4 absolute transition-transform`}
+				>
+					<Icons.Close defaultSize="w-4 h-4" />
+				</button>
 			</div>
 		</div>
 	);

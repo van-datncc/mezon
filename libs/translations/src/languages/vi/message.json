@@ -24,5 +24,11 @@
     },
     "directMessage": {
         "you": "Bạn"
+    },
+    "newMessage": {
+        "to": "Đến",
+        "newGroup": "Nhóm Mới",
+        "addFriend": "Thêm bạn",
+        "create": "Tạo"
     }
 }

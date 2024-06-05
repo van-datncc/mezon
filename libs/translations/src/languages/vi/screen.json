@@ -6,7 +6,9 @@
         "requestFriend": "Yêu cầu kết bạn",
         "friendRequestSettings": "Cài đặt yêu cầu kết bạn",
         "language": "Ngôn ngữ",
-        "profile": "Hồ sơ"
+        "profile": "Hồ sơ",
+        "newMessage": "Tin Nhắn Mới",
+        "newGroup": "Nhóm Mới"
     },
     "headerRight": {
         "addFriends": "Thêm bạn bè"
