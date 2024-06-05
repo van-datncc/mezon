@@ -10,7 +10,7 @@ import {
 	getSrcEmoji,
 	updateEmojiReactionData,
 } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type MessageReactionProps = {
@@ -182,7 +182,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 						const checkID = emoji.message_id === message.id;
 						const totalCount = calculateTotalCount(emoji.senders);
 						return (
-							<div key={`${index + message.id}`}>
+							<Fragment key={`${index + message.id}`}>
 								{checkID && totalCount > 0 && (
 									<div
 										ref={(element) => (childRef.current[index] = element)}
@@ -227,7 +227,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											)}
 									</div>
 								)}
-							</div>
+							</Fragment>
 						);
 					})}
 			</div>

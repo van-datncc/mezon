@@ -421,6 +421,7 @@ export type ILineMention = {
 
 export type IMessageLine = {
 	mentions: ILineMention[];
+	isOnlyEmoji: boolean;
 };
 
 export interface UsersClanEntity extends IUsersClan {
