@@ -205,30 +205,47 @@ export const updateEmojiReactionData = (data: any[]) => {
 	return Object.values(dataItemReaction);
 };
 
+export const checkTextBetweenTripleBackStick = (text: string) => {
+	if (text.startsWith('```') || (text.startsWith('\n```') && text.endsWith('```')) || text.endsWith('\n```')) {
+		return true;
+	}
+	// } else if (text.startsWith('```{') && text.endsWith('}```')) {
+	// 	return true;
+	// } else if (text.startsWith('```"') && text.endsWith('"```')) {
+	// 	return true;
+	// } else if (text.startsWith("```'") && text.endsWith("'```")) {
+	// 	return true;
+	// } else if (text.startsWith('```(') && text.endsWith(')```')) {
+	// 	return true;
+	// }
+	else return false;
+};
+
 export const checkMarkdownInText = (text: string) => {
-	const backtickRegex = /`[^`]*`/g;
+	// const backtickRegex = /`[^`]*`/g;
 	const headingRegex = /^(#{1,6}) (.*)/gm;
 
 	const numberedListRegex = /^\d+\.\s/gm;
 	const italicRegex = /\*([^*]+)\*/g;
 	const boldRegex = /\*\*([^*]+)\*\*/g;
 	const boldItalicRegex = /\*\*\*([^*]+)\*\*\*/g;
-	const startWithHttpOrHttps = text.startsWith('https://') || text.startsWith('http://');
+	const startWithHttpOrHttps = text.startsWith('https://') || text.startsWith('http://') || text.startsWith('\nhttps://') || text.startsWith('\nhttp://');
+	const betweenBackstick = text.startsWith('`') && text.endsWith('`');
 
-	const startsWithTripleBackticks = text.startsWith('\n```') || text.startsWith('```');
-	const endsWithTripleBackticks = text.endsWith('```') || text.endsWith('\n```');
-	const onlyBackticks = /^```$/.test(text);
+	// const startsWithTripleBackticks = text.startsWith('\n```') || !text.startsWith('```');
+	// const endsWithTripleBackticks = text.endsWith('```') || text.endsWith('\n```');
+	// const onlyBackticks = /^```$/.test(text);
+
 	const isQuote = text.startsWith('>');
 
 	if (
-		backtickRegex.test(text) ||
+		betweenBackstick ||
 		headingRegex.test(text) ||
 		numberedListRegex.test(text) ||
 		italicRegex.test(text) ||
 		boldRegex.test(text) ||
 		boldItalicRegex.test(text) ||
-		(startsWithTripleBackticks && endsWithTripleBackticks) ||
-		onlyBackticks ||
+		// onlyBackticks ||
 		isQuote ||
 		startWithHttpOrHttps
 	) {

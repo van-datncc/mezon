@@ -130,10 +130,10 @@ type TextWithMentionHashtagEmojiOpt = {
 };
 
 const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmojiOpt) => {
-	const lineMessageWithSpace = lineMessage.replace('\n', '\n ');
-
+	const modified = lineMessage.replace("':\n'", "':\n '");
+	const combinedRegex = /(@\S+|#\S+|:\b[^:]*\b:|`(.*?)`)/g;
 	const { emojiListPNG } = useEmojiSuggestion();
-	const splitText = lineMessageWithSpace.split(' ');
+	const splitText = modified?.split(combinedRegex).filter(Boolean);
 	console.log(splitText);
 	return (
 		<div className="lineText contents gap-1">
@@ -142,7 +142,9 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 				const isHashtag = item.startsWith('#');
 				const isEmojiSyntax = item.match(/:\b[^:]*\b:/g);
 				const checkItemIsMarkdown = checkMarkdownInText(item);
-
+				const checkBetweenTripleBacktick = checkTextBetweenTripleBackStick(item);
+				console.log(checkItemIsMarkdown);
+				console.log(checkBetweenTripleBacktick);
 				// console.log('---');
 				// console.log(item);
 				// console.log(isMention);
@@ -150,7 +152,7 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 				// console.log(isEmojiSyntax);
 				// console.log(checkItemIsMarkdown);
 
-				if (isMention && !isHashtag && !isEmojiSyntax && !checkItemIsMarkdown) {
+				if (isMention && !isHashtag && !isEmojiSyntax && !checkItemIsMarkdown && !checkBetweenTripleBacktick) {
 					return (
 						<span key={`mention-${index}`}>
 							{splitText[index + 1] === ';' ||
@@ -165,7 +167,7 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 							)}
 						</span>
 					);
-				} else if (!isMention && isHashtag && !isEmojiSyntax && !checkItemIsMarkdown) {
+				} else if (!isMention && isHashtag && !isEmojiSyntax && !checkItemIsMarkdown && !checkBetweenTripleBacktick) {
 					return (
 						<span key={`hashtag-${index}`}>
 							{splitText[index + 1] === ';' ||
@@ -180,13 +182,13 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 							)}
 						</span>
 					);
-				} else if (!isMention && !isHashtag && !isEmojiSyntax && checkItemIsMarkdown) {
+				} else if (checkItemIsMarkdown && !checkBetweenTripleBacktick) {
 					const getLinkinvite = (children: any) => {
 						window.location.href = children;
 					};
 
 					return (
-						<div key={`url-on-text-${index}`}>
+						<span key={`url-on-text-${index}`}>
 							<Markdown
 								children={item}
 								remarkPlugins={[remarkGFM]}
@@ -205,9 +207,36 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 									),
 								}}
 							/>{' '}
+						</span>
+					);
+				} else if (checkItemIsMarkdown && checkBetweenTripleBacktick) {
+					const getLinkinvite = (children: any) => {
+						window.location.href = children;
+					};
+
+					return (
+						<div key={`url-on-text-${index}`}>
+							<Markdown
+								children={convertMarkdown(item)}
+								remarkPlugins={[remarkGFM]}
+								components={{
+									pre: PreClass,
+									p: 'span',
+									a: ({ children }) => (
+										<span
+											onClick={() => getLinkinvite(children)}
+											rel="noopener noreferrer"
+											style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
+											className="tagLink"
+										>
+											{children}
+										</span>
+									),
+								}}
+							/>{' '}
 						</div>
 					);
-				} else if (!isMention && !isHashtag && isEmojiSyntax && !checkItemIsMarkdown) {
+				} else if (!isMention && !isHashtag && isEmojiSyntax && !checkItemIsMarkdown && !checkBetweenTripleBacktick) {
 					return (
 						<span key={`emoji-${index}`} style={{ userSelect: 'none' }}>
 							<img
