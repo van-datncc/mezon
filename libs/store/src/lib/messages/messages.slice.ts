@@ -344,7 +344,10 @@ export const messagesSlice = createSlice({
 				case 1:
 					messagesAdapter.updateOne(state, {
 						id: action.payload.id,
-						changes: { content: action.payload.content },
+						changes: {
+							content: action.payload.content,
+							update_time: action.payload.update_time
+						},
 					});
 					break;
 				case 2:

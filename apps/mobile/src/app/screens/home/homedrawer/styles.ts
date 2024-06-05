@@ -366,6 +366,14 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		color: Colors.tertiary,
 	},
+	editedText: {
+		fontSize: size.small,
+		color: Colors.gray72,
+	},
+	contentWrapper: {
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
 	contentMessageCombine: {
     padding: size.s_2,
 	},

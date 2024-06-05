@@ -26,6 +26,7 @@ import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { useTranslation } from 'react-i18next';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -66,6 +67,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const { usersClan } = useClans();
+	const { t } = useTranslation('message');
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -260,11 +262,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return (
 			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
+				<View style={styles.contentWrapper}>
 				{matchesMention?.length ? (
 					<Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>
 				) : (
 					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{renderTextWithEmoji(lines)}</Text>
 				)}
+				{isEdited ? (
+					<Text style={styles.editedText}>{t('edited')}</Text>
+				): null}
+				</View>
 			</Hyperlink>
 		);
 	};
@@ -301,6 +308,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const jumpToRepliedMesage = () => {
 		console.log('message to jump', messageRefFetchFromServe);
 	};
+
+	const isEdited = useMemo(() => {
+		if (message?.update_time) {
+			const updateDate = new Date(message?.update_time);
+			const createDate = new Date(message?.create_time);
+			return updateDate > createDate;
+		}
+		return false;
+	}, [message])
 
 	return (
 		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
