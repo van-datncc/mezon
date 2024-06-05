@@ -444,6 +444,7 @@ export type ILineMention = {
 
 export type IMessageLine = {
 	mentions: ILineMention[];
+	isOnlyEmoji: boolean;
 };
 
 export interface UsersClanEntity extends IUsersClan {
@@ -483,4 +484,10 @@ export enum Tabs_Option {
 export enum OptionEvent {
 	OPTION_SPEAKER = 'Speaker',
 	OPTION_LOCATION = 'Location',
+}
+
+export enum MentionTypeEnum {
+	MENTION = 'MENTION',
+	HASHTAG = 'HASHTAG',
+	EMOJI_SYNTAX = 'EMOJI_SYNTAX',
 }

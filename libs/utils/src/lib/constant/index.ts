@@ -10,7 +10,7 @@ export const threadError: ThreadError = {
 	message: 'Starter Message is required',
 };
 
-export const regexToDetectGifLink = /\bhttps?:\/\/\S+\.gif\b/g;
+export const regexToDetectGifLink = /(^|\s)https?:\/\/\S+\.gif(?=\s|$)/g;
 
 export const MIN_THRESHOLD_CHARS = 4096;
 
