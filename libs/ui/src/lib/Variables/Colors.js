@@ -27,6 +27,7 @@ module.exports = {
   bgHoverMember: '#3b3b3b',
   bgHover: '#393C41',
   bgModifierHover: '#404249',
+  bgSearchHover: '#232528',
   bgProfileBody: '#111214',
   bgSelectItem: '#505cdc',
   bgSelectItemHover: '#4752C4',
@@ -66,6 +67,8 @@ module.exports = {
   /* button */
   buttonProfile: '#4E5058',
   buttonProfileHover: '#41434A',
+  buttonSearch: '#3B3C43',
+  buttonSearchHover: '#2C2E32',
 
   primary: '#155EEF',
   hoverPrimary: '#124FC9',

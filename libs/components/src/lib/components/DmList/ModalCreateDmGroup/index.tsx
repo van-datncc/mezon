@@ -17,7 +17,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 	const navigate = useNavigate();
 	const { friends } = useFriends();
 	const [length, setLength] = useState<number>(selectedFriends.length);
-	const {appearanceTheme} = useApp();
+	const { appearanceTheme } = useApp();
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 
@@ -83,12 +83,12 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 						/>
 						<p className="text-sm font-medium my-[8px]">Add individual members by starting with @, or type a role name</p>
 						<ul
-							className={`h-[400px] pb-3 text-sm text-black dark:text-gray-200 max-h-[250px] overflow-y-scroll ${appearanceTheme === "light" ? 'customSmallScrollLightMode' : ''}`}
+							className={`h-[400px] pb-3 text-sm text-black dark:text-gray-200 max-h-[250px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : ''}`}
 							aria-labelledby="dropdownSearchButton"
 						>
 							{filteredFriends.map((friend, index) => (
 								<li key={friend.id}>
-									<div className="flex text-black dark:white items-center py-2 my-2 rounded w-full">
+									<div className="flex text-black dark:text-white items-center py-2 my-2 rounded w-full">
 										<input
 											id={`checkbox-item-${index}`}
 											type="checkbox"

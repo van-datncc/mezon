@@ -42,6 +42,7 @@ export const styles = StyleSheet.create({
 	},
 	aboveTextBoxItem: {
 		flexDirection: 'row',
+		alignItems: 'center',
 		paddingHorizontal: size.tiny,
 		padding: size.tiny,
 		gap: 10,
@@ -396,7 +397,7 @@ export const styles = StyleSheet.create({
 	},
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
-		marginVertical: size.s_10,
+		marginVertical: size.s_6,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',

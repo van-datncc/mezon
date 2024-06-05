@@ -5,7 +5,7 @@ import {
 	getStoreAsync,
 	initStore,
 	selectIsLogin,
-	setHasInternetMobile,
+	selectHasInternetMobile,
 	emojiSuggestionActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -31,7 +31,7 @@ const RootStack = createStackNavigator();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const [isDarkMode] = useState(true); //TODO: move to custom hook\
-	const hasInternet = useSelector(setHasInternetMobile);
+	const hasInternet = useSelector(selectHasInternetMobile);
 
 	useEffect(() => {
 		const unsubscribe = messaging().onMessage((remoteMessage) => {

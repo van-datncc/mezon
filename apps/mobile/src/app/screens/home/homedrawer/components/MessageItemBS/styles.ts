@@ -8,6 +8,7 @@ export const styles = StyleSheet.create({
 		width: '100%',
 		borderTopRightRadius: 8,
 		borderTopLeftRadius: 8,
+		overflow: 'hidden',
 	},
 	messageActionsWrapper: {
 		paddingTop: size.s_2,

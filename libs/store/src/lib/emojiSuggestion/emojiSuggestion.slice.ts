@@ -52,30 +52,22 @@ export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, t
 
 export const fetchEmojiMobile = createAsyncThunk<any>('emoji/fetchStatusMobile', async (_, thunkAPI) => {
 	try {
-		const cachedData = await AsyncStorage.getItem('emojiCache');
 		const cachedEmojiImageData = await AsyncStorage.getItem('emojiImageCache');
-		if (!!cachedData && !!cachedEmojiImageData) {
-			const cachedEmojis = JSON.parse(cachedData) as IEmoji[];
-			const cachedEmojiImages = JSON.parse(cachedEmojiImageData) as IEmoji[];
+
+		if (cachedEmojiImageData) {
+			emojiImageCache = JSON.parse(cachedEmojiImageData) as IEmojiImage[];
 			return {
-				emoji: cachedEmojis,
-				emojiImage: cachedEmojiImages,
+				emojiImage: emojiImageCache,
 			};
 		}
-		const response = await fetch(`${process.env.NX_CHAT_APP_CDN_META_DATA_EMOJI}`);
 		// Temp: mock api to get emoji image data
 		const responseEmojiImg = await fetch(`https://api.mockfly.dev/mocks/a82e14d2-488d-41d3-8ca3-8af8e92626b9/emoijmobile`);
-		if (!response.ok) {
+		if (!responseEmojiImg.ok) {
 			throw new Error('Failed to fetch emoji data');
 		}
-		const data = await response.json();
-		const responseEmojiImgEmojiImg = await responseEmojiImg.json();
-		emojiCache = data.emojis;
-		emojiImageCache = responseEmojiImgEmojiImg;
-		await AsyncStorage.setItem('emojiCache', JSON.stringify(emojiCache));
+		emojiImageCache = await responseEmojiImg.json();
 		await AsyncStorage.setItem('emojiImageCache', JSON.stringify(emojiImageCache));
 		return {
-			emoji: emojiCache,
 			emojiImage: emojiImageCache,
 		};
 	} catch (error) {
@@ -99,11 +91,11 @@ export const emojiSuggestionSlice = createSlice({
 	reducers: {
 		add: emojiSuggestionAdapter.addOne,
 		remove: emojiSuggestionAdapter.removeOne,
-		
+
 		setSuggestionEmojiPicked: (state, action: PayloadAction<string>) => {
 			state.emojiPicked = action.payload;
 		},
-		
+
 		setStatusSuggestionEmojiList: (state, action: PayloadAction<boolean>) => {
 			state.emojiSuggestionListStatus = action.payload;
 		},
@@ -124,13 +116,12 @@ export const emojiSuggestionSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		
+
 		builder
 			.addCase(fetchEmojiMobile.pending, (state: EmojiSuggestionState) => {
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchEmojiMobile.fulfilled, (state: EmojiSuggestionState, action: PayloadAction<FetchEmojiMobilePayload>) => {
-				emojiSuggestionAdapter.setAll(state, action.payload.emoji as EmojiSuggestionEntity[]);
 				state.loadingStatus = 'loaded';
 				state.emojiImage = action.payload.emojiImage;
 			})

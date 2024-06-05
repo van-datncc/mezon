@@ -2503,3 +2503,26 @@ export function ImageUploadIcon(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 128 128" id="Layer_1" version="1.1" viewBox="0 0 128 128" xmlSpace="preserve">
+			<circle cx="64" cy="64" fill="#4B5F83" id="circle" r="64"/>
+			<g id="icon">
+				<path d="M64,99h35c0-16-10.4-29-24.6-33.4C80.1,62,84,55.7,84,48.5c0-11-9-20-20-20" fill="#E6E6E6" id="right"/>
+				<path d="M64,28.5c-11,0-20,9-20,20c0,7.2,3.9,13.6,9.6,17.1C39.4,70,29,83,29,99h35" fill="#FFFFFF" id="left"/>
+			</g>
+		</svg>
+	);
+}
+
+export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-contentTertiary text-colorTextLightMode' }) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className={defaultSize}>
+			<path fill="currentColor" d="M7 1a1 1 0 0 1 1 1v.75c0 .14.11.25.25.25h7.5c.14 0 .25-.11.25-.25V2a1 1 0 1 1 2 0v.75c0 .14.11.25.25.25H19a3 3 0 0 1 3 3 1 1 0 0 1-1 1H3a1 1 0 0 1-1-1 3 3 0 0 1 3-3h.75c.14 0 .25-.11.25-.25V2a1 1 0 0 1 1-1Z">
+			</path>
+			<path fill="currentColor" fillRule="evenodd" d="M2 10a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-9Zm3.5 2a.5.5 0 0 0-.5.5v3c0 .28.22.5.5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z" clipRule="evenodd" >
+			</path>
+		</svg>
+	);
+}

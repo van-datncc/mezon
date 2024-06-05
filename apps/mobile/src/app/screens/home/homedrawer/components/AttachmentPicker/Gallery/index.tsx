@@ -171,6 +171,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		const options = {
 			durationLimit: 10000,
 			mediaType: 'photo',
+			includeBase64: true,
 		};
 
 		ImagePicker.launchCamera(options as CameraOptions, async (response) => {
@@ -180,15 +181,21 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				console.log('Camera Error: ', response.errorMessage);
 			} else {
 				const file = response.assets[0];
-				const fileData = await RNFS.readFile(file.uri, 'base64');
 
 				const fileFormat: IFile = {
 					uri: file?.uri,
 					name: file?.fileName,
 					type: file?.type,
 					size: file?.fileSize?.toString(),
-					fileData,
+					fileData: file?.base64,
 				};
+
+				setAttachmentData({
+					url: file?.uri,
+					filename: file?.fileName || file?.uri,
+					filetype: file?.type,
+				});
+
 				onPickGallery([fileFormat]);
 			}
 		});

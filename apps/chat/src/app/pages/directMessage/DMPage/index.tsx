@@ -87,7 +87,7 @@ export default function DirectMessage() {
 								type={currentDmGroup?.user_id?.length === 1 ? 'DM' : 'GROUP'}
 								mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
 								avatarDM={
-									currentDmGroup?.user_id?.length === 1 ? currentDmGroup.channel_avatar?.at(0) : '/assets/images/avatar-group.png'
+									currentDmGroup?.user_id?.length === 1 ? currentDmGroup.channel_avatar?.at(0) : 'assets/images/avatar-group.png'
 								}
 							/>
 						}

@@ -15,7 +15,7 @@ import { DirectEntity, selectMemberByUserId } from '@mezon/store-mobile';
 
 const SeparatorListFriend = () => {
 	return (
-		<View style={{height: size.s_8}} />
+		<View style={{ height: size.s_8 }} />
 	)
 }
 
@@ -26,15 +26,15 @@ const DmListItem = (props: { directMessage: DirectEntity, navigation: any}) => {
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const senderMessage = useSelector(selectMemberByUserId(directMessage?.last_sent_message?.sender_id || ''));
 	const redirectToMessageDetail = () => {
-		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessage } })
+		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: directMessage?.id } })
 	}
-
 	const lastMessage = useMemo(() => {
-		if (directMessage?.last_sent_message) {
+		if (directMessage?.last_sent_message?.content) {
 			const timestamp = Number(directMessage?.last_sent_message?.timestamp);
+			const content = directMessage?.last_sent_message?.content;
 			return {
 				time: moment.unix(timestamp).format('DD/MM/YYYY HH:mm'),
-				text: JSON.parse(directMessage?.last_sent_message?.content)?.t
+				text: typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t
 			}
 		}
 		return null;
@@ -46,13 +46,13 @@ const DmListItem = (props: { directMessage: DirectEntity, navigation: any}) => {
 				<View style={styles.groupAvatar}>
 					<UserGroupIcon />
 				</View>
-			): (
+			) : (
 				<View>
 					<Image source={{ uri: directMessage.channel_avatar[0] }} style={styles.friendAvatar} />
 					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 				</View>
 			)}
-			
+
 			<View style={{ flex: 1 }}>
 				<View style={styles.messageContent}>
 					<Text
@@ -114,7 +114,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
-			
+
 			<View style={styles.searchMessage}>
 				<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 				<TextInput

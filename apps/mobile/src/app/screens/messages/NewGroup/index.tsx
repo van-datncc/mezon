@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View, Text, Pressable, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { styles } from "./styles";
 import { ArrowLeftIcon } from "@mezon/mobile-components";
@@ -9,12 +9,11 @@ import { useDirect, useFriends } from "@mezon/core";
 import { useThrottledCallback } from "use-debounce";
 import { normalizeString } from "../../../utils/helpers";
 import { FriendListByAlphabet } from "../../../components/FriendListByAlphabet";
-import { FriendsEntity, directActions, selectDmGroupCurrent, useAppDispatch } from "@mezon/store-mobile";
+import { FriendsEntity, directActions, useAppDispatch } from "@mezon/store-mobile";
 import { EFriendItemAction } from "../../../components/FriendItem";
 import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
 import { ChannelType } from "mezon-js";
 import { APP_SCREEN } from "../../../navigation/ScreenTypes";
-import { useSelector } from "react-redux";
 
 export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     const [searchText, setSearchText] = useState<string>('');
@@ -23,8 +22,6 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     const { friends: allUser } = useFriends();
     const { listDM } = useDirect();
     const dispatch = useAppDispatch();
-    const [newChannelId, setNewChannelId] = useState<string>('');
-    const newDirectMessage = useSelector(selectDmGroupCurrent(newChannelId));
 
     const friendList: FriendsEntity[] = useMemo(() => {
         return allUser.filter((user) => user.state === 0)
@@ -51,13 +48,6 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
         setFriendIdSelectedList(friendIdSelected);
     }, [])
 
-    useEffect(() => {
-        if (newDirectMessage?.channel_id) {
-            navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessage: newDirectMessage, from: APP_SCREEN.MESSAGES.NEW_GROUP } });
-            setNewChannelId('');
-        }
-    }, [newDirectMessage, navigation])
-
     const createNewGroup = async () => {
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: friendIdSelectedList.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
@@ -67,21 +57,9 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
 
 		const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
 		const resPayload = response.payload as ApiCreateChannelDescRequest;
-        console.log(friendIdSelectedList);
-        console.log(resPayload);
-        console.log(listDM);
 		if (resPayload.channel_id) {
-            const directMessage = listDM.find(dm => dm.channel_id === resPayload.channel_id)
-            if (directMessage) {
-                console.log('1', directMessage);
-                navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessage, from: APP_SCREEN.MESSAGES.NEW_GROUP } });
-                return;
-            }
-            console.log('2', directMessage);
-            //NOTE: handle navigate for new DM
-            setNewChannelId(resPayload.channel_id);
+            navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: resPayload.channel_id, from: APP_SCREEN.MESSAGES.NEW_GROUP } });
 		}
-
     }
 
     const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)

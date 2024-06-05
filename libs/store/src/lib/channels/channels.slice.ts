@@ -13,6 +13,7 @@ import { threadsActions } from '../threads/threads.slice';
 import memoize from 'memoizee';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
+import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
@@ -79,6 +80,7 @@ export const joinChannel = createAsyncThunk(
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
+			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({channelId: channelId}))
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			thunkAPI.dispatch(channelsActions.setMode('clan'));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
@@ -386,7 +388,7 @@ export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, 
 );
 
 export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels) =>
-	channels.filter((channel) => channel.type == ChannelType.CHANNEL_TYPE_VOICE),
+	channels.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_VOICE),
 );
 
 export const selectChannelFirst = createSelector(selectAllChannels, (channels) => channels[0]);

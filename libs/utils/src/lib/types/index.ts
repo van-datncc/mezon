@@ -2,6 +2,7 @@ import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
+	ApiChannelAttachment,
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
@@ -16,7 +17,10 @@ import {
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
 	ApiPermission,
+	ApiPinMessage,
+	ApiPinMessageRequest,
 	ApiRole,
+	ApiSearchMessageDocument,
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
@@ -29,6 +33,10 @@ export * from './thumbnailPos';
 export type LoadingStatus = 'not loaded' | 'loading' | 'loaded' | 'error';
 
 export type IClan = ApiClanDesc & {
+	id: string;
+};
+
+export type IChannelAttachment = ApiChannelAttachment & {
 	id: string;
 };
 
@@ -99,6 +107,10 @@ export type IChannel = ApiChannelDescription & {
 	description?: string;
 };
 
+export type IPinMessage = ApiPinMessage & {
+	id: string;
+};
+
 export type IChannelMember = ChannelUserListChannelUser & {
 	id: string;
 	channelId?: string;
@@ -153,6 +165,10 @@ export type IMessage = ChannelMessage & {
 	creationTime?: Date;
 	creationTimeMs?: number;
 	lastSeen?: boolean;
+};
+
+export type SearchMessage = ApiSearchMessageDocument & {
+	id: string;
 };
 
 export type IMessageWithUser = IMessage & {
@@ -295,7 +311,6 @@ export enum SubPanelName {
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
-
 export type IEmoji = {
 	category: string;
 	emoji: string;
@@ -386,6 +401,13 @@ export type MentionDataProps = {
 	name?: string;
 };
 
+export type UserSearchDataProps = {
+	id: string | number;
+	display?: string;
+	avatarUrl?: string;
+	name?: string;
+};
+
 export type MentionsInputChangeEvent = {
 	target: {
 		value: string;
@@ -451,3 +473,14 @@ export type RemoveChannelUsers = {
 	channelId: string;
 	ids?: string[];
 };
+
+export enum Tabs_Option {
+	LOCATION = 0,
+	EVENT_INFO = 1,
+	REVIEW = 2,
+}
+
+export enum OptionEvent {
+	OPTION_SPEAKER = 'Speaker',
+	OPTION_LOCATION = 'Location',
+}

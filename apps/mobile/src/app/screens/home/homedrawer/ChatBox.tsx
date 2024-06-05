@@ -39,14 +39,19 @@ import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
-import { selectCurrentChannel, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
+import {
+	selectCurrentChannel,
+	selectEmojiImage,
+	selectHiddenBottomTabMobile,
+	selectMemberByUserId
+} from '@mezon/store-mobile';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTranslation } from 'react-i18next';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import AttachmentPreview from './components/AttachmentPreview';
 import UseMentionList from '../../../hooks/useUserMentionList';
 import { renderTextContent } from './components/RenderTextContent';
-import { ChannelsMention, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
+import { ChannelsMention, EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -55,7 +60,7 @@ import Toast from "react-native-toast-message";
 import { ChannelStreamMode } from 'mezon-js';
 import { RootState } from '@mezon/store-mobile';
 
-export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
+export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
 		trigger: '@',
 		allowedSpacesCount: 0,
@@ -69,6 +74,11 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag'> = {
 			fontWeight: 'bold',
 			color: Colors.white,
 		},
+	},
+  emoji: {
+		trigger: ':',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true,
 	},
 };
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.7;
@@ -87,6 +97,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: props.channelId });
 	const currentChannel = useSelector(selectCurrentChannel);
+	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 	const listMentions = UseMentionList(currentChannel?.id);
 	const { listChannels } = useChannels();
 	const { textInputProps, triggers } = useMentions({
@@ -102,11 +113,11 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
-	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios');
+	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios' && hiddenBottomTab);
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
 	const { setValueThread } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const { attachmentDataRef, setAttachmentData } = useReference();
@@ -117,11 +128,11 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { emojiPicked } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
-	
+
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
-	
+
 
 	//start: DM stuff
 	const { sendDirectMessage, sendMessageTyping: directMessageTyping, messages } = useDirectMessages({
@@ -155,8 +166,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	useEffect(() => {
 		mentions.current = listMentions || [];
 	}, [listMentions])
-	
-	
+
+	useEffect(() => {
+		if (props?.channelId) {
+			removeAction(EMessageActionType.EditMessage);
+		}
+	}, [props?.channelId])
+
+
 	const handleEventAfterEmojiPicked = () => {
 		if (!emojiPicked) {
 			return;
@@ -192,7 +209,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				break;
 		}
 	}, [removeMessageActionByType])
-	
+
 	const isCanSendMessage = useMemo(() => {
 		return !!attachmentDataRef?.length || text.length > 0;
 	}, [attachmentDataRef?.length, text.length]);
@@ -208,8 +225,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			references: [],
 		}
 		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
-		// @ts-ignore
-		const checkAttachmentLoading = attachmentDataUnique.some((attachment) => !attachment?.size);
+		const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
 		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
 			Toast.show({
 				type: 'error',
@@ -412,8 +428,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			case EMessageActionType.CreateThread:
 				setOpenThreadMessageState(true);
 				setValueThread(targetMessage);
-				// @ts-ignore
-				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
+				timeoutRef.current = setTimeout(() => {
+					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
+				}, 500)
 				break;
 			case EMessageActionType.Mention:
 				selectMentionMessage(targetMessage)
@@ -524,6 +541,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			</View>
 			<Suggestions suggestions={listMentions} {...triggers.mention} />
 			<HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
+      <EmojiSuggestion {...triggers.emoji} />
 			{
 				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
 			}
