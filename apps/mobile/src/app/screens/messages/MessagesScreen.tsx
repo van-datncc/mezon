@@ -16,16 +16,24 @@ import { selectMemberByUserId } from '@mezon/store-mobile';
 
 const SeparatorListFriend = () => {
 	return (
-		<View style={{height: size.s_8}} />
+		<View style={{ height: size.s_8 }} />
 	)
 }
 
-const DmListItem = (props: { directMessage: IChannel, navigation: any}) => {
+const DmListItem = (props: { directMessage: IChannel, navigation: any }) => {
 	const { directMessage, navigation } = props;
 	const { t } = useTranslation('message');
 	const { userId } = useAuth();
-	const lastMessage = JSON.parse(directMessage.last_sent_message.content);
-	const timestamp = Number(directMessage.last_sent_message.timestamp);
+
+	const lastMessage = useMemo(() => {
+        try {
+            return JSON.parse(directMessage?.last_sent_message?.content);
+        } catch (err) {
+            return '';
+        }
+    }, [directMessage?.last_sent_message?.content]);
+
+	const timestamp = Number(directMessage?.last_sent_message?.timestamp);
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const senderMessage = useSelector(selectMemberByUserId(directMessage?.last_sent_message?.sender_id || ''));
 	const redirectToMessageDetail = () => {
@@ -38,13 +46,13 @@ const DmListItem = (props: { directMessage: IChannel, navigation: any}) => {
 				<View style={styles.groupAvatar}>
 					<UserGroupIcon />
 				</View>
-			): (
+			) : (
 				<View>
 					<Image source={{ uri: directMessage.channel_avatar[0] }} style={styles.friendAvatar} />
 					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 				</View>
 			)}
-			
+
 			<View style={{ flex: 1 }}>
 				<View style={styles.messageContent}>
 					<Text
@@ -57,7 +65,7 @@ const DmListItem = (props: { directMessage: IChannel, navigation: any}) => {
 				</View>
 
 				<Text style={[styles.defaultText, styles.lastMessage]}>
-					{directMessage.last_sent_message.sender_id === userId ? t('directMessage.you') : senderMessage?.user?.username}
+					{directMessage?.last_sent_message?.sender_id === userId ? t('directMessage.you') : senderMessage?.user?.username}
 					{': ' + lastMessage.t}
 				</Text>
 			</View>
@@ -98,7 +106,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
-			
+
 			<View style={styles.searchMessage}>
 				<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 				<TextInput
@@ -118,7 +126,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			/>
 
 			<Pressable style={styles.addMessage}>
-				<MessageIcon width={32} height={25} style={{marginLeft: -5}} />
+				<MessageIcon width={32} height={25} style={{ marginLeft: -5 }} />
 			</Pressable>
 		</View>
 	);

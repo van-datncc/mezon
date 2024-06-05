@@ -58,6 +58,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+	const checkReferences = message.references?.length !== 0;
 
 	const [checkMessageReply, setCheckMessageReply] = useState(false);
 	const [checkMessageToMove, setCheckMessageToMove] = useState(false);
@@ -108,15 +109,15 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
 				</div>
 			)}
-			<div className={`relative ${isCombine ? '' : 'mt-2'} ${classNameNotification}`}>
+			<div className={`relative ${isCombine ? '' : 'mt-3'} ${checkReferences && 'mt-3'} ${classNameNotification}`}>
 				<div className={` relative rounded-sm  overflow-visible `}>
 					<div
 						className={` absolute w-0.5 h-full left-0
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-[2px]
-						${isMention ? 'mt-0 py-2' : isCombine ? '' : 'pt-[2px]'}
+						className={`flex h-15 flex-col w-auto px-3 py-0.5
+						${isMention ? 'mt-0' : isCombine ? '' : 'pt-[2px]'}
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					>
 						{' '}

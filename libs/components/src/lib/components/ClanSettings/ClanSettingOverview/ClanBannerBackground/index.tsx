@@ -92,7 +92,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 					The recommended minimum size is 960x540 and recommended aspect ratio is 16:9.
 				</p>
 				<Button
-					className="h-10 w-fit px-4 mt-4 rounded bg-transparent border border-buttonProfile hover:!bg-buttonProfileHover dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
+					className="h-10 w-fit px-4 mt-4 rounded bg-bgLightModeThird text-textLightTheme dark:text-textDarkTheme border dark:border-buttonProfile hover:!bg-[#9e9e9e] dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
 					onClick={handleOpenFile}
 				>
 					Upload Background
@@ -103,9 +103,9 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 					<label>
 						<div
 							style={{ backgroundImage: `url(${urlImage})` }}
-							className={`bg-cover bg-no-repeat bg-center w-full h-full bg-buttonProfile rounded relative cursor-pointer`}
+							className={`bg-cover bg-no-repeat bg-center w-full h-full dark:bg-buttonProfile bg-bgLightModeThird rounded relative cursor-pointer`}
 						>
-							{!urlImage && <p className="text-white text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
+							{!urlImage && <p className="dark:text-white text-textLightTheme text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
 						</div>
 						<input ref={fileInputRef} id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 					</label>
@@ -121,7 +121,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 			<ModalValidateFile
 				openModal={openModal}
 				onClose={() => setOpenModal(false)}
-				image="/assets/images/file-and-folder.png"
+				image="assets/images/file-and-folder.png"
 				title="Only image files are allowed"
 				content="Just uploaf type file (JPEG, PNG), please!"
 			/>
