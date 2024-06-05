@@ -341,20 +341,21 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return (
 			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
-				<View style={styles.contentWrapper}>
 				{matchesMention?.length ? (
 					<Text style={[isCombine && styles.contentMessageCombine]}>
 						{renderTextWithMention(lines, matchesMention)}
+						{isEdited ? (
+					<Text style={styles.editedText}>{t('edited')}</Text>
+				): null}
 					</Text>
 				) : (
 					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>
 						{renderTextWithEmoji(lines)}
-					</Text>
-				)}
-				{isEdited ? (
+						{isEdited ? (
 					<Text style={styles.editedText}>{t('edited')}</Text>
 				): null}
-				</View>
+					</Text>
+				)}
 			</Hyperlink>
 		);
 	};

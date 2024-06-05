@@ -371,10 +371,6 @@ export const styles = StyleSheet.create({
 		fontSize: size.small,
 		color: Colors.gray72,
 	},
-	contentWrapper: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
 	contentMessageCombine: {
 		padding: size.s_2,
 	},

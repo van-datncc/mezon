@@ -18,7 +18,9 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
     const { t } = useTranslation(['']);
     const { friends: allUser } = useFriends();
     const { createDirectMessageWithUser, listDM } = useDirect();
-    const friendList = allUser.filter((user) => user.state === 0);
+    const friendList: FriendsEntity[] = useMemo(() => {
+        return allUser.filter((user) => user.state === 0)
+    }, [allUser]);
 
     const inputRef = useRef(null);
 

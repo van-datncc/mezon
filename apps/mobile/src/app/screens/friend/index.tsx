@@ -18,7 +18,9 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
     const { t } = useTranslation(['common', 'friends']);
     const { friends: allUser } = useFriends();
     const { createDirectMessageWithUser, listDM } = useDirect();
-    const friendList = allUser.filter((user) => user.state === 0);
+    const friendList: FriendsEntity[] = useMemo(() => {
+        return allUser.filter((user) => user.state === 0)
+    }, [allUser]);
 
     const navigateToRequestFriendScreen = () => {
         navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND })
