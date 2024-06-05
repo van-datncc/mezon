@@ -357,10 +357,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					}}
 				>
 					{isShowInfoUser ? (
-						<View style={styles.messageBoxTop}>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							onPress={() => {
+								setIsOnlyEmojiPicker(false);
+								setMessageSelected(EMessageBSToShow.UserInformation);
+								setFoundUser(user)
+							}}
+							style={styles.messageBoxTop}
+						>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
-						</View>
+						</TouchableOpacity>
 					) : null}
 					{videos.length > 0 && renderVideos()}
 					{images.length > 0 && renderImages()}
