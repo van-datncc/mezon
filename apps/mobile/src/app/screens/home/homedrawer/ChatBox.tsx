@@ -128,6 +128,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { emojiPicked } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
+	const [heightInput, setHeightInput] = useState(size.s_40);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -533,7 +534,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				{currentSelectedEditMessage ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.EditMessage)}>
-							<Feather size={25} name='x' style={styles.closeIcon} />
+							<Feather size={25} name="x" style={styles.closeIcon} />
 						</Pressable>
 						<Text style={styles.aboveTextBoxText}>{t('chatBox.editingMessage')}</Text>
 					</View>
@@ -541,10 +542,10 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			</View>
 			<Suggestions suggestions={listMentions} {...triggers.mention} />
 			<HashtagSuggestions listChannelsMention={listChannelsMention} {...triggers.hashtag} />
-      <EmojiSuggestion {...triggers.emoji} />
-			{
-				!!attachmentDataRef?.length && <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
-			}
+			<EmojiSuggestion {...triggers.emoji} />
+			{!!attachmentDataRef?.length && (
+				<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
+			)}
 			<View style={styles.containerInput}>
 				{text.length > 0 && !isShowAttachControl ? (
 					<TouchableOpacity
@@ -571,19 +572,24 @@ const ChatBox = memo((props: IChatBoxProps) => {
 					<TextInput
 						ref={inputRef}
 						autoFocus={isFocus}
-						placeholder={'Write your thoughts here...'}
+						placeholder={'Write message here...'}
 						placeholderTextColor={Colors.textGray}
 						blurOnSubmit={false}
 						onSubmitEditing={handleSendMessage}
 						onFocus={handleInputFocus}
 						onBlur={handleInputBlur}
+						multiline={true}
+						numberOfLines={3}
 						{...textInputProps}
 						style={[
 							styles.inputStyle,
 							text.length > 0 && { width: inputWidthWhenHasInput },
-							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
+							{ height: Math.max(size.s_40, heightInput) },
 						]}
 						children={renderTextContent(text, emojiListPNG)}
+						onContentSizeChange={(e) => {
+							if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
+						}}
 					/>
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />

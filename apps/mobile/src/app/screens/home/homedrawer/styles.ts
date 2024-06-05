@@ -71,15 +71,22 @@ export const styles = StyleSheet.create({
 	wrapperInput: {
 		position: 'relative',
 		justifyContent: 'center',
+		backgroundColor: Colors.tertiaryWeight,
+		paddingVertical: size.s_4,
+		borderRadius: size.s_22,
 	},
 	inputStyle: {
-		height: size.s_40,
+		maxHeight: size.s_40 * 2,
+		lineHeight: size.s_20,
 		width: inputWidth,
 		borderBottomWidth: 0,
-		borderRadius: 20,
-		paddingLeft: 15,
-		paddingRight: 40,
+		borderRadius: size.s_20,
+		paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
+		paddingRight: size.s_40,
 		fontSize: size.medium,
+		paddingTop: size.s_10,
+		backgroundColor: Colors.tertiaryWeight,
+		color: Colors.tertiary
 	},
 	iconEmoji: {
 		position: 'absolute',

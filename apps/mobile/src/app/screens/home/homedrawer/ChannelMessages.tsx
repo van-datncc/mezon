@@ -38,8 +38,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		},
 		filename: attachment.filename,
 		title: attachment.filename,
-		width: Metrics.screenWidth - 100,
-		height: Metrics.screenHeight - 100,
+		width: Metrics.screenWidth,
+		height: Metrics.screenHeight - 120,
 		url: attachment.url,
 		uri: attachment.url,
 	});
