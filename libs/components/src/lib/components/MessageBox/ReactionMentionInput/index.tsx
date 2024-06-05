@@ -104,7 +104,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	} = useReference();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
-
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -219,11 +218,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-
 				setAttachmentData([]);
 				setIdReferenceMessageReply('');
 				setOpenReplyMessageState(false);
-				setMentionEveryone(false)
+				setMentionEveryone(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -255,7 +253,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
-				setMentionEveryone(false)
+				setMentionEveryone(false);
 				setAttachmentData([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
@@ -321,6 +319,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				}))
 			: [];
 		const linkGifDirect = newValue?.match(regexToDetectGifLink);
+
 		if (linkGifDirect && linkGifDirect?.length > 0) {
 			const newAttachmentDataRef = linkGifDirect
 				.filter((item) => item !== null)
@@ -328,7 +327,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					filetype: 'image/gif',
 					url: item,
 				}));
-
 			setAttachmentData(newAttachmentDataRef);
 		}
 
@@ -343,8 +341,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setContent(convertedHashtag);
 
 		if (mentions.length > 0) {
-			if (mentions.some((mention) => mention.display === '@here')){
-				setMentionEveryone(true)
+			if (mentions.some((mention) => mention.display === '@here')) {
+				setMentionEveryone(true);
 			}
 			for (const mention of mentions) {
 				if (mention.display.startsWith('@')) {
@@ -385,19 +383,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		return result;
 	};
 
-	const replaceChannelIdsWithDisplay = (text: string, listInput: any[]) => {
-		// Regex to match 19-digit numbers preceded by '#'
-		const regex = /#[0-9]{19}\b/g;
-		// Replace channelId with display name
-		const replacedText = text.replace(regex, (match) => {
-			const channelId = match.substring(1); // Remove '#' from channelId
-			const channel = listInput.find((item) => item.id === channelId);
-			return channel ? `#${channel.display}` : match; // Replace with display name or original match if not found
-		});
-
-		return replacedText;
-	};
-
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
@@ -409,9 +394,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
 		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked);
+			textFieldEdit.insert(input, emojiPicked + ' ');
 		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked + ' ');
 			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
@@ -419,7 +404,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}
 
 	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:[^\s]+(?=$|[\p{Emoji}])/gu;
+		const regexEmoji = /:\b[^:]*\b:/g;
 		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
 		if (emojiArray.length > 0) {
 			return emojiArray[0];

@@ -25,5 +25,11 @@
     "directMessage": {
         "you": "You"
     },
-    "edited": "(edited)"
+    "edited": "(edited)",
+    "newMessage": {
+        "to": "To",
+        "newGroup": "New Group",
+        "addFriend": "Add a Friend",
+        "create": "Create"
+    }
 }

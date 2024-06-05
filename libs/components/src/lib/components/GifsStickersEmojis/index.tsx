@@ -38,14 +38,6 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 
 	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
 	const emojiRefParentDiv = useRef<HTMLDivElement>(null);
-	const [emojiDivWidth, setEmojiDivWidth] = useState<number | undefined>();
-
-	useEffect(() => {
-		if (emojiRefParentDiv.current) {
-			const width = emojiRefParentDiv.current.getBoundingClientRect().width;
-			setEmojiDivWidth(width);
-		}
-	}, [emojiRefParentDiv]);
 
 	return (
 		<div

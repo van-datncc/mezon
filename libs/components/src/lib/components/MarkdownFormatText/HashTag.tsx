@@ -51,7 +51,7 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
 			to={channelPath}
-			className="font-medium px-1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
+			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 		>
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 mr-0.5" defaultFill="#3297FF" />

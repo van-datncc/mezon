@@ -25,5 +25,11 @@
     "directMessage": {
         "you": "Bạn"
     },
-    "edited": "(đã chỉnh sửa)"
+    "edited": "(đã chỉnh sửa)",
+    "newMessage": {
+        "to": "Đến",
+        "newGroup": "Nhóm Mới",
+        "addFriend": "Thêm bạn",
+        "create": "Tạo"
+    }
 }
