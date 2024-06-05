@@ -140,6 +140,7 @@ const colors = {
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
 	green: "green",
+	pink: "#e148c7",
   bgDarkCharcoal: '#323232',
   bgMessageHighlight: '#c99d072b',
   // background button
