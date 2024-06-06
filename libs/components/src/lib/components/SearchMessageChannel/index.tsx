@@ -130,7 +130,7 @@ const SearchMessageChannel = () => {
 					customSuggestionsContainer={(children: React.ReactNode) => {
 						return (
 							<div
-								className={`absolute left-0 top-10 p-3 ${valueInputSearch ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
+								className={`absolute left-0 top-10 pb-3 ${valueInputSearch ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
 							>
 								{valueInputSearch && (
 									<div className="first:mt-0 mt-3 p-3 rounded-t dark:bg-bgSecondary600 border-b border-borderDivider last:border-b-0 last:bottom-b-0">
@@ -149,8 +149,7 @@ const SearchMessageChannel = () => {
 										</div>
 									</div>
 								)}
-								{isShowSearchMessageModal && <SelectGroup groupName="From user">{children}</SelectGroup>}
-								{children}
+								<SelectGroup groupName="From user">{children}</SelectGroup>
 							</div>
 						);
 					}}

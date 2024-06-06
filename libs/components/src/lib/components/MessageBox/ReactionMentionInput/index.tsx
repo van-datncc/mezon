@@ -80,6 +80,8 @@ export type MentionReactInputProps = {
 	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
+	readonly finishUpload?: boolean;
+	readonly onFinishUpload?: () => void;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -440,10 +442,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
 
+	useEffect(() => {
+		if (props.finishUpload) {
+			editorRef.current?.focus();
+			props.onFinishUpload?.();
+		}
+	}, [props, props.finishUpload]);
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
-				<div className={`flex flex-col overflow-y-auto h-heightMessageViewChatThread ${appearanceTheme === "light"? "customScrollLightMode" : ""}`}>
+				<div
+					className={`flex flex-col overflow-y-auto h-heightMessageViewChatThread ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+				>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
 							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-[#26262B] bg-bgLightModeButton rounded-full pointer-events-none">
