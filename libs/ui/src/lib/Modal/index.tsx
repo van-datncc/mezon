@@ -30,7 +30,7 @@ const Modal = (props: ModalProps) => {
 										<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
-									<button className="flex items-center justify-center opacity-50" onClick={() => {onClose(); console.log(1)}}>
+									<button className="flex items-center justify-center opacity-50" onClick={() => {onClose();}}>
 										<span className="text-5xl leading-3 dark:hover:text-white hover:text-black">×</span>
 									</button>
 								</div>
