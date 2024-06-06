@@ -1,9 +1,9 @@
-import { AttachmentPreviewThumbnail, MentionReactInput, AttachmentLoading } from '@mezon/components';
+import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useMenu, useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelName, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, useCallback } from 'react';
+import { Fragment, ReactElement, useCallback, useState } from 'react';
 import * as Icons from '../Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
@@ -29,6 +29,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const { attachmentDataRef, setAttachmentData, statusLoadingAttachment } = useReference();
+
+	const [finishUpload, setFinishUpload] = useState<boolean>(false);
 
 	const onConvertToFiles = useCallback((content: string) => {
 		if (content.length > MIN_THRESHOLD_CHARS) {
@@ -60,6 +62,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				return (attachment.filetype = typeConvert.typeConvert);
 			}
 		});
+		setFinishUpload(true);
 		setAttachmentData(attachment);
 	}, []);
 
@@ -121,7 +124,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		<div className="relative max-sm:-pb-2  ">
 			<div
 				className={`w-wrappBoxChatView sbm:max-w-wrappBoxChatView max-w-wrappBoxChatViewMobile
-				${(attachmentDataRef.length > 0 || statusLoadingAttachment) ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+				${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 			>
 				<div className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll`}>
 					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
@@ -156,6 +159,8 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							currentChannelId={props.currentChannelId ?? ''}
 							handleConvertToFile={onConvertToFiles}
 							currentClanId={currentClanId}
+							finishUpload={finishUpload}
+							onFinishUpload={() => setFinishUpload(false)}
 						/>
 					</div>
 					<GifStickerEmojiButtons activeTab={SubPanelName.NONE} />

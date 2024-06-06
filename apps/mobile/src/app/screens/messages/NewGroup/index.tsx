@@ -5,7 +5,7 @@ import { ArrowLeftIcon } from "@mezon/mobile-components";
 import { Colors } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 import Feather from 'react-native-vector-icons/Feather';
-import { useDirect, useFriends } from "@mezon/core";
+import { useFriends } from "@mezon/core";
 import { useThrottledCallback } from "use-debounce";
 import { normalizeString } from "../../../utils/helpers";
 import { FriendListByAlphabet } from "../../../components/FriendListByAlphabet";
@@ -20,7 +20,6 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     const { t } = useTranslation(['common', 'friends']);
     const [ friendIdSelectedList, setFriendIdSelectedList ] = useState<string[]>([]);
     const { friends: allUser } = useFriends();
-    const { listDM } = useDirect();
     const dispatch = useAppDispatch();
 
     const friendList: FriendsEntity[] = useMemo(() => {
@@ -49,6 +48,7 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     }, [])
 
     const createNewGroup = async () => {
+        if (friendIdSelectedList.length === 0) return; 
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: friendIdSelectedList.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,

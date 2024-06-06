@@ -149,7 +149,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 							<>
 								{listMemSearch.length
 									? listMemSearch
-											.filter((item: any) => item.name.indexOf(searchText) > -1)
+											.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
 											.slice(0, 7)
 											.map((item: any) => (
 												<div
@@ -174,7 +174,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 									: null}
 								{listChannelSearch.length
 									? listChannelSearch
-											.filter((item) => item.name.indexOf(searchText) > -1)
+											.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
 											.slice(0, 8)
 											.map((channel: any) => {
 												return (
@@ -217,7 +217,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 										</span>
 										{listMemSearch.length ? (
 											listMemSearch
-												.filter((item: any) => item.name.indexOf(searchText.substring(1)) > -1)
+												.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
 												.slice(0, 25)
 												.map((item: any) => {
 													return (
@@ -251,7 +251,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 										<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 										{listChannelSearch.length ? (
 											listChannelSearch
-												.filter((item) => item.name.indexOf(searchText.substring(1)) > -1)
+												.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
 												.slice(0, 25)
 												.map((channel: any) => {
 													return (

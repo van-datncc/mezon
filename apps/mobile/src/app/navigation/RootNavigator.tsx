@@ -2,11 +2,11 @@ import {
 	MezonStoreProvider,
 	accountActions,
 	authActions,
+	emojiSuggestionActions,
 	getStoreAsync,
 	initStore,
-	selectIsLogin,
 	selectHasInternetMobile,
-	emojiSuggestionActions
+	selectIsLogin,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
@@ -20,11 +20,13 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { Colors, darkThemeColor, lightThemeColor } from '@mezon/mobile-ui';
+import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
 import { SafeAreaView } from 'react-native';
+import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
-import { createLocalNotification } from '../utils/pushNotificationHelpers';
+import SplashScreen from '../components/SplashScreen';
+import { checkNotificationPermission, createLocalNotification, navigateToNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
@@ -32,13 +34,32 @@ const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const [isDarkMode] = useState(true); //TODO: move to custom hook\
 	const hasInternet = useSelector(selectHasInternetMobile);
+	const [isLoadingSplashScreen, setIsLoadingSplashScreen] = useAnimatedState(true);
 
 	useEffect(() => {
+		const timer = setTimeout(() => {
+			setIsLoadingSplashScreen(false);
+		}, 2500);
+		checkNotificationPermission();
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			createLocalNotification(remoteMessage?.notification?.title, remoteMessage?.notification?.body, remoteMessage?.data);
+			Toast.show({
+				type: 'info',
+				text1: remoteMessage.notification?.title,
+				text2: remoteMessage.notification?.body,
+				onPress: async () => {
+					Toast.hide();
+					await navigateToNotification(remoteMessage, null, null);
+				},
+			});
+		});
+		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
 		});
 
-		return unsubscribe;
+		return () => {
+			unsubscribe();
+			clearTimeout(timer);
+		};
 	}, []);
 
 	useEffect(() => {
@@ -111,6 +132,7 @@ const NavigationMain = () => {
 					)}
 				</RootStack.Navigator>
 			</SafeAreaView>
+			{isLoadingSplashScreen && <SplashScreen />}
 		</NavigationContainer>
 	);
 };

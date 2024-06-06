@@ -1,11 +1,68 @@
+import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, messagesActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
-import { Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const IS_ANDROID = Platform.OS === 'android';
 
+export const checkNotificationPermission = async () => {
+	const authorizationStatus = await messaging().hasPermission();
+
+	if (authorizationStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
+		// Permission has not been requested yet
+		await requestNotificationPermission();
+	} else if (authorizationStatus === messaging.AuthorizationStatus.DENIED) {
+		// Permission has been denied
+		Alert.alert('Notification Permission', 'Notifications are disabled. Please enable them in settings.', [
+			{
+				text: 'Cancel',
+				style: 'cancel',
+			},
+			{
+				text: 'OK',
+				onPress: () => {
+					openAppSettings();
+				},
+			},
+		]);
+	} else if (
+		authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+		authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
+	) {
+		// Permission is granted
+		console.log('Notification permission granted.');
+	}
+};
+
+const requestNotificationPermission = async () => {
+	try {
+		await messaging().requestPermission();
+		Alert.alert('Notification Permission', 'Notifications have been enabled.');
+	} catch (error) {
+		Alert.alert('Notification Permission', 'Notification permission denied.', [
+			{
+				text: 'Cancel',
+				style: 'cancel',
+			},
+			{
+				text: 'OK',
+				onPress: () => {
+					openAppSettings();
+				},
+			},
+		]);
+	}
+};
+
+const openAppSettings = () => {
+	if (Platform.OS === 'ios') {
+		Linking.openURL('app-settings:');
+	} else {
+		Linking.openSettings();
+	}
+};
 export const createLocalNotification = async (title: string, body: string, data: { [key: string]: string | object }) => {
 	try {
 		const channelId = await notifee.createChannel({
@@ -57,10 +114,13 @@ export const handleFCMToken = async () => {
 	}
 };
 
-const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
+export const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
 	const link = notification?.data?.link;
 	if (link) {
 		const store = await getStoreAsync();
+		store.dispatch(appActions.setLoadingMainMobile(true));
+		store.dispatch(appActions.setIsFromFCMMobile(true));
+
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
 		// IF is notification to channel
@@ -72,9 +132,12 @@ const navigateToNotification = async (notification: any, navigation: any, curren
 			if (isDifferentClan) store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 			setTimeout(
 				() => {
+					save(STORAGE_KEY_CHANNEL_ID, channelId);
+					save(STORAGE_KEY_CLAN_ID, clanId);
 					store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 					store.dispatch(appActions.setLoadingMainMobile(false));
+					store.dispatch(appActions.setIsFromFCMMobile(false));
 				},
 				isDifferentClan ? 2500 : 0,
 			);
@@ -87,6 +150,7 @@ const navigateToNotification = async (notification: any, navigation: any, curren
 				const type = linkDirectMessageMatch[2];
 
 				store.dispatch(appActions.setLoadingMainMobile(false));
+				store.dispatch(appActions.setIsFromFCMMobile(false));
 				// TODO: handle navigation
 			}
 		}

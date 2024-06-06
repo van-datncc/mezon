@@ -1,4 +1,4 @@
-import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox } from '@mezon/components';
 import { useDirectMessages, useGifsStickersEmoji, useMenu, useReference } from '@mezon/core';
 import { RootState } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';

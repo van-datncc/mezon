@@ -241,13 +241,13 @@ const ModalNotificationSetting = (props: ModalParam) => {
 										))}
 										<td className='col-span-1 text-center'>
                                         	<input type="checkbox" />
+											<button
+												className="absolute top-0 right-0 text-red-500 rounded-full dark:bg-white bg-black size-[15px] justify-center items-center hidden group-hover:flex"
+												onClick={() => handleRemoveOverride(channelCategorySetting.channel_category_title || "", channelCategorySetting.id || "")}
+											>
+												x
+											</button>
 										</td>
-										<button
-											className="absolute top-0 right-0 text-red-500 rounded-full dark:bg-white bg-black size-[15px] justify-center items-center hidden group-hover:flex"
-											onClick={() => handleRemoveOverride(channelCategorySetting.channel_category_title || "", channelCategorySetting.id || "")}
-										>
-											x
-										</button>
 									</tr>
 								))}
 							</tbody>

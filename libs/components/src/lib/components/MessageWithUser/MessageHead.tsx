@@ -45,10 +45,10 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	useEffect(() => {
 		const updatePosition = () => {
 			const width = window.innerWidth;
-			if(panelRefShort.current){
+			if (panelRefShort.current) {
 				if (width >= 910) {
 					panelRefShort.current.style.left = `${positionLeft}px`;
-				} else if (width >= 480 && width <910) {
+				} else if (width >= 480 && width < 910) {
 					panelRefShort.current.style.left = `42px`;
 				} else {
 					panelRefShort.current.style.left = `20px`;
@@ -72,10 +72,10 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-base dark:text-white text-black font-medium tracking-wider cursor-pointer break-all username"
+					className="text-base text-textLightUserName dark:text-white font-medium tracking-wider cursor-pointer break-all username"
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
-					role='button'
+					role="button"
 				>
 					{username ?? 'Anonymous'}
 				</div>
@@ -88,7 +88,6 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 						left: `20px`,
 						top: positionBottom ? '' : `${positionTop}px`,
 						bottom: positionBottom ? '64px' : '',
-
 					}}
 					onMouseDown={handleDefault}
 					role="button"

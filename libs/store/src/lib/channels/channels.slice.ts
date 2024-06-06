@@ -167,7 +167,7 @@ export const fetchChannelsCached = memoize(
 		promise: true,
 		maxAge: LIST_CHANNEL_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[4];
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.token;
 		},
 	},
 );

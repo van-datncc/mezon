@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useAuth } from '@mezon/core';
 import { getAppInfo } from '@mezon/mobile-components';
 import { fcmActions, selectCurrentClan, selectLoadingMainMobile } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
@@ -22,12 +23,13 @@ const RootStack = createNativeStackNavigator();
 export const Authentication = () => {
 	const getInitialRouteName = APP_SCREEN.BOTTOM_BAR;
 	const navigation = useNavigation();
+	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	useEffect(() => {
-		loadFRMConfig();
-	}, []);
+		if (userProfile?.email) loadFRMConfig();
+	}, [userProfile?.email]);
 
 	useEffect(() => {
 		setupNotificationListeners(navigation, currentClan);

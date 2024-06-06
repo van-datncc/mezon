@@ -1,4 +1,4 @@
-import { useChannels, useNotification } from '@mezon/core';
+import { useApp, useChannels, useNotification } from '@mezon/core';
 import { INotification } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
 import * as Icons from '../Icons';
@@ -27,7 +27,7 @@ function NotificationList() {
 	const notifyMentionItem = notification.filter(
 		(item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
 	);
-
+	const {appearanceTheme} = useApp();
 	useEffect(() => {
 		if (currentTabNotify === 'mention' && tabMentionRef.current) {
 			tabMentionRef.current.scrollTop = -tabMentionRef.current.scrollHeight;
@@ -69,7 +69,7 @@ function NotificationList() {
 					</div>
 				)}
 				{currentTabNotify === 'mention' && (
-					<div ref={tabMentionRef} className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto">
+					<div ref={tabMentionRef} className={`dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto ${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}>
 						{notifyMentionItem.map((notify: INotification) => (
 							<NotifyMentionItem notify={notify} key={notify.id} />
 						))}
