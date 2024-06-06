@@ -284,7 +284,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					style={styles.contentMessageMention}
 				>
 					{type === ChannelType.CHANNEL_TYPE_VOICE
-						? <SpeakerIcon height={12} width={12} />
+						? <Text><SpeakerIcon height={12} width={12} /> </Text>
 						// : <HashSignIcon height={16} width={16} />
 						: "#"}
 					{channel?.channel_label || ""}
