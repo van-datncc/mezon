@@ -5,6 +5,7 @@ import {
 	selectAllUsesClan,
 	selectCurrentClan,
 	selectCurrentClanId,
+	selectShowNumEvent,
 	useAppDispatch,
 	userClanProfileActions,
 } from '@mezon/store';
@@ -19,6 +20,14 @@ export function useClans() {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const usersClan = useSelector(selectAllUsesClan);
+	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
+
+	const setClanShowNumEvent = React.useCallback(
+		async (status: boolean) => {
+			await dispatch(clansActions.setClanShowNumEvent({ clanId: currentClanId || '', status }));
+		},
+		[dispatch, currentClanId],
+	);
 
 	const changeCurrentClan = React.useCallback(
 		async (clanId: string) => {
@@ -89,6 +98,8 @@ export function useClans() {
 			avatarClans,
 			remainingMember,
 			listUserSearch,
+			showNumEvent,
+			setClanShowNumEvent,
 			getUserClanProfile,
 			updateUserClanProfile,
 			createClans,
@@ -102,6 +113,8 @@ export function useClans() {
 			avatarClans,
 			remainingMember,
 			listUserSearch,
+			showNumEvent,
+			setClanShowNumEvent,
 			getUserClanProfile,
 			updateUserClanProfile,
 			createClans,

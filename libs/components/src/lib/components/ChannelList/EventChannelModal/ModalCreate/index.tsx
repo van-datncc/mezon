@@ -26,6 +26,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const [option, setOption] = useState('');
 	const [logo, setLogo] = useState('');
 	const [description, setDescription] = useState('');
+	const [errorTime, setErrorTime] = useState(false);
 	const { createEventManagement } = useEventManagement();
 	const { currentClanId } = useClans();
 
@@ -33,7 +34,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const tabs = ['Location', 'Event Info', 'Review'];
 
 	const handleNext = (currentModal: number) => {
-		if (buttonWork && currentModal < tabs.length - 1) {
+		if (buttonWork && currentModal < tabs.length - 1 && !errorTime) {
 			setCurrentModal(currentModal + 1);
 		}
 	};
@@ -111,19 +112,45 @@ const ModalCreate = (props: ModalCreateProps) => {
 		return isoDate.toISOString();
 	}
 
+	const getCurrentTimeRounded = (addMinute?: boolean) => {
+		const now = new Date();
+		if(addMinute){
+			now.setMinutes(now.getMinutes() + 30);
+		}
+		const minuteNow = now.getMinutes();
+		const roundedMinutes = Math.floor(minuteNow / 30);
+		if (roundedMinutes >= 1) {
+			now.setHours(now.getHours() + 1);
+			now.setMinutes(0);
+		} else {
+			now.setMinutes(30);
+		}
+		const hour = now.getHours();
+		const minute = now.getMinutes();
+		return `${hour}:${minute === 0 ? '00' : minute }`;
+	};
+
 	useEffect(() => {
 		if (currentModal >= 1) {
 			setButtonWork(false);
 		} else {
 			setButtonWork(true);
 		}
-		if (topic !== '') {
+		if ((topic !== '')) {
 			setButtonWork(true);
 		}
 	}, [currentModal, topic]);
 
+	const defaultTimeStart = getCurrentTimeRounded();
+	const defaultTimeEnd = getCurrentTimeRounded(true);
+	
+	useEffect(() => {
+		setTimeStart(defaultTimeStart);
+		setTimeEnd(defaultTimeEnd);
+	},[]);
+
 	return (
-		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4" onClick={()=>console.log()}>
+		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4">
 			<div className="flex gap-x-4 mb-4">
 				{tabs.map((item, index) => {
 					const isCurrent = currentModal === index;
@@ -158,13 +185,18 @@ const ModalCreate = (props: ModalCreateProps) => {
 						handleDescription={handleDescription} 
 						logo={logo} 
 						setLogo={setLogo} 
+						timeStart={timeStart}
+						timeEnd={timeEnd}
+						timeStartDefault={defaultTimeStart}
+						timeEndDefault={defaultTimeEnd}
 						selectedDateStart = {selectedDateStart}
 						setSelectedDateStart = {setSelectedDateStart}
 						selectedDateEnd = {selectedDateEnd}
 						setSelectedDateEnd = {setSelectedDateEnd}
+						setErrorTime={(status:boolean) => setErrorTime(status)}
 					/>
 				}
-				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} logo={logo}/>}
+				{currentModal === Tabs_Option.REVIEW && <ReviewModal option={option} topic={topic} voice={voiceChannel} titleEvent={titleEvent} logo={logo} start={handleTimeISO(selectedDateStart, timeStart)}/>}
 			</div>
 			<div className="flex justify-between mt-4 w-full">
 				<button
@@ -178,7 +210,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						Cancel
 					</button>
 					<button
-						className={`px-4 py-2 rounded font-semibold bg-primary ${!buttonWork && 'bg-opacity-50'}`}
+						className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime) && 'bg-opacity-50'}`}
 						onClick={currentModal === Tabs_Option.REVIEW ? () => handleSubmit() : () => handleNext(currentModal)}
 					>
 						{currentModal === Tabs_Option.REVIEW ? 'Create Event' : 'Next'}
