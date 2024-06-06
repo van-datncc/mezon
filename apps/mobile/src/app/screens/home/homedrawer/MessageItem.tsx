@@ -1,7 +1,7 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, verticalScale, useAnimatedState } from '@mezon/mobile-ui';
-import { selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
+import { FileIcon, HashSignIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
+import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import { ChannelsEntity, channelsActions, getStoreAsync, messagesActions, selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -26,6 +26,9 @@ import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { useTranslation } from 'react-i18next';
+import { ChannelType } from 'mezon-js';
+import Toast from 'react-native-toast-message';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -51,13 +54,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
+	const [foundUser, setFoundUser] = useState(null);
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
-	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
-  const [foundUser, setFoundUser] = useState(null);
+	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
@@ -66,6 +69,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const { usersClan } = useClans();
+	const { t } = useTranslation('message');
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -218,15 +222,98 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const onMention = async (mention: string) => {
 		try {
-      const tagName = mention.slice(1);
-      const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
-      userMention && setFoundUser(userMention)
-      if(!mention) return ;
-      setMessageSelected(EMessageBSToShow.UserInformation);
+			const tagName = mention.slice(1);
+			const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
+			userMention && setFoundUser(userMention)
+			if (!mention) return;
+			setMessageSelected(EMessageBSToShow.UserInformation);
 		} catch (error) {
 			console.log('error', error);
 		}
 	};
+
+	const jumpToChannel = async (channelId: string, clanId: string) => {
+		const store = await getStoreAsync();
+
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		store.dispatch(channelsActions.joinChannel({
+			clanId: clanId ?? '',
+			channelId: channelId,
+			noFetchMembers: false
+		}));
+	};
+
+	const onChannelMention = async (channel: ChannelsEntity) => {
+		try {
+			const type = channel?.type;
+			const channelId = channel?.channel_id;
+			const clanId = channel?.clan_id;
+
+			if (type === ChannelType.CHANNEL_TYPE_VOICE) {
+				Toast.show({
+					type: "info",
+					text1: "Updating...",
+				})
+			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+				save(STORAGE_KEY_CHANNEL_ID, channelId);
+				save(STORAGE_KEY_CLAN_ID, clanId);
+				console.log(channelId);
+				console.log(clanId);
+
+				await jumpToChannel(channelId, clanId);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	const getChannelById = (channelHashtagId: string) => {
+		const channel = useSelector(selectChannelById(channelHashtagId));
+		return channel;
+	};
+
+
+	const renderChannelMention = (id: string) => {
+		const channel = getChannelById(id.slice(1));
+		const type = channel?.type;
+
+		return (
+			<Text style={styles.mentionWrapper}>
+				<Text
+					onPress={() => onChannelMention(channel)}
+					style={styles.contentMessageMention}
+				>
+					{type === ChannelType.CHANNEL_TYPE_VOICE
+						? <SpeakerIcon height={16} width={16} />
+						// : <HashSignIcon height={16} width={16} />
+						: "#"}
+					{channel?.channel_label || ""}
+				</Text>
+			</Text>
+
+		)
+	}
+
+	const renderUserMention = (id: string) => {
+		return (
+			<Text style={styles.mentionWrapper}>
+				<Text
+					onPress={() => onMention(id)}
+					style={styles.contentMessageMention}
+				>
+					{id}
+				</Text>
+			</Text>
+		)
+	}
+
+	const renderMention = (id: string) => {
+		return id.startsWith("@")
+			? <Text>{renderUserMention(id)} </Text>
+			: id.startsWith("#")
+				? renderChannelMention(id)
+				: <Text />
+	}
 
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
@@ -234,24 +321,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			.filter(Boolean)
 			.filter((i) => i !== '@' && i !== '#');
 
-		return parts.map((part, index) => {
-			if (!part) return <View />;
-			return (
-				<Text
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					onTouchEnd={() => {
-						if (matchesMention.includes(part)) {
-							onMention(part);
-						}
-					}}
-					key={index}
-					style={matchesMention.includes(part) ? styles.contentMessageMention : styles.contentMessageBox}
-				>
-					{matchesMention.includes(part) ? `${part} ` : renderTextWithEmoji(part)}
-				</Text>
-			);
-		});
+		return parts.map((part, index) => (
+			<Text key={`${index}-${part}-renderTextWithMention'}`}>
+				{!part
+					? <Text />
+					: matchesMention.includes(part)
+						? renderMention(part)
+						: <Text style={styles.contentMessageBox}>
+							{renderTextWithEmoji(part)}
+						</Text>
+				}
+			</Text>
+		));
 	};
 
 	const renderTextContent = () => {
@@ -261,9 +342,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
 				{matchesMention?.length ? (
-					<Text style={[isCombine && styles.contentMessageCombine]}>{renderTextWithMention(lines, matchesMention)}</Text>
+					<Text style={[isCombine && styles.contentMessageCombine]}>
+						{renderTextWithMention(lines, matchesMention)}
+						{isEdited ? (
+					<Text style={styles.editedText}>{t('edited')}</Text>
+				): null}
+					</Text>
 				) : (
-					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>{renderTextWithEmoji(lines)}</Text>
+					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>
+						{renderTextWithEmoji(lines)}
+						{isEdited ? (
+					<Text style={styles.editedText}>{t('edited')}</Text>
+				): null}
+					</Text>
 				)}
 			</Hyperlink>
 		);
@@ -279,13 +370,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					const regex = /:\b[^:]*\b:/g;
 					if (item.match(regex) && srcEmoji) {
 						return (
-							<Text>
+							<Text key={`${index}-${srcEmoji}-renderTextWithEmoji`}>
 								{' '}
 								<FastImage key={index} source={{ uri: srcEmoji }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />{' '}
 							</Text>
 						);
 					}
-					return <Text>{item} </Text>;
+					return <Text key={`${index}-${item}-renderTextWithEmoji`}>{item} </Text>;
 				})}
 			</Text>
 		);
@@ -301,6 +392,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const jumpToRepliedMesage = () => {
 		console.log('message to jump', messageRefFetchFromServe);
 	};
+
+	const isEdited = useMemo(() => {
+		if (message?.update_time) {
+			const updateDate = new Date(message?.update_time);
+			const createDate = new Date(message?.create_time);
+			return updateDate > createDate;
+		}
+		return false;
+	}, [message])
 
 	return (
 		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
@@ -333,7 +433,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
-              setFoundUser(user)
 						}}
 						style={styles.wrapperAvatar}
 					>
@@ -388,7 +487,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				onClose={() => {
 					setOpenBottomSheet(null);
 				}}
-        user={foundUser}
 			/>
 		</View>
 	);

@@ -104,6 +104,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	listChannels: {
+		paddingTop: size.s_14,
 		backgroundColor: Colors.tertiaryWeight,
 	},
 	channelListSection: {
@@ -246,7 +247,7 @@ export const styles = StyleSheet.create({
 		width: '22%',
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.primary,
-    alignItems: 'center'
+		alignItems: 'center'
 	},
 	friendItemWrapper: {
 		marginHorizontal: 20,
@@ -315,12 +316,12 @@ export const styles = StyleSheet.create({
 		flexDirection: 'column',
 		marginTop: size.s_10,
 	},
-  highlightMessageMention: {
-    backgroundColor: Colors.bgMessageHighlight,
-    borderLeftColor: Colors.borderMessageHighlight,
-    borderLeftWidth: 2,
-    paddingTop: size.s_2
-  },
+	highlightMessageMention: {
+		backgroundColor: Colors.bgMessageHighlight,
+		borderLeftColor: Colors.borderMessageHighlight,
+		borderLeftWidth: 2,
+		paddingTop: size.s_2
+	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
 		color: Colors.white,
@@ -337,7 +338,7 @@ export const styles = StyleSheet.create({
 		marginRight: 0,
 	},
 	wrapperMessageBoxCombine: {
-		marginBottom: size.s_10,
+		// marginBottom: size.s_10,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
@@ -366,17 +367,24 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		color: Colors.tertiary,
 	},
+	editedText: {
+		fontSize: size.small,
+		color: Colors.gray72,
+	},
 	contentMessageCombine: {
-    padding: size.s_2,
+		padding: size.s_2,
 	},
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
+		lineHeight: size.s_20
 	},
 	contentMessageMention: {
 		fontSize: size.medium,
 		fontWeight: '600',
 		color: Colors.textLink,
+	},
+	mentionWrapper: {
 	},
 	loadMoreChannelMessage: {
 		paddingVertical: size.s_20,
@@ -398,6 +406,8 @@ export const styles = StyleSheet.create({
 	imageMessageRender: {
 		borderRadius: verticalScale(5),
 		marginVertical: size.s_6,
+		borderWidth: 0.5,
+		borderColor: Colors.borderPrimary
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
@@ -538,15 +548,15 @@ export const styles = StyleSheet.create({
 		borderRadius: size.s_50,
 		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
-  wrapperPlusClan: {
-    height: verticalScale(50),
+	wrapperPlusClan: {
+		height: verticalScale(50),
 		width: verticalScale(50),
 		borderRadius: verticalScale(15),
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.tertiaryWeight,
-  },
+	},
 	overlay: {
 		position: 'absolute',
 		top: 0,
