@@ -4,6 +4,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
+import { getChannelById } from '@mezon/mobile-components';
 
 const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 	const parts = text
