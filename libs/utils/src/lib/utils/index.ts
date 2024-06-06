@@ -218,7 +218,7 @@ export const checkLastChar = (text: string) => {
 	}
 };
 
-export function searchMentionsHashtagEmojiSyntax(searchValue: any, list: any[]) {
+export function searchMentionsHashtag(searchValue: any, list: any[]) {
 	if (!searchValue) return list;
 	const lowerCaseSearchValue = searchValue.toLowerCase();
 	return list

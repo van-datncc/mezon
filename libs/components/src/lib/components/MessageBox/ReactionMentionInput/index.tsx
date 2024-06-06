@@ -33,7 +33,7 @@ import {
 	UsersClanEntity,
 	focusToElement,
 	regexToDetectGifLink,
-	searchMentionsHashtagEmojiSyntax,
+	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
@@ -432,12 +432,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSearchUserMention = (search: any, callback: any) => {
 		setValueHightlight(search);
-		callback(searchMentionsHashtagEmojiSyntax(search, props.listMentions ?? []));
+		callback(searchMentionsHashtag(search, props.listMentions ?? []));
 	};
 
 	const handleSearchHashtag = (search: any, callback: any) => {
 		setValueHightlight(search);
-		callback(searchMentionsHashtagEmojiSyntax(search, listChannelsMention ?? []));
+		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
 
 	return (
@@ -535,27 +535,3 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 }
 
 export default MentionReactInput;
-
-// [
-//     {
-//         "id": "1775732201627848704",
-//         "display": "an.buihoang",
-//         "avatarUrl": "https://cdn.mezon.vn/1782714213009985536/1795006860827299840/1716985383718z5126645130854_0c32cb7d64e06799d129e375d8313896.jpg"
-//     },
-//     {
-//         "id": "1789901995239280640",
-//         "display": "dien.huynhphuc",
-//         "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKCBcSKAhM8GvBrjLq-HlAx-OXMOhlPXAQIgMDevjiUTuncYg=s96-c"
-//     },
-//     {
-//         "id": "1789912002575994880",
-//         "display": "ha.nguyen",
-//         "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKt67CSBAa0mOTTMMZKF09JU_ohVj5UwWWTTVJ-H1oK7qRdFA=s96-c"
-//     },
-//     {
-//         "id": "1787788310626701312",
-//         "display": "hohoaisan",
-//         "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocK5LTjGkPC-KFJ-aXLMMwaovvIE93k3qQmKLeL6-Oif0ud9sHPm=s96-c"
-//     },
-
-// ]
