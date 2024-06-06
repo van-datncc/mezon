@@ -4,6 +4,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { CloseIcon } from "@mezon/mobile-components";
 import { useRef } from "react";
 import { useState } from "react";
+import { size } from "@mezon/mobile-ui";
 
 interface IMezonInputProps {
     placeHolder?: string;
@@ -36,7 +37,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         numberOfLines={textarea ? 4 : 1}
                         textAlignVertical={textarea ? 'top' : 'center'}
                         maxLength={maxCharacter}
-                        style={styles.input}
+                        style={[styles.input, textarea && {height: size.s_100}]}
                         placeholder={placeHolder}
                         placeholderTextColor="gray"
                         onFocus={() => setShowCount(true)}
