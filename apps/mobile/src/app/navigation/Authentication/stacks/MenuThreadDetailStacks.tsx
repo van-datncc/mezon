@@ -122,6 +122,7 @@ export const MenuThreadDetailStacks = ({}: any) => {
 						backgroundColor: Colors.secondary,
 					},
 					headerTintColor: Colors.white,
+					headerLeftLabelVisible: false,
 				}}
 			/>
 		</Stack.Navigator>
