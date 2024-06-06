@@ -48,6 +48,7 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
     }, [])
 
     const createNewGroup = async () => {
+        if (friendIdSelectedList.length === 0) return; 
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: friendIdSelectedList.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,

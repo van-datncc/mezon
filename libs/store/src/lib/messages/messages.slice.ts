@@ -3,7 +3,6 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
-import { ApiSearchMessageRequest, ApiSearchMessageResponse } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -59,8 +58,6 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
-	isSearchMessage: boolean;
-	searchMessagesChannel: ApiSearchMessageResponse | null;
 }
 
 export interface MessagesRootState {
@@ -90,7 +87,7 @@ export const fetchMessagesCached = memoize(
 			if (args[3] === undefined) {
 				args[3] = 1;
 			}
-			return args[1] + args[2] + args[3];
+			return args[1] + args[2] + args[3] + args[0].session.token;
 		},
 	},
 );
@@ -281,23 +278,6 @@ export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async 
 	return ack;
 });
 
-export const searchChannelMessages = createAsyncThunk(
-	'messages/searchChannelMessages',
-	async ({ filters, from, size, sorts }: ApiSearchMessageRequest, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-			const response = await mezon.client.searchMessage(mezon.session, { filters, from, size, sorts });
-
-			if (response) {
-				thunkAPI.dispatch(messagesActions.setSearchMessages(response));
-			}
-		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
-		}
-	},
-);
-
 export type SetChannelLastMessageArgs = {
 	channelId: string;
 	messageId: string;
@@ -319,8 +299,6 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	openOptionMessageState: false,
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
-	isSearchMessage: false,
-	searchMessagesChannel: {},
 });
 
 export type SetCursorChannelArgs = {
@@ -351,7 +329,7 @@ export const messagesSlice = createSlice({
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
-							update_time: action.payload.update_time
+							update_time: action.payload.update_time,
 						},
 					});
 					break;
@@ -419,12 +397,6 @@ export const messagesSlice = createSlice({
 		setDataReactionGetFromMessage(state, action) {
 			state.dataReactionGetFromLoadMessage = action.payload;
 		},
-		setIsSearchMessage: (state, action: PayloadAction<boolean>) => {
-			state.isSearchMessage = action.payload;
-		},
-		setSearchMessages: (state, action: PayloadAction<ApiSearchMessageResponse>) => {
-			state.searchMessagesChannel = action.payload;
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -439,8 +411,6 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-
-		builder.addCase(updateLastSeenMessage.fulfilled, (state: MessagesState) => {});
 	},
 });
 
@@ -476,7 +446,6 @@ export const messagesActions = {
 	sendTypingUser,
 	loadMoreMessage,
 	jumpToMessage,
-	searchChannelMessages,
 };
 
 /*
@@ -586,6 +555,3 @@ export const selectMessageByMessageId = (messageId: string) =>
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
 export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
-export const selectIsSearchMessage = createSelector(getMessagesState, (state) => state.isSearchMessage);
-
-export const selectSearchMessagesChannel = createSelector(getMessagesState, (state) => state.searchMessagesChannel);

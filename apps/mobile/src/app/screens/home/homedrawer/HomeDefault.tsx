@@ -1,7 +1,7 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, UnMuteIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { ActionEmitEvent, AngleRight, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
+import { Colors, size } from '@mezon/mobile-ui';
+import { ChannelsEntity, selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
@@ -78,7 +78,7 @@ const HomeDefault = React.memo((props: any) => {
 
 	return (
 		<View style={[styles.homeDefault]}>
-			<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} channelTitle={currentChannel?.channel_label} />
+			<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} currentChannel={currentChannel} />
 			{currentChannel && isFocusChannelView && (
 				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
 					<ChannelMessages
@@ -128,24 +128,22 @@ const HomeDefault = React.memo((props: any) => {
 			>
 				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
 			</BottomSheet>
-			{
-				showForwardModal && (
-					<ForwardMessageModal
-						show={showForwardModal}
-						onClose={() => setShowForwardModal(false)}
-						message={messageForward}
-					/>
-				)
-			}
+			{showForwardModal && <ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />}
 		</View>
 	);
 });
 
 const HomeDefaultHeader = React.memo(
-	({ navigation, channelTitle, openBottomSheet }: { navigation: any; channelTitle: string; openBottomSheet: () => void }) => {
+	({ navigation, currentChannel, openBottomSheet }: { navigation: any; currentChannel: ChannelsEntity; openBottomSheet: () => void }) => {
 		const navigateMenuThreadDetail = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
+		const channelsEntities = useSelector(selectChannelsEntities);
+		const [channelOfThread, setChannelOfThread] = useState<ChannelsEntity>(null);
+
+		useEffect(() => {
+			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
+		}, [currentChannel, channelsEntities]);
 		return (
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
@@ -160,9 +158,19 @@ const HomeDefaultHeader = React.memo(
 						>
 							<BarsLogo width={20} height={20} />
 						</TouchableOpacity>
-						<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-							{!!channelTitle && <HashSignIcon width={18} height={18} />}
-							<Text style={{ color: '#FFFFFF', fontFamily: 'bold', marginLeft: 10, fontSize: 16 }}>{channelTitle}</Text>
+						<View style={styles.channelContainer}>
+							{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
+								<ThreadIcon width={20} height={20}></ThreadIcon>
+							) : (
+								<HashSignIcon width={18} height={18} />
+							)}
+							<View>
+								<View style={styles.threadHeaderBox}>
+									<Text style={styles.threadHeaderLabel}>{currentChannel?.channel_label}</Text>
+									<AngleRight width={10} height={10} style={{ marginLeft: size.s_4 }} />
+								</View>
+								{channelOfThread?.channel_label && <Text style={styles.channelHeaderLabel}>{channelOfThread?.channel_label}</Text>}
+							</View>
 						</View>
 					</View>
 				</TouchableOpacity>

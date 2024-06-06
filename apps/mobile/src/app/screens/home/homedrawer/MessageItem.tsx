@@ -284,7 +284,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					style={styles.contentMessageMention}
 				>
 					{type === ChannelType.CHANNEL_TYPE_VOICE
-						? <SpeakerIcon height={16} width={16} />
+						? <Text><SpeakerIcon height={12} width={12} /> </Text>
 						// : <HashSignIcon height={16} width={16} />
 						: "#"}
 					{channel?.channel_label || ""}
@@ -311,7 +311,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return id.startsWith("@")
 			? <Text>{renderUserMention(id)} </Text>
 			: id.startsWith("#")
-				? renderChannelMention(id)
+				? <Text>{renderChannelMention(id)} </Text>
 				: <Text />
 	}
 
@@ -433,6 +433,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
+							setFoundUser(user);
 						}}
 						style={styles.wrapperAvatar}
 					>
@@ -456,10 +457,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					}}
 				>
 					{isShowInfoUser ? (
-						<View style={styles.messageBoxTop}>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							onPress={() => {
+								setIsOnlyEmojiPicker(false);
+								setMessageSelected(EMessageBSToShow.UserInformation);
+								setFoundUser(user)
+							}}
+							style={styles.messageBoxTop}
+						>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
-						</View>
+						</TouchableOpacity>
 					) : null}
 					{videos.length > 0 && renderVideos()}
 					{images.length > 0 && renderImages()}
@@ -487,6 +496,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				onClose={() => {
 					setOpenBottomSheet(null);
 				}}
+				user={foundUser}
 			/>
 		</View>
 	);

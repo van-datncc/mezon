@@ -7,9 +7,10 @@ import dmMessage from './dmMessage.json';
 import common from './common.json';
 import friends from './friends.json';
 import clan from './clan.json';
-import profileSetting from "./profileSetting.json";
+import profileSetting from './profileSetting.json';
 import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
+import profile from './profile.json';
 
 export default {
 	inviteToChannel,
@@ -24,4 +25,5 @@ export default {
 	profileSetting,
 	notificationSetting,
 	userProfile,
+	profile
 };

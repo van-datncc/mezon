@@ -71,15 +71,22 @@ export const styles = StyleSheet.create({
 	wrapperInput: {
 		position: 'relative',
 		justifyContent: 'center',
+		backgroundColor: Colors.tertiaryWeight,
+		paddingVertical: size.s_4,
+		borderRadius: size.s_22,
 	},
 	inputStyle: {
-		height: size.s_40,
+		maxHeight: size.s_40 * 2,
+		lineHeight: size.s_20,
 		width: inputWidth,
 		borderBottomWidth: 0,
-		borderRadius: 20,
-		paddingLeft: 15,
-		paddingRight: 40,
+		borderRadius: size.s_20,
+		paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
+		paddingRight: size.s_40,
 		fontSize: size.medium,
+		paddingTop: size.s_10,
+		backgroundColor: Colors.tertiaryWeight,
+		color: Colors.tertiary
 	},
 	iconEmoji: {
 		position: 'absolute',
@@ -209,7 +216,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		borderBottomWidth: 0.5,
-		borderBottomColor: 'lightgray',
+		borderBottomColor: Colors.gray48,
 		backgroundColor: Colors.secondary,
 	},
 	lineActiveClan: {
@@ -246,7 +253,7 @@ export const styles = StyleSheet.create({
 		paddingTop: size.s_20,
 		width: '22%',
 		justifyContent: 'flex-start',
-		backgroundColor: Colors.primary,
+		backgroundColor: Colors.secondary,
 		alignItems: 'center'
 	},
 	friendItemWrapper: {
@@ -320,7 +327,7 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.bgMessageHighlight,
 		borderLeftColor: Colors.borderMessageHighlight,
 		borderLeftWidth: 2,
-		paddingTop: size.s_2
+		paddingTop: size.s_2,
 	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
@@ -328,7 +335,7 @@ export const styles = StyleSheet.create({
 	},
 	repliedContentText: {
 		fontSize: size.small,
-		color: Colors.white,
+		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
 	},
@@ -377,15 +384,14 @@ export const styles = StyleSheet.create({
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
-		lineHeight: size.s_20
+		lineHeight: size.s_20,
 	},
 	contentMessageMention: {
 		fontSize: size.medium,
 		fontWeight: '600',
 		color: Colors.textLink,
 	},
-	mentionWrapper: {
-	},
+	mentionWrapper: {},
 	loadMoreChannelMessage: {
 		paddingVertical: size.s_20,
 		alignItems: 'center',
@@ -407,7 +413,7 @@ export const styles = StyleSheet.create({
 		borderRadius: verticalScale(5),
 		marginVertical: size.s_6,
 		borderWidth: 0.5,
-		borderColor: Colors.borderPrimary
+		borderColor: Colors.borderPrimary,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
@@ -563,10 +569,14 @@ export const styles = StyleSheet.create({
 		left: 0,
 		width: '100%',
 		height: '100%',
-		backgroundColor: Colors.secondary
+		backgroundColor: Colors.secondary,
 	},
 	iconEmojiInMessage: {
 		width: size.s_18,
 		height: size.s_18,
 	},
+	channelContainer: { flexDirection: 'row', alignItems: 'center' },
+	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },
+	threadHeaderLabel: { color: Colors.white, fontFamily: 'bold', marginLeft: size.s_10, fontSize: size.label },
+	channelHeaderLabel: { color: Colors.textGray, marginLeft: size.s_10, fontSize: size.medium },
 });

@@ -2,14 +2,14 @@ import { useAuth, useMemberStatus, useRoles } from '@mezon/core';
 import { CallIcon, CloseIcon, MessageIcon, VideoIcon } from '@mezon/mobile-components';
 import { Metrics, size } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, selectMemberByUserId } from '@mezon/store-mobile';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import ImageColors from 'react-native-image-colors';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../../../../app/temp-ui/MezonAvatar';
 import { styles } from './UserProfile.styles';
+import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 
 interface userProfileProps {
 	userId: string;
@@ -20,42 +20,9 @@ const UserProfile = ({ userId }: userProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { t } = useTranslation(['userProfile']);
 	const userById = useSelector(selectMemberByUserId(userId ?? ''));
-	const [color, setColor] = useState<string>('#323232');
 	const userStatus = useMemberStatus(userId || '');
 	const { RolesClan } = useRoles(currentChannelId || '');
-
-	const checkUrl = (url: string | undefined) => {
-		if (url !== undefined && url !== '') return true;
-		return false;
-	};
-	const getColor = useCallback(async () => {
-		if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
-			const imageUrl = userById?.user?.avatar_url;
-
-			try {
-				const result = await ImageColors.getColors(imageUrl, {
-					fallback: '#323232',
-					cache: true,
-					key: imageUrl,
-				});
-
-				switch (result.platform) {
-					case 'android':
-						setColor(result.dominant);
-						break;
-					case 'ios':
-						setColor(result.background);
-						break;
-				}
-			} catch (error) {
-				console.error(error);
-			}
-		}
-	}, [userProfile?.user?.avatar_url, userById?.user?.avatar_url]);
-
-	useEffect(() => {
-		getColor();
-	}, []);
+	const { color } = useMixImageColor(userProfile?.user?.avatar_url || userById?.user?.avatar_url);
 
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];

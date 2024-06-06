@@ -9,7 +9,7 @@ export function useMessageLine(line: string): IMessageLine {
 	const emojiRegex = /^:\b[^:]*\b:$/;
 
 	const isOnlyEmoji = useMemo(() => {
-		if (!line.trim()) {
+		if (!line?.trim()) {
 			return false;
 		}
 
