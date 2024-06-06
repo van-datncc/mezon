@@ -253,7 +253,7 @@ export const styles = StyleSheet.create({
 		paddingTop: size.s_20,
 		width: '22%',
 		justifyContent: 'flex-start',
-		backgroundColor: Colors.primary,
+		backgroundColor: Colors.secondary,
 		alignItems: 'center'
 	},
 	friendItemWrapper: {

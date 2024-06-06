@@ -1,3 +1,4 @@
+import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, messagesActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
@@ -57,10 +58,13 @@ export const handleFCMToken = async () => {
 	}
 };
 
-const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
+export const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
 	const link = notification?.data?.link;
 	if (link) {
 		const store = await getStoreAsync();
+		store.dispatch(appActions.setLoadingMainMobile(true));
+		store.dispatch(appActions.setIsFromFCMMobile(true));
+
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
 		// IF is notification to channel
@@ -72,9 +76,12 @@ const navigateToNotification = async (notification: any, navigation: any, curren
 			if (isDifferentClan) store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 			setTimeout(
 				() => {
+					save(STORAGE_KEY_CHANNEL_ID, channelId);
+					save(STORAGE_KEY_CLAN_ID, clanId);
 					store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 					store.dispatch(appActions.setLoadingMainMobile(false));
+					store.dispatch(appActions.setIsFromFCMMobile(false));
 				},
 				isDifferentClan ? 2500 : 0,
 			);
@@ -87,6 +94,7 @@ const navigateToNotification = async (notification: any, navigation: any, curren
 				const type = linkDirectMessageMatch[2];
 
 				store.dispatch(appActions.setLoadingMainMobile(false));
+				store.dispatch(appActions.setIsFromFCMMobile(false));
 				// TODO: handle navigation
 			}
 		}

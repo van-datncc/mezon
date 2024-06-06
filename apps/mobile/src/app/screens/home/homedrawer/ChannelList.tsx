@@ -1,7 +1,14 @@
 import { useCategory } from '@mezon/core';
 import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
-import { appActions, channelsActions, getStoreAsync, messagesActions, selectCurrentClan } from '@mezon/store-mobile';
+import {
+	appActions,
+	channelsActions,
+	getStoreAsync,
+	messagesActions,
+	selectCurrentClan,
+	selectIsFromFCMMobile
+} from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
@@ -16,10 +23,11 @@ import { styles } from './styles';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
+	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 
 	useEffect(() => {
-		if (categorizedChannels?.length) {
+		if (categorizedChannels?.length && !isFromFCMMobile) {
 			setDefaultChannelLoader();
 		}
 	}, [categorizedChannels]);
