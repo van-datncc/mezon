@@ -169,7 +169,7 @@ const TextWithMentionHashtagEmoji = ({ lineMessage }: TextWithMentionHashtagEmoj
 							<Link
 								style={{ textDecoration: 'none' }}
 								to={url}
-								className="px-1  cursor-pointer inline whitespace-nowrap !text-[#3B82F6] hover:!underline font-thin "
+								className="px-1  cursor-pointer inline-block whitespace-nowrap !text-[#3B82F6] hover:!underline font-thin w-full truncate"
 							>
 								{url}
 							</Link>
