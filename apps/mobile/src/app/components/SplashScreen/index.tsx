@@ -1,6 +1,6 @@
 import { Colors, Metrics } from '@mezon/mobile-ui';
 import React from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { Animated, Easing, Keyboard, StyleSheet, View } from 'react-native';
 import LogoMezon from '../../../assets/svg/logoMezon.svg';
 
 const SplashScreen = () => {
@@ -8,6 +8,7 @@ const SplashScreen = () => {
 	const bounceValue = React.useRef(new Animated.Value(1)).current;
 
 	React.useEffect(() => {
+		Keyboard.dismiss();
 		const rotationAnimation = Animated.loop(
 			Animated.timing(rotation, {
 				toValue: 1,

@@ -3,10 +3,66 @@ import { appActions, channelsActions, clansActions, messagesActions } from '@mez
 import { getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
-import { Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const IS_ANDROID = Platform.OS === 'android';
 
+export const checkNotificationPermission = async () => {
+	const authorizationStatus = await messaging().hasPermission();
+
+	if (authorizationStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
+		// Permission has not been requested yet
+		await requestNotificationPermission();
+	} else if (authorizationStatus === messaging.AuthorizationStatus.DENIED) {
+		// Permission has been denied
+		Alert.alert('Notification Permission', 'Notifications are disabled. Please enable them in settings.', [
+			{
+				text: 'Cancel',
+				style: 'cancel',
+			},
+			{
+				text: 'OK',
+				onPress: () => {
+					openAppSettings();
+				},
+			},
+		]);
+	} else if (
+		authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+		authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
+	) {
+		// Permission is granted
+		console.log('Notification permission granted.');
+	}
+};
+
+const requestNotificationPermission = async () => {
+	try {
+		await messaging().requestPermission();
+		Alert.alert('Notification Permission', 'Notifications have been enabled.');
+	} catch (error) {
+		Alert.alert('Notification Permission', 'Notification permission denied.', [
+			{
+				text: 'Cancel',
+				style: 'cancel',
+			},
+			{
+				text: 'OK',
+				onPress: () => {
+					openAppSettings();
+				},
+			},
+		]);
+	}
+};
+
+const openAppSettings = () => {
+	if (Platform.OS === 'ios') {
+		Linking.openURL('app-settings:');
+	} else {
+		Linking.openSettings();
+	}
+};
 export const createLocalNotification = async (title: string, body: string, data: { [key: string]: string | object }) => {
 	try {
 		const channelId = await notifee.createChannel({

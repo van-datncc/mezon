@@ -158,26 +158,32 @@ const HomeDefaultHeader = React.memo(
 						>
 							<BarsLogo width={20} height={20} />
 						</TouchableOpacity>
-						<View style={styles.channelContainer}>
-							{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-								<ThreadIcon width={20} height={20}></ThreadIcon>
-							) : (
-								<HashSignIcon width={18} height={18} />
-							)}
-							<View>
-								<View style={styles.threadHeaderBox}>
-									<Text style={styles.threadHeaderLabel}>{currentChannel?.channel_label}</Text>
-									<AngleRight width={10} height={10} style={{ marginLeft: size.s_4 }} />
+						{!!currentChannel?.channel_label && (
+							<View style={styles.channelContainer}>
+								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
+									<ThreadIcon width={20} height={20}></ThreadIcon>
+								) : (
+									<HashSignIcon width={18} height={18} />
+								)}
+								<View>
+									<View style={styles.threadHeaderBox}>
+										<Text style={styles.threadHeaderLabel}>{currentChannel?.channel_label}</Text>
+										<AngleRight width={10} height={10} style={{ marginLeft: size.s_4 }} />
+									</View>
+									{channelOfThread?.channel_label && (
+										<Text style={styles.channelHeaderLabel}>{channelOfThread?.channel_label}</Text>
+									)}
 								</View>
-								{channelOfThread?.channel_label && <Text style={styles.channelHeaderLabel}>{channelOfThread?.channel_label}</Text>}
 							</View>
-						</View>
+						)}
 					</View>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => openBottomSheet()}>
-					{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-					<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
-				</TouchableOpacity>
+				{!!currentChannel?.channel_label && (
+					<TouchableOpacity onPress={() => openBottomSheet()}>
+						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
+						<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
+					</TouchableOpacity>
+				)}
 			</View>
 		);
 	},
