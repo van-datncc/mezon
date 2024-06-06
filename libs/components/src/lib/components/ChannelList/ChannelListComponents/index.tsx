@@ -1,5 +1,5 @@
-import { useAppNavigation, useAppParams, useEventManagement } from '@mezon/core';
-import { selectCurrentClanId } from '@mezon/store';
+import { useAppNavigation, useAppParams, useClans, useEventManagement } from '@mezon/core';
+import { clansActions, selectCurrentClanId } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ export const Events = () => {
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const { numberEventManagement } = useEventManagement();
+	const { showNumEvent, setClanShowNumEvent } = useClans();
 
 	const currentClanId = useSelector(selectCurrentClanId);
 
@@ -21,6 +22,7 @@ export const Events = () => {
 
 	const openModal = () => {
 		setShowModal(true);
+		setClanShowNumEvent(false);
 	};
 
 	const memberPath = toMembersPage(currentClanId || '');
@@ -37,9 +39,9 @@ export const Events = () => {
 							<Icons.IconEvents />
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">Events</div>
+					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">{numberEventManagement !==0 ? `${numberEventManagement} Event` : 'Events'}</div>
 				</div>
-				{numberEventManagement !== 0 &&
+				{(numberEventManagement !== 0 && showNumEvent) &&
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
 						<div className="text-white text-xs font-medium">{numberEventManagement}</div>
 					</div>

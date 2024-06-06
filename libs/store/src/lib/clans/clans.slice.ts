@@ -28,10 +28,25 @@ export const mapClanToEntity = (clanRes: ApiClanDesc) => {
 	return { ...clanRes, id: clanRes.clan_id || '' };
 };
 
+interface ClanMeta {
+	id: string;
+	showNumEvent: boolean;
+}
+
+const clanMetaAdapter = createEntityAdapter<ClanMeta>();
+
+function extractClanMeta(clan: ClansEntity): ClanMeta {
+	return {
+		id: clan.id,
+		showNumEvent: true,
+	};
+}
+
 export interface ClansState extends EntityState<ClansEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentClanId?: string | null;
+	clanMetadata: EntityState<ClanMeta, string>;
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -72,6 +87,8 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		}
 
 		const clans = response.clandesc.map(mapClanToEntity);
+		const meta = clans.map((clan) => extractClanMeta(clan));
+		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
 		return clans;
 	} catch (error: any) {
 		const errmsg = await error.json();
@@ -173,6 +190,7 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],
 	error: null,
+	clanMetadata: clanMetaAdapter.getInitialState(),
 });
 
 export const clansSlice = createSlice({
@@ -183,6 +201,15 @@ export const clansSlice = createSlice({
 		remove: clansAdapter.removeOne,
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
+		},
+		updateBulkClanMetadata: (state, action: PayloadAction<ClanMeta[]>) => {
+			state.clanMetadata = clanMetaAdapter.upsertMany(state.clanMetadata, action.payload);
+		},
+		setClanShowNumEvent: (state, action: PayloadAction<{ clanId: string; status: boolean }>) => {
+			const clan = state.clanMetadata.entities[action.payload.clanId];
+			if (clan) {
+				clan.showNumEvent = action.payload.status;
+			}
 		},
 	},
 	extraReducers: (builder) => {
@@ -275,3 +302,9 @@ export const selectCurrentClan = createSelector(selectClansEntities, selectCurre
 );
 
 export const selectDefaultClanId = createSelector(selectAllClans, (clans) => (clans.length > 0 ? clans[0].id : null));
+
+export const selectShowNumEvent = (clanId: string) =>
+	createSelector(getClansState, (state) => {
+		const clan = state.clanMetadata.entities[clanId];
+		return clan.showNumEvent;
+	});
