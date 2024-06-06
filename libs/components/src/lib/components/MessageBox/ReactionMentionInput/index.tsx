@@ -357,6 +357,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(convertedHashtag);
 			setContent('');
+			setValueTextInput('');
 		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
