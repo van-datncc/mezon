@@ -2,7 +2,7 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { useChannels, useNotification } from '@mezon/core';
 import { Colors } from '@mezon/mobile-ui';
 import moment from 'moment';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -11,33 +11,41 @@ import NotificationItem from './NotificationItem';
 import NotificationOption from './NotificationOption';
 import { styles } from './Notifications.styles';
 import { EActionDataNotify } from './types';
+import { NotificationEntity } from '@mezon/store-mobile';
 
 const Notifications = () => {
 	const { notification } = useNotification();
 	const { t } = useTranslation(['notification']);
-	const [notifications, setNotifications] = useState([]);
 	const { channels } = useChannels();
+
+	const [sortedNotifications, setSortedNotifications] = useState<NotificationEntity[]>([]);
+
 	const handleFilterNotify = (tabNotify) => {
+		const dataSort = notification.sort((a, b) => moment(b.create_time).valueOf() - moment(a.create_time).valueOf());
+
 		switch (tabNotify) {
 			case EActionDataNotify.Individual:
-				setNotifications(
-					notification.filter((item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id)),
+				setSortedNotifications(
+					dataSort.filter((item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id)),
 				);
 				break;
 			case EActionDataNotify.Mention:
-				setNotifications(
-					notification.filter((item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id)),
+				setSortedNotifications(
+					dataSort.filter((item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id)),
 				);
 				break;
 			case EActionDataNotify.All:
-				setNotifications(notification);
+				setSortedNotifications(dataSort.filter((item) => channels.some((channel) => channel.channel_id === item.content.channel_id)));
 				break;
 			default:
-				setNotifications([]);
+				setSortedNotifications([]);
 				break;
 		}
 	};
-	const sortedNotifications = notifications.sort((a, b) => moment(b.create_time).valueOf() - moment(a.create_time).valueOf());
+
+	useEffect(() => {
+		handleFilterNotify(EActionDataNotify.Individual);
+	}, [notification, channels]);
 
 	const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -81,6 +89,7 @@ const Notifications = () => {
 			>
 				<BottomSheetView style={styles.contentContainer}>
 					<NotificationOption
+						channels={channels}
 						onChange={(value) => {
 							handleFilterNotify(value);
 						}}

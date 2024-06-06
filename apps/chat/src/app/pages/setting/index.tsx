@@ -29,12 +29,11 @@ const Setting = (props: ModalSettingProps) => {
 						{currentSetting === 'Appearance' && <SettingAppearance menuIsOpen={menuIsOpen} />}
 						<ExitSetting onClose={onClose} />
 
-						<div
-							className={`flex sbm:hidden absolute left-4 top-4 rounded-sm text-center dark:bg-[#AEAEAE] hover:text-slate-400 bg-gray-500`}
-							onClick={handleMenuBtn}
-						>
-							<Icons.ArrowDownFill className={`dark:text-bgSecondary text-white w-[30px] h-[30px] transition duration-300 ease-in-out ${menuIsOpen ? 'rotate-90' : '-rotate-90'}`} />
-						</div>
+						{menuIsOpen ? (
+							<Icons.ArrowLeftCircleActive className='flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400' onClick={handleMenuBtn}/>
+						) : (
+							<Icons.ArrowLeftCircle className='flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400' onClick={handleMenuBtn}/>
+						)}
 
 						<div className="flex sbm:hidden absolute right-4 top-4" onClick={() => onClose()}>
 							<Icons.CloseIcon className="dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400" />

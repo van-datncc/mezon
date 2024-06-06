@@ -40,6 +40,7 @@ import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
 import {
+  selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiImage,
 	selectHiddenBottomTabMobile,
@@ -127,6 +128,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const mentions = useRef([]);
 	const { emojiPicked } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
+	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
 
@@ -586,7 +588,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							text.length > 0 && { width: inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
-						children={renderTextContent(text, emojiListPNG)}
+						children={renderTextContent(text, emojiListPNG, channelsEntities)}
 						onContentSizeChange={(e) => {
 							if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
 						}}
