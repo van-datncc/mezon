@@ -1,56 +1,76 @@
 import { Icons } from '@mezon/components';
-import { useClans, useSearchMessages } from '@mezon/core';
-import { appActions, messagesActions, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
+import { useClans, useSearchMessages, useThreads } from '@mezon/core';
+import { appActions, searchMessagesActions, selectCurrentChannel, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
+import SearchMessageChannelModal from './SearchMessageChannelModal';
 import SelectGroup from './SelectGroup';
 import SelectItem from './SelectItem';
 import darkMentionsInputStyle from './StyleSearchMessages';
+import { hasKeySearch, searchFieldName } from './constant';
 
 const SearchMessageChannel = () => {
 	const dispatch = useAppDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
+	const { isSearchMessage, currentPage, searchMessages } = useSearchMessages();
+	const currentChannel = useSelector(selectCurrentChannel);
 
-	const { searchMessages } = useSearchMessages();
 	const { listUserSearch } = useClans();
-	const { isSearchMessage } = useSearchMessages();
+	const { setIsShowCreateThread } = useThreads();
 
 	const [expanded, setExpanded] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
-	const [value, setValue] = useState<string>('');
+	const [isShowSearchOptions, setIsShowSearchOptions] = useState('');
+	const [valueInputSearch, setValueInputSearch] = useState<string>('');
+	const [valueDisplay, setValueDisplay] = useState<string>('');
 	const [search, setSearch] = useState<ApiSearchMessageRequest | undefined>();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const searchRef = useRef<HTMLInputElement | null>(null);
 
 	const handleInputClick = () => {
 		setExpanded(true);
-		setIsShowSearchMessageModal(true);
+		if (!hasKeySearch(valueInputSearch)) {
+			setIsShowSearchMessageModal(true);
+		}
 	};
 
 	const handleOutsideClick = (event: MouseEvent) => {
 		const targetIsOutside = inputRef.current && !inputRef.current.contains(event.target as Node);
 
-		if (targetIsOutside && !value) {
+		if (targetIsOutside && !valueInputSearch) {
 			setExpanded(false);
 			setIsShowSearchMessageModal(false);
 		}
-		if (targetIsOutside && value) {
+		if (targetIsOutside && valueInputSearch) {
 			setIsShowSearchMessageModal(false);
 		}
 	};
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
-		setValue(value);
-		setSearch({ ...search, filters: [{ field_name: 'content', field_value: value }], from: 0, size: 10 });
+		setValueInputSearch(value);
+		setValueDisplay(newPlainTextValue);
+		const filter = [];
+
+		if (mentions.length === 0) {
+			filter.push({ field_name: 'content', field_value: value });
+		}
+
+		for (const mention of mentions) {
+			const convertMemtion = mention.display.split(':');
+			filter.push({ field_name: searchFieldName[convertMemtion[0]], field_value: convertMemtion[1] });
+		}
+
+		setSearch({ ...search, filters: filter, from: 0, size: 25 });
 	};
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
-		if (value && event.key === 'Enter') {
+		if (valueInputSearch && event.key === 'Enter') {
 			setIsShowSearchMessageModal(false);
-			dispatch(messagesActions.setIsSearchMessage(true));
+			dispatch(searchMessagesActions.setIsSearchMessage(true));
+			setIsShowCreateThread(false, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 			if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 			if (search) {
 				searchMessages(search);
@@ -64,17 +84,30 @@ const SearchMessageChannel = () => {
 	};
 
 	const handleClose = () => {
-		setValue('');
-		dispatch(messagesActions.setIsSearchMessage(false));
+		setValueInputSearch('');
+		setValueDisplay('');
+		dispatch(searchMessagesActions.setIsSearchMessage(false));
 		if (isSearchMessage) dispatch(appActions.setIsShowMemberList(!isActive));
+		searchRef.current?.focus();
 	};
+
+	const handleClickSearchOptions = (value: string) => {
+		setValueInputSearch(valueInputSearch + value);
+		searchRef.current?.focus();
+	};
+
+	useEffect(() => {
+		if (search) {
+			searchMessages({ ...search, from: currentPage });
+		}
+	}, [currentPage]);
 
 	useEffect(() => {
 		document.addEventListener('click', handleOutsideClick);
 		return () => {
 			document.removeEventListener('click', handleOutsideClick);
 		};
-	}, [value]);
+	}, [valueInputSearch]);
 
 	return (
 		<div className="relative" ref={inputRef}>
@@ -86,7 +119,7 @@ const SearchMessageChannel = () => {
 				<MentionsInput
 					inputRef={searchRef}
 					placeholder="Search"
-					value={value ?? ''}
+					value={valueInputSearch ?? ''}
 					style={darkMentionsInputStyle}
 					onChange={handleChange}
 					className="w-full mr-[10px] dark:bg-transparent bg-transparent dark:text-white text-colorTextLightMode rounded-md focus-visible:!border-0 focus-visible:!outline-none focus-visible:[&>*]:!outline-none"
@@ -97,18 +130,22 @@ const SearchMessageChannel = () => {
 					customSuggestionsContainer={(children: React.ReactNode) => {
 						return (
 							<div
-								className={`absolute left-0 top-10 pb-3 ${value ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch`}
+								className={`absolute left-0 top-10 p-3 ${valueInputSearch ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
 							>
-								{value && (
+								{valueInputSearch && (
 									<div className="first:mt-0 mt-3 p-3 rounded-t dark:bg-bgSecondary600 border-b border-borderDivider last:border-b-0 last:bottom-b-0">
 										<div className="flex items-center justify-between">
 											<div className="flex flex-row items-center flex-1 overflow-x-hidden">
-												<h3 className="text-xs font-medium uppercase mr-1 flex-shrink-0">Search for:</h3>
+												<h3 className="text-xs font-medium text-textLightTheme dark:text-textPrimary uppercase mr-1 flex-shrink-0">
+													Search for:
+												</h3>
 												<p className="text-sm font-semibold w-full mr-[10px] whitespace-normal text-ellipsis overflow-x-hidden">
-													{value}
+													{valueDisplay}
 												</p>
 											</div>
-											<button className="px-1 h-5 w-10 text-xs font-semibold rounded bg-borderDividerLight">Enter</button>
+											<button className="px-1 h-5 w-10 text-xs text-textLightTheme dark:text-textPrimary font-semibold rounded bg-borderDividerLight dark:bg-borderDividerLight">
+												Enter
+											</button>
 										</div>
 									</div>
 								)}
@@ -126,7 +163,20 @@ const SearchMessageChannel = () => {
 							return `from:${display}`;
 						}}
 						renderSuggestion={(suggestion) => {
-							return <SelectItem title="from: " content={suggestion.display} />;
+							return <SelectItem title="from: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
+						}}
+						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+					/>
+
+					<Mention
+						appendSpaceOnAdd={true}
+						data={listUserSearch ?? []}
+						trigger="mentions:"
+						displayTransform={(id: any, display: any) => {
+							return `from:${display}`;
+						}}
+						renderSuggestion={(suggestion) => {
+							return <SelectItem title="mentions: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
 						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
@@ -135,17 +185,27 @@ const SearchMessageChannel = () => {
 			<div className="w-6 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">
 				<button
 					onClick={handleSearchIcon}
-					className={`${value ? 'z-0 opacity-0 rotate-0' : 'z-10 opacity-100 rotate-90'} w-4 h-4 absolute transition-transform`}
+					className={`${valueInputSearch ? 'z-0 opacity-0 rotate-0' : 'z-10 opacity-100 rotate-90'} w-4 h-4 absolute transition-transform`}
 				>
-					<Icons.Search className="w-4 h-4" />
+					<Icons.Search className="w-4 h-4 dark:text-white text-colorTextLightMode" />
 				</button>
 				<button
 					onClick={handleClose}
-					className={`${value ? 'z-10 opacity-100 rotate-90' : 'z-0 opacity-0 rotate-0'} w-4 h-4 absolute transition-transform`}
+					className={`${valueInputSearch ? 'z-10 opacity-100 rotate-90' : 'z-0 opacity-0 rotate-0'} w-4 h-4 absolute transition-transform`}
 				>
 					<Icons.Close defaultSize="w-4 h-4" />
 				</button>
 			</div>
+
+			{isShowSearchMessageModal && (
+				<SearchMessageChannelModal
+					hasKeySearch={hasKeySearch(valueInputSearch ?? '')}
+					valueInputSearch={valueInputSearch}
+					valueDisplay={valueDisplay}
+					isShowSearchOptions={isShowSearchOptions}
+					onClickSearchOptions={handleClickSearchOptions}
+				/>
+			)}
 		</div>
 	);
 };
