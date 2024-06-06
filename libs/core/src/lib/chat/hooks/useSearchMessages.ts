@@ -1,4 +1,11 @@
-import { messagesActions, selectCurrentClan, selectIsSearchMessage, selectSearchMessagesChannel, useAppDispatch } from '@mezon/store';
+import {
+	searchMessagesActions,
+	selectCurrentClan,
+	selectCurrentPage,
+	selectIsSearchMessage,
+	selectSearchMessagesChannel,
+	useAppDispatch,
+} from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -8,10 +15,11 @@ export function useSearchMessages() {
 	const isSearchMessage = useSelector(selectIsSearchMessage);
 	const searchMessagesChannelRaw = useSelector(selectSearchMessagesChannel);
 	const currentClan = useSelector(selectCurrentClan);
+	const currentPage = useSelector(selectCurrentPage);
 
 	const searchMessages = useCallback(
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {
-			await dispatch(messagesActions.searchChannelMessages({ filters, from, size, sorts }));
+			await dispatch(searchMessagesActions.searchChannelMessages({ filters, from, size, sorts }));
 		},
 		[dispatch],
 	);
@@ -43,8 +51,9 @@ export function useSearchMessages() {
 		() => ({
 			isSearchMessage,
 			searchMessagesChannel,
+			currentPage,
 			searchMessages,
 		}),
-		[isSearchMessage, searchMessagesChannel, searchMessages],
+		[isSearchMessage, searchMessagesChannel, currentPage, searchMessages],
 	);
 }

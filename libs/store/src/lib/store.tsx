@@ -29,17 +29,18 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { attachmentReducer } from './attachment/attachments.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
+import { eventManagementReducer } from './eventManagement/eventManagement.slice';
 import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
+import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
+import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
+import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
+import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
+import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
-import { eventManagementReducer } from './eventManagement/eventManagement.slice';
-import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
-import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
-import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
-import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
-import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -74,13 +75,13 @@ const reducer = {
 	channels: channelsReducer,
 	channelMembers: channelMembersReducer,
 	threads: threadsReducer,
+	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
 	messages: messagesReducer,
 	users: usersReducer,
 	categories: categoriesReducer,
 	rolesclan: RolesClanReducer,
 	eventmanagement: eventManagementReducer,
 	usersClan: usersClanReducer,
-	// membersRole: MembersRoleReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
