@@ -433,6 +433,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
+							setFoundUser(user);
 						}}
 						style={styles.wrapperAvatar}
 					>
@@ -487,6 +488,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				onClose={() => {
 					setOpenBottomSheet(null);
 				}}
+				user={foundUser}
 			/>
 		</View>
 	);

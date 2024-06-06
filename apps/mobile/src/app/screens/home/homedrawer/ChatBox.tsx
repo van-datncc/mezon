@@ -40,6 +40,7 @@ import { EMessageActionType } from './enums';
 import { styles } from './styles';
 import { useSelector } from 'react-redux';
 import {
+  selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiImage,
 	selectHiddenBottomTabMobile,
@@ -127,6 +128,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const mentions = useRef([]);
 	const { emojiPicked } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
+	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 
 	useEffect(() => {
@@ -583,7 +585,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							text.length > 0 && { width: inputWidthWhenHasInput },
 							{ backgroundColor: Colors.tertiaryWeight, color: Colors.tertiary },
 						]}
-						children={renderTextContent(text, emojiListPNG)}
+						children={renderTextContent(text, emojiListPNG, channelsEntities)}
 					/>
 					<View style={styles.iconEmoji}>
 						<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
