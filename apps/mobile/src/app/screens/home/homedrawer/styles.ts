@@ -216,7 +216,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		borderBottomWidth: 0.5,
-		borderBottomColor: 'lightgray',
+		borderBottomColor: Colors.gray48,
 		backgroundColor: Colors.secondary,
 	},
 	lineActiveClan: {

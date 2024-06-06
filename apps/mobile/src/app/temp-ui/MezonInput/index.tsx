@@ -54,7 +54,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                 </View>
                 {showCount && textarea &&
                     <View style={styles.lineCountWrapper}>
-                        <Text style={styles.count}>{`${value.length}/${maxCharacter}`}</Text>
+                        <Text style={styles.count}>{`${value?.length || 1}/${maxCharacter}`}</Text>
                     </View>
                 }
             </View>
