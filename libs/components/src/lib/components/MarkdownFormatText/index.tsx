@@ -63,7 +63,7 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 				const result = convertMarkdown(markdown);
 
 				return (
-					<div key={index} className="lineText contents">
+					<div key={index} className="lineText contents ">
 						{(startsWithTripleBackticks && endsWithNoTripleBackticks && !isBetween) || onlyBackticks ? (
 							<span>{markdown}</span>
 						) : (
@@ -88,7 +88,7 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 						)}{' '}
 						{markdown && ' '}
 						{tagName && (
-							<span>
+							<span className='ml-[-0.3rem]'>
 								{checkMention(tagName) === MentionTypeEnum.MENTION ? (
 									<MentionUser tagName={tagName} />
 								) : checkMention(tagName) === MentionTypeEnum.HASHTAG ? (
@@ -117,8 +117,8 @@ const EmojiMarkdown = ({ emojiSyntax, onlyEmoji }: EmojiMarkdownOpt) => {
 	return (
 		<span style={{ userSelect: 'none' }}>
 			<img
-				src={getSrcEmoji(emojiSyntax, emojiListPNG)}
-				alt={getSrcEmoji(emojiSyntax, emojiListPNG)}
+				src={getSrcEmoji(emojiSyntax.trim(), emojiListPNG)}
+				alt={getSrcEmoji(emojiSyntax.trim(), emojiListPNG)}
 				className={`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`}
 				onDragStart={(e) => e.preventDefault()}
 			/>{' '}

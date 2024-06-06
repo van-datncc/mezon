@@ -33,6 +33,7 @@ import {
 	UsersClanEntity,
 	focusToElement,
 	regexToDetectGifLink,
+	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
@@ -49,12 +50,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-
-type Emoji = {
-	emoji: string;
-	name: string;
-	shortname: string;
-};
 
 type ChannelsMentionProps = {
 	id: string;
@@ -121,7 +116,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
-
+	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const matches = emojiListPNG
@@ -395,9 +390,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
 		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked + ' ');
+			textFieldEdit.insert(input, emojiPicked);
 		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked + ' ');
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
 			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
@@ -434,6 +429,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 	const { appearanceTheme } = useApp();
+
+	const handleSearchUserMention = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtag(search, props.listMentions ?? []));
+	};
+
+	const handleSearchHashtag = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
+	};
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -480,13 +486,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			>
 				<Mention
 					appendSpaceOnAdd={true}
-					data={props.listMentions ?? []}
+					data={handleSearchUserMention}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
 						return `@${display}`;
 					}}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+						<SuggestItem
+							valueHightLight={valueHighlight}
+							name={suggestion.display ?? ''}
+							avatarUrl={(suggestion as any).avatarUrl}
+							subText=""
+						/>
 					)}
 					style={mentionStyle}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -494,14 +505,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				<Mention
 					markup="#[__display__](__id__)"
 					appendSpaceOnAdd={true}
-					data={listChannelsMention ?? []}
+					data={handleSearchHashtag}
 					trigger="#"
 					displayTransform={(id: any, display: any) => {
 						return `#${display}`;
 					}}
 					style={mentionStyle}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
+						<SuggestItem
+							valueHightLight={valueHighlight}
+							name={suggestion.display ?? ''}
+							symbol="#"
+							subText={(suggestion as ChannelsMentionProps).subText}
+						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>

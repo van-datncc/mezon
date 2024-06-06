@@ -217,3 +217,26 @@ export const checkLastChar = (text: string) => {
 		return false;
 	}
 };
+
+export function searchMentionsHashtag(searchValue: any, list: any[]) {
+	if (!searchValue) return list;
+	const lowerCaseSearchValue = searchValue.toLowerCase();
+	return list
+		.filter((mention) => mention.display.toLowerCase().includes(lowerCaseSearchValue))
+		.sort((a, b) => {
+			const displayA = a.display.toLowerCase();
+			const displayB = b.display.toLowerCase();
+			const indexA = displayA.indexOf(lowerCaseSearchValue);
+			const indexB = displayB.indexOf(lowerCaseSearchValue);
+
+			if (indexA !== -1 && indexB !== -1) {
+				return indexA - indexB;
+			} else if (indexA !== -1) {
+				return -1;
+			} else if (indexB !== -1) {
+				return 1;
+			} else {
+				return displayA.localeCompare(displayB);
+			}
+		});
+}
