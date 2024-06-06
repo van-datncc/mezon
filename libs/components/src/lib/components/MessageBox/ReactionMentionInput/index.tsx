@@ -33,6 +33,7 @@ import {
 	UsersClanEntity,
 	focusToElement,
 	regexToDetectGifLink,
+	searchMentionsHashtagEmojiSyntax,
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
@@ -115,7 +116,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
-
+	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const matches = emojiListPNG
@@ -124,7 +125,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
-	const [mentionListUpdate, setMentionListUpdate] = useState(props.listMentions);
 
 	useEffect(() => {
 		if (getRefMessageReply && getRefMessageReply.attachments) {
@@ -389,9 +389,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
 		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked + ' ');
+			textFieldEdit.insert(input, emojiPicked);
 		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked + ' ');
+			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
 			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
 			setContent(replaceSyntaxByEmoji);
 			focusToElement(editorRef);
@@ -429,33 +429,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 	const { appearanceTheme } = useApp();
 
-	useEffect(() => {
-		if (valueTextInput && valueTextInput.includes('@')) {
-			const searchValue = valueTextInput.slice(1).toLowerCase(); // Remove '@' and convert to lowercase
+	const handleSearchUserMention = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtagEmojiSyntax(search, props.listMentions ?? []));
+	};
 
-			const sortedMentionList = [...(mentionListUpdate ?? [])].sort((a, b) => {
-				const displayA = a?.display?.toLowerCase() ?? '';
-				const displayB = b?.display?.toLowerCase() ?? '';
-
-				// Calculate the index of searchValue in displayA and displayB
-				const indexA = displayA.indexOf(searchValue);
-				const indexB = displayB.indexOf(searchValue);
-
-				// Sort based on the index position (smaller index comes first)
-				if (indexA !== -1 && indexB !== -1) {
-					return indexA - indexB; // Smaller index (closer match) comes first
-				} else if (indexA !== -1) {
-					return -1; // A comes before B (A has the match)
-				} else if (indexB !== -1) {
-					return 1; // B comes before A (B has the match)
-				} else {
-					return displayA.localeCompare(displayB); // Default to alphabetical order
-				}
-			});
-
-			setMentionListUpdate(sortedMentionList);
-		}
-	}, [valueTextInput, mentionListUpdate]);
+	const handleSearchHashtag = (search: any, callback: any) => {
+		setValueHightlight(search);
+		callback(searchMentionsHashtagEmojiSyntax(search, listChannelsMention ?? []));
+	};
 
 	return (
 		<div className="relative">
@@ -503,13 +485,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			>
 				<Mention
 					appendSpaceOnAdd={true}
-					data={mentionListUpdate ?? []}
+					data={handleSearchUserMention}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
 						return `@${display}`;
 					}}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
+						<SuggestItem
+							valueHightLight={valueHighlight}
+							name={suggestion.display ?? ''}
+							avatarUrl={(suggestion as any).avatarUrl}
+							subText=""
+						/>
 					)}
 					style={mentionStyle}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -517,14 +504,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				<Mention
 					markup="#[__display__](__id__)"
 					appendSpaceOnAdd={true}
-					data={listChannelsMention ?? []}
+					data={handleSearchHashtag}
 					trigger="#"
 					displayTransform={(id: any, display: any) => {
 						return `#${display}`;
 					}}
 					style={mentionStyle}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} symbol="#" subText={(suggestion as ChannelsMentionProps).subText} />
+						<SuggestItem
+							valueHightLight={valueHighlight}
+							name={suggestion.display ?? ''}
+							symbol="#"
+							subText={(suggestion as ChannelsMentionProps).subText}
+						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
@@ -542,3 +534,27 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 }
 
 export default MentionReactInput;
+
+// [
+//     {
+//         "id": "1775732201627848704",
+//         "display": "an.buihoang",
+//         "avatarUrl": "https://cdn.mezon.vn/1782714213009985536/1795006860827299840/1716985383718z5126645130854_0c32cb7d64e06799d129e375d8313896.jpg"
+//     },
+//     {
+//         "id": "1789901995239280640",
+//         "display": "dien.huynhphuc",
+//         "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKCBcSKAhM8GvBrjLq-HlAx-OXMOhlPXAQIgMDevjiUTuncYg=s96-c"
+//     },
+//     {
+//         "id": "1789912002575994880",
+//         "display": "ha.nguyen",
+//         "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKt67CSBAa0mOTTMMZKF09JU_ohVj5UwWWTTVJ-H1oK7qRdFA=s96-c"
+//     },
+//     {
+//         "id": "1787788310626701312",
+//         "display": "hohoaisan",
+//         "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocK5LTjGkPC-KFJ-aXLMMwaovvIE93k3qQmKLeL6-Oif0ud9sHPm=s96-c"
+//     },
+
+// ]

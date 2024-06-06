@@ -1,4 +1,3 @@
-import { useMessageValue } from '@mezon/core';
 import { selectCurrentChannelId } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
 import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
@@ -9,22 +8,15 @@ type SuggestItemProps = {
 	symbol?: string;
 	name: string;
 	subText?: string;
+	valueHightLight?: string;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, subText }: SuggestItemProps) => {
+const SuggestItem = ({ avatarUrl, symbol, name, subText, valueHightLight }: SuggestItemProps) => {
 	const { emojiListPNG } = useDataEmojiSvg();
 	const urlEmoji = getSrcEmoji(name, emojiListPNG);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const { valueTextInput } = useMessageValue(currentChannelId as string);
-	let getUserName = '';
 
-	if (valueTextInput.startsWith('@')) {
-		const atIndex = valueTextInput.indexOf('@');
-		if (atIndex !== -1) {
-			getUserName = valueTextInput.slice(atIndex + 1);
-		}
-	}
 	const highlightMatch = (name: string, getUserName: string) => {
 		const index = name.toLowerCase().indexOf(getUserName.toLowerCase());
 		if (index === -1) {
@@ -48,7 +40,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText }: SuggestItemProps) => 
 				{avatarUrl && <img src={avatarUrl} alt={name} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />}
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px' }} />}
 				{symbol && <span className="text-[17px] dark:text-textDarkTheme text-textLightTheme">{symbol}</span>}
-				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, getUserName)}</span>
+				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, valueHightLight ?? '')}</span>
 			</div>
 			<span className="text-[10px] font-semibold text-[#A1A1AA] uppercase">{subText}</span>
 		</div>
