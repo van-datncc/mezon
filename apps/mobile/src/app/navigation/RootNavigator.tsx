@@ -20,13 +20,13 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import {Colors, darkThemeColor, lightThemeColor, useAnimatedState} from '@mezon/mobile-ui';
+import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
 import { SafeAreaView } from 'react-native';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
-import { createLocalNotification, navigateToNotification } from '../utils/pushNotificationHelpers';
-import SplashScreen from "../components/SplashScreen";
+import SplashScreen from '../components/SplashScreen';
+import { checkNotificationPermission, createLocalNotification, navigateToNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
@@ -40,7 +40,7 @@ const NavigationMain = () => {
 		const timer = setTimeout(() => {
 			setIsLoadingSplashScreen(false);
 		}, 2500);
-		
+		checkNotificationPermission();
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			Toast.show({
 				type: 'info',
@@ -58,7 +58,7 @@ const NavigationMain = () => {
 
 		return () => {
 			unsubscribe();
-			clearTimeout(timer)
+			clearTimeout(timer);
 		};
 	}, []);
 

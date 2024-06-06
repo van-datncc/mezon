@@ -29,6 +29,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 		<Drawer.Navigator
 			screenOptions={{
 				drawerPosition: 'left',
+				drawerType: 'back',
 				drawerStyle: {
 					width: '85%',
 				},

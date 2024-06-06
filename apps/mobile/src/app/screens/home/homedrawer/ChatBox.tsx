@@ -18,7 +18,15 @@ import {
 	useDirectMessages
 } from '@mezon/core';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, IMessageSendPayload, IMessageWithUser, MentionDataProps, UserMentionsOpt } from '@mezon/utils';
+import {
+	ChannelMembersEntity,
+	IMessageSendPayload,
+	IMessageWithUser,
+	MentionDataProps,
+	MIN_THRESHOLD_CHARS,
+	typeConverts,
+	UserMentionsOpt
+} from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
 	DeviceEventEmitter,
@@ -60,6 +68,9 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { ChannelStreamMode } from 'mezon-js';
 import { RootState } from '@mezon/store-mobile';
+import { handleUploadFileMobile, useMezon } from "@mezon/transport";
+import RNFS from "react-native-fs";
+import { IFile } from './components/AttachmentPicker/Gallery';
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
@@ -92,6 +103,7 @@ interface IChatBoxProps {
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<TextInput>();
+	const { sessionRef, clientRef } = useMezon();
 	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const [mentionTextValue, setMentionTextValue] = useState('');
@@ -114,7 +126,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
-	const [isFocus, setIsFocus] = useState<boolean>(Platform.OS === 'ios' && hiddenBottomTab);
+	const [isFocus, setIsFocus] = useState<boolean>(false);
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
@@ -351,9 +363,16 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}, [listChannels])
 
 
-	const handleTextInputChange = (text) => {
-		setText(convertMentionsToText(text));
-		setMentionTextValue(text);
+	const handleTextInputChange = async (text: string) => {
+		const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
+		if (isConvertToFileTxt) {
+			setText('');
+			currentTextInput.current = '';
+			await onConvertToFiles(text);
+		} else {
+			setText(convertMentionsToText(text));
+			setMentionTextValue(text);
+		}
 		setIsShowAttachControl(false);
 		switch (props.mode) {
 			case ChannelStreamMode.STREAM_MODE_CHANNEL:
@@ -367,6 +386,72 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				break;
 		}
 	}
+	
+	const onConvertToFiles = useCallback(async (content: string) => {
+		try {
+			if (content.length > MIN_THRESHOLD_CHARS) {
+				
+				const fileTxtSaved = await writeTextToFile(content);
+				const session = sessionRef.current;
+				const client = clientRef.current;
+				
+				if (!client || !session || !currentChannel.channel_id) {
+					console.log('Client is not initialized')
+				}
+				handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
+					.then((attachment) => {
+						handleFinishUpload(attachment);
+						return 'handled';
+					})
+					.catch((err) => {
+						console.log('err', err);
+						return 'not-handled';
+					});
+			}
+		} catch (e) {
+			console.log('err', e);
+		}
+	}, []);
+	
+	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
+		typeConverts.map((typeConvert) => {
+			if (typeConvert.type === attachment.filetype) {
+				return (attachment.filetype = typeConvert.typeConvert);
+			}
+		});
+		setAttachmentData(attachment);
+	}, []);
+	
+	
+	const writeTextToFile = async (text: string) => {
+		// Define the path to the file
+		const now = Date.now();
+		const filename = now + '.txt';
+		const path = RNFS.DocumentDirectoryPath + `/${filename}`;
+		
+		// Write the text to the file
+		await RNFS.writeFile(path, text, 'utf8')
+			.then((success) => {
+				console.log('FILE WRITTEN!');
+			})
+			.catch((err) => {
+				console.log(err.message);
+			});
+		
+		// Read the file to get its base64 representation
+		const fileData = await RNFS.readFile(path, 'base64');
+		
+		// Create the file object
+		const fileFormat: IFile = {
+			uri: path,
+			name: filename,
+			type: 'text/plain',
+			size: (await RNFS.stat(path)).size.toString(),
+			fileData: fileData,
+		};
+		
+		return fileFormat;
+	};
 
 	const handleMentionInput = (mentions: MentionDataProps[]) => {
 		const mentionedUsers: UserMentionsOpt[] = [];
