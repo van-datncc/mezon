@@ -5,6 +5,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
+import { getChannelById } from '@mezon/mobile-components';
 
 export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], channelsEntities?: Record<string, ChannelsEntity>) => {
 	const getChannelById = (channelHashtagId: string) => {

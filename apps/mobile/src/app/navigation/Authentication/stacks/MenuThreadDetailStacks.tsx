@@ -1,5 +1,5 @@
 import { useReference } from '@mezon/core';
-import { AngleRight, ArrowLeftIcon } from '@mezon/mobile-components';
+import { AngleRight, ArrowLeftIcon, HashSignIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
@@ -64,31 +64,32 @@ export const MenuThreadDetailStacks = ({}: any) => {
 				component={CreateThreadForm}
 				options={{
 					headerShown: true,
-					headerTitle: () =>
-						openThreadMessageState ? (
-							<View></View>
-						) : (
-							<Text style={{ color: Colors.white, fontSize: size.h5 }}>{currentChannel?.channel_label}</Text>
-						),
-					headerLeft: () =>
-						openThreadMessageState ? (
-							<View style={styles.headerLeft}>
-								<TouchableOpacity style={styles.btnBack} onPress={() => navigation.goBack()}>
-									<ArrowLeftIcon />
-								</TouchableOpacity>
-								<View>
-									<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-										<Text style={{ color: Colors.white, fontSize: size.h6 }}>New Thread</Text>
-										<AngleRight width={14} height={14} style={{ marginLeft: size.s_10 }}></AngleRight>
-									</View>
+					headerTitle: () => <Text></Text>,
+					headerLeft: () => (
+						<View style={styles.headerLeft}>
+							<TouchableOpacity style={styles.btnBack} onPress={() => navigation.goBack()}>
+								<ArrowLeftIcon />
+							</TouchableOpacity>
+							<View>
+								<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+									{!openThreadMessageState && (
+										<View style={{ marginRight: size.s_10 }}>
+											<HashSignIcon width={18} height={18} />
+										</View>
+									)}
+									<Text style={{ color: Colors.white, fontSize: size.h6 }}>
+										{openThreadMessageState ? 'New Thread' : currentChannel?.channel_label}
+									</Text>
+									<AngleRight width={14} height={14} style={{ marginLeft: size.s_10 }}></AngleRight>
+								</View>
+								{openThreadMessageState && (
 									<Text style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400' }}>
 										{currentChannel?.channel_label}
 									</Text>
-								</View>
+								)}
 							</View>
-						) : (
-							<Text style={{ color: Colors.white, fontSize: size.h5 }}>{currentChannel?.channel_label}</Text>
-						),
+						</View>
+					),
 					headerTitleStyle: {
 						color: Colors.white,
 					},

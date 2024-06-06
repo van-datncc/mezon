@@ -327,7 +327,7 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.bgMessageHighlight,
 		borderLeftColor: Colors.borderMessageHighlight,
 		borderLeftWidth: 2,
-		paddingTop: size.s_2
+		paddingTop: size.s_2,
 	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
@@ -384,15 +384,14 @@ export const styles = StyleSheet.create({
 	contentMessageLink: {
 		fontSize: size.medium,
 		color: Colors.textLink,
-		lineHeight: size.s_20
+		lineHeight: size.s_20,
 	},
 	contentMessageMention: {
 		fontSize: size.medium,
 		fontWeight: '600',
 		color: Colors.textLink,
 	},
-	mentionWrapper: {
-	},
+	mentionWrapper: {},
 	loadMoreChannelMessage: {
 		paddingVertical: size.s_20,
 		alignItems: 'center',
@@ -414,7 +413,7 @@ export const styles = StyleSheet.create({
 		borderRadius: verticalScale(5),
 		marginVertical: size.s_6,
 		borderWidth: 0.5,
-		borderColor: Colors.borderPrimary
+		borderColor: Colors.borderPrimary,
 	},
 	wrapperTypingLabel: {
 		position: 'absolute',
@@ -570,10 +569,14 @@ export const styles = StyleSheet.create({
 		left: 0,
 		width: '100%',
 		height: '100%',
-		backgroundColor: Colors.secondary
+		backgroundColor: Colors.secondary,
 	},
 	iconEmojiInMessage: {
 		width: size.s_18,
 		height: size.s_18,
 	},
+	channelContainer: { flexDirection: 'row', alignItems: 'center' },
+	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },
+	threadHeaderLabel: { color: Colors.white, fontFamily: 'bold', marginLeft: size.s_10, fontSize: size.label },
+	channelHeaderLabel: { color: Colors.textGray, marginLeft: size.s_10, fontSize: size.medium },
 });
