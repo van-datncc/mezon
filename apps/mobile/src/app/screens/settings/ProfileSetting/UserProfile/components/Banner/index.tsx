@@ -5,6 +5,7 @@ import { PenIcon } from "@mezon/mobile-components";
 import Toast from "react-native-toast-message";
 import { useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker"
+import { useMixImageColor } from "apps/mobile/src/app/hooks/useMixImageColor";
 
 export interface IFile {
     uri: string;
@@ -19,7 +20,7 @@ interface IBannerAvatarProps {
 }
 
 export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
-    const [bannerColor, setBannerColor] = useState<string>("purple");
+    const { color } = useMixImageColor(avatar);
     const [imageUrl, setImageUrl] = useState<string>(avatar);
 
     function reserve() {
@@ -57,7 +58,7 @@ export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
 
     return (
         <View style={{ display: "flex" }}>
-            <View style={[styles.bannerContainer, { backgroundColor: bannerColor }]}>
+            <View style={[styles.bannerContainer, { backgroundColor: color }]}>
                 <View style={styles.btnGroup}>
                     <TouchableOpacity
                         onPress={reserve}

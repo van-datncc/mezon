@@ -1,4 +1,4 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -26,9 +26,11 @@ const styles = StyleSheet.create({
     },
 
     input: {
+        paddingVertical: 0,
         color: Colors.white,
         flexBasis: 20,
-        flexGrow: 1
+        flexGrow: 1,
+        height: size.s_40
     },
 
     clearBtn: {
