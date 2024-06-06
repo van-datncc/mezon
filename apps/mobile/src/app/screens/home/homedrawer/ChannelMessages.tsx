@@ -49,7 +49,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		const attachmentObjects = attachments
 			.filter((u) => u.url !== imageSelected?.url)
 			.map(createAttachmentObject)
-			.reverse();
 		return [imageSelectedUrl, ...attachmentObjects];
 	}, [attachments, imageSelected]);
 

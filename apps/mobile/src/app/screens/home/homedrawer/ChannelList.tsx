@@ -1,7 +1,7 @@
 import { useCategory } from '@mezon/core';
 import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync, messagesActions, selectCurrentClan } from '@mezon/store-mobile';
+import { appActions, channelsActions, getStoreAsync, messagesActions, selectCurrentClan } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
@@ -22,7 +22,7 @@ const ChannelList = React.memo((props: any) => {
 		if (categorizedChannels?.length) {
 			setDefaultChannelLoader();
 		}
-	}, [categorizedChannels, currentClan]);
+	}, [categorizedChannels]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useAnimatedState([]);
 
@@ -56,6 +56,7 @@ const ChannelList = React.memo((props: any) => {
 		const store = await getStoreAsync();
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		store.dispatch(appActions.setLoadingMainMobile(false));
 	};
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>

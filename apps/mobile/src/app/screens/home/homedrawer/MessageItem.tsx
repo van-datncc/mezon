@@ -284,7 +284,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					style={styles.contentMessageMention}
 				>
 					{type === ChannelType.CHANNEL_TYPE_VOICE
-						? <SpeakerIcon height={16} width={16} />
+						? <SpeakerIcon height={12} width={12} />
 						// : <HashSignIcon height={16} width={16} />
 						: "#"}
 					{channel?.channel_label || ""}
@@ -311,7 +311,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return id.startsWith("@")
 			? <Text>{renderUserMention(id)} </Text>
 			: id.startsWith("#")
-				? renderChannelMention(id)
+				? <Text>{renderChannelMention(id)} </Text>
 				: <Text />
 	}
 

@@ -335,7 +335,7 @@ export const styles = StyleSheet.create({
 	},
 	repliedContentText: {
 		fontSize: size.small,
-		color: Colors.white,
+		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
 	},
