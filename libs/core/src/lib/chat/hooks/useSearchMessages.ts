@@ -42,7 +42,7 @@ export function useSearchMessages() {
 		});
 
 		return {
-			messageChannels: data.length > 0 ? [data] : [],
+			messageChannels: data.length > 0 ? data : [],
 			total: searchMessagesChannelRaw?.total ?? 0,
 		};
 	}, [currentClan?.clan_id, searchMessagesChannelRaw?.messages, searchMessagesChannelRaw?.total]);

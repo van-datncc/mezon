@@ -55,6 +55,7 @@ module.exports = {
   textSecondary800: '#4E5058',
   textLightTheme: "#000000",
   textDarkTheme: "#ffffff",
+  textLightUserName: '#17AC86',
 
   /* border */
   borderDefault: '#1E1E1E',
@@ -74,6 +75,8 @@ module.exports = {
   hoverPrimary: '#124FC9',
   buttonSecondary: '#4E5057',
   buttonSecondaryHover: '#6D6F77',
+  buttonLightTertiary: '#CCCED3',
+  buttonLightTertiaryHover: '#D3D5DA',
 
   red100: '#FFE1E7',
   red200: '#FFC8D6',

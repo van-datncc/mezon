@@ -10,11 +10,11 @@ const SelectItem = ({ title, content, onClick }: SelectItemProps) => {
 	return (
 		<button
 			onClick={onClick}
-			className="flex flex-row justify-between items-center group w-full cursor-pointer hover:bg-bgSearchHover hover:opacity-90 rounded py-1 px-2"
+			className="flex flex-row justify-between items-center group w-full cursor-pointer hover:bg-bgModifierHoverLight dark:hover:bg-bgSearchHover hover:opacity-90 rounded py-1 px-2"
 		>
 			<div>
-				<span className="font-semibold">{title}</span>
-				<span>{content}</span>
+				<span className="text-textPrimaryLight dark:text-textPrimary font-semibold">{title}</span>
+				<span className="text-textSecondary400 dark:text-textPrimary">{content}</span>
 			</div>
 			<div className="group-hover:opacity-100 opacity-0">
 				<Icons.Plus />
