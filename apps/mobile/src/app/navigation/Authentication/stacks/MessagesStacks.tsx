@@ -46,6 +46,7 @@ export const MessagesStacks = ({}: any) => {
 						backgroundColor: Colors.secondary,
 					},
 					headerShadowVisible: false,
+					headerLeftLabelVisible: false,
 				}}
 			/>
 			<Stack.Screen
