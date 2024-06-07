@@ -93,11 +93,13 @@ export const fetchCreateEventManagement = createAsyncThunk(
 export interface EventManagementState extends EntityState<EventManagementEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	chooseEvent: EventManagementEntity | null;
 }
 
 export const initialEventManagementState: EventManagementState = eventManagementAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	chooseEvent: null,
 });
 
 export const eventManagementSlice = createSlice({
@@ -110,6 +112,9 @@ export const eventManagementSlice = createSlice({
 		clearEntities: (state) => {
 			eventManagementAdapter.removeAll(state);
 		},
+		setChooseEvent: (state, action) => {
+			state.chooseEvent = action.payload;
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -144,5 +149,7 @@ export const selectAllEventManagement = createSelector(getEventManagementState, 
 export const selectEventManagementEntities = createSelector(getEventManagementState, selectEntities);
 
 export const selectNumberEvent = createSelector(selectAllEventManagement, (events) => events.length);
+
+export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
 
 

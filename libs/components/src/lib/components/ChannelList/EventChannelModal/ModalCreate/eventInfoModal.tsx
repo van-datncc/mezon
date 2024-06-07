@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../../ModalError';
 import { OptionEvent } from '@mezon/utils';
 import { useApp } from '@mezon/core';
+import { compareDate, compareTime } from '../timeFomatEvent';
 
 export type EventInfoModalProps = {
 	topic: string;
@@ -32,7 +33,7 @@ export type EventInfoModalProps = {
 
 const EventInfoModal = (props: EventInfoModalProps) => {
 	const { topic, description, option, logo, selectedDateStart, selectedDateEnd, timeStart, timeEnd, timeStartDefault, timeEndDefault, setSelectedDateStart, setSelectedDateEnd, setLogo, handleTopic, handleTimeStart, handleTimeEnd, handleDescription, setErrorTime } = props;
-	const [countCharacterDescription, setCountCharacterDescription] = useState(1024);
+	const [countCharacterDescription, setCountCharacterDescription] = useState(1000);
 	const [errorStart, setErrorStart] = useState(false);
 	const [errorEnd, setErrorEnd] = useState(false);
 	const [checkDaySame, setCheckDaySame] = useState(true);
@@ -56,7 +57,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 
 	const handleDateChangeEnd = (date: Date) => {
 		setSelectedDateEnd(date);
-		compareDate(selectedDateStart, date);
+		setCheckDaySame(compareDate(selectedDateStart, date));
 	};
 
 	const renderOptions = () => {
@@ -75,8 +76,11 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 	};
 
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		if (e.target.value.length > 1000) {
+		return;
+		}
 		handleDescription(e.target.value);
-		setCountCharacterDescription(1024 - e.target.value.length);
+		setCountCharacterDescription(1000 - e.target.value.length);
 	};
 
 	const handleChangeTimeStart = (e:any)=>{
@@ -97,42 +101,6 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		} else {
 			setErrorEnd(true);
 		}
-	}
-
-	const compareDate = (start: Date, end: Date) => {
-		const startDay = new Date(start);
-		const endDay = new Date(end);
-
-		const dayStart = startDay.getDate();
-		const monthStart = startDay.getMonth();
-		const yearStart = startDay.getFullYear();
-
-		const dayEnd = endDay.getDate();
-		const monthEnd = endDay.getMonth();
-		const yearEnd = endDay.getFullYear();
-
-		if ((yearStart === yearEnd) && (monthStart === monthEnd) && (dayStart === dayEnd)){
-			setCheckDaySame(true);
-		} else {
-			setCheckDaySame(false);
-		}
-	}
-
-	const compareTime = (start: string, end: string, equal?: boolean) =>{
-		const [hourStart, minuteStart] = start.split(":").map(Number);
-		const [hourEnd, minuteEnd] = end.split(":").map(Number);
-
-		const totalStart = hourStart * 60 + minuteStart;
-		const totalEnd = hourEnd * 60 + minuteEnd;
-
-		if(equal && (totalStart <= totalEnd)) {
-			return true;
-		}
-
-		if(totalStart < totalEnd) {
-			return true;
-		}
-		return false;
 	}
 
 	const {appearanceTheme} = useApp();
