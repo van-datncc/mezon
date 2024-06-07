@@ -1,10 +1,10 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, AngleRight, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
+import { ActionEmitEvent, AngleRight, HashSignLockIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
+import { ChannelStatusEnum, IMessageWithUser } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -162,6 +162,9 @@ const HomeDefaultHeader = React.memo(
 							<View style={styles.channelContainer}>
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 									<ThreadIcon width={20} height={20}></ThreadIcon>
+								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
+								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+									<HashSignLockIcon width={20} height={20} color={Colors.white} />
 								) : (
 									<HashSignIcon width={18} height={18} />
 								)}
