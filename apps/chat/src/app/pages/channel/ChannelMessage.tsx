@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
+import ModalDeleteMess from './ModalDeleteMess';
 
 type MessageProps = {
 	message: IMessageWithUser;
@@ -48,6 +49,7 @@ const neverMatchingRegex = /($a)/;
 
 export function ChannelMessage(props: Readonly<MessageProps>) {
 	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
+	const [deleteMessage, setDeleteMessage] = useState(false);
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
@@ -114,11 +116,19 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
+			if (editMessage?.trim()===''){
+				if(editMessage?.length === 0) {
+					setDeleteMessage(true);
+				}
+				setEditMessage(message.content.t);
+				handleCancelEdit();
+				return;
+			}
 			if (content) {
 				handleSend(content, message.id);
 				setNewMessage(content);
 				handleCancelEdit();
-			}
+			} 
 		}
 		if (e.key === 'Escape') {
 			e.preventDefault();
@@ -126,6 +136,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 			handleCancelEdit();
 		}
 	};
+
 	const handelSave = () => {
 		if (content) {
 			handleSend(content, message.id);
@@ -136,7 +147,9 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 
 	const handleSend = useCallback(
 		(editMessage: string, messageId: string) => {
-			EditSendMessage(editMessage, messageId);
+			const content = editMessage.trim();
+			EditSendMessage(content, messageId);
+			setEditMessage(content);
 		},
 		[EditSendMessage],
 	);
@@ -270,6 +283,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 				}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
+			{ deleteMessage && <ModalDeleteMess closeModal={() => setDeleteMessage(false)} mess={message}/> }
 		</div>
 	);
 }

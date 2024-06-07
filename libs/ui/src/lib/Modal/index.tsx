@@ -1,3 +1,9 @@
+import { Icons } from "@mezon/components";
+import { ChannelsEntity } from "@mezon/store";
+import { ChannelStatusEnum } from "@mezon/utils";
+import { channel } from "diagnostics_channel";
+import { ChannelType } from "mezon-js";
+
 export type ModalProps = {
 	children: React.ReactNode;
 	showModal: boolean;
@@ -11,10 +17,11 @@ export type ModalProps = {
 	classSubTitleBox?: string;
 	borderBottomTitle?: string;
 	classNameWrapperChild?: string;
+	hasChannel?: ChannelsEntity ;
 };
 
 const Modal = (props: ModalProps) => {
-	const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm, classNameBox, subTitleBox, classSubTitleBox, classNameWrapperChild } =
+	const { showModal, onClose, confirmButton, title, children, titleConfirm, disableButtonConfirm, classNameBox, subTitleBox, classSubTitleBox, classNameWrapperChild,hasChannel } =
 		props;
 	return (
 		// TODO: using modal component
@@ -28,6 +35,19 @@ const Modal = (props: ModalProps) => {
 								<div className={`flex items-start justify-between py-[20px] px-[20px]  border-solid dark:border-borderDefault border-b rounded-t`}>
 									<div>
 										<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
+										{ hasChannel &&
+											<div className="inline-flex gap-x-2">
+												{hasChannel.channel_private === ChannelStatusEnum.isPrivate && hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+													<Icons.SpeakerLocked defaultSize="w-5 h-5" />
+												)}
+												{hasChannel.channel_private === ChannelStatusEnum.isPrivate && hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+													<Icons.HashtagLocked defaultSize="w-5 h-5 " />
+												)}
+												{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
+												{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
+												<p>{hasChannel.channel_label}</p>
+											</div>
+										}
 										<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 									</div>
 									<button className="flex items-center justify-center opacity-50" onClick={() => {onClose();}}>

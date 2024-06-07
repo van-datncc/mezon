@@ -244,7 +244,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend(
-						{ t: content },
+						{ t: content.trim() },
 						mentionData,
 						attachmentDataRef,
 						undefined,
