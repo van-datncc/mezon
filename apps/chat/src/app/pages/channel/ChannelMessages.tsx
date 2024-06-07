@@ -17,7 +17,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
-	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('start');
+	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
 	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump } = useReference();
 	const { appearanceTheme } = useApp();

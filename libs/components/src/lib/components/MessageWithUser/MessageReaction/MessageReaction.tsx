@@ -39,6 +39,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 
 	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
 
+	console.log(dataReactionCombine);
+
 	async function reactOnExistEmoji(
 		id: string,
 		mode: number,

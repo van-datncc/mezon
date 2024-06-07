@@ -70,10 +70,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setEmojiSuggestion(emojiPicked);
-			if (window.innerWidth > 640) {
-				setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
-				setSubPanelActive(SubPanelName.NONE);
-			}
+
 		}
 	};
 

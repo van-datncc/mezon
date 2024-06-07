@@ -390,24 +390,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (!emojiPicked || !input) {
 			return;
 		}
-		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
-		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked);
-		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
-			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
-			setContent(replaceSyntaxByEmoji);
-			focusToElement(editorRef);
-		}
-	}
-
-	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:\b[^:]*\b:/g;
-		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
-		if (emojiArray.length > 0) {
-			return emojiArray[0];
-		}
-		return null;
+		textFieldEdit.insert(input, emojiPicked);
 	}
 
 	const clickUpToEditMessage = () => {
