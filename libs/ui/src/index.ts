@@ -8,6 +8,7 @@ export * from './lib/MezonUiProvider';
 export { default as Modal } from './lib/Modal';
 export { default as Select } from './lib/Select';
 export { default as TextArea } from './lib/TextArea';
+export { default as TimePicker } from './lib/TimePicker';
 export * from './lib/ThumnailAttachmentRender/index';
 
 export * from './lib/useMezonUi';

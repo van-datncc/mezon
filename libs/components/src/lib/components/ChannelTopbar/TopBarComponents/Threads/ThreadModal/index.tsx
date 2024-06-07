@@ -1,5 +1,5 @@
 import { useAppNavigation, useReference, useThreads } from '@mezon/core';
-import { selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
+import { searchMessagesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { Button } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +30,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 		setIsShowCreateThread(true, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 		dispatch(threadsActions.setNameThreadError(''));
 		dispatch(threadsActions.setMessageThreadError(''));
+		dispatch(searchMessagesActions.setIsSearchMessage(false));
 	};
 
 	return (

@@ -1,7 +1,17 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, HashSignIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
+import { FileIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
-import { ChannelsEntity, channelsActions, getStoreAsync, messagesActions, selectChannelById, selectEmojiImage, selectMemberByUserId, selectMessageByMessageId, useAppDispatch } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	channelsActions,
+	getStoreAsync,
+	messagesActions,
+	selectEmojiImage,
+	selectMemberByUserId,
+	selectMessageByMessageId,
+	useAppDispatch,
+	selectChannelsEntities
+} from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
@@ -67,6 +77,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
 	const emojiListPNG = useSelector(selectEmojiImage);
+	const channelsEntities = useSelector(selectChannelsEntities);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const { usersClan } = useClans();
@@ -269,13 +280,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}
 
 	const getChannelById = (channelHashtagId: string) => {
-		const channel = useSelector(selectChannelById(channelHashtagId));
-		return channel;
+		const channel = channelsEntities?.[channelHashtagId];
+		if (channel) {
+			return channel;
+		} else {
+			return {
+				channel_label: channelHashtagId
+			}
+		}
 	};
 
 
 	const renderChannelMention = (id: string) => {
-		const channel = getChannelById(id.slice(1));
+		const channel = getChannelById(id.slice(1)) as ChannelsEntity;
 		const type = channel?.type;
 
 		return (
