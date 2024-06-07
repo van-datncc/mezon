@@ -7,7 +7,7 @@ export type useJumpToMessagesOptions = {
 let messID: string | null = null;
 
 export function useJumpToMessage() {
-	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'start') => {
+	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'center') => {
 		if (messageId) {
 			const messageElement = document.getElementById(messageId);
 			if (messageElement) {
