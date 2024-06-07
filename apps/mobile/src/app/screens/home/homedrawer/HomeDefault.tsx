@@ -76,9 +76,20 @@ const HomeDefault = React.memo((props: any) => {
 		}, []),
 	);
 
+	const onOpenDrawer = () => {
+		onShowKeyboardBottomSheet(false, 0, 'text');
+		props.navigation.openDrawer();
+		Keyboard.dismiss();
+	};
+
 	return (
 		<View style={[styles.homeDefault]}>
-			<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} currentChannel={currentChannel} />
+			<HomeDefaultHeader
+				openBottomSheet={openBottomSheet}
+				navigation={props.navigation}
+				currentChannel={currentChannel}
+				onOpenDrawer={onOpenDrawer}
+			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
 					<ChannelMessages
@@ -134,7 +145,17 @@ const HomeDefault = React.memo((props: any) => {
 });
 
 const HomeDefaultHeader = React.memo(
-	({ navigation, currentChannel, openBottomSheet }: { navigation: any; currentChannel: ChannelsEntity; openBottomSheet: () => void }) => {
+	({
+		navigation,
+		currentChannel,
+		openBottomSheet,
+		onOpenDrawer,
+	}: {
+		navigation: any;
+		currentChannel: ChannelsEntity;
+		openBottomSheet: () => void;
+		onOpenDrawer: () => void;
+	}) => {
 		const navigateMenuThreadDetail = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
@@ -148,14 +169,7 @@ const HomeDefaultHeader = React.memo(
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						<TouchableOpacity
-							activeOpacity={0.8}
-							style={styles.iconBar}
-							onPress={() => {
-								navigation.openDrawer();
-								Keyboard.dismiss();
-							}}
-						>
+						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
 							<BarsLogo width={20} height={20} />
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (

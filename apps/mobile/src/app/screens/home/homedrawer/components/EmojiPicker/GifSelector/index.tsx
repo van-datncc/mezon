@@ -1,6 +1,5 @@
 import { useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { Metrics, size } from '@mezon/mobile-ui';
-import { GifCategoriesEntity } from '@mezon/store-mobile';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import GifCategory from './GifCategory';
@@ -8,10 +7,11 @@ import GiftItem from './GifItem';
 
 type GifSelectorProps = {
 	onSelected: (url: string) => void;
+	onScroll: (e: any) => void;
 	searchText: string;
 };
 
-export default function GifSelector({ onSelected, searchText }: GifSelectorProps) {
+export default function GifSelector({ onSelected, searchText, onScroll }: GifSelectorProps) {
 	const [gifData, setGifData] = useState<any>();
 
 	const {
@@ -46,9 +46,14 @@ export default function GifSelector({ onSelected, searchText }: GifSelectorProps
 	}
 
 	return (
-		<ScrollView style={{ maxHeight: Metrics.screenHeight / 1.4 }} contentContainerStyle={{ paddingBottom: size.s_50 * 2 }}>
+		<ScrollView
+			scrollEventThrottle={16}
+			onScroll={onScroll}
+			style={{ maxHeight: Metrics.screenHeight / 1.4 }}
+			contentContainerStyle={{ paddingBottom: size.s_50 * 2 }}
+		>
 			{valueInputToCheckHandleSearch === '' ? (
-				<GifCategory loading={loadingStatusGifs === 'loading'} data={dataGifCategories as unknown as GifCategoriesEntity[]} />
+				<GifCategory loading={loadingStatusGifs === 'loading'} data={dataGifCategories} />
 			) : (
 				<GiftItem loading={loadingStatusGifs === 'loading'} data={gifData} onPress={handleGifPress} />
 			)}

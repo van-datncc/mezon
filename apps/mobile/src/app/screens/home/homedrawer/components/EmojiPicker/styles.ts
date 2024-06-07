@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
 	textInput: {
 		color: Colors.white,
 		flexGrow: 1,
-		fontSize: 9,
-		height: 40,
+		fontSize: size.medium,
+		height: size.s_40,
 	},
 
 	textInputWrapper: {

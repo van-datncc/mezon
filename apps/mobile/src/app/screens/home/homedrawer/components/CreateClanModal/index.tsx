@@ -28,7 +28,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const { createClans } = useClans();
 	const handleCreateClan = async () => {
 		const store = await getStoreAsync();
-		createClans(nameClan, urlImage).then((res) => {
+		createClans(nameClan?.trim(), urlImage).then((res) => {
 			if (res && res.clan_id) {
 				store.dispatch(clansActions.changeCurrentClan({ clanId: res.clan_id }));
 				setVisible(false);
@@ -123,7 +123,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 				<Text style={s.community}>
 					{t('byCreatingClan')} <Text style={s.communityGuideLines}>Community Guidelines.</Text>
 				</Text>
-				<MezonButton disabled={!nameClan} viewContainerStyle={s.button} onPress={handleCreateClan}>
+				<MezonButton disabled={!nameClan?.trim()} viewContainerStyle={s.button} onPress={handleCreateClan}>
 					<Text style={s.buttonText}>{t('createServer')}</Text>
 				</MezonButton>
 			</View>
