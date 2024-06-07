@@ -10,7 +10,8 @@
     }
   },
   "notifySettingThreadModal": {
-    "headerTitle": "Mute this thread",
+    "headerTitleMuteThread": "Mute this thread",
+    "headerTitleMuteChannel": "Mute this channel",
     "muteDuration": {
       "forFifteenMinutes": "For 15 Minutes",
       "forOneHour": "For 1 Hour",
