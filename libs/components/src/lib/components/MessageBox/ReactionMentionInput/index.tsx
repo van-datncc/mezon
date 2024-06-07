@@ -383,7 +383,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const convertToPlainTextHashtag = (text: string) => {
 		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `#${p2}` : `@${p1}`;
+			return symbol === '#' ? `<#${p2}>` : `@${p1}`;
 		});
 		return result;
 	};

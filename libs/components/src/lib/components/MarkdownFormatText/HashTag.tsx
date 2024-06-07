@@ -22,18 +22,18 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	};
 
 	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
-		if (channelHastagId.startsWith('#')) {
-			return toChannelPage(channelHastagId.slice(1), clanId || '');
+		if (channelHastagId.startsWith('<#')&& channelHastagId.endsWith('>')) {
+			return toChannelPage(channelHastagId.slice(2, -1), clanId || '');
 		}
 		return undefined;
 	};
 	const [channelPath, setChannelPath] = useState(getChannelPath(channelHastagId, clanId ?? ''));
 
-	const channel = getChannelById(channelHastagId.slice(1));
+	const channel = getChannelById(channelHastagId.slice(2, -1));
 
 	useEffect(() => {
 		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			setChannelPath(getChannelPath('#' + currentChannelId || '', clanId ?? ''));
+			setChannelPath(getChannelPath('<#' + currentChannelId || '', clanId || ''+'>'));
 		} else {
 			setChannelPath(getChannelPath(channelHastagId, clanId ?? ''));
 		}
@@ -46,7 +46,7 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		}
 	}, [channel]);
 
-	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && channelPath && getChannelById(channelHastagId.slice(1)) ? (
+	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && channelPath && getChannelById(channelHastagId.slice(2, -1)) ? (
 		<Link
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
