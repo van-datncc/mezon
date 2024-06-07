@@ -116,7 +116,7 @@ export const fetchChannelCategorySetting = createAsyncThunk('channelCategorySett
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.getChannelCategoryNotiSettingsList(mezon.session, clanId);
 	if (!response.noti_channel_categoy_setting) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	return response.noti_channel_categoy_setting.map(mapChannelCategorySettingToEntity);
 });

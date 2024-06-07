@@ -1,9 +1,9 @@
 import { useApp, useEscapeKey, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectIsShowMemberList } from '@mezon/store';
+import { appActions, searchMessagesActions, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectnotificatonSelected } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons';
@@ -118,6 +118,26 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
+	const [isMuteBell, setIsMuteBell] = useState(false)
+	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
+	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	useEffect(()=>{
+		if (getNotificationChannelSelected?.active !== 1 || getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
+			setIsMuteBell(true)
+		}
+		else if (getNotificationChannelSelected?.notification_setting_type === '' || getNotificationChannelSelected?.notification_setting_type === undefined) {
+			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === 'NOTHING') {
+				setIsMuteBell(true)
+			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === 'NOTHING') {
+				setIsMuteBell(true)
+			} else {
+				setIsMuteBell(false)
+			}
+		} else {
+			setIsMuteBell(false)
+		}
+	},[getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -137,7 +157,8 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.MuteBell />
+					{ isMuteBell ? (<Icons.MuteBell />):(
+					<Icons.UnMuteBell />)}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}
