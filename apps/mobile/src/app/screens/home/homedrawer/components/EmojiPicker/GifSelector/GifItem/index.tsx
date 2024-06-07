@@ -1,17 +1,22 @@
-import { GifEntity } from '@mezon/store-mobile';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '@mezon/mobile-ui';
+import { TouchableOpacity, View } from 'react-native';
+import { Wave } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import styles from './styles';
 
 interface GifItemProps {
 	loading?: boolean;
-	data: GifEntity[];
+	data: any;
 	onPress?: (url: string) => void;
 }
 
 export default function GiftItem({ loading, data, onPress }: GifItemProps) {
 	if (loading) {
-		return <Text>loading...</Text>;
+		return (
+			<View style={styles.containerLoading}>
+				<Wave color={Colors.bgViolet} />
+			</View>
+		);
 	}
 
 	function handlePressGif(url: string) {
@@ -29,7 +34,7 @@ export default function GiftItem({ loading, data, onPress }: GifItemProps) {
 								source={{
 									uri: item.media_formats.tinygif.url,
 									cache: FastImage.cacheControl.web,
-									priority: FastImage.priority.high
+									priority: FastImage.priority.high,
 								}}
 								resizeMode={FastImage.resizeMode.cover}
 								style={{ height: '100%', width: '100%' }}

@@ -6,6 +6,7 @@ import LocationModal from './locationModal';
 import ReviewModal from './reviewModal';
 import { useClans, useEventManagement } from '@mezon/core';
 import { OptionEvent, Tabs_Option } from '@mezon/utils';
+import { getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
 
 export type ModalCreateProps = {
 	onClose: () => void;
@@ -20,21 +21,22 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const [timeEnd, setTimeEnd] = useState('00:00');
 	const [selectedDateStart, setSelectedDateStart] = useState<Date>(new Date());
 	const [selectedDateEnd, setSelectedDateEnd] = useState<Date>(new Date());
-	const [voiceChannel, setVoiceChannel] = useState('');
+	const voicesChannel = useSelector(selectVoiceChannelAll);
+	const [voiceChannel, setVoiceChannel] = useState(voicesChannel[0]?.id || '');
 	const [buttonWork, setButtonWork] = useState(true);
 	const [titleEvent, setTitleEvent] = useState('');
 	const [option, setOption] = useState('');
 	const [logo, setLogo] = useState('');
 	const [description, setDescription] = useState('');
+	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
 	const { createEventManagement } = useEventManagement();
 	const { currentClanId } = useClans();
 
-	const voicesChannel = useSelector(selectVoiceChannelAll);
 	const tabs = ['Location', 'Event Info', 'Review'];
 
 	const handleNext = (currentModal: number) => {
-		if (buttonWork && currentModal < tabs.length - 1 && !errorTime) {
+		if (buttonWork && currentModal < tabs.length - 1 && !errorTime && !errorOption) {
 			setCurrentModal(currentModal + 1);
 		}
 	};
@@ -68,7 +70,11 @@ const ModalCreate = (props: ModalCreateProps) => {
 	};
 
 	const handleCurrentModal = (number: number) => {
-		if (buttonWork || number < 1) {
+		if( errorOption || errorTime ){
+			return;
+		}
+
+		if (buttonWork || number < 1 ) {
 			setCurrentModal(number);
 		}
 	};
@@ -99,47 +105,24 @@ const ModalCreate = (props: ModalCreateProps) => {
 		onCloseEventModal();
 	}
 
-	const handleTimeISO = (fullDateStr: Date, timeStr: string)=>{
-		const date = new Date(fullDateStr);
-
-		const year = date.getFullYear();
-		const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
-		const day = date.getDate().toString().padStart(2, '0');
-
-		const [hours, minutes] = timeStr.split(':').map(Number);
-		const isoDate = new Date(Date.UTC(year, Number(month) - 1, Number(day), hours, minutes));
-
-		return isoDate.toISOString();
-	}
-
-	const getCurrentTimeRounded = (addMinute?: boolean) => {
-		const now = new Date();
-		if(addMinute){
-			now.setMinutes(now.getMinutes() + 30);
-		}
-		const minuteNow = now.getMinutes();
-		const roundedMinutes = Math.floor(minuteNow / 30);
-		if (roundedMinutes >= 1) {
-			now.setHours(now.getHours() + 1);
-			now.setMinutes(0);
-		} else {
-			now.setMinutes(30);
-		}
-		const hour = now.getHours();
-		const minute = now.getMinutes();
-		return `${hour}:${minute === 0 ? '00' : minute }`;
-	};
-
 	useEffect(() => {
 		if (currentModal >= 1) {
 			setButtonWork(false);
 		} else {
 			setButtonWork(true);
 		}
-		if ((topic !== '')) {
+		if (topic !== '') {
 			setButtonWork(true);
 		}
 	}, [currentModal, topic]);
+
+	useEffect(() => {
+		if((option === OptionEvent.OPTION_LOCATION && titleEvent ==='') || (option === OptionEvent.OPTION_SPEAKER && voiceChannel ==='')){
+			setErrorOption(true);
+		} else {
+			setErrorOption(false);
+		}
+	}, [option, titleEvent, voiceChannel])
 
 	const defaultTimeStart = getCurrentTimeRounded();
 	const defaultTimeEnd = getCurrentTimeRounded(true);
@@ -200,7 +183,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			</div>
 			<div className="flex justify-between mt-4 w-full">
 				<button
-					className={`py-2 text-[#84ADFF] font-bold ${currentModal === Tabs_Option.LOCATION && 'hidden'}`}
+					className={`py-2 text-[#84ADFF] font-bold ${(currentModal === Tabs_Option.LOCATION || errorTime) && 'hidden'}`}
 					onClick={() => handleBack(currentModal)}
 				>
 					Back
@@ -209,12 +192,20 @@ const ModalCreate = (props: ModalCreateProps) => {
 					<button className="px-4 py-2 rounded bg-slate-500 font-semibold" onClick={onClose}>
 						Cancel
 					</button>
-					<button
-						className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime) && 'bg-opacity-50'}`}
-						onClick={currentModal === Tabs_Option.REVIEW ? () => handleSubmit() : () => handleNext(currentModal)}
-					>
-						{currentModal === Tabs_Option.REVIEW ? 'Create Event' : 'Next'}
-					</button>
+					{ currentModal === Tabs_Option.REVIEW ?  
+						<button
+							className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption ) && 'bg-opacity-50'}`}
+							onClick={(option === '' || errorOption ) ? () => {} : () => handleSubmit()}
+						>
+							Create Event
+						</button> :
+						<button
+							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'bg-opacity-50'}`}
+							onClick={() => handleNext(currentModal)}
+						>
+							Next
+						</button>
+					}
 				</div>
 			</div>
 		</div>

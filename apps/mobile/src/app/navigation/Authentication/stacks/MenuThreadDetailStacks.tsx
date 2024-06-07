@@ -1,9 +1,12 @@
 import { useReference } from '@mezon/core';
-import { AngleRight, ArrowLeftIcon, HashSignIcon } from '@mezon/mobile-components';
+import { AngleRight, ArrowLeftIcon, HashSignIcon, HashSignLockIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
+import { ChannelType } from 'mezon-js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -19,7 +22,11 @@ export const MenuThreadDetailStacks = ({}: any) => {
 	const { t } = useTranslation(['notificationSetting']);
 	const { openThreadMessageState } = useReference();
 	const navigation = useNavigation();
+	const [isChannel, setIsChannel] = useState<boolean>();
 	const currentChannel = useSelector(selectCurrentChannel);
+	useEffect(() => {
+		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
+	}, [currentChannel]);
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -74,7 +81,12 @@ export const MenuThreadDetailStacks = ({}: any) => {
 								<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 									{!openThreadMessageState && (
 										<View style={{ marginRight: size.s_10 }}>
-											<HashSignIcon width={18} height={18} />
+											{currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
+											currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+												<HashSignLockIcon width={20} height={20} color={Colors.white} />
+											) : (
+												<HashSignIcon width={18} height={18} />
+											)}
 										</View>
 									)}
 									<Text style={{ color: Colors.white, fontSize: size.h6 }}>
@@ -108,10 +120,12 @@ export const MenuThreadDetailStacks = ({}: any) => {
 					headerTitle: () => (
 						<View>
 							<Text style={{ color: Colors.white, fontSize: size.label, fontWeight: '700' }}>
-								{t('notifySettingThreadModal.headerTitle')}
+								{isChannel
+									? t('notifySettingThreadModal.headerTitleMuteChannel')
+									: t('notifySettingThreadModal.headerTitleMuteThread')}
 							</Text>
 							<Text style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400' }}>
-								"{currentChannel?.channel_label}""
+								{isChannel ? `#${currentChannel?.channel_label}` : `"${currentChannel?.channel_label}"`}
 							</Text>
 						</View>
 					),

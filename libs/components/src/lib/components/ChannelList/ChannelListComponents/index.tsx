@@ -39,7 +39,11 @@ export const Events = () => {
 							<Icons.IconEvents />
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">{numberEventManagement !==0 ? `${numberEventManagement} Event` : 'Events'}</div>
+					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">
+						{numberEventManagement === 0 && 'Events'}
+						{numberEventManagement === 1 && '1 Event'}
+						{numberEventManagement > 1 && `${numberEventManagement} Events`}
+					</div>
 				</div>
 				{(numberEventManagement !== 0 && showNumEvent) &&
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">

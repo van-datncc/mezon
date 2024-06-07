@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
 	textInput: {
 		color: Colors.white,
 		flexGrow: 1,
-		fontSize: size.small,
-		height: 40,
+		fontSize: size.medium,
+		height: size.s_40,
 	},
 });
 

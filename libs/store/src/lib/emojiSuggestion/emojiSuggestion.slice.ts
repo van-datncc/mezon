@@ -20,8 +20,9 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	emojiSuggestionListStatus: boolean;
 	keyCodeFromKeyBoardState: number;
 	textToSearchEmojiSuggestion: string;
-	pressAnyButtonState: boolean;
+	addEmojiAction: boolean;
 	emojiImage?: IEmojiImage[];
+	shiftPressed: boolean;
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
@@ -82,7 +83,8 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	emojiSuggestionListStatus: false,
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
-	pressAnyButtonState: false,
+	addEmojiAction: false,
+	shiftPressed: false,
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -101,6 +103,12 @@ export const emojiSuggestionSlice = createSlice({
 		},
 		setTextToSearchEmojiSuggestion: (state, action: PayloadAction<string>) => {
 			state.textToSearchEmojiSuggestion = action.payload;
+		},
+		setAddEmojiActionChatbox: (state, action: PayloadAction<boolean>) => {
+			state.addEmojiAction = action.payload;
+		},
+		setShiftPressed: (state, action: PayloadAction<boolean>) => {
+			state.shiftPressed = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -156,3 +164,7 @@ export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (em
 export const selectEmojiImage = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiImage);
 
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
+
+export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.addEmojiAction);
+
+export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);

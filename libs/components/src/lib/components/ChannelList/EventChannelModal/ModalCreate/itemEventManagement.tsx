@@ -1,7 +1,10 @@
-import { EventManagementEntity, selectChannelById, selectChannelFirst } from '@mezon/store';
+import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberByUserId } from '@mezon/store';
 import * as Icons from '../../../Icons';
 import { useSelector } from 'react-redux';
 import { OptionEvent } from '@mezon/utils';
+import { useApp, useEventManagement } from '@mezon/core';
+import { timeFomat } from '../timeFomatEvent';
+import { Tooltip } from 'flowbite-react';
 
 export type ItemEventManagementProps = {
 	option: string;
@@ -18,35 +21,29 @@ export type ItemEventManagementProps = {
 
 const ItemEventManagement = (props: ItemEventManagementProps)=>{
     const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, event, setOpenModalDetail } = props;
+	const { setChooseEvent } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
-	const timeFomat = () => {
-		const date = new Date(start);
-
-		const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		const dayName = daysOfWeek[date.getUTCDay()];
-
-		const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-		const monthName = months[date.getUTCMonth()];
-
-		const day = date.getUTCDate();
-
-		const hours = date.getUTCHours().toString().padStart(2, '0');
-		const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-		return `${dayName} ${monthName} ${day} - ${hours}:${minutes}`;
-	};
+	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const { appearanceTheme } = useApp();
 
     return (
         <div 
 			className="dark:bg-black bg-bgModifierHoverLight rounded-lg overflow-hidden"
-			onClick={setOpenModalDetail ? () => setOpenModalDetail(true) : () => {}}
+			onClick={(setOpenModalDetail && event) ? () => {setOpenModalDetail(true); setChooseEvent(event);} : () => {}}
 		>
 				{logo && <img src={logo} alt='logo' className='w-full max-h-[180px] object-cover'/>}
 				<div className="p-4 border-b dark:border-slate-600 border-white">
-					<div className="flex items-center gap-x-2 mb-4">
-						<Icons.IconEvents />
-						<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{timeFomat()}</p>
+					<div className='flex justify-between'>
+						<div className="flex items-center gap-x-2 mb-4">
+							<Icons.IconEvents />
+							<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{timeFomat(start)}</p>
+						</div>
+						{ event?.creator_id && 
+							<Tooltip content={`Created by ${userCreate?.user?.username}`} trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+								<img src={userCreate?.user?.avatar_url} alt={userCreate?.user?.avatar_url} className="size-6 rounded-full"/>
+							</Tooltip> 
+						}
 					</div>
 					<div className='flex justify-between'>
 						<p className="hover:underline font-bold dark:text-white text-black flex-grow basis-3/5">{topic}</p>
