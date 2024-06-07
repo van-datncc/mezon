@@ -1,12 +1,13 @@
 import { useGifs, useGifsStickersEmoji } from '@mezon/core';
-import { GifCategoriesEntity } from '@mezon/store-mobile';
+import { Colors } from '@mezon/mobile-ui';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { Wave } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import styles from './styles';
 
 interface GifCategoryProps {
 	loading?: boolean;
-	data: GifCategoriesEntity[];
+	data: any;
 }
 export default function GifCategory({ loading, data }: GifCategoryProps) {
 	const { fetchGifsDataSearch } = useGifs();
@@ -18,16 +19,17 @@ export default function GifCategory({ loading, data }: GifCategoryProps) {
 	}
 
 	if (loading) {
-		return <Text>Loading...</Text>;
+		return (
+			<View style={styles.containerLoading}>
+				<Wave color={Colors.bgViolet} />
+			</View>
+		);
 	}
 
 	return (
 		<View style={styles.container}>
 			{data?.map((item, index) => (
-				<TouchableOpacity
-					onPress={() => handlePressCategory(item.searchterm)}
-					style={styles.content}
-					key={index.toString()}>
+				<TouchableOpacity onPress={() => handlePressCategory(item.searchterm)} style={styles.content} key={index.toString()}>
 					<FastImage source={{ uri: item.image }} style={{ height: '100%', width: '100%' }} />
 					<View style={styles.textWrapper}>
 						<Text style={styles.textTitle}>{item.name}</Text>

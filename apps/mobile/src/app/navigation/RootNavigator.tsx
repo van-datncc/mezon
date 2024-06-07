@@ -22,7 +22,7 @@ import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
@@ -109,7 +109,7 @@ const NavigationMain = () => {
 
 	return (
 		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
-			<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
 				<NetInfoComp />
 				<RootStack.Navigator screenOptions={{ headerShown: false }}>
 					{isLoggedIn ? (

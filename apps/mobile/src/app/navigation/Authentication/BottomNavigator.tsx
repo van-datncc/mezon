@@ -6,11 +6,11 @@ import 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
+import Notifications from '../../screens/Notifications';
 import HomeScreen from '../../screens/home/HomeScreen';
 import MessagesScreen from '../../screens/messages/MessagesScreen';
 import ProfileScreen from '../../screens/profile/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
-import Notifications from '../../screens/Notifications';
 
 const TabStack = createBottomTabNavigator();
 
@@ -22,8 +22,8 @@ const BottomNavigator = () => {
 			screenOptions={{
 				tabBarHideOnKeyboard: true,
 				tabBarStyle: {
-					height: hiddenBottomTab ? 0 : 65,
-					paddingBottom: 10,
+					height: hiddenBottomTab ? 0 : 80,
+					paddingBottom: hiddenBottomTab ? 10 : 20,
 					borderTopWidth: 0,
 					elevation: 0,
 					backgroundColor: Colors.secondary,
