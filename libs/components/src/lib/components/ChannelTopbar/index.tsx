@@ -137,7 +137,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 		} else {
 			setIsMuteBell(false)
 		}
-	},[getNotificationChannelSelected])
+	},[getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
