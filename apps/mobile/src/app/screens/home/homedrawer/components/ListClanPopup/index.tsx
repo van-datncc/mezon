@@ -13,23 +13,17 @@ import { styles } from './ListClanPopup.styles';
 
 interface ListClanPopupProps {
 	clans: ClansEntity[];
-	setVisible?: (isVisible: boolean) => void;
+  handleChangeClan: (clan_id: string)=> void;
 }
 
-const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, setVisible }) => {
+const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, handleChangeClan }) => {
 	const { t } = useTranslation(['clan']);
-	const handleChangeClan = async (clanId: string) => {
-		const store = await getStoreAsync();
-		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
-		setVisible(false);
-	};
 	const scrollViewRef = useRef(null);
 	const currentClan = useSelector(selectCurrentClan);
 	const [isVisibleCreateClanModal, setIsVisibleCreateClanModal] = useState<boolean>(false);
 
 	const visibleCreateClanModal = (value) => {
 		setIsVisibleCreateClanModal(value);
-		setVisible(false);
 	};
 
 	useEffect(() => {
@@ -62,7 +56,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, se
 					>
 						<View style={styles.serverName}>
 							<ClanIcon data={server} />
-							<Text style={styles.clanName}>{server?.clan_name}</Text>
+							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode='tail'>{server?.clan_name}</Text>
 						</View>
 						{currentClan?.clan_id === server?.clan_id && <TickIcon width={10} height={10} color={Colors.azureBlue} />}
 					</Pressable>

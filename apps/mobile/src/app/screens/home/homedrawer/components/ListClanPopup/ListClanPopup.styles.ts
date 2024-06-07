@@ -5,8 +5,6 @@ export const styles = StyleSheet.create({
 	clansBox: {
 		width: 250,
 		maxHeight: 300,
-		paddingVertical: size.s_10,
-		paddingHorizontal: size.s_14,
 		borderRadius: 10,
 		backgroundColor: Colors.secondary,
 	},
@@ -45,5 +43,6 @@ export const styles = StyleSheet.create({
 		color: Colors.white,
 		fontSize: size.label,
 		fontWeight: '600',
+		maxWidth: 150,
 	},
 });

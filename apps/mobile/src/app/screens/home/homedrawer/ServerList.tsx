@@ -9,6 +9,7 @@ import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
 import ListClanPopupProps from './components/ListClanPopup';
 import { styles } from './styles';
+import { useEffect } from 'react';
 
 const ServerList = React.memo((props: any) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -20,6 +21,10 @@ const ServerList = React.memo((props: any) => {
 		store.dispatch(appActions.setLoadingMainMobile(true));
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
+
+  useEffect(()=>{
+    setIsVisible(false)
+  },[currentClan])
 
 	return (
 		<View style={styles.wrapperServerList}>
@@ -37,15 +42,12 @@ const ServerList = React.memo((props: any) => {
 				isVisible={isVisible}
 				content={
 					<ListClanPopupProps
-						setVisible={(isVisible) => {
-							setIsVisible(isVisible);
-						}}
+            handleChangeClan={handleChangeClan}
 						clans={clans}
 					/>
-				}
-				contentStyle={{ backgroundColor: Colors.secondary }}
+          }
+				contentStyle={{ backgroundColor: Colors.secondary}}
 				placement="bottom"
-				arrowSize={{ width: 0, height: 0 }}
 				onClose={() => setIsVisible(false)}
 			>
 				<Pressable
