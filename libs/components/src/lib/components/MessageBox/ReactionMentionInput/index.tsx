@@ -7,6 +7,7 @@ import {
 	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
+	useGifsStickersEmoji,
 	useMenu,
 	useMessageValue,
 	useReference,
@@ -24,10 +25,12 @@ import {
 } from '@mezon/store';
 import {
 	ChannelMembersEntity,
+	EmojiPlaces,
 	ILineMention,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
+	SubPanelName,
 	ThreadValue,
 	UserMentionsOpt,
 	UsersClanEntity,
@@ -99,6 +102,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setIdReferenceMessageReply,
 		setOpenReplyMessageState,
 	} = useReference();
+	const { setReactionPlaceActive } = useChatReaction();
+	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
@@ -113,7 +118,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
-	const { emojiPicked } = useEmojiSuggestion();
+	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const { reactionRightState } = useChatReaction();
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
@@ -258,6 +263,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				dispatch(threadsActions.setIsPrivate(0));
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
+			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+			setSubPanelActive(SubPanelName.NONE);
 		},
 		[
 			valueTextInput,
@@ -383,7 +390,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
-	}, [emojiPicked]);
+	}, [emojiPicked, addEmojiState]);
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
