@@ -29,6 +29,7 @@ import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMes
 import { useTranslation } from 'react-i18next';
 import { ChannelType } from 'mezon-js';
 import Toast from 'react-native-toast-message';
+import Markdown from 'react-native-markdown-display';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -337,7 +338,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderTextContent = () => {
 		if (!lines) return null;
-		const matchesMention = lines.match(mentionRegex);
+		// const matchesMention = lines.match(mentionRegex);
+		return renderTextWithMarkdown(lines);
 
 		return (
 			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
@@ -381,6 +383,54 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			</Text>
 		);
 	};
+	
+
+	const renderTextWithMarkdown = (lines: string) => {
+		const markdownStyles = {
+			body: {
+				color: Colors.tertiary,
+				fontSize: size.medium
+			},
+			paragraph: {
+				marginTop: 0,
+				marginBottom: 0,
+				paddingTop: 0,
+				paddingBottom: 0,
+			},
+			text: {
+
+			},
+			code_block: {
+				color: Colors.textGray,
+				backgroundColor: Colors.bgCharcoal,
+				paddingVertical: 1,
+				borderColor: Colors.black,
+				borderRadius: 5,
+			},
+			code_inline: {
+				color: Colors.textGray,
+				backgroundColor: Colors.bgCharcoal,
+				paddingVertical: 1,
+				borderColor: Colors.black,
+				borderRadius: 5,
+			},
+			fence: {
+				color: Colors.textGray,
+				backgroundColor: Colors.bgCharcoal,
+				paddingVertical: 5,
+				borderColor: Colors.black,
+				borderRadius: 5,
+			}
+		  };
+		const mentionList = lines.match(mentionRegex);
+		console.log('matchesMention', mentionList);
+		return (
+			<Markdown style={markdownStyles} >
+				{lines}
+			</Markdown>
+		)
+	}
+
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
 	};
@@ -389,7 +439,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setOpenBottomSheet(type);
 	};
 
-	const jumpToRepliedMesage = () => {
+	const jumpToRepliedMessage = () => {
 		console.log('message to jump', messageRefFetchFromServe);
 	};
 
@@ -409,7 +459,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-					<Pressable onPress={() => jumpToRepliedMesage()} style={styles.repliedMessageWrapper}>
+					<Pressable onPress={() => jumpToRepliedMessage()} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
 								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
