@@ -22,7 +22,7 @@ const UserProfile = ({ userId }: userProfileProps) => {
 	const userById = useSelector(selectMemberByUserId(userId ?? ''));
 	const userStatus = useMemberStatus(userId || '');
 	const { RolesClan } = useRoles(currentChannelId || '');
-	const { color } = useMixImageColor(userProfile?.user?.avatar_url || userById?.user?.avatar_url);
+	const { color } = useMixImageColor(userById?.user?.avatar_url || userProfile?.user?.avatar_url);
 
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
