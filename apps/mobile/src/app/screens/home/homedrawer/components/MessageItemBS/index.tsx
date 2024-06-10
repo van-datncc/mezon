@@ -217,7 +217,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const renderUserInformation = () => {
 		return (
-				<UserProfile userId={user?.user?.id}></UserProfile>
+				<UserProfile userId={user?.id}></UserProfile>
 		);
 	};
 

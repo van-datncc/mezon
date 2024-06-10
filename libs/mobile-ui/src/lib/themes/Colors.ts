@@ -139,6 +139,7 @@ const colors = {
 	bgGrayDark: '#676b73',
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
+	bgMention: '#3b426e',
 	green: "green",
 	bgDarkCharcoal: '#323232',
 	bgMessageHighlight: '#c99d072b',

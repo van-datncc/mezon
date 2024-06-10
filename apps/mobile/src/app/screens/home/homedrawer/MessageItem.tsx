@@ -19,11 +19,10 @@ import {
 	TIME_COMBINE,
 	checkSameDay,
 	convertTimeString,
-	getSrcEmoji,
 	getTimeDifferenceInSeconds,
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -31,7 +30,7 @@ import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { isImage, mentionRegex, mentionRegexSplit } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, emojiRegex, isImage, mentionRegex, mentionRegexSplit, urlRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -40,6 +39,8 @@ import { useTranslation } from 'react-i18next';
 import { ChannelType } from 'mezon-js';
 import Toast from 'react-native-toast-message';
 import Markdown from 'react-native-markdown-display';
+import { EDITED_FLAG, formatBlockCode, formatEmoji, formatUrls, markdownStyles, renderRulesCustom } from './constants';
+import { openUrl } from "react-native-markdown-display";
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -65,7 +66,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
-	const [foundUser, setFoundUser] = useState(null);
+	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
 	const { attachments, lines } = useMessageParser(props.message);
 	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
@@ -79,9 +80,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
-	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
+	const hasIncludeMention = useMemo(() => {
+		return message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+	}, [message, userLogin]);
 	const isCombine = useMemo(() => {
 		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
 		return (
@@ -200,7 +203,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			}
 
 			return (
-				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => onOpenDocument(document)}>
+				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => openUrl(document.url)}>
 					<View style={styles.fileViewer}>
 						<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
 						<View style={{ maxWidth: '75%' }}>
@@ -214,30 +217,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		});
 	};
 
-	const onOpenDocument = async (document: ApiMessageAttachment) => {
-		await Linking.openURL(document.url);
+	const onMention = async (mentionedUser: string) => {
 		try {
-			await Linking.openURL(document.url);
-		} catch (error) {
-			console.log('OpenDocument error', error);
-		}
-	};
-
-	const onOpenLink = async (link: string) => {
-		try {
-			await Linking.openURL(link);
-		} catch (error) {
-			const googleSearchURL = `https://${encodeURIComponent(link)}`;
-			await Linking.openURL(googleSearchURL);
-		}
-	};
-
-	const onMention = async (mention: string) => {
-		try {
-			const tagName = mention.slice(1);
-			const userMention = usersClan?.find(userClan => userClan?.user?.username === tagName)
-			userMention && setFoundUser(userMention)
-			if (!mention) return;
+			const tagName = mentionedUser.slice(1);
+			const clanUser = usersClan?.find(userClan => userClan?.user?.username === tagName);
+			clanUser && setFoundUser(clanUser.user)
+			if (!mentionedUser) return;
 			setMessageSelected(EMessageBSToShow.UserInformation);
 		} catch (error) {
 			console.log('error', error);
@@ -247,10 +232,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
 
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
 		store.dispatch(channelsActions.joinChannel({
-			clanId: clanId ?? '',
-			channelId: channelId,
+			clanId,
+			channelId,
 			noFetchMembers: false
 		}));
 	};
@@ -269,8 +254,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				save(STORAGE_KEY_CHANNEL_ID, channelId);
 				save(STORAGE_KEY_CLAN_ID, clanId);
-				console.log(channelId);
-				console.log(clanId);
 
 				await jumpToChannel(channelId, clanId);
 			}
@@ -290,163 +273,80 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-
-	const renderChannelMention = (id: string) => {
-		const channel = getChannelById(id.slice(1)) as ChannelsEntity;
-		const type = channel?.type;
-
-		return (
-			<Text style={styles.mentionWrapper}>
-				<Text
-					onPress={() => onChannelMention(channel)}
-					style={styles.contentMessageMention}
-				>
-					{type === ChannelType.CHANNEL_TYPE_VOICE
-						? <Text><SpeakerIcon height={12} width={12} /> </Text>
-						// : <HashSignIcon height={16} width={16} />
-						: "#"}
-					{channel?.channel_label || ""}
-				</Text>
-			</Text>
-
-		)
-	}
-
-	const renderUserMention = (id: string) => {
-		return (
-			<Text style={styles.mentionWrapper}>
-				<Text
-					onPress={() => onMention(id)}
-					style={styles.contentMessageMention}
-				>
-					{id}
-				</Text>
-			</Text>
-		)
-	}
-
-	const renderMention = (id: string) => {
-		return id.startsWith("@")
-			? <Text>{renderUserMention(id)} </Text>
-			: id.startsWith("#")
-				? <Text>{renderChannelMention(id)} </Text>
-				: <Text />
-	}
-
-	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
+	const formatMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
 			.split(mentionRegexSplit)
 			.filter(Boolean)
 			.filter((i) => i !== '@' && i !== '#');
-
-		return parts.map((part, index) => (
-			<Text key={`${index}-${part}-renderTextWithMention'}`}>
-				{!part
-					? <Text />
-					: matchesMention.includes(part)
-						? renderMention(part)
-						: <Text style={styles.contentMessageBox}>
-							{renderTextWithEmoji(part)}
-						</Text>
+			
+		return parts?.map((part) => {
+			if (matchesMention.includes(part)) {
+				if (part.startsWith('@')) {
+					return `[${part}](${part})`;
 				}
-			</Text>
-		));
-	};
+				if (part.startsWith('<#')) {
+					const channelId = part.match(channelIdRegex)[1];
+					const channel = getChannelById(channelId) as ChannelsEntity;
+					return `[#${channel.channel_label}](#${channelId})`;
+				}
+			}
+			return part
+		}).join('');
+	}
 
 	const renderTextContent = () => {
 		if (!lines) return null;
-		// const matchesMention = lines.match(mentionRegex);
-		return renderTextWithMarkdown(lines);
+		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
+		const matchesUrls = lines.match(urlRegex);         //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
+		const isExistEmoji = emojiRegex.test(lines);
+		const isExistBlockCode = codeBlockRegex.test(lines);
+
+		let content: string = lines;
+
+		if (matchesMentions) {
+			content = formatMention(content, matchesMentions);
+		}
+
+		if (matchesUrls) {
+			content = formatUrls(content);
+		}
+
+		if (isExistEmoji) {
+			content = formatEmoji(content, emojiListPNG);
+		}
+
+		if (isExistBlockCode) {
+			content = formatBlockCode(content);
+		}
+
+		if (isEdited) {
+			content = content + ` [${t('edited')}](${EDITED_FLAG})`;
+		}
 
 		return (
-			<Hyperlink linkStyle={styles.contentMessageLink} onPress={(url) => onOpenLink(url)}>
-				{matchesMention?.length ? (
-					<Text style={[isCombine && styles.contentMessageCombine]}>
-						{renderTextWithMention(lines, matchesMention)}
-						{isEdited ? (
-					<Text style={styles.editedText}>{t('edited')}</Text>
-				): null}
-					</Text>
-				) : (
-					<Text style={[styles.contentMessageBox, isCombine && styles.contentMessageCombine]}>
-						{renderTextWithEmoji(lines)}
-						{isEdited ? (
-					<Text style={styles.editedText}>{t('edited')}</Text>
-				): null}
-					</Text>
-				)}
-			</Hyperlink>
-		);
-	};
-
-	const renderTextWithEmoji = (text: string) => {
-		const splitTextMarkdown = text?.trim()?.split?.(' ');
-
-		return (
-			<Text>
-				{splitTextMarkdown.map((item, index) => {
-					const srcEmoji = getSrcEmoji(item, emojiListPNG || []);
-					const regex = /:\b[^:]*\b:/g;
-					if (item.match(regex) && srcEmoji) {
-						return (
-							<Text key={`${index}-${srcEmoji}-renderTextWithEmoji`}>
-								{' '}
-								<FastImage key={index} source={{ uri: srcEmoji }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />{' '}
-							</Text>
-						);
+			<Markdown
+				style={markdownStyles}
+				rules={renderRulesCustom}
+				onLinkPress={(url) => {
+					if (url.startsWith('@')) {
+						onMention(url);
+						return false;
 					}
-					return <Text key={`${index}-${item}-renderTextWithEmoji`}>{item} </Text>;
-				})}
-			</Text>
+
+					if (url.startsWith('#')) {
+						const channelId = url.slice(1);
+						const channel = getChannelById(channelId) as ChannelsEntity;
+						onChannelMention(channel)
+						return false;
+					}
+					//Note: return false to prevent default
+					return true;
+				}}
+			>
+				{content}
+			</Markdown>
 		);
 	};
-	
-
-	const renderTextWithMarkdown = (lines: string) => {
-		const markdownStyles = {
-			body: {
-				color: Colors.tertiary,
-				fontSize: size.medium
-			},
-			paragraph: {
-				marginTop: 0,
-				marginBottom: 0,
-				paddingTop: 0,
-				paddingBottom: 0,
-			},
-			text: {
-
-			},
-			code_block: {
-				color: Colors.textGray,
-				backgroundColor: Colors.bgCharcoal,
-				paddingVertical: 1,
-				borderColor: Colors.black,
-				borderRadius: 5,
-			},
-			code_inline: {
-				color: Colors.textGray,
-				backgroundColor: Colors.bgCharcoal,
-				paddingVertical: 1,
-				borderColor: Colors.black,
-				borderRadius: 5,
-			},
-			fence: {
-				color: Colors.textGray,
-				backgroundColor: Colors.bgCharcoal,
-				paddingVertical: 5,
-				borderColor: Colors.black,
-				borderRadius: 5,
-			}
-		  };
-		const mentionList = lines.match(mentionRegex);
-		console.log('matchesMention', mentionList);
-		return (
-			<Markdown style={markdownStyles} >
-				{lines}
-			</Markdown>
-		)
-	}
 
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
@@ -500,7 +400,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
-							setFoundUser(user);
+							setFoundUser(user.user);
 						}}
 						style={styles.wrapperAvatar}
 					>
@@ -529,7 +429,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							onPress={() => {
 								setIsOnlyEmojiPicker(false);
 								setMessageSelected(EMessageBSToShow.UserInformation);
-								setFoundUser(user)
+								setFoundUser(user.user)
 							}}
 							style={styles.messageBoxTop}
 						>
