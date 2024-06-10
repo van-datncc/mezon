@@ -137,7 +137,7 @@ const Notifications = () => {
 						return item.code === -9 ? (
 							<NotificationItem onPressNotify={handleOnPressNotify} notify={item} onLongPressNotify={openBottomSheet} />
 						) : (
-							<NotificationIndividualItem notify={item} onLongPressNotify={openBottomSheet} />
+							<NotificationIndividualItem onPressNotify={handleOnPressNotify} notify={item} onLongPressNotify={openBottomSheet} />
 						);
 					}}
 					keyExtractor={(item) => item.id}
