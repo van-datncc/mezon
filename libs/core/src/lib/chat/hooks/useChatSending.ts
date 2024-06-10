@@ -66,7 +66,6 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			const client = clientRef.current;
 			const socket = socketRef.current;
 			const channel = channelRef.current;
-			console.log(channelLabel);
 
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
