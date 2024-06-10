@@ -1,76 +1,56 @@
+import { useChannelMembers, useChannels, useChatSending, useDirectMessages, useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	AngleRightIcon,
 	GiftIcon,
 	MicrophoneIcon,
 	SendIcon,
-	convertMentionsToData,
 	convertMentionsToText,
-	getAttachmentUnique
+	getAttachmentUnique,
 } from '@mezon/mobile-components';
-import {
-	useChannelMembers,
-	useChannels,
-	useChatSending,
-	useEmojiSuggestion,
-	useReference,
-	useThreads,
-	useDirectMessages
-} from '@mezon/core';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import {
+	RootState,
+	selectChannelsEntities,
+	selectCurrentChannel,
+	selectEmojiImage,
+	selectHiddenBottomTabMobile,
+	selectMemberByUserId,
+} from '@mezon/store-mobile';
+import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
 	ChannelMembersEntity,
 	IMessageSendPayload,
 	IMessageWithUser,
-	MentionDataProps,
 	MIN_THRESHOLD_CHARS,
+	MentionDataProps,
+	UserMentionsOpt,
 	typeConverts,
-	UserMentionsOpt
 } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
+import { ChannelStreamMode } from 'mezon-js';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-	DeviceEventEmitter,
-	Dimensions,
-	Keyboard,
-	TextInput,
-	View,
-	Text,
-	Pressable,
-	Platform,
-	TouchableOpacity,
-	KeyboardEvent
-} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { DeviceEventEmitter, Dimensions, Keyboard, KeyboardEvent, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
+import RNFS from 'react-native-fs';
+import Toast from 'react-native-toast-message';
+import Feather from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import { ChannelsMention, EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
+import UseMentionList from '../../../hooks/useUserMentionList';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { IModeKeyboardPicker } from './components';
 import AttachmentSwitcher from './components/AttachmentPicker/AttachmentSwitcher';
+import { IFile } from './components/AttachmentPicker/Gallery';
+import AttachmentPreview from './components/AttachmentPreview';
 import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
+import { renderTextContent } from './components/RenderTextContent';
 import { EMessageActionType } from './enums';
 import { styles } from './styles';
-import { useSelector } from 'react-redux';
-import {
-  selectChannelsEntities,
-	selectCurrentChannel,
-	selectEmojiImage,
-	selectHiddenBottomTabMobile,
-	selectMemberByUserId
-} from '@mezon/store-mobile';
-import Feather from 'react-native-vector-icons/Feather';
-import { useTranslation } from 'react-i18next';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import AttachmentPreview from './components/AttachmentPreview';
-import UseMentionList from '../../../hooks/useUserMentionList';
-import { renderTextContent } from './components/RenderTextContent';
-import { ChannelsMention, EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
-import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { useNavigation } from '@react-navigation/native';
-import Toast from "react-native-toast-message";
-import { ChannelStreamMode } from 'mezon-js';
-import { RootState } from '@mezon/store-mobile';
-import { handleUploadFileMobile, useMezon } from "@mezon/transport";
-import RNFS from "react-native-fs";
-import { IFile } from './components/AttachmentPicker/Gallery';
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
@@ -87,7 +67,7 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 			color: Colors.white,
 		},
 	},
-  emoji: {
+	emoji: {
 		trigger: ':',
 		allowedSpacesCount: 0,
 		isInsertSpaceAfterMention: true,
@@ -98,7 +78,7 @@ interface IChatBoxProps {
 	channelLabel: string;
 	channelId: string;
 	mode: ChannelStreamMode;
-	messageAction?: EMessageActionType,
+	messageAction?: EMessageActionType;
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
@@ -116,11 +96,17 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { textInputProps, triggers } = useMentions({
 		value: mentionTextValue,
 		onChange: (newValue) => handleTextInputChange(newValue),
-		onSelectionChange: (position) => { handleSelectionChange(position) },
+		onSelectionChange: (position) => {
+			handleSelectionChange(position);
+		},
 		triggersConfig,
 	});
-	const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([])
-	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
+	const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([]);
+	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({
+		channelId: props.channelId,
+		channelLabel: props.channelLabel,
+		mode: props.mode,
+	});
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
 	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
@@ -130,6 +116,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [senderId, setSenderId] = useState<string>('');
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
+	const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 	const navigation = useNavigation<any>();
 	const { setValueThread } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
@@ -148,12 +135,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
 
-
 	//start: DM stuff
-	const { sendDirectMessage, sendMessageTyping: directMessageTyping, messages } = useDirectMessages({
-        channelId: props.channelId ?? '',
-        mode: props.mode
-    });
+	const {
+		sendDirectMessage,
+		sendMessageTyping: directMessageTyping,
+		messages,
+	} = useDirectMessages({
+		channelId: props.channelId ?? '',
+		mode: props.mode,
+	});
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const handleSendDM = useCallback(
 		(
@@ -180,21 +170,20 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	useEffect(() => {
 		mentions.current = listMentions || [];
-	}, [listMentions])
+	}, [listMentions]);
 
 	useEffect(() => {
 		if (props?.channelId) {
 			removeAction(EMessageActionType.EditMessage);
 		}
-	}, [props?.channelId])
-
+	}, [props?.channelId]);
 
 	const handleEventAfterEmojiPicked = () => {
 		if (!emojiPicked) {
 			return;
 		}
 		setText(`${text.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
-	}
+	};
 
 	const editMessage = useCallback(
 		(editMessage: string, messageId: string) => {
@@ -203,27 +192,33 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		[EditSendMessage],
 	);
 
-	const removeMessageActionByType = useCallback((type: EMessageActionType) => {
-		const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== type)];
-		setMessageActionListNeedToResolve(newStack);
-	}, [messageActionListNeedToResolve])
+	const removeMessageActionByType = useCallback(
+		(type: EMessageActionType) => {
+			const newStack = [...messageActionListNeedToResolve.filter((it) => it.type !== type)];
+			setMessageActionListNeedToResolve(newStack);
+		},
+		[messageActionListNeedToResolve],
+	);
 
-	const removeAction = useCallback((actionType: EMessageActionType) => {
-		switch (actionType) {
-			case EMessageActionType.Reply:
-				setSenderId('');
-				removeMessageActionByType(EMessageActionType.Reply);
-				setCurrentSelectedReplyMessage(null);
-				break;
-			case EMessageActionType.EditMessage:
-				setCurrentSelectedEditMessage(null);
-				removeMessageActionByType(EMessageActionType.EditMessage);
-				setText('');
-				break;
-			default:
-				break;
-		}
-	}, [removeMessageActionByType])
+	const removeAction = useCallback(
+		(actionType: EMessageActionType) => {
+			switch (actionType) {
+				case EMessageActionType.Reply:
+					setSenderId('');
+					removeMessageActionByType(EMessageActionType.Reply);
+					setCurrentSelectedReplyMessage(null);
+					break;
+				case EMessageActionType.EditMessage:
+					setCurrentSelectedEditMessage(null);
+					removeMessageActionByType(EMessageActionType.EditMessage);
+					setText('');
+					break;
+				default:
+					break;
+			}
+		},
+		[removeMessageActionByType],
+	);
 
 	const isCanSendMessage = useMemo(() => {
 		return !!attachmentDataRef?.length || text.length > 0;
@@ -238,7 +233,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			mentions: mentionData,
 			attachments: [],
 			references: [],
-		}
+		};
 		const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
 		const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
 		if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
@@ -253,14 +248,18 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			editMessage(text, currentSelectedEditMessage.id);
 			removeAction(EMessageActionType.EditMessage);
 		} else {
-			const reference = currentSelectedReplyMessage ? [{
-				message_id: '',
-				message_ref_id: currentSelectedReplyMessage.id,
-				ref_type: 0,
-				message_sender_id: currentSelectedReplyMessage.user.id,
-				content: JSON.stringify(currentSelectedReplyMessage.content),
-				has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
-			}] : undefined;
+			const reference = currentSelectedReplyMessage
+				? [
+						{
+							message_id: '',
+							message_ref_id: currentSelectedReplyMessage.id,
+							ref_type: 0,
+							message_sender_id: currentSelectedReplyMessage.user.id,
+							content: JSON.stringify(currentSelectedReplyMessage.content),
+							has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
+						},
+					]
+				: undefined;
 			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
 				switch (props.mode) {
@@ -280,8 +279,22 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		}
 		inputRef?.current?.clear?.();
 		setText('');
-		[EMessageActionType.CreateThread].includes(props.messageAction) && DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-	}, [sendMessage, handleSendDM, props.mode, text, mentionData, currentSelectedReplyMessage, messageActionListNeedToResolve, currentSelectedEditMessage, editMessage, removeAction, attachmentDataRef, inputRef]);
+		[EMessageActionType.CreateThread].includes(props.messageAction) &&
+			DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+	}, [
+		sendMessage,
+		handleSendDM,
+		props.mode,
+		text,
+		mentionData,
+		currentSelectedReplyMessage,
+		messageActionListNeedToResolve,
+		currentSelectedEditMessage,
+		editMessage,
+		removeAction,
+		attachmentDataRef,
+		inputRef,
+	]);
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -305,8 +318,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 					setSenderId('');
 					break;
 			}
-		})
-	}, [messageActionListNeedToResolve])
+		});
+	}, [messageActionListNeedToResolve]);
 
 	const sortMessageActionList = (a: IMessageActionNeedToResolve, b: IMessageActionNeedToResolve) => {
 		if (a.type === EMessageActionType.EditMessage && b.type !== EMessageActionType.EditMessage) {
@@ -316,34 +329,37 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			return -1;
 		}
 		return 0;
-	}
+	};
 
-	const pushMessageActionIntoStack = useCallback((messagePayload: IMessageActionNeedToResolve) => {
-		const isExistingAction = messageActionListNeedToResolve.some(it => it.type === messagePayload.type);
-		if (isExistingAction) {
-			const newStack = [...messageActionListNeedToResolve.filter(it => it.type !== messagePayload.type), { ...messagePayload }].sort(sortMessageActionList);
-			setMessageActionListNeedToResolve(newStack);
-		} else {
-			setMessageActionListNeedToResolve(preValue => [...preValue, { ...messagePayload }].sort(sortMessageActionList))
-		}
-	}, [messageActionListNeedToResolve])
+	const pushMessageActionIntoStack = useCallback(
+		(messagePayload: IMessageActionNeedToResolve) => {
+			const isExistingAction = messageActionListNeedToResolve.some((it) => it.type === messagePayload.type);
+			if (isExistingAction) {
+				const newStack = [...messageActionListNeedToResolve.filter((it) => it.type !== messagePayload.type), { ...messagePayload }].sort(
+					sortMessageActionList,
+				);
+				setMessageActionListNeedToResolve(newStack);
+			} else {
+				setMessageActionListNeedToResolve((preValue) => [...preValue, { ...messagePayload }].sort(sortMessageActionList));
+			}
+		},
+		[messageActionListNeedToResolve],
+	);
 
 	function keyboardWillShow(event: KeyboardEvent) {
 		if (keyboardHeight !== event.endCoordinates.height) {
-			setKeyboardHeight(event.endCoordinates.height);
+			setIsShowEmojiNativeIOS(event.endCoordinates.height >= 380 && Platform.OS === 'ios');
+			setKeyboardHeight(event.endCoordinates.height <= 345 ? 345 : event.endCoordinates.height);
 		}
 	}
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
-		const showKeyboard = DeviceEventEmitter.addListener(
-			ActionEmitEvent.SHOW_KEYBOARD,
-			(value) => {
-				//NOTE: trigger from message action 'MessageItemBS component'
-				resetInput();
-				handleMessageAction(value)
-				openKeyBoard();
-			},
-		);
+		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_KEYBOARD, (value) => {
+			//NOTE: trigger from message action 'MessageItemBS component'
+			resetInput();
+			handleMessageAction(value);
+			openKeyBoard();
+		});
 		return () => {
 			showKeyboard.remove();
 			resetInput();
@@ -359,9 +375,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				subText: item?.category_name ?? '',
 			};
 		});
-		setListChannelsMention(listChannelsMention)
-	}, [listChannels])
-
+		setListChannelsMention(listChannelsMention);
+	}, [listChannels]);
 
 	const handleTextInputChange = async (text: string) => {
 		const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
@@ -385,18 +400,17 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			default:
 				break;
 		}
-	}
-	
+	};
+
 	const onConvertToFiles = useCallback(async (content: string) => {
 		try {
 			if (content.length > MIN_THRESHOLD_CHARS) {
-				
 				const fileTxtSaved = await writeTextToFile(content);
 				const session = sessionRef.current;
 				const client = clientRef.current;
-				
+
 				if (!client || !session || !currentChannel.channel_id) {
-					console.log('Client is not initialized')
+					console.log('Client is not initialized');
 				}
 				handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
 					.then((attachment) => {
@@ -412,7 +426,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			console.log('err', e);
 		}
 	}, []);
-	
+
 	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
 		typeConverts.map((typeConvert) => {
 			if (typeConvert.type === attachment.filetype) {
@@ -421,14 +435,13 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		});
 		setAttachmentData(attachment);
 	}, []);
-	
-	
+
 	const writeTextToFile = async (text: string) => {
 		// Define the path to the file
 		const now = Date.now();
 		const filename = now + '.txt';
 		const path = RNFS.DocumentDirectoryPath + `/${filename}`;
-		
+
 		// Write the text to the file
 		await RNFS.writeFile(path, text, 'utf8')
 			.then((success) => {
@@ -437,10 +450,10 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			.catch((err) => {
 				console.log(err.message);
 			});
-		
+
 		// Read the file to get its base64 representation
 		const fileData = await RNFS.readFile(path, 'base64');
-		
+
 		// Create the file object
 		const fileFormat: IFile = {
 			uri: path,
@@ -449,7 +462,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			size: (await RNFS.stat(path)).size.toString(),
 			fileData: fileData,
 		};
-		
+
 		return fileFormat;
 	};
 
@@ -463,9 +476,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			})) ?? [];
 		const convertedMentions: UserMentionsOpt[] = mentionList
 			? mentionList.map((mention) => ({
-				user_id: mention.id.toString() ?? '',
-				username: mention.display ?? '',
-			}))
+					user_id: mention.id.toString() ?? '',
+					username: mention.display ?? '',
+				}))
 			: [];
 		if (mentions?.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {
@@ -488,7 +501,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	};
 
 	useEffect(() => {
-
 		const mentionsSelected = getListMentionSelected();
 		handleMentionInput(mentionsSelected);
 	}, [mentionTextValue]);
@@ -497,14 +509,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		if (!mentionTextValue || !mentions?.current?.length) return;
 		const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
 		const validMentions = text?.match(mentionRegex);
-		const mentionsSelected = mentions?.current?.filter(mention => {
-			return validMentions?.includes(`@${mention.display}` || '')
+		const mentionsSelected = mentions?.current?.filter((mention) => {
+			return validMentions?.includes(`@${mention.display}` || '');
 		});
-		return mentionsSelected.map(mention => ({
+		return mentionsSelected.map((mention) => ({
 			id: mention.id,
-			display: `@${mention.display}`
-		}))
-	}
+			display: `@${mention.display}`,
+		}));
+	};
 
 	const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
 		const { type, targetMessage } = messageAction;
@@ -518,15 +530,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				setValueThread(targetMessage);
 				timeoutRef.current = setTimeout(() => {
 					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
-				}, 500)
+				}, 500);
 				break;
 			case EMessageActionType.Mention:
-				selectMentionMessage(targetMessage)
+				selectMentionMessage(targetMessage);
 				break;
 			default:
 				break;
 		}
-	}
+	};
 
 	const openKeyBoard = () => {
 		timeoutRef.current = setTimeout(() => {
@@ -541,27 +553,24 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		if (!mentionMessage?.display) return;
 		const textMentions = `@${mentionMessage?.display} `;
 		const textArray = inputValue.split('');
-		textArray.splice(cursorPosition, 0, textMentions)
-		const textConverted = textArray.join('')
-		setText(textConverted)
-		setMentionTextValue(textConverted)
-	}
+		textArray.splice(cursorPosition, 0, textMentions);
+		const textConverted = textArray.join('');
+		setText(textConverted);
+		setMentionTextValue(textConverted);
+	};
 
 	useEffect(() => {
 		currentTextInput.current = text;
-	}, [text])
+	}, [text]);
 
 	const selectMentionMessage = (message: IMessageWithUser) => {
-		const mention = mentions?.current?.find(mention => {
-			return mention.id === message.sender_id
+		const mention = mentions?.current?.find((mention) => {
+			return mention.id === message.sender_id;
 		});
-		handleInsertMentionTextInput(mention)
-	}
+		handleInsertMentionTextInput(mention);
+	};
 
-	const handleSelectionChange = (selection: {
-		start: number;
-		end: number;
-	}) => {
+	const handleSelectionChange = (selection: { start: number; end: number }) => {
 		cursorPositionRef.current = selection.start;
 	};
 
@@ -606,7 +615,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}
 
 	return (
-		<View style={styles.wrapperChatBox}>
+		<View style={[styles.wrapperChatBox, isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
 			<View style={styles.aboveTextBoxWrapper}>
 				{senderMessage?.user?.username ? (
 					<View style={styles.aboveTextBoxItem}>

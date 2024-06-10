@@ -1,5 +1,5 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, AngleRight, HashSignLockIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
+import { ActionEmitEvent, AngleRight, HashSignLockIcon, MuteIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IMessageWithUser } from '@mezon/utils';
@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import NotificationSetting from '../../../components/NotificationSetting';
+import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
@@ -161,6 +162,7 @@ const HomeDefaultHeader = React.memo(
 		};
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const [channelOfThread, setChannelOfThread] = useState<ChannelsEntity>(null);
+		const { statusMute } = useStatusMuteChannel();
 
 		useEffect(() => {
 			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
@@ -198,7 +200,11 @@ const HomeDefaultHeader = React.memo(
 				{!!currentChannel?.channel_label && (
 					<TouchableOpacity onPress={() => openBottomSheet()}>
 						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-						<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
+						{statusMute === EActionMute.Mute ? (
+							<MuteIcon width={22} height={22} style={{ marginRight: 20 }} />
+						) : (
+							<UnMuteIcon width={22} height={22} style={{ marginRight: 20 }} />
+						)}
 					</TouchableOpacity>
 				)}
 			</View>

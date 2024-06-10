@@ -2,20 +2,14 @@ import { useNavigation } from '@react-navigation/native';
 
 import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon, UnMuteIcon } from '@mezon/mobile-components';
 import { Pressable, Text, View } from 'react-native';
+import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import styles from './style';
-import { useSelector } from 'react-redux';
-import { selectnotificatonSelected } from '@mezon/store-mobile';
-
-const enum EActionMute {
-  Mute = 1,
-  UnMute = 0
-}
 
 export default function ActionRow() {
-  const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const navigation = useNavigation<any>();
-  const actionList = [
+	const { statusMute } = useStatusMuteChannel();
+	const actionList = [
 		{
 			title: 'Search',
 			action: () => {},
@@ -32,9 +26,8 @@ export default function ActionRow() {
 			title: 'Mute',
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL });
-      },
-			icon: getNotificationChannelSelected?.active === EActionMute.Mute ?
-      <UnMuteIcon width={22} height={22} /> : <MuteIcon width={22} height={22} />,
+			},
+			icon: statusMute === EActionMute.Mute ? <MuteIcon width={22} height={22} /> : <UnMuteIcon width={22} height={22} />,
 		},
 		{
 			title: 'Settings',
