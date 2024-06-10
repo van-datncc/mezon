@@ -1,8 +1,10 @@
 import {
 	emojiSuggestionActions,
+	selectAddEmojiState,
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
 	selectEmojiSuggestion,
+	selectShiftPressedStatus,
 	selectTextToSearchEmojiSuggestion,
 	useAppDispatch,
 } from '@mezon/store';
@@ -27,6 +29,8 @@ export function useEmojiSuggestion() {
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
+	const addEmojiState = useSelector(selectAddEmojiState);
+	const shiftPressedState = useSelector(selectShiftPressedStatus);
 
 	const dispatch = useAppDispatch();
 	const setEmojiSuggestion = useCallback(
@@ -50,6 +54,20 @@ export function useEmojiSuggestion() {
 		[dispatch],
 	);
 
+	const setAddEmojiActionChatbox = useCallback(
+		(isAdd: boolean) => {
+			dispatch(emojiSuggestionActions.setAddEmojiActionChatbox(isAdd));
+		},
+		[dispatch],
+	);
+
+	const setShiftPressed = useCallback(
+		(isPress: boolean) => {
+			dispatch(emojiSuggestionActions.setShiftPressed(isPress));
+		},
+		[dispatch],
+	);
+
 	const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	return useMemo(
 		() => ({
@@ -62,6 +80,10 @@ export function useEmojiSuggestion() {
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
 			emojiListPNG,
+			setAddEmojiActionChatbox,
+			addEmojiState,
+			setShiftPressed,
+			shiftPressedState,
 		}),
 		[
 			emojis,
@@ -73,6 +95,10 @@ export function useEmojiSuggestion() {
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
 			emojiListPNG,
+			setAddEmojiActionChatbox,
+			addEmojiState,
+			setShiftPressed,
+			shiftPressedState,
 		],
 	);
 }

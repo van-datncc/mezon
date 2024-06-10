@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		paddingTop: size.s_10,
 		backgroundColor: Colors.tertiaryWeight,
-		color: Colors.tertiary
+		color: Colors.tertiary,
 	},
 	iconEmoji: {
 		position: 'absolute',
@@ -100,7 +100,6 @@ export const styles = StyleSheet.create({
 	containerDrawerContent: {
 		flex: 1,
 		flexDirection: 'row',
-		backgroundColor: Colors.primary,
 	},
 	homeDefault: {
 		backgroundColor: '#2b2d31',
@@ -187,9 +186,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 	},
 	wrapperClanIcon: {
-		width: '100%',
 		alignItems: 'center',
-		marginBottom: verticalScale(10),
 	},
 	clanIcon: {
 		height: verticalScale(50),
@@ -254,7 +251,7 @@ export const styles = StyleSheet.create({
 		width: '22%',
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.secondary,
-		alignItems: 'center'
+		alignItems: 'center',
 	},
 	friendItemWrapper: {
 		marginHorizontal: 20,
@@ -561,4 +558,7 @@ export const styles = StyleSheet.create({
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderLabel: { color: Colors.white, fontFamily: 'bold', marginLeft: size.s_10, fontSize: size.label },
 	channelHeaderLabel: { color: Colors.textGray, marginLeft: size.s_10, fontSize: size.medium },
+	mb_10: {
+		marginBottom: verticalScale(10),
+	},
 });

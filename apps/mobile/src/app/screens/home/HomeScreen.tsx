@@ -121,9 +121,7 @@ const HomeScreen = React.memo((props: any) => {
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<DrawerScreen navigation={props.navigation} />
-		</SafeAreaView>
+		<DrawerScreen navigation={props.navigation} />
 	);
 });
 

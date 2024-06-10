@@ -1,4 +1,4 @@
-import { Colors } from '@mezon/mobile-ui';
+import {Colors, size} from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -33,6 +33,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-around',
 		gap: 10
 	},
+	containerLoading: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingTop: size.s_10
+	}
 });
 
 export default styles;

@@ -1,5 +1,5 @@
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { selectMessageByMessageId } from '@mezon/store';
+import { selectCurrentChannelId, selectMessageByMessageId } from '@mezon/store';
 import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -14,7 +14,7 @@ export type EmojiCustomPanelOptions = {
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
-	const { emojis, categoriesEmoji, emojiListPNG } = useEmojiSuggestion();
+	const { emojis, categoriesEmoji, emojiListPNG, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
@@ -54,6 +54,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
+	const { setShiftPressed } = useEmojiSuggestion();
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
@@ -69,8 +70,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
+			setAddEmojiActionChatbox(!addEmojiState);
 			setEmojiSuggestion(emojiPicked);
-			if (window.innerWidth > 640) {
+			if (!shiftPressedState) {
 				setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 				setSubPanelActive(SubPanelName.NONE);
 			}
@@ -134,6 +136,24 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			container.addEventListener('scroll', handleScroll);
 			return () => container.removeEventListener('scroll', handleScroll);
 		}
+	}, []);
+
+	const handleShiftKeyDown = (event: KeyboardEvent) => {
+		if (event.shiftKey) {
+			setShiftPressed(true);
+		}
+	};
+	const handleShiftKeyUp = () => {
+		setShiftPressed(false);
+	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleShiftKeyDown);
+		window.addEventListener('keyup', handleShiftKeyUp);
+		return () => {
+			window.removeEventListener('keydown', handleShiftKeyDown);
+			window.removeEventListener('keyup', handleShiftKeyUp);
+		};
 	}, []);
 
 	return (
@@ -241,19 +261,21 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
+	const { shiftPressedState } = useEmojiSuggestion();
+
 	return (
 		<div
-			className={`grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
+			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className="text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full"
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
 					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img src={item.src}></img>
+					<img draggable="false" src={item.src}></img>
 				</button>
 			))}
 		</div>
@@ -271,7 +293,7 @@ const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHov
 		<div
 			className={`w-full min-h-12 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2'}`}
 		>
-			<img className="w-10" src={emojiHoverSrc}></img>
+			<img draggable="false" className="w-10" src={emojiHoverSrc}></img>
 			{emojiHoverShortCode}
 		</div>
 	);

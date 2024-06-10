@@ -7,6 +7,7 @@ import styles from './styles';
 
 type StickerSelectorProps = {
 	onSelected?: (url: string) => void;
+	onScroll?: (e: any) => void;
 	searchText: string;
 };
 
@@ -14,34 +15,6 @@ type StickerSelectorProps = {
 const cates = [
 	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
 	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-	{ url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
-	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
 	{ url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
 ];
 const images = [
@@ -94,7 +67,7 @@ const _stickers = [...new Set(images.map((item) => item.type))].map((item) => ({
 	data: images.filter((_item) => _item.type == item).map((_item) => _item.url),
 }));
 
-export default function StickerSelector({ onSelected, searchText }: StickerSelectorProps) {
+export default function StickerSelector({ onSelected, searchText, onScroll }: StickerSelectorProps) {
 	const [stickers, setStickers] = useState(_stickers);
 
 	useEffect(() => {
@@ -106,7 +79,12 @@ export default function StickerSelector({ onSelected, searchText }: StickerSelec
 	}
 
 	return (
-		<ScrollView style={{ maxHeight: Metrics.screenHeight / 1.4 }} contentContainerStyle={{ paddingBottom: size.s_50 * 2 }}>
+		<ScrollView
+			scrollEventThrottle={16}
+			onScroll={onScroll}
+			style={{ maxHeight: Metrics.screenHeight / 1.4 }}
+			contentContainerStyle={{ paddingBottom: size.s_50 * 2 }}
+		>
 			<ScrollView horizontal contentContainerStyle={styles.btnWrap}>
 				{cates.map((item, index) => (
 					<TouchableOpacity
@@ -118,7 +96,7 @@ export default function StickerSelector({ onSelected, searchText }: StickerSelec
 							resizeMode={FastImage.resizeMode.cover}
 							source={{
 								uri: item.url,
-								cache: FastImage.cacheControl.web,
+								cache: FastImage.cacheControl.immutable,
 								priority: FastImage.priority.high,
 							}}
 							style={{ height: '100%', width: '100%' }}
@@ -128,12 +106,19 @@ export default function StickerSelector({ onSelected, searchText }: StickerSelec
 			</ScrollView>
 
 			{stickers.map((emojisCate, indexCate) => (
-				<View style={styles.session} key={indexCate.toString()}>
+				<View style={styles.session} key={indexCate.toString() + 'stickers-parent'}>
 					<Text style={styles.sessionTitle}>{emojisCate.title}</Text>
 					<View style={styles.sessionContent}>
 						{emojisCate.data.map((item, index) => (
-							<TouchableOpacity onPress={() => handlePressSticker(item)} style={styles.content} key={index.toString()}>
-								<FastImage source={{ uri: item }} style={{ height: '100%', width: '100%' }} />
+							<TouchableOpacity onPress={() => handlePressSticker(item)} style={styles.content} key={index.toString() + 'stickers'}>
+								<FastImage
+									source={{
+										uri: item,
+										cache: FastImage.cacheControl.immutable,
+										priority: FastImage.priority.high,
+									}}
+									style={{ height: '100%', width: '100%' }}
+								/>
 							</TouchableOpacity>
 						))}
 					</View>

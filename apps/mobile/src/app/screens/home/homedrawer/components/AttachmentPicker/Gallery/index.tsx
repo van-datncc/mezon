@@ -69,16 +69,14 @@ const Gallery = ({ onPickGallery }: IProps) => {
 
 		setLoading(true);
 		try {
-			if (Platform.OS !== 'ios') {
-				const res = await CameraRoll.getPhotos({
-					first: 10,
-					assetType: 'All',
-					after,
-					include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
-				});
-				setPhotos(after ? [...photos, ...res.edges] : res.edges);
-				setPageInfo(res.page_info);
-			}
+			const res = await CameraRoll.getPhotos({
+				first: 10,
+				assetType: 'All',
+				...(!!pageInfo && !!after && { after: after }),
+				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
+			})  ;
+			setPhotos(after ? [...photos, ...res.edges] : res.edges);
+			setPageInfo(res.page_info);
 		} catch (error) {
 			console.log('Error loading photos', error);
 		} finally {

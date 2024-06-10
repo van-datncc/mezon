@@ -1,16 +1,17 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, AngleRight, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
+import { ActionEmitEvent, AngleRight, HashSignLockIcon, MuteIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelsEntity, selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
+import { ChannelStatusEnum, IMessageWithUser } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import NotificationSetting from '../../../components/NotificationSetting';
+import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from './ChannelMessages';
 import ChatBox from './ChatBox';
@@ -76,9 +77,20 @@ const HomeDefault = React.memo((props: any) => {
 		}, []),
 	);
 
+	const onOpenDrawer = () => {
+		onShowKeyboardBottomSheet(false, 0, 'text');
+		props.navigation.openDrawer();
+		Keyboard.dismiss();
+	};
+
 	return (
 		<View style={[styles.homeDefault]}>
-			<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} currentChannel={currentChannel} />
+			<HomeDefaultHeader
+				openBottomSheet={openBottomSheet}
+				navigation={props.navigation}
+				currentChannel={currentChannel}
+				onOpenDrawer={onOpenDrawer}
+			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
 					<ChannelMessages
@@ -134,12 +146,23 @@ const HomeDefault = React.memo((props: any) => {
 });
 
 const HomeDefaultHeader = React.memo(
-	({ navigation, currentChannel, openBottomSheet }: { navigation: any; currentChannel: ChannelsEntity; openBottomSheet: () => void }) => {
+	({
+		navigation,
+		currentChannel,
+		openBottomSheet,
+		onOpenDrawer,
+	}: {
+		navigation: any;
+		currentChannel: ChannelsEntity;
+		openBottomSheet: () => void;
+		onOpenDrawer: () => void;
+	}) => {
 		const navigateMenuThreadDetail = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const [channelOfThread, setChannelOfThread] = useState<ChannelsEntity>(null);
+		const { statusMute } = useStatusMuteChannel();
 
 		useEffect(() => {
 			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
@@ -148,20 +171,16 @@ const HomeDefaultHeader = React.memo(
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-						<TouchableOpacity
-							activeOpacity={0.8}
-							style={styles.iconBar}
-							onPress={() => {
-								navigation.openDrawer();
-								Keyboard.dismiss();
-							}}
-						>
+						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
 							<BarsLogo width={20} height={20} />
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 									<ThreadIcon width={20} height={20}></ThreadIcon>
+								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
+								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+									<HashSignLockIcon width={20} height={20} color={Colors.white} />
 								) : (
 									<HashSignIcon width={18} height={18} />
 								)}
@@ -181,7 +200,11 @@ const HomeDefaultHeader = React.memo(
 				{!!currentChannel?.channel_label && (
 					<TouchableOpacity onPress={() => openBottomSheet()}>
 						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-						<UnMuteIcon width={20} height={20} style={{ marginRight: 20 }} />
+						{statusMute === EActionMute.Mute ? (
+							<MuteIcon width={22} height={22} style={{ marginRight: 20 }} />
+						) : (
+							<UnMuteIcon width={22} height={22} style={{ marginRight: 20 }} />
+						)}
 					</TouchableOpacity>
 				)}
 			</View>

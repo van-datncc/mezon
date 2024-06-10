@@ -22,11 +22,12 @@ import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
-import { SafeAreaView } from 'react-native';
+import { AppState } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
-import { checkNotificationPermission, createLocalNotification, navigateToNotification } from '../utils/pushNotificationHelpers';
+import { createLocalNotification, navigateToNotification } from '../utils/pushNotificationHelpers';
 
 const RootStack = createStackNavigator();
 
@@ -35,12 +36,13 @@ const NavigationMain = () => {
 	const [isDarkMode] = useState(true); //TODO: move to custom hook\
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const [isLoadingSplashScreen, setIsLoadingSplashScreen] = useAnimatedState(true);
+	const { reconnect } = useMezon();
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setIsLoadingSplashScreen(false);
 		}, 2500);
-		checkNotificationPermission();
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			Toast.show({
 				type: 'info',
@@ -59,6 +61,7 @@ const NavigationMain = () => {
 		return () => {
 			unsubscribe();
 			clearTimeout(timer);
+			appStateSubscription.remove();
 		};
 	}, []);
 
@@ -67,6 +70,16 @@ const NavigationMain = () => {
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
+
+	const handleAppStateChange = async (state: string) => {
+		if (state === 'inactive' || state === 'background') {
+			reconnect().catch((e) => 'trying to reconnect');
+		} else if (state === 'active') {
+			/* empty */
+		} else {
+			/* empty */
+		}
+	};
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
@@ -109,7 +122,7 @@ const NavigationMain = () => {
 
 	return (
 		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
-			<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
 				<NetInfoComp />
 				<RootStack.Navigator screenOptions={{ headerShown: false }}>
 					{isLoggedIn ? (

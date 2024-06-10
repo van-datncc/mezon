@@ -36,7 +36,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 
-			if (currentChatRef.scrollTop === 0 && remain !== 0) {
+			if (currentChatRef.scrollTop === 0) {
 				const previousHeight = currentChatRef.scrollHeight;
 				setIsFetching(true);
 				await loadMoreMessage();
@@ -52,5 +52,5 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		};
 	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, remain]);
 
-	return isFetching;
+	return { isFetching, remain };
 };

@@ -14,18 +14,21 @@ import {
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
 import { selectEmojiImage } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
+import { debounce } from 'lodash';
 import React, { useCallback, useRef, useState } from 'react';
 import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image';
+import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import { useThrottledCallback } from 'use-debounce';
 import styles from './styles';
 
 type EmojiSelectorProps = {
 	onSelected: (url: string) => void;
 	searchText?: string;
 	isReactMessage?: boolean;
+	onScroll?: (e: any) => void;
+	handleBottomSheetExpand?: () => void;
+	handleBottomSheetCollapse?: () => void;
 };
 
 const cateIcon = [
@@ -80,7 +83,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 	);
 };
 
-export default function EmojiSelector({ onSelected, isReactMessage = false }: EmojiSelectorProps) {
+export default function EmojiSelector({ onScroll, onSelected, isReactMessage = false, handleBottomSheetExpand, handleBottomSheetCollapse }: EmojiSelectorProps) {
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
 	const { categoriesEmoji, setEmojiSuggestion } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
@@ -88,12 +91,16 @@ export default function EmojiSelector({ onSelected, isReactMessage = false }: Em
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
-	const categoryRefs = categoriesWithIcons.reduce((refs, item) => {
-		refs[item.name] = { ref: React.createRef(), position: 0 };
-		return refs;
-	}, {});
+	const categoryRefs = useRef(
+		categoriesEmoji.reduce((refs, item) => {
+			refs[item] = { position: 0 };
+			return refs;
+		}, {}),
+	);
+
 	const handleEmojiSelect = useCallback(async (emojiPicked: string) => {
 		onSelected(emojiPicked);
+		handleBottomSheetCollapse?.();
 		if (!isReactMessage) setEmojiSuggestion(emojiPicked);
 	}, []);
 
@@ -107,20 +114,25 @@ export default function EmojiSelector({ onSelected, isReactMessage = false }: Em
 		setEmojiSearch(result);
 	};
 
-	const typingSearchDebounce = useThrottledCallback((text) => onSearchEmoji(text), 500);
+	const debouncedSetSearchText = useCallback(
+		debounce((text) => onSearchEmoji(text), 300),
+		[],
+	);
 
 	return (
 		<ScrollView
 			ref={refScrollView}
 			showsVerticalScrollIndicator={false}
 			stickyHeaderIndices={[0]}
+			scrollEventThrottle={16}
+			onScroll={onScroll}
 			style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
 			contentContainerStyle={{ paddingBottom: size.s_50 }}
 		>
 			<View style={{ backgroundColor: isReactMessage ? Colors.bgCharcoal : Colors.secondary }}>
 				<View style={styles.textInputWrapper}>
 					<SearchIcon height={18} width={18} />
-					<TextInput style={styles.textInput} onChangeText={(text) => typingSearchDebounce(text)} />
+					<TextInput onFocus={handleBottomSheetExpand} style={styles.textInput} onChangeText={debouncedSetSearchText} />
 				</View>
 				<ScrollView
 					horizontal
@@ -134,7 +146,7 @@ export default function EmojiSelector({ onSelected, isReactMessage = false }: Em
 							onPress={() => {
 								setSelectedCategory(item.name);
 								refScrollView.current?.scrollTo({
-									y: categoryRefs[item.name].position,
+									y: categoryRefs.current[item.name].position - 130,
 									animated: true,
 								});
 							}}
@@ -155,9 +167,9 @@ export default function EmojiSelector({ onSelected, isReactMessage = false }: Em
 				categoriesWithIcons.map((item, index) => {
 					return (
 						<View
-							ref={categoryRefs[item.name].ref} // Pass the ref here
+							ref={categoryRefs.current[item.name]} // Pass the ref here
 							onLayout={(event) => {
-								categoryRefs[item.name].position = event.nativeEvent.layout.y;
+								categoryRefs.current[item.name].position = event.nativeEvent.layout.y;
 							}}
 						>
 							<DisplayByCategories

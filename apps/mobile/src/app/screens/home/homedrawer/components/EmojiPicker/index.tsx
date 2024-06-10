@@ -5,6 +5,7 @@ import { SearchIcon } from '@mezon/mobile-components';
 import { Colors, Fonts } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
+import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
@@ -28,7 +29,7 @@ interface TextTabProps {
 function TextTab({ selected, title, onPress }: TextTabProps) {
 	return (
 		<View style={{ flex: 1 }}>
-			<TouchableOpacity onPress={onPress} style={{ backgroundColor: selected ? Colors.green : 'transparent', ...styles.selected }}>
+			<TouchableOpacity onPress={onPress} style={{ backgroundColor: selected ? Colors.bgViolet : 'transparent', ...styles.selected }}>
 				<Text style={{ color: selected ? Colors.white : Colors.gray72, fontSize: Fonts.size.small, textAlign: 'center' }}>{title}</Text>
 			</TouchableOpacity>
 		</View>
@@ -74,7 +75,7 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 			console.log('handleSelected data', data);
 		}
 
-		onDone && onDone();
+		onDone && type !== 'emoji' && onDone();
 	}
 
 	function handleInputSearchFocus() {
@@ -84,6 +85,29 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 	function handleInputSearchBlur() {
 		Keyboard.dismiss();
 	}
+
+	const debouncedSetSearchText = useCallback(
+		debounce((text) => setSearchText(text), 300),
+		[],
+	);
+
+	const handleBottomSheetExpand = () => {
+		bottomSheetRef && bottomSheetRef?.current && bottomSheetRef.current.expand();
+	};
+
+	const handleBottomSheetCollapse = () => {
+		bottomSheetRef && bottomSheetRef?.current && bottomSheetRef.current.collapse();
+	};
+
+	const onScroll = (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+		if (e.nativeEvent.contentOffset.y < -100) {
+			handleBottomSheetCollapse();
+		}
+
+		if (e.nativeEvent.contentOffset.y > 200) {
+			handleBottomSheetExpand();
+		}
+	};
 
 	return (
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
@@ -97,16 +121,22 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 				{mode !== 'emoji' && (
 					<View style={styles.textInputWrapper}>
 						<SearchIcon height={18} width={18} />
-						<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={setSearchText} />
+						<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
 					</View>
 				)}
 
 				{mode === 'emoji' ? (
-					<EmojiSelector onSelected={(url) => handleSelected('emoji', url)} searchText={searchText} />
+					<EmojiSelector
+						onScroll={onScroll}
+						handleBottomSheetExpand={handleBottomSheetExpand}
+						handleBottomSheetCollapse={handleBottomSheetCollapse}
+						onSelected={(url) => handleSelected('emoji', url)}
+						searchText={searchText}
+					/>
 				) : mode === 'gif' ? (
-					<GifSelector onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
+					<GifSelector onScroll={onScroll} onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
 				) : (
-					<StickerSelector onSelected={(url) => handleSelected('sticker', url)} searchText={searchText} />
+					<StickerSelector onScroll={onScroll} onSelected={(url) => handleSelected('sticker', url)} searchText={searchText} />
 				)}
 			</View>
 		</TouchableWithoutFeedback>

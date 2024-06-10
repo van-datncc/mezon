@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal';
-import { handleFCMToken, setupNotificationListeners } from '../../utils/pushNotificationHelpers';
+import { checkNotificationPermission, handleFCMToken, setupNotificationListeners } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigator from './BottomNavigator';
 import { FriendStacks } from './stacks/FriendStacks';
@@ -27,6 +27,7 @@ export const Authentication = () => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
+
 	useEffect(() => {
 		if (userProfile?.email) loadFRMConfig();
 	}, [userProfile?.email]);
@@ -34,6 +35,10 @@ export const Authentication = () => {
 	useEffect(() => {
 		setupNotificationListeners(navigation, currentClan);
 	}, [navigation, currentClan]);
+
+	useEffect(() => {
+		checkNotificationPermission();
+	}, []);
 
 	const loadFRMConfig = async () => {
 		const fcmtoken = await handleFCMToken();

@@ -15,25 +15,24 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	const { toChannelPage } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
 	const currentChannel = useSelector(selectCurrentChannel);
-
+	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
+		if (channelHastagId.startsWith('<#') && channelHastagId.endsWith('>')) {
+			return toChannelPage(channelHastagId.slice(2, -1), clanId || '');
+		}
+		return undefined;
+	};
 	const getChannelById = (channelHastagId: string) => {
 		const channel = useSelector(selectChannelById(channelHastagId));
 		return channel;
 	};
 
-	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
-		if (channelHastagId.startsWith('#')) {
-			return toChannelPage(channelHastagId.slice(1), clanId || '');
-		}
-		return undefined;
-	};
 	const [channelPath, setChannelPath] = useState(getChannelPath(channelHastagId, clanId ?? ''));
 
-	const channel = getChannelById(channelHastagId.slice(1));
+	const channel = getChannelById(channelHastagId.slice(2, -1));
 
 	useEffect(() => {
 		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			setChannelPath(getChannelPath('#' + currentChannelId || '', clanId ?? ''));
+			setChannelPath(getChannelPath('<#' + currentChannelId || '', clanId || '' + '>'));
 		} else {
 			setChannelPath(getChannelPath(channelHastagId, clanId ?? ''));
 		}
@@ -46,11 +45,11 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		}
 	}, [channel]);
 
-	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && channelPath && getChannelById(channelHastagId.slice(1)) ? (
+	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && getChannelById(channelHastagId.slice(2, -1)) ? (
 		<Link
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
-			to={channelPath}
+			to={channelPath ?? ''}
 			className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]"
 		>
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (

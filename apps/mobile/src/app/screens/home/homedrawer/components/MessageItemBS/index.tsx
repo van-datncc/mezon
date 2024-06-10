@@ -19,7 +19,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, FlatList, Pressable, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, FlatList, Platform, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import Toast from 'react-native-toast-message';
@@ -27,9 +27,9 @@ import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
+import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
-import UserProfile from '../UserProfile';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user } = props;
@@ -294,7 +294,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	useEffect(() => {
 		return () => {
 			timeoutRef.current && clearTimeout(timeoutRef.current);
-		}
+		};
 	}, []);
 
 	useEffect(() => {
@@ -320,13 +320,17 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	return (
 		<BottomSheet
 			ref={ref}
-			height={isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type) ? Metrics.screenHeight / 1.4 : Metrics.screenHeight / 2}
+			height={
+				isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type)
+					? Metrics.screenHeight / 1.4
+					: Metrics.screenHeight / 2
+			}
 			onClose={() => {
 				onClose();
 				setIsShowEmojiPicker(false);
 			}}
 			draggable
-			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type))}
+			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type)) && Platform.OS !== 'ios'}
 			customStyles={{
 				container: {
 					backgroundColor: 'transparent',

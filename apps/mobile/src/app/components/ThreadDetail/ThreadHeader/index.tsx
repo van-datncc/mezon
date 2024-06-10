@@ -1,4 +1,6 @@
-import { ArrowLeftIcon, HashSignIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { ArrowLeftIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { Colors } from '@mezon/mobile-ui';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo } from 'react';
@@ -38,7 +40,11 @@ export const ThreadHeader = memo(() => {
 				</View>
 			) : (
 				<View style={styles.channelText}>
-					<HashSignIcon width={18} height={18} />
+					{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+						<HashSignLockIcon width={20} height={20} color={Colors.white} />
+					) : (
+						<HashSignIcon width={18} height={18} />
+					)}
 					<Text numberOfLines={1} style={styles.channelLabel}>
 						{currentChannel?.channel_label}
 					</Text>

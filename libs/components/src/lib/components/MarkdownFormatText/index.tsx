@@ -35,7 +35,7 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 
 	const checkMention = (syntax: string) => {
 		const isMention = syntax.startsWith('@');
-		const isHashtag = syntax.startsWith('#');
+		const isHashtag = syntax.startsWith('<#') && syntax.endsWith('>');
 		const isEmojiSyntax = syntax.match(/:\b[^:]*\b:/g);
 		if (isMention && !isHashtag && !isEmojiSyntax) {
 			return MentionTypeEnum.MENTION;

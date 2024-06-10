@@ -10,7 +10,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { NotificationType } from 'mezon-js';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Creatable from 'react-select/creatable';
 import Modal from '../../../../../ui/src/lib/Modal';
@@ -93,6 +93,21 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const channelCategorySettings = useSelector(selectAllchannelCategorySetting);
     const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
+	const sortedChannelCategorySettings = React.useMemo(() => {
+		const settingsCopy = [...channelCategorySettings];
+		settingsCopy.sort((a, b) => {
+			if(a.channel_category_label && b.channel_category_label){
+				if (a.channel_category_label < b.channel_category_label) {
+					return -1;
+				}
+				if (a.channel_category_label > b.channel_category_label) {
+					return 1;
+				}
+			}
+			return 0;
+		});
+		return settingsCopy;
+	}, [channelCategorySettings]);
 	const handleNotificationClanChange = (event: any, notification: string) => {
 		dispatch(defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClan?.id, notification_type: notification }));
 	};
@@ -127,13 +142,23 @@ const ModalNotificationSetting = (props: ModalParam) => {
 			);
 		}
 		if (newValue.title === 'channel') {
-			dispatch(
-				notificationSettingActions.setNotificationSetting({
-					channel_id: newValue.id,
-					notification_type: notificatonSelected?.notification_setting_type,
-                    clan_id: currentClanId || ""
-				}),
-			);
+			if (notificatonSelected?.notification_setting_type === '' || notificatonSelected?.notification_setting_type === undefined) {
+				dispatch(
+					notificationSettingActions.setNotificationSetting({
+						channel_id: newValue.id,
+						notification_type: defaultNotificationClan?.notification_setting_type,
+						clan_id: currentClanId || ""
+					}),
+				);
+			} else {
+				dispatch(
+					notificationSettingActions.setNotificationSetting({
+						channel_id: newValue.id,
+						notification_type: notificatonSelected?.notification_setting_type,
+						clan_id: currentClanId || ""
+					}),
+				);
+			}
 		}
 	};
 
@@ -214,13 +239,13 @@ const ModalNotificationSetting = (props: ModalParam) => {
 								<tr className="grid grid-cols-7">
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-3">CHANNEL OR CATEGORY</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">ALL</th>
-									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">MENTIONS</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">NOTHING</th>
+									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">MENTIONS</th>
 									<th className="text-xs font-bold dark:text-white text-colorTextLightMode uppercase mb-2 col-span-1">Mute</th>
 								</tr>
 							</thead>
 							<tbody>
-								{channelCategorySettings.map((channelCategorySetting, index) => (
+								{sortedChannelCategorySettings.map((channelCategorySetting, index) => (
 									<tr key={index} className="group relative grid grid-cols-7 mb-2.5 dark:bg-bgModifierHover bg-bgModifierHoverLight hover:dark:bg-black hover:bg-bgLightModeButton rounded p-[10px]">
 										<td className="col-span-3">{channelCategorySetting.channel_category_label}</td>
 										{notificationTypes.map((notificationType) => (

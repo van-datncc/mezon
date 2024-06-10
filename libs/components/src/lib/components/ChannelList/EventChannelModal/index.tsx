@@ -20,7 +20,7 @@ const EventModal = (props: EventModalProps) => {
 	const { allEventManagement } = useEventManagement();
 
 	return open ? (
-		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black">
+		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
 			{!openModalDetail ?
 				<div className={`relative w-full sm:h-auto ${openModal ? 'max-w-[472px]' : 'max-w-[600px]'}`}>
 					<div className="rounded-lg overflow-hidden text-sm">

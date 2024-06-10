@@ -7,6 +7,7 @@ import {
 	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
+	useGifsStickersEmoji,
 	useMenu,
 	useMessageValue,
 	useReference,
@@ -24,10 +25,12 @@ import {
 } from '@mezon/store';
 import {
 	ChannelMembersEntity,
+	EmojiPlaces,
 	ILineMention,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
+	SubPanelName,
 	ThreadValue,
 	UserMentionsOpt,
 	UsersClanEntity,
@@ -99,6 +102,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setIdReferenceMessageReply,
 		setOpenReplyMessageState,
 	} = useReference();
+	const { setReactionPlaceActive } = useChatReaction();
+	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
@@ -113,7 +118,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
-	const { emojiPicked } = useEmojiSuggestion();
+	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const { reactionRightState } = useChatReaction();
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
@@ -239,7 +244,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend(
-						{ t: content },
+						{ t: content.trim() },
 						mentionData,
 						attachmentDataRef,
 						undefined,
@@ -258,6 +263,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				dispatch(threadsActions.setIsPrivate(0));
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
+			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+			setSubPanelActive(SubPanelName.NONE);
 		},
 		[
 			valueTextInput,
@@ -376,38 +383,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const convertToPlainTextHashtag = (text: string) => {
 		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `#${p2}` : `@${p1}`;
+			return symbol === '#' ? `<#${p2}>` : `@${p1}`;
 		});
 		return result;
 	};
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
-	}, [emojiPicked]);
+	}, [emojiPicked, addEmojiState]);
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
 		if (!emojiPicked || !input) {
 			return;
 		}
-		const syntaxEmoji = findSyntaxEmoji(content) ?? '';
-		if (syntaxEmoji === '') {
-			textFieldEdit.insert(input, emojiPicked);
-		} else {
-			const replaceSyntaxByEmoji = content.replace(syntaxEmoji, emojiPicked);
-			setValueTextInput(replaceSyntaxByEmoji, props.isThread);
-			setContent(replaceSyntaxByEmoji);
-			focusToElement(editorRef);
-		}
-	}
-
-	function findSyntaxEmoji(contentText: string): string | null {
-		const regexEmoji = /:\b[^:]*\b:/g;
-		const emojiArray = Array.from(contentText.matchAll(regexEmoji), (match) => match[0]);
-		if (emojiArray.length > 0) {
-			return emojiArray[0];
-		}
-		return null;
+		textFieldEdit.insert(input, emojiPicked);
 	}
 
 	const clickUpToEditMessage = () => {
@@ -539,6 +529,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					data={queryEmojis}
 					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
+					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
 		</div>

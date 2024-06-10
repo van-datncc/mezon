@@ -38,7 +38,6 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const { openReplyMessageState, idMessageRefReply, idMessageToJump } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
-	const { openEditMessageState } = useReference();
 	const userLogin = useAuth();
 
 	const isCombine = useMemo(() => {
