@@ -115,6 +115,7 @@ export const fetchMessages = createAsyncThunk(
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
+		await thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
 			if (!message.reactions) return [];
 			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
@@ -155,8 +156,8 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
+
 		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
-		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(response.messages.length));
 
 		if (response.last_seen_message?.id) {
 			thunkAPI.dispatch(
@@ -316,6 +317,7 @@ export const messagesSlice = createSlice({
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		setQuatitiesMessageRemain: (state, action) => {
+			action.payload;
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {

@@ -22,9 +22,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump } = useReference();
 	const { appearanceTheme } = useApp();
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
-
 	// share logic to load more message
-	const isFetching = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
+	const { isFetching, remain } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
@@ -63,8 +62,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{!hasMoreMessage && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && hasMoreMessage && <p className=" text-center">Loading messages...</p>}
+			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
+			{isFetching && remain !== 0 && <p className=" text-center">Loading messages...</p>}
 
 			{reverseArray(messages).map((message, i) => {
 				return (
@@ -82,6 +81,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		</div>
 	);
 }
+
+
 
 ChannelMessages.Skeleton = () => {
 	return (
