@@ -27,9 +27,16 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 	};
 
 	useEffect(() => {
+		let timeout;
 		if (currentClan) {
-			scrollToCurrentClan();
+			timeout = setTimeout(() => {
+				scrollToCurrentClan();
+			}, 200);
 		}
+		
+		return () => {
+			timeout && clearTimeout(timeout);
+		};
 	}, [currentClan]);
 
 	const scrollToCurrentClan = () => {

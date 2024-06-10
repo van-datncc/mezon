@@ -1,5 +1,5 @@
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { selectMessageByMessageId } from '@mezon/store';
+import { selectCurrentChannelId, selectMessageByMessageId } from '@mezon/store';
 import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -71,7 +71,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
-			setEmojiSuggestion(emojiPicked.trim());
+			setEmojiSuggestion(emojiPicked);
 			if (!shiftPressedState) {
 				setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
 				setSubPanelActive(SubPanelName.NONE);
@@ -272,7 +272,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 				<button
 					key={index}
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
-					onClick={() => onEmojiSelect(item.shortname)}
+					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					<img draggable="false" src={item.src}></img>

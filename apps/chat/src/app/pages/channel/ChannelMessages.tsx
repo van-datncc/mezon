@@ -19,11 +19,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
-	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump } = useReference();
+	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
 	const { appearanceTheme } = useApp();
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	// share logic to load more message
 	const { isFetching, remain } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
+
+	useEffect(() => {
+		setMessageIdToJump(messageMentionId);
+	}, [messageMentionId]);
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
@@ -81,8 +85,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		</div>
 	);
 }
-
-
 
 ChannelMessages.Skeleton = () => {
 	return (
