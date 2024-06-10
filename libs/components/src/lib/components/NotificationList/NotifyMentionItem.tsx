@@ -1,6 +1,6 @@
-import { useAppNavigation, useClans, useJumpToMessage, useNotification } from '@mezon/core';
+import { useAppNavigation, useClans, useJumpToMessage, useNotification, useReference } from '@mezon/core';
 import { INotification, selectChannelById, selectCurrentChannelId, selectMemberClanByUserId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IChannelMember } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
@@ -49,16 +49,19 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const { currentClan } = useClans();
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
-	const { toMessageChannel, navigate } = useAppNavigation();
+	const { toChannelPage, navigate } = useAppNavigation();
 	const { jumpToMessage } = useJumpToMessage();
+	const { setMessageMentionId } = useReference();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const messageContent = JSON.parse(data.content);
-	const jump = async (messId: string) => {
-		if (currentChannelId === data.channel_id) {
-			jumpToMessage(messId);
+
+	const dispatchMessageMention = async () => {
+		if (currentChannelId !== data.channel_id) {
+			await navigate(toChannelPage(data.channel_id, currentClan?.id ?? ''));
+			setMessageMentionId(data.message_id);
 		} else {
-			await navigate(toMessageChannel(data.channel_id, currentClan?.id || '', messId));
+			jumpToMessage(data.message_id);
 		}
 	};
 
@@ -101,7 +104,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				<button
 					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 					onClick={() => {
-						jump(data.message_id);
+						dispatchMessageMention();
 					}}
 				>
 					Jump
