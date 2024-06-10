@@ -1,8 +1,8 @@
 import { channelsActions, messagesActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import React, { useMemo } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import React, { useMemo } from 'react';
 import { useClans } from './useClans';
 
 export type UseChatSendingOptions = {
@@ -24,7 +24,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
 			anonymous?: boolean,
-			mentionEveryone?: boolean
+			mentionEveryone?: boolean,
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -35,7 +35,18 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(currentClanId, channel.id, channel.chanel_label, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
+			await socket.writeChatMessage(
+				currentClanId,
+				channel.id,
+				channel.chanel_label,
+				mode,
+				content,
+				mentions,
+				attachments,
+				references,
+				anonymous,
+				mentionEveryone,
+			);
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
@@ -55,6 +66,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			const client = clientRef.current;
 			const socket = socketRef.current;
 			const channel = channelRef.current;
+			console.log(channelLabel);
 
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
@@ -62,7 +74,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			if (mode === 4) {
 				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
 			} else {
-				await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
+				await socket.updateChatMessage(channelId, channel.chanel_label, mode, messageId, editMessage);
 			}
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, channelId, channelLabel],
