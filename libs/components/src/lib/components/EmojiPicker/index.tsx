@@ -54,6 +54,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
+	const { setShiftPressed } = useEmojiSuggestion();
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
@@ -135,6 +136,24 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			container.addEventListener('scroll', handleScroll);
 			return () => container.removeEventListener('scroll', handleScroll);
 		}
+	}, []);
+
+	const handleShiftKeyDown = (event: KeyboardEvent) => {
+		if (event.shiftKey) {
+			setShiftPressed(true);
+		}
+	};
+	const handleShiftKeyUp = () => {
+		setShiftPressed(false);
+	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleShiftKeyDown);
+		window.addEventListener('keyup', handleShiftKeyUp);
+		return () => {
+			window.removeEventListener('keydown', handleShiftKeyDown);
+			window.removeEventListener('keyup', handleShiftKeyUp);
+		};
 	}, []);
 
 	return (

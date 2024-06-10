@@ -2,6 +2,8 @@ import { useClans, useEscapeKey, useInvite } from '@mezon/core';
 import { useEffect, useState } from 'react';
 import ListMemberInvite from '.';
 import Modal from '../../../../../ui/src/lib/Modal';
+import { useSelector } from 'react-redux';
+import { selectChannelById, selectCurrentClan } from '@mezon/store';
 
 const expireAfter = [
 	'30 minutes',
@@ -39,7 +41,9 @@ const ModalInvite = (props: ModalParam) => {
 	const { currentClanId } = useClans();
 	const { createLinkInviteUser } = useInvite();
 
-	const { onClose } = props;
+	const { onClose, channelID } = props;
+	const channel = useSelector(selectChannelById(channelID));
+	const clan = useSelector(selectCurrentClan);
 
 	const handleOpenInvite = () => {
 		createLinkInviteUser(currentClanId ?? '', props.channelID ?? '', 10).then((res) => {
@@ -81,14 +85,14 @@ const ModalInvite = (props: ModalParam) => {
 	return (
 		!modalEdit ?
 		(<Modal
-			title="Invite friends to KOMU"
+			title={`Invite friends to ${clan?.clan_name}`}
 			onClose={() => {
 				props.onClose();
 			}}
 			showModal={props.open}
 			confirmButton={() => handleCopyToClipboard(urlInvite)}
 			titleConfirm="Copy"
-			subTitleBox="Send invite link to a friend"
+			hasChannel={channel}
 			classSubTitleBox="ml-[0px] cursor-default"
 			borderBottomTitle="border-b "
 		>
@@ -118,9 +122,9 @@ const ModalInvite = (props: ModalParam) => {
 				</div>
 				<p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] inline-flex gap-x-2">
 					<span className="cursor-default dark:text-white text-black">Your invite link expires in {expire} </span>
-					<p className="text-blue-300 cursor-pointer hover:underline" onClick={()=>setModalEdit(true)}>
+					<span className="text-blue-300 cursor-pointer hover:underline" onClick={()=>setModalEdit(true)}>
 						Edit invite link.
-					</p>
+					</span>
 				</p>
 			</div>
 		</Modal>) : 
@@ -163,7 +167,7 @@ const ModalInvite = (props: ModalParam) => {
 			</div>
 			<div className='flex justify-end gap-x-4'>
 				<button className='px-4 py-2 rounded bg-slate-500 hover:bg-opacity-85' onClick={closeModalEdit}>Cancel</button>
-				<button className='px-4 py-2 rounded bg-primary hover:bg-opacity-85' onClick={() => {props.onClose(); }}>Generate a New Link</button>
+				<button className='px-4 py-2 rounded bg-primary hover:bg-opacity-85' onClick={closeModalEdit}>Generate a New Link</button>
 			</div>
 		</Modal>)
 	);
