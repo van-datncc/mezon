@@ -1,3 +1,4 @@
+import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
 import { selectChannelById, selectMemberClanByUserId } from '@mezon/store-mobile';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
@@ -6,9 +7,8 @@ import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import MessageNotification from '../MessageNotification';
-import { NotifyProps } from '../types';
+import { ENotifyBsToShow, NotifyProps } from '../types';
 import { styles as s } from './NotificationItem.styles';
-import {AVATAR_DEFAULT_URL} from "@mezon/mobile-components";
 
 function parseObject(obj: any) {
 	let attachments;
@@ -45,16 +45,22 @@ function parseObject(obj: any) {
 	return parsedObj;
 }
 
-const NotificationItem = React.memo(({ notify }: NotifyProps) => {
+const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify }: NotifyProps) => {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user as any);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
 	const messageContent = JSON.parse(data.content);
 	const { messageTimeDifference } = useMessageParser(data);
-	const handleOnTouchMessage = () => {};
 	return (
-		<TouchableOpacity onPress={handleOnTouchMessage}>
+		<TouchableOpacity
+			onPress={() => {
+				onPressNotify(notify);
+			}}
+			onLongPress={() => {
+				onLongPressNotify(ENotifyBsToShow.removeNotification, notify);
+			}}
+		>
 			<View style={s.notifyContainer}>
 				<View style={s.notifyHeader}>
 					<View style={s.boxImage}>
