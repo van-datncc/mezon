@@ -18,15 +18,12 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
-	}, [channelId, dispatch]);
-
-	useEffect(() => {
 		setIdChannelSelected(channelId);
 		if(idChannelSelected) {
 			const path = toChannelPage(idChannelSelected, currentClanId ||'');
 			navigate(path);
 		}
-	},[idChannelSelected, dispatch])
+	}, [channelId, idChannelSelected, dispatch]);
 }
 
 export default function ChannelLayout() {
