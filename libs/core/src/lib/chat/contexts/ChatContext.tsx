@@ -167,7 +167,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelUpdated: ChannelUpdatedEvent) => {
 			if (channelUpdated) {
 				dispatch(channelsActions.updateChannelSocket(channelUpdated));
-				// dispatch(channelsActions.fetchChannels({clanId: channelUpdated.clan_id, noCache: true}));
 			}
 		},
 		[dispatch],
