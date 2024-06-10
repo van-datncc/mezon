@@ -1,5 +1,5 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useAuth, useClans, useDragAndDrop, useMenu, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import { useAppNavigation, useAuth, useChangeChannelId, useClans, useDragAndDrop, useMenu, useSearchMessages, useThreads, useVoice } from '@mezon/core';
 import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -12,11 +12,21 @@ import { ChannelTyping } from './ChannelTyping';
 // TODO: move this to core
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
+	const { idChannelSelected, currentClanId, setIdChannelSelected } = useChangeChannelId();
+	const { navigate, toChannelPage } = useAppNavigation();
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
 	}, [channelId, dispatch]);
+
+	useEffect(() => {
+		setIdChannelSelected(channelId);
+		if(idChannelSelected) {
+			const path = toChannelPage(idChannelSelected, currentClanId ||'');
+			navigate(path);
+		}
+	},[idChannelSelected, dispatch])
 }
 
 export default function ChannelLayout() {

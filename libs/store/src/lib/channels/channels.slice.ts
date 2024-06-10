@@ -49,6 +49,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	channelMetadata: EntityState<ChannelMeta, string>;
 	currentVoiceChannelId: string;
 	valueTextInput: Record<string, string>;
+	idChannelSelected: Record<string, string>;
 	mode: 'clan' | 'dm';
 }
 
@@ -199,6 +200,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
 	valueTextInput: {},
+	idChannelSelected: {},
 	mode: 'dm',
 });
 
@@ -257,6 +259,9 @@ export const channelsSlice = createSlice({
 		},
 		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
 			state.valueTextInput[action.payload.channelId] = action.payload.value;
+		},
+		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
+			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
 		},
 	},
 	extraReducers: (builder) => {
@@ -398,8 +403,12 @@ export const selectChannelSecond = createSelector(selectAllChannels, (channels) 
 export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
-export const selectDefaultChannelIdByClanId = (clainId: string) =>
-	createSelector(selectChannelsByClanId(clainId), (channels) => (channels.length > 0 ? channels[0].id : null));
+export const selectDefaultChannelIdByClanId = (clanId: string) =>
+  	createSelector(selectChannelsByClanId(clanId), (channels) => {
+		const filteredChannels = channels.filter((channel) => channel.parrent_id === "0");
+		return filteredChannels.length > 0 ? filteredChannels[0].id : null;
+	}
+);
 
 export const selectIsUnreadChannelById = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
@@ -420,3 +429,10 @@ export const selectValueTextInputByChannelId = (channelId: string) =>
 	});
 
 export const selectAllTextInput = createSelector(getChannelsState, (state) => state.valueTextInput);
+
+export const selectIdChannelSelectedByClanId = (clanId: string) =>
+	createSelector(getChannelsState, (state) => {
+		return state.idChannelSelected[clanId];
+	});
+
+export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
