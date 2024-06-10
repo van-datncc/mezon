@@ -1,5 +1,5 @@
 import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, messagesActions } from '@mezon/store';
+import { appActions, channelsActions, clansActions, messagesActions } from '@mezon/store-mobile';
 import { getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
@@ -39,7 +39,7 @@ export const checkNotificationPermission = async () => {
 const requestNotificationPermission = async () => {
 	try {
 		await messaging().requestPermission();
-		Alert.alert('Notification Permission', 'Notifications have been enabled.');
+		// Alert.alert('Notification Permission', 'Notifications have been enabled.');
 	} catch (error) {
 		Alert.alert('Notification Permission', 'Notification permission denied.', [
 			{
