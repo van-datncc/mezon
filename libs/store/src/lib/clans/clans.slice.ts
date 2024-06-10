@@ -306,5 +306,5 @@ export const selectDefaultClanId = createSelector(selectAllClans, (clans) => (cl
 export const selectShowNumEvent = (clanId: string) =>
 	createSelector(getClansState, (state) => {
 		const clan = state.clanMetadata.entities[clanId];
-		return clan.showNumEvent;
+		return clan?.showNumEvent;
 	});
