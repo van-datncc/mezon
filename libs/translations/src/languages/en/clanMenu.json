@@ -1,0 +1,29 @@
+{
+    "menu": {
+        "menu1": {
+            "title": "",
+            "markAsRead": "Mark As Read",
+            "browseChannels": "Browse Channels"
+        },
+        "menu2": {
+            "title": "",
+            "createChannel": "Create Channel",
+            "createCategory": "Create Category",
+            "createEvent": "Create Event"
+        },
+        "menu3": {
+            "title": "",
+            "editServerProfile": "Edit Server Profile",
+            "showAllChannels": "Show All Channels",
+            "hideMutedChannels": "Hide Muted Channels",
+            "allowDirectMessage": "Allow Direct Message",
+            "allowMessageRequest": "Allow Message Request",
+            "reportServer": "Report Server",
+            "leaveServer": "Leave Server"
+        },
+        "devMode": {
+            "title": "Development Mode",
+            "copyServerID": "Copy Server ID"
+        }
+    }
+}

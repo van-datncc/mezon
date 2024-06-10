@@ -11,6 +11,7 @@ import profileSetting from './profileSetting.json';
 import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
 import profile from './profile.json';
+import clanMenu from "./clanMenu.json";
 
 export default {
 	inviteToChannel,
@@ -25,5 +26,6 @@ export default {
 	profileSetting,
 	notificationSetting,
 	userProfile,
-	profile
+	profile,
+	clanMenu
 };
