@@ -75,7 +75,7 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 			console.log('handleSelected data', data);
 		}
 
-		onDone && onDone();
+		onDone && type !== 'emoji' && onDone();
 	}
 
 	function handleInputSearchFocus() {
@@ -128,7 +128,8 @@ function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
 				{mode === 'emoji' ? (
 					<EmojiSelector
 						onScroll={onScroll}
-						onFocus={handleBottomSheetExpand}
+						handleBottomSheetExpand={handleBottomSheetExpand}
+						handleBottomSheetCollapse={handleBottomSheetCollapse}
 						onSelected={(url) => handleSelected('emoji', url)}
 						searchText={searchText}
 					/>

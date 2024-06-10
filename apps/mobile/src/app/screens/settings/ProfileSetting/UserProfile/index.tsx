@@ -1,7 +1,7 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useAccount, useAuth } from '@mezon/core';
 import { HashSignIcon } from '@mezon/mobile-components';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';

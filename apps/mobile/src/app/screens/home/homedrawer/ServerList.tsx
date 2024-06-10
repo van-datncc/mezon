@@ -1,6 +1,6 @@
 import { Colors } from '@mezon/mobile-ui';
 import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
@@ -9,22 +9,27 @@ import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
 import ListClanPopupProps from './components/ListClanPopup';
 import { styles } from './styles';
-import { useEffect } from 'react';
 
 const ServerList = React.memo((props: any) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
+	const timeoutRef = useRef<any>();
 
 	const handleChangeClan = async (clanId: string) => {
+		timeoutRef.current = setTimeout(() => {
+			setIsVisible(false);
+		}, 200);
 		const store = await getStoreAsync();
 		store.dispatch(appActions.setLoadingMainMobile(true));
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
 
-  useEffect(()=>{
-    setIsVisible(false)
-  },[currentClan])
+	useEffect(() => {
+		return () => {
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	return (
 		<View style={styles.wrapperServerList}>
@@ -40,13 +45,11 @@ const ServerList = React.memo((props: any) => {
 
 			<Tooltip
 				isVisible={isVisible}
-				content={
-					<ListClanPopupProps
-            handleChangeClan={handleChangeClan}
-						clans={clans}
-					/>
-          }
-				contentStyle={{ backgroundColor: Colors.secondary}}
+				closeOnBackgroundInteraction={true}
+				disableShadow={true}
+				closeOnContentInteraction={true}
+				content={<ListClanPopupProps handleChangeClan={handleChangeClan} clans={clans} />}
+				contentStyle={{ backgroundColor: Colors.secondary }}
 				placement="bottom"
 				onClose={() => setIsVisible(false)}
 			>
