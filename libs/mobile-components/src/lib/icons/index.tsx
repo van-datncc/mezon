@@ -680,3 +680,12 @@ export function TickIcon({ width = 20, height = 20, color = 'white', ...props }:
 		</Svg>
 	);
 }
+
+export function LockIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg role="img" width={width} height={height} fill={color} viewBox="0 0 24 24">
+			<Path fill={color} fill-rule="evenodd" d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z" clip-rule="evenodd">
+			</Path>
+		</Svg>
+	)
+}
