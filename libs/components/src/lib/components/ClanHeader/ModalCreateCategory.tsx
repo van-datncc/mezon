@@ -7,6 +7,9 @@ type ModalCreateCategoryProps = {
 	onClose: () => void;
 	onCreateCategory: (nameCate: string) => void;
 };
+export const Regex = () => {
+	return /^(?![_-])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_-]{1,64}$/u;
+}
 
 const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {
 	const [nameCate, setNameCate] = useState('');
@@ -15,7 +18,8 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNameCate(value);
-		if (/^[A-Za-z0-9_-]{0,64}$/.test(value) && value !== '') {
+		const regex = Regex()
+		if (regex.test(value) && value !== '') {
 			setCheckValidate(false);
 		} else {
 			setCheckValidate(true);
