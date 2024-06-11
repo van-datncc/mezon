@@ -23,7 +23,8 @@
         },
         "devMode": {
             "title": "Chế độ nhà phát triển",
-            "copyServerID": "Sao chép ID máy chủ"
+            "copyServerID": "Sao chép ID máy chủ",
+            "serverIDCopied": "Đã sao chép ID máy chủ"
         }
     },
     "actions": {

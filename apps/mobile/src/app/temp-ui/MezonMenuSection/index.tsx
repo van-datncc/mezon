@@ -17,10 +17,7 @@ export default function MezonMenuSection({ title, items }: IMezonMenuSectionProp
                     <MezonMenuItem
                         isLast={index === items.length - 1}
                         key={index.toString()}
-                        onPress={item.onPress}
-                        title={item.title}
-                        icon={item.icon}
-                        component={item.component}
+                        {...item}
                     />
                 ))}
             </View>

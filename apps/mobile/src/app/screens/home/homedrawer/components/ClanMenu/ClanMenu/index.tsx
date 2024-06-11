@@ -16,6 +16,7 @@ import { APP_SCREEN } from "apps/mobile/src/app/navigation/ScreenTypes";
 import { useNavigation } from "@react-navigation/native";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { MutableRefObject } from "react";
+import Clipboard from "@react-native-clipboard/clipboard";
 
 interface IServerMenuProps {
     clan: ClansEntity;
@@ -93,6 +94,7 @@ export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
         },
         {
             title: t('menu.optionsMenu.allowMessageRequest'),
+
             component: <ToggleBtn />
         },
         {
@@ -102,12 +104,19 @@ export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
         {
             onPress: () => reserve(),
             title: t('menu.optionsMenu.leaveServer'),
+            textStyle: { color: "red" }
         },
     ]
 
     const devMenu: IMezonMenuItemProps[] = [
         {
-            onPress: () => reserve(),
+            onPress: () => {
+                Clipboard.setString(clan.clan_id);
+                Toast.show({
+                    type: 'info',
+                    text1: t('menu.devMode.serverIDCopied'),
+                });
+            },
             title: t('menu.devMode.copyServerID'),
         }
     ]

@@ -23,7 +23,8 @@
         },
         "devMode": {
             "title": "Development Mode",
-            "copyServerID": "Copy Server ID"
+            "copyServerID": "Copy Server ID",
+            "serverIDCopied": "Copied Server ID"
         }
     },
     "actions": {
