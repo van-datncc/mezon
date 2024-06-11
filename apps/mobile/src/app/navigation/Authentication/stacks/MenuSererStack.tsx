@@ -1,8 +1,9 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { APP_SCREEN } from "../../ScreenTypes";
-import CategoryCreator from "../../../components/Category";
 import { Colors } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
+import CategoryCreator from "../../../components/Category";
+import ClanSetting from "../../../components/ClanSettings";
 
 export const MenuClanStacks = ({ }: any) => {
     const Stack = createStackNavigator();
@@ -14,7 +15,16 @@ export const MenuClanStacks = ({ }: any) => {
                 headerShown: true,
                 headerShadowVisible: false,
                 gestureEnabled: true,
-                gestureDirection: 'horizontal'
+                gestureDirection: 'horizontal',
+                headerTitleAlign: "center",
+                headerTintColor: Colors.white,
+                headerStyle: {
+                    backgroundColor: Colors.primary
+                },
+                headerTitleStyle: {
+                    fontSize: 14,
+                    fontWeight: 'normal'
+                },
             }}>
 
             <Stack.Screen
@@ -22,14 +32,16 @@ export const MenuClanStacks = ({ }: any) => {
                 component={CategoryCreator}
                 options={{
                     headerTitle: t('menuClanStack.categoryCreator'),
-                    headerTitleAlign: "center",
-                    headerTintColor: Colors.white,
-                    headerStyle: {
-                        backgroundColor: Colors.primary
-                    }
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.SETTINGS}
+                component={ClanSetting}
+                options={{
+                    headerTitle: t('menuClanStack.clanSetting'),
                 }}
             />
         </Stack.Navigator>
     );
 }
-
