@@ -204,14 +204,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
 			{visibleImageModal && <View style={styles.overlay} />}
 			<ImageView
-				animationType={'none'}
+				animationType={'fade'}
 				images={formatAttachments}
 				imageIndex={idxSelectedImageModal}
 				isVisible={visibleImageModal}
-				glideAlways
-				isSwipeCloseEnabled
-				isPinchZoomEnabled
-				isTapZoomEnabled
+				isSwipeCloseEnabled={false}
 				onImageChange={(idx: number) => {
 					setIdxSelectedImageModal(idx);
 					timeOutRef.current = setTimeout(() => {

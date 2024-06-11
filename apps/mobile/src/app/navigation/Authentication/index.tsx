@@ -6,6 +6,7 @@ import { getAppInfo } from '@mezon/mobile-components';
 import { fcmActions, selectCurrentClan, selectLoadingMainMobile } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal';
 import { checkNotificationPermission, handleFCMToken, setupNotificationListeners } from '../../utils/pushNotificationHelpers';
@@ -22,7 +23,7 @@ const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
 	const getInitialRouteName = APP_SCREEN.BOTTOM_BAR;
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
@@ -38,6 +39,20 @@ export const Authentication = () => {
 
 	useEffect(() => {
 		checkNotificationPermission();
+		// To get All Recived Urls
+		ReceiveSharingIntent.getReceivedFiles(
+			(files: any) => {
+				console.log('Files getReceivedFiles', files);
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.SHARING, params: { data: files } });
+			},
+			(error: any) => {
+				console.log('Error getReceivedFiles', error);
+			},
+			'com.mezon.mobile',
+		);
+
+		// To clear Intents
+		return ReceiveSharingIntent.clearReceivedFiles();
 	}, []);
 
 	const loadFRMConfig = async () => {
