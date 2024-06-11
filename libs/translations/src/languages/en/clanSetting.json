@@ -1,0 +1,30 @@
+{
+    "menu": {
+        "settings": {
+            "title": "Settings",
+            "overview": "Overview",
+            "moderation": "Moderation",
+            "auditLog": "Audit Log",
+            "channels": "Channels",
+            "integrations": "Integrations",
+            "emoji": "Emoji",
+            "webhooks": "Webhooks",
+            "security": "Security"
+        },
+        "community": {
+            "title": "Community",
+            "enableCommunity": "Enable Community"
+        },
+        "subscriptions": {
+            "title": "Server Subscriptions",
+            "getStarted": "Get Started"
+        },
+        "userManagement": {
+            "title": "User Management",
+            "members": "Members",
+            "role": "Role",
+            "invite": "Invite",
+            "bans": "Bans"
+        }
+    }
+}
