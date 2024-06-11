@@ -1,8 +1,8 @@
 import { useChannelMembers, useChannels, useChatSending, useDirectMessages, useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
+	AddThread,
 	AngleRightIcon,
-	GiftIcon,
 	MicrophoneIcon,
 	SendIcon,
 	convertMentionsToText,
@@ -655,12 +655,14 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						<View style={[styles.iconContainer, { backgroundColor: '#333333' }]}>
 							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						</View>
-						<TouchableOpacity
-							style={[styles.iconContainer, { backgroundColor: '#333333', marginRight: isShowAttachControl ? size.s_10 : 0 }]}
-							onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}
-						>
-							<GiftIcon width={22} height={22} />
-						</TouchableOpacity>
+						{!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id) && (
+							<TouchableOpacity
+								style={[styles.iconContainer, { backgroundColor: '#333333', marginRight: isShowAttachControl ? size.s_10 : 0 }]}
+								onPress={() => navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD })}
+							>
+								<AddThread width={22} height={22} />
+							</TouchableOpacity>
+						)}
 					</>
 				)}
 

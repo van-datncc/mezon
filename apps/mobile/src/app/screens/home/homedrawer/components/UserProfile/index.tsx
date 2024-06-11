@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { Platform, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
+import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import MezonAvatar from '../../../../../../app/temp-ui/MezonAvatar';
 import { styles } from './UserProfile.styles';
-import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 
 interface userProfileProps {
 	userId: string;
@@ -57,11 +57,11 @@ const UserProfile = ({ userId }: userProfileProps) => {
 						{!checkOwner(userById?.user?.google_id || '') && (
 							<View style={[styles.userAction]}>
 								<View style={[styles.actionItem]}>
-									<MessageIcon width={20} height={20}></MessageIcon>
+									<MessageIcon width={25} height={20}></MessageIcon>
 									<Text style={[styles.actionText]}>{t('userAction.sendMessage')}</Text>
 								</View>
 								<View style={[styles.actionItem]}>
-									<CallIcon width={20} height={20}></CallIcon>
+									<CallIcon width={25} height={20}></CallIcon>
 									<Text style={[styles.actionText]}>{t('userAction.voiceCall')}</Text>
 								</View>
 								<View style={[styles.actionItem]}>
@@ -72,7 +72,12 @@ const UserProfile = ({ userId }: userProfileProps) => {
 						)}
 					</View>
 					<View style={[styles.userInfo]}>
-						<Text style={[styles.aboutMe]}>{t('aboutMe.headerTitle')}</Text>
+						{userById?.user?.about_me && (
+							<View>
+								<Text style={[styles.aboutMe]}>{t('aboutMe.headerTitle')}</Text>
+								<Text style={[styles.aboutMeText]}>{userById?.user?.about_me}</Text>
+							</View>
+						)}
 						<Text style={[styles.title]}>{t('aboutMe.roles.headerTitle')}</Text>
 						<View style={[styles.roles]}>
 							{userRolesClan.length
