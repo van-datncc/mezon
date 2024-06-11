@@ -11,6 +11,8 @@ import profileSetting from './profileSetting.json';
 import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
 import profile from './profile.json';
+import categoryCreator from "./categoryCreator.json";
+import screenStack from "./screenStack.json";
 
 export default {
 	inviteToChannel,
@@ -25,5 +27,7 @@ export default {
 	profileSetting,
 	notificationSetting,
 	userProfile,
-	profile
+	profile,
+	categoryCreator,
+	screenStack
 };
