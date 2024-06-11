@@ -29,7 +29,7 @@ import FastImage from 'react-native-fast-image';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, emojiRegex, isImage, mentionRegex, mentionRegexSplit, urlRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, emojiRegex, isImage, mentionRegex, splitBlockCodeRegex, urlRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -274,23 +274,24 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const formatMention = (text: string, matchesMention: RegExpMatchArray) => {
-		const parts = text
-			.split(mentionRegexSplit)
-			.filter(Boolean)
-			.filter((i) => i !== '@' && i !== '#');
-			
+		const parts = text.split(splitBlockCodeRegex);
+
 		return parts?.map((part) => {
-			if (matchesMention.includes(part)) {
-				if (part.startsWith('@')) {
-					return `[${part}](${part})`;
-				}
-				if (part.startsWith('<#')) {
-					const channelId = part.match(channelIdRegex)[1];
-					const channel = getChannelById(channelId) as ChannelsEntity;
-					return `[#${channel.channel_label}](#${channelId})`;
+			if (codeBlockRegex.test(part)) {
+				return part;
+			} else {
+				if (matchesMention.includes(part)) {
+					if (part.startsWith('@')) {
+						return `[${part}](${part})`;
+					}
+					if (part.startsWith('<#')) {
+						const channelId = part.match(channelIdRegex)[1];
+						const channel = getChannelById(channelId) as ChannelsEntity;
+						return `[#${channel.channel_label}](#${channelId})`;
+					}
 				}
 			}
-			return part
+			return part;
 		}).join('');
 	}
 
