@@ -88,7 +88,7 @@ const MessageContent = ({ user, message, isCombine, newMessage }: IMessageConten
 					<div id={message.id} className="w-full">
 						<MessageLine line={newMessage as string} />
 					</div>
-					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">(edit)</p>
+					<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">(edited)</p>
 				</div>
 			) : (
 				<div className="flex w-full">

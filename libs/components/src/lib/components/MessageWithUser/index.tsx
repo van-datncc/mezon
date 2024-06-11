@@ -35,7 +35,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { openReplyMessageState, idMessageRefReply, idMessageToJump } = useReference();
+	const { openReplyMessageState, idMessageRefReply, idMessageToJump, idMessageRefEdit } = useReference();
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const userLogin = useAuth();
