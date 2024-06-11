@@ -36,8 +36,10 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
 	const { emojiListPNG } = useEmojiSuggestion();
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-
-	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
+	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
+	useEffect(() => {
+		setDataReactionCombine(updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]));
+	}, [reactDataFirstGetFromMessage, dataReactionServerAndSocket]);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -111,11 +113,12 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const [posToRight, setPosToRight] = useState<boolean>(false);
 
 	const emojiIndexMap: { [key: string]: number } = {};
-	dataReactionCombine.forEach((emoji: EmojiDataOptionals, index: number) => {
-		if (emoji.id !== undefined) {
-			emojiIndexMap[emoji.id] = index;
-		}
-	});
+	dataReactionCombine &&
+		dataReactionCombine.forEach((emoji: EmojiDataOptionals, index: number) => {
+			if (emoji.id !== undefined) {
+				emojiIndexMap[emoji.id] = index;
+			}
+		});
 
 	const checkPositionSenderPanel = (emoji: EmojiDataOptionals) => {
 		if (!parentDiv.current || !childRef.current || emoji.id === undefined) return;
@@ -137,7 +140,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 
 	// For button smile
 	const lastPositionEmoji = (emoji: EmojiDataOptionals, message: IMessageWithUser) => {
-		const filterMessage = dataReactionCombine.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id);
+		const filterMessage =
+			dataReactionCombine && dataReactionCombine.filter((emojiFilter: EmojiDataOptionals) => emojiFilter.message_id === message.id);
 		const indexEmoji = filterMessage.indexOf(emoji);
 		if (indexEmoji === filterMessage.length - 1) {
 			return true;
@@ -156,7 +160,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [showSenderPanelIn1s]);
 
-	
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
