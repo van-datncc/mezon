@@ -1,27 +1,49 @@
 import { useAuth } from '@mezon/core';
 import { useGoogleLogin } from '@react-oauth/google';
-import React from 'react';
+import isElectron from 'is-electron';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const GoogleButtonLogin: React.FC = () => {
 	const { loginByGoogle } = useAuth();
+
+	const [redirect, setRedirect] = useState(false);
+
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
 		ux_mode: 'popup',
 		//redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
-			await loginByGoogle(code);
+			const session = await loginByGoogle(code);
+			console.log('🚀 ~ session:', session);
+			console.log('🚀 ~ redirect:', redirect);
+			window.location.href = `mezonapp://session=${session}`;
 		},
 		onError: (errorResponse) => console.log(errorResponse),
 	});
 
 	return (
 		<div className="w-full lg:px-0">
-			<button onClick={googleLogin} className="flex justify-center w-full  h-fit p-3 rounded-[4px] bg-[#d1e0ff] relative">
-				<div className="flex items-center w-fit h-fit gap-x-1 p-0">
+			{!isElectron() && (
+				<button onClick={googleLogin} className="flex justify-center w-full  h-fit p-3 rounded-[4px] bg-[#d1e0ff] relative">
+					<div className="flex items-center w-fit h-fit gap-x-1 p-0">
+						<img src={'assets/images/google-icon.png'} className="p-0 object-cover" alt="Google Logo" />
+						<p className="w-fit h-fit text-base font-medium text-[#155eef] leading-[150%]">Continue with Google</p>
+					</div>
+				</button>
+			)}
+			{isElectron() && (
+				<Link
+					target="_blank"
+					to={'http://localhost:4200/guess/login'}
+					// to={process.env.NX_CHAT_APP_REDIRECT_URI as string}
+					onClick={() => setRedirect(true)}
+					className="flex justify-center w-full  h-fit p-3 rounded-[4px] bg-[#d1e0ff]"
+				>
 					<img src={'assets/images/google-icon.png'} className="p-0 object-cover" alt="Google Logo" />
 					<p className="w-fit h-fit text-base font-medium text-[#155eef] leading-[150%]">Continue with Google</p>
-				</div>
-			</button>
+				</Link>
+			)}
 		</div>
 	);
 };

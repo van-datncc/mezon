@@ -49,6 +49,7 @@
 		"i18next": "^23.11.4",
 		"i18next-browser-languagedetector": "^8.0.0",
 		"i18next-http-backend": "^2.5.1",
+		"is-electron": "^2.2.2",
 		"localforage": "^1.10.0",
 		"match-sorter": "^6.3.3",
 		"memoizee": "^0.4.15",
