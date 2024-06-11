@@ -2,16 +2,22 @@ import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
-import MezonBadge from "apps/mobile/src/app/temp-ui/MezonBadge";
-import { AddFillIcon, BellIcon, CircleIcon, KeyframeIcon, NittroIcon } from "@mezon/mobile-components";
+import { AddFillIcon, BellIcon, KeyframeIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
 import MezonMenu from "apps/mobile/src/app/temp-ui/MezonMenu";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { IMezonMenuSectionProps } from "apps/mobile/src/app/temp-ui/MezonMenuSection";
 import { IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui/MezonMenuItem";
+import { ClansEntity } from "@mezon/store-mobile";
+import ClanMenuInfo from "../ClanMenuInfo";
+import MezonToggleButton from "apps/mobile/src/app/temp-ui/MezonToggleButton";
 
-export default function ServerMenu() {
+interface IServerMenuProps {
+    clan: ClansEntity;
+}
+
+export default function ClanMenu({ clan }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
 
     const reserve = () => {
@@ -22,16 +28,20 @@ export default function ServerMenu() {
 
     }
 
+    const ToggleBtn = () => <MezonToggleButton
+        onChange={() => { }}
+        height={25}
+        width={45}
+    />
+
     const Menu1: IMezonMenuItemProps[] = [
         {
             onPress: () => reserve(),
             title: t('menu.menu1.markAsRead'),
-            icon: <NittroIcon width={20} height={20} />,
         },
         {
             onPress: () => reserve(),
             title: t('menu.menu1.browseChannels'),
-            icon: <NittroIcon width={20} height={20} />,
         },
     ]
 
@@ -39,17 +49,14 @@ export default function ServerMenu() {
         {
             onPress: () => reserve(),
             title: t('menu.menu2.createChannel'),
-            icon: <NittroIcon width={20} height={20} />,
         },
         {
             onPress: () => reserve(),
             title: t('menu.menu2.createCategory'),
-            icon: <NittroIcon width={20} height={20} />,
         },
         {
             onPress: () => reserve(),
             title: t('menu.menu2.createEvent'),
-            icon: <NittroIcon width={20} height={20} />,
         },
     ]
 
@@ -57,50 +64,41 @@ export default function ServerMenu() {
         {
             onPress: () => reserve(),
             title: t('menu.menu3.editServerProfile'),
-            icon: <NittroIcon width={20} height={20} />,
         },
         {
             onPress: () => reserve(),
             title: t('menu.menu3.editServerProfile'),
-            icon: <NittroIcon width={20} height={20} />,
         },
         {
-            onPress: () => reserve(),
             title: t('menu.menu3.showAllChannels'),
-            icon: <NittroIcon width={20} height={20} />,
+            component: <ToggleBtn />
         },
         {
-            onPress: () => reserve(),
             title: t('menu.menu3.hideMutedChannels'),
-            icon: <NittroIcon width={20} height={20} />,
+            component: <ToggleBtn />
         },
         {
-            onPress: () => reserve(),
             title: t('menu.menu3.allowDirectMessage'),
-            icon: <NittroIcon width={20} height={20} />,
+            component: <ToggleBtn />
         },
         {
-            onPress: () => reserve(),
             title: t('menu.menu3.allowMessageRequest'),
-            icon: <NittroIcon width={20} height={20} />,
+            component: <ToggleBtn />
         },
         {
             onPress: () => reserve(),
             title: t('menu.menu3.reportServer'),
-            icon: <NittroIcon width={20} height={20} />,
         },
         {
             onPress: () => reserve(),
             title: t('menu.menu3.leaveServer'),
-            icon: <NittroIcon width={20} height={20} />,
         },
     ]
 
     const Menu4: IMezonMenuItemProps[] = [
         {
             onPress: () => reserve(),
-            title: t('menu.menu1.copyServerID'),
-            icon: <NittroIcon width={20} height={20} />,
+            title: t('menu.devMode.copyServerID'),
         }
     ]
 
@@ -125,30 +123,19 @@ export default function ServerMenu() {
             <View style={styles.header}>
                 <View style={styles.avatarWrapper}>
                     <FastImage
-                        source={{ uri: "https://avatars.githubusercontent.com/u/14251235?s=280&v=4" }}
+                        source={{ uri: clan?.logo }}
                         style={{ width: "100%", height: "100%" }}
                     />
                 </View>
-                <Text style={styles.serverName}>KOMU</Text>
-                <View style={styles.info}>
-                    <MezonBadge title="Community Server" />
-                    <View style={styles.inlineInfo}>
-                        <CircleIcon height={10} width={10} color="green" />
-                        <Text style={styles.inlineText}>333 Online</Text>
-                    </View>
-
-                    <View style={styles.inlineInfo}>
-                        <CircleIcon height={10} width={10} color="gray" />
-                        <Text style={styles.inlineText}>398 Members</Text>
-                    </View>
-                </View>
+                <Text style={styles.serverName}>{clan?.clan_name}</Text>
+                <ClanMenuInfo clan={clan} />
 
                 <ScrollView
                     contentContainerStyle={styles.actionWrapper}
                     horizontal>
-                    <MezonButtonIcon title="18 Boots" icon={KeyframeIcon} iconStyle={{ color: "red" }} />
-                    <MezonButtonIcon title="Invite" icon={AddFillIcon} />
-                    <MezonButtonIcon title="Notifications" icon={BellIcon} />
+                    <MezonButtonIcon title={`18 ${t("actions.boot")}`} icon={KeyframeIcon} iconStyle={{ color: "red" }} />
+                    <MezonButtonIcon title={t("actions.invite")} icon={AddFillIcon} />
+                    <MezonButtonIcon title={t("actions.notifications")} icon={BellIcon} />
                 </ScrollView>
 
                 <MezonMenu menu={menu} />

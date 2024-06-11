@@ -25,5 +25,14 @@
             "title": "Chế độ nhà phát triển",
             "copyServerID": "Sao chép ID máy chủ"
         }
+    },
+    "actions": {
+        "boot": "Nâng cấp",
+        "invite": "Lời mời",
+        "notifications": "Thông báo"
+    },
+    "info": {
+        "online": "Trực tuyến",
+        "members": "Thành viên"
     }
 }

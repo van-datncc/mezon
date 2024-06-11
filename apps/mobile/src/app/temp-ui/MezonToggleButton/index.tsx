@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 
 import Animated, {
   interpolate,
@@ -20,7 +20,7 @@ const InterpolateXInput = [0, 1];
 const MezonToggleButton = ({
   onChange,
   value = false,
-  containerStyle ={},
+  containerStyle = {},
   toggleOffColor = Colors.bgToggleOffBtn,
   toggleOnColor = Colors.bgToggleOnBtn,
   toggleBgOnColor = Colors.bgToggleOnBtn,
@@ -97,7 +97,7 @@ const MezonToggleButton = ({
     <TouchableOpacity
       onPress={onPressSwitch}
       activeOpacity={1}
-      style={[styles.containerStyle, containerScale, containerStyle, {backgroundColor: bgColorBtn}]}>
+      style={[styles.containerStyle, containerScale, containerStyle, { backgroundColor: bgColorBtn }]}>
       <Animated.View
         style={[styles.switchButton, switchScale, switchAreaStyles]}
       />

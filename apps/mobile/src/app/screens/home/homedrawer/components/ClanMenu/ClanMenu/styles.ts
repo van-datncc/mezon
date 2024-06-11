@@ -26,24 +26,6 @@ const styles = StyleSheet.create({
         gap: 15
     },
 
-    info: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 15,
-        justifyContent: "flex-start"
-    },
-
-    inlineInfo: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 5,
-    },
-
-    inlineText: {
-        fontSize: 10,
-        color: Colors.white
-    },
-
     actionWrapper: {
         flexDirection: "row",
         gap: 10,

@@ -24,7 +24,7 @@ import BottomSheet2 from '../../../components/BottomSheet2';
 import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
-import ServerMenu from './components/ChannelList/ChannelListMenu';
+import ClanMenu from './components/ClanMenu/ClanMenu';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -100,7 +100,7 @@ const ChannelList = React.memo((props: any) => {
 			</View>
 
 			<BottomSheet2 ref={bottomSheetModalRef} >
-				<ServerMenu />
+				<ClanMenu clan={currentClan} />
 			</BottomSheet2>
 		</ChannelListContext.Provider >
 	);

@@ -25,5 +25,15 @@
             "title": "Development Mode",
             "copyServerID": "Copy Server ID"
         }
+    },
+    "actions": {
+        "boot": "Boots",
+        "invite": "Invite",
+        "notifications": "Notifications"
+    },
+
+    "info": {
+        "online": "Online",
+        "members": "Members"
     }
 }

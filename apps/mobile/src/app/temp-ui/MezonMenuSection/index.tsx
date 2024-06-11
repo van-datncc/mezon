@@ -20,6 +20,7 @@ export default function MezonMenuSection({ title, items }: IMezonMenuSectionProp
                         onPress={item.onPress}
                         title={item.title}
                         icon={item.icon}
+                        component={item.component}
                     />
                 ))}
             </View>

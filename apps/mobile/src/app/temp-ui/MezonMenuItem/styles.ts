@@ -18,7 +18,11 @@ const styles = StyleSheet.create({
     btnTitleWrapper: {
         padding: 15,
         paddingLeft: 0,
-        flexGrow: 1
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
     },
     borderBottom: {
         borderBottomColor: Colors.borderDim,
