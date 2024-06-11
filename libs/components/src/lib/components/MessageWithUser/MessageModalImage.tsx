@@ -1,6 +1,6 @@
 import { useAttachments, useEscapeKey } from '@mezon/core';
 import { selectAttachmentPhoto, selectOpenModalAttachment } from '@mezon/store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 
@@ -45,6 +45,13 @@ const MessageModalImage = () => {
 		setOpenModalAttachment(false);
 	}
 
+	const selectedImageRef = useRef<HTMLDivElement | null>(null);
+	useEffect(() => {
+		if (selectedImageRef.current) {
+			selectedImageRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
+		}
+	}, [urlImg, openModalAttachment]);
+
 	useEscapeKey(closeModal);
 
 	return (
@@ -75,19 +82,16 @@ const MessageModalImage = () => {
 					</button>
 					{showList && (
 						<div className="w-full md:w-[250px] h-[120px] md:h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col px-[10px] md:px-0 md:py-5 overflow-y-hidden gap-x-2 md:gap-y-5">
-							<div className="dark:bg-slate-700 bg-bgLightModeButton border flex items-center md:block">
-								<img
-									src={urlImg}
-									alt={urlImg}
-									className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
-									onDragStart={handleDrag}
-								/>
-							</div>
-							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
+							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col-reverse py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
 								{attachments.map((img, index) => {
 									const url = img.url;
+									const isSelected = url === urlImg;
 									return (
-										<div className={url === urlImg ? 'hidden' : ''} key={`${img.id}_${index}`}>
+										<div 
+											className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-full dark:border-white border-colorTextLightMode flex items-center' : 'border-transparent'}`} 
+											key={`${img.id}_${index}`}
+											ref={isSelected ? selectedImageRef : null}
+										>
 											<img
 												src={url}
 												alt={url}
