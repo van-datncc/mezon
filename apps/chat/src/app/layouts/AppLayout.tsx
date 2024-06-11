@@ -14,8 +14,23 @@ const AppLayout = () => {
 	const navigate = useNavigate();
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
-			const parts = payload.notification.body;
-			toast.info(parts, {
+			const message = payload.notification.body;
+			const image = payload.notification.image;
+			const title = payload.notification.title;
+			
+			toast(
+				<div>
+					<div className="flex items-center">
+						{image && <img src={image} alt="Notification" className="w-10 h-10 rounded-full object-cover" />}
+						<div className="ml-3">
+							<span className="block font-semibold">{title}</span>
+						</div>
+					</div>
+					<div>
+						<p className="mt-1 ml-[10px]">{message}</p>
+					</div>
+				</div>,
+				{
 				onClick: () => {
 					const fullLink = payload.data.link;
 					const baseUrl = 'https://mezon.vn';
