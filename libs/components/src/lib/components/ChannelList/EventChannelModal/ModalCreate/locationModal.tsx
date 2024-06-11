@@ -41,7 +41,7 @@ const LocationModal = (props: LocationModalProps) => {
 				<p className="text-slate-400 text-center">So no one gets lost on where to go.</p>
 			</div>
 			<div className={`flex flex-col mb-4 ${errorVoice ? 'gap-y-2' : 'gap-y-4'}`}>
-				<div className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2">
+				<div className={`w-full rounded flex justify-between items-center p-2 ${errorVoice ? 'bg-transparent opacity-80' : 'dark:bg-[#2B2D31] bg-bgLightModeButton'}`}>
 					<div className="flex items-center gap-x-2">
 						<Icons.Speaker />
 						<div>
@@ -60,7 +60,6 @@ const LocationModal = (props: LocationModalProps) => {
 						id="Speaker"
 					/>
 				</div>
-				{errorVoice && <p className='text-[#e44141] text-xs font-thin'>No voices channel of your Clan.</p>}
 				<div className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2">
 					<div className="flex items-center gap-x-2">
 						<Icons.Location />
