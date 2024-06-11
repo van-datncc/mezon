@@ -24,9 +24,8 @@ import {
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Linking, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { Hyperlink } from 'react-native-hyperlink';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
@@ -124,8 +123,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return (
 			<View
 				style={{
+					height: 170,
 					width: widthMedia + size.s_50,
-					marginVertical: size.s_10,
+					marginTop: size.s_10,
 				}}
 			>
 				{videos.map((video, index) => {
@@ -325,7 +325,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return (
 			<Markdown
-				style={markdownStyles}
+				style={markdownStyles as StyleSheet.NamedStyles<any>}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
 					if (url.startsWith('@')) {

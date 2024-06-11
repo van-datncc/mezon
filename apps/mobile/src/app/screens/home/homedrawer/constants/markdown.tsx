@@ -26,7 +26,8 @@ export const markdownStyles = {
         paddingBottom: 0,
     },
     text: {
-        fontSize: size.medium
+        fontSize: size.medium,
+        lineHeight: size.s_22
     },
     code_block: {
         color: Colors.textGray,
@@ -34,6 +35,7 @@ export const markdownStyles = {
         paddingVertical: 1,
         borderColor: Colors.black,
         borderRadius: 5,
+        lineHeight: size.s_20
     },
     code_inline: {
         color: Colors.textGray,
@@ -41,7 +43,8 @@ export const markdownStyles = {
         paddingVertical: 1,
         borderColor: Colors.black,
         borderRadius: 5,
-        fontSize: size.small
+        fontSize: size.small,
+        lineHeight: size.s_20
     },
     fence: {
         color: Colors.textGray,
@@ -49,11 +52,13 @@ export const markdownStyles = {
         paddingVertical: 5,
         borderColor: Colors.black,
         borderRadius: 5,
-        fontSize: size.small
+        fontSize: size.small,
+        lineHeight: size.s_20
     },
     link: {
         color: Colors.textLink,
-        textDecorationLine: 'none'
+        textDecorationLine: 'none',
+        lineHeight: size.s_20
     },
     iconEmojiInMessage: {
 		width: size.s_18,
@@ -62,11 +67,13 @@ export const markdownStyles = {
     editedText: {
 		fontSize: size.small,
 		color: Colors.gray72,
-	},
+    lineHeight: size.s_20
+    },
     mention: {
         fontSize: size.medium,
 		color: Colors.textGray,
         backgroundColor: Colors.bgMention,
+        lineHeight: size.s_20
     },
 };
 
