@@ -7,6 +7,7 @@ import { Button } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../../ModalValidateFile';
+import { Regex } from '../../../ClanHeader/ModalCreateCategory';
 
 type ClanLogoNameProps = {
 	hasChanges: boolean;
@@ -24,6 +25,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 
 	const [urlLogo, setUrlLogo] = useState<string | undefined>(currentClan?.logo ?? '');
 	const [clanName, setClanName] = useState<string | undefined>(currentClan?.clan_name ?? '');
+	const [checkvalidate, setCheckValidate] = useState(!Regex().test(currentClan?.clan_name || ""));
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +55,12 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 	const handleChangeClanName = (clanName: string) => {
 		setClanName(clanName);
 		onGetClanName(clanName);
+		const regex = Regex()
+		if (regex.test(clanName) && clanName !== '') {
+			setCheckValidate(false);
+		} else {
+			setCheckValidate(true);
+		}
 	};
 
 	const handleOpenFile = () => {
@@ -74,7 +82,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 	};
 
 	useEffect(() => {
-		if (clanName !== currentClan?.clan_name || urlLogo !== currentClan?.logo) {
+		if ((clanName !== currentClan?.clan_name || urlLogo !== currentClan?.logo) && !checkvalidate ) {
 			onHasChanges(true);
 		} else {
 			onHasChanges(false);
@@ -135,6 +143,11 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 						placeholder="Support has arrived!"
 					/>
 				</div>
+				{checkvalidate && (
+					<p className="text-[#e44141] text-xs italic font-thin">
+						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+					</p>
+				)}
 			</div>
 
 			<ModalValidateFile
