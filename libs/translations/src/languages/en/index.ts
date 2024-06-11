@@ -11,6 +11,8 @@ import profileSetting from './profileSetting.json';
 import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
 import profile from './profile.json';
+import categoryCreator from "./categoryCreator.json";
+import screenStack from "./screenStack.json";
 import clanMenu from  "./clanMenu.json";
 
 export default {
@@ -27,5 +29,7 @@ export default {
 	notificationSetting,
 	userProfile,
 	profile,
+	categoryCreator,
+	screenStack,
 	clanMenu
 };
