@@ -19,7 +19,7 @@ import { EMaxUserCanInvite } from '../../enums';
 import { friendList } from '../fakeData';
 import { styles } from './styles';
 
-export const InviteToChannel = React.memo(() => {
+export const InviteToChannel = React.memo(React.forwardRef(({ }: any, refRBSheet: React.Ref<any>) => {
 	const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 	const [currentInviteLink, setCurrentInviteLink] = useState('');
@@ -28,8 +28,6 @@ export const InviteToChannel = React.memo(() => {
 	const { createLinkInviteUser } = useInvite();
 	const { t } = useTranslation(['inviteToChannel']);
 	const timeoutRef = useRef(null);
-
-	const refRBSheet = useRef(null);
 	//TODO: get from API
 	const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
 	const [expiredTimeSelected, setExpiredTimeSelected] = useState<number>(2);
@@ -39,6 +37,7 @@ export const InviteToChannel = React.memo(() => {
 	const renderUserItem = ({ item }) => <FriendListItem user={item} />;
 
 	const openEditLinkModal = () => {
+		//@ts-ignore
 		refRBSheet?.current?.close();
 		timeoutRef.current = setTimeout(() => {
 			setIsVisibleEditLinkModal(true);
@@ -53,6 +52,7 @@ export const InviteToChannel = React.memo(() => {
 
 	const backToInviteModal = () => {
 		setIsVisibleEditLinkModal(false);
+		//@ts-ignore
 		refRBSheet.current.open();
 	};
 
@@ -117,7 +117,9 @@ export const InviteToChannel = React.memo(() => {
 
 	return (
 		<View style={styles.inviteToChannelWrapper}>
-			<Pressable onPress={() => refRBSheet.current.open()}>
+			<Pressable onPress={
+				//@ts-ignore
+				() => refRBSheet.current.open()}>
 				<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
 			</Pressable>
 			<BottomSheet
@@ -269,4 +271,4 @@ export const InviteToChannel = React.memo(() => {
 			</MezonModal>
 		</View>
 	);
-});
+}));

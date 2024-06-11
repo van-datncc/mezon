@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
-import { AddFillIcon, BellIcon, KeyframeIcon } from "@mezon/mobile-components";
+import { AddFillIcon, BellIcon, KeyframeIcon, SettingIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
 import MezonMenu from "apps/mobile/src/app/temp-ui/MezonMenu";
 import Toast from "react-native-toast-message";
@@ -21,9 +21,10 @@ import Clipboard from "@react-native-clipboard/clipboard";
 interface IServerMenuProps {
     clan: ClansEntity;
     bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
+    inviteRef: MutableRefObject<any>;
 }
 
-export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
+export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
     const navigation = useNavigation();
 
@@ -32,6 +33,11 @@ export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
             type: 'info',
             text1: 'Coming soon'
         });
+    }
+
+    const handleOpenInvite = () => {
+        inviteRef?.current.open();
+        bottomSheetRef?.current?.dismiss();
     }
 
     const ToggleBtn = () => <MezonToggleButton
@@ -60,7 +66,7 @@ export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
             onPress: () => {
                 // @ts-ignore
                 navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
-                console.log(bottomSheetRef?.current?.dismiss());
+                bottomSheetRef?.current?.dismiss();
 
             },
             title: t('menu.organizationMenu.createCategory'),
@@ -152,9 +158,25 @@ export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
                 <ScrollView
                     contentContainerStyle={styles.actionWrapper}
                     horizontal>
-                    <MezonButtonIcon title={`18 ${t("actions.boot")}`} icon={KeyframeIcon} iconStyle={{ color: "red" }} />
-                    <MezonButtonIcon title={t("actions.invite")} icon={AddFillIcon} />
-                    <MezonButtonIcon title={t("actions.notifications")} icon={BellIcon} />
+                    <MezonButtonIcon
+                        title={`18 ${t("actions.boot")}`}
+                        icon={KeyframeIcon}
+                        iconStyle={{ color: "red" }}
+                        onPress={() => reserve()}
+                    />
+                    <MezonButtonIcon
+                        title={t("actions.invite")}
+                        icon={AddFillIcon}
+                        onPress={() => handleOpenInvite()} />
+                    <MezonButtonIcon
+                        title={t("actions.notifications")}
+                        icon={BellIcon}
+                        onPress={() => reserve()} />
+                    <MezonButtonIcon
+                        title={t("actions.settings")}
+                        icon={SettingIcon}
+                        onPress={() => reserve()}
+                    />
                 </ScrollView>
 
                 <MezonMenu menu={menu} />

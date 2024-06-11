@@ -30,7 +30,8 @@ const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
-	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
+	const bottomSheetInviteRef = useRef(null);
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -74,7 +75,7 @@ const ChannelList = React.memo((props: any) => {
 	};
 
 	function handlePress() {
-		bottomSheetModalRef.current?.present();
+		bottomSheetMenuRef.current?.present();
 		// @ts-ignore
 		// navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
 	}
@@ -88,7 +89,7 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<InviteToChannel />
+					<InviteToChannel ref={bottomSheetInviteRef} />
 				</View>
 				<FlatList
 					data={categorizedChannels || []}
@@ -99,8 +100,12 @@ const ChannelList = React.memo((props: any) => {
 				/>
 			</View>
 
-			<BottomSheet2 ref={bottomSheetModalRef} >
-				<ClanMenu clan={currentClan} bottomSheetRef={bottomSheetModalRef}/>
+			<BottomSheet2 ref={bottomSheetMenuRef} >
+				<ClanMenu
+					clan={currentClan}
+					bottomSheetRef={bottomSheetMenuRef}
+					inviteRef={bottomSheetInviteRef}
+				/>
 			</BottomSheet2>
 		</ChannelListContext.Provider >
 	);

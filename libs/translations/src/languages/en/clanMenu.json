@@ -30,7 +30,8 @@
     "actions": {
         "boot": "Boots",
         "invite": "Invite",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "settings": "Settings"
     },
 
     "info": {

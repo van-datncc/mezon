@@ -30,7 +30,8 @@
     "actions": {
         "boot": "Nâng cấp",
         "invite": "Lời mời",
-        "notifications": "Thông báo"
+        "notifications": "Thông báo",
+        "settings": "Cài đặt"
     },
     "info": {
         "online": "Trực tuyến",
