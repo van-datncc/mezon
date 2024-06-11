@@ -12,20 +12,25 @@ import { IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui/MezonMenuItem";
 import { ClansEntity } from "@mezon/store-mobile";
 import ClanMenuInfo from "../ClanMenuInfo";
 import MezonToggleButton from "apps/mobile/src/app/temp-ui/MezonToggleButton";
+import { APP_SCREEN } from "apps/mobile/src/app/navigation/ScreenTypes";
+import { useNavigation } from "@react-navigation/native";
+import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { MutableRefObject } from "react";
 
 interface IServerMenuProps {
     clan: ClansEntity;
+    bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
 }
 
-export default function ClanMenu({ clan }: IServerMenuProps) {
+export default function ClanMenu({ clan, bottomSheetRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
+    const navigation = useNavigation();
 
     const reserve = () => {
         Toast.show({
             type: 'info',
             text1: 'Coming soon'
         });
-
     }
 
     const ToggleBtn = () => <MezonToggleButton
@@ -34,68 +39,73 @@ export default function ClanMenu({ clan }: IServerMenuProps) {
         width={45}
     />
 
-    const Menu1: IMezonMenuItemProps[] = [
+    const watchMenu: IMezonMenuItemProps[] = [
         {
             onPress: () => reserve(),
-            title: t('menu.menu1.markAsRead'),
+            title: t('menu.watchMenu.markAsRead'),
         },
         {
             onPress: () => reserve(),
-            title: t('menu.menu1.browseChannels'),
+            title: t('menu.watchMenu.browseChannels'),
         },
     ]
 
-    const Menu2: IMezonMenuItemProps[] = [
+    const organizationMenu: IMezonMenuItemProps[] = [
         {
             onPress: () => reserve(),
-            title: t('menu.menu2.createChannel'),
+            title: t('menu.organizationMenu.createChannel'),
+        },
+        {
+            onPress: () => {
+                // @ts-ignore
+                navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
+                console.log(bottomSheetRef?.current?.dismiss());
+
+            },
+            title: t('menu.organizationMenu.createCategory'),
         },
         {
             onPress: () => reserve(),
-            title: t('menu.menu2.createCategory'),
-        },
-        {
-            onPress: () => reserve(),
-            title: t('menu.menu2.createEvent'),
+            title: t('menu.organizationMenu.createEvent'),
         },
     ]
 
-    const Menu3: IMezonMenuItemProps[] = [
+    const optionsMenu: IMezonMenuItemProps[] = [
         {
             onPress: () => reserve(),
-            title: t('menu.menu3.editServerProfile'),
-        },
-        {
-            onPress: () => reserve(),
-            title: t('menu.menu3.editServerProfile'),
-        },
-        {
-            title: t('menu.menu3.showAllChannels'),
-            component: <ToggleBtn />
-        },
-        {
-            title: t('menu.menu3.hideMutedChannels'),
-            component: <ToggleBtn />
-        },
-        {
-            title: t('menu.menu3.allowDirectMessage'),
-            component: <ToggleBtn />
-        },
-        {
-            title: t('menu.menu3.allowMessageRequest'),
-            component: <ToggleBtn />
+            title: t('menu.optionsMenu.editServerProfile'),
         },
         {
             onPress: () => reserve(),
-            title: t('menu.menu3.reportServer'),
+            title: t('menu.optionsMenu.editServerProfile'),
+        },
+        {
+            title: t('menu.optionsMenu.showAllChannels'),
+            component: <ToggleBtn />
+        },
+        {
+            title: t('menu.optionsMenu.hideMutedChannels'),
+            component: <ToggleBtn />
+        },
+        {
+            title: t('menu.optionsMenu.allowDirectMessage'),
+            component: <ToggleBtn />
+        },
+        {
+            title: t('menu.optionsMenu.allowMessageRequest'),
+            component: <ToggleBtn />
         },
         {
             onPress: () => reserve(),
-            title: t('menu.menu3.leaveServer'),
+            title: t('menu.optionsMenu.reportServer'),
+        },
+        {
+            onPress: () => reserve(),
+            title: t('menu.optionsMenu.leaveServer'),
         },
     ]
 
-    const Menu4: IMezonMenuItemProps[] = [
+    const devMenu: IMezonMenuItemProps[] = [
         {
             onPress: () => reserve(),
             title: t('menu.devMode.copyServerID'),
@@ -104,17 +114,17 @@ export default function ClanMenu({ clan }: IServerMenuProps) {
 
     const menu: IMezonMenuSectionProps[] = [
         {
-            items: Menu1,
+            items: watchMenu,
         },
         {
-            items: Menu2,
+            items: organizationMenu,
         },
         {
-            items: Menu3,
+            items: optionsMenu,
         },
         {
             title: t('menu.devMode.title'),
-            items: Menu4,
+            items: devMenu,
         },
     ]
 

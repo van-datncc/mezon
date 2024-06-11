@@ -1,17 +1,17 @@
 {
     "menu": {
-        "menu1": {
+        "watchMenu": {
             "title": "",
             "markAsRead": "Mark As Read",
             "browseChannels": "Browse Channels"
         },
-        "menu2": {
+        "organizationMenu": {
             "title": "",
             "createChannel": "Create Channel",
             "createCategory": "Create Category",
             "createEvent": "Create Event"
         },
-        "menu3": {
+        "optionsMenu": {
             "title": "",
             "editServerProfile": "Edit Server Profile",
             "showAllChannels": "Show All Channels",

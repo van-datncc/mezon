@@ -100,7 +100,7 @@ const ChannelList = React.memo((props: any) => {
 			</View>
 
 			<BottomSheet2 ref={bottomSheetModalRef} >
-				<ClanMenu clan={currentClan} />
+				<ClanMenu clan={currentClan} bottomSheetRef={bottomSheetModalRef}/>
 			</BottomSheet2>
 		</ChannelListContext.Provider >
 	);

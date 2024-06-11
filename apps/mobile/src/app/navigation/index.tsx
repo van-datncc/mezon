@@ -8,7 +8,6 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '@mezon/translations';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mezon: CreateMezonClientOptions = {
@@ -23,10 +22,8 @@ const App = () => {
 		<SafeAreaProvider>
 			<I18nextProvider i18n={i18n}>
 				<MezonContextProvider mezon={mezon} connect={true}>
-					<BottomSheetModalProvider>
-						<RootNavigation />
-						<Toast config={toastConfig} />
-					</BottomSheetModalProvider>
+					<RootNavigation />
+					<Toast config={toastConfig} />
 				</MezonContextProvider>
 			</I18nextProvider>
 		</SafeAreaProvider>

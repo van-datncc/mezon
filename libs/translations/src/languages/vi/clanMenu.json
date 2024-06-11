@@ -1,17 +1,17 @@
 {
     "menu": {
-        "menu1": {
+        "watchMenu": {
             "title": "",
             "markAsRead": "Đánh dấu đã đọc",
             "browseChannels": "Tìm kênh"
         },
-        "menu2": {
+        "organizationMenu": {
             "title": "",
             "createChannel": "Tạo kênh",
             "createCategory": "Tạo danh mục",
             "createEvent": "Tạo sự kiên"
         },
-        "menu3": {
+        "optionsMenu": {
             "title": "",
             "editServerProfile": "Sửa hồ sơ máy chủ",
             "showAllChannels": "Hiện tất cả các kênh",
