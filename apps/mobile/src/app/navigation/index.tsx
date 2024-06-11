@@ -11,10 +11,8 @@ import { toastConfig } from '../configs/toastConfig';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 const mezon: CreateMezonClientOptions = {
-	// host: process.env.NX_CHAT_APP_API_HOST as string,
-	// key: process.env.NX_CHAT_APP_API_KEY as string,
-	host: "mezon.vn",
-	key: "m3zonPr0dkey",
+	host: process.env.NX_CHAT_APP_API_HOST as string,
+	key: process.env.NX_CHAT_APP_API_KEY as string,
 	port: process.env.NX_CHAT_APP_API_PORT as string,
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };
