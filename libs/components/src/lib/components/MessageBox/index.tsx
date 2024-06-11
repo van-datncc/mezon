@@ -45,7 +45,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			if (!client || !session || !currentChannelId) {
 				throw new Error('Client is not initialized');
 			}
-			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
+			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file, props.mode)
 				.then((attachment) => {
 					handleFinishUpload(attachment);
 					return 'handled';
@@ -103,7 +103,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					if (!client || !session || !currentClanId) {
 						throw new Error('Client is not initialized');
 					}
-					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
+					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file, props.mode)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
 							return 'handled';
