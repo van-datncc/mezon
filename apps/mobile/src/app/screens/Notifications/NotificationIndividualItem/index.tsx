@@ -1,17 +1,14 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
-import {selectAllUsesClan, selectMemberClanByUserId} from '@mezon/store-mobile';
+import { selectMemberClanByUserId } from '@mezon/store-mobile';
 import { getTimeDifferenceDate } from '@mezon/utils';
-import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useMessageSender } from '../../../hooks/useMessageSender';
+import { ENotifyBsToShow, NotifyProps } from '../types';
 import { styles as s } from './NotificationIndividualItem.styles';
-export type NotifyProps = {
-	readonly notify: INotification;
-};
 
-function NotificationIndividualItem({ notify }: NotifyProps) {
+function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user as any);
 	const userName = notify?.content?.username;
@@ -23,10 +20,16 @@ function NotificationIndividualItem({ notify }: NotifyProps) {
 		const userNameLenght = userName.length;
 		notice = notify?.subject?.slice(userNameLenght);
 	}
-	const handleOnTouchMessage = () => {};
 
 	return (
-		<TouchableOpacity onPress={handleOnTouchMessage}>
+		<TouchableOpacity
+			onPress={() => {
+				onPressNotify(notify);
+			}}
+			onLongPress={() => {
+				onLongPressNotify(ENotifyBsToShow.removeNotification, notify);
+			}}
+		>
 			<View style={s.notifyContainer}>
 				<View style={s.notifyHeader}>
 					<View style={s.boxImage}>

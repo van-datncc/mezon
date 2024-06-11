@@ -99,7 +99,7 @@ const ModalInvite = (props: ModalParam) => {
 			<div>
 				<ListMemberInvite url={urlInvite} channelID={props.channelID} />
 				<div className="relative ">
-					<p className="pt-[20px] pb-[12px] text-[20px] mb-12px cursor-default">
+					<p className="pt-4 pb-1 text-[20px] mb-12px cursor-default">
 						<span>Or, send a server invite link to a friend</span>
 					</p>
 					<input
@@ -120,7 +120,7 @@ const ModalInvite = (props: ModalParam) => {
 						Copy
 					</button>
 				</div>
-				<p className="pt-[20px] pb-[12px] text-[14px] mb-12px text-[#AEAEAE] inline-flex gap-x-2">
+				<p className="pt-1 text-[14px] mb-12px text-[#AEAEAE] inline-flex gap-x-2">
 					<span className="cursor-default dark:text-white text-black">Your invite link expires in {expire} </span>
 					<span className="text-blue-300 cursor-pointer hover:underline" onClick={()=>setModalEdit(true)}>
 						Edit invite link.

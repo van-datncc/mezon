@@ -52,7 +52,7 @@ const ListMemberInvite = (props: ModalParam) => {
                 placeholder="Search..."
                 className="w-full h-10 border border-solid dark:border-black dark:bg-black bg-bgLightModeSecond rounded-[5px] px-[16px] py-[13px] text-[14px]"
             />
-            <p className="ml-[0px] mt-[16px] mb-[16px] dark:text-[#AEAEAE] text-black text-[15px] cursor-default">This channel is private, only select members and roles can view this channel.</p>
+            <p className="ml-[0px] mt-1 mb-4 dark:text-[#AEAEAE] text-black text-[15px] cursor-default">This channel is private, only select members and roles can view this channel.</p>
             <hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t "></hr>
             <div className={`py-[10px] cursor-default overflow-y-auto max-h-[200px] ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
                 {listDMInvite ? (
