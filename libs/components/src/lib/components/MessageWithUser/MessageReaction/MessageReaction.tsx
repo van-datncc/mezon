@@ -73,6 +73,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	// Check position sender panel && emoji panel
 	const childRef = useRef<(HTMLDivElement | null)[]>([]);
 	const parentDiv = useRef<HTMLDivElement | null>(null);
+	const contentDiv = useRef<HTMLDivElement | null>(null);
+
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals>();
 	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
@@ -84,20 +86,14 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		setEmojiShowUserReaction(emojiParam);
 		setShowSenderPanelIn1s(true);
 		setShowIconSmile(true);
+		// checkPositionSenderPanel(emojiParam);
 	};
 
 	const handleOnleaveEmoji = () => {
-		setUserReactionPanelState(false);
 		if (subPanelActive === SubPanelName.NONE) {
 			return setShowIconSmile(false);
 		}
 	};
-
-	useEffect(() => {
-		if (hoverEmoji) {
-			checkPositionSenderPanel(hoverEmoji);
-		}
-	}, [hoverEmoji, parentDiv]);
 
 	useEffect(() => {
 		if (subPanelActive === SubPanelName.NONE) {
@@ -120,22 +116,40 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			}
 		});
 
+	const [leftChildRef, setLeftChildRef] = useState(0);
+	const [widthContent, setWidthContent] = useState(0);
+	const [leftContent, setLeftContent] = useState(0);
+
+	useEffect(() => {
+		if (hoverEmoji) {
+			checkPositionSenderPanel(hoverEmoji);
+		}
+	}, [hoverEmoji]);
+
+	useEffect(() => {
+		if (
+			(leftChildRef + PANEL_SENDER_WIDTH > leftContent && widthContent > leftChildRef + PANEL_SENDER_WIDTH) ||
+			(leftChildRef === 0 && leftContent === 0 && widthContent === 0)
+		) {
+			return setPosToRight(false);
+		} else if (leftChildRef + PANEL_SENDER_WIDTH < leftContent || widthContent < leftChildRef + PANEL_SENDER_WIDTH) {
+			return setPosToRight(true);
+		}
+	}, [leftChildRef, widthContent, leftContent, window.innerWidth]);
+
 	const checkPositionSenderPanel = (emoji: EmojiDataOptionals) => {
-		if (!parentDiv.current || !childRef.current || emoji.id === undefined) return;
+		if (!parentDiv.current || !childRef.current || !contentDiv.current || emoji.id === undefined) return;
 		const parentRect = parentDiv.current.getBoundingClientRect();
 		const index = emojiIndexMap[emoji.id];
 		if (index === undefined) return;
 		const childElement = childRef.current[index];
 		if (!childElement) return;
-		const childRect = childElement.getBoundingClientRect();
-
-		const distanceToRight = parentRect.right - childRect.right;
-		const distanceRemainChildToParent = parentRect.width - distanceToRight;
-		if (distanceRemainChildToParent < PANEL_SENDER_WIDTH) {
-			return setPosToRight(false);
-		} else {
-			return setPosToRight(true);
-		}
+		const leftChildRect = childElement.getBoundingClientRect().left;
+		const widthContentDiv = contentDiv.current.getBoundingClientRect().right;
+		const leftContentDiv = contentDiv.current.getBoundingClientRect().left + 56;
+		setLeftChildRef(leftChildRect);
+		setWidthContent(widthContentDiv);
+		setLeftContent(leftContentDiv);
 	};
 
 	// For button smile
@@ -161,7 +175,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	}, [showSenderPanelIn1s]);
 
 	return (
-		<div className="relative">
+		<div ref={contentDiv} className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
 				<div className={`w-fit md:hidden z-30 absolute bottom-0 block`}>
 					<div className="scale-75 transform mb-0 z-20">
@@ -220,7 +234,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 											userReactionPanelState &&
 											checkEmojiToMatchWithEmojiHover(emoji) &&
 											emojiShowUserReaction && (
-												<div className="max-sm:hidden">
+												<div className="max-sm:hidden z-50">
 													<UserReactionPanel
 														moveToRight={posToRight}
 														emojiShowPanel={emojiShowUserReaction}
