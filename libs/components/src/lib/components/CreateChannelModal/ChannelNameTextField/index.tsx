@@ -2,6 +2,7 @@ import { ChannelType } from 'mezon-js';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
 import { useState } from 'react';
+import { Regex } from '../../ClanHeader/ModalCreateCategory';
 
 interface ChannelNameModalProps {
 	type: number;
@@ -22,7 +23,8 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 		}else{
 			setCheckNameChannel(false)
 		}
-		if (/^[A-Za-z0-9_-]{0,64}$/.test(value)) {
+		const regex = Regex();
+		if (regex.test(value)) {
 			setCheckValidate(false);
 			onCheckValidate(true);
 		} else {

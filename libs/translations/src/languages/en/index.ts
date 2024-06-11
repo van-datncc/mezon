@@ -12,6 +12,9 @@ import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
 import profile from './profile.json';
 import createThread from './createThread.json';
+import categoryCreator from "./categoryCreator.json";
+import screenStack from "./screenStack.json";
+import clanMenu from  "./clanMenu.json";
 
 export default {
 	inviteToChannel,
@@ -28,4 +31,7 @@ export default {
 	userProfile,
 	profile,
 	createThread,
+	categoryCreator,
+	screenStack,
+	clanMenu
 };
