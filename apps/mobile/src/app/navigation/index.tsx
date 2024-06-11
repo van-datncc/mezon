@@ -9,6 +9,7 @@ import i18n from '@mezon/translations';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
@@ -19,14 +20,17 @@ const mezon: CreateMezonClientOptions = {
 
 const App = () => {
 	return (
-		<I18nextProvider i18n={i18n}>
-			<MezonContextProvider mezon={mezon} connect={true}>
-				<BottomSheetModalProvider>
-					<RootNavigation />
-					<Toast config={toastConfig} />
-				</BottomSheetModalProvider>
-			</MezonContextProvider>
-		</I18nextProvider>
+		<SafeAreaProvider>
+			<I18nextProvider i18n={i18n}>
+				<MezonContextProvider mezon={mezon} connect={true}>
+					<BottomSheetModalProvider>
+						<RootNavigation />
+						<Toast config={toastConfig} />
+					</BottomSheetModalProvider>
+				</MezonContextProvider>
+			</I18nextProvider>
+		</SafeAreaProvider>
+
 	);
 };
 
