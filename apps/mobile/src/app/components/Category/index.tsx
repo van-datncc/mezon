@@ -18,7 +18,13 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
     navigation.setOptions({
         headerRight: () => (
             <Pressable onPress={handleCreateCategory}>
-                <Text style={{ color: "white", paddingHorizontal: 20 }}>Create</Text>
+                <Text style={{
+                    color: "white",
+                    paddingHorizontal: 20,
+                    opacity: categoryName.trim().length > 0 ? 1 : 0.5
+                }}>
+                    Create
+                </Text>
             </Pressable>
         ),
         headerLeft: () => (
@@ -29,9 +35,11 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
     });
 
     const handleCreateCategory = async () => {
+        if (categoryName.trim().length === 0) return;
+
         const body: ApiCreateCategoryDescRequest = {
             clan_id: currentClanId?.toString(),
-            category_name: categoryName,
+            category_name: categoryName.trim(),
         };
         await dispatch(categoriesActions.createNewCategory(body));
         setCategoryName('');
