@@ -1,0 +1,40 @@
+{
+    "menu": {
+        "watchMenu": {
+            "title": "",
+            "markAsRead": "Đánh dấu đã đọc",
+            "browseChannels": "Tìm kênh"
+        },
+        "organizationMenu": {
+            "title": "",
+            "createChannel": "Tạo kênh",
+            "createCategory": "Tạo danh mục",
+            "createEvent": "Tạo sự kiên"
+        },
+        "optionsMenu": {
+            "title": "",
+            "editServerProfile": "Sửa hồ sơ máy chủ",
+            "showAllChannels": "Hiện tất cả các kênh",
+            "hideMutedChannels": "Ẩn tất cả các kênh",
+            "allowDirectMessage": "Cho phép gửi tin nhắn trực tiếp",
+            "allowMessageRequest": "Cho phép gửi yêu cầu tin nhắn",
+            "reportServer": "Báo cáo máy chủ",
+            "leaveServer": "Rời máy chủ"
+        },
+        "devMode": {
+            "title": "Chế độ nhà phát triển",
+            "copyServerID": "Sao chép ID máy chủ",
+            "serverIDCopied": "Đã sao chép ID máy chủ"
+        }
+    },
+    "actions": {
+        "boot": "Nâng cấp",
+        "invite": "Lời mời",
+        "notifications": "Thông báo",
+        "settings": "Cài đặt"
+    },
+    "info": {
+        "online": "Trực tuyến",
+        "members": "Thành viên"
+    }
+}
