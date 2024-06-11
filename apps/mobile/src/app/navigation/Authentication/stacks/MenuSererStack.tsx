@@ -1,7 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { APP_SCREEN } from "../../ScreenTypes";
 import CategoryCreator from "../../../components/Category";
-import { Pressable, Text } from "react-native";
 import { Colors } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 

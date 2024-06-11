@@ -1,5 +1,5 @@
 import { useCategory } from '@mezon/core';
-import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
+import { AngleRightIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -20,11 +20,18 @@ import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
 import { styles } from './styles';
+import BottomSheet2 from '../../../components/BottomSheet2';
+import { useRef } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import ChannelListHeader from './components/ChannelList/ChannelListHeader';
+import ClanMenu from './components/ClanMenu/ClanMenu';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
+	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
+	const bottomSheetInviteRef = useRef(null);
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -66,16 +73,23 @@ const ChannelList = React.memo((props: any) => {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 		store.dispatch(appActions.setLoadingMainMobile(false));
 	};
+
+	function handlePress() {
+		bottomSheetMenuRef.current?.present();
+		// @ts-ignore
+		// navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
+	}
+
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
 			<View style={[styles.mainList, { backgroundColor: Colors.surface }]}>
-				<ServerListHeader title={currentClan?.clan_name} />
+				<ChannelListHeader onPress={handlePress} clan={currentClan} />
 				<View style={styles.channelListSearch}>
 					<View style={styles.channelListSearchWrapperInput}>
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<InviteToChannel />
+					<InviteToChannel ref={bottomSheetInviteRef} />
 				</View>
 				<FlatList
 					data={categorizedChannels || []}
@@ -85,22 +99,15 @@ const ChannelList = React.memo((props: any) => {
 					)}
 				/>
 			</View>
-		</ChannelListContext.Provider>
-	);
-});
 
-const ServerListHeader = React.memo((props: { title: string }) => {
-	const navigation = useNavigation();
-
-	function handlePress() {
-		// @ts-ignore
-		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
-	}
-	return (
-		<TouchableOpacity style={styles.listHeader} onPress={handlePress}>
-			<Text style={styles.titleHeaderChannel}>{props.title}</Text>
-			<Dots width={30} height={30} />
-		</TouchableOpacity>
+			<BottomSheet2 ref={bottomSheetMenuRef} >
+				<ClanMenu
+					clan={currentClan}
+					bottomSheetRef={bottomSheetMenuRef}
+					inviteRef={bottomSheetInviteRef}
+				/>
+			</BottomSheet2>
+		</ChannelListContext.Provider >
 	);
 });
 
