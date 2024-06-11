@@ -5,6 +5,7 @@ import { InputField, Modal } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import { Regex } from '../ClanHeader/ModalCreateCategory';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -15,6 +16,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { open, onClose } = props;
 	const [urlImage, setUrlImage] = useState('');
 	const [nameClan, setNameClan] = useState('');
+	const [checkvalidate, setCheckValidate] = useState(true);
 	const { sessionRef, clientRef } = useMezon();
 	const { navigate, toClanPage } = useAppNavigation();
 	const { createClans } = useClans();
@@ -23,7 +25,16 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
-
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setNameClan(value);
+		const regex = Regex();
+		if (regex.test(value) && value !== '') {
+			setCheckValidate(false);
+		} else {
+			setCheckValidate(true);
+		}
+	};
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
 		const session = sessionRef.current;
@@ -60,7 +71,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			title=""
 			titleConfirm="Create"
 			confirmButton={handleCreateClan}
-			disableButtonConfirm={!nameClan ? true : false}
+			disableButtonConfirm={!nameClan ? true : false || checkvalidate}
 			classNameBox="h-full"
 		>
 			<div className="flex items-center flex-col justify-center ">
@@ -88,11 +99,16 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 				<div className="w-full">
 					<span className="font-[700] text-[16px] leading-6">CLAN NAME</span>
 					<InputField
-						onChange={(e) => setNameClan(e.target.value)}
+						onChange={handleInputChange}
 						type="text"
 						className="dark:bg-bgSurface bg-bgModifierHoverLight mb-2 mt-4 py-2"
 						placeholder={`${userProfile?.user?.username}'s clan`}
 					/>
+					{checkvalidate && (
+						<p className="text-[#e44141] text-xs italic font-thin">
+							Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+						</p>
+					)}
 					<span className="text-[14px] text-contentTertiary">
 						By creating a clan, you agree to Mezon’s <span className="text-contentBrandLight">Communnity Guidelines</span>.
 					</span>

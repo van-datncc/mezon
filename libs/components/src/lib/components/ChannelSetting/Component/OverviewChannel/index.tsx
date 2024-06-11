@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
+import { Regex } from '../../../ClanHeader/ModalCreateCategory';
 
 export type OverviewChannelProps = {
 	channel: IChannel;
@@ -18,6 +19,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
+	const [checkvalidate, setCheckValidate] = useState(!Regex().test(channelLabelInit|| ""));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTopic(e.target.value);
@@ -25,7 +27,14 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	};
 
 	const handleDisplayChannelLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setChannelLabel(e.target.value);
+		const value = e.target.value;
+		setChannelLabel(value);
+		const regex = Regex()
+		if (regex.test(value) && value !== '') {
+			setCheckValidate(false);
+		} else {
+			setCheckValidate(true);
+		}
 	};
 
 	const handleReset = () => {
@@ -64,6 +73,11 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					onChange={handleDisplayChannelLabel}
 					className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
 				/>
+				{checkvalidate && (
+					<p className="text-[#e44141] text-xs italic font-thin">
+						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+					</p>
+				)}
 				<hr className="border-t border-solid dark:border-borderDefault my-10" />
 				<p className="uppercase mb-3">Channel Topic</p>
 				<div className="relative">
@@ -78,7 +92,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{(channelLabelInit !== channelLabel || topicInit !== topic) && (
+			{((channelLabelInit !== channelLabel || topicInit !== topic) && !checkvalidate) && (
 				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 			)}
 		</div>

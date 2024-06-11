@@ -1,0 +1,16 @@
+{
+    "actions": {
+        "create": "Create",
+        "cancel": "Cancel"
+    },
+    "fields": {
+        "cateName": {
+            "title": "Category Name",
+            "placeholder": "New Category"
+        },
+        "catePrivate": {
+            "title": "Private Category",
+            "description": "By making a category private, only selected members and roles will be able to view this category. Synced channels in this category will automatically match to this setting."
+        }
+    }
+}

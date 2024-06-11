@@ -1,4 +1,4 @@
-import { useMemberStatus, useMenu } from '@mezon/core';
+import { useApp, useMemberStatus, useMenu } from '@mezon/core';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -6,6 +6,7 @@ import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
+import { Tooltip } from 'flowbite-react';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -15,6 +16,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
+	const { appearanceTheme } = useApp();
 
 	return (
 		<div
@@ -22,8 +24,8 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		>
 			<div className="justify-start items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center">
-					<div onClick={() => setStatusMenu(true)} className="mx-6" role="button">
-						<Icons.OpenMenu defaultSize={`w-5 h-5 ${closeMenu && !statusMenu ? '' : 'hidden'}`} />
+					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
+						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 					</div>
 					<MemberProfile
 						numberCharacterCollapse={22}
@@ -45,19 +47,24 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>
-								<Icons.ThreadIcon />
+							<Tooltip content='Start voice call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+								<Icons.IconPhoneDM />
+							</Tooltip>
 							</button>
 							<button>
-								<Icons.MuteBell />
+								<Tooltip content='Start Video Call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+									<Icons.IconMeetDM />
+								</Tooltip>
 							</button>
 							<button>
-								<Icons.PinRight />
+								<Tooltip content='Pinned Messages' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+									<Icons.PinRight />
+								</Tooltip>
 							</button>
 							<button>
-								<Icons.MemberList />
-							</button>
-							<button>
-								<Icons.ThreeDot />
+								<Tooltip content='Add friends to DM' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+									<Icons.IconAddFriendDM />
+								</Tooltip>
 							</button>
 						</div>
 						<SearchMessageChannel />

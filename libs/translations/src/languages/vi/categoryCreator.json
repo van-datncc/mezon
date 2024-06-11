@@ -1,0 +1,16 @@
+{
+    "actions": {
+        "create": "Tạo",
+        "cancel": "Hủy"
+    },
+    "fields": {
+        "cateName": {
+            "title": "Danh mục mới",
+            "placeholder": "Tên danh mục"
+        },
+        "catePrivate": {
+            "title": "Danh mục riêng",
+            "description": "Nếu danh mục đặt ở chế độ riêng tư, chỉ các thành viên và vai trò được chọn mới có thể xem danh mục này. Các kênh đã đồng bộ trong danh mục này cũng sẽ tự động được chuyển thành riêng tư."
+        }
+    }
+}
