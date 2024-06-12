@@ -78,9 +78,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 
 	const handleOnleaveEmoji = () => {
 		setUserReactionPanelState(false);
-		// if (window.innerWidth > 640) {
-		// 	setHoverEmoji(null);
-		// }
+
 		if (subPanelActive === SubPanelName.NONE) {
 			return setShowIconSmile(false);
 		}
