@@ -28,3 +28,4 @@ export const typeConverts: ITypeConvert[] = [
 export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-msvideo'];
 
 export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+

@@ -294,7 +294,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 				}
 			/>
 			{lastSeen && <UnreadMessageBreak />}
-			{deleteMessage && <ModalDeleteMess closeModal={() => setDeleteMessage(false)} mess={message} />}
+			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 		</div>
 	);
 }
