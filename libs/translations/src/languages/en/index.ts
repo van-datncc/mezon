@@ -15,6 +15,7 @@ import categoryCreator from "./categoryCreator.json";
 import screenStack from "./screenStack.json";
 import clanMenu from "./clanMenu.json";
 import clanSetting from "./clanSetting.json";
+import clanOverviewSetting from "./clanOverviewSetting.json";
 
 export default {
 	inviteToChannel,
@@ -33,5 +34,6 @@ export default {
 	categoryCreator,
 	screenStack,
 	clanMenu,
-	clanSetting
+	clanSetting,
+	clanOverviewSetting
 };

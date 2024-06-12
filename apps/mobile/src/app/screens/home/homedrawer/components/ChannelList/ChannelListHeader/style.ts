@@ -38,8 +38,12 @@ const styles = StyleSheet.create({
         fontSize: 9,
     },
 
-    container: {
+    actions: {
         padding: 10,
+    },
+    container: {
+        height: 220,
+        width: "100%"
     }
 });
 

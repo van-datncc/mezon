@@ -4,7 +4,7 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../navigation/ScreenTypes";
 import { IMezonMenuItemProps } from "../../temp-ui/MezonMenuItem";
 import Toast from "react-native-toast-message";
 import { IMezonMenuSectionProps } from "../../temp-ui/MezonMenuSection";
-import MezonMenu from "../../temp-ui/MezonMenu";
+import MezonMenu, { reserve } from "../../temp-ui/MezonMenu";
 import styles from "./styles";
 import { useTranslation } from "react-i18next";
 import LogoClanSelector from "./LogoClanSelector";
@@ -22,13 +22,6 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
         ),
     });
 
-    const reserve = () => {
-        Toast.show({
-            type: 'info',
-            text1: 'Coming soon'
-        });
-    }
-
     function handleClose() {
         navigation.goBack();
     }
@@ -36,7 +29,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
     const settingsMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.settings.overview'),
-            onPress: () => reserve(),
+            onPress: () => {
+                navigation.navigate(APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING)
+            },
             expandable: true,
             icon: <HashSignLockIcon />
         },

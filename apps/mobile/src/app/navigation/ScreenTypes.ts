@@ -56,6 +56,7 @@ export const APP_SCREEN = {
     STACK: 'ROUTES.MENU_CLAN.STACk',
     CREATE_CATEGORY: 'ROUTES.MENU_CLAN.CREATE_CATEGORY',
     SETTINGS: 'ROUTES.MENU_CLAN.SETTINGS',
+    OVERVIEW_SETTING: 'ROUTES.MENU_CLAN.OVERVIEW_SETTING'
   },
 
   SETTINGS: {
@@ -103,6 +104,7 @@ type MenuThreadStackParamList = {
 type MenuClanStackParamList = {
   [APP_SCREEN.MENU_CLAN.CREATE_CATEGORY]: undefined;
   [APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
+  [APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
 };
 
 type SettingStackParamList = {

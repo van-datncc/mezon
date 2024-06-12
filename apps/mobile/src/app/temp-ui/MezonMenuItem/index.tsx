@@ -11,15 +11,17 @@ export interface IMezonMenuItemProps {
     expandable?: boolean,
     isLast?: boolean,
     component?: ReactNode,
-    textStyle?: StyleProp<TextStyle>
+    textStyle?: StyleProp<TextStyle>,
+    disabled?: boolean
 }
-export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle }: IMezonMenuItemProps) {
+export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled }: IMezonMenuItemProps) {
     return (
         <MezonButton
+            disabled={disabled}
             onPress={() => { onPress && onPress() }}
             viewContainerStyle={styles.btn}>
             {icon}
-            <View style={[styles.btnTitleWrapper, !isLast && styles.borderBottom]}>
+            <View style={[styles.btnTitleWrapper, disabled && styles.disable, !isLast && styles.borderBottom]}>
                 <Text style={[styles.btnTitle, textStyle]}>{title}</Text>
                 {component}
                 {expandable && <AngleRightIcon height={24} width={24} />}

@@ -1,0 +1,26 @@
+{
+    "menu": {
+        "serverName": {
+            "title": "Server Name"
+        },
+        "inactive": {
+            "title": "Inactive Settings",
+            "description": "Automatically move members to this channel and mute them when they have been idle for longer than the inactive timeout. This does not affect browsers.",
+            "inactiveChannel": "Inactive Channel",
+            "inactiveTimeout": "Inactive Timeout"
+        },
+        "systemMessage": {
+            "title": "System Message Settings",
+            "description": "This is the channel we send system event messages to. These can be turned off at any time.",
+            "channel": "Channel",
+            "sendRandomWelcome": "Send a random welcome messages when someone joins this server.",
+            "promptMembersReply": "Prompt members to reply to welcome messages with a sticker.",
+            "sendMessageBoost": "Send a messages when someone boosts this server",
+            "sendHelpfulTips": "Send helpful tips for server setup"
+        },
+        "deleteServer": {
+            "title": "Delete Server",
+            "delete": "Delete Server"
+        }
+    }
+}

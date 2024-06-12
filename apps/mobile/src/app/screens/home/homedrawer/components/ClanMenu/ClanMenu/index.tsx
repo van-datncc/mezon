@@ -4,7 +4,7 @@ import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { AddFillIcon, BellIcon, KeyframeIcon, SettingIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
-import MezonMenu from "apps/mobile/src/app/temp-ui/MezonMenu";
+import MezonMenu, { reserve } from "apps/mobile/src/app/temp-ui/MezonMenu";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { IMezonMenuSectionProps } from "apps/mobile/src/app/temp-ui/MezonMenuSection";
@@ -27,13 +27,6 @@ interface IServerMenuProps {
 export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
     const navigation = useNavigation<AppStackScreenProps['navigation']>();
-
-    const reserve = () => {
-        Toast.show({
-            type: 'info',
-            text1: 'Coming soon'
-        });
-    }
 
     const handleOpenInvite = () => {
         inviteRef?.current.open();

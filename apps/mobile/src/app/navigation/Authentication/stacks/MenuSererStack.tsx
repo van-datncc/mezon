@@ -4,6 +4,7 @@ import { Colors } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 import CategoryCreator from "../../../components/Category";
 import ClanSetting from "../../../components/ClanSettings";
+import ClanOverviewSetting from "../../../components/ClanSettings/Overview";
 
 export const MenuClanStacks = ({ }: any) => {
     const Stack = createStackNavigator();
@@ -40,6 +41,14 @@ export const MenuClanStacks = ({ }: any) => {
                 component={ClanSetting}
                 options={{
                     headerTitle: t('menuClanStack.clanSetting'),
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING}
+                component={ClanOverviewSetting}
+                options={{
+                    headerTitle: t('menuClanStack.clanOverviewSetting'),
                 }}
             />
         </Stack.Navigator>

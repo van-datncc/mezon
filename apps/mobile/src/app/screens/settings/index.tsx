@@ -8,7 +8,7 @@ import { styles } from './styles';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import Toast from 'react-native-toast-message';
-import MezonMenu from '../../temp-ui/MezonMenu';
+import MezonMenu, { reserve } from '../../temp-ui/MezonMenu';
 import MezonMenuItem, { IMezonMenuItemProps } from '../../temp-ui/MezonMenuItem';
 import { IMezonMenuSectionProps } from '../../temp-ui/MezonMenuSection';
 
@@ -38,14 +38,6 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 
 	const navigateToLanguageSetting = () => {
 		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.LANGUAGE });
-	}
-
-	const reserve = () => {
-		Toast.show({
-			type: 'info',
-			text1: 'Coming soon'
-		});
-
 	}
 
 	const AccountMenu: IMezonMenuItemProps[] = [
