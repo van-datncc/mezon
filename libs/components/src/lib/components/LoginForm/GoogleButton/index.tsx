@@ -1,13 +1,11 @@
 import { useAuth } from '@mezon/core';
 import { useGoogleLogin } from '@react-oauth/google';
 import isElectron from 'is-electron';
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const GoogleButtonLogin: React.FC = () => {
 	const { loginByGoogle } = useAuth();
-
-	const [redirect, setRedirect] = useState(false);
 
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
@@ -15,9 +13,8 @@ const GoogleButtonLogin: React.FC = () => {
 		//redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
 			const session = await loginByGoogle(code);
-			console.log('🚀 ~ session:', session);
-			console.log('🚀 ~ redirect:', redirect);
-			window.location.href = `mezonapp://session=${session}`;
+			const jsonString = encodeURIComponent(JSON.stringify(session));
+			window.location.href = `mezonapp://accounts?data=${jsonString}`;
 		},
 		onError: (errorResponse) => console.log(errorResponse),
 	});
@@ -37,7 +34,6 @@ const GoogleButtonLogin: React.FC = () => {
 					target="_blank"
 					to={'http://localhost:4200/guess/login'}
 					// to={process.env.NX_CHAT_APP_REDIRECT_URI as string}
-					onClick={() => setRedirect(true)}
 					className="flex justify-center w-full  h-fit p-3 rounded-[4px] bg-[#d1e0ff]"
 				>
 					<img src={'assets/images/google-icon.png'} className="p-0 object-cover" alt="Google Logo" />

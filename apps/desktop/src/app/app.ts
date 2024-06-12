@@ -79,15 +79,9 @@ export default class App {
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
-				// Someone tried to run a second instance, we should focus our window.
-
-				// Protocol handler for win32
-				// argv: An array of the second instance’s (command line / deep linked) arguments
 				if (process.platform == 'win32') {
-					// Keep only command line / deep linked arguments
 					deeplinkingUrl = argv.slice(1);
 				}
-				console.log('app.makeSingleInstance# ' + deeplinkingUrl);
 
 				if (App.mainWindow) {
 					if (App.mainWindow.isMinimized()) App.mainWindow.restore();
@@ -101,15 +95,17 @@ export default class App {
 
 		App.mainWindow.webContents.openDevTools();
 
-		if (process.platform == 'win32') {
-			// Keep only command line / deep linked arguments
-			deeplinkingUrl = process.argv.slice(1);
-		}
-		console.log('createWindow# ' + deeplinkingUrl);
-
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
+
+		App.application.on('will-finish-launching', function () {
+			// Protocol handler for osx
+			App.application.on('open-url', function (event, url) {
+				event.preventDefault();
+				deeplinkingUrl = url;
+			});
+		});
 
 		// if main window is ready to show, close the splash window and show the main window
 		App.mainWindow.once('ready-to-show', () => {
@@ -148,6 +144,15 @@ export default class App {
 		if (process.platform == 'win32') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
+			logEverywhere('createWindow2# ' + deeplinkingUrl);
+		}
+
+		logEverywhere('deeplinkingUrl' + deeplinkingUrl);
+
+		function logEverywhere(s) {
+			if (App.mainWindow && App.mainWindow.webContents) {
+				App.mainWindow.webContents.executeJavaScript(`console.log("${s}")`);
+			}
 		}
 	}
 
