@@ -1,5 +1,5 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
-import { useChatReaction, useEmojiSuggestion, useEscapeKey, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { Fragment, useEffect, useRef, useState } from 'react';
 
@@ -12,8 +12,15 @@ type MessageReactionProps = {
 
 // TODO: refactor component for message lines
 const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode, dataReaction }) => {
-	const { userId, reactionMessageDispatch, reactionBottomState, setUserReactionPanelState, userReactionPanelState, reactionBottomStateResponsive } =
-		useChatReaction();
+	const {
+		userId,
+		reactionMessageDispatch,
+		reactionBottomState,
+		setUserReactionPanelState,
+		userReactionPanelState,
+		reactionBottomStateResponsive,
+		setArrowPosition,
+	} = useChatReaction();
 
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
@@ -57,6 +64,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals | null>();
 	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
+	const [outOfRight, setOutRight] = useState<boolean>(false);
 
 	const handleOnEnterEmoji = (emojiParam: EmojiDataOptionals, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		event.stopPropagation();
@@ -70,13 +78,16 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 
 	const handleOnleaveEmoji = () => {
 		setUserReactionPanelState(false);
-
+		// if (window.innerWidth > 640) {
+		// 	setHoverEmoji(null);
+		// }
 		if (subPanelActive === SubPanelName.NONE) {
 			return setShowIconSmile(false);
 		}
 	};
 
 	const PANEL_SENDER_WIDTH = 300;
+	const GAP_EMOJI = 8;
 
 	const emojiIndexMap: { [key: string]: number } = {};
 
@@ -96,13 +107,27 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		if (index === undefined) return;
 		const childElement = childRef.current[index];
 		if (!childElement) return;
-		const leftEmojiDistance = childElement.getBoundingClientRect().left - 57;
+		const leftEmojiDistance = childElement.getBoundingClientRect().left;
 		const widthEmojiElement = childElement.getBoundingClientRect().width;
-		const topEmojiDistance = childElement.getBoundingClientRect().top;
-		const wrapperEmojiRightDistance = contentDiv.current.getBoundingClientRect().right;
+		const distanceEmojiToRightScreen = window.innerWidth - leftEmojiDistance - widthEmojiElement;
+		const conditionOutOfRight = PANEL_SENDER_WIDTH / 2 - widthEmojiElement / 2;
+		if (distanceEmojiToRightScreen < conditionOutOfRight) {
+			setOutRight(true);
+			setArrowPosition(true);
+		} else {
+			setOutRight(false);
+			setArrowPosition(false);
+		}
 		const wrapperEmojiLeftDistance = contentDiv.current.getBoundingClientRect().left;
-		setTopPanel(topEmojiDistance - userPanelDiv.current.getBoundingClientRect().height - 5);
-		setLeftPanel(leftEmojiDistance - 24);
+		const wrapperEmojiTopDistance = contentDiv.current.getBoundingClientRect().top;
+
+		setTopPanel(wrapperEmojiTopDistance - userPanelDiv.current.getBoundingClientRect().height - 5);
+
+		if (leftEmojiDistance === wrapperEmojiLeftDistance) {
+			setLeftPanel(leftEmojiDistance - PANEL_SENDER_WIDTH / 2 + widthEmojiElement / 2);
+		} else {
+			setLeftPanel(leftEmojiDistance - PANEL_SENDER_WIDTH / 2 + widthEmojiElement / 2 + GAP_EMOJI);
+		}
 	};
 
 	// For button smile
@@ -132,7 +157,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	}, [subPanelActive]);
 
 	useEffect(() => {
-		if (!userReactionPanelState) {
+		if (!userReactionPanelState && window.innerWidth > 640) {
 			setHoverEmoji(null);
 		}
 	}, [userReactionPanelState]);
@@ -146,11 +171,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			return () => clearTimeout(timer);
 		}
 	}, [showSenderPanelIn1s]);
-	const handlePressEsc = () => {
-		setUserReactionPanelState(false);
-		setHoverEmoji(null);
-	};
-	useEscapeKey(handlePressEsc);
+
 	return (
 		<div className="relative">
 			{checkMessageToMatchMessageRef(message) && reactionBottomState && reactionBottomStateResponsive && (
@@ -162,11 +183,12 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			)}
 
 			<div ref={contentDiv} className="flex flex-wrap  gap-2 whitespace-pre-wrap ml-14  ">
-				{hoverEmoji && showSenderPanelIn1s && (
+				{showSenderPanelIn1s && (
 					<div className="hidden max-sm:block max-sm:-top-[0] absolute">
-						{checkMessageToMatchMessageRef(message) && checkEmojiToMatchWithEmojiHover(hoverEmoji) && emojiShowUserReaction && (
-							<UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} message={message} />
-						)}
+						{hoverEmoji &&
+							checkMessageToMatchMessageRef(message) &&
+							checkEmojiToMatchWithEmojiHover(hoverEmoji) &&
+							emojiShowUserReaction && <UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} message={message} />}
 					</div>
 				)}
 
@@ -182,7 +204,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 									{checkID && totalCount > 0 && (
 										<div
 											ref={(element) => (childRef.current[index] = element)}
-											className={` justify-center items-center relative
+											className={` justify-center items-center relative 
 									${userSender?.count && userSender.count > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
 									rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row  items-center cursor-pointer`}
 											onClick={() =>
@@ -218,7 +240,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 														style={{
 															position: 'fixed',
 															top: topPanel,
-															left: leftPanel,
+															left: outOfRight ? leftPanel - 120 : leftPanel,
 														}}
 													>
 														<UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} message={message} />

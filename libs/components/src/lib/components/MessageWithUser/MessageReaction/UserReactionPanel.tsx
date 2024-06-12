@@ -12,7 +12,7 @@ type UserReactionPanelProps = {
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const { emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
-	const { reactionMessageDispatch } = useChatReaction();
+	const { reactionMessageDispatch, arrowPosition } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		await reactionMessageDispatch(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
 	};
@@ -31,7 +31,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			<div
 				onClick={(e) => e.stopPropagation()}
 				className={`z-50   w-[18rem]
-				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1'} `}
+				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1 bottom-0'}`}
 			>
 				<div>
 					<div className="flex flex-row items-center m-2 dark:text-white text-black">
@@ -75,6 +75,9 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 				})}
 
 				<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
+			</div>
+			<div className={`text-[#28272b] mt-[-0.4rem] ${arrowPosition ? 'flex justify-end' : 'flex justify-center'} `}>
+				<Icons.ArrowDownFill />
 			</div>
 		</>
 	);
