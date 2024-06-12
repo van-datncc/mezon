@@ -27,14 +27,14 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
                         <span className="text-5xl leading-3 dark:hover:text-white hover:text-black cursor-pointer" onClick={closeModal}>×</span>
                     </div>
                     <div className="p-4">
-                        <MessageWithUser
+                        {/* <MessageWithUser
                             message={mess}
                             user={user as IChannelMember}
                             isMessNotifyMention={true}
                             mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
                             newMessage={mess.content.t}
                             isMention={true}
-                        />
+                        /> */}
                     </div>
                     <div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
                         <button onClick={closeModal} className="px-4 py-2 hover:underline rounded">Cancel</button>
