@@ -26,8 +26,9 @@ type EmojiSelectorProps = {
 	onSelected: (url: string) => void;
 	searchText?: string;
 	isReactMessage?: boolean;
-	onScroll: (e: any) => void;
-	onFocus: () => void;
+	onScroll?: (e: any) => void;
+	handleBottomSheetExpand?: () => void;
+	handleBottomSheetCollapse?: () => void;
 };
 
 const cateIcon = [
@@ -82,7 +83,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 	);
 };
 
-export default function EmojiSelector({ onScroll, onSelected, isReactMessage = false, onFocus }: EmojiSelectorProps) {
+export default function EmojiSelector({ onScroll, onSelected, isReactMessage = false, handleBottomSheetExpand, handleBottomSheetCollapse }: EmojiSelectorProps) {
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
 	const { categoriesEmoji, setEmojiSuggestion } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectEmojiImage);
@@ -99,6 +100,7 @@ export default function EmojiSelector({ onScroll, onSelected, isReactMessage = f
 
 	const handleEmojiSelect = useCallback(async (emojiPicked: string) => {
 		onSelected(emojiPicked);
+		handleBottomSheetCollapse?.();
 		if (!isReactMessage) setEmojiSuggestion(emojiPicked);
 	}, []);
 
@@ -130,7 +132,7 @@ export default function EmojiSelector({ onScroll, onSelected, isReactMessage = f
 			<View style={{ backgroundColor: isReactMessage ? Colors.bgCharcoal : Colors.secondary }}>
 				<View style={styles.textInputWrapper}>
 					<SearchIcon height={18} width={18} />
-					<TextInput onFocus={onFocus} style={styles.textInput} onChangeText={debouncedSetSearchText} />
+					<TextInput onFocus={handleBottomSheetExpand} style={styles.textInput} onChangeText={debouncedSetSearchText} />
 				</View>
 				<ScrollView
 					horizontal

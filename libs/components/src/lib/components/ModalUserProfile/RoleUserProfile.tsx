@@ -60,7 +60,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	};
 	return (
 		<div className="flex flex-col">
-			<div className="font-bold tracking-wider text-sm">ROLES</div>
+			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
 			<div className="mt-2">
 				{userRolesClan.map((role, index) => (
 					<span key={`${role.id}_${index}`} className="inline-block text-xs border dark:border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgModifierHoverLight mr-2 mb-2">

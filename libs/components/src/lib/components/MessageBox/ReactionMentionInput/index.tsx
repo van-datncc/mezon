@@ -529,6 +529,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					data={queryEmojis}
 					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
+					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
 		</div>

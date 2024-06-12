@@ -10,6 +10,7 @@ export * from './lib/chat/hooks/useAttachment';
 export * from './lib/chat/hooks/useCategory';
 export * from './lib/chat/hooks/useChannelMembers';
 export * from './lib/chat/hooks/useChannels';
+export * from './lib/chat/hooks/useChangeChannelId';
 export * from './lib/chat/hooks/useChatChannel';
 export * from './lib/chat/hooks/useChatMessage';
 export * from './lib/chat/hooks/useChatMessages';

@@ -5,12 +5,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Icons } from '../../components';
+import ModalUnknowChannel from './ModalUnknowChannel';
 
 type ChannelHashtagProps = {
 	channelHastagId: string;
 };
 
 const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
+	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
@@ -60,7 +62,13 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 			{channel.channel_label}
 		</Link>
 	) : (
-		<span>{channelHastagId}</span>
+		<>
+			<span 
+				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]" 
+				onClick={() => setOpenModal(true)}
+			># unknow</span>
+			{ openModal && <ModalUnknowChannel onClose={() => setOpenModal(false)}/> }
+		</>
 	);
 };
 

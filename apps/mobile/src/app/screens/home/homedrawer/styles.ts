@@ -10,23 +10,7 @@ export const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		overflow: 'hidden',
 	},
-	listHeader: {
-		width: '100%',
-		height: 50,
-		borderTopLeftRadius: 10,
-		paddingHorizontal: 10,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		borderTopRightRadius: 10,
-		marginBottom: 10,
-	},
-	titleHeaderChannel: {
-		color: '#FFF',
-		fontWeight: 'bold',
-		fontSize: 18,
-		textTransform: 'uppercase',
-	},
+	
 	wrapperChatBox: {
 		backgroundColor: Colors.secondary,
 		flexDirection: 'column',

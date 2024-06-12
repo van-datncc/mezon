@@ -1,6 +1,6 @@
 import { useAttachments, useEscapeKey } from '@mezon/core';
 import { selectAttachmentPhoto, selectOpenModalAttachment } from '@mezon/store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
 
@@ -45,7 +45,26 @@ const MessageModalImage = () => {
 		setOpenModalAttachment(false);
 	}
 
-	useEscapeKey(closeModal);
+	const selectedImageRef = useRef<HTMLDivElement | null>(null);
+	useEffect(() => {
+		if (selectedImageRef.current) {
+			selectedImageRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest'});
+		}
+	}, [urlImg, openModalAttachment]);
+
+	const handleKeyDown = (event: any) => {
+		if (event.key === 'Escape') {
+			closeModal();
+		}
+  	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+  	}, []);
 
 	return (
 		<div>
@@ -75,31 +94,31 @@ const MessageModalImage = () => {
 					</button>
 					{showList && (
 						<div className="w-full md:w-[250px] h-[120px] md:h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col px-[10px] md:px-0 md:py-5 overflow-y-hidden gap-x-2 md:gap-y-5">
-							<div className="dark:bg-slate-700 bg-bgLightModeButton border flex items-center md:block">
-								<img
-									src={urlImg}
-									alt={urlImg}
-									className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
-									onDragStart={handleDrag}
-								/>
-							</div>
-							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
+							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col-reverse py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
 								{attachments.map((img, index) => {
 									const url = img.url;
+									const isSelected = url === urlImg;
 									return (
-										<div className={url === urlImg ? 'hidden' : ''} key={`${img.id}_${index}`}>
-											<img
+										<div 
+											className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-full dark:border-white border-colorTextLightMode' : 'border-transparent'}`} 
+											key={`${img.id}_${index}`}
+											ref={isSelected ? selectedImageRef : null}
+										>
+											<div className={isSelected ? 'flex items-center' : 'relative'} onClick={() => handleClickImg(url || '')}>
+												<img
 												src={url}
 												alt={url}
-												className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
+												className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer ${isSelected ? '' : 'overlay'}`}
 												onDragStart={handleDrag}
-												onClick={() => handleClickImg(url || '')}
 												onKeyDown={(event) => {
 													if (event.key === 'Enter') {
 														handleClickImg(url || '');
 													}
-												}}
-											/>
+												}}/>
+												{!isSelected && (
+													<div className="absolute inset-0 bg-black opacity-50 rounded"></div>
+												)}
+											</div>
 										</div>
 									);
 								})}

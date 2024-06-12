@@ -32,10 +32,6 @@ export function useAppNavigation() {
 		return `/chat/clans/${clanId}/member-safety`;
 	}, []);
 
-	const toMessageChannel = useCallback((channelId: string, clanId: string, messageId: string) => {
-		return `/chat/clans/${clanId}/channels/${channelId}?messageId=${messageId}`;
-	}, []);
-
 	const toClanPage = useCallback((clanId: string) => {
 		return `/chat/clans/${clanId}/channels`;
 	}, []);
@@ -65,7 +61,6 @@ export function useAppNavigation() {
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
 			toDmGroupPageFromMainApp,
-			toMessageChannel,
 		}),
 		[
 			navigate,
@@ -79,7 +74,6 @@ export function useAppNavigation() {
 			toDmGroupPage,
 			toDmGroupPageFromFriendPage,
 			toDmGroupPageFromMainApp,
-			toMessageChannel,
 		],
 	);
 }

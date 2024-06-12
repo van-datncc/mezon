@@ -12,13 +12,13 @@ interface INotificationOptionProps {
 	onChange: (value: EActionDataNotify) => void;
 	channels: ChannelsEntity[];
 }
-const NotificationOption = ({ onChange, channels } : INotificationOptionProps) => {
+const NotificationOption = ({ onChange, channels }: INotificationOptionProps) => {
 	const { t } = useTranslation(['notification']);
 	const tabDataNotify = [
 		{ id: 1, title: t('tabNotify.forYou'), value: 'individual', icon: <Text style={s.icon}>@</Text> },
 		{ id: 2, title: t('tabNotify.mention'), value: 'mention', icon: <MuteIcon width={22} height={22} /> },
 	];
-	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: false });
+	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
 
 	const handleTabChange = (value, isSelected) => {
 		setSelectedTabs((prevState) => ({
@@ -28,7 +28,7 @@ const NotificationOption = ({ onChange, channels } : INotificationOptionProps) =
 	};
 
 	useEffect(() => {
-		setSelectedTabs({ individual: true, mention: false });
+		setSelectedTabs({ individual: true, mention: true });
 	}, [channels]);
 
 	const calculateValue = () => {
