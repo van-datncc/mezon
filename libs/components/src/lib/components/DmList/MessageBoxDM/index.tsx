@@ -93,6 +93,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				currentChannelId={directParamId}
 				onTyping={handleTypingDebounced}
 				// listMentions={UserMentionList(directParamId)}
+				mode={mode}
 			/>
 			{isEmojiOnChat && ( // responsive mobile
 				<div

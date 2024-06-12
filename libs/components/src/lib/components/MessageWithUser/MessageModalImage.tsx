@@ -48,11 +48,23 @@ const MessageModalImage = () => {
 	const selectedImageRef = useRef<HTMLDivElement | null>(null);
 	useEffect(() => {
 		if (selectedImageRef.current) {
-			selectedImageRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
+			selectedImageRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest'});
 		}
 	}, [urlImg, openModalAttachment]);
 
-	useEscapeKey(closeModal);
+	const handleKeyDown = (event: any) => {
+		if (event.key === 'Escape') {
+			closeModal();
+		}
+  	};
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+  	}, []);
 
 	return (
 		<div>
@@ -88,22 +100,25 @@ const MessageModalImage = () => {
 									const isSelected = url === urlImg;
 									return (
 										<div 
-											className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-full dark:border-white border-colorTextLightMode flex items-center' : 'border-transparent'}`} 
+											className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-full dark:border-white border-colorTextLightMode' : 'border-transparent'}`} 
 											key={`${img.id}_${index}`}
 											ref={isSelected ? selectedImageRef : null}
 										>
-											<img
+											<div className={isSelected ? 'flex items-center' : 'relative'} onClick={() => handleClickImg(url || '')}>
+												<img
 												src={url}
 												alt={url}
-												className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer`}
+												className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer ${isSelected ? '' : 'overlay'}`}
 												onDragStart={handleDrag}
-												onClick={() => handleClickImg(url || '')}
 												onKeyDown={(event) => {
 													if (event.key === 'Enter') {
 														handleClickImg(url || '');
 													}
-												}}
-											/>
+												}}/>
+												{!isSelected && (
+													<div className="absolute inset-0 bg-black opacity-50 rounded"></div>
+												)}
+											</div>
 										</div>
 									);
 								})}
