@@ -94,13 +94,13 @@ const MessageModalImage = () => {
 					</button>
 					{showList && (
 						<div className="w-full md:w-[250px] h-[120px] md:h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col px-[10px] md:px-0 md:py-5 overflow-y-hidden gap-x-2 md:gap-y-5">
-							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col-reverse py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
+							<div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
 								{attachments.map((img, index) => {
 									const url = img.url;
 									const isSelected = url === urlImg;
 									return (
 										<div 
-											className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-full dark:border-white border-colorTextLightMode' : 'border-transparent'}`} 
+											className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-fit dark:border-white border-colorTextLightMode' : 'border-transparent'}`} 
 											key={`${img.id}_${index}`}
 											ref={isSelected ? selectedImageRef : null}
 										>
