@@ -187,7 +187,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
-				keyExtractor={(item) => `${item?.id}`}
+				keyExtractor={(item, index) => `${item?.id}-${index}`}
 				windowSize={10}
 				removeClippedSubviews={true}
 				maxToRenderPerBatch={20}
