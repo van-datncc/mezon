@@ -21,7 +21,7 @@ import {
 	selectPinMessageByChannelId,
 	useAppDispatch,
 } from '@mezon/store';
-import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
+import { EmojiDataOptionals, EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -40,6 +40,7 @@ type MessageProps = {
 	mode: number;
 	channelId: string;
 	channelLabel: string;
+	dataReaction: EmojiDataOptionals[];
 };
 
 type ChannelsMentionProps = {
@@ -57,7 +58,7 @@ type EmojiData = {
 const neverMatchingRegex = /($a)/;
 
 export function ChannelMessage(props: Readonly<MessageProps>) {
-	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
+	const { message, lastSeen, preMessage, mode, channelId, channelLabel, dataReaction } = props;
 	const [deleteMessage, setDeleteMessage] = useState(false);
 	const { markMessageAsSeen } = useChatMessage(message.id);
 	const user = useSelector(selectMemberByUserId(message.sender_id));
@@ -203,6 +204,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	return (
 		<div className="fullBoxText relative group">
 			<MessageWithUser
+				dataReaction={props.dataReaction}
 				message={mess as IMessageWithUser}
 				preMessage={messPre as IMessageWithUser}
 				user={user}

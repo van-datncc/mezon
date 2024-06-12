@@ -1,49 +1,66 @@
-import { MessageWithUser } from "@mezon/components";
-import { useDeleteMessage } from "@mezon/core";
-import { selectMemberClanByUserId } from "@mezon/store";
-import { IChannelMember, IMessageWithUser } from "@mezon/utils";
-import { ChannelStreamMode } from "mezon-js";
-import { useSelector } from "react-redux";
+import { MessageWithUser } from '@mezon/components';
+import { useDeleteMessage } from '@mezon/core';
+import { selectMemberClanByUserId } from '@mezon/store';
+import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
+import { useSelector } from 'react-redux';
 
 type ModalDeleteMessProps = {
-    mess: IMessageWithUser;
-    closeModal: () => void;
-}
+	mess: IMessageWithUser;
+	closeModal: () => void;
+};
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
-    const { mess, closeModal } = props;
-    const user = useSelector(selectMemberClanByUserId(mess.sender_id || ''));
-    const  { DeleteSendMessage } = useDeleteMessage({ channelId: mess.channel_id, channelLabel:mess.channel_label, mode: ChannelStreamMode.STREAM_MODE_CHANNEL});
+	const { mess, closeModal } = props;
+	const user = useSelector(selectMemberClanByUserId(mess.sender_id || ''));
+	const { DeleteSendMessage } = useDeleteMessage({
+		channelId: mess.channel_id,
+		channelLabel: mess.channel_label,
+		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
+	});
 
-    return (
-        <div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
-            <div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeSecond rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden">
-                <div className="dark:text-white text-black">
-                    <div className="flex justify-between p-4">
-                        <div>
-                            <h3 className="font-bold ">Delete Message</h3>
-                            <p>Are you sure you want to delete this message?</p>
-                        </div>
-                        <span className="text-5xl leading-3 dark:hover:text-white hover:text-black cursor-pointer" onClick={closeModal}>×</span>
-                    </div>
-                    <div className="p-4">
-                        <MessageWithUser
-                            message={mess}
-                            user={user as IChannelMember}
-                            isMessNotifyMention={true}
-                            mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-                            newMessage={mess.content.t}
-                            isMention={true}
-                        />
-                    </div>
-                    <div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
-                        <button onClick={closeModal} className="px-4 py-2 hover:underline rounded">Cancel</button>
-                        <button onClick={() => {DeleteSendMessage(mess.id); closeModal();}} className="px-4 py-2 bg-red-900 rounded hover:bg-opacity-85">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );  
-}
+	return (
+		<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeSecond rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden">
+				<div className="dark:text-white text-black">
+					<div className="flex justify-between p-4">
+						<div>
+							<h3 className="font-bold ">Delete Message</h3>
+							<p>Are you sure you want to delete this message?</p>
+						</div>
+						<span className="text-5xl leading-3 dark:hover:text-white hover:text-black cursor-pointer" onClick={closeModal}>
+							×
+						</span>
+					</div>
+					<div className="p-4">
+						<MessageWithUser
+							dataReaction={[]}
+							message={mess}
+							user={user as IChannelMember}
+							isMessNotifyMention={true}
+							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							newMessage={mess.content.t}
+							isMention={true}
+						/>
+					</div>
+					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
+						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
+							Cancel
+						</button>
+						<button
+							onClick={() => {
+								DeleteSendMessage(mess.id);
+								closeModal();
+							}}
+							className="px-4 py-2 bg-red-900 rounded hover:bg-opacity-85"
+						>
+							Delete
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
 
 export default ModalDeleteMess;
