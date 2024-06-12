@@ -47,7 +47,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 								<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
 									<AvatarComponent id={sender.sender_id ?? ''} />
 									<NameComponent id={sender.sender_id ?? ''} />
-									<p className="text-xs absolute right-8">{sender.count}</p>
+									<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
 									{sender.sender_id === userId.userId && sender.count > 0 && (
 										<div
 											onClick={(e: any) => {

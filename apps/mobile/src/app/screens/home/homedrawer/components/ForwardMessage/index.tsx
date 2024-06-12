@@ -223,7 +223,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 					<ScrollView style={{ marginVertical: 10 }}>
 						{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
 							<>
-								{/*{renderMember()}*/}
+								{renderMember()}
 								{renderChannel()}
 							</>
 						) : (

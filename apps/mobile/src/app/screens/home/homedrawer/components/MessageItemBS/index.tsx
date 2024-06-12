@@ -216,7 +216,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.user?.id}></UserProfile>;
+		return (
+				<UserProfile userId={user?.id}></UserProfile>
+		);
 	};
 
 	const handleReact = async (mode, messageId, emoji: IEmojiImage, senderId) => {

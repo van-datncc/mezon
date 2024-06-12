@@ -92,6 +92,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}
 				currentClanId={clanId}
+				mode={mode}
 			/>
 			{isEmojiOnChat && (
 				<div

@@ -194,13 +194,13 @@ const ModalCreate = (props: ModalCreateProps) => {
 					</button>
 					{ currentModal === Tabs_Option.REVIEW ?  
 						<button
-							className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption ) && 'bg-opacity-50'}`}
+							className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption ) && 'text-slate-400 bg-opacity-50'}`}
 							onClick={(option === '' || errorOption ) ? () => {} : () => handleSubmit()}
 						>
 							Create Event
 						</button> :
 						<button
-							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'bg-opacity-50'}`}
+							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'text-slate-400 bg-opacity-50'}`}
 							onClick={() => handleNext(currentModal)}
 						>
 							Next

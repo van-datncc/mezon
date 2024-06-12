@@ -54,8 +54,8 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const { setMessageMentionId } = useReference();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const messageContent = JSON.parse(data.content);
-
+	data.content = JSON.parse(data.content);
+	data.update_time = data.create_time;
 	const dispatchMessageMention = async () => {
 		if (currentChannelId !== data.channel_id) {
 			await navigate(toChannelPage(data.channel_id, currentClan?.id ?? ''));
@@ -115,7 +115,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					user={user as IChannelMember}
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					newMessage={messageContent.t}
+					newMessage={""}
 					isMention={true}
 				/>
 			</div>

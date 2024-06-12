@@ -10,23 +10,7 @@ export const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		overflow: 'hidden',
 	},
-	listHeader: {
-		width: '100%',
-		height: 50,
-		borderTopLeftRadius: 10,
-		paddingHorizontal: 10,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		borderTopRightRadius: 10,
-		marginBottom: 10,
-	},
-	titleHeaderChannel: {
-		color: '#FFF',
-		fontWeight: 'bold',
-		fontSize: 18,
-		textTransform: 'uppercase',
-	},
+	
 	wrapperChatBox: {
 		backgroundColor: Colors.secondary,
 		flexDirection: 'column',
@@ -367,14 +351,6 @@ export const styles = StyleSheet.create({
 		fontSize: size.small,
 		color: Colors.gray72,
 	},
-	contentMessageBox: {
-		fontSize: size.medium,
-		color: Colors.tertiary,
-	},
-	editedText: {
-		fontSize: size.small,
-		color: Colors.gray72,
-	},
 	contentMessageCombine: {
 		padding: size.s_2,
 	},
@@ -383,12 +359,6 @@ export const styles = StyleSheet.create({
 		color: Colors.textLink,
 		lineHeight: size.s_20,
 	},
-	contentMessageMention: {
-		fontSize: size.medium,
-		fontWeight: '600',
-		color: Colors.textLink,
-	},
-	mentionWrapper: {},
 	loadMoreChannelMessage: {
 		paddingVertical: size.s_20,
 		alignItems: 'center',
@@ -567,10 +537,6 @@ export const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		backgroundColor: Colors.secondary,
-	},
-	iconEmojiInMessage: {
-		width: size.s_18,
-		height: size.s_18,
 	},
 	channelContainer: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },

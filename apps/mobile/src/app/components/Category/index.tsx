@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { Pressable, Switch, Text, TextInput, View } from 'react-native';
-import LockIcon from "../../../assets/svg/lock.svg"
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import styles from './style';
-import { CrossIcon } from '@mezon/mobile-components';
+import { CrossIcon, LockIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoryCreator({ navigation }: { navigation: any }) {
     const [isPrivate, setPrivate] = useState<boolean>(false);
     const [categoryName, setCategoryName] = useState<string>("");
     const dispatch = useAppDispatch();
     const currentClanId = useSelector(selectCurrentClanId);
+    const { t } = useTranslation(['categoryCreator']);
 
     navigation.setOptions({
         headerRight: () => (
@@ -23,7 +24,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                     paddingHorizontal: 20,
                     opacity: categoryName.trim().length > 0 ? 1 : 0.5
                 }}>
-                    Create
+                    {t("actions.create")}
                 </Text>
             </Pressable>
         ),
@@ -59,10 +60,10 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
     return (
         <View style={styles.container}>
             <View>
-                <Text style={styles.label}>Category Name</Text>
+                <Text style={styles.label}>{t('fields.cateName.title')}</Text>
                 <TextInput
                     placeholderTextColor={'gray'}
-                    placeholder='New Category'
+                    placeholder={t('fields.cateName.placeholder')}
                     style={styles.input}
                     value={categoryName}
                     onChangeText={setCategoryName}
@@ -73,7 +74,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                 <View style={styles.checkboxWrapper}>
                     <View style={styles.labelIconWrapper}>
                         <LockIcon height={18} width={18} />
-                        <Text style={styles.labelNormal}>Private Category</Text>
+                        <Text style={styles.labelNormal}>{t('fields.catePrivate.title')}</Text>
                     </View>
                     <Switch
                         trackColor={{ false: Colors.gray48, true: Colors.green }}
@@ -82,7 +83,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                     />
                 </View>
                 <Text style={styles.description}>
-                    By making a category private, only selected members and roles will be able to view this category. Synced channels in this category will automatically match to this setting.
+                    {t('fields.catePrivate.description')}
                 </Text>
             </View>
         </View>
