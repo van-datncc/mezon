@@ -227,7 +227,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 									onFocus={handleFocus}
 									inputRef={textareaRef}
 									value={editMessage}
-									className="w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black"
+									className={`w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention' }`}
 									onKeyDown={onSend}
 									onChange={(e, newValue) => {
 										setEditMessage(newValue);

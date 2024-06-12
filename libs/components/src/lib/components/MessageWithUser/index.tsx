@@ -126,7 +126,7 @@ function MessageWithUser({
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-0.5
+						className={`flex h-15 flex-col w-auto px-3
 						${isMention ? 'mt-0' : isCombine ? '' : 'pt-[2px]'}
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					>
