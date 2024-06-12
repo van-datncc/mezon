@@ -76,7 +76,6 @@ export default function LogoClanSelector({ }: ILogoClanSelector) {
                     creator_id: currentClan?.creator_id ?? '',
                     logo: url || (currentClan?.logo ?? ''),
                 });
-                console.log("Ok");
             }
         }
     }
@@ -97,7 +96,7 @@ export default function LogoClanSelector({ }: ILogoClanSelector) {
                     </View>
                 </TouchableOpacity>
             </View>
-            <Text style={styles.clanName}>nghiacangao</Text>
+            <Text style={styles.clanName}>{currentClan.clan_name}</Text>
         </View>
     )
 }
