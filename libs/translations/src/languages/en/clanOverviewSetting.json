@@ -1,4 +1,11 @@
 {
+    "header": {
+        "save": "Save"
+    },
+    "toast": {
+        "saveSuccess": "Save Success",
+        "notBlank": "Cannot be left blank"
+    },
     "menu": {
         "serverName": {
             "title": "Server Name"

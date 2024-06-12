@@ -19,8 +19,8 @@ export interface IFile {
 }
 
 interface IMezonImagePickerProps {
-    onChange?: () => void;
-    onLoad?: () => void;
+    onChange?: (url: string) => void;
+    onLoad?: (url: string) => void;
     defaultValue: string;
     height?: DimensionValue;
     width?: DimensionValue;
@@ -70,12 +70,12 @@ export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, 
         const file = await handleSelectImage();
         if (file) {
             setImage(file.uri);
-            onChange && onChange();
+            onChange && onChange(file.uri);
 
             const url = await handleUploadImage(file);
             if (url) {
                 setImage(url);
-                onLoad && onLoad();
+                onLoad && onLoad(url);
             }
         }
     }
