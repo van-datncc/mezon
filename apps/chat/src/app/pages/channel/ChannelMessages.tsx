@@ -67,7 +67,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && remain !== 0 && <p className=" text-center">Loading messages...</p>}
+			{isFetching && remain !== 0 && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
 
 			{reverseArray(messages).map((message, i) => {
 				return (
