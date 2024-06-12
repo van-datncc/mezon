@@ -18,23 +18,20 @@ export default function ChannelListHeader({ onPress, clan }: IProps) {
         <View style={styles.container}>
             <FastImage
                 source={{ uri: clan?.banner }}
-                style={{flex: 1 }}
+                style={{ flex: 1 }}
                 resizeMode="cover"
             />
-            <TouchableOpacity style={styles.actions} onPress={handlePress}>
-                <View style={styles.listHeader} >
-                    <View style={styles.titleNameWrapper}>
-                        <Text style={styles.titleServer}>{clan?.clan_name}</Text>
-                        <VerifyIcon width={18} height={18} />
-                    </View>
-                    <AngleRightIcon height={18} width={18} />
+
+            <View style={styles.listHeader}>
+                <View style={styles.titleNameWrapper}>
+                    <Text style={styles.titleServer}>{clan?.clan_name}</Text>
+                    <VerifyIcon width={18} height={18} />
                 </View>
-                <View style={styles.infoHeader}>
-                    <Text style={styles.textInfo}>398 Members</Text>
-                    <CircleIcon width={5} height={5} color={Colors.gray48} />
-                    <Text style={styles.textInfo}>Community</Text>
-                </View>
-            </TouchableOpacity>
+
+                <TouchableOpacity style={styles.actions} onPress={handlePress}>
+                    <AngleRightIcon height={18} width={18} color="white"/>
+                </TouchableOpacity>
+            </View>
         </View>
     )
 }
