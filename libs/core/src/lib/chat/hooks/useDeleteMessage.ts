@@ -26,7 +26,8 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 				throw new Error('Client is not initialized');
 			}
 			dispatch(messagesActions.remove(messageId));
-			await socket.removeChatMessage(channelId, channel.chanel_label, mode, messageId);
+
+			await socket.removeChatMessage(channelId, channel.chanel_label ?? '', mode, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, channelId, channelLabel],
 	);

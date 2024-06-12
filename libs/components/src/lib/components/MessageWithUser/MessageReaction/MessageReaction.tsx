@@ -96,8 +96,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			}
 		});
 
-	const [topPanel, setTopPanel] = useState<number>(0);
-	const [leftPanel, setLeftPanel] = useState<number>(0);
+	const [topPanel, setTopPanel] = useState<any>();
+	const [leftPanel, setLeftPanel] = useState<any>();
 
 	const checkPositionSenderPanel = (emoji: EmojiDataOptionals) => {
 		if (!childRef.current || !contentDiv.current || emoji.emoji === undefined || !userPanelDiv.current) return;

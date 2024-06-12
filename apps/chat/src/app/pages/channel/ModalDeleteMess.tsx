@@ -2,21 +2,21 @@ import { MessageWithUser } from '@mezon/components';
 import { useDeleteMessage } from '@mezon/core';
 import { selectMemberClanByUserId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 
 type ModalDeleteMessProps = {
 	mess: IMessageWithUser;
 	closeModal: () => void;
+	mode: number;
 };
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
-	const { mess, closeModal } = props;
+	const { mess, closeModal, mode } = props;
 	const user = useSelector(selectMemberClanByUserId(mess.sender_id || ''));
 	const { DeleteSendMessage } = useDeleteMessage({
 		channelId: mess.channel_id,
 		channelLabel: mess.channel_label,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
+		mode: mode,
 	});
 
 	return (
@@ -38,7 +38,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 							message={mess}
 							user={user as IChannelMember}
 							isMessNotifyMention={true}
-							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+							mode={mode}
 							newMessage={mess.content.t}
 							isMention={true}
 						/>
