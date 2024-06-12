@@ -17,6 +17,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { MutableRefObject } from "react";
 import Clipboard from "@react-native-clipboard/clipboard";
+import { useAuth, useClans } from "@mezon/core";
 
 interface IServerMenuProps {
     clan: ClansEntity;
@@ -26,6 +27,9 @@ interface IServerMenuProps {
 
 export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
+    const user = useAuth();
+    const { clans } = useClans();
+
     const navigation = useNavigation<AppStackScreenProps['navigation']>();
 
     const handleOpenInvite = () => {
@@ -168,11 +172,15 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
                         title={t("actions.notifications")}
                         icon={BellIcon}
                         onPress={() => reserve()} />
-                    <MezonButtonIcon
-                        title={t("actions.settings")}
-                        icon={SettingIcon}
-                        onPress={handleOpenSettings}
-                    />
+
+                    {user.userId === clan.creator_id &&
+                        <MezonButtonIcon
+                            title={t("actions.settings")}
+                            icon={SettingIcon}
+                            onPress={handleOpenSettings}
+                        />
+                    }
+
                 </ScrollView>
 
                 <MezonMenu menu={menu} />
