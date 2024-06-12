@@ -480,7 +480,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
-				className="dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md"
+				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
@@ -501,7 +501,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						/>
 					)}
 					style={mentionStyle}
-					className="dark:bg-[#3B416B] bg-bgLightModeButton"
+					className="dark:bg-[#3B416B] bg-bgLightModeButton block"
 				/>
 				<Mention
 					markup="#[__display__](__id__)"
