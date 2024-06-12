@@ -1,7 +1,7 @@
 import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, useAnimatedState } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto } from '@mezon/store-mobile';
+import { channelsActions, selectAttachmentPhoto, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,6 +31,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const timeOutRef = useRef(null);
 	const attachments = useSelector(selectAttachmentPhoto());
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+	const dispatch = useAppDispatch();
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -79,7 +80,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	useEffect(() => {
 		if (messages?.[0]) {
+			const timestamp = Date.now() / 1000;
 			markMessageAsSeen(messages?.[0]);
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: messages?.[0].channel_id, timestamp }));
 		}
 	}, [markMessageAsSeen, messages]);
 
