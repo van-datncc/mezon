@@ -97,7 +97,6 @@ export const markdownStyles = {
  */
 export const renderRulesCustom = {
     heading1: (node, children, parent, styles) => {
-        console.log(node, children, parent, styles);
         return (
             <View key={node.key} style={styles._VIEW_SAFE_heading1}>
                 {children}
@@ -182,7 +181,7 @@ export const renderRulesCustom = {
                 </Text>
             )
         }
-    
+
         return (
           <Text key={node.key} style={[inheritedStyles, styles.fence]}>
             {content}
@@ -197,7 +196,7 @@ export const renderRulesCustom = {
 export const formatUrls = (text: string) => {
     const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
     const parts = modifiedString.split('\0').filter(Boolean);
-    
+
     return parts?.map((part) => {
         if (codeBlockRegex.test(part)) {
             return part;
