@@ -681,7 +681,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						{...textInputProps}
 						style={[
 							styles.inputStyle,
-							text.length > 0 && { width: inputWidthWhenHasInput },
+							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_30 : inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
 						children={renderTextContent(text, emojiListPNG, channelsEntities)}
