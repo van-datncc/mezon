@@ -121,7 +121,6 @@ interface IMenuItem {
 }
 
 const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
-	const [copied, setCopied] = useState<boolean>(true);
 	const clickItem = () => {
 		if (item.name === RightClickList.COPY_IMAGE) {
 			return handleCopyImage(urlData);
@@ -173,26 +172,41 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 	};
 
 	const handleSaveImage = () => {
-		console.log('saveImage');
+		const a = document.createElement('a');
+		a.href = urlData;
+		a.download = 'image.png';
+		a.click();
 	};
-	const handleCopyLink = () => {
-		
-	};
+	const handleCopyLink = () => {};
 	const handleOpenLink = () => {
-		window.open(urlData);
+		window.open(urlData, '_blank');
 	};
 
 	return (
-		<CopyToClipboard text={urlData} onCopy={handleCopyLink}>
-			<span
-				onClick={clickItem}
-				className="flex justify-between items-center text-sm pl-1 py-1
+		<>
+			{item.name === RightClickList.COPY_LINK ? (
+				<CopyToClipboard text={urlData}>
+					<span
+						onClick={clickItem}
+						className="flex justify-between items-center text-sm pl-1 py-1
 				cursor-pointer rounded-sm text-[#81858A] hover:text-[#FFFFFF] 
 				dark:hover:bg-[#4B5CD6] hover:bg-bgLightModeButton font-medium"
-			>
-				<span className="w-[90%]">{item.name}</span>
-				<span className="w-[10%] flex justify-end mr-1">{item.symbol}</span>
-			</span>
-		</CopyToClipboard>
+					>
+						<span className="w-[90%]">{item.name}</span>
+						<span className="w-[10%] flex justify-end mr-1">{item.symbol}</span>
+					</span>
+				</CopyToClipboard>
+			) : (
+				<span
+					onClick={clickItem}
+					className="flex justify-between items-center text-sm pl-1 py-1
+				cursor-pointer rounded-sm text-[#81858A] hover:text-[#FFFFFF] 
+				dark:hover:bg-[#4B5CD6] hover:bg-bgLightModeButton font-medium"
+				>
+					<span className="w-[90%]">{item.name}</span>
+					<span className="w-[10%] flex justify-end mr-1">{item.symbol}</span>
+				</span>
+			)}
+		</>
 	);
 };
