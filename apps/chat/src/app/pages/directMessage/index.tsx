@@ -26,6 +26,7 @@ export default function Direct() {
 					status={userProfile?.user?.online}
 					avatar={userProfile?.user?.avatar_url || ''}
 					openSetting={handleOpenCreate}
+					userId={userProfile?.user?.id}
 				/>
 			</div>
 			<MainContentDirect />
