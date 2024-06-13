@@ -12,6 +12,8 @@ export const styles = StyleSheet.create({
 	boxImage: {
 		borderRadius: 50,
 		overflow: 'hidden',
+	},
+	borderBoxImage: {
 		borderColor: Colors.gray48,
 		borderWidth: 5,
 	},

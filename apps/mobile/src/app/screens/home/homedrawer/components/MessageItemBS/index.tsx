@@ -14,6 +14,7 @@ import {
 	TrashIcon,
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { AppDispatch, pinMessageActions, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import { IEmojiImage } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -23,6 +24,7 @@ import { Alert, DeviceEventEmitter, FlatList, Platform, Pressable, Text, View } 
 import FastImage from 'react-native-fast-image';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import Toast from 'react-native-toast-message';
+import { useDispatch, useSelector } from 'react-redux';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -33,6 +35,7 @@ import { styles } from './styles';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user } = props;
+	const dispatch = useDispatch<AppDispatch>();
 	const ref = useRef(null);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -49,6 +52,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 	};
+	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
+	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const handleActionReply = () => {
 		onClose();
@@ -99,7 +104,15 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionPinMessage = () => {
-		console.log('PinMessage');
+    if(message)
+		onClose();
+		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message.channel_id, message_id: message.id }));
+	};
+
+	const handleActionUnPinMessage = () => {
+    if(message)
+		onClose();
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId || '', message_id: message.id }));
 	};
 
 	const handleActionMarkUnRead = () => {
@@ -154,6 +167,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.PinMessage:
 				handleActionPinMessage();
 				break;
+			case EMessageActionType.UnPinMessage:
+				handleActionUnPinMessage();
+				break;
 			case EMessageActionType.MarkUnRead:
 				handleActionMarkUnRead();
 				break;
@@ -190,6 +206,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				return <TrashIcon />;
 			case EMessageActionType.PinMessage:
 				return <PinMessageIcon />;
+			case EMessageActionType.UnPinMessage:
+				return <PinMessageIcon />;
 			case EMessageActionType.MarkUnRead:
 				return <MarkUnreadIcon />;
 			case EMessageActionType.Mention:
@@ -205,20 +223,25 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
-
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
-		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
+		const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
+		const listOfActionOnlyMyMessage = [
+			EMessageActionType.EditMessage,
+			EMessageActionType.DeleteMessage,
+			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
+		];
+		const listOfActionOnlyOtherMessage = [
+			EMessageActionType.Report,
+			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
+		];
 		if (isMyMessage) {
 			return getMessageActions(t).filter((action) => !listOfActionOnlyOtherMessage.includes(action.type));
 		}
 
 		return getMessageActions(t).filter((action) => !listOfActionOnlyMyMessage.includes(action.type));
-	}, [t, userProfile, message]);
+	}, [t, userProfile, message, listPinMessages]);
 
 	const renderUserInformation = () => {
-		return (
-				<UserProfile userId={user?.id}></UserProfile>
-		);
+		return <UserProfile userId={user?.id}></UserProfile>;
 	};
 
 	const handleReact = async (mode, messageId, emoji: IEmojiImage, senderId) => {
