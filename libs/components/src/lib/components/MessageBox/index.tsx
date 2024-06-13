@@ -99,7 +99,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					const session = sessionRef.current;
 					const client = clientRef.current;
 
-					if (!client || !session || !currentClanId) {
+					if (!client || !session || !currentChannelId) {
 						throw new Error('Client is not initialized');
 					}
 
@@ -135,6 +135,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	);
 
 	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
+	const handleChildContextMenu = (event: React.MouseEvent) => {
+		// Ngăn chặn sự kiện lan truyền lên phần tử cha
+		event.stopPropagation();
+	};
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			<div
@@ -165,7 +169,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				/>
 
 				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
-					<div className={`w-[96%] dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}>
+					<div
+						className={`w-[96%] dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
+						onContextMenu={handleChildContextMenu}
+					>
 						<MentionReactInput
 							handlePaste={onPastedFiles}
 							listMentions={props.listMentions}

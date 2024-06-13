@@ -1,0 +1,9 @@
+{
+  "emptyThread": {
+    "textNoThread": "Không có cuộc thảo luận nào",
+    "textNotify": "Hãy tập trung vào cuộc trò chuyện với một cuộc thảo luận - một kênh văn bản tạm thời.",
+    "createThreads": "Tạo Cuộc Thảo Luận"
+  },
+  "otherThreads": "các cuộc thảo luận khác",
+  "joinedThreads": "các cuộc thảo luận đã tham gia"
+}

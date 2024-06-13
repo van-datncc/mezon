@@ -207,7 +207,6 @@ function useDataEmojiSvg() {
 		{ src: anime, shortname: ':anime:', category: 'Custom' },
 		{ src: verify, shortname: ':verify:', category: 'Custom' },
 		{ src: pepecry, shortname: ':pepecry:', category: 'Custom' },
-		{ src: wow, shortname: ':wow:', category: 'Custom' },
 		{ src: amongus, shortname: ':amongus:', category: 'Custom' },
 		{ src: huh, shortname: ':huh:', category: 'Custom' },
 		{ src: whatthe, shortname: ':whatthe:', category: 'Custom' },

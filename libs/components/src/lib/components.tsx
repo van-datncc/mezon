@@ -8,6 +8,7 @@ export { default as ChannelVoiceOff } from './components/ChannelVoice/ChannelVoi
 export { default as ChatWelcome } from './components/ChatWelcome';
 export { default as ClanHeader } from './components/ClanHeader';
 export { default as ModalCreateClan } from './components/CreateClanModal';
+export { default as DeleteClanModal } from './components/DeleteClanModal';
 export { default as DirectMessageList } from './components/DmList';
 export { default as DmTopbar } from './components/DmList/DMtopbar/index';
 export { default as MemberListGroupChat } from './components/DmList/MemberListGroupChat/index';

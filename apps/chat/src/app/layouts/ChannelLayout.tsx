@@ -38,7 +38,7 @@ const ChannelLayout = () => {
 		<div
 			className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-			  h-[100%] overflow-visible
+			  h-[100%] overflow-visible 
 			   
 			   ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 		>
