@@ -5,7 +5,7 @@ import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { useClans } from "@mezon/core";
-import MezonMenu from "apps/mobile/src/app/temp-ui/MezonMenu";
+import MezonMenu, { reserve } from "apps/mobile/src/app/temp-ui/MezonMenu";
 import { IMezonMenuSectionProps } from "apps/mobile/src/app/temp-ui/MezonMenuSection";
 import { IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui/MezonMenuItem";
 import { useTranslation } from "react-i18next";
@@ -25,54 +25,54 @@ export default function CategoryMenu({ category }: ICategoryMenuProps) {
     const watchMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.watchMenu.markAsRead'),
-            onPress: () => { },
-            icon: <NittroIcon/>
+            onPress: () => reserve(),
+            icon: <NittroIcon />
         }
     ]
 
     const inviteMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.inviteMenu.invite'),
-            onPress: () => { },
-            icon: <NittroIcon/>
+            onPress: () => reserve(),
+            icon: <NittroIcon />
         }
     ]
 
     const notificationMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.notification.muteCategory'),
-            onPress: () => { },
-            icon: <NittroIcon/>
+            onPress: () => reserve(),
+            icon: <NittroIcon />
         },
         {
             title: t('menu.notification.notification'),
-            onPress: () => { },
-            icon: <NittroIcon/>
+            onPress: () => reserve(),
+            icon: <NittroIcon />
         }
     ]
 
     const organizationMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.organizationMenu.edit'),
-            onPress: () => { },
-            icon: <NittroIcon/>
+            onPress: () => reserve(),
+            icon: <NittroIcon />
         },
         {
             title: t('menu.organizationMenu.createChannel'),
-            onPress: () => { },
-            icon: <NittroIcon/>
+            onPress: () => reserve(),
+            icon: <NittroIcon />
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.devMode.copyServerID'),
-            icon: <NittroIcon/>,
+            icon: <NittroIcon />,
             onPress: () => {
                 Clipboard.setString(category.category_id);
                 Toast.show({
                     type: 'info',
-                    text1: t('menu.notify.serverIDCopied'),
+                    text1: t('notify.serverIDCopied'),
                 });
             },
         }

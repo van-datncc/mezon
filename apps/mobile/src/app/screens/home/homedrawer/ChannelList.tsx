@@ -83,7 +83,6 @@ const ChannelList = React.memo((props: any) => {
 
 	function handleLongPressCategory(categoryChannel: ICategoryChannel) {
 		bottomSheetCategoryMenuRef.current?.present();
-		console.log(categoryChannel);
 		setCurrentPressedCategory(categoryChannel);
 	}
 
