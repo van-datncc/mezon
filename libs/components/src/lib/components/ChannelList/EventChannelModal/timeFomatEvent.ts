@@ -55,7 +55,7 @@ export const getCurrentTimeRounded = (addMinute?: boolean) => {
     return `${hour}:${minute === 0 ? '00' : minute }`;
 };
 
-export const compareDate = (start: Date, end: Date) => {
+export const compareDate = (start: Date | string, end: Date | string) => {
     const startDay = new Date(start);
     const endDay = new Date(end);
 
@@ -89,4 +89,28 @@ export const compareTime = (start: string, end: string, equal?: boolean) =>{
         return true;
     }
     return false;
+}
+
+export const differenceTime = (end: string) => {
+
+    const start = handleTimeISO(new Date(), getTimeFomatDay());
+    
+    const dateStart = new Date(start);
+    const dateEnd = new Date(end);
+
+    if (!isNaN(dateStart.getTime()) && !isNaN(dateEnd.getTime())) {
+        const differenceInMilliseconds = dateEnd.getTime() - dateStart.getTime();
+
+        const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
+
+        return differenceInMinutes;
+    }
+    return -1;
+}
+
+export const getTimeFomatDay = () => {
+    const date = new Date();
+    const hours = date.getHours().toString().padStart(2, '0'); 
+    const minutes = date.getMinutes().toString().padStart(2, '0'); 
+    return `${hours}:${minutes}`;
 }
