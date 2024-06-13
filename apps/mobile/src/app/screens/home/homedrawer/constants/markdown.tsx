@@ -221,7 +221,7 @@ export const formatEmoji = (text: string, emojiImages: IEmojiImage[] = []) => {
         if (codeBlockRegex.test(part)) {
             return part;
         } else {
-            if (emojiRegex.test(part)) {
+            if (part.match(emojiRegex)) {
                 const srcEmoji = getSrcEmoji(part, emojiImages);
                 return srcEmoji ? `![${part}](${srcEmoji})` : part;
             }
@@ -241,4 +241,9 @@ export const formatBlockCode = (text: string) => {
         return '\n' + block + '\n';
     };
     return text.replace(codeBlockRegexGlobal, addNewlinesToCodeBlock);
+}
+
+export const removeBlockCode = (text: string) => {
+    const regex = /(`{1,3})(.*?)\1/g;
+    return text.replace(regex, '$2');
 }

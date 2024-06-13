@@ -117,6 +117,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
                             {typeKeyboardBottomSheet === 'emoji' ? (
                                 <EmojiPicker
+                                    directMessageId={directMessageId}
                                     onDone={() => {
                                         onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
                                         DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
