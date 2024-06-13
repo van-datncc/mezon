@@ -1,5 +1,15 @@
 import { ChannelVoice, ChannelVoiceOff, FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useAppNavigation, useAuth, useChangeChannelId, useClans, useDragAndDrop, useMenu, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import {
+	useAppNavigation,
+	useAuth,
+	useChangeChannelId,
+	useClans,
+	useDragAndDrop,
+	useMenu,
+	useSearchMessages,
+	useThreads,
+	useVoice,
+} from '@mezon/core';
 import { channelsActions, selectCurrentChannel, selectShowScreen, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -19,8 +29,8 @@ function useChannelSeen(channelId: string) {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		setIdChannelSelected(channelId);
-		if(idChannelSelected) {
-			const path = toChannelPage(idChannelSelected, currentClanId ||'');
+		if (idChannelSelected) {
+			const path = toChannelPage(idChannelSelected, currentClanId || '');
 			navigate(path);
 		}
 	}, [channelId, idChannelSelected, dispatch]);
@@ -98,7 +108,7 @@ export default function ChannelLayout() {
 
 	return (
 		<>
-			{draggingState && <FileUploadByDnD />}
+			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-0"
 				id="mainChat"
