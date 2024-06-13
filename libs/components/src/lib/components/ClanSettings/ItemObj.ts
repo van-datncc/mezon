@@ -16,5 +16,4 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
-	{ id: ItemSetting.DELETE_SERVER, name: 'Delete Server' },
 ];

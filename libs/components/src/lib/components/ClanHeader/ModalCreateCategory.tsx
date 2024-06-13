@@ -8,7 +8,7 @@ type ModalCreateCategoryProps = {
 	onCreateCategory: (nameCate: string) => void;
 };
 export const Regex = () => {
-	return /^(?![_-])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_-]{1,64}$/u;
+	return /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]{1,64}$/u;
 }
 
 const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {

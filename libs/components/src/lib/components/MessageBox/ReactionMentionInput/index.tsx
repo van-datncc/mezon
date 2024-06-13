@@ -501,7 +501,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						/>
 					)}
 					style={mentionStyle}
-					className="dark:bg-[#3B416B] bg-bgLightModeButton block"
+					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					markup="#[__display__](__id__)"

@@ -133,6 +133,7 @@ const colors = {
 	textRed: '#E53935',
 	textViolet: '#5a62f4',
 	azureBlue: '#4173c3',
+	caribbeanGreen: '#0bbc73',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
@@ -141,7 +142,7 @@ const colors = {
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
 	bgMention: '#3b426e',
-	green: "green",
+	green: 'green',
 	bgDarkCharcoal: '#323232',
 	bgMessageHighlight: '#c99d072b',
 	bgDarkMidnightBlue: '#141c2a',

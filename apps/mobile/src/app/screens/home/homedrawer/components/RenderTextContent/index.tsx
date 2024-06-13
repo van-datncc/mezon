@@ -3,7 +3,7 @@ import { ChannelsEntity } from '@mezon/store-mobile';
 import { IEmojiImage } from '@mezon/utils';
 import React from 'react';
 import { Text } from 'react-native';
-import { highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
+import { channelIdRegex, highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
 
 export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], channelsEntities?: Record<string, ChannelsEntity>) => {
@@ -19,7 +19,8 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], ch
 	};
 
 	const renderChannelMention = (id: string) => {
-		const channel = getChannelById(id.slice(1));
+		const channelId = id.match(channelIdRegex)[1];
+		const channel = getChannelById(channelId);
 
 		return (
 			<Text>
@@ -40,7 +41,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], ch
 	};
 
 	const renderMention = (id: string) => {
-		return id.startsWith('@') ? <Text>{renderUserMention(id)}</Text> : id.startsWith('#') ? renderChannelMention(id) : <Text />;
+		return id.startsWith('@') ? <Text>{renderUserMention(id)}</Text> : id.startsWith('<#') ? renderChannelMention(id) : <Text />;
 	};
 
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
