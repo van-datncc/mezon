@@ -14,6 +14,8 @@ import profile from './profile.json';
 import clanMenu from "./clanMenu.json";
 import categoryCreator from "./categoryCreator.json";
 import screenStack from "./screenStack.json";
+import clanSetting from "./clanSetting.json";
+import clanOverviewSetting from "./clanOverviewSetting.json";
 
 export default {
 	inviteToChannel,
@@ -31,5 +33,7 @@ export default {
 	profile,
 	clanMenu,
 	categoryCreator,
-	screenStack
+	screenStack,
+	clanSetting,
+	clanOverviewSetting
 };

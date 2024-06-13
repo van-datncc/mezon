@@ -1,3 +1,4 @@
+import { useApp } from '@mezon/core';
 import EmptyPinMessage from './EmptyPinMessage';
 
 type PinnedMessagesProps = {
@@ -5,6 +6,7 @@ type PinnedMessagesProps = {
 };
 
 const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
+	const {appearanceTheme} = useApp();
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-md w-[420px] max-h-[80vh] shadow-sm overflow-hidden">
@@ -13,7 +15,7 @@ const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
 						<span className="text-base font-medium cursor-default dark:text-white text-black">Pinned Messages</span>
 					</div>
 				</div>
-				<div className="flex flex-col bg-bgSecondary min-h-full flex-1 overflow-y-auto thread-scroll">
+				<div className={`flex flex-col bg-bgSecondary min-h-full flex-1 overflow-y-auto ${appearanceTheme === "light" ? "customScrollLightMode" : "thread-scroll"}`}>
 					{/* <ItemPinMessage /> */}
 					{<EmptyPinMessage />}
 				</div>

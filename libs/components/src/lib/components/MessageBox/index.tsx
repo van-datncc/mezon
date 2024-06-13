@@ -195,7 +195,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 MessageBox.Skeleton = () => {
 	return (
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-visible">
-			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
+			<form className="self-stretch p-4 dark:bg-neutral-950 bg-bgLightSecondary rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
 					<div className="flex flex-row  justify-end h-fit">
 						<Icons.AddCircle />
@@ -205,7 +205,7 @@ MessageBox.Skeleton = () => {
 				<div className="grow self-stretch justify-start items-center gap-2 flex">
 					<div
 						contentEditable
-						className="grow text-white text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
+						className="grow text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none dark:text-textDarkTheme text-textLightTheme"
 					/>
 				</div>
 				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12 rounded-r-lg">
