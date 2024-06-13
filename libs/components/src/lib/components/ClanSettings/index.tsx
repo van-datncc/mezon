@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ExitSetting } from '../SettingProfile';
 import ClanSettingOverview from './ClanSettingOverview';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
@@ -6,6 +6,7 @@ import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
 import { useMenu } from '@mezon/core';
 import * as Icons from '../Icons';
+import DeleteClanModal from '../DeleteClanModal';
 
 export type ModalSettingProps = {
 	open: boolean;
@@ -20,7 +21,12 @@ const ClanSetting = (props: ModalSettingProps) => {
 	};
 	const [menu, setMenu] = useState(true);
 	const { closeMenu } = useMenu();
-
+	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
+	useEffect(()=>{
+		if(currentSetting.id === ItemSetting.DELETE_SERVER){
+			setIsShowDeletePopup(true);
+		}
+	}, [currentSetting.id]);
 	return (
 		<div>
 			{open ? (
@@ -43,7 +49,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 							</button>
 						</div>
 						<div className={`flex-col flex-1 dark:bg-bgSecondary bg-bgLightSecondary ${(closeMenu && !menu) ? 'hidden' : 'flex'}`}>
-							<SettingSidebar onClickItem={handleSettingItemClick} handleMenu={(value: boolean)=>setMenu(value)} currentSetting = {currentSetting.id}/>
+							<SettingSidebar onClickItem={handleSettingItemClick} handleMenu={(value: boolean)=>setMenu(value)} currentSetting = {currentSetting.id} setIsShowDeletePopup={()=>setIsShowDeletePopup(true)}/>
 						</div>
 
 						<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto hide-scrollbar">
@@ -55,8 +61,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 										</h2>
 										{currentSetting.id === ItemSetting.OVERVIEW && <ClanSettingOverview />}
 										{currentSetting.id === ItemSetting.ROLES && <ServerSettingMainRoles />}
+										
 									</div>
 								</div>
+								{isShowDeletePopup && <DeleteClanModal onClose={()=>setIsShowDeletePopup(false)}/>}
 								<ExitSetting onClose={onClose} />
 							</div>
 						</div>

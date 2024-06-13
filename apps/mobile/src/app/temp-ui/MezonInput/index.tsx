@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from "react-native";
+import { StyleProp, Text, TextInput, View, ViewStyle } from "react-native";
 import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { CloseIcon } from "@mezon/mobile-components";
@@ -12,22 +12,43 @@ interface IMezonInputProps {
     textarea?: boolean;
     value: string;
     onTextChange?: (value: string) => void;
-    maxCharacter?: number
+    maxCharacter?: number,
+    inputWrapperStyle?: StyleProp<ViewStyle>,
+    showBorderOnFocus?: boolean
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60 }: IMezonInputProps) {
+export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus }: IMezonInputProps) {
     const ref = useRef<TextInput>(null)
     const [showCount, setShowCount] = useState<boolean>(false);
+    const [isFocus, setFocus] = useState<boolean>(false);
 
     function handleClearBtn() {
         ref && ref.current && ref.current.clear();
         onTextChange && onTextChange("");
     }
 
+    function handleFocus() {
+        setShowCount(true);
+        setFocus(true);
+    }
+
+    function handleBlur() {
+        setShowCount(false);
+        setFocus(false);
+    }
+
+    const renderBorder = (): StyleProp<ViewStyle> => {
+        if (showBorderOnFocus) {
+            return isFocus ? styles.fakeInputFocus : styles.fakeInputBlur;
+        } else {
+            return {}
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>{label}</Text>
-            <View style={styles.fakeInput}>
+            <View style={[styles.fakeInput, renderBorder(), inputWrapperStyle]}>
                 <View style={styles.inputBox}>
                     <TextInput
                         ref={ref}
@@ -37,11 +58,11 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         numberOfLines={textarea ? 4 : 1}
                         textAlignVertical={textarea ? 'top' : 'center'}
                         maxLength={maxCharacter}
-                        style={[styles.input, textarea && {height: size.s_100}]}
+                        style={[styles.input, textarea && { height: size.s_100 }]}
                         placeholder={placeHolder}
                         placeholderTextColor="gray"
-                        onFocus={() => setShowCount(true)}
-                        onBlur={() => setShowCount(false)}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
                     />
 
                     {!textarea &&

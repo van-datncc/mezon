@@ -13,7 +13,13 @@ const styles = StyleSheet.create({
         marginBottom: Fonts.size.s_10
     },
 
+    sectionDescription: {
+        color: Colors.gray72,
+        fontSize: 11,
+    },
+
     section: {
+        marginBottom: 10,
         backgroundColor: Colors.secondary,
         borderRadius: 10,
         overflow: 'hidden',

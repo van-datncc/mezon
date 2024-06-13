@@ -2,16 +2,17 @@ import { useClans } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
-import { ItemObjProps, ItemSetting, listItemSetting } from '../ItemObj';
+import { ItemObjProps, listItemSetting } from '../ItemObj';
 import SettingItem from '../SettingItem';
 
 type SettingSidebarProps = {
 	onClickItem?: (settingItem: ItemObjProps) => void;
 	handleMenu: (value: boolean) => void;
 	currentSetting: string;
+	setIsShowDeletePopup: () => void;
 };
 
-const SettingSidebar = ({ onClickItem, handleMenu, currentSetting }: SettingSidebarProps) => {
+const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDeletePopup }: SettingSidebarProps) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const { currentClan } = useClans();
 
@@ -43,6 +44,12 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting }: SettingSide
 						handleMenu={handleMenu}
 					/>
 				))}
+				<button
+					className={`dark:text-textPrimary text-buttonProfile w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight`}
+					onClick={setIsShowDeletePopup}
+				>
+					Delete server
+				</button>
 				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
 			</div>
 		</div>
