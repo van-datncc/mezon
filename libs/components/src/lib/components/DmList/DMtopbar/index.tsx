@@ -1,4 +1,4 @@
-import { useApp, useMemberStatus, useMenu } from '@mezon/core';
+import { useApp, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -7,6 +7,8 @@ import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
+import { useRef, useState } from 'react';
+import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -58,7 +60,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							</button>
 							<button>
 								<Tooltip content='Pinned Messages' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
-									<Icons.PinRight />
+									<PinButton isLightMode={appearanceTheme === 'light'} />
 								</Tooltip>
 							</button>
 							<button>
@@ -78,6 +80,34 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					</div>
 				</div>
 			</div>
+		</div>
+	);
+}
+
+function PinButton({ isLightMode }: { isLightMode: boolean }) {
+	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
+	const threadRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowPinMessage = () => {
+		setIsShowPinMessage(!isShowPinMessage);
+	};
+
+	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
+	useEscapeKey(() => setIsShowPinMessage(false));
+	return (
+		<div className="relative leading-5 h-5" ref={threadRef}>
+			<Tooltip
+				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
+				content="Pinned Messages"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.PinRight isWhite={isShowPinMessage} />
+				</button>
+			</Tooltip>
+			{isShowPinMessage && <PinnedMessages />}
 		</div>
 	);
 }

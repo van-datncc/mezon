@@ -76,7 +76,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 
 				<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
 			</div>
-			<div className={`text-[#28272b] mt-[-0.4rem] ${arrowPosition ? 'flex justify-end' : 'flex justify-center'} `}>
+			<div className={`dark:text-[#28272b] text-white mt-[-0.4rem] ${arrowPosition ? 'flex justify-end' : 'flex justify-center'} `}>
 				<Icons.ArrowDownFill />
 			</div>
 		</>
