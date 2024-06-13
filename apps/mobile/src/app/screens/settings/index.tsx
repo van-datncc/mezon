@@ -7,10 +7,8 @@ import { Alert, ScrollView } from 'react-native';
 import { styles } from './styles';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
-import Toast from 'react-native-toast-message';
-import MezonMenu, { reserve } from '../../temp-ui/MezonMenu';
-import MezonMenuItem, { IMezonMenuItemProps } from '../../temp-ui/MezonMenuItem';
-import { IMezonMenuSectionProps } from '../../temp-ui/MezonMenuSection';
+import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
+import MezonMenuItem from '../../temp-ui/MezonMenuItem';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['setting']);

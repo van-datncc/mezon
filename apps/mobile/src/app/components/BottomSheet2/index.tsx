@@ -14,8 +14,8 @@ export default forwardRef(function BottomSheet({ children }: IProps, ref: Ref<Bo
     return (
         <OriginalBottomSheet
             ref={ref}
-            snapPoints={['20%', '90%']}
-            index={1}
+            snapPoints={['90%']}
+            index={0}
             animateOnMount
             backgroundStyle={styles.backgroundStyle}
             backdropComponent={Backdrop}

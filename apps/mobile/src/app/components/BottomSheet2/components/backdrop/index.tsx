@@ -8,17 +8,15 @@ import Animated, {
 import { Colors } from "@mezon/mobile-ui";
 
 const Backdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
-  // animated variables
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       animatedIndex.value,
-      [0, 1],
+      [-1, 0],
       [0, 0.7],
       Extrapolation.CLAMP
     ),
   }));
 
-  // styles
   const containerStyle = useMemo(
     () => [
       style,
@@ -28,6 +26,7 @@ const Backdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
       containerAnimatedStyle,
     ],
     [style, containerAnimatedStyle]
+    // [style]
   );
 
   return <Animated.View style={containerStyle} />;
