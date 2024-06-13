@@ -6,6 +6,7 @@
         "copyText": "Copy Text",
         "deleteMessage": "Delete Message",
         "pinMessage": "Pin Message",
+        "unPinMessage": "UnPin Message",
         "markUnRead": "Mark UnRead",
         "mention": "Mention",
         "copyMessageLink": "Copy Message Link",

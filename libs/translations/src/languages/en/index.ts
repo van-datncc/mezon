@@ -13,7 +13,8 @@ import userProfile from './userProfile.json';
 import profile from './profile.json';
 import categoryCreator from "./categoryCreator.json";
 import screenStack from "./screenStack.json";
-import clanMenu from "./clanMenu.json";
+import clanMenu from  "./clanMenu.json";
+import pinMessage from './pinMessage.json';
 import clanSetting from "./clanSetting.json";
 import clanOverviewSetting from "./clanOverviewSetting.json";
 
@@ -34,6 +35,7 @@ export default {
 	categoryCreator,
 	screenStack,
 	clanMenu,
+	pinMessage,
 	clanSetting,
 	clanOverviewSetting
 };
