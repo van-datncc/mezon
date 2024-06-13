@@ -8,6 +8,7 @@ import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
+import { attachmentActions } from '../attachment/attachments.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -37,7 +38,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({}));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			return response;
 		} else {
@@ -53,12 +54,16 @@ type fetchDmGroupArgs = {
 	limit?: number;
 	forward?: number;
 	channelType?: number;
+	noCache?: boolean;
 };
 
-export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2 }: fetchDmGroupArgs, thunkAPI) => {
+export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = 2, noCache }: fetchDmGroupArgs, thunkAPI) => {	
 	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
+	if (noCache) {
+		fetchChannelsCached.clear(mezon,100,1, '', channelType);
+	}
+	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);	
 	
 	if (!response.channeldesc) {
 		return thunkAPI.rejectWithValue([]);
@@ -101,6 +106,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
 			);
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({channelId: directMessageId}))
+			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			await mezon.joinChatDirectMessage(directMessageId, channelName, type);
 			return;

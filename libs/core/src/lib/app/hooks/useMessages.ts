@@ -2,6 +2,7 @@ import { selectQuantitiesMessageRemain } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useChatReaction } from '../../chat/hooks/useChatReaction';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
@@ -15,6 +16,8 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
 	const remain = useSelector(selectQuantitiesMessageRemain);
+	const { positionOfSmileButton, setUserReactionPanelState } = useChatReaction();
+
 	useEffect(() => {
 		const currentChatRef = chatRef.current;
 		if (!currentChatRef || isFetching) return;
@@ -33,6 +36,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
+			setUserReactionPanelState(false);
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 

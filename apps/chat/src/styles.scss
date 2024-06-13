@@ -628,3 +628,15 @@ input:-webkit-autofill:active {
 .bg-opacity-30{
 	--tw-bg-opacity: 0.3;
 }
+
+// Scrollbar mention
+
+.lightModeScrollBarMention {
+	::-webkit-scrollbar-track {
+		background: #ebedef;
+	}
+	::-webkit-scrollbar-thumb {
+		background-color: #c4c9ce;
+		border-radius: 4px;
+	}
+}
