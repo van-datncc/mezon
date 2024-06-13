@@ -8,13 +8,22 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: size.s_10,
         backgroundColor: Colors.secondary,
-        paddingLeft: 20
+        paddingLeft: 20,
     },
+
+    btnTextWrapper: {
+        flexBasis: 10,
+        flexGrow: 1,
+    },
+
     btnTitle: {
         color: Colors.tertiary,
         fontSize: 14,
-        flexBasis: 10,
-        flexGrow: 1,
+    },
+
+    btnDescription: {
+        color: Colors.gray48,
+        fontSize: 11,
     },
 
     btnTitleWrapper: {
@@ -25,7 +34,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 5
+        gap: 5,
+        flexBasis:10
     },
     borderBottom: {
         borderBottomColor: Colors.borderDim,

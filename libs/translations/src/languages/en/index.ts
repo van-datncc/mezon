@@ -17,6 +17,7 @@ import clanMenu from "./clanMenu.json";
 import clanSetting from "./clanSetting.json";
 import clanOverviewSetting from "./clanOverviewSetting.json";
 import categoryMenu from "./categoryMenu.json";
+import channelCreator from "./channelCreator.json";
 
 export default {
 	inviteToChannel,
@@ -37,5 +38,6 @@ export default {
 	clanMenu,
 	clanSetting,
 	clanOverviewSetting,
-	categoryMenu
+	categoryMenu,
+	channelCreator
 };

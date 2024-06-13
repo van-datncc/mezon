@@ -183,7 +183,9 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
 
                 </ScrollView>
 
-                <MezonMenu menu={menu} />
+                <View>
+                    <MezonMenu menu={menu} />
+                </View>
             </View>
         </View>
     )
