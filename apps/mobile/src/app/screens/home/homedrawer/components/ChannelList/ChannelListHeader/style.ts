@@ -8,10 +8,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         position: "absolute",
-        top: 0,
+        top: 2,
         left: 0,
         padding: 5,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        paddingVertical: 10
     },
 
     titleNameWrapper: {
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
     titleServer: {
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 14
+        fontSize: 16
     },
 
     infoHeader: {
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     },
 
     actions: {
-        padding: 10,
+        padding: 4,
         backgroundColor: Colors.gray4850,
         borderRadius: 999
     },

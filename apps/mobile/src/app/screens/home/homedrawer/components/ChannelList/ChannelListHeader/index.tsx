@@ -1,4 +1,4 @@
-import { AngleRightIcon, CircleIcon, VerifyIcon } from "@mezon/mobile-components";
+import {AngleRightIcon, CircleIcon, SettingIcon, VerifyIcon} from "@mezon/mobile-components";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ClansEntity } from "@mezon/store-mobile";
 import styles from "./style";
@@ -15,23 +15,27 @@ export default function ChannelListHeader({ onPress, clan }: IProps) {
     }
 
     return (
-        <View style={styles.container}>
-            <FastImage
+        <View style={[styles.container, {height: clan?.banner ? 150 : 70 }]}>
+          {
+            clan?.banner && (
+              <FastImage
                 source={{ uri: clan?.banner }}
                 style={{ flex: 1 }}
                 resizeMode="cover"
-            />
+              />
+            )
+          }
 
-            <View style={styles.listHeader}>
+            <TouchableOpacity  activeOpacity={0.8} onPress={handlePress} style={styles.listHeader}>
                 <View style={styles.titleNameWrapper}>
                     <Text style={styles.titleServer}>{clan?.clan_name}</Text>
                     <VerifyIcon width={18} height={18} />
                 </View>
 
                 <TouchableOpacity style={styles.actions} onPress={handlePress}>
-                    <AngleRightIcon height={18} width={18} color="white"/>
+                    <SettingIcon height={18} width={18} color="white"/>
                 </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
         </View>
     )
 }
