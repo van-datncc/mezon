@@ -8,6 +8,8 @@ import ActionRow from '../ActionRow';
 import AssetsViewer from '../AssetViewer';
 import { IChannel } from '@mezon/utils';
 import { ThreadHeader } from '../ThreadHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '@mezon/mobile-ui';
 
 export const threadDetailContext = createContext<IChannel | ChannelsEntity>(null);
 
@@ -25,11 +27,13 @@ export default function MenuThreadDetail(props: { route: any }) {
 
     return (
         <threadDetailContext.Provider value={channel}>
-            <View style={styles.container}>
-                <ThreadHeader />
-                <ActionRow />
-                <AssetsViewer />
-            </View>
+            <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
+                <View style={styles.container}>
+                    <ThreadHeader />
+                    <ActionRow />
+                    <AssetsViewer />
+                </View>
+            </SafeAreaView>
         </threadDetailContext.Provider>
     )
 }

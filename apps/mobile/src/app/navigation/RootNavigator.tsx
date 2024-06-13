@@ -23,7 +23,6 @@ import { IWithError } from '@mezon/utils';
 import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
 import { AppState } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
@@ -122,29 +121,27 @@ const NavigationMain = () => {
 
 	return (
 		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
-			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
-				<NetInfoComp />
-				<RootStack.Navigator screenOptions={{ headerShown: false }}>
-					{isLoggedIn ? (
-						<RootStack.Group
-							screenOptions={{
-								gestureEnabled: false,
-							}}
-						>
-							<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
-						</RootStack.Group>
-					) : (
-						<RootStack.Group
-							screenOptions={{
-								animationTypeForReplace: 'pop',
-								gestureEnabled: false,
-							}}
-						>
-							<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
-						</RootStack.Group>
-					)}
-				</RootStack.Navigator>
-			</SafeAreaView>
+			<NetInfoComp />
+			<RootStack.Navigator screenOptions={{ headerShown: false }}>
+				{isLoggedIn ? (
+					<RootStack.Group
+						screenOptions={{
+							gestureEnabled: false,
+						}}
+					>
+						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
+					</RootStack.Group>
+				) : (
+					<RootStack.Group
+						screenOptions={{
+							animationTypeForReplace: 'pop',
+							gestureEnabled: false,
+						}}
+					>
+						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
+					</RootStack.Group>
+				)}
+			</RootStack.Navigator>
 			{isLoadingSplashScreen && <SplashScreen />}
 		</NavigationContainer>
 	);

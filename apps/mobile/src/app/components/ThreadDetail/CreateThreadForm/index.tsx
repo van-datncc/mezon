@@ -30,7 +30,7 @@ import { styles } from './CreateThreadForm.style';
 
 export default function CreateThreadForm() {
 	const dispatch = useAppDispatch();
-	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(110);
+	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(0);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
