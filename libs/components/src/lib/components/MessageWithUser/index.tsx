@@ -1,6 +1,6 @@
 import { MessageReaction } from '@mezon/components';
 import { selectCurrentChannelId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
+import { EmojiDataOptionals, IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import * as Icons from '../Icons/index';
@@ -29,9 +29,20 @@ export type MessageWithUserProps = {
 	newMessage?: string;
 	child?: JSX.Element;
 	isMention?: boolean;
+	dataReaction: EmojiDataOptionals[];
 };
 
-function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({
+	message,
+	preMessage,
+	user,
+	isMessNotifyMention,
+	mode,
+	newMessage,
+	child,
+	isMention,
+	dataReaction,
+}: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -115,7 +126,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntChildDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					></div>
 					<div
-						className={`flex h-15 flex-col w-auto px-3 py-0.5
+						className={`flex h-15 flex-col w-auto px-3
 						${isMention ? 'mt-0' : isCombine ? '' : 'pt-[2px]'}
 						${hasIncludeMention || checkReplied || checkMessageTargetToMoved ? `${classNameHighligntParentDiv}` : 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]'}`}
 					>
@@ -139,7 +150,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
-						<MessageReaction currentChannelId={currentChannelId || ''} message={message} mode={mode} />
+						<MessageReaction dataReaction={dataReaction} currentChannelId={currentChannelId || ''} message={message} mode={mode} />
 						{message && !isMessNotifyMention && (
 							<div
 								className={`absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}

@@ -13,6 +13,8 @@ const styles = StyleSheet.create({
     btnTitle: {
         color: Colors.tertiary,
         fontSize: 14,
+        flexBasis: 10,
+        flexGrow: 1,
     },
 
     btnTitleWrapper: {
@@ -22,11 +24,16 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        gap: 5
     },
     borderBottom: {
         borderBottomColor: Colors.borderDim,
         borderBottomWidth: 1,
+    },
+
+    disable: {
+        opacity: 0.8
     }
 })
 

@@ -78,7 +78,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		);
 		setAttachmentData(removedAttachment);
 	}
-
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
@@ -103,12 +102,28 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					if (!client || !session || !currentClanId) {
 						throw new Error('Client is not initialized');
 					}
+
 					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file, props.mode)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
+							files.length = 0;
+							navigator.clipboard
+								.writeText('')
+								.then(() => {})
+								.catch((error) => {
+									console.error('Failed to clear clipboard:', error);
+								});
 							return 'handled';
 						})
 						.catch((err) => {
+							console.error('Error uploading file:', err);
+							files.length = 0;
+							navigator.clipboard
+								.writeText('')
+								.then(() => {})
+								.catch((error) => {
+									console.error('Failed to clear clipboard:', error);
+								});
 							return 'not-handled';
 						});
 
@@ -116,7 +131,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				}
 			}
 		},
-		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
+		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef, props.mode],
 	);
 
 	const { closeMenu, statusMenu, isShowMemberList } = useMenu();
@@ -173,7 +188,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 MessageBox.Skeleton = () => {
 	return (
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-visible">
-			<form className="self-stretch p-4 bg-neutral-950 rounded-lg justify-start gap-2 inline-flex items-center">
+			<form className="self-stretch p-4 dark:bg-neutral-950 bg-bgLightSecondary rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
 					<div className="flex flex-row  justify-end h-fit">
 						<Icons.AddCircle />
@@ -183,7 +198,7 @@ MessageBox.Skeleton = () => {
 				<div className="grow self-stretch justify-start items-center gap-2 flex">
 					<div
 						contentEditable
-						className="grow text-white text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none "
+						className="grow text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none dark:text-textDarkTheme text-textLightTheme"
 					/>
 				</div>
 				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12 rounded-r-lg">
