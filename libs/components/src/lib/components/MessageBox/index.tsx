@@ -99,7 +99,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					const session = sessionRef.current;
 					const client = clientRef.current;
 
-					if (!client || !session || !currentClanId) {
+					if (!client || !session || !currentChannelId) {
 						throw new Error('Client is not initialized');
 					}
 

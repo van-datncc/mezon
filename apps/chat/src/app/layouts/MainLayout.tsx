@@ -12,7 +12,13 @@ const MainLayout = () => {
 		setUserReactionPanelState(false);
 	};
 	return (
-		<div id="main-layout" onClick={handleClickingOutside}>
+		<div
+			id="main-layout"
+			onClick={handleClickingOutside}
+			onContextMenu={(event: React.MouseEvent) => {
+				event.preventDefault();
+			}}
+		>
 			<Outlet />
 		</div>
 	);
