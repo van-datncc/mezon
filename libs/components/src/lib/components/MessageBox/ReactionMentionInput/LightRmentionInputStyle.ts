@@ -16,7 +16,7 @@ export default {
 			border: '1px solid transparent',
 		},
 		input: {
-			padding: '9px 12px',
+			padding: '9px 10px',
 			border: 'none',
 			outline: 'none',
 			whiteSpace: 'pre-wrap',
