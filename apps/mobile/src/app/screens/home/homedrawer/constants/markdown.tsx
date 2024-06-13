@@ -1,9 +1,12 @@
 import { Colors, size } from "@mezon/mobile-ui";
-import { codeBlockRegex, codeBlockRegexGlobal, emojiRegex, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from "../../../../../app/utils/helpers";
-import { View, Text } from "react-native";
+import { channelIdRegex, codeBlockRegex, codeBlockRegexGlobal, emojiRegex, markdownDefaultUrlRegex, mentionRegex, splitBlockCodeRegex, urlRegex } from "../../../../../app/utils/helpers";
+import { View, Text , StyleSheet} from "react-native";
 import { IEmojiImage, getSrcEmoji } from "@mezon/utils";
 import FastImage from "react-native-fast-image";
 import {Linking} from 'react-native';
+import Markdown from "react-native-markdown-display";
+import { TFunction } from "i18next";
+import { ChannelsEntity } from "@mezon/store-mobile";
 
 export default function openUrl(url, customCallback) {
   if (customCallback) {
@@ -97,7 +100,6 @@ export const markdownStyles = {
  */
 export const renderRulesCustom = {
     heading1: (node, children, parent, styles) => {
-        console.log(node, children, parent, styles);
         return (
             <View key={node.key} style={styles._VIEW_SAFE_heading1}>
                 {children}
@@ -182,7 +184,7 @@ export const renderRulesCustom = {
                 </Text>
             )
         }
-    
+
         return (
           <Text key={node.key} style={[inheritedStyles, styles.fence]}>
             {content}
@@ -197,7 +199,7 @@ export const renderRulesCustom = {
 export const formatUrls = (text: string) => {
     const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
     const parts = modifiedString.split('\0').filter(Boolean);
-    
+
     return parts?.map((part) => {
         if (codeBlockRegex.test(part)) {
             return part;
@@ -215,19 +217,19 @@ export const formatUrls = (text: string) => {
 }
 
 export const formatEmoji = (text: string, emojiImages: IEmojiImage[] = []) => {
-    const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
-    const parts = modifiedString.split('\0').filter(Boolean);
-    return parts?.map((part) => {
-        if (codeBlockRegex.test(part)) {
-            return part;
-        } else {
-            if (emojiRegex.test(part)) {
-                const srcEmoji = getSrcEmoji(part, emojiImages);
-                return srcEmoji ? `![${part}](${srcEmoji})` : part;
-            }
-            return part;
-        }
-    }).join('');
+  const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
+  const parts = modifiedString.split('\0').filter(Boolean);
+  return parts?.map((part) => {
+      if (codeBlockRegex.test(part)) {
+          return part;
+      } else {
+          if (part.match(emojiRegex)) {
+              const srcEmoji = getSrcEmoji(part, emojiImages);
+              return srcEmoji ? `![${part}](${srcEmoji})` : part;
+          }
+          return part;
+      }
+  }).join('');
 };
 
 export const formatBlockCode = (text: string) => {
@@ -242,3 +244,94 @@ export const formatBlockCode = (text: string) => {
     };
     return text.replace(codeBlockRegexGlobal, addNewlinesToCodeBlock);
 }
+
+
+export const renderTextContent = (lines: string, isEdited?: boolean, t?: TFunction, channelsEntities?: Record<string, ChannelsEntity>, emojiListPNG?: IEmojiImage[],
+  onMention?: (url: string)=>void, onChannelMention?: (channel: ChannelsEntity)=>void) => {
+  if (!lines) return null;
+
+  const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
+  const matchesUrls = lines.match(urlRegex);         //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
+  const isExistEmoji = emojiRegex.test(lines);
+  const isExistBlockCode = codeBlockRegex.test(lines);
+
+  let content: string = lines;
+
+  if (matchesMentions) {
+    content = formatMention(content, matchesMentions, channelsEntities);
+  }
+
+  if (matchesUrls) {
+    content = formatUrls(content);
+  }
+
+  if (isExistEmoji) {
+    content = formatEmoji(content, emojiListPNG);
+  }
+
+  if (isExistBlockCode) {
+    content = formatBlockCode(content);
+  }
+
+  if (isEdited) {
+    content = content + ` [${t('edited')}](${EDITED_FLAG})`;
+  }
+
+  return (
+    <Markdown
+      style={markdownStyles as StyleSheet.NamedStyles<any>}
+      rules={renderRulesCustom}
+      onLinkPress={(url) => {
+        if (url.startsWith('@')) {
+          onMention && onMention(url);
+          return false;
+        }
+
+        if (url.startsWith('#')) {
+          const channelId = url.slice(1);
+          const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
+          onChannelMention && onChannelMention(channel)
+          return false;
+        }
+        //Note: return false to prevent default
+        return true;
+      }}
+    >
+      {content}
+    </Markdown>
+  );
+};
+
+
+const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsEntities:  Record<string, ChannelsEntity>) => {
+  const parts = text.split(splitBlockCodeRegex);
+
+  return parts?.map((part) => {
+    if (codeBlockRegex.test(part)) {
+      return part;
+    } else {
+      if (matchesMention.includes(part)) {
+        if (part.startsWith('@')) {
+          return `[${part}](${part})`;
+        }
+        if (part.startsWith('<#')) {
+          const channelId = part.match(channelIdRegex)[1];
+          const channel = getChannelById(channelId, channelsEntities);
+          return `[#${channel.channel_label}](#${channelId})`;
+        }
+      }
+    }
+    return part;
+  }).join('');
+}
+
+const getChannelById = (channelHashtagId: string, channelsEntities:  Record<string, ChannelsEntity>) => {
+  const channel = channelsEntities?.[channelHashtagId];
+  if (channel) {
+    return channel;
+  } else {
+    return {
+      channel_label: channelHashtagId
+    }
+  }
+};

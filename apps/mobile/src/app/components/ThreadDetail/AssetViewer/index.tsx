@@ -3,6 +3,7 @@ import styles from "./style"
 import MemberListStatus from "../../MemberStatus";
 import AssetsHeader from "../AssetsHeader";
 import { useState, useRef } from "react";
+import PinMessage from "../../PinMessage";
 
 const TabList = [
     "Members",
@@ -37,9 +38,9 @@ export default function AssetsViewer() {
             <View style={styles.container}>
                 <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
                     <MemberListStatus />
-                    <Page2 /> 
-                    <Page2 /> 
-                    <Page2 /> 
+                    <Page2 />
+                    <PinMessage />
+                    <Page2 />
                     <Page2 />
                 </ScrollView>
             </View >
