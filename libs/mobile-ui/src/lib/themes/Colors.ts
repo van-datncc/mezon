@@ -119,6 +119,7 @@ const colors = {
 	tertiary: isDarkTheme ? '#bcbcbc' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
+	gray4850: isDarkTheme ? '#484848e0' : '#484848e0',
 	textLink: '#007AFF',
 	borderDim: isDarkTheme ? '#5a5b5c30' : '#5a5b5c30',
 	/* border color */

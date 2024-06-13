@@ -3,13 +3,14 @@ import { Pressable, Switch, Text, TextInput, View } from 'react-native';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import styles from './style';
 import { CrossIcon, LockIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 
-export default function CategoryCreator({ navigation }: { navigation: any }) {
+type CreateCategoryScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CATEGORY;
+export default function CategoryCreator({ navigation }: MenuClanScreenProps<CreateCategoryScreen>) {
     const [isPrivate, setPrivate] = useState<boolean>(false);
     const [categoryName, setCategoryName] = useState<string>("");
     const dispatch = useAppDispatch();
@@ -28,6 +29,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                 </Text>
             </Pressable>
         ),
+
         headerLeft: () => (
             <Pressable style={{ padding: 20 }} onPress={handleClose}>
                 <CrossIcon height={16} width={16} />
@@ -45,7 +47,6 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
         await dispatch(categoriesActions.createNewCategory(body));
         setCategoryName('');
 
-        // @ts-ignore
         navigation.navigate(APP_SCREEN.HOME);
     };
 
