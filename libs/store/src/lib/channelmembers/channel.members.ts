@@ -343,6 +343,8 @@ export const selectMemberById = (userId: string) =>
 
 export const selectMemberByUserId = (userId: string) =>
 	createSelector(selectAllChannelMembers, (entities) => {
+		console.log(entities);
+		
 		return entities.find((ent) => ent?.user?.id === userId) || null;
 	});
 
