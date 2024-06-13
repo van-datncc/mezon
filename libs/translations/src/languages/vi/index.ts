@@ -14,6 +14,8 @@ import profile from './profile.json';
 import clanMenu from "./clanMenu.json";
 import categoryCreator from "./categoryCreator.json";
 import screenStack from "./screenStack.json";
+import clanSetting from "./clanSetting.json";
+import clanOverviewSetting from "./clanOverviewSetting.json";
 import categoryMenu from "./categoryMenu.json";
 
 export default {
@@ -33,5 +35,7 @@ export default {
 	clanMenu,
 	categoryCreator,
 	screenStack,
+	clanSetting,
+	clanOverviewSetting,
 	categoryMenu
 };
