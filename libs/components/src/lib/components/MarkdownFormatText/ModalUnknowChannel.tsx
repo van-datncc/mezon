@@ -20,7 +20,11 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
                         <span className="text-5xl leading-3 dark:hover:text-white hover:text-black cursor-pointer" onClick={onClose}>×</span>
                     </div>
                     <div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4">
-                        <button className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary dark:text-white text-black" onClick={onClose}>Okay</button>
+                        <button 
+                            className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary" 
+                            onClick={onClose}
+                            style={{color: 'white'}}
+                        >Okay</button>
                     </div>
                 </div>
             </div>

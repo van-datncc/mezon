@@ -89,9 +89,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 		const title = option === OptionEvent.OPTION_LOCATION ? titleEvent : '';
 
 		const timeValueStart = handleTimeISO(selectedDateStart, timeStart);
-		const timeValueEnd = handleTimeISO(selectedDateStart, timeEnd);
+		const timeValueEnd = handleTimeISO(selectedDateEnd, timeEnd);
 
-		if(!timeValueEnd){
+		if(option === OptionEvent.OPTION_SPEAKER){
 			await createEventManagement(currentClanId || '', voice, title, topic, timeValueStart, timeValueStart, description, logo);
 			hanldeCloseModal();
 			return;
@@ -133,7 +133,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	},[]);
 
 	return (
-		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4">
+		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4" >
 			<div className="flex gap-x-4 mb-4">
 				{tabs.map((item, index) => {
 					const isCurrent = currentModal === index;

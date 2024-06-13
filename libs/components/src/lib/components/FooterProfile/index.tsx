@@ -1,6 +1,7 @@
-import { useApp, useOnClickOutside, useVoice } from '@mezon/core';
+import { useApp, useAuth, useOnClickOutside, useVoice } from '@mezon/core';
 import {
 	ChannelsEntity,
+	selectMemberByUserId,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	useAppDispatch,
@@ -54,7 +55,7 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 	};
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
-
+	
 	return (
 		<>
 			<button

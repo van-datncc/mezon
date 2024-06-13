@@ -62,7 +62,7 @@ export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChan
                     {isFriend && showAction && !selectMode ? (
                         <View style={styles.friendAction}>
                             <Pressable onPress={() => onPressAction(EFriendItemAction.Call)}>
-                                <CallIcon width={18} height={18} color={Colors.textGray} />
+                                <CallIcon width={24} height={18} color={Colors.textGray} />
                             </Pressable>
                             <Pressable onPress={() => onPressAction(EFriendItemAction.MessageDetail)}>
                                 <MessageIcon width={25} height={18} color={Colors.textGray} />

@@ -5,7 +5,7 @@ export const convertMentionsToText = (text: string) => {
 		if (userMention) {
 			return `@${userMention}`;
 		} else if (hashtagMention && hashtagId) {
-			return `#${hashtagId}`;
+			return `<#${hashtagId}>`;
 		} else if (tagValue) {
 			return `${tagValue}`;
 		} else {

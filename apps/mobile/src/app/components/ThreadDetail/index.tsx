@@ -1,33 +1,35 @@
-import React from 'react'
-import { View , Text, TouchableOpacity} from 'react-native'
-import { styles } from './styles'
-import {useNavigation} from '@react-navigation/native'
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { ThreadIcon } from '@mezon/mobile-components';
-import { useReference, useThreads } from '@mezon/core';
+import { useThreads } from '@mezon/core';
+import { size } from '@mezon/mobile-ui';
+import React from 'react';
+import { ScrollView, View } from 'react-native';
+import EmptyThread from './EmptyThread';
+import GroupThread from './GroupThread';
+import ThreadItem from './ThreadItem';
+import { styles } from './styles';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateThreadModal() {
-  const { setValueThread } = useThreads();
-  const { setOpenThreadMessageState } = useReference();
-  const navigation = useNavigation<any>();
-  const handleNavigateCreateForm = () =>{
-    setOpenThreadMessageState(false);
-    setValueThread(null);
-    navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL});
-  }
-  return (
-    <View style={styles.createChannelContainer}>
-      <View style={styles.createChannelContent}>
-        <View style={styles.iconContainer}><ThreadIcon width={22} height={22}/></View>
-      <Text style={styles.textNoThread}>There are no threads</Text>
-      <Text style={styles.textNotify}>Stay focus on conversation with a threads - a temporary text channel.</Text>
-      <TouchableOpacity onPress={handleNavigateCreateForm} style={[styles.button]}>
-      <Text style={[styles.buttonText]}>Create Threads</Text>
-    </TouchableOpacity>
-      </View>
-    </View>
-  )
+	const { threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
+  const { t } = useTranslation(['createThread']);
+	return (
+		<View style={styles.createChannelContainer}>
+			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
+				{threadChannelOnline?.length ? (
+					<GroupThread title={`${threadChannelOnline.length} ${t('joinedThreads')}`}>
+						{threadChannelOnline?.map((thread) => (
+							<ThreadItem thread={thread} key={thread.id} />
+						))}
+					</GroupThread>
+				) : null}
+				{threadChannelOld?.length ? (
+					<GroupThread title={t('otherThreads')}>
+						{threadChannelOld?.map((thread) => (
+							<ThreadItem thread={thread} key={thread.id} />
+						))}
+					</GroupThread>
+				) : null}
+			</ScrollView>
+			{threadChannel.length === 0 && <EmptyThread />}
+		</View>
+	);
 }
-
-
-

@@ -19,7 +19,8 @@ export const styles = StyleSheet.create({
 		width: '93%',
 		borderRadius: 20,
 		color: Colors.white,
-        paddingVertical: size.s_6
+        paddingVertical: 0,
+		height: size.s_50,
 	},
     requestFriendWrapper: {
         backgroundColor: Colors.bgDarkCharcoal,
