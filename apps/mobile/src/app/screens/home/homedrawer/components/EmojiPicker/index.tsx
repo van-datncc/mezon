@@ -1,9 +1,9 @@
 import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { useChatSending } from '@mezon/core';
+import { useChatSending, useDirectMessages } from '@mezon/core';
 import { SearchIcon } from '@mezon/mobile-components';
 import { Colors, Fonts } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
@@ -19,6 +19,7 @@ import styles from './styles';
 export type IProps = {
 	onDone: () => void;
 	bottomSheetRef: MutableRefObject<BottomSheetMethods>;
+	directMessageId?: string;
 };
 
 interface TextTabProps {
@@ -38,20 +39,26 @@ function TextTab({ selected, title, onPress }: TextTabProps) {
 
 type ExpressionType = 'emoji' | 'gif' | 'sticker';
 
-function EmojiPicker({ onDone, bottomSheetRef }: IProps) {
+function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
+
 	const [mode, setMode] = useState<ExpressionType>('emoji');
 	const [channelMode, setChannelMode] = useState(0);
 	const [searchText, setSearchText] = useState<string>('');
+
+	const dmMode = currentDirectMessage ?
+		Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP) :
+		'';
 
 	useEffect(() => {
 		setChannelMode(ChannelStreamMode.STREAM_MODE_CHANNEL);
 	}, []);
 
 	const { sendMessage } = useChatSending({
-		channelId: currentChannel?.id || '',
-		channelLabel: currentChannel?.channel_label || '',
-		mode: channelMode,
+		channelId: currentDirectMessage?.channel_id || currentChannel?.id || '',
+		channelLabel: currentDirectMessage?.channel_label || currentChannel?.channel_label || '',
+		mode: dmMode || channelMode,
 	});
 
 	const handleSend = useCallback(

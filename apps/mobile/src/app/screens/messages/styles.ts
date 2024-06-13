@@ -102,7 +102,8 @@ export const styles = StyleSheet.create({
     },
     lastMessage: {
         fontSize: size.s_12,
-        color: Colors.gray72
+        color: Colors.gray72,
+        lineHeight: size.s_18
     },
     dateTime: {
         fontSize: size.s_12,
