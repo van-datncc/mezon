@@ -12,22 +12,21 @@ const styles = StyleSheet.create({
 
     serverName: {
         color: Colors.white,
-        fontSize: 18,
-        fontWeight: "700",
-        marginBottom: 10
+        fontSize: 14,
+        fontWeight: "700"
     },
 
     header: {
         gap: 15,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-start"
+        justifyContent: "flex-start",
+        marginBottom: 30
     },
 
     container: {
         padding: 20,
         paddingTop: 0,
-        gap: 20
     }
 })
 
