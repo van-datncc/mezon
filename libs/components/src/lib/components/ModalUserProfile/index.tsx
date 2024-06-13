@@ -16,7 +16,7 @@ type ModalUserProfileProps = {
 
 const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) => {
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-
+	
 	const { sendInviteMessage } = useSendInviteMessage();
 	const { createDirectMessageWithUser } = useDirect();
 	const [content, setContent] = useState<string>('');
@@ -62,13 +62,13 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
-				userById = {userById}
+				userToDisplay = {isFooterProfile ? userProfile : userById}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
-						<p className="font-semibold tracking-wider text-xl one-line my-0">{userById ? userById?.user?.username : "Anonymous"}</p>
-						<p className="font-medium tracking-wide text-sm my-0">{userById ? userById?.user?.display_name : "Unknown"}</p>
+						<p className="font-semibold tracking-wider text-xl one-line my-0">{isFooterProfile ? userProfile?.user?.username : (userById ? userById?.user?.username : "Anonymous")}</p>
+						<p className="font-medium tracking-wide text-sm my-0">{isFooterProfile ? userProfile?.user?.display_name : (userById ? userById?.user?.display_name : "Unknown")}</p>
 					</div>
 					<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}

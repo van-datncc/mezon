@@ -3,13 +3,13 @@ import { ChannelMembersEntity } from '@mezon/utils';
 type AvatarProfileProps = {
 	avatar?: string;
 	username?: string;
-	userById: ChannelMembersEntity | null;
+	userToDisplay: any;
 };
 
-const AvatarProfile = ({ avatar, username, userById }: AvatarProfileProps) => {
+const AvatarProfile = ({ avatar, username, userToDisplay }: AvatarProfileProps) => {
 	return (
 		<div className="text-black ml-[50px]">
-			{userById ? (
+			{userToDisplay ? (
 				!avatar ? (
 					<div className="w-[90px] h-[90px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[50px] mt-[-50px] ml-[-25px]">
 						{username?.charAt(0).toUpperCase()}
