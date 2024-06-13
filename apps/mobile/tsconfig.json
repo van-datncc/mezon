@@ -10,7 +10,8 @@
 		"moduleResolution": "node",
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
-		"declaration": true
+		"declaration": true,
+		"composite": true
 	},
 	"files": [],
 	"include": [],

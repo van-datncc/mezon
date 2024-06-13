@@ -10,6 +10,7 @@ import * as Icons from '../Icons';
 import { IconFriends } from '../Icons';
 import DMListItem from './DMListItem';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
+import { Tooltip } from 'flowbite-react';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -80,7 +81,9 @@ function DirectMessageList() {
 						onClick={onClickOpenModal}
 						className="cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
 					>
-						<Icons.Plus />
+						<Tooltip content='Create DM' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+							<Icons.Plus />
+						</Tooltip>
 					</button>
 				</div>
 			</div>

@@ -124,10 +124,10 @@ export function SettingIcon({ width = 60, height = 60, color = 'white', ...props
 	);
 }
 
-export function AngleRightIcon({ width = 60, height = 60, color ='white', ...props }: SvgProps) {
+export function AngleRightIcon({ width = 60, height = 60, color = "#c7c7c7", ...props }: SvgProps) {
 	return (
-		<Svg width={width} height={height} viewBox="-12 0 32 32" {...props}>
-			<Path fill={color} d="M0.88 23.28c-0.2 0-0.44-0.080-0.6-0.24-0.32-0.32-0.32-0.84 0-1.2l5.76-5.84-5.8-5.84c-0.32-0.32-0.32-0.84 0-1.2 0.32-0.32 0.84-0.32 1.2 0l6.44 6.44c0.16 0.16 0.24 0.36 0.24 0.6s-0.080 0.44-0.24 0.6l-6.4 6.44c-0.2 0.16-0.4 0.24-0.6 0.24z"></Path>
+		<Svg fill={color} width={width} height={height} viewBox="-12 0 32 32" {...props}>
+			<Path d="M0.88 23.28c-0.2 0-0.44-0.080-0.6-0.24-0.32-0.32-0.32-0.84 0-1.2l5.76-5.84-5.8-5.84c-0.32-0.32-0.32-0.84 0-1.2 0.32-0.32 0.84-0.32 1.2 0l6.44 6.44c0.16 0.16 0.24 0.36 0.24 0.6s-0.080 0.44-0.24 0.6l-6.4 6.44c-0.2 0.16-0.4 0.24-0.6 0.24z"></Path>
 		</Svg>
 	);
 }

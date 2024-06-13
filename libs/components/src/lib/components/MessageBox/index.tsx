@@ -78,7 +78,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		);
 		setAttachmentData(removedAttachment);
 	}
-
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
@@ -103,12 +102,28 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					if (!client || !session || !currentClanId) {
 						throw new Error('Client is not initialized');
 					}
+
 					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file, props.mode)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
+							files.length = 0;
+							navigator.clipboard
+								.writeText('')
+								.then(() => {})
+								.catch((error) => {
+									console.error('Failed to clear clipboard:', error);
+								});
 							return 'handled';
 						})
 						.catch((err) => {
+							console.error('Error uploading file:', err);
+							files.length = 0;
+							navigator.clipboard
+								.writeText('')
+								.then(() => {})
+								.catch((error) => {
+									console.error('Failed to clear clipboard:', error);
+								});
 							return 'not-handled';
 						});
 
@@ -116,7 +131,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				}
 			}
 		},
-		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef],
+		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef, props.mode],
 	);
 
 	const { closeMenu, statusMenu, isShowMemberList } = useMenu();

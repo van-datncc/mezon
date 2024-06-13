@@ -1,0 +1,30 @@
+{
+    "menu": {
+        "settings": {
+            "title": "Cài đặt",
+            "overview": "Tổng quan",
+            "moderation": "Điều chỉnh",
+            "auditLog": "Nhật ký chỉnh sửa",
+            "channels": "Kênh",
+            "integrations": "Tích hợp",
+            "emoji": "Emoji",
+            "webhooks": "Webhooks",
+            "security": "Bảo mật"
+        },
+        "community": {
+            "title": "Cộng đồng",
+            "enableCommunity": "Kích hoạt cộng đồng"
+        },
+        "subscriptions": {
+            "title": "Gói đăng ký máy chủ",
+            "getStarted": "Bắt đâu"
+        },
+        "userManagement": {
+            "title": "Quản lý người dùng",
+            "members": "Thành viên",
+            "role": "Vai trò",
+            "invite": "Lời mời",
+            "bans": "Chặn"
+        }
+    }
+}
