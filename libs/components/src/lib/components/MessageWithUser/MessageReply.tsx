@@ -76,6 +76,17 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 					</div>
 				</div>
 			)}
+			{ !messageRefFetchFromServe && message.references && message?.references.length > 0 &&
+				(<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
+					<Icons.ReplyCorner />
+					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
+						<div className='rounded-full bg-bgSurface size-4'>
+							<Icons.IconReplyMessDeleted />
+						</div>
+						<i className='dark:text-zinc-400 text-colorTextLightMode text-[13px]'>Original message was deleted</i>
+					</div>
+				</div>)
+			}
 		</div>
 	);
 };

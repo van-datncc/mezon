@@ -11,6 +11,12 @@ import profileSetting from './profileSetting.json';
 import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
 import profile from './profile.json';
+import clanMenu from "./clanMenu.json";
+import categoryCreator from "./categoryCreator.json";
+import screenStack from "./screenStack.json";
+import pinMessage from './pinMessage.json';
+import clanSetting from "./clanSetting.json";
+import clanOverviewSetting from "./clanOverviewSetting.json";
 
 export default {
 	inviteToChannel,
@@ -25,5 +31,11 @@ export default {
 	profileSetting,
 	notificationSetting,
 	userProfile,
-	profile
+	profile,
+	clanMenu,
+	categoryCreator,
+	screenStack,
+	pinMessage,
+	clanSetting,
+	clanOverviewSetting
 };

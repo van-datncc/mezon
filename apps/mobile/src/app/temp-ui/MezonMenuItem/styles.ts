@@ -1,5 +1,5 @@
-import { Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
+import { Colors, size } from "@mezon/mobile-ui";
 
 const styles = StyleSheet.create({
     btn: {
@@ -13,16 +13,27 @@ const styles = StyleSheet.create({
     btnTitle: {
         color: Colors.tertiary,
         fontSize: 14,
+        flexBasis: 10,
+        flexGrow: 1,
     },
 
     btnTitleWrapper: {
         padding: 15,
         paddingLeft: 0,
-        flexGrow: 1
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 5
     },
     borderBottom: {
         borderBottomColor: Colors.borderDim,
         borderBottomWidth: 1,
+    },
+
+    disable: {
+        opacity: 0.8
     }
 })
 

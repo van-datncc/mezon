@@ -7,13 +7,12 @@ type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
 	mode: any;
 	message: IMessageWithUser;
-	moveToRight?: boolean;
 };
 
-const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserReactionPanelProps) => {
+const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const { emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
-	const { reactionMessageDispatch } = useChatReaction();
+	const { reactionMessageDispatch, arrowPosition } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		await reactionMessageDispatch(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
 	};
@@ -31,8 +30,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 		<>
 			<div
 				onClick={(e) => e.stopPropagation()}
-				className={`absolute z-50  bottom-7 w-[18rem]
-				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${moveToRight ? 'right-0' : 'left-0'} `}
+				className={`z-50   w-[18rem]
+				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1 bottom-0'}`}
 			>
 				<div>
 					<div className="flex flex-row items-center m-2 dark:text-white text-black">
@@ -48,7 +47,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 								<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
 									<AvatarComponent id={sender.sender_id ?? ''} />
 									<NameComponent id={sender.sender_id ?? ''} />
-									<p className="text-xs absolute right-8">{sender.count}</p>
+									<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
 									{sender.sender_id === userId.userId && sender.count > 0 && (
 										<div
 											onClick={(e: any) => {
@@ -71,9 +70,14 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message, moveToRight }: UserR
 							</div>
 						);
 					}
+
 					return null;
 				})}
+
 				<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
+			</div>
+			<div className={`dark:text-[#28272b] text-white mt-[-0.4rem] ${arrowPosition ? 'flex justify-end' : 'flex justify-center'} `}>
+				<Icons.ArrowDownFill />
 			</div>
 		</>
 	);

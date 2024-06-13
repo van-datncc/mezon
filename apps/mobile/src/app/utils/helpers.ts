@@ -46,9 +46,16 @@ export const normalizeString = (str: string) => {
   return normalizedStr.toLowerCase();
 }
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
-export const mentionRegex = /(?<=(\s|^))(@|#)\S+(?=\s|$)/g;
-export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$))/g;
+export const mentionRegex = /(?<=(^|[^`]))(@\S+|#[^\s#]+)(?=\s|$)|<#\d+>/g;
+export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$)|<#\d+>)/g;
 export const highlightEmojiRegex = /(:\b[^:\s]*\b:)/g;
+export const urlRegex = /(https?:\/\/[^\s]+)/g;
+export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
+export const emojiRegex = /:[a-z0-9_]+:/g;
+export const channelIdRegex = /<#(\d+)>/;
+export const codeBlockRegex = /^```[\s\S]*```$/;
+export const codeBlockRegexGlobal = /```[\s\S]*?```/g;
+export const splitBlockCodeRegex = /(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-z0-9_]+:)/g;
 
 export const validURL = (string: string) => {
   const res = string.match(urlPattern);

@@ -121,6 +121,19 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 	}
 });
 
+export const deleteClan = createAsyncThunk(
+	"clans/deleteClans",
+	async (body: ChangeCurrentClanArgs, thunkAPI) =>{
+		try{
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
+		}
+		catch (error) {
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+)
+
 export const updateClan = createAsyncThunk(
 	'clans/updateClans',
 	async ({ clan_id, banner, clan_name, creator_id, logo }: ApiUpdateClanDescRequest, thunkAPI) => {

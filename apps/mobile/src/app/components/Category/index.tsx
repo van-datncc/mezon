@@ -1,26 +1,35 @@
 import { useState } from 'react';
 import { Pressable, Switch, Text, TextInput, View } from 'react-native';
-import LockIcon from "../../../assets/svg/lock.svg"
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import styles from './style';
-import { CrossIcon } from '@mezon/mobile-components';
+import { CrossIcon, LockIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
+import { useTranslation } from 'react-i18next';
 
-export default function CategoryCreator({ navigation }: { navigation: any }) {
+type CreateCategoryScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CATEGORY;
+export default function CategoryCreator({ navigation }: MenuClanScreenProps<CreateCategoryScreen>) {
     const [isPrivate, setPrivate] = useState<boolean>(false);
     const [categoryName, setCategoryName] = useState<string>("");
     const dispatch = useAppDispatch();
     const currentClanId = useSelector(selectCurrentClanId);
+    const { t } = useTranslation(['categoryCreator']);
 
     navigation.setOptions({
         headerRight: () => (
             <Pressable onPress={handleCreateCategory}>
-                <Text style={{ color: "white", paddingHorizontal: 20 }}>Create</Text>
+                <Text style={{
+                    color: "white",
+                    paddingHorizontal: 20,
+                    opacity: categoryName.trim().length > 0 ? 1 : 0.5
+                }}>
+                    {t("actions.create")}
+                </Text>
             </Pressable>
         ),
+
         headerLeft: () => (
             <Pressable style={{ padding: 20 }} onPress={handleClose}>
                 <CrossIcon height={16} width={16} />
@@ -29,14 +38,15 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
     });
 
     const handleCreateCategory = async () => {
+        if (categoryName.trim().length === 0) return;
+
         const body: ApiCreateCategoryDescRequest = {
             clan_id: currentClanId?.toString(),
-            category_name: categoryName,
+            category_name: categoryName.trim(),
         };
         await dispatch(categoriesActions.createNewCategory(body));
         setCategoryName('');
 
-        // @ts-ignore
         navigation.navigate(APP_SCREEN.HOME);
     };
 
@@ -51,10 +61,10 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
     return (
         <View style={styles.container}>
             <View>
-                <Text style={styles.label}>Category Name</Text>
+                <Text style={styles.label}>{t('fields.cateName.title')}</Text>
                 <TextInput
                     placeholderTextColor={'gray'}
-                    placeholder='New Category'
+                    placeholder={t('fields.cateName.placeholder')}
                     style={styles.input}
                     value={categoryName}
                     onChangeText={setCategoryName}
@@ -65,7 +75,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                 <View style={styles.checkboxWrapper}>
                     <View style={styles.labelIconWrapper}>
                         <LockIcon height={18} width={18} />
-                        <Text style={styles.labelNormal}>Private Category</Text>
+                        <Text style={styles.labelNormal}>{t('fields.catePrivate.title')}</Text>
                     </View>
                     <Switch
                         trackColor={{ false: Colors.gray48, true: Colors.green }}
@@ -74,7 +84,7 @@ export default function CategoryCreator({ navigation }: { navigation: any }) {
                     />
                 </View>
                 <Text style={styles.description}>
-                    By making a category private, only selected members and roles will be able to view this category. Synced channels in this category will automatically match to this setting.
+                    {t('fields.catePrivate.description')}
                 </Text>
             </View>
         </View>

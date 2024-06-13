@@ -74,7 +74,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			body: body,
 			data: data,
 			android: {
-				channelId,
+				channelId: 'mezon-mobile',
 				smallIcon: 'ic_notification',
 				color: '#000000',
 				pressAction: {
