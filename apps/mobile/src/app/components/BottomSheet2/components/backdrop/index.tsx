@@ -26,7 +26,6 @@ const Backdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
       containerAnimatedStyle,
     ],
     [style, containerAnimatedStyle]
-    // [style]
   );
 
   return <Animated.View style={containerStyle} />;
