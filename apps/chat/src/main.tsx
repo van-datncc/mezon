@@ -6,7 +6,7 @@ import './styles.scss';
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
-	dsn: "https://0ad9872b197a6c943650fb74933f8649@o4507416661786624.ingest.us.sentry.io/4507417628770304",
+	dsn: process.env.NX_CHAT_SENTRY_DNS,
 	integrations: [
 		Sentry.browserTracingIntegration(),
 		Sentry.replayIntegration(),
