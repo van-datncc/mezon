@@ -477,7 +477,7 @@ export type RemoveClanUsers = {
 
 export type RemoveChannelUsers = {
 	channelId: string;
-	ids?: string[];
+	userIds: string[];
 };
 
 export enum Tabs_Option {
