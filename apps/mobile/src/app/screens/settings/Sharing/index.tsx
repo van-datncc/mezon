@@ -117,12 +117,12 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const sendToDM = async (dataSend: { text: any }) => {
-		mezon.joinChatDirectMessage(channelSelected.id, '', ChannelType.CHANNEL_TYPE_DM);
+		await mezon.joinChatDirectMessage(channelSelected.id, '', Number(channelSelected?.type));
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
 			'',
-			ChannelStreamMode.STREAM_MODE_DM,
+			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{ t: dataSend.text },
 			[],
 			attachmentDataRef || [],
@@ -158,7 +158,7 @@ export const Sharing = ({ data, onClose }) => {
 			text: dataText,
 		};
 		// Send to DM message
-		if (channelSelected.type === ChannelStreamMode.STREAM_MODE_DM || channelSelected.type === ChannelStreamMode.STREAM_MODE_GROUP) {
+		if (channelSelected.type === ChannelType.CHANNEL_TYPE_GROUP || channelSelected.type === ChannelType.CHANNEL_TYPE_DM) {
 			await sendToDM(dataSend);
 		} else {
 			await sendToGroup(dataSend);
