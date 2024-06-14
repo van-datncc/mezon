@@ -1,6 +1,6 @@
 import { useCategory, useDirect, useReference } from '@mezon/core';
-import { CloseIcon, PenIcon, SearchIcon, SendIcon } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { CloseIcon, FileIcon, PenIcon, SearchIcon, SendIcon, abbreviateText } from '@mezon/mobile-components';
+import { Colors, size, verticalScale } from '@mezon/mobile-ui';
 import { channelsActions, directActions, getStoreAsync, selectCurrentClan } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
@@ -223,6 +223,24 @@ export const Sharing = ({ data, onClose }) => {
 		setAttachmentData(removedAttachment);
 	}
 
+	const renderFileView = (attachment: ApiMessageAttachment) => {
+		const splitFiletype = attachment.filetype.split('/');
+		const type = splitFiletype[splitFiletype.length - 1];
+		return (
+			<View style={styles.fileViewer}>
+				<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
+				<View style={{ maxWidth: '75%' }}>
+					<Text style={styles.fileName} numberOfLines={1}>
+						{abbreviateText(attachment.filename)}
+					</Text>
+					<Text style={styles.typeFile} numberOfLines={1}>
+						{type}
+					</Text>
+				</View>
+			</View>
+		);
+	};
+
 	return (
 		<SafeAreaView style={styles.wrapper}>
 			<View style={styles.header}>
@@ -245,9 +263,14 @@ export const Sharing = ({ data, onClose }) => {
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
 								{attachmentDataRef?.map((media, index) => {
+									const isFile = !media.filetype.includes('video') && !media.filetype.includes('image');
+
 									return (
-										<View key={`${media?.url}_${index}_media_sharing`} style={styles.wrapperItemMedia}>
-											<FastImage source={{ uri: media?.url }} style={styles.itemMedia} />
+										<View
+											key={`${media?.url}_${index}_media_sharing`}
+											style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
+										>
+											{isFile ? renderFileView(media) : <FastImage source={{ uri: media?.url }} style={styles.itemMedia} />}
 											<TouchableOpacity
 												style={styles.iconRemoveMedia}
 												onPress={() => removeAttachmentByUrl(media.url ?? '', media?.filename || '')}
