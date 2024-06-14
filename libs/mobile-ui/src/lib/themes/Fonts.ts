@@ -15,6 +15,8 @@ export const size = {
   h4: 26,
   h5: 20,
   h6: 19,
+  h7: 14,
+  h8: 11,
   input: 18,
   regular: 17,
   medium: verticalScale(14),
@@ -47,7 +49,7 @@ export const size = {
 
 const style = {
   h1: {
-    fontFamily: type.base,
+    XMLHttpRequestfontFamily: type.base,
     fontSize: size.h1
   },
   h2: {

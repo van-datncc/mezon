@@ -1,4 +1,4 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Colors, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 
     serverName: {
         color: Colors.white,
-        fontSize: 14,
+        fontSize: Fonts.size.h7,
         fontWeight: "700"
     },
 
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     },
 
     container: {
-        padding: 20,
+        padding: Metrics.size.xl,
         paddingTop: 0,
     }
 })
