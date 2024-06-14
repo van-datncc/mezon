@@ -137,6 +137,27 @@ export const deleteClan = createAsyncThunk(
 	}
 )
 
+type removeClanUsersPayload = {
+	clanId: string;
+    userId: string
+};
+
+export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ( {clanId, userId} : removeClanUsersPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const userIds = [userId]
+		const response = await mezon.client.removeClanUsers(mezon.session, clanId, userIds);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		thunkAPI.dispatch(fetchClans())
+		return response;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
+	}
+});
+
 export const updateClan = createAsyncThunk(
 	'clans/updateClans',
 	async ({ clan_id, banner, clan_name, creator_id, logo }: ApiUpdateClanDescRequest, thunkAPI) => {
@@ -298,6 +319,7 @@ export const clansActions = {
 	fetchClans,
 	createClan,
 	updateClan,
+	removeClanUsers,
 	changeCurrentClan,
 	updateUser,
 	deleteClan,
