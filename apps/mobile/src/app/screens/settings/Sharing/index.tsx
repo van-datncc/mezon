@@ -1,6 +1,6 @@
 import { useCategory, useDirect, useReference } from '@mezon/core';
 import { CloseIcon, FileIcon, PenIcon, SearchIcon, SendIcon, abbreviateText, getAttachmentUnique } from '@mezon/mobile-components';
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState, verticalScale } from '@mezon/mobile-ui';
 import { channelsActions, directActions, getStoreAsync, selectCurrentClan } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
@@ -8,6 +8,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Wave } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,6 +24,7 @@ export const Sharing = ({ data, onClose }) => {
 	const dispatch = useDispatch();
 	const [dataText, setDataText] = useState<string>('');
 	const [dataShareTo, setDataShareTo] = useState<any>([]);
+	const [isLoading, setIsLoading] = useAnimatedState<boolean>(false);
 	const [searchText, setSearchText] = useState<string>('');
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();
@@ -154,6 +156,7 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const onSend = async () => {
+		setIsLoading(true);
 		const dataSend = {
 			text: dataText,
 		};
@@ -163,6 +166,7 @@ export const Sharing = ({ data, onClose }) => {
 		} else {
 			await sendToGroup(dataSend);
 		}
+		setIsLoading(false);
 		onClose();
 	};
 
@@ -254,9 +258,13 @@ export const Sharing = ({ data, onClose }) => {
 				</TouchableOpacity>
 				<Text style={styles.titleHeader}>Share</Text>
 				{channelSelected ? (
-					<TouchableOpacity onPress={onSend}>
-						<SendIcon width={size.s_28} height={size.s_20} />
-					</TouchableOpacity>
+					isLoading ? (
+						<Wave size={size.s_28} color={Colors.white} />
+					) : (
+						<TouchableOpacity onPress={onSend}>
+							<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />
+						</TouchableOpacity>
+					)
 				) : (
 					<View style={{ width: size.s_28 }} />
 				)}
