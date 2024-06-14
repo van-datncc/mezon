@@ -1,11 +1,14 @@
 import { useAuth } from '@mezon/core';
+import { selectIsLogin } from '@mezon/store';
 import { useGoogleLogin } from '@react-oauth/google';
 import isElectron from 'is-electron';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const GoogleButtonLogin: React.FC = () => {
 	const { loginByGoogle } = useAuth();
+	const isLogin = useSelector(selectIsLogin);
 
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
@@ -13,8 +16,11 @@ const GoogleButtonLogin: React.FC = () => {
 		//redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
 			const session = await loginByGoogle(code);
-			const jsonString = encodeURIComponent(JSON.stringify(session));
-			window.location.href = `mezonapp://accounts?data=${jsonString}`;
+
+			if (!isLogin) {
+				const jsonString = encodeURIComponent(JSON.stringify(session));
+				window.location.href = `mezonapp://accounts?data=${jsonString}`;
+			}
 		},
 		onError: (errorResponse) => console.log(errorResponse),
 	});

@@ -13,6 +13,10 @@ window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
   })
 });
 
+window.electron?.onDeepLinkUrl((deepLinkUrl) => {
+  localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
+});
+
 window.electron?.on(NOTIFICATION_SERVICE_ERROR, (_, error) => {
   console.log('notification error', error);
 });

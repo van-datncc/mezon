@@ -1,6 +1,6 @@
-import { Session } from 'mezon-js';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { Session } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { getMezonCtx } from '../helpers';
 export const AUTH_FEATURE_KEY = 'auth';
@@ -94,6 +94,7 @@ export const authSlice = createSlice({
 	initialState: initialAuthState,
 	reducers: {
 		setSession(state, action) {
+			console.log('action', action.payload);
 			state.session = action.payload;
 			state.isLogin = true;
 		},
@@ -176,4 +177,3 @@ export const selectAuthIsLoaded = createSelector(getAuthState, (state: AuthState
 export const selectIsLogin = createSelector(getAuthState, (state: AuthState) => state.isLogin);
 
 export const selectSession = createSelector(getAuthState, (state: AuthState) => state.session);
-

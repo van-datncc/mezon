@@ -81,6 +81,17 @@ export default class App {
 			App.application.on('second-instance', (e, argv) => {
 				if (process.platform == 'win32') {
 					deeplinkingUrl = argv.slice(1);
+
+					const url = argv.pop().slice(1);
+
+					if (url) {
+						const index = url.indexOf('=');
+						const dataString = url.substring(index + 1);
+
+						if (dataString) {
+							App.mainWindow.webContents.send('send-data-to-renderer', dataString);
+						}
+					}
 				}
 
 				if (App.mainWindow) {
@@ -144,15 +155,6 @@ export default class App {
 		if (process.platform == 'win32') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
-			logEverywhere('createWindow2# ' + deeplinkingUrl);
-		}
-
-		logEverywhere('deeplinkingUrl' + deeplinkingUrl);
-
-		function logEverywhere(s) {
-			if (App.mainWindow && App.mainWindow.webContents) {
-				App.mainWindow.webContents.executeJavaScript(`console.log("${s}")`);
-			}
 		}
 	}
 
