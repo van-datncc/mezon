@@ -4,19 +4,26 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     listHeader: {
         width: '100%',
-        height: 30,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        position: "absolute",
+        top: 2,
+        left: 0,
+        padding: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 10
     },
 
     titleNameWrapper: {
         display: "flex",
+        backgroundColor: Colors.gray4850,
+        paddingHorizontal: 10,
+        paddingVertical: 3,
+        borderRadius: 20,
         flexDirection: "row",
         gap: 5,
-        alignItems: "center"
+        alignItems: "center",
     },
 
     titleServer: {
@@ -38,8 +45,17 @@ const styles = StyleSheet.create({
         fontSize: 9,
     },
 
+    actions: {
+        padding: 4,
+        backgroundColor: Colors.gray4850,
+        borderRadius: 999
+    },
+
     container: {
-        padding: 10,
+        height: 150,
+        width: "100%",
+        position: "relative",
+        marginBottom: 20
     }
 });
 

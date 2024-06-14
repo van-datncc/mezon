@@ -7,9 +7,19 @@ const styles = StyleSheet.create({
     },
     fakeInput: {
         borderColor: Colors.gray48,
+        backgroundColor: Colors.primary,
         borderWidth: 1,
-        borderRadius: 10,
+        borderRadius: 15,
     },
+
+    fakeInputFocus: {
+        borderColor: Colors.gray48,
+    },
+
+    fakeInputBlur: {
+        borderColor: "transparent",
+    },
+
     inputBox: {
         display: "flex",
         flexDirection: "row",
@@ -19,7 +29,7 @@ const styles = StyleSheet.create({
     },
 
     label: {
-        color: Colors.gray48,
+        color: Colors.gray72,
         fontSize: 14,
         fontWeight: 'bold',
         marginBottom: 5

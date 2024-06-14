@@ -1,5 +1,7 @@
 {
     "menuClanStack": {
-        "categoryCreator": "Create Category"
+        "categoryCreator": "Create Category",
+        "clanSetting": "Server Settings",
+        "clanOverviewSetting": "Overview Settings"
     }
 }

@@ -3,6 +3,7 @@ import { useApp, useChatReaction, useGifsStickersEmoji, useMenu, useReference, u
 import { selectCurrentChannel, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
@@ -14,7 +15,7 @@ const ChannelLayout = () => {
 	const { closeMenu, statusMenu } = useMenu();
 	const { isShowCreateThread } = useThreads();
 	const { isShowMemberList } = useApp();
-	const { positionOfSmileButton } = useChatReaction();
+	const { positionOfSmileButton, setUserReactionPanelState } = useChatReaction();
 
 	const HEIGHT_EMOJI_PANEL: number = 457;
 	const WIDTH_EMOJI_PANEL: number = 500;
@@ -30,11 +31,15 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
+
+
+
 	return (
 		<div
 			className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-			  h-[100%] overflow-visible
+			  h-[100%] overflow-visible 
+			   
 			   ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 		>
 			<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>

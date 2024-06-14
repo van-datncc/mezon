@@ -43,15 +43,17 @@ const NavigationMain = () => {
 		}, 2500);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			Toast.show({
-				type: 'info',
-				text1: remoteMessage.notification?.title,
-				text2: remoteMessage.notification?.body,
-				onPress: async () => {
-					Toast.hide();
-					await navigateToNotification(remoteMessage, null, null);
-				},
-			});
+			if (remoteMessage.notification?.title) {
+				Toast.show({
+					type: 'info',
+					text1: remoteMessage.notification?.title,
+					text2: remoteMessage.notification?.body,
+					onPress: async () => {
+						Toast.hide();
+						await navigateToNotification(remoteMessage, null, null);
+					},
+				});
+			}
 		});
 		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
@@ -71,13 +73,7 @@ const NavigationMain = () => {
 	}, [isLoggedIn, hasInternet]);
 
 	const handleAppStateChange = async (state: string) => {
-		if (state === 'inactive' || state === 'background') {
-			reconnect().catch((e) => 'trying to reconnect');
-		} else if (state === 'active') {
-			/* empty */
-		} else {
-			/* empty */
-		}
+		reconnect().catch((e) => 'trying to reconnect');
 	};
 
 	const authLoader = async () => {

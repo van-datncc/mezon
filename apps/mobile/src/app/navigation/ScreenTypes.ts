@@ -1,3 +1,7 @@
+import { CompositeNavigationProp, CompositeScreenProps, NavigatorScreenParams, ParamListBase } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { StackScreenProps } from "@react-navigation/stack";
+
 export const APP_SCREEN = {
   UN_AUTHORIZE: 'UN_AUTHORIZE',
   LOGIN: 'LOGIN',
@@ -35,7 +39,7 @@ export const APP_SCREEN = {
     REQUEST_FRIEND_SETTING: 'ROUTES.FRIENDS.REQUEST_FRIEND_SETTING',
   },
 
-PROFILE: {
+  PROFILE: {
     STACK: 'ROUTES.PROFILE.STACK',
     HOME: 'ROUTES.PROFILE.HOME',
   },
@@ -50,7 +54,9 @@ PROFILE: {
 
   MENU_CLAN: {
     STACK: 'ROUTES.MENU_CLAN.STACk',
-    CREATE_CATEGORY: 'ROUTES.MENU_CLAN.CREATE_CATEGORY'
+    CREATE_CATEGORY: 'ROUTES.MENU_CLAN.CREATE_CATEGORY',
+    SETTINGS: 'ROUTES.MENU_CLAN.SETTINGS',
+    OVERVIEW_SETTING: 'ROUTES.MENU_CLAN.OVERVIEW_SETTING'
   },
 
   SETTINGS: {
@@ -60,4 +66,83 @@ PROFILE: {
     PROFILE: 'ROUTES.SETTINGS.PROFILE',
     SHARING: 'ROUTES.SETTINGS.SHARING'
   }
+} as const;
+
+type ServerStackParamList = {
+  [APP_SCREEN.SERVERS.HOME]: undefined;
 }
+
+type NotificationStackParamList = {
+  [APP_SCREEN.NOTIFICATION.HOME]: undefined;
+  [APP_SCREEN.NOTIFICATION.DETAIL]: undefined;
+}
+
+type MessagesStackParamList = {
+  [APP_SCREEN.MESSAGES.HOME]: undefined;
+  [APP_SCREEN.MESSAGES.MESSAGE_DETAIL]: undefined;
+  [APP_SCREEN.MESSAGES.NEW_MESSAGE]: undefined;
+  [APP_SCREEN.MESSAGES.NEW_GROUP]: undefined;
+}
+
+type FriendsStackParamList = {
+  [APP_SCREEN.FRIENDS.HOME]: undefined;
+  [APP_SCREEN.FRIENDS.ADD_FRIEND]: undefined;
+  [APP_SCREEN.FRIENDS.REQUEST_FRIEND]: undefined;
+  [APP_SCREEN.FRIENDS.REQUEST_FRIEND_SETTING]: undefined;
+}
+
+type ProfileStackParamList = {
+  [APP_SCREEN.PROFILE.HOME]: undefined;
+}
+
+type MenuThreadStackParamList = {
+  [APP_SCREEN.MENU_THREAD.BOTTOM_SHEET]: undefined;
+  [APP_SCREEN.MENU_THREAD.CREATE_THREAD]: undefined;
+  [APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: undefined;
+  [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: undefined;
+}
+
+type MenuClanStackParamList = {
+  [APP_SCREEN.MENU_CLAN.CREATE_CATEGORY]: undefined;
+  [APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
+  [APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
+};
+
+type SettingStackParamList = {
+  [APP_SCREEN.SETTINGS.HOME]: undefined;
+  [APP_SCREEN.SETTINGS.LANGUAGE]: undefined;
+  [APP_SCREEN.SETTINGS.PROFILE]: undefined;
+}
+
+type AppStackParamList = {
+  [APP_SCREEN.UN_AUTHORIZE]: undefined,
+  [APP_SCREEN.LOGIN]: undefined,
+  [APP_SCREEN.REGISTER]: undefined,
+  [APP_SCREEN.AUTHORIZE]: undefined,
+  [APP_SCREEN.BOTTOM_BAR]: undefined,
+  [APP_SCREEN.DRAWER_BAR]: undefined,
+  [APP_SCREEN.HOME]: undefined,
+  [APP_SCREEN.SERVERS.STACK]: NavigatorScreenParams<ServerStackParamList>,
+  [APP_SCREEN.NOTIFICATION.STACK]: NavigatorScreenParams<NotificationStackParamList>
+  [APP_SCREEN.MESSAGES.STACK]: NavigatorScreenParams<MessagesStackParamList>,
+  [APP_SCREEN.FRIENDS.STACK]: NavigatorScreenParams<FriendsStackParamList>,
+  [APP_SCREEN.PROFILE.STACK]: NavigatorScreenParams<ProfileStackParamList>,
+  [APP_SCREEN.MENU_THREAD.STACK]: NavigatorScreenParams<MenuThreadStackParamList>,
+  [APP_SCREEN.MENU_CLAN.STACK]: NavigatorScreenParams<MenuClanStackParamList>,
+  [APP_SCREEN.SETTINGS.STACK]: NavigatorScreenParams<SettingStackParamList>,
+}
+
+type a = keyof Record<string, object | undefined>;
+
+type CustomStackScreenProps<
+  U extends ParamListBase,
+  T extends keyof U = string
+> = CompositeScreenProps<
+  // NativeStackScreenProps<U, T>,
+  NativeStackScreenProps<U>,
+  AppStackScreenProps<keyof AppStackParamList>
+>;
+
+export type AppStackScreenProps<T extends keyof AppStackParamList = typeof APP_SCREEN.HOME> = StackScreenProps<AppStackParamList, T>;
+
+export type MenuClanScreenProps<T extends keyof MenuClanStackParamList> = CustomStackScreenProps<MenuClanStackParamList, T>

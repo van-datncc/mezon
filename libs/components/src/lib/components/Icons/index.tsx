@@ -1025,7 +1025,7 @@ export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 	);
 };
 
-export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '' }) => {
 	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
@@ -1041,7 +1041,7 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`dark:hover:text-white hover:text-black ${defaultSize === '' ? (isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode') : defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -2598,7 +2598,7 @@ export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
-			enable-background="new 0 0 128 128"
+			enableBackground="new 0 0 128 128"
 			id="Layer_1"
 			version="1.1"
 			viewBox="0 0 128 128"
@@ -2706,6 +2706,37 @@ export function IconAddFriendDM({ isWhite } : {isWhite?: boolean}) {
 			<path fill="currentColor" d="M14.5 8a3 3 0 1 0-2.7-4.3c-.2.4.06.86.44 1.12a5 5 0 0 1 2.14 3.08c.01.06.06.1.12.1ZM16.62 13.17c-.22.29-.65.37-.92.14-.34-.3-.7-.57-1.09-.82-.52-.33-.7-1.05-.47-1.63.11-.27.2-.57.26-.87.11-.54.55-1 1.1-.92 1.6.2 3.04.92 4.15 1.98.3.27-.25.95-.65.95a3 3 0 0 0-2.38 1.17ZM15.19 15.61c.13.16.02.39-.19.39a3 3 0 0 0-1.52 5.59c.2.12.26.41.02.41h-8a.5.5 0 0 1-.5-.5v-2.1c0-.25-.31-.33-.42-.1-.32.67-.67 1.58-.88 2.54a.2.2 0 0 1-.2.16A1.5 1.5 0 0 1 2 20.5a7.5 7.5 0 0 1 13.19-4.89ZM9.5 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM15.5 22Z" >
 			</path>
 			<path fill="currentColor" d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z">
+			</path>
+		</svg>
+	);
+}
+
+export function IconReplyMessDeleted() {
+	return (
+		<svg width="8" height="8" viewBox="0 0 8 8" className='dark:text-zinc-400 text-colorTextLightMode -ml-[10px] mt-[3px]'>
+			<path d="M0.809739 3.59646L5.12565 0.468433C5.17446 0.431163 5.23323 0.408043 5.2951 0.401763C5.35698 0.395482 5.41943 0.406298 5.4752 0.432954C5.53096 0.45961 5.57776 0.50101 5.61013 0.552343C5.64251 0.603676 5.65914 0.662833 5.6581 0.722939V2.3707C10.3624 2.3707 11.2539 5.52482 11.3991 7.21174C11.4028 7.27916 11.3848 7.34603 11.3474 7.40312C11.3101 7.46021 11.2554 7.50471 11.1908 7.53049C11.1262 7.55626 11.0549 7.56204 10.9868 7.54703C10.9187 7.53201 10.857 7.49695 10.8104 7.44666C8.72224 5.08977 5.6581 5.63359 5.6581 5.63359V7.28135C5.65831 7.34051 5.64141 7.39856 5.60931 7.44894C5.5772 7.49932 5.53117 7.54004 5.4764 7.5665C5.42163 7.59296 5.3603 7.60411 5.29932 7.59869C5.23834 7.59328 5.18014 7.57151 5.13128 7.53585L0.809739 4.40892C0.744492 4.3616 0.691538 4.30026 0.655067 4.22975C0.618596 4.15925 0.599609 4.08151 0.599609 4.00269C0.599609 3.92386 0.618596 3.84612 0.655067 3.77562C0.691538 3.70511 0.744492 3.64377 0.809739 3.59646Z" fill="currentColor">
+			</path>
+		</svg>
+	);
+}
+
+export function IConShareEventLocation() {
+	return(
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
+			<path fill="currentColor" d="M13 16V5.41l3.3 3.3a1 1 0 1 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L11 5.4V16a1 1 0 1 0 2 0Z" >
+			</path>
+			<path fill="currentColor" d="M4 15a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Z">
+			</path>
+		</svg>
+	);
+} 
+
+export function IconShareEventVoice() {
+	return(
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
+			<path fill="currentColor" d="M16.3 14.7a1 1 0 0 1 0-1.4l2.5-2.5a3.95 3.95 0 1 0-5.6-5.6l-2.5 2.5a1 1 0 1 1-1.4-1.4l2.5-2.5a5.95 5.95 0 1 1 8.4 8.4l-2.5 2.5a1 1 0 0 1-1.4 0ZM7.7 9.3a1 1 0 0 1 0 1.4l-2.5 2.5a3.95 3.95 0 0 0 5.6 5.6l2.5-2.5a1 1 0 1 1 1.4 1.4l-2.5 2.5a5.95 5.95 0 0 1-8.4-8.4l2.5-2.5a1 1 0 0 1 1.4 0Z">
+			</path>
+			<path fill="currentColor" d="M14.7 10.7a1 1 0 1 0-1.4-1.4l-4 4a1 1 0 0 0 1.4 1.4l4-4Z">
 			</path>
 		</svg>
 	);

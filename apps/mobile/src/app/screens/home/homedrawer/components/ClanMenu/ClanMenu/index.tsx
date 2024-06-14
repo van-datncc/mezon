@@ -4,7 +4,7 @@ import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { AddFillIcon, BellIcon, KeyframeIcon, SettingIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
-import MezonMenu from "apps/mobile/src/app/temp-ui/MezonMenu";
+import MezonMenu, { reserve } from "apps/mobile/src/app/temp-ui/MezonMenu";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { IMezonMenuSectionProps } from "apps/mobile/src/app/temp-ui/MezonMenuSection";
@@ -12,11 +12,12 @@ import { IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui/MezonMenuItem";
 import { ClansEntity } from "@mezon/store-mobile";
 import ClanMenuInfo from "../ClanMenuInfo";
 import MezonToggleButton from "apps/mobile/src/app/temp-ui/MezonToggleButton";
-import { APP_SCREEN } from "apps/mobile/src/app/navigation/ScreenTypes";
-import { useNavigation } from "@react-navigation/native";
+import { APP_SCREEN, AppStackScreenProps } from "apps/mobile/src/app/navigation/ScreenTypes";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { MutableRefObject } from "react";
 import Clipboard from "@react-native-clipboard/clipboard";
+import { useAuth, useClans } from "@mezon/core";
 
 interface IServerMenuProps {
     clan: ClansEntity;
@@ -26,17 +27,18 @@ interface IServerMenuProps {
 
 export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
-    const navigation = useNavigation();
+    const user = useAuth();
+    const { clans } = useClans();
 
-    const reserve = () => {
-        Toast.show({
-            type: 'info',
-            text1: 'Coming soon'
-        });
-    }
+    const navigation = useNavigation<AppStackScreenProps['navigation']>();
 
     const handleOpenInvite = () => {
         inviteRef?.current.open();
+        bottomSheetRef?.current?.dismiss();
+    }
+
+    const handleOpenSettings = () => {
+        navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
         bottomSheetRef?.current?.dismiss();
     }
 
@@ -64,10 +66,8 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
         },
         {
             onPress: () => {
-                // @ts-ignore
-                navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
                 bottomSheetRef?.current?.dismiss();
-
+                navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
             },
             title: t('menu.organizationMenu.createCategory'),
         },
@@ -167,16 +167,20 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
                     <MezonButtonIcon
                         title={t("actions.invite")}
                         icon={AddFillIcon}
-                        onPress={() => handleOpenInvite()} />
+                        onPress={handleOpenInvite} />
                     <MezonButtonIcon
                         title={t("actions.notifications")}
                         icon={BellIcon}
                         onPress={() => reserve()} />
-                    <MezonButtonIcon
-                        title={t("actions.settings")}
-                        icon={SettingIcon}
-                        onPress={() => reserve()}
-                    />
+
+                    {user.userId === clan.creator_id &&
+                        <MezonButtonIcon
+                            title={t("actions.settings")}
+                            icon={SettingIcon}
+                            onPress={handleOpenSettings}
+                        />
+                    }
+
                 </ScrollView>
 
                 <MezonMenu menu={menu} />

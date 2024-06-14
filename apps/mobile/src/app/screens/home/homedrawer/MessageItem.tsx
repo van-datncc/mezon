@@ -1,16 +1,16 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
+import { FileIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelsActions,
 	getStoreAsync,
 	messagesActions,
+	selectChannelsEntities,
 	selectEmojiImage,
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	useAppDispatch,
-	selectChannelsEntities
 } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
@@ -24,13 +24,14 @@ import {
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, emojiRegex, isImage, mentionRegex, splitBlockCodeRegex, urlRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, isImage, splitBlockCodeRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
+import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -220,8 +221,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const onMention = async (mentionedUser: string) => {
 		try {
 			const tagName = mentionedUser.slice(1);
-			const clanUser = usersClan?.find(userClan => userClan?.user?.username === tagName);
-			clanUser && setFoundUser(clanUser.user)
+			const clanUser = usersClan?.find((userClan) => userClan?.user?.username === tagName);
+			clanUser && setFoundUser(clanUser.user);
 			if (!mentionedUser) return;
 			setMessageSelected(EMessageBSToShow.UserInformation);
 		} catch (error) {
@@ -233,11 +234,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		const store = await getStoreAsync();
 
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
-		store.dispatch(channelsActions.joinChannel({
-			clanId,
-			channelId,
-			noFetchMembers: false
-		}));
+		store.dispatch(
+			channelsActions.joinChannel({
+				clanId,
+				channelId,
+				noFetchMembers: false,
+			}),
+		);
 	};
 
 	const onChannelMention = async (channel: ChannelsEntity) => {
@@ -248,9 +251,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 			if (type === ChannelType.CHANNEL_TYPE_VOICE) {
 				Toast.show({
-					type: "info",
-					text1: "Updating...",
-				})
+					type: 'info',
+					text1: 'Updating...',
+				});
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				save(STORAGE_KEY_CHANNEL_ID, channelId);
 				save(STORAGE_KEY_CLAN_ID, clanId);
@@ -260,7 +263,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		} catch (error) {
 			console.log(error);
 		}
-	}
+	};
 
 	const getChannelById = (channelHashtagId: string) => {
 		const channel = channelsEntities?.[channelHashtagId];
@@ -268,85 +271,33 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			return channel;
 		} else {
 			return {
-				channel_label: channelHashtagId
-			}
+				channel_label: channelHashtagId,
+			};
 		}
 	};
 
 	const formatMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text.split(splitBlockCodeRegex);
 
-		return parts?.map((part) => {
-			if (codeBlockRegex.test(part)) {
-				return part;
-			} else {
-				if (matchesMention.includes(part)) {
-					if (part.startsWith('@')) {
-						return `[${part}](${part})`;
-					}
-					if (part.startsWith('<#')) {
-						const channelId = part.match(channelIdRegex)[1];
-						const channel = getChannelById(channelId) as ChannelsEntity;
-						return `[#${channel.channel_label}](#${channelId})`;
+		return parts
+			?.map((part) => {
+				if (codeBlockRegex.test(part)) {
+					return part;
+				} else {
+					if (matchesMention.includes(part)) {
+						if (part.startsWith('@')) {
+							return `[${part}](${part})`;
+						}
+						if (part.startsWith('<#')) {
+							const channelId = part.match(channelIdRegex)[1];
+							const channel = getChannelById(channelId) as ChannelsEntity;
+							return `[#${channel.channel_label}](#${channelId})`;
+						}
 					}
 				}
-			}
-			return part;
-		}).join('');
-	}
-
-	const renderTextContent = () => {
-		if (!lines) return null;
-		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
-		const matchesUrls = lines.match(urlRegex);         //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
-		const isExistEmoji = emojiRegex.test(lines);
-		const isExistBlockCode = codeBlockRegex.test(lines);
-
-		let content: string = lines;
-
-		if (matchesMentions) {
-			content = formatMention(content, matchesMentions);
-		}
-
-		if (matchesUrls) {
-			content = formatUrls(content);
-		}
-
-		if (isExistEmoji) {
-			content = formatEmoji(content, emojiListPNG);
-		}
-
-		if (isExistBlockCode) {
-			content = formatBlockCode(content);
-		}
-
-		if (isEdited) {
-			content = content + ` [${t('edited')}](${EDITED_FLAG})`;
-		}
-
-		return (
-			<Markdown
-				style={markdownStyles as StyleSheet.NamedStyles<any>}
-				rules={renderRulesCustom}
-				onLinkPress={(url) => {
-					if (url.startsWith('@')) {
-						onMention(url);
-						return false;
-					}
-
-					if (url.startsWith('#')) {
-						const channelId = url.slice(1);
-						const channel = getChannelById(channelId) as ChannelsEntity;
-						onChannelMention(channel)
-						return false;
-					}
-					//Note: return false to prevent default
-					return true;
-				}}
-			>
-				{content}
-			</Markdown>
-		);
+				return part;
+			})
+			.join('');
 	};
 
 	const onConfirmDeleteMessage = () => {
@@ -368,7 +319,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			return updateDate > createDate;
 		}
 		return false;
-	}, [message])
+	}, [message]);
 
 	return (
 		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
@@ -430,7 +381,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							onPress={() => {
 								setIsOnlyEmojiPicker(false);
 								setMessageSelected(EMessageBSToShow.UserInformation);
-								setFoundUser(user.user)
+								setFoundUser(user?.user);
 							}}
 							style={styles.messageBoxTop}
 						>
@@ -442,7 +393,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					{images.length > 0 && renderImages()}
 
 					{documents.length > 0 && renderDocuments()}
-					{renderTextContent()}
+					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention)}
 					<MessageAction
 						message={message}
 						dataReactionCombine={dataReactionCombine}

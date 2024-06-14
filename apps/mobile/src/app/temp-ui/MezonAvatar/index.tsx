@@ -8,12 +8,13 @@ interface IMezonAvatarProps {
 	width?: number;
 	height?: number;
 	userStatus?: boolean;
+	isBorderBoxImage?: boolean;
 }
 const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
-	const { avatarUrl, userName, width = 40, height = 40, userStatus } = props;
+	const { avatarUrl, userName, width = 40, height = 40, userStatus, isBorderBoxImage } = props;
 	return (
 		<View style={[s.containerItem, { height, width }]}>
-			<View style={[s.boxImage, { height, width }]}>
+			<View style={[s.boxImage, { height, width }, isBorderBoxImage && s.borderBoxImage]}>
 				{avatarUrl ? (
 					<Image
 						style={[s.image]}
@@ -25,7 +26,7 @@ const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 					<Text style={s.textAvatarMessageBoxDefault}>{userName?.charAt(0)?.toUpperCase()}</Text>
 				)}
 			</View>
-			<View style={[s.statusCircle, userStatus ? s.online : s.offline]} />
+			{userStatus && <View style={[s.statusCircle, userStatus ? s.online : s.offline]} />}
 		</View>
 	);
 });

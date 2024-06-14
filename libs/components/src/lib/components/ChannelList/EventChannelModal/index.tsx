@@ -18,6 +18,7 @@ const EventModal = (props: EventModalProps) => {
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
 	const { allEventManagement } = useEventManagement();
+	const checkUserCreate = currentClan?.creator_id === userProfile?.user?.id;
 
 	return open ? (
 		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
@@ -32,7 +33,7 @@ const EventModal = (props: EventModalProps) => {
 											<Icons.IconEvents />
 											<h4>Events</h4>
 										</div>
-										{currentClan?.creator_id === userProfile?.user?.id &&
+										{ checkUserCreate &&
 											<>
 												<div className="w-[0.1px] h-4 bg-gray-400"></div>
 												<div className="bg-primary px-2 py-1 rounded-md text-white" onClick={() => setOpenModal(true)}>
@@ -58,8 +59,11 @@ const EventModal = (props: EventModalProps) => {
 													option={event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER} 
 													logoRight={event.logo} 
 													start={event.start_time || ''} 
+													end={event.end_time || ''} 
 													event={event} 
 													setOpenModalDetail={(status: boolean) => setOpenModalDetail(status)}
+													createTime={event.create_time}
+													checkUserCreate={checkUserCreate}
 												/>
 											</div>
 										})}

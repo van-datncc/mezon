@@ -1,17 +1,20 @@
-import { useDragAndDrop, useReference } from '@mezon/core';
-import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { useAppParams, useDragAndDrop, useReference } from '@mezon/core';
+import { selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { DragEvent } from 'react';
 import { useSelector } from 'react-redux';
 import DragAndDropUI from './DragAndDropUI';
 
-function FileUploadByDnD() {
+type FileUploadByDnDOpt = {
+	currentId: string;
+};
+
+function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 	const { setDraggingState } = useDragAndDrop();
 	const { setAttachmentData, setStatusLoadingAttachment } = useReference();
 	const { sessionRef, clientRef } = useMezon();
-	
+	const { clanId, directId, type } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
-	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -38,18 +41,20 @@ function FileUploadByDnD() {
 		const files = e.dataTransfer.files;
 		const session = sessionRef.current;
 		const client = clientRef.current;
-		if (!files || !client || !session || !currentChannelId) {
+		if (!files || !client || !session || !currentId) {
 			throw new Error('Client or files are not initialized');
 		}
 
 		const promises = Array.from(files).map((file) => {
-			return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
+			return handleUploadFile(client, session, currentClanId, currentId, file.name, file);
 		});
-		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => setAttachmentData(attachment));
-		}).then(() => {
-			setStatusLoadingAttachment(false);
-		});
+		Promise.all(promises)
+			.then((attachments) => {
+				attachments.forEach((attachment) => setAttachmentData(attachment));
+			})
+			.then(() => {
+				setStatusLoadingAttachment(false);
+			});
 	};
 
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;

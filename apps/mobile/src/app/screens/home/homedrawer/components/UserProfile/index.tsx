@@ -47,6 +47,7 @@ const UserProfile = ({ userId }: userProfileProps) => {
 							avatarUrl={userById?.user?.avatar_url}
 							userName={userById?.user?.username}
 							userStatus={userStatus}
+              isBorderBoxImage={true}
 						/>
 					</View>
 				</View>

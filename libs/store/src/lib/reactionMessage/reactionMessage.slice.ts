@@ -39,6 +39,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 		left: number;
 		bottom: number;
 	};
+	arrowPosition: boolean;
 }
 
 export const reactionAdapter = createEntityAdapter({
@@ -83,6 +84,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		left: 0,
 		bottom: 0,
 	},
+	arrowPosition: false,
 });
 
 export const reactionSlice = createSlice({
@@ -156,6 +158,9 @@ export const reactionSlice = createSlice({
 		setPositionOfSmileButton(state, action) {
 			state.positionOfSmileButton = action.payload;
 		},
+		setArrowPosition(state, action) {
+			state.arrowPosition = action.payload;
+		},
 	},
 });
 
@@ -193,3 +198,5 @@ export const selectUserReactionPanelState = createSelector(getReactionState, (st
 export const selectMessageMatchWithRef = createSelector(getReactionState, (state: ReactionState) => state.messageMatchWithRef);
 
 export const selectPositionEmojiButtonSmile = createSelector(getReactionState, (state: ReactionState) => state.positionOfSmileButton);
+
+export const selectArrowPosition = createSelector(getReactionState, (state: ReactionState) => state.arrowPosition);

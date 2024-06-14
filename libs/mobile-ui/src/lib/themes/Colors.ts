@@ -119,6 +119,7 @@ const colors = {
 	tertiary: isDarkTheme ? '#bcbcbc' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
+	gray4850: isDarkTheme ? '#484848e0' : '#484848e0',
 	textLink: '#007AFF',
 	borderDim: isDarkTheme ? '#5a5b5c30' : '#5a5b5c30',
 	/* border color */
@@ -132,6 +133,7 @@ const colors = {
 	textRed: '#E53935',
 	textViolet: '#5a62f4',
 	azureBlue: '#4173c3',
+	caribbeanGreen: '#0bbc73',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
@@ -140,7 +142,7 @@ const colors = {
 	bgDarkSlate: '#2a2e31',
 	bgCharcoal: '#313338',
 	bgMention: '#3b426e',
-	green: "green",
+	green: 'green',
 	bgDarkCharcoal: '#323232',
 	bgMessageHighlight: '#c99d072b',
 	bgDarkMidnightBlue: '#141c2a',

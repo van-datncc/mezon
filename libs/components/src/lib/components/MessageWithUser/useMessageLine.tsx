@@ -1,12 +1,11 @@
 import { IMessageLine } from '@mezon/utils';
 import { useMemo } from 'react';
 
-// TODO: refactor this to sender function
-
 export function useMessageLine(line: string): IMessageLine {
-	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:(?!\d+:)\b[^:`\s]*\b:)(?!`)/g;
 
-	const emojiRegex = /^:\b[^:]*\b:$/;
+	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:[a-zA-Z0-9_]*:)(?!`)/g;
+
+	const emojiRegex = /^:\b[a-zA-Z0-9]*\b:$/;
 
 	const isOnlyEmoji = useMemo(() => {
 		if (!line?.trim()) {
@@ -25,6 +24,20 @@ export function useMessageLine(line: string): IMessageLine {
 	}, [line]);
 
 	const mentions = useMemo(() => {
+		// Check if the line is within ``` or `
+		const trimmedLine = line.trim();
+		if ((trimmedLine.startsWith('```') && trimmedLine.endsWith('```')) || 
+			(trimmedLine.startsWith('`') && trimmedLine.endsWith('`'))) {
+			return [
+				{
+					nonMatchText: line,
+					matchedText: '',
+					startIndex: 0,
+					endIndex: line.length,
+				},
+			];
+		}
+
 		let lastIndex = 0;
 		let nonMatchText = line;
 
@@ -42,7 +55,7 @@ export function useMessageLine(line: string): IMessageLine {
 			};
 		});
 		if (mentions.length === 0) {
-			// not match mention
+			// no matches
 			return [
 				{
 					nonMatchText: nonMatchText,

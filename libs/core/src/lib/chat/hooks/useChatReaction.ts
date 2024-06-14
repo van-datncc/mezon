@@ -1,5 +1,6 @@
 import {
 	reactionActions,
+	selectArrowPosition,
 	selectDataReactionCombine,
 	selectMessageMatchWithRef,
 	selectPositionEmojiButtonSmile,
@@ -31,6 +32,7 @@ export function useChatReaction() {
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const messageMatchWithRefStatus = useSelector(selectMessageMatchWithRef);
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
+	const arrowPosition = useSelector(selectArrowPosition);
 
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
@@ -104,6 +106,13 @@ export function useChatReaction() {
 		},
 		[dispatch],
 	);
+	const setArrowPosition = useCallback(
+		(state: boolean) => {
+			dispatch(reactionActions.setArrowPosition(state));
+		},
+		[dispatch],
+	);
+
 	return useMemo(
 		() => ({
 			reactionActions,
@@ -126,6 +135,8 @@ export function useChatReaction() {
 			setMessageMatchWithRef,
 			setPositionOfSmileButton,
 			positionOfSmileButton,
+			arrowPosition,
+			setArrowPosition,
 		}),
 		[
 			reactionActions,
@@ -146,6 +157,8 @@ export function useChatReaction() {
 			setMessageMatchWithRef,
 			setPositionOfSmileButton,
 			positionOfSmileButton,
+			arrowPosition,
+			setArrowPosition,
 		],
 	);
 }
