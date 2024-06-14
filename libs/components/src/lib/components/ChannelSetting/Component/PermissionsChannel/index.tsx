@@ -153,7 +153,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 												</div>
 												<div className="flex items-center gap-x-2">
 													<p className="text-xs text-[#AEAEAE]">
-														{checkOwner(user?.google_id || '') ? 'Server Owner' : ''}
+														{checkOwner(user?.google_id || '') ? 'Clan Owner' : ''}
 													</p>
 													<div onClick={() => deleteMember(user?.id || '')} role="button">
 														<Icons.EscIcon

@@ -1,0 +1,9 @@
+{
+  "emptyThread": {
+    "textNoThread": "There are no threads",
+    "textNotify": "Stay focus on conversation with a threads - a temporary text channel.",
+    "createThreads": "Create Threads"
+  },
+  "otherThreads": "other Threads",
+  "joinedThreads": "joined threads"
+}

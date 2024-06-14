@@ -11,6 +11,7 @@ import profileSetting from './profileSetting.json';
 import notificationSetting from './notificationSetting.json';
 import userProfile from './userProfile.json';
 import profile from './profile.json';
+import createThread from './createThread.json';
 import clanMenu from "./clanMenu.json";
 import categoryCreator from "./categoryCreator.json";
 import screenStack from "./screenStack.json";
@@ -34,6 +35,7 @@ export default {
 	notificationSetting,
 	userProfile,
 	profile,
+	createThread,
 	clanMenu,
 	categoryCreator,
 	screenStack,
