@@ -1,17 +1,19 @@
 import { useAuth } from '@mezon/core';
-import { channelUsersActions, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
+import { channelUsersActions, clansActions, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
+
 export type PermissionsChannelProps = {
+	clanId: string;
 	channel: IChannel;
 };
 
 const PermissionsChannel = (props: PermissionsChannelProps) => {
-	const { channel } = props;
+	const { clanId, channel } = props;
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
@@ -54,6 +56,17 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const checkOwner = (userId: string) => {
 		return userId === userProfile?.user?.google_id;
 	};
+
+	const kickClanMember = async (userId: string) => {
+		if (userId !== userProfile?.user?.id) {
+			const body = {
+				clanId: clanId,
+				userId: userId,
+			};
+			await dispatch(clansActions.removeClanUsers(body));
+		}
+	};
+
 	const deleteMember = async (userId: string) => {
 		if (userId !== userProfile?.user?.id) {
 			const body = {
@@ -153,9 +166,9 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 												</div>
 												<div className="flex items-center gap-x-2">
 													<p className="text-xs text-[#AEAEAE]">
-														{checkOwner(user?.google_id || '') ? 'Server Owner' : ''}
+														{checkOwner(user?.google_id || '') ? 'Clan Owner' : ''}
 													</p>
-													<div onClick={() => deleteMember(user?.id || '')} role="button">
+													<div onClick={() => kickClanMember(user?.id || '')} role="button">
 														<Icons.EscIcon
 															defaultSize={`${checkOwner(user?.google_id || '') ? '' : 'cursor-pointer'} size-[15px]`}
 															defaultFill={`${checkOwner(user?.google_id || '') ? '#4C4D55' : '#AEAEAE'}`}

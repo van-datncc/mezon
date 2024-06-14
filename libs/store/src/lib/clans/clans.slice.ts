@@ -127,12 +127,36 @@ export const deleteClan = createAsyncThunk(
 		try{
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
+			if(response){
+				thunkAPI.dispatch(fetchClans());
+			}
 		}
 		catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
 	}
 )
+
+type removeClanUsersPayload = {
+	clanId: string;
+    userId: string
+};
+
+export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ( {clanId, userId} : removeClanUsersPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const userIds = [userId]
+		const response = await mezon.client.removeClanUsers(mezon.session, clanId, userIds);
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+		thunkAPI.dispatch(fetchClans())
+		return response;
+	} catch(error : any) {		
+		const errmsg = await error.json();
+		return thunkAPI.rejectWithValue(errmsg.message);
+	}
+});
 
 export const updateClan = createAsyncThunk(
 	'clans/updateClans',
@@ -251,6 +275,19 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+		builder
+			.addCase(deleteClan.pending, (state: ClansState) => {
+				state.loadingStatus = 'loading';
+			})
+		builder
+			.addCase(deleteClan.fulfilled, (state: ClansState) => {
+				state.loadingStatus = 'loaded';
+			})
+		builder
+			.addCase(deleteClan.rejected, (state: ClansState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
 	},
 });
 
@@ -282,8 +319,10 @@ export const clansActions = {
 	fetchClans,
 	createClan,
 	updateClan,
+	removeClanUsers,
 	changeCurrentClan,
 	updateUser,
+	deleteClan,
 };
 
 /*
