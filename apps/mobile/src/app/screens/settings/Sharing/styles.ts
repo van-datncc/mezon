@@ -143,5 +143,15 @@ export const styles = StyleSheet.create({
 		fontSize: size.small,
 		color: Colors.textGray,
 		textTransform: 'uppercase'
-	}
+	},
+	videoOverlay: {
+		position: 'absolute',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		alignItems: 'center',
+		justifyContent: 'center',
+		bottom: 0,
+		height: '100%',
+		width: '100%',
+		borderRadius: size.s_6,
+	},
 });

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { useAuth } from '@mezon/core';
+import { useAuth, useReference } from '@mezon/core';
 import { getAppInfo } from '@mezon/mobile-components';
 import { fcmActions, selectCurrentClan, selectLoadingMainMobile } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
@@ -39,7 +39,7 @@ export const Authentication = () => {
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	const [fileShared, setFileShared] = useState<any>();
-	console.log('Tom log  => fileShared', fileShared);
+	const { setAttachmentData } = useReference();
 
 	useEffect(() => {
 		if (userProfile?.email) loadFRMConfig();
@@ -112,6 +112,7 @@ export const Authentication = () => {
 
 	const onCloseFileShare = () => {
 		setFileShared(undefined);
+		setAttachmentData([]);
 		BackHandler.exitApp();
 	};
 
