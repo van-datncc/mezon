@@ -1,13 +1,14 @@
 import { useCategory, useDirect, useReference } from '@mezon/core';
-import { CloseIcon, FileIcon, PenIcon, SearchIcon, SendIcon, abbreviateText } from '@mezon/mobile-components';
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { CloseIcon, FileIcon, PenIcon, SearchIcon, SendIcon, abbreviateText, getAttachmentUnique } from '@mezon/mobile-components';
+import { Colors, size, useAnimatedState, verticalScale } from '@mezon/mobile-ui';
 import { channelsActions, directActions, getStoreAsync, selectCurrentClan } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Wave } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,6 +24,7 @@ export const Sharing = ({ data, onClose }) => {
 	const dispatch = useDispatch();
 	const [dataText, setDataText] = useState<string>('');
 	const [dataShareTo, setDataShareTo] = useState<any>([]);
+	const [isLoading, setIsLoading] = useAnimatedState<boolean>(false);
 	const [searchText, setSearchText] = useState<string>('');
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();
@@ -125,7 +127,7 @@ export const Sharing = ({ data, onClose }) => {
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{ t: dataSend.text },
 			[],
-			attachmentDataRef || [],
+			getAttachmentUnique(attachmentDataRef) || [],
 			[],
 		);
 	};
@@ -144,7 +146,7 @@ export const Sharing = ({ data, onClose }) => {
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
 			{ t: dataSend.text },
 			[], //mentions
-			attachmentDataRef || [], //attachments
+			getAttachmentUnique(attachmentDataRef) || [], //attachments
 			[], //references
 			false, //anonymous
 			false, //mentionEveryone
@@ -154,6 +156,7 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const onSend = async () => {
+		setIsLoading(true);
 		const dataSend = {
 			text: dataText,
 		};
@@ -163,12 +166,18 @@ export const Sharing = ({ data, onClose }) => {
 		} else {
 			await sendToGroup(dataSend);
 		}
+		setIsLoading(false);
 		onClose();
 	};
 
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
+				setAttachmentData({
+					url: media.contentUri,
+					filename: media?.fileName || media?.contentUri,
+					filetype: media?.mimeType,
+				});
 				const fileData = await RNFS.readFile(media.contentUri, 'base64');
 
 				return {
@@ -201,7 +210,7 @@ export const Sharing = ({ data, onClose }) => {
 		});
 
 		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => handleFinishUpload(attachment));
+			attachments.forEach((attachment) => handleFinishUpload({ ...attachment, size: attachment.size || 100 }));
 		});
 	};
 
@@ -249,9 +258,13 @@ export const Sharing = ({ data, onClose }) => {
 				</TouchableOpacity>
 				<Text style={styles.titleHeader}>Share</Text>
 				{channelSelected ? (
-					<TouchableOpacity onPress={onSend}>
-						<SendIcon width={size.s_28} height={size.s_20} />
-					</TouchableOpacity>
+					isLoading ? (
+						<Wave size={size.s_28} color={Colors.white} />
+					) : (
+						<TouchableOpacity onPress={onSend}>
+							<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />
+						</TouchableOpacity>
+					)
 				) : (
 					<View style={{ width: size.s_28 }} />
 				)}
@@ -259,11 +272,12 @@ export const Sharing = ({ data, onClose }) => {
 			<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<View style={styles.rowItem}>
 					<Text style={styles.title}>Message preview</Text>
-					{!!attachmentDataRef?.length && (
+					{!!getAttachmentUnique(attachmentDataRef)?.length && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
-								{attachmentDataRef?.map((media, index) => {
+								{getAttachmentUnique(attachmentDataRef)?.map((media, index) => {
 									const isFile = !media.filetype.includes('video') && !media.filetype.includes('image');
+									const isUploaded = !!media?.size;
 
 									return (
 										<View
@@ -271,12 +285,20 @@ export const Sharing = ({ data, onClose }) => {
 											style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
 										>
 											{isFile ? renderFileView(media) : <FastImage source={{ uri: media?.url }} style={styles.itemMedia} />}
-											<TouchableOpacity
-												style={styles.iconRemoveMedia}
-												onPress={() => removeAttachmentByUrl(media.url ?? '', media?.filename || '')}
-											>
-												<CloseIcon width={size.s_18} height={size.s_18} />
-											</TouchableOpacity>
+											{isUploaded && (
+												<TouchableOpacity
+													style={styles.iconRemoveMedia}
+													onPress={() => removeAttachmentByUrl(media.url ?? '', media?.filename || '')}
+												>
+													<CloseIcon width={size.s_18} height={size.s_18} />
+												</TouchableOpacity>
+											)}
+
+											{!isUploaded && (
+												<View style={styles.videoOverlay}>
+													<ActivityIndicator size={'small'} color={'white'} />
+												</View>
+											)}
 										</View>
 									);
 								})}
