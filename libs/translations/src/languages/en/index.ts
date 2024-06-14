@@ -18,6 +18,7 @@ import clanMenu from  "./clanMenu.json";
 import pinMessage from './pinMessage.json';
 import clanSetting from "./clanSetting.json";
 import clanOverviewSetting from "./clanOverviewSetting.json";
+import eventMenu from "./eventMenu.json"
 
 export default {
 	inviteToChannel,
@@ -39,5 +40,6 @@ export default {
 	clanMenu,
 	pinMessage,
 	clanSetting,
-	clanOverviewSetting
+	clanOverviewSetting,
+	eventMenu
 };

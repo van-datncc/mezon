@@ -1,5 +1,5 @@
 import { useAuth, useCategory, useEventManagement } from '@mezon/core';
-import { AngleRightIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
+import { AngleRightIcon, CalendarIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -96,12 +96,13 @@ const ChannelList = React.memo((props: any) => {
 					</View>
 					<InviteToChannel ref={bottomSheetInviteRef} />
 				</View>
-				<View>
-					<View>
-						<TouchableOpacity onPress={() => bottomSheetEventRef?.current?.present()}>
-							<Text style={{ color: "white" }}>{`${allEventManagement.length} Events`}</Text>
-						</TouchableOpacity>
-					</View>
+				<View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+					<TouchableOpacity
+						style={{ flexDirection: "row", gap: 5, alignItems: "center" }}
+						onPress={() => bottomSheetEventRef?.current?.present()}>
+						<CalendarIcon height={20} width={20} />
+						<Text style={{ color: "white" }}>{`${allEventManagement.length} Events`}</Text>
+					</TouchableOpacity>
 				</View>
 				<FlatList
 					data={categorizedChannels || []}

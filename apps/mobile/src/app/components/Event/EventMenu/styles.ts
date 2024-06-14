@@ -1,11 +1,10 @@
+import { Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%",
-        flexGrow: 1,
-        flexBasis: 500,
-        overflow: "hidden"
+        padding: Metrics.size.xl,
+        paddingTop: 0
     },
 })
 
