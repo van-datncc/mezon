@@ -231,6 +231,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 					setOpenSetting(false);
 				}}
 				channel={channel}
+				clanId={clanId || ''}
 			/>
 			{/* <p>{numberNotication}</p> */}
 			{isShowPanelChannel && (

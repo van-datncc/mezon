@@ -13,10 +13,11 @@ export type ModalSettingProps = {
 	open: boolean;
 	onClose: () => void;
 	channel: IChannel;
+	clanId: string;
 };
 
 const SettingChannel = (props: ModalSettingProps) => {
-	const { open, onClose, channel } = props;
+	const { open, onClose, channel, clanId } = props;
 	const [currentSetting, setCurrentSetting] = useState<string>('Overview');
 	const [menu, setMenu] = useState(true);
 
@@ -52,7 +53,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 						</div>
 						<ChannelSettingItem onItemClick={handleSettingItemClick} channel={channel} onCloseModal={onClose} stateClose={closeMenu} stateMenu={menu}/>
 						{currentSetting === 'Overview' && <OverviewChannel channel={channel} />}
-						{currentSetting === 'Permissions' && <PermissionsChannel channel={channel} />}
+						{currentSetting === 'Permissions' && <PermissionsChannel clanId={clanId} channel={channel} />}
 						{currentSetting === 'Invites' && <InvitesChannel />}
 						{currentSetting === 'Integrations' && <IntegrationsChannel />}
 						<ExitSetting onClose={onClose} />
