@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		overflow: 'hidden',
 	},
-	
+
 	wrapperChatBox: {
 		backgroundColor: Colors.secondary,
 		flexDirection: 'column',
@@ -187,7 +187,7 @@ export const styles = StyleSheet.create({
 	logoClan: {
 		height: verticalScale(70),
 		width: verticalScale(70),
-		resizeMode: 'cover'
+		resizeMode: 'cover',
 	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
@@ -534,11 +534,13 @@ export const styles = StyleSheet.create({
 	},
 	overlay: {
 		position: 'absolute',
+		alignItems: 'center',
+		justifyContent: 'center',
 		top: 0,
 		left: 0,
 		width: '100%',
 		height: '100%',
-		backgroundColor: Colors.secondary,
+		backgroundColor: 'rgba(000,000,000,0.8)',
 	},
 	channelContainer: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },

@@ -62,12 +62,7 @@ export const SettingStacks = ({}: any) => {
 				name={APP_SCREEN.SETTINGS.SHARING}
 				component={Sharing}
 				options={{
-					headerTitle: t('headerTitle.share'),
-					headerTitleAlign: 'center',
-					headerTintColor: Colors.white,
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
+					headerShown: false,
 				}}
 			/>
 		</Stack.Navigator>
