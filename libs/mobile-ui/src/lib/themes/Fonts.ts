@@ -49,7 +49,7 @@ export const size = {
 
 const style = {
   h1: {
-    XMLHttpRequestfontFamily: type.base,
+    fontFamily: type.base,
     fontSize: size.h1
   },
   h2: {
