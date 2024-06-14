@@ -1,4 +1,4 @@
-import { useCategory } from '@mezon/core';
+import { useAuth, useCategory, useEventManagement } from '@mezon/core';
 import { AngleRightIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
@@ -25,13 +25,18 @@ import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
+import EventViewer from '../../../components/Event';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
+	const { allEventManagement } = useEventManagement();
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
+	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+	const user = useAuth();
+
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -91,6 +96,13 @@ const ChannelList = React.memo((props: any) => {
 					</View>
 					<InviteToChannel ref={bottomSheetInviteRef} />
 				</View>
+				<View>
+					<View>
+						<TouchableOpacity onPress={() => bottomSheetEventRef?.current?.present()}>
+							<Text style={{ color: "white" }}>{`${allEventManagement.length} Events`}</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
 				<FlatList
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}
@@ -106,6 +118,13 @@ const ChannelList = React.memo((props: any) => {
 					bottomSheetRef={bottomSheetMenuRef}
 					inviteRef={bottomSheetInviteRef}
 				/>
+			</BottomSheet2>
+
+			<BottomSheet2
+				title={`${allEventManagement.length} Events`}
+				headerRight={currentClan.creator_id === user.userId && <Text style={{ color: "white" }}>Create</Text>}
+				ref={bottomSheetEventRef}>
+				<EventViewer />
 			</BottomSheet2>
 		</ChannelListContext.Provider >
 	);

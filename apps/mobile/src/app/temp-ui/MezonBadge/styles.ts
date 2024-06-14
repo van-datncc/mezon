@@ -14,6 +14,18 @@ const styles = StyleSheet.create({
         paddingVertical: 3
     },
 
+    containerSuccess: {
+        backgroundColor: Colors.green,
+    },
+
+    containerDanger: {
+        backgroundColor: Colors.textRed,
+    },
+
+    containerWarning: {
+        backgroundColor: Colors.textViolet,
+    },
+
     title: {
         color: Colors.white,
         fontSize: 9,
