@@ -1,7 +1,8 @@
 import {
 	reactionActions,
 	selectArrowPosition,
-	selectDataReactionCombine,
+	selectDataReactionGetFromMessage,
+	selectDataSocketUpdate,
 	selectMessageMatchWithRef,
 	selectPositionEmojiButtonSmile,
 	selectReactionBottomState,
@@ -11,7 +12,7 @@ import {
 	selectUserReactionPanelState,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EmojiDataOptionals, EmojiPlaces, updateEmojiReactionData } from '@mezon/utils';
+import { EmojiPlaces, updateEmojiReactionData } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -26,7 +27,6 @@ export function useChatReaction() {
 	const dispatch = useDispatch();
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
-	const dataReactionServerAndSocket = useSelector(selectDataReactionCombine);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
@@ -34,6 +34,10 @@ export function useChatReaction() {
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 	const arrowPosition = useSelector(selectArrowPosition);
 
+	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
+	const dataReactionSocket = useSelector(selectDataSocketUpdate);
+	const combineDataServerAndSocket = [...reactDataFirstGetFromMessage, ...dataReactionSocket];
+	const convertReactionToMatchInterface = updateEmojiReactionData(combineDataServerAndSocket);
 	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
 	const { userId } = useAuth();
 
@@ -46,18 +50,10 @@ export function useChatReaction() {
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
+
 			await socket.writeMessageReaction(id, channel.id, channel.chanel_label, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
-	);
-
-	const dataReactionCombine = updateEmojiReactionData(dataReactionServerAndSocket);
-
-	const setDataReactionFromServe = useCallback(
-		(state: EmojiDataOptionals[]) => {
-			dispatch(reactionActions.setDataReactionFromServe(state));
-		},
-		[dispatch],
 	);
 
 	const setReactionPlaceActive = useCallback(
@@ -117,14 +113,14 @@ export function useChatReaction() {
 		() => ({
 			reactionActions,
 			userId,
-			setDataReactionFromServe,
+			// setDataReactionFromServe,
 			reactionMessageDispatch,
 			setReactionPlaceActive,
 			reactionPlaceActive,
 			reactionRightState,
 			reactionBottomState,
-			dataReactionServerAndSocket,
-			dataReactionCombine,
+			// dataReactionServerAndSocket,
+			// dataReactionCombine,
 			setReactionRightState,
 			setReactionBottomState,
 			setUserReactionPanelState,
@@ -137,18 +133,19 @@ export function useChatReaction() {
 			positionOfSmileButton,
 			arrowPosition,
 			setArrowPosition,
+			convertReactionToMatchInterface,
 		}),
 		[
 			reactionActions,
 			userId,
-			setDataReactionFromServe,
+			// setDataReactionFromServe,
 			reactionMessageDispatch,
 			setReactionPlaceActive,
 			reactionPlaceActive,
 			reactionRightState,
 			reactionBottomState,
-			dataReactionServerAndSocket,
-			dataReactionCombine,
+			// dataReactionServerAndSocket,
+			// dataReactionCombine,
 			setReactionRightState,
 			setReactionBottomState,
 			setReactionBottomStateResponsive,
@@ -159,6 +156,7 @@ export function useChatReaction() {
 			positionOfSmileButton,
 			arrowPosition,
 			setArrowPosition,
+			convertReactionToMatchInterface,
 		],
 	);
 }
