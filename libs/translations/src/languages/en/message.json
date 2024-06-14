@@ -32,5 +32,6 @@
         "newGroup": "New Group",
         "addFriend": "Add a Friend",
         "create": "Create"
-    }
+    },
+    "messageDeleteReply": "Original message was deleted"
 }

@@ -812,3 +812,14 @@ export function EmptyPinIcon ({ width = 24, height = 24, color = 'white', ...pro
   )
 
 }
+export function ReplyMessageDeleted({ width = 24, height = 24, color = '#a1a1a9', ...props }: SvgProps) {
+	return (
+    <Svg width={width} height={height} viewBox="0 0 8 8" {...props}>
+    <Path
+      d="M.81 3.596L5.126.468a.335.335 0 01.484.084.31.31 0 01.048.17v1.649c4.704 0 5.596 3.154 5.741 4.84a.317.317 0 01-.052.192.335.335 0 01-.156.127.349.349 0 01-.38-.083C8.721 5.09 5.657 5.634 5.657 5.634V7.28a.31.31 0 01-.049.168.325.325 0 01-.133.117.339.339 0 01-.345-.03L.81 4.409a.513.513 0 01-.21-.406.494.494 0 01.21-.407z"
+      fill={color}
+    />
+  </Svg>
+	)
+}
+
