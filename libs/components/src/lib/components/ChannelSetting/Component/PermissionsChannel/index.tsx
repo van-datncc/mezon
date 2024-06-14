@@ -8,12 +8,11 @@ import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
 export type PermissionsChannelProps = {
-	clanId: string;
 	channel: IChannel;
 };
 
 const PermissionsChannel = (props: PermissionsChannelProps) => {
-	const { clanId, channel } = props;
+	const { channel } = props;
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
@@ -55,16 +54,6 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 
 	const checkOwner = (userId: string) => {
 		return userId === userProfile?.user?.google_id;
-	};
-
-	const kickClanMember = async (userId: string) => {
-		if (userId !== userProfile?.user?.id) {
-			const body = {
-				clanId: clanId,
-				userId: userId,
-			};
-			await dispatch(clansActions.removeClanUsers(body));
-		}
 	};
 
 	const deleteMember = async (userId: string) => {
@@ -168,7 +157,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 													<p className="text-xs text-[#AEAEAE]">
 														{checkOwner(user?.google_id || '') ? 'Clan Owner' : ''}
 													</p>
-													<div onClick={() => kickClanMember(user?.id || '')} role="button">
+													<div onClick={() => deleteMember(user?.id || '')} role="button">
 														<Icons.EscIcon
 															defaultSize={`${checkOwner(user?.google_id || '') ? '' : 'cursor-pointer'} size-[15px]`}
 															defaultFill={`${checkOwner(user?.google_id || '') ? '#4C4D55' : '#AEAEAE'}`}

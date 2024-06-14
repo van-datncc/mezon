@@ -111,7 +111,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 						setOpenSetting(false);
 					}}
 					channel={thread}
-					clanId={clanId || ''}
 				/>
 
 				{showModal && (
