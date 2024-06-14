@@ -64,8 +64,8 @@ export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) 
 	}, [rawMembers]);
 
 	const removeMemberChannel = useCallback(
-		async ({ channelId, ids }: RemoveChannelUsers) => {
-			await dispatch(channelMembersActions.removeMemberChannel({ channelId, ids }));
+		async ({ channelId, userIds }: RemoveChannelUsers) => {
+			await dispatch(channelMembersActions.removeMemberChannel({ channelId, userIds }));
 		},
 		[dispatch],
 	);
