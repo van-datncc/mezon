@@ -127,6 +127,9 @@ export const deleteClan = createAsyncThunk(
 		try{
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
+			if(response){
+				thunkAPI.dispatch(fetchClans());
+			}
 		}
 		catch (error) {
 			return thunkAPI.rejectWithValue([]);
@@ -251,6 +254,19 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+		builder
+			.addCase(deleteClan.pending, (state: ClansState) => {
+				state.loadingStatus = 'loading';
+			})
+		builder
+			.addCase(deleteClan.fulfilled, (state: ClansState) => {
+				state.loadingStatus = 'loaded';
+			})
+		builder
+			.addCase(deleteClan.rejected, (state: ClansState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
 	},
 });
 
@@ -284,6 +300,7 @@ export const clansActions = {
 	updateClan,
 	changeCurrentClan,
 	updateUser,
+	deleteClan,
 };
 
 /*
