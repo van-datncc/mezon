@@ -84,7 +84,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 	return (
 		<div className="flex sbm:flex-row flex-col pt-10 mt-10 border-t border-borderClan gap-x-5 gap-y-[10px]">
 			<div className="flex flex-col flex-1 text-textSecondary">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Server Banner Background</h3>
+				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Clan Banner Background</h3>
 				<p className="text-sm font-normal mb-2 dark:text-textSecondary text-textSecondary800">
 					This image will display at the top of your channels list.
 				</p>

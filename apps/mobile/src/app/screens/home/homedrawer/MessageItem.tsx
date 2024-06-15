@@ -336,7 +336,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						) : (
 							<View style={[styles.replyAvatar]}>
 								<View style={styles.avatarMessageBoxDefault}>
-									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+									<Text style={styles.repliedTextAvatar}>{repliedSender?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
 								</View>
 							</View>
 						)}
@@ -360,7 +360,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
 						) : (
 							<View style={styles.avatarMessageBoxDefault}>
-								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
 							</View>
 						)}
 					</Pressable>
@@ -385,7 +385,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							}}
 							style={styles.messageBoxTop}
 						>
-							<Text style={styles.userNameMessageBox}>{user?.user?.username}</Text>
+							<Text style={styles.userNameMessageBox}>{user?.user?.username || 'Anonymous'}</Text>
 							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
 						</TouchableOpacity>
 					) : null}
