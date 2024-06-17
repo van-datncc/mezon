@@ -1,4 +1,4 @@
-import { directActions, selectAllDirectMessages, selectIsLoadDMData, useAppDispatch } from '@mezon/store';
+import { appActions, directActions, selectAllDirectMessages, selectIsLoadDMData, selectIsShowMemberListDM, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
 
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -10,9 +10,11 @@ type UseDirectParams = {
 }
 
 export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : false}) {
+	const dispatch = useAppDispatch();
 	const listDM = useSelector(selectAllDirectMessages);
 	const isLoadDM = useSelector(selectIsLoadDMData);
-	const dispatch = useAppDispatch();
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 
 	const createDirectMessageWithUser = useCallback(
 		async (userId: string) => {
@@ -45,6 +47,20 @@ export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : fa
 		[dispatch],
 	);
 
+	const setIsShowMemberListDM = useCallback(
+		async (status: boolean) => {
+			await dispatch(appActions.setIsShowMemberListDM(status));
+		},
+		[dispatch],
+	);
+
+	const setIsUseProfileDM = useCallback(
+		async (status: boolean) => {
+			await dispatch(appActions.setIsUseProfileDM(status));
+		},
+		[dispatch],
+	);
+
 	useEffect(() => {
 		if (isLoadDM || !autoFetch){
 			return
@@ -55,9 +71,21 @@ export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : fa
 	return useMemo(
 		() => ({
 			listDM,
+			isShowMemberListDM,
+			isUseProfileDM,
 			createDirectMessageWithUser,
 			refechDMList,
+			setIsShowMemberListDM,
+			setIsUseProfileDM,
 		}),
-		[listDM, createDirectMessageWithUser, refechDMList],
+		[
+			listDM, 
+			isUseProfileDM,
+			isShowMemberListDM,
+			createDirectMessageWithUser, 
+			refechDMList,
+			setIsShowMemberListDM,
+			setIsUseProfileDM,
+		],
 	);
 }
