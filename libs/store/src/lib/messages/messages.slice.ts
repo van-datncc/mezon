@@ -87,7 +87,7 @@ export const fetchMessagesCached = memoize(
 			if (args[3] === undefined) {
 				args[3] = 1;
 			}
-			return args[1] + args[2] + args[3] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		},
 	},
 );
@@ -365,6 +365,7 @@ export const messagesSlice = createSlice({
 			});
 		},
 		remove: messagesAdapter.removeOne,
+		removeAll: messagesAdapter.removeAll,
 		setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,

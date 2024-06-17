@@ -5,14 +5,16 @@ const NOTIFICATION_SERVICE_ERROR = 'PUSH_RECEIVER:::NOTIFICATION_SERVICE_ERROR'
 const NOTIFICATION_RECEIVED = 'PUSH_RECEIVER:::NOTIFICATION_RECEIVED'
 const TOKEN_UPDATED = 'PUSH_RECEIVER:::TOKEN_UPDATED'
 
-console.log('electron-renderer.js loaded');
-
 window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
   localStorage.setItem('fcmToken', token);
   window.electron.getDeviceId().then(deviceId => {
     const fcmTokenObject = { token, deviceId };
     localStorage.setItem('fcmTokenObject', JSON.stringify(fcmTokenObject));
   })
+});
+
+window.electron?.onDeepLinkUrl((deepLinkUrl) => {
+  localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
 });
 
 window.electron?.on(NOTIFICATION_SERVICE_ERROR, (_, error) => {
