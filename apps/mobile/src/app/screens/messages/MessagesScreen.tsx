@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { MessageIcon, UserGroupIcon, UserPlusIcon } from '@mezon/mobile-components';
@@ -8,10 +8,13 @@ import { styles } from './styles';
 import { useTranslation } from 'react-i18next';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { useAuth, useDirect, useMemberStatus } from '@mezon/core';
-import { normalizeString } from '../../utils/helpers';
+import { emojiRegex, normalizeString } from '../../utils/helpers';
 import { useThrottledCallback } from 'use-debounce';
 import { useSelector } from 'react-redux';
-import { DirectEntity, selectMemberByUserId } from '@mezon/store-mobile';
+import { DirectEntity, selectEmojiImage, selectMemberByUserId } from '@mezon/store-mobile';
+import { removeBlockCode } from '../home/homedrawer/constants';
+import FastImage from 'react-native-fast-image';
+import { getSrcEmoji } from '@mezon/utils';
 
 const SeparatorListFriend = () => {
 	return (
@@ -19,26 +22,47 @@ const SeparatorListFriend = () => {
 	)
 }
 
-const DmListItem = (props: { directMessage: DirectEntity, navigation: any}) => {
+const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation: any}) => {
 	const { directMessage, navigation } = props;
 	const { t } = useTranslation('message');
 	const { userId } = useAuth();
+	const emojiListPNG = useSelector(selectEmojiImage);
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const senderMessage = useSelector(selectMemberByUserId(directMessage?.last_sent_message?.sender_id || ''));
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: directMessage?.id } })
 	}
+
+	const formatLastMessageContent = useCallback((text: string) => {
+		const parts = removeBlockCode?.(text)?.split(/(:[^:]+:)/);
+		const content = parts?.map?.((part, index) => {
+			if (part.match(emojiRegex)) {
+				const srcEmoji = getSrcEmoji(part, emojiListPNG);
+				return <FastImage key={index} source={{uri: srcEmoji}} style={{width: 18, height: 18}} />
+			}
+			return <Text key={index}>{part} </Text>
+		})
+		return (
+			<Text style={[styles.defaultText, styles.lastMessage]} numberOfLines={1}>
+				{directMessage?.last_sent_message?.sender_id === userId ? t('directMessage.you') : senderMessage?.user?.username}
+				{': '}
+				{content}
+			</Text>
+		)
+	}, [directMessage, emojiListPNG, t, userId, senderMessage])
+
 	const lastMessage = useMemo(() => {
 		if (directMessage?.last_sent_message?.content) {
 			const timestamp = Number(directMessage?.last_sent_message?.timestamp);
 			const content = directMessage?.last_sent_message?.content;
+			const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 			return {
 				time: moment.unix(timestamp).format('DD/MM/YYYY HH:mm'),
-				text: typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t
+				textContent: formatLastMessageContent(text)
 			}
 		}
 		return null;
-	}, [directMessage])
+	}, [directMessage, formatLastMessageContent])
 
 	return (
 		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()}>
@@ -67,20 +91,23 @@ const DmListItem = (props: { directMessage: DirectEntity, navigation: any}) => {
 				</View>
 
 				{lastMessage ? (
-					<Text style={[styles.defaultText, styles.lastMessage]}>
-						{directMessage?.last_sent_message?.sender_id === userId ? t('directMessage.you') : senderMessage?.user?.username}
-						{': ' + lastMessage?.text}
-					</Text>
+					lastMessage.textContent
 				): null}
 			</View>
 		</TouchableOpacity>
 	)
-}
+})
 
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const { listDM: dmGroupChatList } = useDirect();
 	const { t } = useTranslation(['dmMessage', 'common']);
+
+	const sortDM = (a, b) => {
+		const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
+		const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+		return timestampB - timestampA;
+	};
 
 	const filterDmGroupsByChannelLabel = (data: DirectEntity[]) => {
 		const uniqueLabels = new Set();
@@ -88,7 +115,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			const isUnique = !uniqueLabels.has(obj.channel_label);
 			uniqueLabels.add(obj.channel_label);
 			return isUnique;
-		});
+		}).sort(sortDM);
 	};
 
 	const filteredDataDM = useMemo(() => {

@@ -15,7 +15,7 @@ export default function ClanMenuInfo({ clan }: ClanMenuInfoProps) {
 
     return (
         <View style={styles.info}>
-            <MezonBadge title="Community Server" />
+            <MezonBadge title="Community Clan" />
             <View style={styles.inlineInfo}>
                 <CircleIcon height={10} width={10} color="green" />
                 <Text style={styles.inlineText}>{`${onlineMembers} ${t('info.online')}`}</Text>

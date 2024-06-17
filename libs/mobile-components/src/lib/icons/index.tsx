@@ -681,6 +681,23 @@ export function TickIcon({ width = 20, height = 20, color = 'white', ...props }:
 	);
 }
 
+
+export function AddThread({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
+	return (
+    <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 24 24"
+    {...props}
+  >
+    <Path
+      d="M19 14a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 01-2 0v-3h-3a1 1 0 010-2h3v-3a1 1 0 011-1zm-7 5c0-.22.03-.44.08-.66a.56.56 0 00-.21-.58l-8.84-6.22a1 1 0 00-1.3.13l-.69.69a1 1 0 000 1.41l9.2 9.2a1 1 0 001.4 0l.36-.36a1 1 0 000-1.41l-.35-.36.37-.37a.56.56 0 00.12-.56A3 3 0 0112 19zm3-3h.16c.33 0 .56-.32.3-.53a.98.98 0 00-.07-.06L6.9 9.76a1 1 0 10-1.1 1.66l7.3 4.88c.17.1.39.1.56.02.4-.2.86-.32 1.34-.32zm.82-2.61c.25.17.6.07.77-.17.12-.17.26-.32.42-.46.29-.26.32-.76 0-.98L9.73 6.93a1 1 0 00-1.11 1.66l7.2 4.8zM12 2.81a1 1 0 010-1.41l.36-.36a1 1 0 011.41 0l9.2 9.2a1 1 0 010 1.4l-.7.7a1 1 0 01-1.3.13l-9.54-6.72a1 1 0 01-.08-1.58l1-1L12 2.8z"
+      fill={color}
+    />
+  </Svg>
+	);
+}
+
 export function LockIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
 	return (
 		<Svg role="img" width={width} height={height} fill={color} viewBox="0 0 24 24">

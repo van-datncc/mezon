@@ -57,6 +57,13 @@ export const styles = StyleSheet.create({
 		fontWeight: '600',
 		marginBottom: size.s_10,
 	},
+	aboutMeText: {
+		color: Colors.white,
+		fontSize: size.medium,
+		fontWeight: '500',
+		marginBottom: size.s_10,
+		fontStyle: 'italic',
+	},
 	roles: {
 		flexDirection: 'row',
 		gap: size.s_20,

@@ -245,6 +245,10 @@ export const formatBlockCode = (text: string) => {
     return text.replace(codeBlockRegexGlobal, addNewlinesToCodeBlock);
 }
 
+export const removeBlockCode = (text: string) => {
+    const regex = /(`{1,3})(.*?)\1/g;
+    return text?.replace?.(regex, '$2');
+}
 
 export const renderTextContent = (lines: string, isEdited?: boolean, t?: TFunction, channelsEntities?: Record<string, ChannelsEntity>, emojiListPNG?: IEmojiImage[],
   onMention?: (url: string)=>void, onChannelMention?: (channel: ChannelsEntity)=>void) => {
