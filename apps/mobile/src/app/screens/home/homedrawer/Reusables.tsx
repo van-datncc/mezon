@@ -70,11 +70,12 @@ export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string;
 	);
 });
 
-export const ChannelListHeader = React.memo((props: { title: string; onPress: any; isCollapsed: boolean }) => {
+export const ChannelListHeader = React.memo((props: { title: string; onPress: any; onLongPress: () => void; isCollapsed: boolean }) => {
 	return (
 		<TouchableOpacity
 			activeOpacity={0.8}
 			onPress={props?.onPress}
+			onLongPress={props?.onLongPress}
 			key={Math.floor(Math.random() * 9999999).toString()}
 			style={styles.channelListHeader}
 		>
@@ -86,7 +87,7 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 	);
 });
 
-export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; collapseItems: any }) => {
+export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; onLongPress: () => void; collapseItems: any }) => {
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
 	const currentChanel = useSelector(selectCurrentChannel);
 
@@ -95,6 +96,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 			<ChannelListHeader
 				title={props.data.category_name}
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
+				onLongPress={() => props?.onLongPress()}
 				isCollapsed={isCollapsed}
 			/>
 			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>

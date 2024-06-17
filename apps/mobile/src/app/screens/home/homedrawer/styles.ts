@@ -68,9 +68,10 @@ export const styles = StyleSheet.create({
 		paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
 		paddingRight: size.s_40,
 		fontSize: size.medium,
-		paddingTop: size.s_10,
+		paddingTop: size.s_8,
 		backgroundColor: Colors.tertiaryWeight,
 		color: Colors.tertiary,
+		textAlignVertical: 'center',
 	},
 	iconEmoji: {
 		position: 'absolute',
@@ -186,6 +187,7 @@ export const styles = StyleSheet.create({
 	logoClan: {
 		height: verticalScale(70),
 		width: verticalScale(70),
+		resizeMode: 'cover',
 	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
@@ -539,11 +541,13 @@ export const styles = StyleSheet.create({
 	},
 	overlay: {
 		position: 'absolute',
+		alignItems: 'center',
+		justifyContent: 'center',
 		top: 0,
 		left: 0,
 		width: '100%',
 		height: '100%',
-		backgroundColor: Colors.secondary,
+		backgroundColor: 'rgba(000,000,000,0.8)',
 	},
 	channelContainer: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },

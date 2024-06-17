@@ -75,7 +75,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			classNameBox="h-full"
 		>
 			<div className="flex items-center flex-col justify-center ">
-				<span className="dark:text-contentPrimary text-black text-[24px] pb-4 font-[700] leading-8">Customize Your Server</span>
+				<span className="dark:text-contentPrimary text-black text-[24px] pb-4 font-[700] leading-8">Customize Your Clan</span>
 				<p className="dark:text-contentTertiary text-black  text-center text-[20px] leading-6 font-[400]">
 					Give your new clan a personality with a name and an icon. You can always change it later.
 				</p>
