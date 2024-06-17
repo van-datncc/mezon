@@ -71,7 +71,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	return (
 		<View style={styles.reactionWrapper}>
 			{allReactionDataOnOneMessage
-				.map((emojiItemData: EmojiDataOptionals, index) => {
+				?.map((emojiItemData: EmojiDataOptionals, index) => {
 					const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 					const isMyReaction = userSender?.count && userSender.count > 0;
 
