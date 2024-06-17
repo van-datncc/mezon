@@ -14,8 +14,12 @@ import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
+
+import { directActions } from '../direct/direct.slice';
+
 import { boolean } from 'yup';
 import { ThunkConfigWithToast, withToast } from '../toasts';
+
 export const CLANS_FEATURE_KEY = 'clans';
 
 /*
@@ -70,6 +74,7 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>('
 	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan(clanId));
 	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
+	thunkAPI.dispatch(directActions.fetchDirectMessage({}));
 	thunkAPI.dispatch(
 		voiceActions.fetchVoiceChannelMembers({
 			clanId: clanId ?? '',
@@ -237,6 +242,7 @@ export const clansSlice = createSlice({
 	reducers: {
 		add: clansAdapter.addOne,
 		remove: clansAdapter.removeOne,
+		removeAll: clansAdapter.removeAll,
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
 		},
