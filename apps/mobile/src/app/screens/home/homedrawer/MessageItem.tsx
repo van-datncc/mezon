@@ -1,5 +1,5 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, save } from '@mezon/mobile-components';
+import { FileIcon, ReplyIcon, ReplyMessageDeleted, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
 import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -56,6 +56,7 @@ export type MessageItemProps = {
 	channelId?: string;
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
+  isNumberOfLine?: boolean
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -63,7 +64,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, dataReactionCombine, preMessage, onOpenImage } = props;
+	const { message, mode, dataReactionCombine, preMessage, onOpenImage, isNumberOfLine } = props;
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
@@ -341,11 +342,21 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							</View>
 						)}
 						<Text style={styles.repliedContentText} numberOfLines={1}>
-							{messageRefFetchFromServe.content.t}
+            {messageRefFetchFromServe.content.t}
 						</Text>
 					</Pressable>
 				</View>
 			) : null}
+      {!messageRefFetchFromServe && message?.references?.length && message.references ?
+      <View style={styles.aboveMessageDeleteReply}>
+					<View style={styles.iconReply}>
+						<ReplyIcon width={34} height={30} />
+					</View>
+          <View style={styles.iconMessageDeleteReply}>
+          <ReplyMessageDeleted width={18} height={9} />
+          </View>
+					<Text style={styles.messageDeleteReplyText}>{t("messageDeleteReply")}</Text>
+				</View> : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 				{isShowInfoUser ? (
 					<Pressable
@@ -393,7 +404,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					{images.length > 0 && renderImages()}
 
 					{documents.length > 0 && renderDocuments()}
-					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention)}
+					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine)}
 					<MessageAction
 						message={message}
 						dataReactionCombine={dataReactionCombine}

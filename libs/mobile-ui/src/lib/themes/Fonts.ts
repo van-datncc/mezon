@@ -15,6 +15,8 @@ export const size = {
   h4: 26,
   h5: 20,
   h6: 19,
+  h7: 14,
+  h8: 11,
   input: 18,
   regular: 17,
   medium: verticalScale(14),
