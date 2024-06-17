@@ -35,7 +35,7 @@ const DeleteClanModal: React.FC<DeleteClanModalProps> = ({ onClose }) => {
 							value={inputValue}
 							onChange={(e) => setInputValue(e.target.value)}
 						/>
-						{!inputValueIsMatchClanName ? <div className='text-[#fa777c] text-xs font-semibold'>You didn't enter the server name correctly</div> : ""}
+						{!inputValueIsMatchClanName ? <div className='text-[#fa777c] text-xs font-semibold'>You didn't enter the clan name correctly</div> : ""}
 					</div>
 				</div>
 				<div className="bottom-block flex justify-end p-[16px] dark:bg-[#2b2d31] bg-[#e1dfdf] items-center gap-[20px] font-semibold rounded-[5px]">
