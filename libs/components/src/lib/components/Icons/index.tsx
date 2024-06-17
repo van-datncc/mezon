@@ -2661,7 +2661,7 @@ export function IconClockChannel() {
 			<circle cx="110.16" cy="71.6" fill="#ff87ff" r="2.22"/>
 			<rect fill="url(#b)" height="56.67" rx="3.23" width="85.13" x="17.43" y="33.33"/>
 			<rect fill="#ffd01a" height="56.67" rx="3.23" width="66.95" x="17.43" y="33.33"/>
-			<g fill="none" stroke-miterlimit="10">
+			<g fill="none" strokeMiterlimit="10">
 				<g stroke="#ffa600" stroke-width="2.262054">
 					<path d="m17.43 81.75h85.14"/>
 					<path d="m17.43 41.58h66.95"/>

@@ -11,7 +11,7 @@ const Backdrop = (props: BottomSheetBackdropProps) => {
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       props.animatedIndex.value,
-      [0, 1],
+      [-1, 0],
       [0, 0.7],
       Extrapolation.CLAMP
     ),
@@ -31,7 +31,6 @@ const Backdrop = (props: BottomSheetBackdropProps) => {
     <BottomSheetBackdrop
       {...props}
       style={containerStyle}
-      opacity={0.5}
       pressBehavior="close"
     />
   )

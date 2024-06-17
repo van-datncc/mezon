@@ -4,7 +4,7 @@ import { Ref } from "react";
 import { forwardRef } from "react";
 import styles from "./styles";
 import { ReactNode } from "react";
-import Backdrop from "./components/backdrop";
+import Backdrop from "./backdrop";
 import { Text, View } from "react-native";
 
 interface IProps {
@@ -14,12 +14,15 @@ interface IProps {
     headerRight?: ReactNode
 }
 
-export default forwardRef(function BottomSheet({ children, title, headerLeft, headerRight }: IProps, ref: Ref<BottomSheetModalMethods>) {
+export default forwardRef(function BottomSheet(
+    { children, title, headerLeft, headerRight }: IProps,
+    ref: Ref<BottomSheetModalMethods>) {
+
     return (
         <OriginalBottomSheet
             ref={ref}
-            snapPoints={['20%', '90%']}
-            index={1}
+            snapPoints={['90%']}
+            index={0}
             animateOnMount
             backgroundStyle={styles.backgroundStyle}
             backdropComponent={Backdrop}

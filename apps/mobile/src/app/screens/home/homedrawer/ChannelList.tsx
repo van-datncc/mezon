@@ -1,5 +1,5 @@
 import { useAuth, useCategory, useEventManagement } from '@mezon/core';
-import { AngleRightIcon, CalendarIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
+import { CalendarIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -9,14 +9,10 @@ import {
 	selectCurrentClan,
 	selectIsFromFCMMobile
 } from '@mezon/store-mobile';
-import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
-import Dots from '../../../../assets/svg/guildMoreOptions1.svg';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
 import { styles } from './styles';
@@ -25,16 +21,23 @@ import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
+import CategoryMenu from './components/CategoryMenu';
+import { ICategoryChannel } from '@mezon/utils';
+import { useState } from 'react';
 import EventViewer from '../../../components/Event';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
+
 	const { allEventManagement } = useEventManagement();
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
+	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+
+	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const user = useAuth();
 
 
@@ -81,8 +84,11 @@ const ChannelList = React.memo((props: any) => {
 
 	function handlePress() {
 		bottomSheetMenuRef.current?.present();
-		// @ts-ignore
-		// navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
+	}
+
+	function handleLongPressCategory(categoryChannel: ICategoryChannel) {
+		bottomSheetCategoryMenuRef.current?.present();
+		setCurrentPressedCategory(categoryChannel);
 	}
 
 	return (
@@ -108,7 +114,12 @@ const ChannelList = React.memo((props: any) => {
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}
 					renderItem={({ item, index }) => (
-						<ChannelListSection data={item} index={index} onPressHeader={toggleCollapseChannel} collapseItems={collapseChannelItems} />
+						<ChannelListSection
+							data={item}
+							index={index}
+							onPressHeader={toggleCollapseChannel}
+							onLongPress={() => handleLongPressCategory(item)}
+							collapseItems={collapseChannelItems} />
 					)}
 				/>
 			</View>
@@ -118,6 +129,13 @@ const ChannelList = React.memo((props: any) => {
 					clan={currentClan}
 					bottomSheetRef={bottomSheetMenuRef}
 					inviteRef={bottomSheetInviteRef}
+				/>
+			</BottomSheet2>
+
+			<BottomSheet2 ref={bottomSheetCategoryMenuRef} >
+				<CategoryMenu
+					bottomSheetRef={bottomSheetCategoryMenuRef}
+					category={currentPressedCategory}
 				/>
 			</BottomSheet2>
 
