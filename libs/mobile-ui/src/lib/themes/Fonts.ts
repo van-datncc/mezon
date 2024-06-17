@@ -1,5 +1,9 @@
 import { verticalScale } from "./Metrics";
 
+const family = {
+  arial: 'Arial',
+};
+
 const type = {
   light: '',
   medium: '',
@@ -86,5 +90,6 @@ const style = {
 export default {
   type,
   size,
-  style
+  style,
+  family
 };
