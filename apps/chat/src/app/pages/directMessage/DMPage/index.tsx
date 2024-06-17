@@ -3,6 +3,7 @@ import {
 	useApp,
 	useAppNavigation,
 	useAppParams,
+	useChatMessages,
 	useChatReaction,
 	useDirectMessages,
 	useDragAndDrop,
@@ -11,14 +12,24 @@ import {
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState } from '@mezon/store';
+import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
-
+function useChannelSeen(channelId: string) {
+	const dispatch = useAppDispatch();
+	const { lastMessage } = useChatMessages({ channelId });
+		useEffect(() => {
+			if (lastMessage) {
+				const timestamp = Date.now() / 1000;
+				dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+				dispatch(directActions.updateLastSeenTime(lastMessage));
+			}
+		}, [channelId, dispatch, lastMessage]);
+}
 export default function DirectMessage() {
 	// TODO: move selector to store
 	const isSending = useSelector((state: RootState) => state.messages.isSending);
@@ -27,6 +38,7 @@ export default function DirectMessage() {
 	const { navigate } = useAppNavigation();
 	const { draggingState, setDraggingState } = useDragAndDrop();
 
+	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (defaultChannelId) {
