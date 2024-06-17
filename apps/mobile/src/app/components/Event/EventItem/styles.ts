@@ -9,30 +9,27 @@ const styles = StyleSheet.create({
         borderColor: Colors.gray48,
         borderRadius: 15,
         backgroundColor: Colors.secondary,
-        // gap: Metrics.size.xs
-        gap: 3
+        gap: Metrics.size.xs
     },
     description: {
-        // fontSize: Fonts.size.h8,
-        fontSize: 11,
+        fontSize: Fonts.size.h8,
         color: Colors.gray48
     },
     title: {
-        // fontSize: Fonts.size.h7,
-        fontSize: 14,
+        fontSize: Fonts.size.h7,
         color: Colors.white
     },
     infoSection: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 10
+        marginBottom: Metrics.size.m
     },
 
     inline: {
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-        gap: 5
+        gap: Metrics.size.s
     },
 
     tinyText: {
@@ -42,8 +39,7 @@ const styles = StyleSheet.create({
 
     smallText: {
         color: Colors.white,
-        fontSize: 11
-        // fontSize: Fonts.size.h7,
+        fontSize: Fonts.size.h8,
     },
 
     avatar: {
@@ -59,7 +55,7 @@ const styles = StyleSheet.create({
 
     mainSec: {
         gap: 5,
-        marginBottom: 10
+        marginBottom: Metrics.size.m
     }
 })
 

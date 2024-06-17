@@ -10,38 +10,34 @@ const styles = StyleSheet.create({
         borderColor: Colors.gray48,
         borderRadius: 15,
         backgroundColor: Colors.secondary,
-        // gap: Metrics.size.xs
-        gap: 10,
+        gap: Metrics.size.m
     },
 
     title: {
         color: Colors.white,
-        // fontSize: 14,
-        fontSize: Fonts.size.h6,
+        fontSize: Fonts.size.h7,
         fontWeight: "bold"
     },
 
     description: {
-        // fontSize: Fonts.size.h8,
-        fontSize: 11,
+        fontSize: Fonts.size.h8,
         color: Colors.gray48
     },
 
     mainSection: {
-        gap: 5
+        gap:  Metrics.size.s
     },
 
     inline: {
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-        gap: 5
+        gap:  Metrics.size.s
     },
 
     smallText: {
         color: Colors.white,
-        fontSize: 11
-        // fontSize: Fonts.size.h7,
+        fontSize: Fonts.size.h8,
     },
 })
 
