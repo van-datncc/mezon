@@ -42,7 +42,7 @@ export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: an
 export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string, isCirle?: boolean }) => {
 	return (
 		<FastImage
-			style={[{ width: '100%', height: '100%' }, isCirle && {borderRadius: 50}]}
+			style={[{ width: '100%', height: '100%' }, isCirle && { borderRadius: 50 }]}
 			source={{
 				uri: uri,
 				headers: { Authorization: 'someAuthToken' },
@@ -53,11 +53,12 @@ export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string,
 	);
 });
 
-export const ChannelListHeader = React.memo((props: { title: string; onPress: any; isCollapsed: boolean }) => {
+export const ChannelListHeader = React.memo((props: { title: string; onPress: any; onLongPress: () => void; isCollapsed: boolean }) => {
 	return (
 		<TouchableOpacity
 			activeOpacity={0.8}
 			onPress={props?.onPress}
+			onLongPress={props?.onLongPress}
 			key={Math.floor(Math.random() * 9999999).toString()}
 			style={styles.channelListHeader}
 		>
@@ -69,7 +70,7 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 	);
 });
 
-export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; collapseItems: any }) => {
+export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; onLongPress: () => void; collapseItems: any }) => {
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
 	const currentChanel = useSelector(selectCurrentChannel);
 
@@ -78,6 +79,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 			<ChannelListHeader
 				title={props.data.category_name}
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
+				onLongPress={() => props?.onLongPress()}
 				isCollapsed={isCollapsed}
 			/>
 			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
@@ -117,7 +119,7 @@ export const FriendListItem = React.memo((props: { user: IUser }) => {
 				/>
 				<Text style={styles.friendItemName}>{user?.name}</Text>
 			</View>
-		
+
 			<View>
 				<MezonButton
 					viewContainerStyle={styles.inviteButton}

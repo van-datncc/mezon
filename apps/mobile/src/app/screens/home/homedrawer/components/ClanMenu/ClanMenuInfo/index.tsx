@@ -1,5 +1,5 @@
 import { CircleIcon } from "@mezon/mobile-components";
-import MezonBadge from "apps/mobile/src/app/temp-ui/MezonBadge";
+import { MezonBadge } from "apps/mobile/src/app/temp-ui";
 import { View, Text } from "react-native";
 import styles from "./styles";
 import { useTranslation } from "react-i18next";
