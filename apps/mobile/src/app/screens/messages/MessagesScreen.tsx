@@ -34,7 +34,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 	}
 
 	const formatLastMessageContent = useCallback((text: string) => {
-		const parts = removeBlockCode(text).split(/(:[^:]+:)/);
+		const parts = removeBlockCode(text)?.split(/(:[^:]+:)/) || [];
 		const content = parts.map((part, index) => {
 			if (part.match(emojiRegex)) {
 				const srcEmoji = getSrcEmoji(part, emojiListPNG);
