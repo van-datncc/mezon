@@ -237,6 +237,7 @@ export const clansSlice = createSlice({
 	reducers: {
 		add: clansAdapter.addOne,
 		remove: clansAdapter.removeOne,
+		removeAll: clansAdapter.removeAll,
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
 		},
