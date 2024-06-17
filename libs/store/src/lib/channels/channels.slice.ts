@@ -74,8 +74,8 @@ export const joinChannel = createAsyncThunk(
 		try {
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting(channelId));
-			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage(channelId));
+			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({channelId}));
+			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({channelId}));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
