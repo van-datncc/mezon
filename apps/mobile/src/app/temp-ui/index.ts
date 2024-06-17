@@ -12,6 +12,7 @@ export * from './MezonInput';
 export * from './MezonImagePicker';
 export * from './MezonBadge';
 export * from './MezonTab';
+export * from './MezonBottomSheet'
 
 export { default as MezonMenu } from './MezonMenu';
 export { default as MezonOption } from './MezonOption';
@@ -20,4 +21,5 @@ export { default as MezonInput } from './MezonInput';
 export { default as MezonImagePicker } from './MezonImagePicker';
 export { default as MezonBadge } from './MezonBadge';
 export { default as MezonTab } from './MezonTab';
+export { default as MezonBottomSheet } from './MezonBottomSheet';
 
