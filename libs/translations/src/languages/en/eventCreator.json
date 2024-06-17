@@ -1,0 +1,27 @@
+{
+    "title": "Where is your event?",
+    "subtitle": "So no one gets lost on where to go",
+    "description": "You can give other people permission to create events in Server > Settings > Roles",
+    "fields": {
+        "channelType": {
+            "voiceChannel": {
+                "title": "Voice Channel",
+                "description": "hang out with voice, video, screenshare, and Go Live."
+            },
+            "somewhere": {
+                "title": "Somewhere else",
+                "description": "Text channel, external link, or in-person location."
+            }
+        },
+        "channel": {
+            "title": "Select channel"
+        },
+        "address": {
+            "title": "Locations",
+            "placeholder": "Add a location, link or something"
+        }
+    },
+    "actions": {
+        "next": "Next"
+    }
+}

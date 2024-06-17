@@ -1,0 +1,27 @@
+{
+    "title": "Sự kiện của bạn diễn ra ở đâu?",
+    "subtitle": "Để mọi người không bị lạc đường",
+    "description": "Có có thể cấp quyền cho người khác tạo Sự kiện trong Máy chủ > Cài đặt > Vai trò",
+    "fields": {
+        "channelType": {
+            "voiceChannel": {
+                "title": "Kênh thoại",
+                "description": "Gặp gỡ bằng giọng nói, video, chia sẻ màn hình và Trực tiếp."
+            },
+            "somewhere": {
+                "title": "Nơi khác",
+                "description": "Kênh văn bản, liên kết ngoài hoặc vị trí trực tiếp."
+            }
+        },
+        "channel": {
+            "title": "Chọn kênh"
+        },
+        "address": {
+            "title": "Địa điểm",
+            "placeholder": "Thêm một địa điểm, link hoặc một thứ gì đó"
+        }
+    },
+    "actions": {
+        "next": "Tiếp theo"
+    }
+}
