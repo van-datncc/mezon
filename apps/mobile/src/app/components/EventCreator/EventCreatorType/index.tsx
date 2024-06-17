@@ -1,17 +1,17 @@
 import { Text, View } from "react-native";
-import { MenuClanScreenProps, APP_SCREEN } from "../../navigation/ScreenTypes";
-import { MezonInput, MezonOption, MezonSelect } from "../../temp-ui";
+import { MenuClanScreenProps, APP_SCREEN } from "../../../navigation/ScreenTypes";
+import { MezonInput, MezonOption, MezonSelect } from "../../../temp-ui";
 import { useTranslation } from "react-i18next";
 import styles from "./styles";
 import { SpeakerIcon } from "@mezon/mobile-components";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectVoiceChannelAll } from "@mezon/store-mobile";
-import MezonButton from "../../temp-ui/MezonButton2";
+import MezonButton from "../../../temp-ui/MezonButton2";
 
 
 type CreateEventScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
-export default function EventCreator({ navigation }: MenuClanScreenProps<CreateEventScreen>) {
+export default function EventCreatorType({ navigation }: MenuClanScreenProps<CreateEventScreen>) {
     const { t } = useTranslation(['eventCreator']);
     const voicesChannel = useSelector(selectVoiceChannelAll);
     const [eventType, setEventType] = useState<number>(0);

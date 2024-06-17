@@ -34,11 +34,11 @@ const RootStack = createNativeStackNavigator();
 export const Authentication = () => {
 	const getInitialRouteName = APP_SCREEN.BOTTOM_BAR;
 	const navigation = useNavigation<any>();
-	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	const [fileShared, setFileShared] = useState<any>();
+	const { userProfile } = useAuth();
 	const { setAttachmentData } = useReference();
 
 	useEffect(() => {
