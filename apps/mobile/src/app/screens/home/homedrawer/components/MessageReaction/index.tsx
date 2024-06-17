@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { FastImageRes } from '../../Reusables';
 import { IDetailReactionBottomSheet, IMessageReactionProps } from '../../types';
 import { styles } from './styles';
-import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
+// import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
@@ -281,8 +281,8 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 					)}
 				</View>
 			</BottomSheet>
-
-			<UserInformationBottomSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
+			{/* TODO: update later */}
+			{/* <UserInformationBottomSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} /> */}
 		</View>
 	);
 });
