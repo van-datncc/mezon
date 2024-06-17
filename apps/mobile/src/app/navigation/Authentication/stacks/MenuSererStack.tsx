@@ -6,6 +6,7 @@ import CategoryCreator from "../../../components/Category";
 import ClanSetting from "../../../components/ClanSettings";
 import ClanOverviewSetting from "../../../components/ClanSettings/Overview";
 import ChannelCreator from "../../../components/ChannelCreator";
+import EventCreator from "../../../components/EventCreator";
 
 export const MenuClanStacks = ({ }: any) => {
     const Stack = createStackNavigator();
@@ -42,6 +43,14 @@ export const MenuClanStacks = ({ }: any) => {
                 component={ChannelCreator}
                 options={{
                     headerTitle: t('menuClanStack.channelCreator'),
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.CREATE_EVENT}
+                component={EventCreator}
+                options={{
+                    headerTitle: t('menuClanStack.eventCreator'),
                 }}
             />
 
