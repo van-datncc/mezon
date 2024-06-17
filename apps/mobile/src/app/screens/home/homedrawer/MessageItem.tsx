@@ -22,18 +22,20 @@ import {
 	getTimeDifferenceInSeconds,
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
+import { Text } from '@mezon/mobile-ui';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, isImage, splitBlockCodeRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, isImage, isVideo, splitBlockCodeRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useTranslation } from 'react-i18next';
 import { ChannelType } from 'mezon-js';
@@ -120,7 +122,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = () => {
+	const renderVideos = (videoItem?: any) => {
 		return (
 			<View
 				style={{
@@ -129,29 +131,51 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					marginTop: size.s_10,
 				}}
 			>
-				{videos.map((video, index) => {
-					return (
-						<VideoPlayer
-							key={`${video?.url}_${index}`}
-							isControlsVisible={false}
-							disableFullscreen={false}
-							video={{ uri: video?.url }}
-							videoWidth={widthMedia + size.s_50}
-							videoHeight={160}
-							hideControlsOnStart={true}
-							resizeMode="cover"
-							style={{
-								width: widthMedia + size.s_50,
-								height: 160,
-								borderRadius: size.s_4,
-								overflow: 'hidden',
-								backgroundColor: Colors.borderDim,
-							}}
-							endWithThumbnail={true}
-							thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
-						/>
-					);
-				})}
+				{videoItem ? (
+					<VideoPlayer
+						key={`${videoItem?.url}_${videoItem}`}
+						isControlsVisible={false}
+						disableFullscreen={false}
+						video={{ uri: videoItem?.url }}
+						videoWidth={widthMedia + size.s_50}
+						videoHeight={160}
+						hideControlsOnStart={true}
+						resizeMode="cover"
+						style={{
+							width: widthMedia + size.s_50,
+							height: 160,
+							borderRadius: size.s_4,
+							overflow: 'hidden',
+							backgroundColor: Colors.borderDim,
+						}}
+						endWithThumbnail={true}
+						thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
+					/>
+				) : (
+					videos.map((video, index) => {
+						return (
+							<VideoPlayer
+								key={`${video?.url}_${index}`}
+								isControlsVisible={false}
+								disableFullscreen={false}
+								video={{ uri: video?.url }}
+								videoWidth={widthMedia + size.s_50}
+								videoHeight={160}
+								hideControlsOnStart={true}
+								resizeMode="cover"
+								style={{
+									width: widthMedia + size.s_50,
+									height: 160,
+									borderRadius: size.s_4,
+									overflow: 'hidden',
+									backgroundColor: Colors.borderDim,
+								}}
+								endWithThumbnail={true}
+								thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
+							/>
+						);
+					})
+				)}
 			</View>
 		);
 	};
@@ -201,6 +225,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const checkIsImage = isImage(document?.url);
 			if (checkIsImage) {
 				return imageItem({ image: document, index, checkImage: checkIsImage });
+			}
+			const checkIsVideo = isVideo(document?.url);
+			
+			if (checkIsVideo) {
+				return renderVideos(document);
 			}
 
 			return (

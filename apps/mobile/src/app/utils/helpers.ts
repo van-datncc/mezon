@@ -41,6 +41,10 @@ export const isImage = (url?: string) => {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)/.test(url);
 };
 
+export const isVideo = (url?: string) => {
+  return /\.(mp4|webm|ogg|mov)/.test(url);
+};
+
 export const normalizeString = (str: string) => {
   const normalizedStr = str.replace(/\s+/g, '').trim();
   return normalizedStr.toLowerCase();
