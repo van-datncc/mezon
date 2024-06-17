@@ -21,6 +21,7 @@ export type MemberProfileProps = {
 	listProfile?: boolean;
 	isOffline?: boolean;
 	isHideAnimation?: boolean;
+	isUnReadDirect?: boolean;
 };
 
 function MemberProfile({
@@ -37,6 +38,7 @@ function MemberProfile({
 	listProfile,
 	isOffline,
 	isHideAnimation,
+	isUnReadDirect,
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
@@ -150,7 +152,9 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile`}
+							className={`text-base font-medium
+							${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile 
+							${(isUnReadDirect) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}

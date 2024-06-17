@@ -4,13 +4,20 @@ import { Ref } from "react";
 import { forwardRef } from "react";
 import styles from "./styles";
 import { ReactNode } from "react";
-import Backdrop from "./components/backdrop";
+import Backdrop from "./backdrop";
+import { Text, View } from "react-native";
 
 interface IProps {
-    children: ReactNode
+    children: ReactNode,
+    title?: string,
+    headerLeft?: ReactNode,
+    headerRight?: ReactNode
 }
 
-export default forwardRef(function BottomSheet({ children }: IProps, ref: Ref<BottomSheetModalMethods>) {
+export default forwardRef(function BottomSheet(
+    { children, title, headerLeft, headerRight }: IProps,
+    ref: Ref<BottomSheetModalMethods>) {
+
     return (
         <OriginalBottomSheet
             ref={ref}
@@ -21,6 +28,14 @@ export default forwardRef(function BottomSheet({ children }: IProps, ref: Ref<Bo
             backdropComponent={Backdrop}
         >
             <BottomSheetScrollView >
+                {(title || headerLeft || headerRight) &&
+                    <View style={styles.header}>
+                        <View style={[styles.section, styles.sectionLeft]}>{headerLeft}</View>
+                        <Text style={[styles.section, styles.sectionTitle]}>{title}</Text>
+                        <View style={[styles.section, styles.sectionRight]}>{headerRight}</View>
+                    </View>
+                }
+
                 {children}
             </BottomSheetScrollView>
         </OriginalBottomSheet >
