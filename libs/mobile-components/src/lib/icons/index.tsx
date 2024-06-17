@@ -700,7 +700,7 @@ export function AddThread({ width = 20, height = 20, color = 'white', ...props }
 
 export function LockIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
 	return (
-		<Svg role="img" width={width} height={height} fill={color} viewBox="0 0 24 24">
+		<Svg role="img" width={width} height={height} fill="none" viewBox="0 0 24 24">
 			<Path fill={color} fill-rule="evenodd" d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z" clip-rule="evenodd">
 			</Path>
 		</Svg>
@@ -812,3 +812,14 @@ export function EmptyPinIcon ({ width = 24, height = 24, color = 'white', ...pro
   )
 
 }
+export function ReplyMessageDeleted({ width = 24, height = 24, color = '#a1a1a9', ...props }: SvgProps) {
+	return (
+    <Svg width={width} height={height} viewBox="0 0 8 8" {...props}>
+    <Path
+      d="M.81 3.596L5.126.468a.335.335 0 01.484.084.31.31 0 01.048.17v1.649c4.704 0 5.596 3.154 5.741 4.84a.317.317 0 01-.052.192.335.335 0 01-.156.127.349.349 0 01-.38-.083C8.721 5.09 5.657 5.634 5.657 5.634V7.28a.31.31 0 01-.049.168.325.325 0 01-.133.117.339.339 0 01-.345-.03L.81 4.409a.513.513 0 01-.21-.406.494.494 0 01.21-.407z"
+      fill={color}
+    />
+  </Svg>
+	)
+}
+

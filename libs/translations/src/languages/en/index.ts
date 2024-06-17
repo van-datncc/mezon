@@ -18,6 +18,8 @@ import clanMenu from  "./clanMenu.json";
 import pinMessage from './pinMessage.json';
 import clanSetting from "./clanSetting.json";
 import clanOverviewSetting from "./clanOverviewSetting.json";
+import categoryMenu from "./categoryMenu.json";
+import channelCreator from "./channelCreator.json";
 
 export default {
 	inviteToChannel,
@@ -39,5 +41,7 @@ export default {
 	clanMenu,
 	pinMessage,
 	clanSetting,
-	clanOverviewSetting
+	clanOverviewSetting,
+	categoryMenu,
+	channelCreator
 };

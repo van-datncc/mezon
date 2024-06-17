@@ -37,5 +37,6 @@
         "noActionTitle": "No Reactions",
         "noActionDescription": "What a cold, emotionless world.",
         "removeActions": "Remove Actions"
-    }
+    },
+    "messageDeleteReply": "Original message was deleted"
 }

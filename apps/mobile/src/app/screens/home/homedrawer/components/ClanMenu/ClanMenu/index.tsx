@@ -4,11 +4,9 @@ import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { AddFillIcon, BellIcon, KeyframeIcon, SettingIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
-import MezonMenu, { reserve } from "apps/mobile/src/app/temp-ui/MezonMenu";
+import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
-import { IMezonMenuSectionProps } from "apps/mobile/src/app/temp-ui/MezonMenuSection";
-import { IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui/MezonMenuItem";
 import { ClansEntity } from "@mezon/store-mobile";
 import ClanMenuInfo from "../ClanMenuInfo";
 import MezonToggleButton from "apps/mobile/src/app/temp-ui/MezonToggleButton";
@@ -183,7 +181,9 @@ export default function ClanMenu({ clan, bottomSheetRef, inviteRef }: IServerMen
 
                 </ScrollView>
 
-                <MezonMenu menu={menu} />
+                <View>
+                    <MezonMenu menu={menu} />
+                </View>
             </View>
         </View>
     )
