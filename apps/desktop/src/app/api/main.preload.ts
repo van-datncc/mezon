@@ -15,4 +15,5 @@ contextBridge.exposeInMainWorld('electron', {
 	},
 	getDeviceId: () => ipcRenderer.invoke('get-device-id'),
 	onDeepLinkUrl: (callback) => ipcRenderer.on('send-data-to-renderer', (event, data) => callback(data)),
+	senderId: (senderId) => ipcRenderer.invoke('sender-id', senderId)
 });
