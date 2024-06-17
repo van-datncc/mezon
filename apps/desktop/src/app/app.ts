@@ -74,8 +74,6 @@ export default class App {
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
 
-		// TODO:
-
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
@@ -90,6 +88,7 @@ export default class App {
 
 						if (dataString) {
 							App.mainWindow.webContents.send('send-data-to-renderer', dataString);
+							App.loadMainWindow();
 						}
 					}
 				}

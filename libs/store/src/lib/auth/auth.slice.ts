@@ -94,7 +94,6 @@ export const authSlice = createSlice({
 	initialState: initialAuthState,
 	reducers: {
 		setSession(state, action) {
-			console.log('action', action.payload);
 			state.session = action.payload;
 			state.isLogin = true;
 		},

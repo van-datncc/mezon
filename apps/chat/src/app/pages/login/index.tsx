@@ -26,7 +26,7 @@ function Login() {
 		if (isLogin) {
 			navigate(redirectTo || '/chat/direct/friends');
 		}
-	}, [redirectTo, isLogin, deepLinkUrl, navigate]);
+	}, [redirectTo, isLogin, navigate]);
 
 	return (
 		<div

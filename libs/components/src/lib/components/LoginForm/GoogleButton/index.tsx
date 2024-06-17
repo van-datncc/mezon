@@ -1,26 +1,18 @@
 import { useAuth } from '@mezon/core';
-import { selectIsLogin } from '@mezon/store';
 import { useGoogleLogin } from '@react-oauth/google';
 import isElectron from 'is-electron';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const GoogleButtonLogin: React.FC = () => {
 	const { loginByGoogle } = useAuth();
-	const isLogin = useSelector(selectIsLogin);
 
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
 		ux_mode: 'popup',
 		//redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
-			const session = await loginByGoogle(code);
-
-			if (!isLogin) {
-				const jsonString = encodeURIComponent(JSON.stringify(session));
-				window.location.href = `mezonapp://accounts?data=${jsonString}`;
-			}
+			await loginByGoogle(code);
 		},
 		onError: (errorResponse) => console.log(errorResponse),
 	});
@@ -38,7 +30,7 @@ const GoogleButtonLogin: React.FC = () => {
 			{isElectron() && (
 				<Link
 					target="_blank"
-					to={'http://localhost:4200/guess/login'}
+					to={'http://localhost:4200/guess/login-desktop'}
 					// to={process.env.NX_CHAT_APP_REDIRECT_URI as string}
 					className="flex justify-center w-full  h-fit p-3 rounded-[4px] bg-[#d1e0ff]"
 				>
