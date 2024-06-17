@@ -141,7 +141,7 @@ const ChannelList = React.memo((props: any) => {
 
 			<BottomSheet2
 				title={`${allEventManagement.length} Events`}
-				headerRight={currentClan.creator_id === user.userId && <Text style={{ color: "white" }}>Create</Text>}
+				headerRight={currentClan?.creator_id === user?.userId && <Text style={{ color: "white" }}>Create</Text>}
 				ref={bottomSheetEventRef}>
 				<EventViewer />
 			</BottomSheet2>
