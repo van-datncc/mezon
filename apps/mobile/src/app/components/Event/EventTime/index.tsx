@@ -1,9 +1,8 @@
 import { Text, View } from "react-native";
 import MezonBadge from "../../../temp-ui/MezonBadge";
-import { CalendarIcon } from "@mezon/mobile-components";
+import { CalendarIcon, isSameDay, timeFormat } from "@mezon/mobile-components";
 import { EventManagementEntity } from "@mezon/store-mobile";
 import styles from "./styles";
-import { isSameDay, timeFormat } from "../timeFormatter";
 
 interface IEventTimeProps {
     event: EventManagementEntity

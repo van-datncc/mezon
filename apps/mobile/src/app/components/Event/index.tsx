@@ -24,7 +24,7 @@ export default function EventViewer() {
 
     return (
         <View style={styles.container}>
-            {allEventManagement.map((event, index) => (
+            {allEventManagement?.map((event, index) => (
                 <EventItem event={event} key={index.toString()} onPress={() => handlePress(event)} />
             ))}
 
