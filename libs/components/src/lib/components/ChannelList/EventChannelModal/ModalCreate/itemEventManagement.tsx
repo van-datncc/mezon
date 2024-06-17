@@ -2,9 +2,12 @@ import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMem
 import * as Icons from '../../../Icons';
 import { useSelector } from 'react-redux';
 import { OptionEvent } from '@mezon/utils';
-import { useApp, useEventManagement } from '@mezon/core';
-import { timeFomat } from '../timeFomatEvent';
+import { useApp, useEventManagement, useOnClickOutside } from '@mezon/core';
+import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
 import { Tooltip } from 'flowbite-react';
+import { useEffect, useRef, useState } from 'react';
+import PanelEventItem from './panelEventItem';
+import { Coords } from '../../../ChannelLink';
 
 export type ItemEventManagementProps = {
 	option: string;
@@ -15,27 +18,68 @@ export type ItemEventManagementProps = {
 	logo?: string;
 	logoRight?: string;
 	start: string; 
+	end?: string;
 	event?: EventManagementEntity;
+	createTime?: string;
+	checkUserCreate?:boolean;
 	setOpenModalDetail?: (status: boolean) => void;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps)=>{
-    const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, event, setOpenModalDetail } = props;
+    const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, setOpenModalDetail } = props;
 	const { setChooseEvent } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
 	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const { deleteEventManagement } = useEventManagement();
+
 	const { appearanceTheme } = useApp();
+
+	const [openPanel, setOpenPanel] = useState(false);
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0,
+	});
+
+	const isSameDay = () => {
+		return compareDate(new Date(), createTime || '');
+	}
+
+	const handleStopPropagation = (e: any) => {
+		e.stopPropagation();
+	}
+
+	const handleOpenPanel = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY + window.screenY;
+		const windowHeight = window.innerHeight;
+		const distanceToBottom = windowHeight - event.clientY;
+		setCoords({ mouseX, mouseY, distanceToBottom });
+		setOpenPanel(true);
+	}
+
+	const panelRef = useRef(null);
+	useOnClickOutside(panelRef, () => setOpenPanel(false));
+
+	const checkTime = differenceTime(end || '') > 15;
+ 	useEffect(() => {
+		if(!checkTime) {
+			deleteEventManagement(event?.clan_id || '',event?.id || '');
+		}
+	},[])
 
     return (
         <div 
 			className="dark:bg-black bg-bgModifierHoverLight rounded-lg overflow-hidden"
 			onClick={(setOpenModalDetail && event) ? () => {setOpenModalDetail(true); setChooseEvent(event);} : () => {}}
+			ref={panelRef}
 		>
-				{logo && <img src={logo} alt='logo' className='w-full max-h-[180px] object-cover'/>}
+				{ logo && <img src={logo} alt='logo' className='w-full max-h-[180px] object-cover'/>}
 				<div className="p-4 border-b dark:border-slate-600 border-white">
 					<div className='flex justify-between'>
 						<div className="flex items-center gap-x-2 mb-4">
+							{ createTime && isSameDay() && <div className='text-primary rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold'>New</div> }
 							<Icons.IconEvents />
 							<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{timeFomat(start)}</p>
 						</div>
@@ -50,26 +94,46 @@ const ItemEventManagement = (props: ItemEventManagementProps)=>{
 						{logoRight && <img src={logoRight} alt='logoRight' className='w-[60%] max-h-[100px] object-cover rounded flex-grow basis-2/5'/>}
 					</div>
 				</div>
-				<div className="p-4 flex items-center gap-x-2">
-					{option === OptionEvent.OPTION_SPEAKER && (
-						<>
-							<Icons.Speaker />
-							<p>{channelVoice?.channel_label}</p>
-						</>
-					)}
-					{option === OptionEvent.OPTION_LOCATION  && 
-						<>
-							<Icons.Location />
-							<p>{titleEvent}</p>
-						</>
+				<div className="px-4 py-3 flex items-center gap-x-2 justify-between">
+					<div className='flex gap-x-2'>
+						{option === OptionEvent.OPTION_SPEAKER && (
+							<>
+								<Icons.Speaker />
+								<p>{channelVoice?.channel_label}</p>
+							</>
+						)}
+						{option === OptionEvent.OPTION_LOCATION  && 
+							<>
+								<Icons.Location />
+								<p>{titleEvent}</p>
+							</>
+						}
+						{option === '' && !address && !channelVoice && (
+							<>
+								<Icons.Location />
+								<p className="hover:underline text-slate-400">{channelFirst.channel_label}</p>
+							</>
+						)}
+					</div>
+					{ event &&
+						<div className='flex gap-x-2 items-center' onClick={(e) => {handleStopPropagation(e)}}>
+							<div onClick={(e) => handleOpenPanel(e)}>
+								<Icons.IconEditThreeDot className='dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black rotate-90'/>
+							</div>
+							
+							<button className='flex gap-x-1 rounded px-4 py-2 border bg-zinc-600 hover:bg-opacity-80'>
+								{ option === OptionEvent.OPTION_SPEAKER && <Icons.IconShareEventVoice /> }
+								{ option === OptionEvent.OPTION_LOCATION && <Icons.IConShareEventLocation /> }
+								Share
+							</button>
+							<button className='flex gap-x-1 rounded px-4 py-2 border bg-zinc-600 hover:bg-opacity-80'>
+								<Icons.MuteBell defaultSize='size-4 text-white'/>
+								Interested
+							</button>
+						</div>
 					}
-					{option === '' && !address && !channelVoice && (
-						<>
-							<Icons.Location />
-							<p className="hover:underline text-slate-400">{channelFirst.channel_label}</p>
-						</>
-					)}
 				</div>
+				{ openPanel && <PanelEventItem coords={coords} onHandle={handleStopPropagation} checkUserCreate={checkUserCreate || true} event={event} onClose={() => setOpenPanel(false)}/> }
 			</div>
     );
 }

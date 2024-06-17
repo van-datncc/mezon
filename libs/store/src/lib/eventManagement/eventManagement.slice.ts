@@ -25,7 +25,7 @@ const fetchEventManagementCached = memoize(
 );
 
 export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?: string) => {
-	return { ...eventRes, id: eventRes.id || '', clanId };
+	return { ...eventRes, id: eventRes.id || '' };
 };
 
 type fetchEventManagementPayload = {
@@ -43,7 +43,7 @@ export const fetchEventManagement = createAsyncThunk(
 		}
 
 		const response = await fetchEventManagementCached(mezon, clanId);
-		
+				
 		if (!response.events) {
 			thunkAPI.dispatch(eventManagementActions.clearEntities());
 			return thunkAPI.rejectWithValue([]);
@@ -82,13 +82,29 @@ export const fetchCreateEventManagement = createAsyncThunk(
 		const response = await mezon.client.createEvent(mezon.session, body);
 		if(response){
 			thunkAPI.dispatch(fetchEventManagement({ clanId: clan_id, noCache: true}));
-		}
-		else {
+		} else {
 			return thunkAPI.rejectWithValue([]);
 		}
 		return response;
 	},
 );
+
+type fetchDeleteEventManagementPayload = {
+	eventID: string;
+	clanId: string;
+}
+
+export const fetchDeleteEventManagement = createAsyncThunk('deleteEventManagement/fetchDeleteEventManagement', async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.deleteEvent(mezon.session, body.eventID);
+		if (response) {
+			thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true}));
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export interface EventManagementState extends EntityState<EventManagementEntity, string> {
 	loadingStatus: LoadingStatus;
@@ -138,6 +154,7 @@ export const eventManagementActions = {
 	...eventManagementSlice.actions,
 	fetchEventManagement,
 	fetchCreateEventManagement,
+	fetchDeleteEventManagement,
 };
 
 const { selectAll, selectEntities } = eventManagementAdapter.getSelectors();

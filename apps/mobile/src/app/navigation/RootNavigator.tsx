@@ -23,7 +23,6 @@ import { IWithError } from '@mezon/utils';
 import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
 import messaging from '@react-native-firebase/messaging';
 import { AppState } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
@@ -44,15 +43,17 @@ const NavigationMain = () => {
 		}, 2500);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			Toast.show({
-				type: 'info',
-				text1: remoteMessage.notification?.title,
-				text2: remoteMessage.notification?.body,
-				onPress: async () => {
-					Toast.hide();
-					await navigateToNotification(remoteMessage, null, null);
-				},
-			});
+			if (remoteMessage.notification?.title) {
+				Toast.show({
+					type: 'info',
+					text1: remoteMessage.notification?.title,
+					text2: remoteMessage.notification?.body,
+					onPress: async () => {
+						Toast.hide();
+						await navigateToNotification(remoteMessage, null, null);
+					},
+				});
+			}
 		});
 		messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 			await createLocalNotification(remoteMessage.notification?.title, remoteMessage.notification?.body, remoteMessage.data);
@@ -72,13 +73,7 @@ const NavigationMain = () => {
 	}, [isLoggedIn, hasInternet]);
 
 	const handleAppStateChange = async (state: string) => {
-		if (state === 'inactive' || state === 'background') {
-			reconnect().catch((e) => 'trying to reconnect');
-		} else if (state === 'active') {
-			/* empty */
-		} else {
-			/* empty */
-		}
+		reconnect().catch((e) => 'trying to reconnect');
 	};
 
 	const authLoader = async () => {
@@ -122,29 +117,27 @@ const NavigationMain = () => {
 
 	return (
 		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
-			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
-				<NetInfoComp />
-				<RootStack.Navigator screenOptions={{ headerShown: false }}>
-					{isLoggedIn ? (
-						<RootStack.Group
-							screenOptions={{
-								gestureEnabled: false,
-							}}
-						>
-							<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
-						</RootStack.Group>
-					) : (
-						<RootStack.Group
-							screenOptions={{
-								animationTypeForReplace: 'pop',
-								gestureEnabled: false,
-							}}
-						>
-							<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
-						</RootStack.Group>
-					)}
-				</RootStack.Navigator>
-			</SafeAreaView>
+			<NetInfoComp />
+			<RootStack.Navigator screenOptions={{ headerShown: false }}>
+				{isLoggedIn ? (
+					<RootStack.Group
+						screenOptions={{
+							gestureEnabled: false,
+						}}
+					>
+						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
+					</RootStack.Group>
+				) : (
+					<RootStack.Group
+						screenOptions={{
+							animationTypeForReplace: 'pop',
+							gestureEnabled: false,
+						}}
+					>
+						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
+					</RootStack.Group>
+				)}
+			</RootStack.Navigator>
 			{isLoadingSplashScreen && <SplashScreen />}
 		</NavigationContainer>
 	);

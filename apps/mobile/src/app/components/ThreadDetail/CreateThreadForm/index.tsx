@@ -19,20 +19,7 @@ import { Formik } from 'formik';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef } from 'react';
-import {
-	Alert,
-	DeviceEventEmitter,
-	Keyboard,
-	KeyboardAvoidingView,
-	KeyboardEvent,
-	Platform,
-	SafeAreaView,
-	ScrollView,
-	Switch,
-	Text,
-	TextInput,
-	View,
-} from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChatBox from '../../../screens/home/homedrawer/ChatBox';
@@ -43,7 +30,7 @@ import { styles } from './CreateThreadForm.style';
 
 export default function CreateThreadForm() {
 	const dispatch = useAppDispatch();
-	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(110);
+	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(0);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -60,7 +47,7 @@ export default function CreateThreadForm() {
 	});
 
 	function keyboardWillShow(event: KeyboardEvent) {
-		setKeyboardHeight(110);
+		setKeyboardHeight(event.endCoordinates.height);
 	}
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
@@ -144,70 +131,68 @@ export default function CreateThreadForm() {
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {};
 	return (
 		<View style={styles.createChannelContainer}>
-			<KeyboardAvoidingView style={styles.createChannelContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-				<ScrollView contentContainerStyle={{ flex: 1 }}>
-					<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }} onSubmit={() => {}}>
-						{({ setFieldValue, handleChange, handleBlur, handleSubmit, values }) => (
-							<View style={styles.createChannelContent}>
-								<View style={styles.iconContainer}>
-									<ThreadIcon width={22} height={22} />
-								</View>
-								<Text style={styles.threadName}>Thread Name</Text>
-								<SafeAreaView>
-									<TextInput
-										onChangeText={handleChange('nameValueThread')}
-										onBlur={handleBlur('nameValueThread')}
-										value={values.nameValueThread}
-										placeholderTextColor="#7e848c"
-										placeholder="New Thread"
-										style={styles.inputThreadName}
-									/>
-								</SafeAreaView>
-								{!openThreadMessageState && (
-									<View style={styles.threadPolicy}>
-										<View style={styles.threadPolicyInfo}>
-											<Text style={styles.threadPolicyTitle}>Private Thread</Text>
-											<Text style={styles.threadPolicyContent}>Only people you invite and moderators can see this thread</Text>
-										</View>
-										<Switch
-											value={values.isPrivate}
-											trackColor={{ false: '#676b73', true: '#5a62f4' }}
-											thumbColor={'white'}
-											ios_backgroundColor="#3e3e3e"
-											onValueChange={(value) => {
-												setFieldValue('isPrivate', value);
-											}}
-										/>
-									</View>
-								)}
-								{valueThread && openThreadMessageState && (
-									<View style={styles.messageBox}>
-										<MessageItem
-											message={valueThread}
-											mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-											channelId={currentChannel.channel_id}
-											channelLabel={currentChannel?.channel_label}
-										/>
-									</View>
-								)}
-								<ChatBox
-									messageAction={EMessageActionType.CreateThread}
-									channelId={currentChannel.channel_id}
-									channelLabel={currentChannel?.channel_label || ''}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
-								/>
-								<View
-									style={{
-										height: Platform.OS === 'ios' ? keyboardHeight : 0,
-										backgroundColor: Colors.secondary,
-									}}
-								/>
+			<ScrollView contentContainerStyle={{ flex: 1 }}>
+				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }} onSubmit={() => {}}>
+					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values }) => (
+						<View style={styles.createChannelContent}>
+							<View style={styles.iconContainer}>
+								<ThreadIcon width={22} height={22} />
 							</View>
-						)}
-					</Formik>
-				</ScrollView>
-			</KeyboardAvoidingView>
+							<Text style={styles.threadName}>Thread Name</Text>
+							<SafeAreaView>
+								<TextInput
+									onChangeText={handleChange('nameValueThread')}
+									onBlur={handleBlur('nameValueThread')}
+									value={values.nameValueThread}
+									placeholderTextColor="#7e848c"
+									placeholder="New Thread"
+									style={styles.inputThreadName}
+								/>
+							</SafeAreaView>
+							{!openThreadMessageState && (
+								<View style={styles.threadPolicy}>
+									<View style={styles.threadPolicyInfo}>
+										<Text style={styles.threadPolicyTitle}>Private Thread</Text>
+										<Text style={styles.threadPolicyContent}>Only people you invite and moderators can see this thread</Text>
+									</View>
+									<Switch
+										value={values.isPrivate}
+										trackColor={{ false: '#676b73', true: '#5a62f4' }}
+										thumbColor={'white'}
+										ios_backgroundColor="#3e3e3e"
+										onValueChange={(value) => {
+											setFieldValue('isPrivate', value);
+										}}
+									/>
+								</View>
+							)}
+							{valueThread && openThreadMessageState && (
+								<View style={styles.messageBox}>
+									<MessageItem
+										message={valueThread}
+										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+										channelId={currentChannel.channel_id}
+										channelLabel={currentChannel?.channel_label}
+									/>
+								</View>
+							)}
+							<ChatBox
+								messageAction={EMessageActionType.CreateThread}
+								channelId={currentChannel.channel_id}
+								channelLabel={currentChannel?.channel_label || ''}
+								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+							/>
+							<View
+								style={{
+									height: Platform.OS === 'ios' ? keyboardHeight : 0,
+									backgroundColor: Colors.secondary,
+								}}
+							/>
+						</View>
+					)}
+				</Formik>
+			</ScrollView>
 		</View>
 	);
 }

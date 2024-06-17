@@ -18,7 +18,13 @@ export function useEventManagement(){
     const createEventManagement = useCallback(
 		async (clan_id: string, channel_id: string, address: string, title: string, start_time: string, end_time:string, description: string, logo:string) => {
 			await dispatch(eventManagementActions.fetchCreateEventManagement({ clan_id, channel_id, address, title, start_time, end_time, description, logo }));
-			await dispatch(eventManagementActions.fetchEventManagement({ clanId: clan_id }));
+		},
+		[dispatch],
+	);
+
+	const deleteEventManagement = useCallback(
+		async (clan_id: string, event_id: string) => {
+			await dispatch(eventManagementActions.fetchDeleteEventManagement({ clanId: clan_id, eventID: event_id}));
 		},
 		[dispatch],
 	);
@@ -29,6 +35,7 @@ export function useEventManagement(){
 			allEventManagement,
 			numberEventManagement,
             createEventManagement,
+			deleteEventManagement,
 			setChooseEvent,
 		}),
 		[
@@ -36,6 +43,7 @@ export function useEventManagement(){
             allEventManagement,
 			numberEventManagement,
             createEventManagement,
+			deleteEventManagement,
 			setChooseEvent,
         ],
 	);
