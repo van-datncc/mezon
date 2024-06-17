@@ -7,10 +7,10 @@ import { BellIcon, CheckIcon, ShareIcon, ThreeDotIcon } from "@mezon/mobile-comp
 import MezonAvatar from "../../../temp-ui/MezonAvatar";
 import { useSelector } from "react-redux";
 import EventLocation from "../EventLocation";
-import BottomSheet2 from "../../BottomSheet2";
 import EventMenu from "../EventMenu";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useRef } from "react";
+import { MezonBottomSheet } from "../../../temp-ui";
 
 interface IEventDetailProps {
     event: EventManagementEntity
@@ -67,9 +67,9 @@ export default function EventDetail({ event }: IEventDetailProps) {
                 <MezonButton icon={<ThreeDotIcon height={20} width={20} />} onPress={handlePress} />
             </View>
 
-            <BottomSheet2 ref={menuBottomSheet}>
+            <MezonBottomSheet ref={menuBottomSheet}>
                 <EventMenu event={event} />
-            </BottomSheet2>
+            </MezonBottomSheet>
         </View >
     )
 }

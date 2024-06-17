@@ -3,12 +3,11 @@ import { useEventManagement } from "@mezon/core";
 import { View } from "react-native";
 import EventItem from "./EventItem";
 import styles from "./styles";
-import BottomSheet2 from "../BottomSheet2";
 import { useRef } from "react";
 import { EventManagementEntity } from "@mezon/store-mobile";
 import EventDetail from "./EventDetail";
 import { useState } from "react";
-import { MezonTab } from "../../temp-ui";
+import { MezonBottomSheet, MezonTab } from "../../temp-ui";
 import EventMember from "./EventMember";
 
 export default function EventViewer() {
@@ -28,7 +27,7 @@ export default function EventViewer() {
                 <EventItem event={event} key={index.toString()} onPress={() => handlePress(event)} />
             ))}
 
-            <BottomSheet2 ref={bottomSheetDetail}>
+            <MezonBottomSheet ref={bottomSheetDetail}>
                 <MezonTab
                     views={[
                         <EventDetail event={currentEvent} />,
@@ -36,7 +35,7 @@ export default function EventViewer() {
                     ]}
                     titles={["Event Info", "Interested"]}
                 />
-            </BottomSheet2>
+            </MezonBottomSheet>
         </View>
     );
 }
