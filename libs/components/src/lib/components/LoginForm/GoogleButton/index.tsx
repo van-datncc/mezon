@@ -10,7 +10,6 @@ const GoogleButtonLogin: React.FC = () => {
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
 		ux_mode: 'popup',
-		//redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
 			await loginByGoogle(code);
 		},
@@ -30,8 +29,7 @@ const GoogleButtonLogin: React.FC = () => {
 			{isElectron() && (
 				<Link
 					target="_blank"
-					to={'http://localhost:4200/guess/login-desktop'}
-					// to={process.env.NX_CHAT_APP_REDIRECT_URI as string}
+					to={process.env.NX_CHAT_APP_REDIRECT_URI + '/guess/login-desktop'}
 					className="flex justify-center w-full  h-fit p-3 rounded-[4px] bg-[#d1e0ff]"
 				>
 					<img src={'assets/images/google-icon.png'} className="p-0 object-cover" alt="Google Logo" />

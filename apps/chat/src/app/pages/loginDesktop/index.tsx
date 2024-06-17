@@ -14,7 +14,6 @@ const LoginDesktop = () => {
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
 		ux_mode: 'popup',
-		// redirect_uri: process.env.NX_CHAT_APP_REDIRECT_URI as string,
 		onSuccess: async ({ code }) => {
 			const session = await loginByGoogle(code);
 			const jsonString = encodeURIComponent(JSON.stringify(session));
