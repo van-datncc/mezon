@@ -58,6 +58,7 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 		e.stopPropagation();
 		if (urlImage && fileInputRef.current) {
 			setUrlImage('');
+			onUpload('');
 			fileInputRef.current.value = '';
 		}
 
@@ -105,7 +106,9 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 							style={{ backgroundImage: `url(${urlImage})` }}
 							className={`bg-cover bg-no-repeat bg-center w-full h-full dark:bg-buttonProfile bg-bgLightModeThird rounded relative cursor-pointer`}
 						>
-							{!urlImage && <p className="dark:text-white text-textLightTheme text-xl font-semibold text-center pt-[25%]">Choose an Image</p>}
+							{!urlImage && (
+								<p className="dark:text-white text-textLightTheme text-xl font-semibold text-center pt-[25%]">Choose an Image</p>
+							)}
 						</div>
 						<input ref={fileInputRef} id="upload_banner_background" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 					</label>

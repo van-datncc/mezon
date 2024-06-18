@@ -1,18 +1,7 @@
 import { ChatWelcome } from '@mezon/components';
-import {
-	getJumpToMessageId,
-	useApp,
-	useChatMessages,
-	useChatReaction,
-	useJumpToMessage,
-	useMessages,
-	useNotification,
-	useReference,
-} from '@mezon/core';
-import { selectDataReactionGetFromMessage } from '@mezon/store';
-import { EmojiDataOptionals, IMessageWithUser, updateEmojiReactionData } from '@mezon/utils';
+import { getJumpToMessageId, useApp, useChatMessages, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
+import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
@@ -35,14 +24,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	// share logic to load more message
 	const { isFetching, remain } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
-
-	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
-	const { dataReactionServerAndSocket } = useChatReaction();
-
-	useEffect(() => {
-		setDataReactionCombine(updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]));
-	}, [reactDataFirstGetFromMessage, dataReactionServerAndSocket]);
 
 	useEffect(() => {
 		setMessageIdToJump(messageMentionId);
@@ -74,10 +55,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		return array.slice().reverse();
 	}
 
-	const getReactionsByChannelId = (data: EmojiDataOptionals[], mesId: string) => {
-		return data.filter((item: any) => item.message_id === mesId);
-	};
-
 	return (
 		<div
 			className={`dark:bg-bgPrimary pb-5
@@ -89,13 +66,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && remain !== 0 && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+			{isFetching && remain !== 0 && (
+				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
+			)}
 
 			{reverseArray(messages).map((message, i) => {
-				const data = getReactionsByChannelId(dataReactionCombine, message.id);
 				return (
 					<ChannelMessage
-						dataReaction={data}
 						mode={mode}
 						key={message.id}
 						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
