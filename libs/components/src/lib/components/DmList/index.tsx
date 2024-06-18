@@ -47,7 +47,6 @@ function DirectMessageList() {
 		const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
 		const sortedData = sortDMItem(filteredDataDM);
 		setSortedFilteredDataDM(sortedData);
-		console.log(dmGroupChatList);
 	}, [dmGroupChatList]);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);

@@ -84,7 +84,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			bg-bgLightPrimary
 			relative h-full overflow-y-scroll
 			overflow-x-hidden flex-col flex
-
 			${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
