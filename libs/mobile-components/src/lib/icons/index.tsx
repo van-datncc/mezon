@@ -823,3 +823,11 @@ export function ReplyMessageDeleted({ width = 24, height = 24, color = '#a1a1a9'
 	)
 }
 
+export function CircleExclamation({ width = 24, height = 24, color = '#a1a1a9', ...props }: SvgProps) {
+	return (
+    <Svg width= {width} height = {height}  viewBox="0 0 512 512" {...props}>
+      <Path fill={color} d="M256 512a256 256 0 100-512 256 256 0 100 512zm0-384c13.3 0 24 10.7 24 24v112c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zm-32 224a32 32 0 1164 0 32 32 0 11-64 0z" />
+    </Svg>
+	)
+}
+

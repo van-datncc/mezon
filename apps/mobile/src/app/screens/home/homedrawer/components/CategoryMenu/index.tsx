@@ -1,6 +1,6 @@
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { ICategoryChannel } from "@mezon/utils";
-import { MutableRefObject } from "react";
+import { ICategoryChannel, IChannel } from "@mezon/utils";
+import React, { MutableRefObject } from "react";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
@@ -12,14 +12,17 @@ import Toast from "react-native-toast-message";
 import { NittroIcon } from "@mezon/mobile-components";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "apps/mobile/src/app/navigation/ScreenTypes";
+import { darkColor } from "apps/mobile/src/app/constants/Colors";
+import Feather from 'react-native-vector-icons/Feather';
 
 interface ICategoryMenuProps {
     bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
-    category: ICategoryChannel;
+    inviteRef:MutableRefObject<any>;
+    category: IChannel | ICategoryChannel;
 }
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
-export default function CategoryMenu({ category, bottomSheetRef }: ICategoryMenuProps) {
+export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: ICategoryMenuProps) {
     const { currentClan } = useClans();
     const { t } = useTranslation(['categoryMenu']);
     const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>()
@@ -35,8 +38,11 @@ export default function CategoryMenu({ category, bottomSheetRef }: ICategoryMenu
     const inviteMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.inviteMenu.invite'),
-            onPress: () => reserve(),
-            icon: <NittroIcon />
+            onPress: () =>{
+              inviteRef.current.open()
+              bottomSheetRef?.current?.dismiss();
+            },
+            icon: <Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
         }
     ]
 
@@ -115,7 +121,7 @@ export default function CategoryMenu({ category, bottomSheetRef }: ICategoryMenu
                         style={{ width: "100%", height: "100%" }}
                     />
                 </View>
-                <Text style={styles.serverName}>{category?.category_name}</Text>
+                <Text style={styles.serverName}>{(category as IChannel)?.channel_label|| category?.category_name}</Text>
             </View>
 
             <View>

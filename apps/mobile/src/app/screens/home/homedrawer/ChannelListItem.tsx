@@ -11,11 +11,12 @@ import HashSignIcon from '../../../../assets/svg/channelText.svg';
 import { ChannelListContext } from './Reusables';
 import ThreadListChannel from './ThreadListChannel';
 import { styles } from './styles';
-export const ChannelListItem = React.memo((props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel }) => {
+export const ChannelListItem = React.memo((props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel, onLongPress: () => void }) => {
 	const useChannelListContentIn = React.useContext(ChannelListContext);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 
 	const handleRouteData = async (thread?: IChannel) => {
+
 		const store = await getStoreAsync();
 		if (props.data.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			// 	TODO: handle voice channel
@@ -36,6 +37,7 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 			<TouchableOpacity
 				activeOpacity={1}
 				onPress={() => handleRouteData()}
+				onLongPress={props.onLongPress}
 				style={[styles.channelListItem, props.isActive && styles.channelListItemActive]}
 			>
 				{isUnRead && <View style={styles.dotIsNew} />}

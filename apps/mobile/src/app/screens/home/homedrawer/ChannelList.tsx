@@ -22,7 +22,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import CategoryMenu from './components/CategoryMenu';
-import { ICategoryChannel } from '@mezon/utils';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
 
 const ChannelList = React.memo((props: any) => {
@@ -34,7 +34,7 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 
-	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
+	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -81,9 +81,9 @@ const ChannelList = React.memo((props: any) => {
 		bottomSheetMenuRef.current?.present();
 	}
 
-	function handleLongPressCategory(categoryChannel: ICategoryChannel) {
+	function handleLongPressCategory(channel: IChannel | ICategoryChannel) {
 		bottomSheetCategoryMenuRef.current?.present();
-		setCurrentPressedCategory(categoryChannel);
+		setCurrentPressedCategory(channel);
 	}
 
 	return (
@@ -95,7 +95,7 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<InviteToChannel ref={bottomSheetInviteRef} />
+					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory}/>
 				</View>
 				<FlatList
 					data={categorizedChannels || []}
@@ -105,7 +105,7 @@ const ChannelList = React.memo((props: any) => {
 							data={item}
 							index={index}
 							onPressHeader={toggleCollapseChannel}
-							onLongPress={() => handleLongPressCategory(item)}
+							onLongPress={(channel: IChannel | ICategoryChannel) => handleLongPressCategory(channel)}
 							collapseItems={collapseChannelItems} />
 					)}
 				/>
@@ -122,6 +122,7 @@ const ChannelList = React.memo((props: any) => {
 			<BottomSheet2 ref={bottomSheetCategoryMenuRef} >
 				<CategoryMenu
 					bottomSheetRef={bottomSheetCategoryMenuRef}
+          inviteRef={bottomSheetInviteRef}
 					category={currentPressedCategory}
 				/>
 			</BottomSheet2>
