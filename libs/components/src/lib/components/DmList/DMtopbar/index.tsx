@@ -1,5 +1,5 @@
 import { useApp, useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
-import { selectDmGroupCurrent } from '@mezon/store';
+import { appActions, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
@@ -7,7 +7,7 @@ import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import { ChannelType } from 'mezon-js';
 
@@ -16,12 +16,26 @@ export type ChannelTopbarProps = {
 };
 
 function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
+	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
-	const { isShowMemberListDM, isUseProfileDM, setIsShowMemberListDM, setIsUseProfileDM } = useDirect();
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const { appearanceTheme } = useApp();
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
+	const setIsUseProfileDM = useCallback(
+		async (status: boolean) => {
+			await dispatch(appActions.setIsUseProfileDM(status));
+		},
+		[dispatch],
+	);
 
+	const setIsShowMemberListDM = useCallback(
+		async (status: boolean) => {
+			await dispatch(appActions.setIsShowMemberListDM(status));
+		},
+		[dispatch],
+	);
 	return (
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
@@ -60,11 +74,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									<Icons.IconMeetDM />
 								</Tooltip>
 							</button>
-							<button>
-								<Tooltip content='Pinned Messages' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
-									<PinButton isLightMode={appearanceTheme === 'light'} />
-								</Tooltip>
-							</button>
+							<div>
+								<PinButton isLightMode={appearanceTheme === 'light'} />
+							</div>
 							<button>
 								<Tooltip content='Add friends to DM' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
 									<Icons.IconAddFriendDM />

@@ -239,7 +239,7 @@ export const formatBlockCode = (text: string) => {
 
 export const removeBlockCode = (text: string) => {
 	const regex = /(`{1,3})(.*?)\1/g;
-	return text.replace(regex, '$2');
+	return text?.replace?.(regex, '$2');
 };
 
 export const renderTextContent = (

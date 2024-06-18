@@ -14,7 +14,7 @@ interface IProps {
     headerRight?: ReactNode
 }
 
-export default forwardRef(function BottomSheet(
+export default forwardRef(function MezonBottomSheet(
     { children, title, headerLeft, headerRight }: IProps,
     ref: Ref<BottomSheetModalMethods>) {
 

@@ -5,7 +5,6 @@ import {
 	useAppParams,
 	useChatMessages,
 	useChatReaction,
-	useDirect,
 	useDirectMessages,
 	useDragAndDrop,
 	useGifsStickersEmoji,
@@ -13,7 +12,7 @@ import {
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState, useAppDispatch } from '@mezon/store';
+import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectReactionTopState, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
@@ -21,6 +20,7 @@ import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
 import ModalUserProfile from '../../../../../../../libs/components/src/lib/components/ModalUserProfile';
+
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
@@ -39,7 +39,8 @@ export default function DirectMessage() {
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
 	const { draggingState, setDraggingState } = useDragAndDrop();
-	const { isShowMemberListDM, isUseProfileDM } = useDirect();
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 
 	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -91,7 +92,6 @@ export default function DirectMessage() {
 			setDraggingState(true);
 		}
 	};
-
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
@@ -184,7 +184,7 @@ export default function DirectMessage() {
 						</div>
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<div className={`w-[268px] dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'}`}>
+						<div className={`w-[241px] dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'}`}>
 							<MemberListGroupChat directMessageId={directId} />
 						</div>
 					)}
