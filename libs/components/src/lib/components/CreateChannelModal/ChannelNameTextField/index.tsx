@@ -1,8 +1,8 @@
+import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { useState } from 'react';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
-import { useState } from 'react';
-import { Regex } from '../../ClanHeader/ModalCreateCategory';
 
 interface ChannelNameModalProps {
 	type: number;
@@ -13,17 +13,17 @@ interface ChannelNameModalProps {
 }
 
 export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelNameProps, type, onChange, onCheckValidate, error }) => {
-	const [checkvalidate, setCheckValidate] = useState(true)
+	const [checkvalidate, setCheckValidate] = useState(true);
 	const [checkNameChannel, setCheckNameChannel] = useState(true);
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		onChange(value);
-		if (value==='') {
-			setCheckNameChannel(true)
-		}else{
-			setCheckNameChannel(false)
+		if (value === '') {
+			setCheckNameChannel(true);
+		} else {
+			setCheckNameChannel(false);
 		}
-		const regex = Regex();
+		const regex = ValidateSpecialCharacters();
 		if (regex.test(value)) {
 			setCheckValidate(false);
 			onCheckValidate(true);
@@ -61,8 +61,10 @@ export const ChannelNameTextField: React.FC<ChannelNameModalProps> = ({ channelN
 				</div>
 			</div>
 			{checkvalidate || checkNameChannel ? (
-			<p className='text-[#e44141] text-xs italic font-thin'>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>)
-			:null}
+				<p className="text-[#e44141] text-xs italic font-thin">
+					Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+				</p>
+			) : null}
 		</div>
 	);
 };
