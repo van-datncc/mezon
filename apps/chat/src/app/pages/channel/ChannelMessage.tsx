@@ -82,7 +82,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	const convertToPlainTextHashtag = (text: string) => {
 		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `#${p2}` : `@${p1}`;
+			return symbol === '#' ? `<#${p2}>` : `@${p1}`;
 		});
 		return result;
 	};
@@ -91,9 +91,9 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	const [content, setContent] = useState(editMessage);
 
 	const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
-		const regex = /#[0-9]{19}\b/g;
+		const regex = /<#[0-9]{19}\b>/g;
 		const replacedText = text.replace(regex, (match) => {
-			const channelId = match.substring(1);
+			const channelId = match.substring(2, match.length - 1);
 			const channel = listInput.find((item) => item.id === channelId);
 			return channel ? `#[${channel.display}](${channelId})` : match;
 		});
@@ -227,12 +227,13 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 									onFocus={handleFocus}
 									inputRef={textareaRef}
 									value={editMessage}
-									className={`w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention' }`}
+									className={`w-full dark:bg-black bg-white border dark:border-none border-[#b7b7b7] rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 									onKeyDown={onSend}
 									onChange={(e, newValue) => {
 										setEditMessage(newValue);
 									}}
 									rows={editMessage?.split('\n').length}
+									allowSpaceInQuery={true}
 									forceSuggestionsAboveCursor={true}
 									style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 								>
@@ -280,7 +281,14 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 								</MentionsInput>
 								<div className="text-xs flex">
 									<p className="pr-[3px]">escape to</p>
-									<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+									<p
+										className="pr-[3px] text-[#3297ff]"
+										style={{ cursor: 'pointer' }}
+										onClick={() => {
+											handleCancelEdit();
+											setEditMessage(mess.content.t);
+										}}
+									>
 										cancel
 									</p>
 									<p className="pr-[3px]">• enter to</p>
