@@ -172,7 +172,7 @@ function MyApp() {
 								// eslint-disable-next-line react/jsx-no-useless-fragment
 								<>
 									{currentClan?.clan_name && (
-										<div className="w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px] clan">
+										<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
 											{currentClan.clan_name.charAt(0).toUpperCase()}
 										</div>
 									)}

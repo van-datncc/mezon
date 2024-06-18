@@ -60,11 +60,9 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									<Icons.IconMeetDM />
 								</Tooltip>
 							</button>
-							<button>
-								<Tooltip content='Pinned Messages' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
-									<PinButton isLightMode={appearanceTheme === 'light'} />
-								</Tooltip>
-							</button>
+							<div>
+								<PinButton isLightMode={appearanceTheme === 'light'} />
+							</div>
 							<button>
 								<Tooltip content='Add friends to DM' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
 									<Icons.IconAddFriendDM />
