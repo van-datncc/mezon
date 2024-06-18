@@ -335,7 +335,6 @@ function useDataEmojiSvg() {
 		{ src: wink, shortname: ':wink:', category: 'People' },
 		{ src: oneHundred, shortname: ':100:', category: 'People' },
 		{ src: like, shortname: ':like:', category: 'People' },
-
 		{ src: black_heart, shortname: ':black_heart:', category: 'Symbols' },
 		{ src: blue_heart, shortname: ':blue_heart:', category: 'Symbols' },
 		{ src: broken_heart, shortname: ':broken_heart:', category: 'Symbols' },
