@@ -45,8 +45,7 @@ export const fetchEventManagement = createAsyncThunk(
 		const response = await fetchEventManagementCached(mezon, clanId);
 				
 		if (!response.events) {
-			thunkAPI.dispatch(eventManagementActions.clearEntities());
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		const events = response.events.map((eventRes) => mapEventManagementToEntity(eventRes, clanId));
