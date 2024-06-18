@@ -12,7 +12,10 @@
             "subtitle": "Điền các thông tin về sự kiện của bạn"
         },
         "eventPreview": {
-            "headerTitle": "Bước 3 trên 3"
+            "headerTitle": "Bước 3 trên 3",
+            "title": "Đây là khung xem trước sự kiện",
+            "subtitle": "Sự kiện này sẽ tự bắt đầu khi đến giờ",
+            "subtitleVoice": "Khi đến giờ, đến phòng họp để bắt đầu sự kiện"
         }
     },
     "fields": {

@@ -1,10 +1,11 @@
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
 import { useTranslation } from "react-i18next";
 import EventItem from "../../Event/EventItem";
 import { useAuth } from "@mezon/core";
 import MezonButton from "../../../temp-ui/MezonButton2";
 import styles from "./styles";
+import { OptionEvent } from "@mezon/utils";
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
 export default function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<CreateEventScreenType>) {
@@ -33,7 +34,12 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
                         channel_id: channelId,
                     }} />
 
-                <View>
+                <View style={styles.headerSection}>
+                    <Text style={styles.title}>{t("screens.eventPreview.title")}</Text>
+                    {type === OptionEvent.OPTION_LOCATION
+                        ? <Text style={styles.subtitle}>{t("screens.eventPreview.subtitle")}</Text>
+                        : <Text style={styles.subtitle}>{t("screens.eventPreview.subtitleVoice")}</Text>
+                    }
 
                 </View>
             </View>

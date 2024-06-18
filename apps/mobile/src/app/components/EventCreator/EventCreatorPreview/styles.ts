@@ -4,14 +4,13 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     title: {
         color: Colors.white,
-        fontSize: Fonts.size.h6,
-        textAlign: "center"
+        fontSize: Fonts.size.h5,
+        fontWeight: "bold"
     },
 
     subtitle: {
         color: Colors.gray72,
         fontSize: Fonts.size.h8,
-        textAlign: "center"
     },
 
     bottomDescription: {
@@ -21,7 +20,7 @@ const styles = StyleSheet.create({
     },
 
     headerSection: {
-        marginVertical: Metrics.size.xl
+        marginVertical: Metrics.size.xxxl
     },
 
     container: {
