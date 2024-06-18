@@ -117,8 +117,6 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 	);
 
 export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) =>{
-	console.log(notifications.filter((notification) => notification.code !== -2 && notification.code !== -3));
-	
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
 }
 );
