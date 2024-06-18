@@ -1,6 +1,6 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import { FileIcon, ReplyIcon, ReplyMessageDeleted, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
-import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -24,23 +24,22 @@ import {
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, isImage, splitBlockCodeRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, isImage, isVideo, splitBlockCodeRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useTranslation } from 'react-i18next';
 import { ChannelType } from 'mezon-js';
+import { useTranslation } from 'react-i18next';
+import { openUrl } from 'react-native-markdown-display';
 import Toast from 'react-native-toast-message';
-import Markdown from 'react-native-markdown-display';
-import { EDITED_FLAG, formatBlockCode, formatEmoji, formatUrls, markdownStyles, renderRulesCustom } from './constants';
-import { openUrl } from "react-native-markdown-display";
+import { RenderVideoChat } from './components/RenderVideoChat';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -60,7 +59,7 @@ export type MessageItemProps = {
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
-	return prevProps.message === nextProps.message && prevProps.dataReactionCombine === nextProps.dataReactionCombine;
+	return prevProps.message === nextProps.message;
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
@@ -95,6 +94,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	}, [message, preMessage]);
 	const isShowInfoUser = useMemo(() => !isCombine || (message.references.length && !!user), [isCombine, message.references, user]);
+	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -121,7 +121,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = () => {
+	const renderVideos = (videoItem?: any) => {
 		return (
 			<View
 				style={{
@@ -130,29 +130,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					marginTop: size.s_10,
 				}}
 			>
-				{videos.map((video, index) => {
-					return (
-						<VideoPlayer
-							key={`${video?.url}_${index}`}
-							isControlsVisible={false}
-							disableFullscreen={false}
-							video={{ uri: video?.url }}
-							videoWidth={widthMedia + size.s_50}
-							videoHeight={160}
-							hideControlsOnStart={true}
-							resizeMode="cover"
-							style={{
-								width: widthMedia + size.s_50,
-								height: 160,
-								borderRadius: size.s_4,
-								overflow: 'hidden',
-								backgroundColor: Colors.borderDim,
-							}}
-							endWithThumbnail={true}
-							thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
-						/>
-					);
-				})}
+				{videoItem ? (
+					<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
+				) : (
+					videos.map((video, index) => {
+						return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
+					})
+				)}
 			</View>
 		);
 	};
@@ -202,6 +186,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const checkIsImage = isImage(document?.url);
 			if (checkIsImage) {
 				return imageItem({ image: document, index, checkImage: checkIsImage });
+			}
+			const checkIsVideo = isVideo(document?.url);
+
+			if (checkIsVideo) {
+				return renderVideos(document);
 			}
 
 			return (
