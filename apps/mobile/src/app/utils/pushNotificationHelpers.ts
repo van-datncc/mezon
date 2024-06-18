@@ -196,12 +196,11 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 
 	messaging().onNotificationOpenedApp((remoteMessage) => {
 		console.log('Notification caused app to open from background state:');
-
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,
 			currentClan,
-			time: 2500,
+			time: 0,
 		});
 	});
 
