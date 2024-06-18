@@ -1,5 +1,5 @@
-import { useCategory } from '@mezon/core';
-import { STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
+import { useAuth, useCategory, useEventManagement } from '@mezon/core';
+import { CalendarIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, load, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -10,13 +10,12 @@ import {
 	selectIsFromFCMMobile
 } from '@mezon/store-mobile';
 import React, { useEffect } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
+import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
 import { styles } from './styles';
-import BottomSheet2 from '../../../components/BottomSheet2';
 import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
@@ -24,17 +23,23 @@ import ClanMenu from './components/ClanMenu/ClanMenu';
 import CategoryMenu from './components/CategoryMenu';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useState } from 'react';
+import EventViewer from '../../../components/Event';
+import { MezonBottomSheet } from '../../../temp-ui';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 
+	const { allEventManagement } = useEventManagement();
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
+	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
+	const user = useAuth();
+
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -97,6 +102,14 @@ const ChannelList = React.memo((props: any) => {
 					</View>
 					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory}/>
 				</View>
+				<View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+					<TouchableOpacity
+						style={{ flexDirection: "row", gap: 5, alignItems: "center" }}
+						onPress={() => bottomSheetEventRef?.current?.present()}>
+						<CalendarIcon height={20} width={20} />
+						<Text style={{ color: "white" }}>{`${allEventManagement.length} Events`}</Text>
+					</TouchableOpacity>
+				</View>
 				<FlatList
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}
@@ -111,21 +124,27 @@ const ChannelList = React.memo((props: any) => {
 				/>
 			</View>
 
-			<BottomSheet2 ref={bottomSheetMenuRef} >
+			<MezonBottomSheet ref={bottomSheetMenuRef} >
 				<ClanMenu
 					clan={currentClan}
-					bottomSheetRef={bottomSheetMenuRef}
 					inviteRef={bottomSheetInviteRef}
 				/>
-			</BottomSheet2>
+			</MezonBottomSheet>
 
-			<BottomSheet2 ref={bottomSheetCategoryMenuRef} >
+			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} >
 				<CategoryMenu
 					bottomSheetRef={bottomSheetCategoryMenuRef}
           inviteRef={bottomSheetInviteRef}
 					category={currentPressedCategory}
 				/>
-			</BottomSheet2>
+			</MezonBottomSheet>
+
+			<MezonBottomSheet
+				title={`${allEventManagement.length} Events`}
+				headerRight={currentClan.creator_id === user.userId && <Text style={{ color: "white" }}>Create</Text>}
+				ref={bottomSheetEventRef}>
+				<EventViewer />
+			</MezonBottomSheet>
 		</ChannelListContext.Provider >
 	);
 });

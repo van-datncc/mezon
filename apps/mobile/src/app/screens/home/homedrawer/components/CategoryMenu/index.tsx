@@ -5,15 +5,17 @@ import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
 import { useClans } from "@mezon/core";
-import { reserve, IMezonMenuSectionProps, MezonMenu, IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui";
+import { reserve, IMezonMenuSectionProps, MezonMenu, IMezonMenuItemProps } from "../../../../../../app/temp-ui";
 import { useTranslation } from "react-i18next";
 import Clipboard from "@react-native-clipboard/clipboard";
 import Toast from "react-native-toast-message";
 import { NittroIcon } from "@mezon/mobile-components";
 import { useNavigation } from "@react-navigation/native";
-import { APP_SCREEN, AppStackScreenProps } from "apps/mobile/src/app/navigation/ScreenTypes";
-import { darkColor } from "apps/mobile/src/app/constants/Colors";
+import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
+import { darkColor } from "../../../../../../app/constants/Colors";
 import Feather from 'react-native-vector-icons/Feather';
+import { useBottomSheetModal } from "@gorhom/bottom-sheet";
+
 
 interface ICategoryMenuProps {
     bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
@@ -24,6 +26,8 @@ interface ICategoryMenuProps {
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
 export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: ICategoryMenuProps) {
     const { currentClan } = useClans();
+    const { dismiss } = useBottomSheetModal();
+
     const { t } = useTranslation(['categoryMenu']);
     const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>()
 
@@ -68,7 +72,7 @@ export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: IC
         {
             title: t('menu.organizationMenu.createChannel'),
             onPress: () => {
-                bottomSheetRef.current?.dismiss();
+                dismiss();
                 navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
                     screen: APP_SCREEN.MENU_CLAN.CREATE_CHANNEL,
                     params: {

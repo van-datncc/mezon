@@ -3,7 +3,6 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { appActions } from '../app/app.slice';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -75,8 +74,8 @@ export const joinChannel = createAsyncThunk(
 		try {
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting(channelId));
-			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage(channelId));
+			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({channelId}));
+			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({channelId}));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
@@ -168,7 +167,7 @@ export const fetchChannelsCached = memoize(
 		promise: true,
 		maxAge: LIST_CHANNEL_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[4] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
 		},
 	},
 );
@@ -209,6 +208,7 @@ export const channelsSlice = createSlice({
 	initialState: initialChannelsState,
 	reducers: {
 		add: channelsAdapter.addOne,
+		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
 		setMode: (state, action) => {
