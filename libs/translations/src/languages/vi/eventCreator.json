@@ -1,7 +1,20 @@
 {
-    "title": "Sự kiện của bạn diễn ra ở đâu?",
-    "subtitle": "Để mọi người không bị lạc đường",
-    "description": "Có có thể cấp quyền cho người khác tạo Sự kiện trong Máy chủ > Cài đặt > Vai trò",
+    "screens": {
+        "eventType": {
+            "headerTitle": "Bước 1 trên 3",
+            "title": "Sự kiện của bạn diễn ra ở đâu?",
+            "subtitle": "Để mọi người không bị lạc đường",
+            "description": "Có có thể cấp quyền cho người khác tạo Sự kiện trong Máy chủ > Cài đặt > Vai trò"
+        },
+        "eventDetails": {
+            "headerTitle": "Bước 2 trên 3",
+            "title": "Sự kiện của bạn nói về điều gì?",
+            "subtitle": "Điền các thông tin về sự kiện của bạn"
+        },
+        "eventPreview": {
+            "headerTitle": "Bước 3 trên 3"
+        }
+    },
     "fields": {
         "channelType": {
             "voiceChannel": {
@@ -19,9 +32,42 @@
         "address": {
             "title": "Địa điểm",
             "placeholder": "Thêm một địa điểm, link hoặc một thứ gì đó"
+        },
+        "eventName": {
+            "title": "Chủ đề",
+            "placeholder": "Chủ đề của sự kiện"
+        },
+        "startDate": {
+            "title": "Ngày bắt đầu"
+        },
+        "startTime": {
+            "title": "Giờ bắt đầu"
+        },
+        "endDate": {
+            "title": "Ngày kết thúc"
+        },
+        "endTime": {
+            "title": "Giờ kết thúc"
+        },
+        "eventFrequency": {
+            "title": "Chu kỳ sự kiện",
+            "noRepeat": "Không lặp lại",
+            "weeklyOn": "Hàng tuần vào",
+            "everyOther": "Hàng tuần bắt đầu từ",
+            "monthlyOn": "Hàng tháng vào",
+            "annuallyOn": "Hàng năm vào",
+            "everyWeekday": "Mọi ngày trong tuần (T2 - T6)"
+        },
+        "description": {
+            "title": "Mô tả",
+            "description": "Mô tả một chút về sự kiện của bạn. Markdown, links, ... đều được hỗ trợ"
         }
     },
     "actions": {
         "next": "Tiếp theo"
+    },
+    "notify": {
+        "locationBlank": "Cần nhập vị trí",
+         "titleBlank": "Cần một chủ đề cho sự kiện"
     }
 }

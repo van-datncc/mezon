@@ -6,22 +6,23 @@ import { MezonDateTimePicker, MezonInput, MezonSelect } from "../../../temp-ui";
 import MezonButton from "../../../temp-ui/MezonButton2";
 import { useState } from "react";
 import { getNearTime } from "@mezon/mobile-components";
+import { OptionEvent } from "@mezon/utils";
+import Toast from "react-native-toast-message";
 
-type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAIL;
-export default function EventCreatorDetails({ navigation }: MenuClanScreenProps<CreateEventScreenDetails>) {
+type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS;
+export default function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<CreateEventScreenDetails>) {
     const { t } = useTranslation(['eventCreator']);
+
+    // @ts-ignore
+    const { type, channelId, location } = route.params;
 
     navigation.setOptions({
         headerTitle: t('screens.eventDetails.headerTitle')
     })
 
-    function handlePressNext() {
-        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW);
-    }
-
     const options = [
         {
-            title: t('fields.eventFrequency.notRepeat'),
+            title: t('fields.eventFrequency.noRepeat'),
             value: 0
         },
         {
@@ -56,6 +57,27 @@ export default function EventCreatorDetails({ navigation }: MenuClanScreenProps<
         setEventFrequency(value);
     }
 
+    function handlePressNext() {
+        if (eventTitle.trim().length === 0) {
+            Toast.show({
+                type: "error",
+                text1: t("notify.titleBlank")
+            })
+            return;
+        }
+
+        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW, {
+            type,
+            channelId,
+            location,
+            title: eventTitle,
+            description: eventDescription,
+            startTime,
+            endTime,
+            frequency: eventFrequency,
+        });
+    }
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.feedSection}>
@@ -65,7 +87,12 @@ export default function EventCreatorDetails({ navigation }: MenuClanScreenProps<
                 </View>
 
                 <View style={styles.section}>
-                    <MezonInput label={t("fields.eventName.title")} value={eventTitle} onTextChange={setEventTitle} />
+                    <MezonInput
+                        label={t("fields.eventName.title")}
+                        value={eventTitle}
+                        onTextChange={setEventTitle}
+                        placeHolder={t('fields.eventName.placeholder')}
+                    />
 
                     <View style={styles.inlineSec}>
                         <View style={{ flex: 2 }}>
@@ -73,6 +100,7 @@ export default function EventCreatorDetails({ navigation }: MenuClanScreenProps<
                                 title={t('fields.startDate.title')}
                                 onChange={(value) => setStartTime(value)}
                                 value={startTime}
+                                keepTime
                             />
                         </View>
                         <View style={{ flex: 1 }}>
@@ -85,29 +113,33 @@ export default function EventCreatorDetails({ navigation }: MenuClanScreenProps<
                         </View>
                     </View>
 
-                    <View style={styles.inlineSec}>
-                        <View style={{ flex: 2 }}>
-                            <MezonDateTimePicker
-                                title={t('fields.endDate.title')}
-                                onChange={(value) => setEndTime(value)}
-                                value={endTime}
-                            />
+                    {type === OptionEvent.OPTION_LOCATION &&
+                        <View style={styles.inlineSec}>
+                            <View style={{ flex: 2 }}>
+                                <MezonDateTimePicker
+                                    title={t('fields.endDate.title')}
+                                    onChange={(value) => setEndTime(value)}
+                                    value={endTime}
+                                    keepTime
+                                />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <MezonDateTimePicker
+                                    title={t('fields.endTime.title')}
+                                    mode="time"
+                                    onChange={(value) => setEndTime(value)}
+                                    value={endTime}
+                                />
+                            </View>
                         </View>
-                        <View style={{ flex: 1 }}>
-                            <MezonDateTimePicker
-                                title={t('fields.endTime.title')}
-                                mode="time"
-                                onChange={(value) => setEndTime(value)}
-                                value={endTime}
-                            />
-                        </View>
-                    </View>
+                    }
 
                     <MezonInput
                         label={t("fields.description.title")}
                         value={eventDescription}
                         onTextChange={setEventDescription}
                         textarea
+                        placeHolder={t('fields.description.description')}
                     />
 
                     <MezonSelect

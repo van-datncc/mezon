@@ -8,23 +8,44 @@ import DatePicker from 'react-native-date-picker'
 import { useState } from "react";
 import { CloseIcon, getNearTime } from "@mezon/mobile-components";
 import MezonFakeBox from "../MezonFakeBox";
+import { useEffect } from "react";
 
 interface IMezonDateTimePicker {
     mode?: "datetime" | "date" | "time",
     title?: string;
     onChange?: (time: Date) => void;
-    value?: Date
+    value?: Date,
+    keepTime?: boolean
 }
 
-export default function MezonDateTimePicker({ mode = "date", title, onChange, value }: IMezonDateTimePicker) {
+export default function MezonDateTimePicker({ mode = "date", title, onChange, value, keepTime }: IMezonDateTimePicker) {
     const bottomSheetRef = useRef<BottomSheetModalMethods>();
     const [date, setDate] = useState(value || getNearTime(120))
     const [currentDate, setCurrentDate] = useState(value || getNearTime(120));
 
+    useEffect(() => {
+        setDate(value || getNearTime(120));
+        setCurrentDate(value || getNearTime(120));
+    }, [value])
+
     function handleChange() {
-        setCurrentDate(date);
+        if (keepTime && mode !== "time" && value) {
+            const new_date = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                value.getHours(),
+                value.getMinutes(),
+                value.getSeconds()
+            );
+
+            setCurrentDate(new_date);
+            onChange && onChange(new_date);
+        } else {
+            setCurrentDate(date);
+            onChange && onChange(date);
+        }
         bottomSheetRef?.current?.dismiss();
-        onChange && onChange(date);
     }
 
     function handleClose() {

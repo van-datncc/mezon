@@ -8,6 +8,8 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectVoiceChannelAll } from "@mezon/store-mobile";
 import MezonButton from "../../../temp-ui/MezonButton2";
+import { OptionEvent } from "@mezon/utils";
+import Toast from "react-native-toast-message";
 
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
@@ -23,12 +25,12 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
         {
             title: t('fields.channelType.voiceChannel.title'),
             description: t('fields.channelType.voiceChannel.description'),
-            value: 0
+            value: OptionEvent.OPTION_SPEAKER
         },
         {
             title: t('fields.channelType.somewhere.title'),
             description: t('fields.channelType.somewhere.description'),
-            value: 1
+            value: OptionEvent.OPTION_LOCATION
         }
     ]
 
@@ -37,16 +39,30 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
         value: item.channel_id
     }))
 
-    const [eventType, setEventType] = useState<number>(0);
+    const [eventType, setEventType] = useState<OptionEvent>(OptionEvent.OPTION_SPEAKER);
     const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || "")
     const [location, setLocation] = useState<string>("");
 
-    function handleEventTypeChange(value: number) {
+    function handleEventTypeChange(value: OptionEvent) {
         setEventType(value);
     }
 
     function handlePressNext() {
-        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAIL);
+        if (eventType === OptionEvent.OPTION_LOCATION) {
+            if (location.trim().length === 0) {
+                Toast.show({
+                    type: "error",
+                    text1: t("notify.locationBlank")
+                })
+                return;
+            }
+        }
+
+        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS, {
+            type: eventType,
+            channelId: eventType === OptionEvent.OPTION_SPEAKER ? channelID : null,
+            location: eventType === OptionEvent.OPTION_LOCATION ? location : null,
+        });
     }
 
     function handleChannelIDChange(value: string | number) {
@@ -66,7 +82,7 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
             />
 
             {
-                eventType === 0
+                eventType === OptionEvent.OPTION_SPEAKER
                     ? <MezonSelect
                         title={t('fields.channel.title')}
                         onChange={handleChannelIDChange}

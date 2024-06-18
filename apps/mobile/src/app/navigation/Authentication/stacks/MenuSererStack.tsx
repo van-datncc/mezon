@@ -57,7 +57,7 @@ export const MenuClanStacks = ({ }: any) => {
             />
 
             <Stack.Screen
-                name={APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAIL}
+                name={APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS}
                 component={EventCreatorDetails}
                 options={{
                     headerTitle: t('menuClanStack.eventCreator'),

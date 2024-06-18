@@ -1,7 +1,20 @@
 {
-    "title": "Where is your event?",
-    "subtitle": "So no one gets lost on where to go",
-    "description": "You can give other people permission to create events in Server > Settings > Roles",
+    "screens": {
+        "eventType": {
+            "headerTitle": "Step 1 of 3",
+            "title": "Where is your event?",
+            "subtitle": "So no one gets lost on where to go",
+            "description": "You can give other people permission to create events in Server > Settings > Roles"
+        },
+        "eventDetails": {
+            "headerTitle": "Step 2 of 3",
+            "title": "What's your event about?",
+            "subtitle": "Fill out the details of your event"
+        },
+        "eventPreview": {
+            "headerTitle": "Step 3 of 3"
+        }
+    },
     "fields": {
         "channelType": {
             "voiceChannel": {
@@ -19,9 +32,42 @@
         "address": {
             "title": "Locations",
             "placeholder": "Add a location, link or something"
+        },
+        "eventName": {
+            "title": "Event Topic",
+            "placeholder": "What's your event?"
+        },
+        "startDate": {
+            "title": "Start Date"
+        },
+        "startTime": {
+            "title": "Start Time"
+        },
+        "endDate": {
+            "title": "End Date"
+        },
+        "endTime": {
+            "title": "End Time"
+        },
+        "eventFrequency": {
+            "title": "Event Frequency",
+            "noRepeat": "Does not repeat",
+            "weeklyOn": "Weekly on",
+            "everyOther": "Every other",
+            "monthlyOn": "Monthly on",
+            "annuallyOn": "Annually On",
+            "everyWeekday": "Every weekday (Monday to Friday"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Tell people a little more about your event. Markdown, new lines, and links are supported."
         }
     },
     "actions": {
         "next": "Next"
+    },
+    "notify": {
+        "locationBlank": "A location is required",
+        "titleBlank": "A title is required"
     }
 }
