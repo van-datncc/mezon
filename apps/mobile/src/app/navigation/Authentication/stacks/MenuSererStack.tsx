@@ -7,7 +7,7 @@ import ClanSetting from "../../../components/ClanSettings";
 import ClanOverviewSetting from "../../../components/ClanSettings/Overview";
 import ChannelCreator from "../../../components/ChannelCreator";
 import EventCreatorType from "../../../components/EventCreator/EventCreatorType";
-import EventCreatorDetail from "../../../components/EventCreator/EventCreatorDetail";
+import EventCreatorDetails from "../../../components/EventCreator/EventCreatorDetails";
 import EventCreatorPreview from "../../../components/EventCreator/EventCreatorPreview";
 
 export const MenuClanStacks = ({ }: any) => {
@@ -29,7 +29,7 @@ export const MenuClanStacks = ({ }: any) => {
                 headerTitleStyle: {
                     fontSize: 14,
                     fontWeight: 'normal'
-                },
+                }
             }}>
 
             <Stack.Screen
@@ -58,7 +58,7 @@ export const MenuClanStacks = ({ }: any) => {
 
             <Stack.Screen
                 name={APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAIL}
-                component={EventCreatorDetail}
+                component={EventCreatorDetails}
                 options={{
                     headerTitle: t('menuClanStack.eventCreator'),
                 }}

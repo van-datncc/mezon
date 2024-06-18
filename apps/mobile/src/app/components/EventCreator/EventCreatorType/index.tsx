@@ -10,11 +10,14 @@ import { selectVoiceChannelAll } from "@mezon/store-mobile";
 import MezonButton from "../../../temp-ui/MezonButton2";
 
 
-type CreateEventScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
-export default function EventCreatorType({ navigation }: MenuClanScreenProps<CreateEventScreen>) {
+type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
+export default function EventCreatorType({ navigation }: MenuClanScreenProps<CreateEventScreenType>) {
     const { t } = useTranslation(['eventCreator']);
     const voicesChannel = useSelector(selectVoiceChannelAll);
-    const [eventType, setEventType] = useState<number>(0);
+
+    navigation.setOptions({
+        headerTitle: t('screens.eventType.headerTitle')
+    })
 
     const options = [
         {
@@ -34,16 +37,27 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
         value: item.channel_id
     }))
 
+    const [eventType, setEventType] = useState<number>(0);
+    const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || "")
+    const [location, setLocation] = useState<string>("");
+
     function handleEventTypeChange(value: number) {
         setEventType(value);
+    }
+
+    function handlePressNext() {
+        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAIL);
+    }
+
+    function handleChannelIDChange(value: string | number) {
+        setChannelID(value as string);
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.headerSection}>
-                {/* <Text>Step 1 of 3</Text> */}
-                <Text style={styles.title}>{t('title')}</Text>
-                <Text style={styles.subtitle}>{t('subtitle')}</Text>
+                <Text style={styles.title}>{t('screens.eventType.title')}</Text>
+                <Text style={styles.subtitle}>{t('screens.eventType.subtitle')}</Text>
             </View>
 
             <MezonOption
@@ -55,20 +69,25 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
                 eventType === 0
                     ? <MezonSelect
                         title={t('fields.channel.title')}
+                        onChange={handleChannelIDChange}
                         data={channels} icon={<SpeakerIcon height={20} width={20} />}
                     />
 
                     : <MezonInput
-                        onTextChange={() => { }} value=""
+                        onTextChange={setLocation} value={location}
                         inputWrapperStyle={styles.input}
                         label={t('fields.address.title')}
                         placeHolder={t('fields.address.placeholder')}
                     />
             }
 
-            <Text style={styles.bottomDescription}>{t('description')}</Text>
+            <Text style={styles.bottomDescription}>{t('screens.eventType.description')}</Text>
 
-            <MezonButton title={t('actions.next')} type="success"/>
+            <MezonButton
+                title={t('actions.next')}
+                type="success"
+                onPress={handlePressNext}
+            />
         </View>
     )
 }
