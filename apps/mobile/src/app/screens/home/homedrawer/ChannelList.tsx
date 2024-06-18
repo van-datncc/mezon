@@ -16,7 +16,6 @@ import { useSelector } from 'react-redux';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
 import { styles } from './styles';
-import BottomSheet2 from '../../../components/BottomSheet2';
 import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
@@ -25,6 +24,7 @@ import CategoryMenu from './components/CategoryMenu';
 import { ICategoryChannel } from '@mezon/utils';
 import { useState } from 'react';
 import EventViewer from '../../../components/Event';
+import { MezonBottomSheet } from '../../../temp-ui';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -124,27 +124,25 @@ const ChannelList = React.memo((props: any) => {
 				/>
 			</View>
 
-			<BottomSheet2 ref={bottomSheetMenuRef} >
+			<MezonBottomSheet ref={bottomSheetMenuRef} >
 				<ClanMenu
 					clan={currentClan}
-					bottomSheetRef={bottomSheetMenuRef}
 					inviteRef={bottomSheetInviteRef}
 				/>
-			</BottomSheet2>
+			</MezonBottomSheet>
 
-			<BottomSheet2 ref={bottomSheetCategoryMenuRef} >
+			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} >
 				<CategoryMenu
-					bottomSheetRef={bottomSheetCategoryMenuRef}
 					category={currentPressedCategory}
 				/>
-			</BottomSheet2>
+			</MezonBottomSheet>
 
-			<BottomSheet2
+			<MezonBottomSheet
 				title={`${allEventManagement.length} Events`}
 				headerRight={currentClan?.creator_id === user?.userId && <Text style={{ color: "white" }}>Create</Text>}
 				ref={bottomSheetEventRef}>
 				<EventViewer />
-			</BottomSheet2>
+			</MezonBottomSheet>
 		</ChannelListContext.Provider >
 	);
 });
