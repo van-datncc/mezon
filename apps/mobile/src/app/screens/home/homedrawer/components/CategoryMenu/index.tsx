@@ -12,15 +12,17 @@ import Toast from "react-native-toast-message";
 import { NittroIcon } from "@mezon/mobile-components";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "apps/mobile/src/app/navigation/ScreenTypes";
+import { useBottomSheetModal } from "@gorhom/bottom-sheet";
 
 interface ICategoryMenuProps {
-    bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
     category: ICategoryChannel;
 }
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
-export default function CategoryMenu({ category, bottomSheetRef }: ICategoryMenuProps) {
+export default function CategoryMenu({ category }: ICategoryMenuProps) {
     const { currentClan } = useClans();
+    const { dismiss } = useBottomSheetModal();
+
     const { t } = useTranslation(['categoryMenu']);
     const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>()
 
@@ -62,7 +64,7 @@ export default function CategoryMenu({ category, bottomSheetRef }: ICategoryMenu
         {
             title: t('menu.organizationMenu.createChannel'),
             onPress: () => {
-                bottomSheetRef.current?.dismiss();
+                dismiss();
                 navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
                     screen: APP_SCREEN.MENU_CLAN.CREATE_CHANNEL,
                     params: {

@@ -1,4 +1,4 @@
-import { useApp, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
+import { useApp, useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
 import { selectDmGroupCurrent } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
 import { useRef, useState } from 'react';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
+import { ChannelType } from 'mezon-js';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -18,6 +19,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(dmGroupId ?? ''));
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
+	const { isShowMemberListDM, isUseProfileDM, setIsShowMemberListDM, setIsUseProfileDM } = useDirect();
 	const { appearanceTheme } = useApp();
 
 	return (
@@ -68,6 +70,20 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									<Icons.IconAddFriendDM />
 								</Tooltip>
 							</button>
+							{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP &&
+								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} >
+									<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+										<Icons.MemberList isWhite={isShowMemberListDM}/>
+									</Tooltip>
+								</button>
+							}
+							{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM &&  
+								<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
+									<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+										<Icons.IconUserProfileDM />
+									</Tooltip>
+								</button>
+							}
 						</div>
 						<SearchMessageChannel />
 						<div
