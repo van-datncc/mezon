@@ -1,10 +1,8 @@
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useState } from 'react';
 import * as Icons from '../../Icons';
 import { ChannelLableModal } from '../ChannelLabel';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { Regex } from '../../ClanHeader/ModalCreateCategory';
 
 interface ChannelNameModalProps {
 	type: number;

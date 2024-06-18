@@ -2,7 +2,7 @@ import { useThreads } from '@mezon/core';
 import { threadsActions, useAppDispatch } from '@mezon/store';
 import { threadError } from '@mezon/utils';
 import { KeyboardEvent, useCallback, useState } from 'react';
-import { Regex } from '../../../../ClanHeader/ModalCreateCategory';
+import { ValidateSpecialCharacters } from '@mezon/utils';
 
 interface ThreadNameTextFieldProps {
 	label?: string;
@@ -21,7 +21,7 @@ const ThreadNameTextField = ({ label, error, placeholder, value, className, onCh
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
-		const regex = Regex().test(value);
+		const regex = ValidateSpecialCharacters().test(value);
 		setCheckValidate(!regex);
 		dispatch(threadsActions.setNameThreadError(''));
 		onChange(value);
