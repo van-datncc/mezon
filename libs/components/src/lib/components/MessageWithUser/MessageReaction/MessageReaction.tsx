@@ -42,7 +42,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		message_sender_id: string,
 		action_delete: boolean,
 	) {
-		console.log(id, mode, messageId, emoji, count, message_sender_id, action_delete);
 		await reactionMessageDispatch(id, mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
 	}
 
