@@ -1,4 +1,4 @@
-import { useAccount } from '@mezon/core';
+import { useAccount, useApp } from '@mezon/core';
 import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
@@ -113,6 +113,7 @@ const SettingRightUser = ({
 		setEditAboutUser(e.target.value);
 		setFlags(true);
 	};
+	const {appearanceTheme} = useApp();
 	return (
 		<div
 			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}
@@ -162,7 +163,7 @@ const SettingRightUser = ({
 						</div>
 						<div className="mt-[30px] w-full">
 							<textarea
-								className="dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full"
+								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full ${appearanceTheme ==="light" ? "customScrollLightMode" : ""}`}
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}
