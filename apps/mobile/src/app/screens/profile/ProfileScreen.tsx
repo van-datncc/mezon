@@ -67,7 +67,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                         <Feather name="chevron-down" style={styles.iconColor} />
                     </TouchableOpacity>
 
-                    <Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
+                    <Text style={styles.text}>{user?.userProfile?.user?.display_name}</Text>
 
                     <View style={styles.buttonList}>
                         <MezonButton viewContainerStyle={styles.button} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
