@@ -110,7 +110,7 @@ export const fetchMessages = createAsyncThunk(
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));

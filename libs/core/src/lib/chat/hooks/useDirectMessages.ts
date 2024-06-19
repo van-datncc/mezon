@@ -1,16 +1,11 @@
 import {
 	directActions,
 	messagesActions,
-	selectHasMoreMessageByChannelId,
-	selectLastMessageIdByChannelId,
-	selectMessageByChannelId,
-	selectUnreadMessageIdByChannelId,
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import { useChatMessages } from './useChatMessages';
 
@@ -24,11 +19,6 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
-
-	const messages = useSelector(selectMessageByChannelId(channelId));
-	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const lastMessageId = useSelector(selectLastMessageIdByChannelId(channelId));
-	const unreadMessageId = useSelector(selectUnreadMessageIdByChannelId(channelId));
 	const { lastMessage } = useChatMessages({ channelId });
 
 	const sendDirectMessage = React.useCallback(
@@ -67,14 +57,10 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	return useMemo(
 		() => ({
 			client,
-			messages,
-			unreadMessageId,
-			lastMessageId,
-			hasMoreMessage,
 			sendDirectMessage,
 			loadMoreMessage,
 			sendMessageTyping,
 		}),
-		[client, messages, unreadMessageId, lastMessageId, hasMoreMessage, sendMessageTyping, sendDirectMessage, loadMoreMessage],
+		[client, sendMessageTyping, sendDirectMessage, loadMoreMessage],
 	);
 }
