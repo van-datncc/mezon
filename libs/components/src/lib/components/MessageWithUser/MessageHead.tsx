@@ -1,6 +1,6 @@
 import { ShortUserProfile } from '@mezon/components';
-import { useClans, useOnClickOutside } from '@mezon/core';
-import { selectUserClanProfileByClanID } from '@mezon/store';
+import { useOnClickOutside } from '@mezon/core';
+import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);

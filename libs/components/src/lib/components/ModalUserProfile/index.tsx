@@ -1,5 +1,5 @@
-import { useAuth, useClans, useDirect, useSendInviteMessage } from '@mezon/core';
-import { selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
+import { useAuth, useDirect, useSendInviteMessage } from '@mezon/core';
+import { selectCurrentClan, selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
@@ -22,10 +22,10 @@ type ModalUserProfileProps = {
 const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote }: ModalUserProfileProps) => {
 	const { userProfile } = useAuth();
 	const mezon = useMezon();
-	const { currentClan } = useClans();
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 
+	const currentClan = useSelector(selectCurrentClan);
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, userID as string));
 

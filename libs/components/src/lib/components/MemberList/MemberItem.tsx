@@ -1,5 +1,5 @@
-import { useClans, useMemberStatus } from '@mezon/core';
-import { ChannelMembersEntity, selectUserClanProfileByClanID } from '@mezon/store';
+import { useMemberStatus } from '@mezon/core';
+import { ChannelMembersEntity, selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
@@ -10,7 +10,7 @@ export type MemberItemProps = {
 
 function MemberItem({ user, listProfile, isOffline }: MemberItemProps) {
 	const userStatus = useMemberStatus(user.user?.id || '');
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 
 	return (
