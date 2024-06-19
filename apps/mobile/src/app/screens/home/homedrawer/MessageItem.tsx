@@ -30,7 +30,7 @@ import {
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
@@ -215,17 +215,20 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		});
 	};
 
-	const onMention = async (mentionedUser: string) => {
-		try {
-			const tagName = mentionedUser.slice(1);
-			const clanUser = usersClan?.find((userClan) => userClan?.user?.username === tagName);
-			clanUser && setFoundUser(clanUser.user);
-			if (!mentionedUser) return;
-			setMessageSelected(EMessageBSToShow.UserInformation);
-		} catch (error) {
-			console.log('error', error);
-		}
-	};
+	const onMention = useCallback(
+		async (mentionedUser: string) => {
+			try {
+				const tagName = mentionedUser.slice(1);
+				const clanUser = usersClan?.find((userClan) => userClan?.user?.username === tagName);
+				clanUser && setFoundUser(clanUser.user);
+				if (!mentionedUser) return;
+				setMessageSelected(EMessageBSToShow.UserInformation);
+			} catch (error) {
+				console.log('error', error);
+			}
+		},
+		[usersClan, setFoundUser],
+	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
@@ -240,7 +243,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
-	const onChannelMention = async (channel: ChannelsEntity) => {
+	const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
 		try {
 			const type = channel?.type;
 			const channelId = channel?.channel_id;
@@ -259,7 +262,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		} catch (error) {
 			console.log(error);
 		}
-	};
+	}, []);
 
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
