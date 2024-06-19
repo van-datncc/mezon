@@ -152,7 +152,7 @@ type removeClanUsersPayload = {
 export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async ( {clanId, userIds} : removeClanUsersPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.removeChannelUsers(mezon.session, clanId, userIds);
+		const response = await mezon.client.removeClanUsers(mezon.session, clanId, userIds);
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
