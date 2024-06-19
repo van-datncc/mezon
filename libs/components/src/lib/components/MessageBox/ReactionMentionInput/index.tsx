@@ -448,6 +448,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (direct !== undefined) {
 			await mezon.joinChatDirectMessage(direct.channel_id || "", direct.channel_label, direct.type);
 		}
+		if (currentChannel !== undefined || currentChannel !== null) {
+			await mezon.joinChatChannel(currentChannel?.channel_id || "");
+		}
+		
 	};
 	return (
 		<div className="relative">
