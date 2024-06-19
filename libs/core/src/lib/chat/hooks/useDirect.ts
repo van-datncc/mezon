@@ -1,4 +1,4 @@
-import { directActions, selectAllDirectMessages, selectDirectsUnreadlist, selectIsLoadDMData, useAppDispatch } from '@mezon/store';
+import { directActions, selectAllDirectMessages, selectDirectsOpenlist, selectDirectsUnreadlist, selectIsLoadDMData, useAppDispatch } from '@mezon/store';
 
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,13 +11,14 @@ type UseDirectParams = {
 }
 
 export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : false}) {
+	const dispatch = useAppDispatch();
 	const listDM = useSelector(selectAllDirectMessages);
+	const listDirectOpen = useSelector(selectDirectsOpenlist);
 	const { directId: currentDmGroupId } = useAppParams();
 	const listDirectMessage = useSelector(selectDirectsUnreadlist);
 	const listDirectMessageUnread = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
 
 	const isLoadDM = useSelector(selectIsLoadDMData);
-	const dispatch = useAppDispatch();
 
 	const createDirectMessageWithUser = useCallback(
 		async (userId: string) => {
@@ -62,8 +63,9 @@ export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : fa
 			listDM,
 			createDirectMessageWithUser,
 			refechDMList,
-			listDirectMessageUnread
+			listDirectMessageUnread,
+			listDirectOpen
 		}),
-		[listDM, createDirectMessageWithUser, refechDMList, listDirectMessageUnread],
+		[listDM, createDirectMessageWithUser, refechDMList, listDirectMessageUnread, listDirectOpen],
 	);
 }
