@@ -1,16 +1,21 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
-	mode: any;
-	message: IMessageWithUser;
+	mode: number;
+	arrowTop?: boolean;
+	arrowBottom?: boolean;
+	isRightLimit?: boolean;
 };
 
-const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
+const UserReactionPanel = ({ emojiShowPanel, mode, isRightLimit, arrowBottom, arrowTop }: UserReactionPanelProps) => {
+	console.log(isRightLimit);
+
 	const { emojiListPNG } = useEmojiSuggestion();
+
 	const userId = useAuth();
 	const { reactionMessageDispatch, arrowPosition } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
@@ -28,10 +33,18 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 
 	return (
 		<>
+			{arrowTop && (
+				<div
+					className={`dark:text-[#28272b] text-white mb-[-0.23rem] rotate-180 ${isRightLimit ? 'flex justify-start' : 'flex justify-center'} `}
+				>
+					<Icons.ArrowDownFill />
+				</div>
+			)}
+
 			<div
 				onClick={(e) => e.stopPropagation()}
 				className={`z-50   w-[18rem]
-				dark:bg-[#28272b] bg-white border-[#28272b] rounded-md min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1 bottom-0'}`}
+				dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1 bottom-0'}`}
 			>
 				<div>
 					<div className="flex flex-row items-center m-2 dark:text-white text-black">
@@ -54,7 +67,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 												e.stopPropagation();
 												removeEmojiSender(
 													emojiShowPanel.id ?? '',
-													message.id,
+													emojiShowPanel.message_id ?? '',
 													emojiShowPanel.emoji ?? '',
 													sender.sender_id ?? '',
 													sender.count ?? 0,
@@ -70,15 +83,16 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 							</div>
 						);
 					}
-
 					return null;
 				})}
-
-				<div className="w-full h-3 absolute bottom-[-0.5rem]"></div>
 			</div>
-			<div className={`dark:text-[#28272b] text-white mt-[-0.4rem] ${arrowPosition ? 'flex justify-end' : 'flex justify-center'} `}>
-				<Icons.ArrowDownFill />
-			</div>
+			{arrowBottom && (
+				<div
+					className={`dark:text-[#28272b] h-fit text-white border mt-[-0.25rem] ${isRightLimit ? 'flex justify-end' : 'flex justify-center'} `}
+				>
+					<Icons.ArrowDownFill />
+				</div>
+			)}
 		</>
 	);
 };

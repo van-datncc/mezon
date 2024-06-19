@@ -149,7 +149,6 @@ export const fetchMessages = createAsyncThunk(
 			return Object.values(emojiDataItems);
 		});
 
-
 		if (reactionData.length > 0) {
 			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
 		}
