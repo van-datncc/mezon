@@ -9,7 +9,7 @@ import {
 } from '@mezon/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelMessage } from './ChannelMessage';
+import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -38,7 +38,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const loadMoreMessage = useCallback(async () => {
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
-	
+
 	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages });
 
 	useEffect(() => {
@@ -84,7 +84,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			)}
 
 			{messages?.map((messageId) => {
-				return <ChannelMessage key={messageId} messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel ?? ''} />;
+				return (
+					<MemorizedChannelMessage
+						key={messageId}
+						messageId={messageId}
+						channelId={channelId}
+						mode={mode}
+						channelLabel={channelLabel ?? ''}
+					/>
+				);
 			})}
 		</div>
 	);
