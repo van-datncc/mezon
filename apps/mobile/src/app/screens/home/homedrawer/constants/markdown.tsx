@@ -2,6 +2,7 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IEmojiImage, getSrcEmoji } from '@mezon/utils';
 import { TFunction } from 'i18next';
+import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
@@ -75,8 +76,8 @@ export const markdownStyles = {
 		lineHeight: size.s_20,
 	},
 	iconEmojiInMessage: {
-		width: size.s_18,
-		height: size.s_18,
+		width: size.s_20,
+		height: size.s_20,
 	},
 	editedText: {
 		fontSize: size.small,
@@ -99,6 +100,17 @@ export const markdownStyles = {
 		backgroundColor: Colors.white,
 		height: 2,
 	},
+};
+
+export type IMarkdownProps = {
+	lines: string;
+	isEdited?: boolean;
+	t?: TFunction;
+	channelsEntities?: Record<string, ChannelsEntity>;
+	emojiListPNG?: IEmojiImage[];
+	onMention?: (url: string) => void;
+	onChannelMention?: (channel: ChannelsEntity) => void;
+	isNumberOfLine?: boolean;
 };
 
 /**
@@ -242,53 +254,68 @@ export const removeBlockCode = (text: string) => {
 	return text?.replace?.(regex, '$2');
 };
 
-export const renderTextContent = (
-	lines: string,
-	isEdited?: boolean,
-	t?: TFunction,
-	channelsEntities?: Record<string, ChannelsEntity>,
-	emojiListPNG?: IEmojiImage[],
-	onMention?: (url: string) => void,
-	onChannelMention?: (channel: ChannelsEntity) => void,
-	isNumberOfLine?: boolean,
-) => {
-	if (!lines) return null;
+const RenderTextContent = React.memo(
+	({ lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine }: IMarkdownProps) => {
+		if (!lines) return null;
 
-	const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
-	const matchesUrls = lines.match(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
-	const isExistEmoji = emojiRegex.test(lines);
-	const isExistBlockCode = codeBlockRegex.test(lines);
+		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
+		const matchesUrls = lines.match(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
+		const isExistEmoji = emojiRegex.test(lines);
+		const isExistBlockCode = codeBlockRegex.test(lines);
 
-	let content: string = lines;
+		let content: string = lines?.trim();
 
-	if (matchesMentions) {
-		content = formatMention(content, matchesMentions, channelsEntities);
-	}
+		if (matchesMentions) {
+			content = formatMention(content, matchesMentions, channelsEntities);
+		}
 
-	if (matchesUrls) {
-		content = formatUrls(content);
-	}
+		if (matchesUrls) {
+			content = formatUrls(content);
+		}
 
-	if (isExistEmoji) {
-		content = formatEmoji(content, emojiListPNG);
-	}
+		if (isExistEmoji) {
+			content = formatEmoji(content, emojiListPNG);
+		}
 
-	if (isExistBlockCode) {
-		content = formatBlockCode(content);
-	}
+		if (isExistBlockCode) {
+			content = formatBlockCode(content);
+		}
 
-	if (isEdited) {
-		content = content + ` [${t('edited')}](${EDITED_FLAG})`;
-	}
+		if (isEdited) {
+			content = content + ` [${t('edited')}](${EDITED_FLAG})`;
+		}
 
-	return isNumberOfLine ? (
-		<View
-			style={{
-				flex: 1,
-				maxHeight: size.s_20 * 10 - size.s_10,
-				overflow: 'hidden',
-			}}
-		>
+		return isNumberOfLine ? (
+			<View
+				style={{
+					flex: 1,
+					maxHeight: size.s_20 * 10 - size.s_10,
+					overflow: 'hidden',
+				}}
+			>
+				<Markdown
+					style={markdownStyles as StyleSheet.NamedStyles<any>}
+					rules={renderRulesCustom}
+					onLinkPress={(url) => {
+						if (url.startsWith('@')) {
+							onMention && onMention(url);
+							return false;
+						}
+
+						if (url.startsWith('#')) {
+							const channelId = url.slice(1);
+							const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
+							onChannelMention && onChannelMention(channel);
+							return false;
+						}
+						//Note: return false to prevent default
+						return true;
+					}}
+				>
+					{content}
+				</Markdown>
+			</View>
+		) : (
 			<Markdown
 				style={markdownStyles as StyleSheet.NamedStyles<any>}
 				rules={renderRulesCustom}
@@ -310,31 +337,9 @@ export const renderTextContent = (
 			>
 				{content}
 			</Markdown>
-		</View>
-	) : (
-		<Markdown
-			style={markdownStyles as StyleSheet.NamedStyles<any>}
-			rules={renderRulesCustom}
-			onLinkPress={(url) => {
-				if (url.startsWith('@')) {
-					onMention && onMention(url);
-					return false;
-				}
-
-				if (url.startsWith('#')) {
-					const channelId = url.slice(1);
-					const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
-					onChannelMention && onChannelMention(channel);
-					return false;
-				}
-				//Note: return false to prevent default
-				return true;
-			}}
-		>
-			{content}
-		</Markdown>
-	);
-};
+		);
+	},
+);
 
 const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsEntities: Record<string, ChannelsEntity>) => {
 	const parts = text.split(splitBlockCodeRegex);
@@ -369,4 +374,28 @@ const getChannelById = (channelHashtagId: string, channelsEntities: Record<strin
 			channel_label: channelHashtagId,
 		};
 	}
+};
+
+export const renderTextContent = (
+	lines: string,
+	isEdited?: boolean,
+	t?: TFunction,
+	channelsEntities?: Record<string, ChannelsEntity>,
+	emojiListPNG?: IEmojiImage[],
+	onMention?: (url: string) => void,
+	onChannelMention?: (channel: ChannelsEntity) => void,
+	isNumberOfLine?: boolean,
+) => {
+	return (
+		<RenderTextContent
+			lines={lines}
+			isEdited={isEdited}
+			t={t}
+			channelsEntities={channelsEntities}
+			emojiListPNG={emojiListPNG}
+			onMention={onMention}
+			onChannelMention={onChannelMention}
+			isNumberOfLine={isNumberOfLine}
+		/>
+	);
 };

@@ -58,7 +58,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 			const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 			return {
 				time: moment.unix(timestamp).format('DD/MM/YYYY HH:mm'),
-				textContent: formatLastMessageContent(text)
+				textContent: formatLastMessageContent(text?.trim())
 			}
 		}
 		return null;

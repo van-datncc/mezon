@@ -1,20 +1,20 @@
-import { reactionActions, selectQuantitiesMessageRemain } from '@mezon/store';
+import { selectQuantitiesMessageRemain } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { reactionActions } from '@mezon/store';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
 	channelId: string;
 	hasMoreMessage: boolean;
 	loadMoreMessage: () => void;
-	messages: IMessageWithUser[];
+	messages?: string[] | null;
 };
 
-export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessage, messages }: MessageProps) => {
+export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, loadMoreMessage }: MessageProps) => {
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
-	const remain = useSelector(selectQuantitiesMessageRemain);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -31,7 +31,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		const currentChatRef = chatRef.current;
 		if (!currentChatRef || isFetching) return;
 		currentChatRef.scrollTop = currentChatRef.scrollHeight;
-	}, [channelId, messages.length]);
+	}, [channelId, messages?.length]);
 
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
@@ -54,7 +54,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		return () => {
 			currentChatRef?.removeEventListener('wheel', handleWheel);
 		};
-	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, remain]);
+	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching]);
 
-	return { isFetching, remain };
+	return { isFetching };
 };

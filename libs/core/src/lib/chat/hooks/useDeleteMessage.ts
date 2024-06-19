@@ -29,7 +29,7 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 
 			await socket.removeChatMessage(channelId, channel.chanel_label ?? '', mode, messageId);
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, channelId, channelLabel],
+		[sessionRef, clientRef, socketRef, channelRef, currentClanId, dispatch, channelId, mode],
 	);
 
 	return useMemo(

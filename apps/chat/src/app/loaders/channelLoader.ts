@@ -13,10 +13,16 @@ export const channelLoader: LoaderFunction = async ({ params, request }) => {
 
 	if (messageId) {
 		setJumpToMessageId(messageId);
+		store.dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	}
 
-	store.dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+	store.dispatch(
+		channelsActions.setIdChannelSelected({
+			clanId: clanId || '',
+			channelId,
+		}),
+	);
 	return null;
 };
 
