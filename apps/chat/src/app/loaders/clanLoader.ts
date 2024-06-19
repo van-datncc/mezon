@@ -11,8 +11,8 @@ export const clanLoader: LoaderFunction = async ({ params }) => {
 	if (!clanId) {
 		throw new Error('Clan ID null');
 	}
+	store.dispatch(clansActions.joinClan({clanId}));
 	store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
-	store.dispatch(clansActions.joinClan({clanId}),);
 	return {
 		clanId,
 	} as ClanLoaderData;
