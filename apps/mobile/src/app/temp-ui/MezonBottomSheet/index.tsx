@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 import Backdrop from "./backdrop";
 import { Text, View } from "react-native";
 
-interface IProps {
+export interface IMezonBottomSheetProps {
     children: ReactNode,
     title?: string,
     headerLeft?: ReactNode,
@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export default forwardRef(function MezonBottomSheet(
-    { children, title, headerLeft, headerRight, heightFitContent }: IProps,
+    { children, title, headerLeft, headerRight, heightFitContent }: IMezonBottomSheetProps,
     ref: Ref<BottomSheetModalMethods>) {
 
     return (
