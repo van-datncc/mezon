@@ -472,6 +472,7 @@ export type UpdateClan = {
 
 export type RemoveClanUsers = {
 	clanId: string;
+	channelId: string;
 	userIds: string[];
 };
 
