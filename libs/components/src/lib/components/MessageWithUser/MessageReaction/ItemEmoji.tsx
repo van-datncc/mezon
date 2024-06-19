@@ -2,7 +2,7 @@ import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import { reactionActions, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
@@ -57,10 +57,6 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 	const resetState = () => {
 		dispatch(reactionActions.setEmojiHover(null));
 		dispatch(reactionActions.setUserReactionPanelState(false));
-		setTopUserPanel(undefined);
-		setRightUserPanel(undefined);
-		setLeftUserPanel(undefined);
-		setBottomUserPanel(undefined);
 	};
 
 	useEffect(() => {
@@ -69,7 +65,7 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 		}
 	}, [userReactionPanelState]);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (emojiHover && emojiItemRef.current && userPanelRef) {
 			const screenWidth = window.innerWidth;
 			const userPanelWidth = userPanelRef.current?.getBoundingClientRect().width;
