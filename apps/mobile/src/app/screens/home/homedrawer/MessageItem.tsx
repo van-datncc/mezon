@@ -70,7 +70,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, dataReactionCombine, preMessage, onOpenImage, isNumberOfLine } = props;
+	const { message, mode, preMessage, onOpenImage, isNumberOfLine } = props;
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
@@ -368,7 +368,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine)}
 					<MessageAction
 						message={message}
-						dataReactionCombine={dataReactionCombine}
 						mode={mode}
 						emojiListPNG={emojiListPNG}
 						openEmojiPicker={() => {

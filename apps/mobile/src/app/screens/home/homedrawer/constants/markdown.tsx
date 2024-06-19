@@ -259,7 +259,7 @@ export const renderTextContent = (
 	const isExistEmoji = emojiRegex.test(lines);
 	const isExistBlockCode = codeBlockRegex.test(lines);
 
-	let content: string = lines.trim();
+	let content: string = lines?.trim();
 
 	if (matchesMentions) {
 		content = formatMention(content, matchesMentions, channelsEntities);
