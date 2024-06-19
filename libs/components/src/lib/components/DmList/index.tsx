@@ -31,15 +31,9 @@ function DirectMessageList() {
 
 	const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 		return notSortedArr.slice().sort((a, b) => {
-			const lastSentTimestampA = parseFloat(a.last_sent_message?.timestamp || '0');
-			const lastSeenTimestampA = parseFloat(a.last_seen_message?.timestamp || '0');
-			const lastSentTimestampB = parseFloat(b.last_sent_message?.timestamp || '0');
-			const lastSeenTimestampB = parseFloat(b.last_seen_message?.timestamp || '0');
-	
-			const maxTimestampA = Math.max(lastSentTimestampA, lastSeenTimestampA);
-			const maxTimestampB = Math.max(lastSentTimestampB, lastSeenTimestampB);
-	
-			return maxTimestampB - maxTimestampA;
+			const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
+			const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+			return timestampB - timestampA;
 		});
 	};
 	
@@ -47,7 +41,6 @@ function DirectMessageList() {
 		const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
 		const sortedData = sortDMItem(filteredDataDM);
 		setSortedFilteredDataDM(sortedData);
-		console.log(dmGroupChatList);
 	}, [dmGroupChatList]);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);

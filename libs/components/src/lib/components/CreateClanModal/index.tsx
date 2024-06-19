@@ -2,10 +2,10 @@ import { useAppNavigation, useClans } from '@mezon/core';
 import { selectAllAccount, selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
+import { ValidateSpecialCharacters } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
-import { Regex } from '../ClanHeader/ModalCreateCategory';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -22,13 +22,12 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { createClans } = useClans();
 	const userProfile = useSelector(selectAllAccount);
 
-	
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNameClan(value);
-		const regex = Regex();
+		const regex = ValidateSpecialCharacters();
 		if (regex.test(value) && value !== '') {
 			setCheckValidate(false);
 		} else {
@@ -90,7 +89,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 							<div className="absolute right-0 top-[-3px] left-[54px]">
 								<Icons.AddIcon />
 							</div>
-							<Icons.UploadImage className='text-black dark:text-white'/>
+							<Icons.UploadImage className="text-black dark:text-white" />
 							<span className="text-[14px]">Upload</span>
 						</div>
 					)}
