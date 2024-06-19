@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRef } from "react";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { AngleRightIcon } from "@mezon/mobile-components";
-import MezonFakeBox from "../MezonFakeBox";
+import MezonFakeInputBox from "../MezonFakeBox";
 import { View } from "react-native";
 import MezonBottomSheet from "../MezonBottomSheet";
 import styles from "./styles";
@@ -38,7 +38,7 @@ export default function MezonSelect({ data, onChange, icon, title }: IMezonSelec
 
     return (
         <View>
-            <MezonFakeBox
+            <MezonFakeInputBox
                 title={title}
                 value={currentContent}
                 postfixIcon={<AngleRightIcon height={20} width={20} />}

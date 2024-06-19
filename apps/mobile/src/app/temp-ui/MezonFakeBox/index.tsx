@@ -10,7 +10,7 @@ interface IMezonFakeBoxProps {
     onPress?: () => void;
 }
 
-export default function MezonFakeBox({ title, prefixIcon, postfixIcon, value, onPress }: IMezonFakeBoxProps) {
+export default function MezonFakeInputBox({ title, prefixIcon, postfixIcon, value, onPress }: IMezonFakeBoxProps) {
     return (
         <View>
             {title && <Text style={styles.sectionTitle}>{title}</Text>}
