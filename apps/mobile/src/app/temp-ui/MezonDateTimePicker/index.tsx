@@ -10,6 +10,7 @@ import { CloseIcon, getNearTime } from "@mezon/mobile-components";
 import MezonFakeInputBox from "../MezonFakeBox";
 import { useEffect } from "react";
 import { memo } from "react";
+import { useCallback } from "react";
 
 interface IMezonDateTimePicker {
     mode?: "datetime" | "date" | "time",
@@ -29,7 +30,7 @@ export default memo(function MezonDateTimePicker({ mode = "date", title, onChang
         setCurrentDate(value || getNearTime(120));
     }, [value])
 
-    function handleChange() {
+    const handleChange = useCallback(() => {
         if (keepTime && mode !== "time" && value) {
             const new_date = new Date(
                 date.getFullYear(),
@@ -47,7 +48,7 @@ export default memo(function MezonDateTimePicker({ mode = "date", title, onChang
             onChange && onChange(date);
         }
         bottomSheetRef?.current?.dismiss();
-    }
+    }, [keepTime, mode, value, date]);
 
     function handleClose() {
         bottomSheetRef?.current?.dismiss();
