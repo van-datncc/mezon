@@ -118,30 +118,27 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			</View>
 		);
 	};
-
-	const onOpenImage = (image: ApiMessageAttachment) => {
+	const onOpenImage = useCallback((image: ApiMessageAttachment) => {
 		setImageSelected(image);
 		setIdxSelectedImageModal(0);
 		footerImagesModalRef?.current?.scrollToIndex({ animated: true, index: 0 });
 		setVisibleImageModal(true);
-	};
+	}, []);
 
-	const renderItem = useCallback(
-		({ item, index }) => {
-			return (
-				<MessageItem
-					message={item}
-					mode={mode}
-					channelId={channelId}
-					dataReactionCombine={dataReactionCombine}
-					channelLabel={channelLabel}
-					preMessage={messages.length > 0 ? messages[index + 1] : undefined}
-					onOpenImage={onOpenImage}
-				/>
-			);
-		},
-		[dataReactionCombine, messages],
-	);
+	const renderItem = ({ item, index }) => {
+		const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
+		return (
+			<MessageItem
+				message={item}
+				mode={mode}
+				channelId={channelId}
+				dataReactionCombine={dataReactionCombine}
+				channelLabel={channelLabel}
+				preMessage={preMessage}
+				onOpenImage={onOpenImage}
+			/>
+		);
+	};
 
 	const RenderFooterModal = () => {
 		return (
@@ -196,12 +193,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
-				keyExtractor={(item, index) => `${item?.id}-${index}`}
-				maxToRenderPerBatch={10}
-				initialNumToRender={20}
-				windowSize={30}
-				removeClippedSubviews={true}
-				updateCellsBatchingPeriod={50}
+				keyExtractor={(item) => `${item?.id}`}
+				maxToRenderPerBatch={5}
+				initialNumToRender={5}
+				windowSize={10}
 				onEndReached={onLoadMore}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}

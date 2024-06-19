@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan } from '@mezon/store';
+import { useApp, useAppNavigation, useAppParams, useDirect, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
@@ -10,7 +10,8 @@ import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
-
+import DirectUnreads from './directUnreads';
+import { useMezon } from '@mezon/transport';
 function MyApp() {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
@@ -23,11 +24,25 @@ function MyApp() {
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
 	};
-
+	
+	const { listDirectMessageUnread: dmGroupChatUnreadList } = useDirect();
+	const listDM = useSelector(selectAllDirectMessages);
+	const mezon = useMezon();
+	const directId = useSelector(selectDmGroupCurrentId)
+	const direct = useSelector(selectDirectById(directId || ""))
+	useEffect(() => {
+		const joinAllDirectMessages = async () => {
+			for (const dm of listDM) {
+				const { channel_id, channel_label, type } = dm;
+				await mezon.joinChatDirectMessage(channel_id || "", channel_label, type);
+			}
+		};
+		joinAllDirectMessages();
+	}, [listDM.length]);
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-
+	const dispatchDirect = useAppDispatch();
 	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
 	useEffect(() => {
 		const handleSizeWidth = () => {
@@ -103,6 +118,24 @@ function MyApp() {
 	const handleClick = useCallback(() => {
 		setOpenOptionMessageState(false);
 	}, []);
+
+	const joinToChatAndNavigate = useCallback(
+		(
+			DMid?: string,
+			type?: number,
+		) => {
+			dispatchDirect(directActions.joinDirectMessage({
+							directMessageId: DMid || "",
+							channelName: '',
+							type: type,
+						}),
+					);
+			if (closeMenu) {
+						setStatusMenu(false);
+					}
+		},
+		[dispatchDirect],
+	);
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
@@ -122,13 +155,16 @@ function MyApp() {
 								className="clan w-full aspect-square"
 							/>
 							{quantityPendingRequest !== 0 && (
-								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
+								<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
 									{quantityPendingRequest}
 								</div>
 							)}
 						</div>
 					</NavLinkComponent>
 				</NavLink>
+				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
+					<DirectUnreads key={dmGroupChatUnread.id} directMessage ={dmGroupChatUnread}/>
+				))}
 				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (
 					<NavLink
@@ -148,7 +184,7 @@ function MyApp() {
 								// eslint-disable-next-line react/jsx-no-useless-fragment
 								<>
 									{currentClan?.clan_name && (
-										<div className="w-[48px] h-[48px] bg-bgTertiary rounded-full flex justify-center items-center text-contentSecondary text-[20px] clan">
+										<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
 											{currentClan.clan_name.charAt(0).toUpperCase()}
 										</div>
 									)}

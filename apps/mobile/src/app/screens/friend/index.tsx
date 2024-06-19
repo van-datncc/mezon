@@ -12,6 +12,8 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { FriendListByAlphabet } from '../../components/FriendListByAlphabet';
 import { FriendsEntity } from '@mezon/store-mobile';
 import { EFriendItemAction } from '../../components/FriendItem';
+import { User } from 'mezon-js';
+import { UserInformationBottomSheet } from '../../components/UserInformationBottomSheet';
 
 export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => {
     const [searchText, setSearchText] = useState<string>('');
@@ -21,6 +23,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
     const friendList: FriendsEntity[] = useMemo(() => {
         return allUser.filter((user) => user.state === 0)
     }, [allUser]);
+    const [ selectedUser, setSelectedUser ] = useState<User | null>(null);
 
     const navigateToRequestFriendScreen = () => {
         navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND })
@@ -56,6 +59,9 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
                 break;
             case EFriendItemAction.MessageDetail:
                 directMessageWithUser(friend?.user?.id)
+                break;
+            case EFriendItemAction.ShowInformation:
+                setSelectedUser(friend.user);
                 break;
             default:
                 break;
@@ -102,6 +108,8 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
                 handleFriendAction={handleFriendAction}
                 showAction={true}
             />
+
+            <UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)}  />
         </View>
     )
 })

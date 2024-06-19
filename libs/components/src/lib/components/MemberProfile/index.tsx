@@ -1,6 +1,6 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, removeMemberChannel, selectCurrentClanId } from '@mezon/store';
+import { ChannelMembersEntity, selectCurrentClanId } from '@mezon/store';
 import { useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
 import { OfflineStatus, OnlineStatus } from '../Icons';
@@ -21,6 +21,7 @@ export type MemberProfileProps = {
 	listProfile?: boolean;
 	isOffline?: boolean;
 	isHideAnimation?: boolean;
+	isUnReadDirect?: boolean;
 };
 
 function MemberProfile({
@@ -37,6 +38,7 @@ function MemberProfile({
 	listProfile,
 	isOffline,
 	isHideAnimation,
+	isUnReadDirect,
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
@@ -49,7 +51,7 @@ function MemberProfile({
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
 
-	const { removeMemberClan, removeMemberChannel } = useChannelMembers();
+	const { removeMemberClan } = useChannelMembers();
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -96,8 +98,7 @@ function MemberProfile({
 	const handleRemoveMember = async (value: string) => {
 		if (user) {
 			const userIds = [user.user?.id ?? ''];
-			await removeMemberClan({ clanId: currentClanId as string, userIds });
-			await removeMemberChannel({ channelId: user.channelId as string, userIds });
+			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
 
 			setOpenModalRemoveMember(false);
 		}
@@ -150,7 +151,9 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<p
-							className={`text-base font-medium text-colorTextLightMode dark:text-white ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile`}
+							className={`text-base font-medium
+							${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile 
+							${(isUnReadDirect) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
