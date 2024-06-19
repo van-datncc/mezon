@@ -139,7 +139,7 @@ const ChannelList = React.memo((props: any) => {
 
 			<MezonBottomSheet
 				title={`${allEventManagement.length} Events`}
-				headerRight={currentClan.creator_id === user.userId && <Text style={{ color: "white" }}>Create</Text>}
+				headerRight={currentClan?.creator_id === user.userId && <Text style={{ color: "white" }}>Create</Text>}
 				ref={bottomSheetEventRef}>
 				<EventViewer />
 			</MezonBottomSheet>
