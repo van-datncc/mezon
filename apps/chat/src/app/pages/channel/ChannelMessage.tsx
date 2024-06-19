@@ -6,7 +6,6 @@ import {
 	useChatReaction,
 	useChatSending,
 	useDeleteMessage,
-	useDirect,
 	useEmojiSuggestion,
 	useEscapeKey,
 	useReference,
@@ -16,6 +15,7 @@ import {
 	messagesActions,
 	pinMessageActions,
 	referencesActions,
+	selectAllDirectMessages,
 	selectCurrentChannel,
 	selectMemberByUserId,
 	selectPinMessageByChannelId,
@@ -330,20 +330,16 @@ function PopupMessage({
 	reactionBottomState,
 	openEditMessageState,
 	openOptionMessageState,
-	mode,
-	isCombine,
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { idMessageRefOpt } = useReference();
 	const { reactionPlaceActive } = useChatReaction();
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
-	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0, bottom: 0 });
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
 		if (channelMessageDiv) {
-			const rect = channelMessageDiv.getBoundingClientRect();
-			setPickerPosition({ top: rect.top, left: rect.left, bottom: rect.bottom });
+			channelMessageDiv.getBoundingClientRect();
 		}
 		return 0;
 	};
@@ -410,8 +406,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const handleClickDelete = () => {
 		deleteSendMessage(message.id);
 	};
-	const { listDM: dmGroupChatList } = useDirect();
-
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const handleClickForward = () => {
 		if (dmGroupChatList.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));

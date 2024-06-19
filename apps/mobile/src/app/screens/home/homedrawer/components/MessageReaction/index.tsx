@@ -5,15 +5,14 @@ import { selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import { useSelector } from 'react-redux';
-import { FastImageRes } from '../../Reusables';
 import { IDetailReactionBottomSheet, IMessageReactionProps } from '../../types';
 import { styles } from './styles';
-// import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
+import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
@@ -281,8 +280,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 					)}
 				</View>
 			</BottomSheet>
-			{/* TODO: update later */}
-			{/* <UserInformationBottomSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} /> */}
+			<UserInformationBottomSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
 		</View>
 	);
 });
@@ -290,7 +288,6 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 const MemberReact = React.memo((props: { userId: string, onSelectUserId: (userId: string) => void }) => {
 	const {userId, onSelectUserId} = props;
 	const user = useSelector(selectMemberByUserId(userId || ''));
-
 	const showUserInformation = () => {
 		onSelectUserId(user.user?.id);
 	};
@@ -299,7 +296,13 @@ const MemberReact = React.memo((props: { userId: string, onSelectUserId: (userId
 		<Pressable style={styles.memberWrapper} onPress={() => showUserInformation()}>
 			<View style={styles.imageWrapper}>
 				{user?.user?.avatar_url ? (
-					<FastImageRes uri={user?.user?.avatar_url} />
+					<View>
+						<Image
+							source={{ uri: user?.user?.avatar_url }}
+							resizeMode='contain'
+							style={styles.image}
+						/>
+					</View>
 				) : (
 					<View style={styles.avatarBoxDefault}>
 						<Text style={styles.textAvatarBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>

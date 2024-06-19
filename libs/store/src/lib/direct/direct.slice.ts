@@ -98,7 +98,7 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);	
 	
 	if (!response.channeldesc) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
 		if (
