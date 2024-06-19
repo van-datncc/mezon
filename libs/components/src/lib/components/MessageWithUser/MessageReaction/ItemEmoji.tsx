@@ -57,6 +57,10 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 	const resetState = () => {
 		dispatch(reactionActions.setEmojiHover(null));
 		dispatch(reactionActions.setUserReactionPanelState(false));
+		setTopUserPanel(undefined);
+		setRightUserPanel(undefined);
+		setLeftUserPanel(undefined);
+		setBottomUserPanel(undefined);
 	};
 
 	useEffect(() => {
@@ -113,12 +117,6 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 				setIsRightLimit(true);
 				return;
 			}
-		} else if (emojiHover === null) {
-			setTopUserPanel(undefined);
-			setRightUserPanel(undefined);
-			setLeftUserPanel(undefined);
-			setBottomUserPanel(undefined);
-			return;
 		}
 	}, [emojiHover, userPanelRef]);
 

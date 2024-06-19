@@ -1,7 +1,7 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
 import { EmojiDataOptionals, IMessageWithUser } from '@mezon/utils';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import ItemEmoji from './ItemEmoji';
 
 type MessageReactionProps = {
@@ -12,20 +12,13 @@ type MessageReactionProps = {
 
 // TODO: refactor component for message lines
 const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode }) => {
-	const {
-		reactionBottomState,
-		reactionBottomStateResponsive,
-		convertReactionToMatchInterface,
-	} = useChatReaction();
-
+	const { reactionBottomState, reactionBottomStateResponsive, convertReactionToMatchInterface } = useChatReaction();
 	const getReactionsByChannelId = (data: EmojiDataOptionals[], mesId: string) => {
-		return data.filter((item: any) => item.message_id === mesId && item.channel_id === currentChannelId);
+		return data.filter((item: any) => item.message_id === mesId);
 	};
-
 	const dataReaction = getReactionsByChannelId(convertReactionToMatchInterface, message.id);
-
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
-
+	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
 		if (message.id === idMessageRefReaction) {
 			return true;
@@ -33,8 +26,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			return false;
 		}
 	};
-
-	// For user reaction panel
+	const contentDiv = useRef<HTMLDivElement | null>(null);
 	const [emojiShowUserReaction, setEmojiShowUserReaction] = useState<EmojiDataOptionals>();
 	const checkEmojiToMatchWithEmojiHover = (emoji: EmojiDataOptionals) => {
 		if (emoji.emoji === emojiShowUserReaction?.emoji) {
@@ -43,30 +35,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 			return false;
 		}
 	};
-	// Check position sender panel && emoji panel
-
-	const contentDiv = useRef<HTMLDivElement | null>(null);
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals | null>();
-	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
-	const emojiIndexMap: { [key: string]: number } = {};
-
-	dataReaction &&
-		dataReaction.forEach((emoji: EmojiDataOptionals, index: number) => {
-			if (emoji.emoji !== undefined) {
-				emojiIndexMap[emoji.emoji] = index;
-			}
-		});
-
-	// work in mobile
-	useEffect(() => {
-		if (showSenderPanelIn1s) {
-			const timer = setTimeout(() => {
-				setShowSenderPanelIn1s(false);
-			}, 3000);
-			return () => clearTimeout(timer);
-		}
-	}, [showSenderPanelIn1s]);
-
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
 
@@ -98,7 +67,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 					{dataReaction?.map((emoji: EmojiDataOptionals, index: number) => {
 						return (
 							<Fragment key={`${index + message.id}`}>
-								<ItemEmoji mode={mode} emoji={emoji}/>
+								<ItemEmoji mode={mode} emoji={emoji} />
 							</Fragment>
 						);
 					})}

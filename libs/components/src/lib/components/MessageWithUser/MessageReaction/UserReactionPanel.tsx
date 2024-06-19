@@ -21,12 +21,14 @@ const UserReactionPanel = ({ emojiShowPanel, mode }: UserReactionPanelProps) => 
 
 	const hideSenderOnPanel = (emojiData: EmojiDataOptionals, senderId: string) => {
 		console.log(emojiData);
+		console.log(senderId)
 		if (emojiData.senders) {
 			emojiData.senders = emojiData.senders.filter((sender) => sender.sender_id !== senderId);
 		}
 		return emojiData;
 	};
 	const count = calculateTotalCount(emojiShowPanel.senders);
+
 	const onLeavePanel = () => {
 		dispatch(reactionActions.setEmojiHover(null));
 		dispatch(reactionActions.setUserReactionPanelState(false));
