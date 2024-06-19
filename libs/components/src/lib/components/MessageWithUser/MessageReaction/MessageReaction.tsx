@@ -32,7 +32,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(true);
 	const { emojiListPNG } = useEmojiSuggestion();
 
-
 	async function reactOnExistEmoji(
 		id: string,
 		mode: number,

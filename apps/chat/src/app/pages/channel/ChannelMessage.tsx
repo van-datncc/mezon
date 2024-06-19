@@ -1,15 +1,5 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import {
-	useApp,
-	useChannels,
-	useChatMessage,
-	useChatReaction,
-	useChatSending,
-	useDeleteMessage,
-	useEmojiSuggestion,
-	useEscapeKey,
-	useReference,
-} from '@mezon/core';
+import { useApp, useChannels, useChatReaction, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
@@ -17,14 +7,23 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectIdMessageRefEdit,
+	selectLastSeenMessage,
 	selectMemberByUserId,
+	selectMessageEntityById,
+	selectOpenEditMessageState,
+	selectOpenOptionMessageState,
 	selectPinMessageByChannelId,
+	selectPreviousMessageByMessageId,
+	selectReactionBottomState,
+	selectReactionRightState,
 	useAppDispatch,
 } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Mention, MentionsInput } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -34,11 +33,9 @@ import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 
 type MessageProps = {
-	message: IMessageWithUser;
-	preMessage?: IMessageWithUser;
-	lastSeen?: boolean;
-	mode: number;
 	channelId: string;
+	messageId: string;
+	mode: number;
 	channelLabel: string;
 };
 
@@ -56,35 +53,42 @@ type EmojiData = {
 
 const neverMatchingRegex = /($a)/;
 
-export function ChannelMessage(props: Readonly<MessageProps>) {
-	const { message, lastSeen, preMessage, mode, channelId, channelLabel } = props;
+const convertToPlainTextHashtag = (text: string) => {
+	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
+	const result = text.replace(regex, (match, symbol, p1, p2) => {
+		return symbol === '#' ? `#${p2}` : `@${p1}`;
+	});
+	return result;
+};
+
+export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Readonly<MessageProps>) {
+	const message = useSelector((state) => selectMessageEntityById(state, messageId));
+	const messPre = useSelector(selectPreviousMessageByMessageId(channelId, messageId));
+	const reactionRightState = useSelector(selectReactionRightState);
+	const reactionBottomState = useSelector(selectReactionBottomState);
+	const openEditMessageState = useSelector(selectOpenEditMessageState);
+	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const [deleteMessage, setDeleteMessage] = useState(false);
-	const { markMessageAsSeen } = useChatMessage(message.id);
+	const { markMessageAsSeen } = useSeenMessagePool();
 	const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
-	const { reactionRightState, reactionBottomState } = useChatReaction();
-	const { openEditMessageState, openOptionMessageState, idMessageRefEdit } = useReference();
+
+	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
 
 	const mess = useMemo(() => {
-		if (typeof message.content === 'object' && typeof (message.content as any).id === 'string') {
+		if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
 			return message.content;
 		}
 		return message;
 	}, [message]);
 
-	const convertToPlainTextHashtag = (text: string) => {
-		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
-		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `<#${p2}>` : `@${p1}`;
-		});
-		return result;
-	};
 	const [newMessage, setNewMessage] = useState('');
 	const [editMessage, setEditMessage] = useState(mess.content.t);
 	const [content, setContent] = useState(editMessage);
@@ -100,6 +104,20 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		return replacedText;
 	};
 
+	const { listChannels } = useChannels();
+
+	const listChannelsMention = useMemo(
+		() =>
+			listChannels.map((item) => {
+				return {
+					id: item?.channel_id ?? '',
+					display: item?.channel_label ?? '',
+					subText: item?.category_name ?? '',
+				};
+			}) as ChannelsMentionProps[],
+		[listChannels],
+	);
+
 	useEffect(() => {
 		if (editMessage) {
 			const convertedHashtag = convertToPlainTextHashtag(editMessage);
@@ -107,14 +125,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 			setEditMessage(replacedText);
 			setContent(convertedHashtag);
 		}
-	}, [editMessage]);
-
-	const messPre = useMemo(() => {
-		if (preMessage && typeof preMessage.content === 'object' && typeof (preMessage.content as any).id === 'string') {
-			return preMessage.content;
-		}
-		return preMessage;
-	}, [preMessage]);
+	}, [editMessage, listChannelsMention]);
 
 	const handleCancelEdit = () => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
@@ -163,7 +174,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 		[EditSendMessage],
 	);
 
-	const textareaRef = useRef<any>(null);
+	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	useEffect(() => {
 		if (openEditMessageState && mess.id === idMessageRefEdit) {
 			textareaRef.current?.focus();
@@ -187,14 +198,6 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 	};
 
 	const mentionList = UserMentionList(channelId);
-	const { listChannels } = useChannels();
-	const listChannelsMention = listChannels.map((item) => {
-		return {
-			id: item?.channel_id ?? '',
-			display: item?.channel_label ?? '',
-			subText: item?.category_name ?? '',
-		};
-	}) as ChannelsMentionProps[];
 
 	useEscapeKey(handleCancelEdit);
 
@@ -355,13 +358,11 @@ function PopupMessage({
 		if (reactionRightState && idMessageRefOpt === mess.id) {
 			getDivHeightToTop();
 		}
-	}, [reactionRightState]);
+	}, [idMessageRefOpt, mess.id, reactionRightState]);
 
-	return (
-		<>
-			{reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM && (
-				<div
-					className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
+	return reactionPlaceActive !== EmojiPlaces.EMOJI_REACTION_BOTTOM ? (
+		<div
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-5 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
 				${
 					(reactionRightState && mess.id === idMessageRefOpt) ||
 					(reactionBottomState && mess.id === idMessageRefOpt) ||
@@ -370,17 +371,17 @@ function PopupMessage({
 						? ''
 						: 'hidden group-hover:block'
 				} `}
-				>
-					<div className="relative">
-						<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
-					</div>
+		>
+			<div className="relative">
+				<ChannelMessageOpt message={mess} ref={channelMessageOptRef} />
+			</div>
 
-					{openOptionMessageState && mess.id === idMessageRefOpt && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
-				</div>
-			)}
-		</>
-	);
+			{openOptionMessageState && mess.id === idMessageRefOpt && <PopupOption message={mess} deleteSendMessage={deleteSendMessage} />}
+		</div>
+	) : null;
 }
+
+export const MemorizedChannelMessage = memo(ChannelMessage);
 
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
