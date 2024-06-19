@@ -30,8 +30,8 @@ export default function DetailInfo({ value, onChange }: IDetailInfoProps) {
     return (
         <View style={styles.container}>
             <View style={styles.nameWrapper}>
-                <Text style={styles.name}>{displayName}</Text>
-                <Text style={styles.username}>{username}</Text>
+                <Text style={styles.name}>{username}</Text>
+                <Text style={styles.username}>{displayName}</Text>
             </View>
 
             <MezonInput

@@ -12,9 +12,12 @@ import { FriendListByAlphabet } from '../../../components/FriendListByAlphabet';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
 import { styles } from './styles';
+import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
+import { User } from 'mezon-js';
 
 export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
+	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const { t } = useTranslation(['']);
 	const { friends: allUser } = useFriends();
 	const { createDirectMessageWithUser, listDM } = useDirect();
@@ -84,6 +87,9 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				case EFriendItemAction.MessageDetail:
 					directMessageWithUser(friend?.user?.id);
 					break;
+				case EFriendItemAction.ShowInformation:
+					setSelectedUser(friend.user)
+					break;
 				default:
 					break;
 			}
@@ -130,6 +136,8 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				handleFriendAction={handleFriendAction}
 				showAction={false}
 			/>
+
+			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
 		</View>
 	);
 };
