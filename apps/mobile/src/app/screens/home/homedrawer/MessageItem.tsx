@@ -1,6 +1,13 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon, ReplyMessageDeleted, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
-import { Colors, Metrics, size, verticalScale } from '@mezon/mobile-ui';
+import {
+	FileIcon,
+	ReplyIcon,
+	ReplyMessageDeleted,
+	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	getUpdateOrAddClanChannelCache,
+	save,
+} from '@mezon/mobile-components';
+import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelsActions,
@@ -23,24 +30,23 @@ import {
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import VideoPlayer from 'react-native-video-player';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, isImage, splitBlockCodeRegex } from '../../../utils/helpers';
+import { channelIdRegex, codeBlockRegex, isImage, isVideo, splitBlockCodeRegex } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useTranslation } from 'react-i18next';
 import { ChannelType } from 'mezon-js';
+import { useTranslation } from 'react-i18next';
+import { openUrl } from 'react-native-markdown-display';
 import Toast from 'react-native-toast-message';
-import Markdown from 'react-native-markdown-display';
-import { EDITED_FLAG, formatBlockCode, formatEmoji, formatUrls, markdownStyles, renderRulesCustom } from './constants';
-import { openUrl } from "react-native-markdown-display";
+import { RenderVideoChat } from './components/RenderVideoChat';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
@@ -56,15 +62,15 @@ export type MessageItemProps = {
 	channelId?: string;
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
-  isNumberOfLine?: boolean
+	isNumberOfLine?: boolean;
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
-	return prevProps.message === nextProps.message && prevProps.dataReactionCombine === nextProps.dataReactionCombine;
+	return prevProps.message === nextProps.message;
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, dataReactionCombine, preMessage, onOpenImage, isNumberOfLine } = props;
+	const { message, mode, preMessage, onOpenImage, isNumberOfLine } = props;
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
@@ -95,6 +101,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	}, [message, preMessage]);
 	const isShowInfoUser = useMemo(() => !isCombine || (message.references.length && !!user), [isCombine, message.references, user]);
+	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -121,7 +128,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = () => {
+	const renderVideos = (videoItem?: any) => {
 		return (
 			<View
 				style={{
@@ -130,29 +137,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					marginTop: size.s_10,
 				}}
 			>
-				{videos.map((video, index) => {
-					return (
-						<VideoPlayer
-							key={`${video?.url}_${index}`}
-							isControlsVisible={false}
-							disableFullscreen={false}
-							video={{ uri: video?.url }}
-							videoWidth={widthMedia + size.s_50}
-							videoHeight={160}
-							hideControlsOnStart={true}
-							resizeMode="cover"
-							style={{
-								width: widthMedia + size.s_50,
-								height: 160,
-								borderRadius: size.s_4,
-								overflow: 'hidden',
-								backgroundColor: Colors.borderDim,
-							}}
-							endWithThumbnail={true}
-							thumbnail={{ uri: 'https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg' }}
-						/>
-					);
-				})}
+				{videoItem ? (
+					<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
+				) : (
+					videos.map((video, index) => {
+						return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
+					})
+				)}
 			</View>
 		);
 	};
@@ -199,9 +190,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			const checkIsImage = isImage(document?.url);
+			const checkIsImage = isImage(document?.url?.toLowerCase());
 			if (checkIsImage) {
-				return imageItem({ image: document, index, checkImage: checkIsImage });
+				return imageItem({ image: document, index, checkImage: false });
+			}
+			const checkIsVideo = isVideo(document?.url?.toLowerCase());
+
+			if (checkIsVideo) {
+				return renderVideos(document);
 			}
 
 			return (
@@ -219,17 +215,20 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		});
 	};
 
-	const onMention = async (mentionedUser: string) => {
-		try {
-			const tagName = mentionedUser.slice(1);
-			const clanUser = usersClan?.find((userClan) => userClan?.user?.username === tagName);
-			clanUser && setFoundUser(clanUser.user);
-			if (!mentionedUser) return;
-			setMessageSelected(EMessageBSToShow.UserInformation);
-		} catch (error) {
-			console.log('error', error);
-		}
-	};
+	const onMention = useCallback(
+		async (mentionedUser: string) => {
+			try {
+				const tagName = mentionedUser.slice(1);
+				const clanUser = usersClan?.find((userClan) => userClan?.user?.username === tagName);
+				clanUser && setFoundUser(clanUser.user);
+				if (!mentionedUser) return;
+				setMessageSelected(EMessageBSToShow.UserInformation);
+			} catch (error) {
+				console.log('error', error);
+			}
+		},
+		[usersClan, setFoundUser],
+	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
@@ -244,7 +243,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
-	const onChannelMention = async (channel: ChannelsEntity) => {
+	const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
 		try {
 			const type = channel?.type;
 			const channelId = channel?.channel_id;
@@ -256,50 +255,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					text1: 'Updating...',
 				});
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
-				save(STORAGE_KEY_CHANNEL_ID, channelId);
-				save(STORAGE_KEY_CLAN_ID, clanId);
-
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		} catch (error) {
 			console.log(error);
 		}
-	};
-
-	const getChannelById = (channelHashtagId: string) => {
-		const channel = channelsEntities?.[channelHashtagId];
-		if (channel) {
-			return channel;
-		} else {
-			return {
-				channel_label: channelHashtagId,
-			};
-		}
-	};
-
-	const formatMention = (text: string, matchesMention: RegExpMatchArray) => {
-		const parts = text.split(splitBlockCodeRegex);
-
-		return parts
-			?.map((part) => {
-				if (codeBlockRegex.test(part)) {
-					return part;
-				} else {
-					if (matchesMention.includes(part)) {
-						if (part.startsWith('@')) {
-							return `[${part}](${part})`;
-						}
-						if (part.startsWith('<#')) {
-							const channelId = part.match(channelIdRegex)[1];
-							const channel = getChannelById(channelId) as ChannelsEntity;
-							return `[#${channel.channel_label}](#${channelId})`;
-						}
-					}
-				}
-				return part;
-			})
-			.join('');
-	};
+	}, []);
 
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
@@ -342,21 +305,22 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							</View>
 						)}
 						<Text style={styles.repliedContentText} numberOfLines={1}>
-            {messageRefFetchFromServe.content.t}
+							{messageRefFetchFromServe.content.t}
 						</Text>
 					</Pressable>
 				</View>
 			) : null}
-      {!messageRefFetchFromServe && message?.references?.length && message.references ?
-      <View style={styles.aboveMessageDeleteReply}>
+			{!messageRefFetchFromServe && message?.references?.length && message.references ? (
+				<View style={styles.aboveMessageDeleteReply}>
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-          <View style={styles.iconMessageDeleteReply}>
-          <ReplyMessageDeleted width={18} height={9} />
-          </View>
-					<Text style={styles.messageDeleteReplyText}>{t("messageDeleteReply")}</Text>
-				</View> : null}
+					<View style={styles.iconMessageDeleteReply}>
+						<ReplyMessageDeleted width={18} height={9} />
+					</View>
+					<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
+				</View>
+			) : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 				{isShowInfoUser ? (
 					<Pressable
@@ -407,7 +371,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine)}
 					<MessageAction
 						message={message}
-						dataReactionCombine={dataReactionCombine}
 						mode={mode}
 						emojiListPNG={emojiListPNG}
 						openEmojiPicker={() => {

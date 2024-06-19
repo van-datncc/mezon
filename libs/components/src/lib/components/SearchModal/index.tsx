@@ -4,7 +4,8 @@ import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
-
+import { useSelector } from 'react-redux';
+import { selectAllDirectMessages } from '@mezon/store';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -16,7 +17,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const accountId = userProfile?.user?.id ?? '';
 	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
 	const { createDirectMessageWithUser } = useDirect();
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
@@ -27,7 +28,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const boxRef = useRef<HTMLDivElement | null>(null);
 	const itemRef = useRef<HTMLDivElement | null>(null);
 
-	const {appearanceTheme} = useApp();
+	const { appearanceTheme } = useApp();
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
@@ -236,12 +237,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
 				</div>
-				<div ref={boxRef} className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
+				<div
+					ref={boxRef}
+					className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+				>
 					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
 						<>
 							{listMemSearch.length
 								? listMemSearch
-										.filter((item: any) => item.name.indexOf(searchText) > -1)
+										.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
 										.slice(0, 7)
 										.map((item: any, index: number) => {
 											return (
@@ -260,7 +264,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								: null}
 							{listChannelSearch.length
 								? listChannelSearch
-										.filter((item) => item.name.indexOf(searchText) > -1)
+										.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
 										.slice(0, 8)
 										.map((item: any) => {
 											return (
@@ -286,7 +290,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									{listMemSearch.length ? (
 										listMemSearch
-											.filter((item: any) => item.name.indexOf(searchText.substring(1)) > -1)
+											.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
 											.slice(0, 25)
 											.map((item: any) => {
 												return (
@@ -312,7 +316,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 									{listChannelSearch.length ? (
 										listChannelSearch
-											.filter((item) => item.name.indexOf(searchText.substring(1)) > -1)
+											.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
 											.slice(0, 25)
 											.map((item: any) => {
 												return (

@@ -1,11 +1,10 @@
-import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus, updateEmojiReactionData } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, lruMemoize } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { shallowEqual } from 'react-redux';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
-import { selectDataReactionCombine } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
@@ -99,7 +98,7 @@ export const fetchMessagesCached = memoize(
 			if (args[3] === undefined) {
 				args[3] = 1;
 			}
-			return args[1] + args[2] + args[3] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		},
 	},
 );
@@ -122,7 +121,7 @@ export const fetchMessages = createAsyncThunk(
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -160,8 +159,6 @@ export const fetchMessages = createAsyncThunk(
 			});
 			return Object.values(emojiDataItems);
 		});
-
-		// thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
 		if (reactionData.length > 0) {
 			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
@@ -386,6 +383,7 @@ export const messagesSlice = createSlice({
 			});
 		},
 		remove: messagesAdapter.removeOne,
+		removeAll: messagesAdapter.removeAll,
 		setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
@@ -624,17 +622,6 @@ export const selectMessageIdsByChannelIdV2 = createSelector(
 
 export const selectMessageEntityById = createSelector([getMessagesState, (_, messageId) => messageId], (messagesState, messageId) =>
 	selectById(messagesState, messageId),
-);
-
-export const selectReactionsByMessageId = createSelector(
-	[selectDataReactionCombine, selectDataReactionGetFromMessage, (_, messageId) => messageId],
-	(dataReactionCombine, dataReactionGetFromMessage, messageId) => {
-		return messageId
-			? updateEmojiReactionData([...dataReactionCombine, ...dataReactionGetFromMessage]).filter(
-					(item: EmojiDataOptionals) => item.message_id === messageId,
-				)
-			: [];
-	},
 );
 
 export const selectPreviousMessageByMessageId = (channelId: string, messageId: string) =>

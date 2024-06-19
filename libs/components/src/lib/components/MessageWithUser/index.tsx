@@ -12,7 +12,6 @@ import { useMessageParser } from './useMessageParser';
 import { useAuth, useChatMessages, useNotification, useReference } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
-import MessageReaction from './MessageReaction/MessageReaction';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -29,20 +28,9 @@ export type MessageWithUserProps = {
 	newMessage?: string;
 	child?: JSX.Element;
 	isMention?: boolean;
-	messageId?: string;
 };
 
-function MessageWithUser({
-	message,
-	preMessage,
-	user,
-	isMessNotifyMention,
-	mode,
-	newMessage,
-	child,
-	isMention,
-	messageId,
-}: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -150,7 +138,6 @@ function MessageWithUser({
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
-						<MessageReaction messageId={messageId} currentChannelId={currentChannelId || ''} message={message} mode={mode} />
 						{message && !isMessNotifyMention && (
 							<div
 								className={`absolute top-[100] right-2 flex-row items-center gap-x-1 text-xs text-gray-600 ${isCombine ? 'hidden' : 'flex'}`}

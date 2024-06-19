@@ -28,7 +28,7 @@ export const fetchListNotification = createAsyncThunk('notification/fetchListNot
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listNotifications(mezon.session, 50);
 	if (!response.notifications) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	const notifications = response.notifications.map(mapNotificationToEntity);
 	return notifications;
@@ -117,8 +117,6 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 	);
 
 export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) =>{
-	console.log(notifications.filter((notification) => notification.code !== -2 && notification.code !== -3));
-	
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
 }
 );

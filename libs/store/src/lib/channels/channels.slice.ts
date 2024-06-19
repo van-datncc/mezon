@@ -73,8 +73,8 @@ export const joinChannel = createAsyncThunk(
 		try {
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
-			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting(channelId));
-			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage(channelId));
+			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({channelId}));
+			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({channelId}));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
 			if (!noFetchMembers) {
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
@@ -165,7 +165,7 @@ export const fetchChannelsCached = memoize(
 		promise: true,
 		maxAge: LIST_CHANNEL_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[4] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
 		},
 	},
 );
@@ -179,7 +179,7 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 
 	const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
 	if (!response.channeldesc) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 
 	const channels = response.channeldesc.map(mapChannelToEntity);
@@ -206,6 +206,7 @@ export const channelsSlice = createSlice({
 	initialState: initialChannelsState,
 	reducers: {
 		add: channelsAdapter.addOne,
+		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
 		setMode: (state, action) => {

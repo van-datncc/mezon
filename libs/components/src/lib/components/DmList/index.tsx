@@ -1,5 +1,5 @@
-import { useApp, useDirect, useEscapeKey } from '@mezon/core';
-import { useAppDispatch } from '@mezon/store';
+import { useApp, useEscapeKey } from '@mezon/core';
+import { selectDirectsOpenlist, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useState } from 'react';
@@ -18,7 +18,7 @@ export type CategoriesState = Record<string, boolean>;
 function DirectMessageList() {
 	const dispatch = useAppDispatch();
 	const pathname = useLocation().pathname;
-	const { listDM: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
 		return data.filter((obj: IChannel) => {
@@ -31,30 +31,26 @@ function DirectMessageList() {
 
 	const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 		return notSortedArr.slice().sort((a, b) => {
-			const lastSentTimestampA = parseFloat(a.last_sent_message?.timestamp || '0');
-			const lastSeenTimestampA = parseFloat(a.last_seen_message?.timestamp || '0');
-			const lastSentTimestampB = parseFloat(b.last_sent_message?.timestamp || '0');
-			const lastSeenTimestampB = parseFloat(b.last_seen_message?.timestamp || '0');
-	
-			const maxTimestampA = Math.max(lastSentTimestampA, lastSeenTimestampA);
-			const maxTimestampB = Math.max(lastSentTimestampB, lastSeenTimestampB);
-	
-			return maxTimestampB - maxTimestampA;
+			const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
+			const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+			return timestampB - timestampA;
 		});
 	};
+	const navigate = useNavigate();
 	
 	useEffect(() => {
 		const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
 		const sortedData = sortDMItem(filteredDataDM);
 		setSortedFilteredDataDM(sortedData);
-		console.log(dmGroupChatList);
+		if (sortedData.length === 0) {
+			navigate('/chat/direct/friends');
+		}
 	}, [dmGroupChatList]);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const onClickOpenModal = () => {
 		setIsOpen(!isOpen);
 	};
-	const navigate = useNavigate();
 	const openPopupForward = useSelector(getIsShowPopupForward);
 
 	const handleCloseModalForward = () => {
@@ -100,7 +96,10 @@ function DirectMessageList() {
 			>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
 					{sortedFilteredDataDM.map((directMessage: any, index: number) => {
-						return <DMListItem key={index} directMessage={directMessage} />;
+						return <DMListItem
+						key={index}
+						directMessage={directMessage}
+					  />;
 					})}
 				</div>
 			</div>

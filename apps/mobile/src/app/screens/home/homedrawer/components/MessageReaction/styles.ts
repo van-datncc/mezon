@@ -89,6 +89,11 @@ export const styles = StyleSheet.create({
 		height: size.s_40,
 		borderRadius: size.s_40,
 		overflow: 'hidden',
+		backgroundColor: Colors.bgGrayDark
+	},
+	image: {
+		width: '100%',
+		height: '100%'
 	},
 	memberName: {
 		marginLeft: size.s_12,
@@ -111,4 +116,40 @@ export const styles = StyleSheet.create({
 		height: size.s_24,
 		padding: size.s_2,
 	},
+	removeEmojiContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		height: 30,
+	},
+	confirmDeleteEmoji: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: Colors.red,
+		paddingVertical: size.s_8,
+		paddingHorizontal: size.s_14,
+		gap: size.s_6,
+		borderRadius: 50
+	},
+	confirmText: {
+		color: Colors.white,
+		fontSize: size.label
+	},
+	emojiText: {
+		color: Colors.tertiary,
+		fontSize: size.label
+	},
+	noActionsWrapper: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	noActionTitle: {
+		color: Colors.white,
+		fontSize: size.h6
+	},
+	noActionContent: {
+		color: Colors.textGray,
+		fontSize: size.medium
+	}
 });

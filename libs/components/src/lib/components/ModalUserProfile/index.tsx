@@ -1,5 +1,5 @@
 import { useAuth, useDirect, useSendInviteMessage } from '@mezon/core';
-import { selectMemberByUserId } from '@mezon/store';
+import { selectCurrentClan, selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
@@ -7,21 +7,29 @@ import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 import AboutUserProfile from './AboutUserProfile';
 import AvatarProfile from './AvatarProfile';
+import NoteUserProfile from './NoteUserProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
+	classWrapper?: string;
+	classBanner?: string;
+	hiddenRole?: boolean;
+	showNote?: boolean;
 };
 
-const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) => {
-	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-	
-	const { sendInviteMessage } = useSendInviteMessage();
-	const { createDirectMessageWithUser } = useDirect();
-	const [content, setContent] = useState<string>('');
+const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote }: ModalUserProfileProps) => {
 	const { userProfile } = useAuth();
 	const mezon = useMezon();
+	const { createDirectMessageWithUser } = useDirect();
+	const { sendInviteMessage } = useSendInviteMessage();
+
+	const currentClan = useSelector(selectCurrentClan);
+	const userById = useSelector(selectMemberByUserId(userID ?? ''));
+	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, userID as string));
+
+	const [content, setContent] = useState<string>('');
 
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
@@ -54,27 +62,30 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 
 	useEffect(() => {
 		getColor();
-	}, []);
+	}, [userID, []]);
 
 	return (
-		<div>
-			<div className="h-[60px] rounded-tl-lg rounded-tr-lg" style={{ backgroundColor: color }}></div>
+		<div className={classWrapper}>
+			<div className={classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} style={{ backgroundColor: color }}></div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
-				userToDisplay = {isFooterProfile ? userProfile : userById}
+				userToDisplay={isFooterProfile ? userProfile : userById}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
-						<p className="font-semibold tracking-wider text-xl one-line my-0">{isFooterProfile ? userProfile?.user?.username : (userById ? userById?.user?.username : "Anonymous")}</p>
-						<p className="font-medium tracking-wide text-sm my-0">{isFooterProfile ? userProfile?.user?.display_name : (userById ? userById?.user?.display_name : "Unknown")}</p>
+						<p className="font-semibold tracking-wider text-xl one-line my-0">
+							{isFooterProfile ? userProfile?.user?.display_name : userById ? clanProfile?.nick_name : 'Anonymous'}
+						</p>
+						<p className="font-medium tracking-wide text-sm my-0">
+							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById?.user?.display_name : 'Unknown'}
+						</p>
 					</div>
-					<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile userById={userById} /> : <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? <StatusProfile userById={userById} /> : !hiddenRole && <RoleUserProfile userID={userID} />}
 
-					{!checkOwner(userById?.user?.google_id || '') ? (
+					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole ? (
 						<div className="w-full items-center">
 							<input
 								type="text"
@@ -90,6 +101,12 @@ const ModalUserProfile = ({ userID, isFooterProfile }: ModalUserProfileProps) =>
 							/>
 						</div>
 					) : null}
+					{showNote && (
+						<>
+							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
+							<NoteUserProfile />
+						</>
+					)}
 				</div>
 			</div>
 		</div>

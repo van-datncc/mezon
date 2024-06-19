@@ -41,7 +41,7 @@ const ClanLayout = () => {
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList channelCurrentType={currentVoiceChannel?.type} />
 					<FooterProfile
-						name={userProfile?.user?.username || ''}
+						name={userProfile?.user?.display_name || ''}
 						status={userProfile?.user?.online}
 						avatar={userProfile?.user?.avatar_url || ''}
 						userId={userProfile?.user?.id || ''}

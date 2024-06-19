@@ -34,7 +34,7 @@ const fetchChannelAttachmentsCached = memoize(
 		promise: true,
 		maxAge: CHANNEL_ATTACHMENTS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[0].session.token;
+			return args[1] + args[2] + args[0].session.username;
 		},
 	},
 );
@@ -50,7 +50,7 @@ export const fetchChannelAttachments = createAsyncThunk(
 		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
 
 		if (!response.attachments) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		const attachments = response.attachments.map((attachmentRes) => mapChannelAttachmentsToEntity(attachmentRes, channelId, clanId));

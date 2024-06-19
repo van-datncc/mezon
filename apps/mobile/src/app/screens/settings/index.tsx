@@ -1,5 +1,5 @@
 import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
-import { authActions, useAppDispatch } from '@mezon/store-mobile';
+import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { Colors } from '@mezon/mobile-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 	const dispatch = useAppDispatch();
 	const logout = () => {
 		dispatch(authActions.logOut());
+		dispatch(channelsActions.removeAll());
+		dispatch(messagesActions.removeAll());
+		dispatch(clansActions.removeAll());
 	};
 
 	const confirmLogout = () => {

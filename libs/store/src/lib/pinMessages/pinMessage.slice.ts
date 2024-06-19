@@ -33,7 +33,7 @@ const fetchChannelPinMessagesCached = memoize(
 		promise: true,
 		maxAge: CHANNEL_PIN_MESSAGES_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[0].session.token;
+			return args[1] + args[0].session.username;
 		},
 	},
 );
@@ -52,7 +52,7 @@ export const fetchChannelPinMessages = createAsyncThunk(
 		}
 		const response = await fetchChannelPinMessagesCached(mezon, channelId);
 		if (!response) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
         if (!response.pin_messages_list) {

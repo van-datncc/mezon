@@ -59,7 +59,7 @@ const fetchChannelMembersCached = memoize(
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		},
 	},
 );
@@ -83,7 +83,7 @@ export const fetchChannelMembers = createAsyncThunk(
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
 		if (!response.channel_users) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 		if (repace) {
 			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));

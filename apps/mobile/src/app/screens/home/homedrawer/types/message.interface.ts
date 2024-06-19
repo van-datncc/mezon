@@ -26,7 +26,6 @@ export interface IMessageActionNeedToResolve {
 export interface IMessageReactionProps {
 	message: IMessageWithUser;
 	mode: number;
-	dataReactionCombine?: EmojiDataOptionals[];
 	emojiListPNG?: IEmojiImage[];
 	openEmojiPicker?: () => void;
 }
@@ -36,6 +35,7 @@ export interface IDetailReactionBottomSheet {
 	emojiSelectedId: string | null;
 	onClose: () => void;
 	emojiListPNG?: IEmojiImage[];
+	removeEmoji?: (emoji: EmojiDataOptionals) => void;
 }
 export interface IPayloadThreadSendMessage {
 	content: IMessageSendPayload;

@@ -36,7 +36,7 @@ export const fetchListFriendsCached = memoize(
 		promise: true,
 		maxAge: LIST_FRIEND_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.token;
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		},
 	},
 );
@@ -52,7 +52,7 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 	}
 	const response = await fetchListFriendsCached(mezon, -1, 100, '');
 	if (!response.friends) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 	const listFriends = response.friends.map(mapFriendToEntity);
 	const userIds = listFriends.map((friend) => friend.user?.id || '');
