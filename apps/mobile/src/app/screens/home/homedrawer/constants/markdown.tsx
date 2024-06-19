@@ -15,6 +15,8 @@ import {
 	splitBlockCodeRegex,
 	urlRegex,
 } from '../../../../../app/utils/helpers';
+import { ChannelType } from 'mezon-js';
+import { SpeakerIcon } from '@mezon/mobile-components';
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -85,7 +87,7 @@ export const markdownStyles = {
 	mention: {
 		fontSize: size.medium,
 		color: Colors.textGray,
-		backgroundColor: Colors.bgMention,
+		backgroundColor: '#3b426e',
 		lineHeight: size.s_20,
 	},
 	blockquote: {
@@ -130,9 +132,21 @@ export const renderRulesCustom = {
 		}
 
 		if (payload.startsWith('@') || payload.startsWith('#')) {
+      console.log('pay: ', payload);
+
+      if (payload.includes('##voice')) {
+        return (
+          <Text key={node.key} style={[styles.mention]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+            <View style={{backgroundColor: 'red', height: 20, alignItems: 'center', alignSelf: 'center', justifyContent: 'center', top: 10}}>
+            <SpeakerIcon style={{bottom: 0}} width={12} height={12} color={Colors.white}/>
+          	<Text>{content}</Text>
+            </View>
+				</Text>
+        )
+      }
 			return (
 				<Text key={node.key} style={[styles.mention]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
-					{content}
+          {content}
 				</Text>
 			);
 		}
@@ -147,7 +161,7 @@ export const renderRulesCustom = {
 		const { src } = node.attributes;
 		return (
 			<View key={node.key} style={{ padding: 1 }}>
-				<FastImage source={{ uri: src }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
+				{/* <FastImage source={{ uri: src }} style={styles.iconEmojiInMessage} resizeMode={'contain'} /> */}
 			</View>
 		);
 	},
@@ -350,8 +364,13 @@ const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsE
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];
-						const channel = getChannelById(channelId, channelsEntities);
-						return `[#${channel.channel_label}](#${channelId})`;
+						const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
+            if(channel.type === ChannelType.CHANNEL_TYPE_VOICE)
+             {
+              return `[${channel.channel_label}](##voice${channelId})`;
+             }
+
+            return `[#${channel.channel_label}](#${channelId})`;
 					}
 				}
 			}
