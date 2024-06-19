@@ -263,7 +263,7 @@ const RenderTextContent = React.memo(
 		const isExistEmoji = emojiRegex.test(lines);
 		const isExistBlockCode = codeBlockRegex.test(lines);
 
-		let content: string = lines;
+		let content: string = lines?.trim();
 
 		if (matchesMentions) {
 			content = formatMention(content, matchesMentions, channelsEntities);
