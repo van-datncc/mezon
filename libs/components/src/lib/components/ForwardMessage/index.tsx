@@ -311,7 +311,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 							onClick={() => sentToMessage()}
 							className="h-10 px-4 rounded dark:bg-bgSelectItem bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent"
 						>
-							Save
+							Send
 						</Button>
 					</div>
 				</div>
