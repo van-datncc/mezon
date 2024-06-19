@@ -5,20 +5,21 @@ import {
 	useAppParams,
 	useChatMessages,
 	useChatReaction,
-	useDirectMessages,
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useMenu,
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectReactionTopState, useAppDispatch } from '@mezon/store';
+import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectMessageByChannelId, selectReactionTopState, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
+import ModalUserProfile from '../../../../../../../libs/components/src/lib/components/ModalUserProfile';
+
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
@@ -37,6 +38,8 @@ export default function DirectMessage() {
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
 	const { draggingState, setDraggingState } = useDragAndDrop();
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 
 	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -48,11 +51,7 @@ export default function DirectMessage() {
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 
-	const { messages } = useDirectMessages({
-		channelId: directId ?? '',
-		mode: currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
-	});
-
+	const messages = useSelector(selectMessageByChannelId(directId));
 	useEffect(() => {
 		if (messagesContainerRef.current) {
 			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -180,8 +179,19 @@ export default function DirectMessage() {
 						</div>
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<div className="w-[268px] dark:bg-bgSurface bg-bgLightModeSecond  lg:flex hidden">
+						<div className={`w-[241px] dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'}`}>
 							<MemberListGroupChat directMessageId={directId} />
+						</div>
+					)}
+					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
+						<div className={`w-[340px] dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'}`}>
+							<ModalUserProfile 
+								userID = {Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id} 
+								classWrapper='w-full' 
+								classBanner='h-[120px]' 
+								hiddenRole={true}
+								showNote={true}
+							/>
 						</div>
 					)}
 				</div>

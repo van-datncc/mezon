@@ -1,5 +1,12 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
-import { FileIcon, ReplyIcon, ReplyMessageDeleted, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, save } from '@mezon/mobile-components';
+import {
+	FileIcon,
+	ReplyIcon,
+	ReplyMessageDeleted,
+	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	getUpdateOrAddClanChannelCache,
+	save,
+} from '@mezon/mobile-components';
 import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -55,7 +62,7 @@ export type MessageItemProps = {
 	channelId?: string;
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
-  isNumberOfLine?: boolean
+	isNumberOfLine?: boolean;
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -183,11 +190,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			const checkIsImage = isImage(document?.url);
+			const checkIsImage = isImage(document?.url?.toLowerCase());
 			if (checkIsImage) {
-				return imageItem({ image: document, index, checkImage: checkIsImage });
+				return imageItem({ image: document, index, checkImage: false });
 			}
-			const checkIsVideo = isVideo(document?.url);
+			const checkIsVideo = isVideo(document?.url?.toLowerCase());
 
 			if (checkIsVideo) {
 				return renderVideos(document);
@@ -245,49 +252,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					text1: 'Updating...',
 				});
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
-				save(STORAGE_KEY_CHANNEL_ID, channelId);
-				save(STORAGE_KEY_CLAN_ID, clanId);
-
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		} catch (error) {
 			console.log(error);
 		}
-	};
-
-	const getChannelById = (channelHashtagId: string) => {
-		const channel = channelsEntities?.[channelHashtagId];
-		if (channel) {
-			return channel;
-		} else {
-			return {
-				channel_label: channelHashtagId,
-			};
-		}
-	};
-
-	const formatMention = (text: string, matchesMention: RegExpMatchArray) => {
-		const parts = text.split(splitBlockCodeRegex);
-
-		return parts
-			?.map((part) => {
-				if (codeBlockRegex.test(part)) {
-					return part;
-				} else {
-					if (matchesMention.includes(part)) {
-						if (part.startsWith('@')) {
-							return `[${part}](${part})`;
-						}
-						if (part.startsWith('<#')) {
-							const channelId = part.match(channelIdRegex)[1];
-							const channel = getChannelById(channelId) as ChannelsEntity;
-							return `[#${channel.channel_label}](#${channelId})`;
-						}
-					}
-				}
-				return part;
-			})
-			.join('');
 	};
 
 	const onConfirmDeleteMessage = () => {
@@ -331,21 +302,22 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							</View>
 						)}
 						<Text style={styles.repliedContentText} numberOfLines={1}>
-            {messageRefFetchFromServe.content.t}
+							{messageRefFetchFromServe.content.t}
 						</Text>
 					</Pressable>
 				</View>
 			) : null}
-      {!messageRefFetchFromServe && message?.references?.length && message.references ?
-      <View style={styles.aboveMessageDeleteReply}>
+			{!messageRefFetchFromServe && message?.references?.length && message.references ? (
+				<View style={styles.aboveMessageDeleteReply}>
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-          <View style={styles.iconMessageDeleteReply}>
-          <ReplyMessageDeleted width={18} height={9} />
-          </View>
-					<Text style={styles.messageDeleteReplyText}>{t("messageDeleteReply")}</Text>
-				</View> : null}
+					<View style={styles.iconMessageDeleteReply}>
+						<ReplyMessageDeleted width={18} height={9} />
+					</View>
+					<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
+				</View>
+			) : null}
 			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 				{isShowInfoUser ? (
 					<Pressable

@@ -110,7 +110,7 @@ export const fetchMessages = createAsyncThunk(
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -149,7 +149,6 @@ export const fetchMessages = createAsyncThunk(
 			return Object.values(emojiDataItems);
 		});
 
-		// thunkAPI.dispatch(reactionActions.setDataReactionFromServe(reactionData));
 
 		if (reactionData.length > 0) {
 			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));

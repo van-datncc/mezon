@@ -139,6 +139,7 @@ const SettingRightUser = ({
 							className="rounded-[3px] w-full border px-4 py-2 mt-2 focus:outline-none focus:border-white-500 font-normal text-sm tracking-wide"
 							placeholder={displayName}
 							value={displayName}
+							maxLength={32}
 						/>
 					</div>
 					<div className="mt-8">
@@ -168,6 +169,7 @@ const SettingRightUser = ({
 								}}
 								value={editAboutUser}
 								rows={4}
+								maxLength={128}
 							></textarea>
 							<div className="w-full flex justify-end">
 								<span className={`text-${editAboutUser.length > 128 ? '[#EF1515]' : '[#797878]'}`}>
@@ -178,7 +180,7 @@ const SettingRightUser = ({
 					</div>
 				</div>
 				<div className="flex-1  text-white">
-					<p className="mt-[20px] dark:text-[#CCCCCC] text-textLightTheme font-semibold tracking-wide text-sm">PREVIEW</p>
+					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
 					<SettingUserClanProfileCard profiles={editProfile} />
 				</div>
 			</div>
