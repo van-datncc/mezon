@@ -10,11 +10,12 @@ interface IMezonOptionProps {
         description?: string;
         title: string;
         value: number | string;
-    }[]
+    }[],
+    value?: number | string;
 }
 
-export default function MezonOption({ data, title, onChange }: IMezonOptionProps) {
-    const [currentValue, setCurrentValue] = useState<number | string>(data?.[0].value || 0);
+export default function MezonOption({ data, title, onChange, value }: IMezonOptionProps) {
+    const [currentValue, setCurrentValue] = useState<number | string>(value || data?.[0]?.value || 0);
 
     function handleChange(value: number | string) {
         setCurrentValue(value);
