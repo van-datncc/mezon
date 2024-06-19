@@ -261,41 +261,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const getChannelById = (channelHashtagId: string) => {
-		const channel = channelsEntities?.[channelHashtagId];
-		if (channel) {
-			return channel;
-		} else {
-			return {
-				channel_label: channelHashtagId,
-			};
-		}
-	};
-
-	const formatMention = (text: string, matchesMention: RegExpMatchArray) => {
-		const parts = text.split(splitBlockCodeRegex);
-
-		return parts
-			?.map((part) => {
-				if (codeBlockRegex.test(part)) {
-					return part;
-				} else {
-					if (matchesMention.includes(part)) {
-						if (part.startsWith('@')) {
-							return `[${part}](${part})`;
-						}
-						if (part.startsWith('<#')) {
-							const channelId = part.match(channelIdRegex)[1];
-							const channel = getChannelById(channelId) as ChannelsEntity;
-							return `[#${channel.channel_label}](#${channelId})`;
-						}
-					}
-				}
-				return part;
-			})
-			.join('');
-	};
-
 	const onConfirmDeleteMessage = () => {
 		DeleteSendMessage(props.message.id);
 	};
