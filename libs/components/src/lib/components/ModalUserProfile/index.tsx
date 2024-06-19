@@ -59,7 +59,6 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 
 	useEffect(() => {
 		getColor();
-		console.log(userID);
 	}, [userID,[]]);
 
 	return (

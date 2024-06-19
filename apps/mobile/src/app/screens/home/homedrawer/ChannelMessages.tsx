@@ -197,7 +197,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				maxToRenderPerBatch={5}
 				initialNumToRender={5}
 				windowSize={10}
-				removeClippedSubviews={true}
 				onEndReached={onLoadMore}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}

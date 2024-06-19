@@ -1,4 +1,11 @@
-import { HashSignLockIcon, STORAGE_KEY_CHANNEL_ID, STORAGE_KEY_CLAN_ID, SpeakerIcon, SpeakerLocked, save } from '@mezon/mobile-components';
+import {
+	HashSignLockIcon,
+	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	SpeakerIcon,
+	SpeakerLocked,
+	getUpdateOrAddClanChannelCache,
+	save,
+} from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, messagesActions, selectIsUnreadChannelById } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
@@ -11,11 +18,12 @@ import HashSignIcon from '../../../../assets/svg/channelText.svg';
 import { ChannelListContext } from './Reusables';
 import ThreadListChannel from './ThreadListChannel';
 import { styles } from './styles';
-export const ChannelListItem = React.memo((props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel }) => {
+export const ChannelListItem = React.memo((props: { data: any; image?: string; isActive: boolean; currentChanel: IChannel, onLongPress: () => void }) => {
 	const useChannelListContentIn = React.useContext(ChannelListContext);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 
 	const handleRouteData = async (thread?: IChannel) => {
+
 		const store = await getStoreAsync();
 		if (props.data.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			// 	TODO: handle voice channel
@@ -25,8 +33,8 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 		useChannelListContentIn.navigation.closeDrawer();
 		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-		save(STORAGE_KEY_CHANNEL_ID, channelId);
-		save(STORAGE_KEY_CLAN_ID, clanId);
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
@@ -36,6 +44,7 @@ export const ChannelListItem = React.memo((props: { data: any; image?: string; i
 			<TouchableOpacity
 				activeOpacity={1}
 				onPress={() => handleRouteData()}
+				onLongPress={props.onLongPress}
 				style={[styles.channelListItem, props.isActive && styles.channelListItemActive]}
 			>
 				{isUnRead && <View style={styles.dotIsNew} />}

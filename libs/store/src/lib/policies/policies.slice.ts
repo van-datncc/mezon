@@ -47,7 +47,7 @@ export const fetchPermission = createAsyncThunk(
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.getListPermission(mezon.session);
 		if (!response.permissions) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 		return response.permissions?.map(mapPermissionUserToEntity);
 	},
