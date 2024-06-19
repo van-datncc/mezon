@@ -5,14 +5,13 @@ import {
 	useAppParams,
 	useChatMessages,
 	useChatReaction,
-	useDirectMessages,
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useMenu,
 	useReference,
 	useThreads,
 } from '@mezon/core';
-import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectReactionTopState, useAppDispatch } from '@mezon/store';
+import { RootState, directActions, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectMessageByChannelId, selectReactionTopState, useAppDispatch } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
@@ -52,11 +51,7 @@ export default function DirectMessage() {
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 
-	const { messages } = useDirectMessages({
-		channelId: directId ?? '',
-		mode: currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
-	});
-
+	const messages = useSelector(selectMessageByChannelId(directId));
 	useEffect(() => {
 		if (messagesContainerRef.current) {
 			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;

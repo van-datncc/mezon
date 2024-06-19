@@ -1,5 +1,5 @@
-import { useApp, useDirect, useEscapeKey } from '@mezon/core';
-import { useAppDispatch } from '@mezon/store';
+import { useApp, useEscapeKey } from '@mezon/core';
+import { selectDirectsOpenlist, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useState } from 'react';
@@ -18,7 +18,7 @@ export type CategoriesState = Record<string, boolean>;
 function DirectMessageList() {
 	const dispatch = useAppDispatch();
 	const pathname = useLocation().pathname;
-	const { listDirectOpen: dmGroupChatList } = useDirect();
+	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
 		return data.filter((obj: IChannel) => {

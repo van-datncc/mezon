@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useDirect, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId } from '@mezon/store';
+import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
@@ -25,7 +25,9 @@ function MyApp() {
 		navigate(toClanPage(clanId));
 	};
 	
-	const { listDirectMessageUnread: dmGroupChatUnreadList } = useDirect();
+	const { directId: currentDmGroupId } = useAppParams();
+	const listDirectMessage = useSelector(selectDirectsUnreadlist);
+	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
 	const listDM = useSelector(selectAllDirectMessages);
 	const mezon = useMezon();
 	const directId = useSelector(selectDmGroupCurrentId)
@@ -119,23 +121,6 @@ function MyApp() {
 		setOpenOptionMessageState(false);
 	}, []);
 
-	const joinToChatAndNavigate = useCallback(
-		(
-			DMid?: string,
-			type?: number,
-		) => {
-			dispatchDirect(directActions.joinDirectMessage({
-							directMessageId: DMid || "",
-							channelName: '',
-							type: type,
-						}),
-					);
-			if (closeMenu) {
-						setStatusMenu(false);
-					}
-		},
-		[dispatchDirect],
-	);
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}

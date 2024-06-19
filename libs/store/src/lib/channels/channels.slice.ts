@@ -181,7 +181,7 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 
 	const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
 	if (!response.channeldesc) {
-		return thunkAPI.rejectWithValue([]);
+		return [];
 	}
 
 	const channels = response.channeldesc.map(mapChannelToEntity);
