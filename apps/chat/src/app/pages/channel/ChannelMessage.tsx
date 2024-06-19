@@ -226,7 +226,7 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 										onFocus={handleFocus}
 										inputRef={textareaRef}
 										value={editMessage}
-										className={`w-[83%] dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
+										className={`w-full dark:bg-black bg-white rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 										onKeyDown={onSend}
 										onChange={(e, newValue) => {
 											setEditMessage(newValue);
@@ -279,7 +279,14 @@ export function ChannelMessage(props: Readonly<MessageProps>) {
 									</MentionsInput>
 									<div className="text-xs flex">
 										<p className="pr-[3px]">escape to</p>
-										<p className="pr-[3px] text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleCancelEdit}>
+										<p
+											className="pr-[3px] text-[#3297ff]"
+											style={{ cursor: 'pointer' }}
+											onClick={() => {
+												handleCancelEdit();
+												setEditMessage(mess.content.t);
+											}}
+										>
 											cancel
 										</p>
 										<p className="pr-[3px]">• enter to</p>
