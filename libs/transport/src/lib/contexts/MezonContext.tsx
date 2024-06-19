@@ -1,4 +1,4 @@
-import { Channel, ChannelStreamMode, ChannelType, Client, Session, Socket, Status } from 'mezon-js';
+import { Channel, ChannelStreamMode, ChannelType, Client, ClanJoin, Session, Socket, Status } from 'mezon-js';
 import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import { DeviceUUID } from 'device-uuid';
 import React, { useCallback } from 'react';
@@ -31,6 +31,7 @@ export type MezonContextValue = {
 	joinChatChannel: (channelId: string) => Promise<Channel>;
 	joinChatThread: (channelId: string) => Promise<Channel>;
 	joinChatDirectMessage: (channelId: string, channelName?: string, channelType?: number) => Promise<Channel>;
+	joinChatClan: (clanId: string) => Promise<ClanJoin>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
 	reconnect: () => Promise<void>;
 };
@@ -241,6 +242,21 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[socketRef],
 	);
 
+	const joinChatClan = React.useCallback(
+		async (clanId: string) => {
+			const socket = socketRef.current;
+
+			if (!socket) {
+				throw new Error('Socket is not initialized');
+			}
+
+			const join = await socket.joinClanChat(clanId);
+			return join;
+		},
+		[socketRef],
+	);
+
+
 	const value = React.useMemo<MezonContextValue>(
 		() => ({
 			clientRef,
@@ -260,6 +276,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			addStatusFollow,
 			logOutMezon,
 			reconnect,
+			joinChatClan,
 		}),
 		[
 			clientRef,
@@ -279,6 +296,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			addStatusFollow,
 			logOutMezon,
 			reconnect,
+			joinChatClan,
 		],
 	);
 
