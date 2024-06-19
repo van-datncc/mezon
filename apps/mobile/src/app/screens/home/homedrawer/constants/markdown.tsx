@@ -33,6 +33,11 @@ export default function openUrl(url, customCallback) {
  * Todo: move to helper
  */
 export const EDITED_FLAG = 'edited-flag';
+export const TYPE_MENTION = {
+  userMention: '@',
+  hashtag: '#',
+  voiceChannel: '##voice'
+}
 /**
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
@@ -101,6 +106,18 @@ export const markdownStyles = {
 		backgroundColor: Colors.white,
 		height: 2,
 	},
+  voiceChannel: {
+		backgroundColor: Colors.midnightIndigoBg,
+    flexDirection:'row',
+    gap: size.s_2,
+    alignItems: 'center',
+    justifyContent: 'center'
+	},
+  textVoiceChannel: {
+    fontSize: size.medium,
+		color: Colors.textGray,
+		lineHeight: size.s_20,
+  }
 };
 
 /**
@@ -132,14 +149,12 @@ export const renderRulesCustom = {
 		}
 
 		if (payload.startsWith('@') || payload.startsWith('#')) {
-      console.log('pay: ', payload);
-
       if (payload.includes('##voice')) {
         return (
-          <Text key={node.key} style={[styles.mention]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
-            <View style={{backgroundColor: 'red', height: 20, alignItems: 'center', alignSelf: 'center', justifyContent: 'center', top: 10}}>
+          <Text key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+            <View style={[styles.voiceChannel]}>
             <SpeakerIcon style={{bottom: 0}} width={12} height={12} color={Colors.white}/>
-          	<Text>{content}</Text>
+          	<Text style={styles.textVoiceChannel}>{content}</Text>
             </View>
 				</Text>
         )
@@ -330,13 +345,15 @@ export const renderTextContent = (
 			style={markdownStyles as StyleSheet.NamedStyles<any>}
 			rules={renderRulesCustom}
 			onLinkPress={(url) => {
-				if (url.startsWith('@')) {
+				if (url.startsWith(TYPE_MENTION.userMention)) {
 					onMention && onMention(url);
 					return false;
 				}
-
-				if (url.startsWith('#')) {
-					const channelId = url.slice(1);
+				if (url.startsWith(TYPE_MENTION.hashtag)) {
+					let channelId = url.slice(1);
+           if (url.includes(TYPE_MENTION.voiceChannel)) {
+              channelId = url.replace(`${TYPE_MENTION.voiceChannel}`, '');
+            }
 					const channel = getChannelById(channelId, channelsEntities) as ChannelsEntity;
 					onChannelMention && onChannelMention(channel);
 					return false;
