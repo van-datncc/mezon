@@ -18,9 +18,9 @@ import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
-	const { message, dataReactionCombine = [], emojiListPNG, openEmojiPicker, mode } = props || {};
+	const { message, emojiListPNG, openEmojiPicker, mode } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
-	const { userId, reactionMessageDispatch } = useChatReaction();
+	const { userId, reactionMessageDispatch, convertReactionToMatchInterface } = useChatReaction();
 
 	const reactOnExistEmoji = async (
 		id: string,
@@ -56,8 +56,8 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	};
 
 	const allReactionDataOnOneMessage = useMemo(() => {
-		return dataReactionCombine.filter((emoji: EmojiDataOptionals) =>
-			emoji.message_id === message.id && emoji.senders.some(sender => sender.count !== 0))
+		return convertReactionToMatchInterface.filter((emoji: EmojiDataOptionals) =>
+			emoji.message_id === message.id && emoji.senders.some(sender => sender.count > 0))
 			.map(emoji => {
 				if (Number(emoji.id) === 0) {
 					const tempId = `${emoji.message_id}-${emoji.emoji}`;
@@ -65,7 +65,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 				}
 				return emoji;
 			})
-	}, [dataReactionCombine, message])
+	}, [convertReactionToMatchInterface, message])
 
 	return (
 		<View style={styles.reactionWrapper}>
