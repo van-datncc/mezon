@@ -90,7 +90,7 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
 
 		if (!response.clandesc) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		const clans = response.clandesc.map(mapClanToEntity);
