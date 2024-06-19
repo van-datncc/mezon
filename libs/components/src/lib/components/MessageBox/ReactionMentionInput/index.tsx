@@ -19,6 +19,8 @@ import {
 	referencesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectDirectById,
+	selectDmGroupCurrentId,
 	selectMessageByMessageId,
 	threadsActions,
 	useAppDispatch,
@@ -53,6 +55,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+import { useMezon } from '@mezon/transport';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -438,7 +441,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onFinishUpload?.();
 		}
 	}, [props, props.finishUpload]);
-
+	const directId = useSelector(selectDmGroupCurrentId)
+	const direct = useSelector(selectDirectById(directId || ""))
+	const mezon = useMezon();
+	const handleMentionInputClick = async () => {
+		if (direct !== undefined) {
+			await mezon.joinChatDirectMessage(direct.channel_id || "", direct.channel_label, direct.type);
+		}
+	};
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -479,6 +489,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
+				onClick={handleMentionInputClick}
 				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
