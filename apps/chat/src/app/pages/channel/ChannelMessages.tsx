@@ -19,7 +19,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
-	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
+	const { idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
 	const { appearanceTheme } = useApp();
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	// share logic to load more message

@@ -13,19 +13,15 @@ type MessageReactionProps = {
 // TODO: refactor component for message lines
 const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode }) => {
 	const {
-		userId,
 		reactionBottomState,
-		setUserReactionPanelState,
-		userReactionPanelState,
 		reactionBottomStateResponsive,
-		setArrowPosition,
 		convertReactionToMatchInterface,
 	} = useChatReaction();
 
 	const getReactionsByChannelId = (data: EmojiDataOptionals[], mesId: string) => {
 		return data.filter((item: any) => item.message_id === mesId && item.channel_id === currentChannelId);
 	};
-	
+
 	const dataReaction = getReactionsByChannelId(convertReactionToMatchInterface, message.id);
 
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
@@ -50,7 +46,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 	// Check position sender panel && emoji panel
 
 	const contentDiv = useRef<HTMLDivElement | null>(null);
-
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals | null>();
 	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
 	const emojiIndexMap: { [key: string]: number } = {};
@@ -72,7 +67,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		}
 	}, [showSenderPanelIn1s]);
 
-	//////////////////////////
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
 
@@ -86,7 +80,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 				</div>
 			)}
 
-			<div ref={contentDiv} className="flex  gap-2  ml-14 border border-green-500">
+			<div ref={contentDiv} className="flex  gap-2  ml-14">
 				{showSenderPanelIn1s && (
 					<div className="hidden max-sm:block max-sm:-top-[0] absolute">
 						{hoverEmoji &&
@@ -104,7 +98,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 					{dataReaction?.map((emoji: EmojiDataOptionals, index: number) => {
 						return (
 							<Fragment key={`${index + message.id}`}>
-								<ItemEmoji mode={mode} emoji={emoji} refWrapEmoji={contentDiv} />
+								<ItemEmoji mode={mode} emoji={emoji}/>
 							</Fragment>
 						);
 					})}

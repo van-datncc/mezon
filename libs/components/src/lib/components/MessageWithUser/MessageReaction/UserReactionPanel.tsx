@@ -1,47 +1,40 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { reactionActions } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { useDispatch } from 'react-redux';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
 	mode: number;
-	arrowTop?: boolean;
-	arrowBottom?: boolean;
-	isRightLimit?: boolean;
 };
 
-const UserReactionPanel = ({ emojiShowPanel, mode, isRightLimit, arrowBottom, arrowTop }: UserReactionPanelProps) => {
-	console.log(isRightLimit);
-
+const UserReactionPanel = ({ emojiShowPanel, mode }: UserReactionPanelProps) => {
+	const dispatch = useDispatch();
 	const { emojiListPNG } = useEmojiSuggestion();
-
 	const userId = useAuth();
-	const { reactionMessageDispatch, arrowPosition } = useChatReaction();
+	const { reactionMessageDispatch } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		await reactionMessageDispatch(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const hideSenderOnPanel = (emojiData: EmojiDataOptionals, senderId: string) => {
+		console.log(emojiData);
 		if (emojiData.senders) {
 			emojiData.senders = emojiData.senders.filter((sender) => sender.sender_id !== senderId);
 		}
 		return emojiData;
 	};
-
 	const count = calculateTotalCount(emojiShowPanel.senders);
-
+	const onLeavePanel = () => {
+		dispatch(reactionActions.setEmojiHover(null));
+		dispatch(reactionActions.setUserReactionPanelState(false));
+	};
 	return (
-		<>
-			{arrowTop && (
-				<div
-					className={`dark:text-[#28272b] text-white mb-[-0.23rem] rotate-180 ${isRightLimit ? 'flex justify-start' : 'flex justify-center'} `}
-				>
-					<Icons.ArrowDownFill />
-				</div>
-			)}
-
+		<div className="flex flex-col justify-center ">
 			<div
+				onMouseLeave={onLeavePanel}
 				onClick={(e) => e.stopPropagation()}
 				className={`z-50   w-[18rem]
 				dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1 bottom-0'}`}
@@ -74,7 +67,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, isRightLimit, arrowBottom, ar
 												);
 												hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 											}}
-											className="right-1 absolute"
+											className="right-1 absolute cursor-pointer"
 										>
 											<Icons.Close defaultSize="w-3 h-3" />
 										</div>
@@ -86,14 +79,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, isRightLimit, arrowBottom, ar
 					return null;
 				})}
 			</div>
-			{arrowBottom && (
-				<div
-					className={`dark:text-[#28272b] h-fit text-white border mt-[-0.25rem] ${isRightLimit ? 'flex justify-end' : 'flex justify-center'} `}
-				>
-					<Icons.ArrowDownFill />
-				</div>
-			)}
-		</>
+		</div>
 	);
 };
 

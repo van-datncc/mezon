@@ -1,17 +1,23 @@
+import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { reactionActions, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
 type EmojiItemProps = {
 	emoji: EmojiDataOptionals;
 	mode: number;
-	refWrapEmoji?: React.RefObject<HTMLDivElement>;
 };
 
-function ItemEmoji({ emoji, mode, refWrapEmoji }: EmojiItemProps) {
+function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 	const userId = useAuth();
-	const { reactionMessageDispatch, userReactionPanelState, setUserReactionPanelState } = useChatReaction();
+	const { reactionMessageDispatch } = useChatReaction();
+	const userReactionPanelState = useSelector(selectUserReactionPanelState);
+	const emojiHover = useSelector(selectEmojiHover);
+
+	const dispatch = useDispatch();
 	const { emojiListPNG } = useEmojiSuggestion();
 	const getUrlItem = getSrcEmoji(emoji.emoji ?? '', emojiListPNG);
 	const count = calculateTotalCount(emoji.senders);
@@ -31,37 +37,36 @@ function ItemEmoji({ emoji, mode, refWrapEmoji }: EmojiItemProps) {
 		await reactionMessageDispatch(id, mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
 	}
 
-	const [emojiShowPanel, setEmojiShowPanel] = useState<EmojiDataOptionals | null>();
-
 	const [topUserPanel, setTopUserPanel] = useState<any>();
 	const [bottomUserPanel, setBottomUserPanel] = useState<any>();
 	const [leftUserPanel, setLeftUserPanel] = useState<any>();
 	const [rightUserPanel, setRightUserPanel] = useState<any>();
-
 	const [arrowTop, setArrowTop] = useState<boolean>(false);
 	const [arrowBottom, setArrowBottom] = useState<boolean>(false);
 	const [isRightLimit, setIsRightLimit] = useState<boolean>(false);
 
 	const onHoverEnter = () => {
-		setEmojiShowPanel(emoji);
-		setUserReactionPanelState(true);
+		dispatch(reactionActions.setEmojiHover(emoji));
+		dispatch(reactionActions.setUserReactionPanelState(true));
 	};
 
 	const onHoverLeave = () => {
-		setUserReactionPanelState(false);
-		setArrowBottom(false);
-		setArrowTop(false);
-		setIsRightLimit(false);
+		resetState();
+	};
+
+	const resetState = () => {
+		dispatch(reactionActions.setEmojiHover(null));
+		dispatch(reactionActions.setUserReactionPanelState(false));
 	};
 
 	useEffect(() => {
 		if (!userReactionPanelState) {
-			setEmojiShowPanel(null);
+			resetState();
 		}
 	}, [userReactionPanelState]);
 
 	useEffect(() => {
-		if (emojiShowPanel && emojiItemRef.current && userPanelRef) {
+		if (emojiHover && emojiItemRef.current && userPanelRef) {
 			const screenWidth = window.innerWidth;
 			const userPanelWidth = userPanelRef.current?.getBoundingClientRect().width;
 			const userPanelHeight = userPanelRef.current?.getBoundingClientRect().height;
@@ -73,39 +78,49 @@ function ItemEmoji({ emoji, mode, refWrapEmoji }: EmojiItemProps) {
 
 			if (disCenterEmojiToRightScreen > userPanelWidth! / 2 && disTopEmojiToTopScreen > userPanelHeight!) {
 				setRightUserPanel(disCenterEmojiToRightScreen - userPanelWidth! / 2);
-				setTopUserPanel(disTopEmojiToTopScreen - userPanelHeight! - 15);
+				setTopUserPanel(disTopEmojiToTopScreen - userPanelHeight!);
 				setLeftUserPanel('auto');
 				setBottomUserPanel('auto');
 				setArrowBottom(true);
 				setArrowTop(false);
 				setIsRightLimit(false);
+				return;
 			} else if (disCenterEmojiToRightScreen > userPanelWidth! / 2 && disTopEmojiToTopScreen < userPanelHeight!) {
 				setRightUserPanel(disCenterEmojiToRightScreen - userPanelWidth! / 2);
-				setTopUserPanel(disTopEmojiToTopScreen + emojiHeight + 15);
+				setTopUserPanel(disTopEmojiToTopScreen + emojiHeight);
 				setLeftUserPanel('auto');
 				setBottomUserPanel('auto');
 				setArrowBottom(false);
 				setArrowTop(true);
 				setIsRightLimit(false);
+				return;
 			} else if (disCenterEmojiToRightScreen < userPanelWidth! / 2 && disTopEmojiToTopScreen > userPanelHeight!) {
 				setRightUserPanel(disCenterEmojiToRightScreen - emojiWidth / 2);
-				setTopUserPanel(disTopEmojiToTopScreen - userPanelHeight! - 15);
+				setTopUserPanel(disTopEmojiToTopScreen - userPanelHeight!);
 				setLeftUserPanel('auto');
 				setBottomUserPanel('auto');
 				setArrowBottom(true);
 				setArrowTop(false);
 				setIsRightLimit(true);
+				return;
 			} else if (disCenterEmojiToRightScreen < userPanelWidth! / 2 && disTopEmojiToTopScreen < userPanelHeight!) {
 				setRightUserPanel(disCenterEmojiToRightScreen - emojiWidth / 2);
-				setTopUserPanel(disTopEmojiToTopScreen + emojiHeight + 15);
+				setTopUserPanel(disTopEmojiToTopScreen + emojiHeight);
 				setLeftUserPanel('auto');
 				setBottomUserPanel('auto');
 				setArrowBottom(false);
 				setArrowTop(true);
 				setIsRightLimit(true);
+				return;
 			}
+		} else if (emojiHover === null) {
+			setTopUserPanel(undefined);
+			setRightUserPanel(undefined);
+			setLeftUserPanel(undefined);
+			setBottomUserPanel(undefined);
+			return;
 		}
-	}, [emojiShowPanel, userPanelRef]);
+	}, [emojiHover, userPanelRef]);
 
 	return (
 		<>
@@ -130,10 +145,10 @@ function ItemEmoji({ emoji, mode, refWrapEmoji }: EmojiItemProps) {
 					</div>
 				</div>
 			</div>
-			{emojiShowPanel && userReactionPanelState && (
+			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === emoji.message_id && userReactionPanelState && (
 				<div
 					ref={userPanelRef}
-					className="w-fit h-fit z-50 border border-green-500"
+					className=" w-[18rem] flex flex-col items-center z-50"
 					style={{
 						position: 'fixed',
 						top: topUserPanel,
@@ -142,13 +157,9 @@ function ItemEmoji({ emoji, mode, refWrapEmoji }: EmojiItemProps) {
 						bottom: bottomUserPanel,
 					}}
 				>
-					<UserReactionPanel
-						arrowTop={arrowTop}
-						arrowBottom={arrowBottom}
-						isRightLimit={isRightLimit}
-						emojiShowPanel={emojiShowPanel!}
-						mode={mode}
-					/>
+					<ArrowItem arrow={arrowTop} isRightLimit={isRightLimit} emojiCross={emoji} />
+					<UserReactionPanel emojiShowPanel={emojiHover!} mode={mode} />
+					<ArrowItem arrow={arrowBottom} isRightLimit={isRightLimit} emojiCross={emoji} />
 				</div>
 			)}
 		</>
@@ -156,3 +167,29 @@ function ItemEmoji({ emoji, mode, refWrapEmoji }: EmojiItemProps) {
 }
 
 export default ItemEmoji;
+
+type ArrowItemProps = {
+	arrow: boolean;
+	isRightLimit: boolean;
+	emojiCross: EmojiDataOptionals;
+};
+
+function ArrowItem({ arrow, isRightLimit, emojiCross }: ArrowItemProps) {
+	const dispatch = useDispatch();
+	const onHover = () => {
+		dispatch(reactionActions.setEmojiHover(emojiCross));
+		dispatch(reactionActions.setUserReactionPanelState(true));
+	};
+	return (
+		<div
+			onMouseEnter={onHover}
+			className="w-full h-3  z-50 cursor-pointer"
+			style={{
+				display: 'flex',
+				justifyContent: isRightLimit ? 'flex-end' : 'center',
+			}}
+		>
+			{arrow && <Icons.ArrowDownFill className={`dark:text-[#28272b] text-white`} />}
+		</div>
+	);
+}

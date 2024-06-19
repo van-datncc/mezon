@@ -1,6 +1,5 @@
 import {
 	reactionActions,
-	selectArrowPosition,
 	selectDataReactionGetFromMessage,
 	selectDataSocketUpdate,
 	selectMessageMatchWithRef,
@@ -9,7 +8,6 @@ import {
 	selectReactionBottomStateResponsive,
 	selectReactionPlaceActive,
 	selectReactionRightState,
-	selectUserReactionPanelState,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EmojiPlaces, updateEmojiReactionData } from '@mezon/utils';
@@ -28,11 +26,9 @@ export function useChatReaction() {
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
-	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const messageMatchWithRefStatus = useSelector(selectMessageMatchWithRef);
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
-	const arrowPosition = useSelector(selectArrowPosition);
 
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
 	const dataReactionSocket = useSelector(selectDataSocketUpdate);
@@ -83,12 +79,6 @@ export function useChatReaction() {
 		[dispatch],
 	);
 
-	const setUserReactionPanelState = useCallback(
-		(state: boolean) => {
-			dispatch(reactionActions.setUserReactionPanelState(state));
-		},
-		[dispatch],
-	);
 
 	const setMessageMatchWithRef = useCallback(
 		(state: boolean) => {
@@ -102,12 +92,7 @@ export function useChatReaction() {
 		},
 		[dispatch],
 	);
-	const setArrowPosition = useCallback(
-		(state: boolean) => {
-			dispatch(reactionActions.setArrowPosition(state));
-		},
-		[dispatch],
-	);
+
 
 	return useMemo(
 		() => ({
@@ -120,16 +105,12 @@ export function useChatReaction() {
 			reactionBottomState,
 			setReactionRightState,
 			setReactionBottomState,
-			setUserReactionPanelState,
-			userReactionPanelState,
 			setReactionBottomStateResponsive,
 			reactionBottomStateResponsive,
 			messageMatchWithRefStatus,
 			setMessageMatchWithRef,
 			setPositionOfSmileButton,
 			positionOfSmileButton,
-			arrowPosition,
-			setArrowPosition,
 			convertReactionToMatchInterface,
 		}),
 		[
@@ -148,8 +129,6 @@ export function useChatReaction() {
 			setMessageMatchWithRef,
 			setPositionOfSmileButton,
 			positionOfSmileButton,
-			arrowPosition,
-			setArrowPosition,
 			convertReactionToMatchInterface,
 		],
 	);

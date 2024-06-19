@@ -1,14 +1,17 @@
 import { Icons } from '@mezon/components';
 import { useChatReaction, useGifsStickersEmoji } from '@mezon/core';
+import { reactionActions } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 type ReactionBottomProps = {
 	smileButtonRef: React.RefObject<HTMLDivElement>;
 };
 
 const ReactionBottom = ({ smileButtonRef }: ReactionBottomProps) => {
-	const { setUserReactionPanelState, setPositionOfSmileButton } = useChatReaction();
+	const dispatch = useDispatch();
+	const { setPositionOfSmileButton } = useChatReaction();
 	const [highlightColor, setHighLightColor] = useState('#AEAEAE');
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const handleClickOpenEmojiBottom = useCallback(
@@ -35,9 +38,10 @@ const ReactionBottom = ({ smileButtonRef }: ReactionBottomProps) => {
 				bottom: rect.bottom,
 			});
 		}
-		setUserReactionPanelState(false);
+		dispatch(reactionActions.setUserReactionPanelState(false));
+
 		setSubPanelActive(SubPanelName.NONE);
-	}, [smileButtonRef, setPositionOfSmileButton, setUserReactionPanelState]);
+	}, [smileButtonRef, setPositionOfSmileButton, dispatch]);
 
 	return (
 		<div onMouseEnter={handleHoverSmileButton} onClick={handleClickOpenEmojiBottom} ref={smileButtonRef}>
