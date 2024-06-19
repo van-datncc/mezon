@@ -1,4 +1,4 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Colors, Fonts, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.gray48,
         backgroundColor: Colors.primary,
         borderWidth: 1,
-        borderRadius: 15,
+        borderRadius: 10
     },
 
     fakeInputFocus: {
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
 
     count: {
         color: Colors.white,
-        fontSize: 14,
+        fontSize: Fonts.size.h8,
         marginRight: 10
     }
 })

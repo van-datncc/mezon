@@ -1,12 +1,13 @@
-import { Text, TouchableOpacity, View } from "react-native";
-import MezonBottomSheet from "../MezonBottomSheet";
 import MezonOption from "../MezonOption";
 import { ReactNode } from "react";
-import styles from "./style";
 import { useState } from "react";
 import { useRef } from "react";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { AngleRightIcon, ArrowDownIcon } from "@mezon/mobile-components";
+import { AngleRightIcon } from "@mezon/mobile-components";
+import MezonFakeBox from "../MezonFakeBox";
+import { View } from "react-native";
+import MezonBottomSheet from "../MezonBottomSheet";
+import styles from "./styles";
 
 interface IMezonSelectProps {
     title?: string;
@@ -20,35 +21,33 @@ interface IMezonSelectProps {
 }
 
 export default function MezonSelect({ data, onChange, icon, title }: IMezonSelectProps) {
-    const [currentValue, setCurrentValue] = useState(data?.[0]?.title || "unknown");
+    const [currentValue, setCurrentValue] = useState(0);
+    const [currentContent, setCurrentContent] = useState(data?.[0]?.title || "unknown");
     const bottomSheetRef = useRef<BottomSheetModalMethods>();
 
     function handleChange(value: number) {
-        setCurrentValue(data?.filter(item => item.value === value)?.[0]?.title || "unknown");
+        setCurrentValue(value);
+        setCurrentContent(data?.filter(item => item.value === value)?.[0]?.title || "unknown");
         bottomSheetRef?.current?.dismiss();
         onChange && onChange(value);
     }
 
-    function handlePressBox() {
+    function handlePress() {
         bottomSheetRef?.current?.present();
     }
 
     return (
         <View>
-            {title && <Text style={styles.sectionTitle}>{title}</Text>}
-            
-            <TouchableOpacity onPress={handlePressBox}>
-                <View style={styles.box}>
-                    {icon}
-                    <Text style={styles.textBox}>{currentValue}</Text>
-                    {/* TODO: Fix this */}
-                    <AngleRightIcon height={20} width={20} />
-                </View>
-            </TouchableOpacity>
+            <MezonFakeBox
+                title={title}
+                value={currentContent}
+                postfixIcon={<AngleRightIcon height={20} width={20} />}
+                onPress={handlePress}
+            />
 
-            <MezonBottomSheet ref={bottomSheetRef} heightFitContent>
+            <MezonBottomSheet ref={bottomSheetRef} heightFitContent title={title}>
                 <View style={styles.bsContainer}>
-                    <MezonOption data={data} onChange={handleChange} />
+                    <MezonOption data={data} onChange={handleChange} value={currentValue} />
                 </View>
             </MezonBottomSheet>
         </View>
