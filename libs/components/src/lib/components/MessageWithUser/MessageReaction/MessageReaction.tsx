@@ -1,17 +1,19 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji, useReference } from '@mezon/core';
+import { selectReactionsByMessageId } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, SubPanelName, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
 	currentChannelId: string;
 	mode: number;
-	dataReaction?: EmojiDataOptionals[] | [];
+	messageId?: string;
 };
 
 // TODO: refactor component for message lines
-const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode, dataReaction }) => {
+const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode, messageId }) => {
 	const {
 		userId,
 		reactionMessageDispatch,
@@ -21,6 +23,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, mes
 		reactionBottomStateResponsive,
 		setArrowPosition,
 	} = useChatReaction();
+
+	const dataReaction = useSelector((state) => selectReactionsByMessageId(state, messageId));
 
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);

@@ -1,17 +1,13 @@
 import { ChatWelcome } from '@mezon/components';
+import { getJumpToMessageId, useApp, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
 import {
-	getJumpToMessageId,
-	useApp,
-	useChatMessages,
-	useChatReaction,
-	useJumpToMessage,
-	useMessages,
-	useNotification,
-	useReference,
-} from '@mezon/core';
-import { selectDataReactionGetFromMessage } from '@mezon/store';
-import { EmojiDataOptionals, IMessageWithUser, updateEmojiReactionData } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+	messagesActions,
+	selectHasMoreMessageByChannelId,
+	selectMessageIdsByChannelIdV2,
+	selectQuantitiesMessageRemain,
+	useAppDispatch,
+} from '@mezon/store';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage } from './ChannelMessage';
 
@@ -24,28 +20,29 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+	const messages = useSelector((state) => selectMessageIdsByChannelIdV2(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
-	const { setIdReferenceMessageReply, idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
+	const { idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
 	const { appearanceTheme } = useApp();
-	const { idMessageNotifed, setMessageNotifedId } = useNotification();
+	const { idMessageNotifed } = useNotification();
+	const remain = useSelector(selectQuantitiesMessageRemain);
 	// share logic to load more message
-	const { isFetching, remain } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, messages, channelId });
 
-	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
-	const { dataReactionServerAndSocket } = useChatReaction();
+	const dispatch = useAppDispatch();
+
+	const loadMoreMessage = useCallback(async () => {
+		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
+	}, [dispatch, channelId]);
+	
+	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages });
 
 	useEffect(() => {
-		setDataReactionCombine(updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]));
-	}, [reactDataFirstGetFromMessage, dataReactionServerAndSocket]);
-
-	useEffect(() => {
-		setMessageIdToJump(messageMentionId);
+		if (messageMentionId) setMessageIdToJump(messageMentionId);
 	}, [messageMentionId]);
 
 	useEffect(() => {
@@ -54,7 +51,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		if (idMessageToJump !== '') setMessageIdToJump(idMessageToJump);
 		setTimeToJump(0);
 		setPositionToJump('center');
-	}, [getJumpToMessageId, idMessageNotifed, idMessageRefReply, idMessageToJump]);
+	}, [idMessageNotifed, idMessageRefReply, idMessageToJump]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout | null = null;
@@ -68,15 +65,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				clearTimeout(timeoutId);
 			}
 		};
-	}, [messageid, jumpToMessage]);
-
-	function reverseArray(array: IMessageWithUser[]) {
-		return array.slice().reverse();
-	}
-
-	const getReactionsByChannelId = (data: EmojiDataOptionals[], mesId: string) => {
-		return data.filter((item: any) => item.message_id === mesId);
-	};
+	}, [messageid, jumpToMessage, timeToJump, positionToJump]);
 
 	return (
 		<div
@@ -90,22 +79,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
-			{isFetching && remain !== 0 && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+			{isFetching && remain !== 0 && (
+				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
+			)}
 
-			{reverseArray(messages).map((message, i) => {
-				const data = getReactionsByChannelId(dataReactionCombine, message.id);
-				return (
-					<ChannelMessage
-						dataReaction={data}
-						mode={mode}
-						key={message.id}
-						lastSeen={message.id === unreadMessageId && message.id !== lastMessageId}
-						message={message}
-						preMessage={reverseArray(messages).length > 0 ? reverseArray(messages)[i - 1] : undefined}
-						channelId={channelId}
-						channelLabel={channelLabel ?? ''}
-					/>
-				);
+			{messages?.map((messageId) => {
+				return <ChannelMessage key={messageId} messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel ?? ''} />;
 			})}
 		</div>
 	);
