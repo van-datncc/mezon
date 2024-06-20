@@ -107,13 +107,14 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 						setIsShowPanelChannel={setIsShowPanelChannel}
 					/>
 				)}
-				<SettingChannel
-					open={openSetting}
-					onClose={() => {
-						setOpenSetting(false);
-					}}
-					channel={thread}
-				/>
+				{openSetting &&
+					<SettingChannel
+						onClose={() => {
+							setOpenSetting(false);
+						}}
+						channel={thread}
+					/>
+				}
 
 				{showModal && (
 					<DeleteModal
