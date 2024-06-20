@@ -44,9 +44,10 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				anonymous,
 				mentionEveryone,
 				senderId: currentUserId,
+				channelLabel: channel.channel_label ?? '',
 			}))
 		},
-		[dispatch, channelId, currentClanId, mode, currentUserId],
+		[dispatch, channelId, currentClanId, mode, currentUserId, channel.channel_label],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {

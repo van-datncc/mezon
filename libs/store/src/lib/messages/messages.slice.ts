@@ -277,6 +277,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 type SendMessagePayload = {
 	clanId: string;
 	channelId: string;
+	channelLabel: string;
 	content: IMessageSendPayload;
 	mentions?: Array<ApiMessageMention>;
 	attachments?: Array<ApiMessageAttachment>;
@@ -290,7 +291,7 @@ type SendMessagePayload = {
 export const sendMessage = createAsyncThunk(
 	'messages/sendMessage',
 	async (payload: SendMessagePayload, thunkAPI) => {
-		const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+		const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, channelLabel, mode, clanId, senderId } = payload;
 		const id = Date.now().toString();
 
 
@@ -309,8 +310,7 @@ export const sendMessage = createAsyncThunk(
 			const res = await socket.writeChatMessage(
 				clanId,
 				channelId,
-				// channel.id,
-				'',
+				channelLabel,
 				mode,
 				content,
 				mentions,
