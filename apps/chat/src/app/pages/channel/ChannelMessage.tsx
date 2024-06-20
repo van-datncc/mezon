@@ -72,6 +72,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	const [deleteMessage, setDeleteMessage] = useState(false);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const user = useSelector(selectMemberByUserId(message.sender_id));
+	// TODO: separate EditSendMessage and SendMessage to different hooks
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
@@ -305,7 +306,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 				{lastSeen && <UnreadMessageBreak />}
 				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>
-			<MessageReaction currentChannelId={channelId || ''} message={message} mode={mode} />
+			<MessageReaction message={message} mode={mode} />
 		</>
 	);
 }
