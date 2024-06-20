@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannel } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { useSelector } from 'react-redux';
