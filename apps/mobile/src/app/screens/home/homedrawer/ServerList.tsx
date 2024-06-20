@@ -40,7 +40,7 @@ const ServerList = React.memo((props: any) => {
 				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
 			</View>
 			<View style={styles.mb_10}>
-				<ClanIcon data={currentClan} onPress={handleChangeClan} />
+				<ClanIcon data={currentClan} onPress={handleChangeClan} isActive={true}/>
 			</View>
 
 			<Tooltip
