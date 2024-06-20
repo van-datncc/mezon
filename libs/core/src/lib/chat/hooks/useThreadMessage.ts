@@ -4,7 +4,6 @@ import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useClans } from './useClans';
-import { useReference } from './useReference';
 import { useSelector } from 'react-redux';
 
 export type UseThreadMessage = {
@@ -66,7 +65,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			if (!client || !session || !socket || !thread || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			if (mode === 4) {
+			if (mode === 4 || mode === 3) {
 				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
 			} else {
 				await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);

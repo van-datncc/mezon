@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { useDMInvite, useDirect, useSendInviteMessage } from '@mezon/core';
@@ -30,7 +30,7 @@ export interface IListMemberInviteProps {
 	channelID?: string;
 }
 
-export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean }) => {
+export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean, clanIconStyle?: ViewStyle }) => {
 	return (
 		<TouchableOpacity
 			activeOpacity={props?.onPress ? 0.7 : 1}
@@ -42,7 +42,7 @@ export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: an
 				}
 			}}
 		>
-			<View style={[styles.clanIcon, props?.isActive && styles.clanIconActive]}>
+			<View style={[styles.clanIcon, props?.isActive && styles.clanIconActive, props?.clanIconStyle]}>
 				{props.icon ? (
 					props.icon
 				) : props?.data?.logo ? (
@@ -219,7 +219,7 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 		});
 	}, [listUserInvite, searchTerm]);
 
-	const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {		
+	const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
