@@ -1,6 +1,8 @@
-import { reactionActions } from '@mezon/store';
+import { selectQuantitiesMessageRemain } from '@mezon/store';
+import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { reactionActions } from '@mezon/store';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
@@ -34,6 +36,7 @@ export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, load
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
 			dispatch(reactionActions.setUserReactionPanelState(false));
+			dispatch(reactionActions.setEmojiHover(null));
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 

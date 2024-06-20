@@ -118,8 +118,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		footerImagesModalRef?.current?.scrollToIndex({ animated: true, index: 0 });
 		setVisibleImageModal(true);
 	}, []);
-
-	const renderItem = ({ item, index }) => {
+	
+	const renderItem = useCallback(({ item, index }) => {
 		const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
 		return (
 			<MessageItem
@@ -131,8 +131,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				onOpenImage={onOpenImage}
 			/>
 		);
-	};
-
+	}, [messages, mode, channelId, channelLabel, onOpenImage]);
+	
 	const RenderFooterModal = () => {
 		return (
 			<View style={styles.wrapperFooterImagesModal}>

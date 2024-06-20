@@ -13,6 +13,7 @@ import { styles } from './UserProfile.styles';
 import { useNavigation } from '@react-navigation/native';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { User } from 'mezon-js';
+import React from 'react';
 
 interface userProfileProps {
 	userId?: string;
@@ -20,7 +21,7 @@ interface userProfileProps {
 	onClose?: () => void
 }
 
-const UserProfile = ({ userId, user, onClose }: userProfileProps) => {
+const UserProfile = React.memo(({ userId, user, onClose }: userProfileProps) => {
 	const { userProfile } = useAuth();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { t } = useTranslation(['userProfile']);
@@ -124,6 +125,6 @@ const UserProfile = ({ userId, user, onClose }: userProfileProps) => {
 			</View>
 		</ScrollView>
 	);
-};
+});
 
 export default UserProfile;
