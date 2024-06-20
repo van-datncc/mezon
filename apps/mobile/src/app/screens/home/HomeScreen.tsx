@@ -2,6 +2,7 @@ import {
 	appActions,
 	clansActions,
 	directActions,
+	eventManagementActions,
 	friendsActions,
 	getStoreAsync,
 	notificationActions,

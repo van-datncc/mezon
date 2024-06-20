@@ -32,7 +32,6 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
                 timeValueStart, timeValueStart,
                 description, ""
             );
-            return;
         } else {
             await createEventManagement(
                 currentClanId || '',
@@ -41,8 +40,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
                 description, ""
             );
         }
-
-        navigation.replace(APP_SCREEN.HOME)
+        navigation.navigate(APP_SCREEN.HOME)
     }
 
     return (
@@ -71,7 +69,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
             </View>
 
             <MezonButton
-                title={t('actions.next')}
+                title={t('actions.create')}
                 type="success"
                 onPress={handleCreate}
             />

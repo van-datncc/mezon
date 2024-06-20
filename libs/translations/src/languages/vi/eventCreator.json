@@ -67,7 +67,8 @@
         }
     },
     "actions": {
-        "next": "Tiếp theo"
+        "next": "Tiếp theo",
+        "create": "Tạo sự kiện"
     },
     "notify": {
         "locationBlank": "Cần nhập vị trí",

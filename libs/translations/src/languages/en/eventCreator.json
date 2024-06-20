@@ -67,7 +67,8 @@
         }
     },
     "actions": {
-        "next": "Next"
+        "next": "Next",
+        "create": "Create Event"
     },
     "notify": {
         "locationBlank": "A location is required",
