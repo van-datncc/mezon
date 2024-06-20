@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectTheme } from '@mezon/store';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectTheme, selectCloseMenu, selectStatusMenu } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';

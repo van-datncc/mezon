@@ -1,5 +1,5 @@
 import { useApp, useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
-import { appActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import { appActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';

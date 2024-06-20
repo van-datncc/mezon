@@ -1,5 +1,5 @@
 import { useApp, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectCloseMenu, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectStatusMenu, selectnotificatonSelected } from '@mezon/store';
+import { appActions, searchMessagesActions, selectCloseMenu, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectStatusMenu, selectTheme, selectnotificatonSelected } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';

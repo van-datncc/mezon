@@ -22,6 +22,7 @@ import {
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
 	selectStatusMenu,
+	selectTheme,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
