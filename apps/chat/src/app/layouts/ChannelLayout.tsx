@@ -15,11 +15,9 @@ const ChannelLayout = () => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const { isShowCreateThread } = useThreads();
 	const { isShowMemberList } = useApp();
-	const { positionOfSmileButton, setUserReactionPanelState } = useChatReaction();
-
+	const { positionOfSmileButton } = useChatReaction();
 	const HEIGHT_EMOJI_PANEL: number = 457;
 	const WIDTH_EMOJI_PANEL: number = 500;
-
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
 	let topPositionEmojiPanel: string;
@@ -31,7 +29,6 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
-
 
 
 	return (
