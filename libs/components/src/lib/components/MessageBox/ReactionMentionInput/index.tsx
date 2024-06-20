@@ -8,7 +8,6 @@ import {
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
-	useMenu,
 	useMessageValue,
 	useReference,
 	useThreads,
@@ -17,9 +16,13 @@ import {
 	ChannelsEntity,
 	channelUsersActions,
 	referencesActions,
+	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectDirectById,
+	selectDmGroupCurrentId,
 	selectMessageByMessageId,
+	selectStatusMenu,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -53,6 +56,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+import { useMezon } from '@mezon/transport';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -366,7 +370,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const { openReplyMessageState, openEditMessageState } = useReference();
-	const { closeMenu, statusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
 		if (closeMenu && statusMenu) {
 			return;
@@ -438,7 +443,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onFinishUpload?.();
 		}
 	}, [props, props.finishUpload]);
-
+	const directId = useSelector(selectDmGroupCurrentId)
+	const direct = useSelector(selectDirectById(directId || ""))
+	const mezon = useMezon();
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (

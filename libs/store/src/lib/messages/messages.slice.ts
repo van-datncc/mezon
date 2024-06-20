@@ -1,8 +1,9 @@
 import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, lruMemoize } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
+import { shallowEqual } from 'react-redux';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
 
@@ -34,6 +35,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 
 export interface MessagesEntity extends IMessageWithUser {
 	id: string; // Primary ID
+	channel_id: string;
 }
 
 export type UserTypingState = {
@@ -58,7 +60,14 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
+	channelMessagesIds: Record<string, string[]>;
 }
+
+export type FetchMessagesMeta = {
+	arg: {
+		channelId: string;
+	};
+};
 
 export interface MessagesRootState {
 	[MESSAGES_FEATURE_KEY]: MessagesState;
@@ -71,7 +80,9 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 
 export const TYPING_TIMEOUT = 3000;
 
-export const messagesAdapter = createEntityAdapter<MessagesEntity>();
+export const messagesAdapter = createEntityAdapter<MessagesEntity>({
+	sortComparer: orderMessageByTimeMsAscending,
+});
 
 export const fetchMessagesCached = memoize(
 	(mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>
@@ -110,12 +121,12 @@ export const fetchMessages = createAsyncThunk(
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
-			return thunkAPI.rejectWithValue([]);
+			return [];
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
-		await thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
+		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
 		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
 			if (!message.reactions) return [];
 			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
@@ -148,7 +159,6 @@ export const fetchMessages = createAsyncThunk(
 			});
 			return Object.values(emojiDataItems);
 		});
-
 
 		if (reactionData.length > 0) {
 			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
@@ -299,6 +309,7 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	openOptionMessageState: false,
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
+	channelMessagesIds: {},
 });
 
 export type SetCursorChannelArgs = {
@@ -307,6 +318,10 @@ export type SetCursorChannelArgs = {
 };
 
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
+
+const filterChannelMessagesIds = (updatedMessagesState: MessagesState, channelId: string) => {
+	return updatedMessagesState.ids.filter((id) => updatedMessagesState.entities[id]?.channel_id === channelId);
+};
 
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
@@ -321,12 +336,14 @@ export const messagesSlice = createSlice({
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const code = action.payload.code;
+			const channelId = action.payload.channel_id;
+			let updatedMessagesState = state;
 			switch (code) {
 				case 0:
-					messagesAdapter.addOne(state, action.payload);
+					updatedMessagesState = messagesAdapter.addOne(state, action.payload);
 					break;
 				case 1:
-					messagesAdapter.updateOne(state, {
+					updatedMessagesState = messagesAdapter.updateOne(state, {
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
@@ -335,13 +352,15 @@ export const messagesSlice = createSlice({
 					});
 					break;
 				case 2:
-					messagesAdapter.removeOne(state, action.payload.id);
+					updatedMessagesState = messagesAdapter.removeOne(state, action.payload.id);
 					break;
 				default:
 					break;
 			}
 
-			if (action.payload.channel_id) {
+			if (channelId) {
+				state.channelMessagesIds[channelId] = filterChannelMessagesIds(updatedMessagesState, channelId);
+
 				// TODO: check duplicates with setChannelLastMessage
 				state.unreadMessagesEntries = {
 					...state.unreadMessagesEntries,
@@ -405,9 +424,20 @@ export const messagesSlice = createSlice({
 			.addCase(fetchMessages.pending, (state: MessagesState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[]>) => {
-				messagesAdapter.setMany(state, action.payload);
+			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[], string, FetchMessagesMeta>) => {
+				const isNew = action.payload.some(({ id }) => !state.entities[id]);
+
+				if (!isNew) return state;
+
+				const reversedMessages = action.payload.reverse();
+				const updatedMessagesState = messagesAdapter.setMany(state, reversedMessages);
 				state.loadingStatus = 'loaded';
+				const channelId = action?.meta?.arg?.channelId;
+				if (channelId) {
+					state.channelMessagesIds[channelId] = updatedMessagesState.ids.filter(
+						(id) => updatedMessagesState.entities[id]?.channel_id === channelId,
+					);
+				}
 			})
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
@@ -464,7 +494,7 @@ export const messagesActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = messagesAdapter.getSelectors();
+const { selectAll, selectEntities, selectById } = messagesAdapter.getSelectors();
 
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];
 
@@ -477,7 +507,16 @@ export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	return 0;
 }
 
+export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEntity) {
+	if (a.creationTimeMs && b.creationTimeMs) {
+		return +a.creationTimeMs - +b.creationTimeMs;
+	}
+	return 0;
+}
+
 export const selectMessagesEntities = createSelector(getMessagesState, selectEntities);
+
+export const selectChannelMessagesIds = createSelector(getMessagesState, (state) => state.channelMessagesIds);
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
@@ -557,3 +596,46 @@ export const selectMessageByMessageId = (messageId: string) =>
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
 export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
+
+// V2
+
+export const selectMessageIdsByChannelIdV2 = createSelector(
+	[selectChannelMessagesIds, (_, channelId) => channelId],
+	(channelMessagesIds, channelId) => {
+		return channelId ? channelMessagesIds?.[channelId] : null;
+	},
+	{
+		memoize: lruMemoize,
+		memoizeOptions: {
+			equalityCheck: shallowEqual,
+			resultEqualityCheck: shallowEqual,
+			maxSize: 10,
+		},
+		argsMemoize: lruMemoize,
+		argsMemoizeOptions: {
+			equalityCheck: shallowEqual,
+			resultEqualityCheck: shallowEqual,
+			maxSize: 10,
+		},
+	},
+);
+
+export const selectMessageEntityById = createSelector([getMessagesState, (_, messageId) => messageId], (messagesState, messageId) =>
+	selectById(messagesState, messageId),
+);
+
+export const selectPreviousMessageByMessageId = (channelId: string, messageId: string) =>
+	createSelector([(state) => selectMessageIdsByChannelIdV2(state, channelId), getMessagesState], (messageIds, messagesState) => {
+		const prevMessageId = messageIds?.find((_, index) => messageIds[index + 1] === messageId);
+		if (!prevMessageId) return undefined;
+		const prevMessageEntity = selectById(messagesState, prevMessageId);
+		if (prevMessageEntity && typeof prevMessageEntity.content === 'object' && typeof (prevMessageEntity.content as any).id === 'string') {
+			return prevMessageEntity.content;
+		}
+		return prevMessageEntity;
+	});
+
+export const selectLastSeenMessage = (channelId: string, messageId: string) =>
+	createSelector([selectLastMessageIdByChannelId(channelId), selectUnreadMessageIdByChannelId(channelId)], (lastMessageId, unreadMessageId) => {
+		return Boolean(messageId === unreadMessageId && messageId !== lastMessageId);
+	});

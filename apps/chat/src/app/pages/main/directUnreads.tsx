@@ -7,17 +7,13 @@ import { selectDirectById } from '@mezon/store';
 
 export type DirectMessUnreadProp = {
 	readonly directMessage: Readonly<any>;
-	readonly onSend: (
-		DMid?: string,
-		type?: number,
-	) => void;
 };
 
-function DirectUnreads({ directMessage, onSend }: DirectMessUnreadProp) {
+function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 	const currentDirect = useSelector(selectDirectById(directMessage.id))
 	
 	return (
-		<div onClick={() => onSend(directMessage.channel_id || "", directMessage.type|| 0)}>
+		<div>
 			<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '8px' }}></div>
 			<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`} >
 				<NavLinkComponent clanName={directMessage.channel_label || ""}>

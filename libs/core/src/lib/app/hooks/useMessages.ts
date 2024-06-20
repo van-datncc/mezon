@@ -1,22 +1,19 @@
-import { selectQuantitiesMessageRemain } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { reactionActions } from '@mezon/store';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useChatReaction } from '../../chat/hooks/useChatReaction';
+import { useDispatch } from 'react-redux';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
 	channelId: string;
 	hasMoreMessage: boolean;
 	loadMoreMessage: () => void;
-	messages: IMessageWithUser[];
+	messages?: string[] | null;
 };
 
-export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessage, messages }: MessageProps) => {
+export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, loadMoreMessage }: MessageProps) => {
 	const [isFetching, setIsFetching] = useState(false);
 	const [currentChannelId, setCurrentChannelId] = useState(channelId);
-	const remain = useSelector(selectQuantitiesMessageRemain);
-	const { positionOfSmileButton, setUserReactionPanelState } = useChatReaction();
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		const currentChatRef = chatRef.current;
@@ -32,11 +29,11 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		const currentChatRef = chatRef.current;
 		if (!currentChatRef || isFetching) return;
 		currentChatRef.scrollTop = currentChatRef.scrollHeight;
-	}, [channelId, messages.length]);
+	}, [channelId, messages?.length]);
 
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
-			setUserReactionPanelState(false);
+			dispatch(reactionActions.setUserReactionPanelState(false));
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 
@@ -54,7 +51,7 @@ export const useMessages = ({ chatRef, channelId, hasMoreMessage, loadMoreMessag
 		return () => {
 			currentChatRef?.removeEventListener('wheel', handleWheel);
 		};
-	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching, remain]);
+	}, [hasMoreMessage, loadMoreMessage, chatRef, isFetching]);
 
-	return { isFetching, remain };
+	return { isFetching };
 };

@@ -20,7 +20,6 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			mezon.joinChatDirectMessage(response.channel_id, '', ChannelType.CHANNEL_TYPE_DM);
 			sendInviteMessage(url, response.channel_id);
 		}
 	};
@@ -31,7 +30,6 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			directMessageWithUser(userId);
 		}
 		if (directParamId && dmGroup) {
-			mezon.joinChatDirectMessage(directParamId, '', type);
 			sendInviteMessage(url, directParamId);
 			onSend(dmGroup);
 		}
@@ -40,15 +38,14 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 		setIsInviteSent(isSent);
 	}, [isSent]);
 	return (
-		<>
-			{dmGroup ? (
+		dmGroup ? (
 				<div key={dmGroup.channel_id} className="flex items-center justify-between h-14">
 					{Array.isArray(dmGroup.channel_avatar) && dmGroup.channel_avatar.length > 1 ? (
 						<img src={`/assets/images/avatar-group.png`} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
 					) : (
 						<img src={dmGroup.channel_avatar?.at(0)} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
 					)}
-					<p style={{ marginRight: 'auto' }} className="pl-[10px]">
+					<p style={{ marginRight: 'auto' }} className="pl-[10px] max-w-full overflow-hidden text truncate">
 						{dmGroup.channel_label}
 					</p>
 					<button
@@ -87,8 +84,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 						{isInviteSent ? 'Sent' : 'Invite'}
 					</button>
 				</div>
-			)}
-		</>
+			)
 	);
 };
 export default ListMemberInviteItem;
