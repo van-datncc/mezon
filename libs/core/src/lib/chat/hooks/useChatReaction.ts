@@ -1,6 +1,5 @@
 import {
 	reactionActions,
-	selectArrowPosition,
 	selectDataReactionGetFromMessage,
 	selectDataSocketUpdate,
 	selectMessageMatchWithRef,
@@ -9,7 +8,6 @@ import {
 	selectReactionBottomStateResponsive,
 	selectReactionPlaceActive,
 	selectReactionRightState,
-	selectUserReactionPanelState,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EmojiPlaces, updateEmojiReactionData } from '@mezon/utils';
@@ -28,12 +26,9 @@ export function useChatReaction() {
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
-	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const messageMatchWithRefStatus = useSelector(selectMessageMatchWithRef);
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
-	const arrowPosition = useSelector(selectArrowPosition);
-
 	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
 	const dataReactionSocket = useSelector(selectDataSocketUpdate);
 	const combineDataServerAndSocket = [...reactDataFirstGetFromMessage, ...dataReactionSocket];
@@ -50,7 +45,6 @@ export function useChatReaction() {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-
 			await socket.writeMessageReaction(id, channelId, channelLabel, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, currentClanId],
@@ -83,12 +77,6 @@ export function useChatReaction() {
 		[dispatch],
 	);
 
-	const setUserReactionPanelState = useCallback(
-		(state: boolean) => {
-			dispatch(reactionActions.setUserReactionPanelState(state));
-		},
-		[dispatch],
-	);
 
 	const setMessageMatchWithRef = useCallback(
 		(state: boolean) => {
@@ -102,12 +90,7 @@ export function useChatReaction() {
 		},
 		[dispatch],
 	);
-	const setArrowPosition = useCallback(
-		(state: boolean) => {
-			dispatch(reactionActions.setArrowPosition(state));
-		},
-		[dispatch],
-	);
+
 
 	return useMemo(
 		() => ({
@@ -120,17 +103,14 @@ export function useChatReaction() {
 			reactionBottomState,
 			setReactionRightState,
 			setReactionBottomState,
-			setUserReactionPanelState,
-			userReactionPanelState,
 			setReactionBottomStateResponsive,
 			reactionBottomStateResponsive,
 			messageMatchWithRefStatus,
 			setMessageMatchWithRef,
 			setPositionOfSmileButton,
 			positionOfSmileButton,
-			arrowPosition,
-			setArrowPosition,
 			convertReactionToMatchInterface,
+			dataReactionSocket
 		}),
 		[
 			userId,
@@ -147,11 +127,8 @@ export function useChatReaction() {
 			setMessageMatchWithRef,
 			setPositionOfSmileButton,
 			positionOfSmileButton,
-			arrowPosition,
-			setArrowPosition,
 			convertReactionToMatchInterface,
-			setUserReactionPanelState,
-			userReactionPanelState,
+
 		],
 	);
 }

@@ -23,6 +23,8 @@ import CategoryMenu from './components/CategoryMenu';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import { styles } from './styles';
+import { useNavigation } from '@react-navigation/native';
+import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -37,6 +39,7 @@ const ChannelList = React.memo((props: any) => {
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
 	const user = useAuth();
+	const navigation = useNavigation<AppStackScreenProps['navigation']>()
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -88,6 +91,11 @@ const ChannelList = React.memo((props: any) => {
 		setCurrentPressedCategory(channel);
 	}
 
+	function handlePressEventCreate() {
+		bottomSheetEventRef?.current?.dismiss();
+		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
+	}
+
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
 			<View style={[styles.mainList, { backgroundColor: Colors.surface }]}>
@@ -136,9 +144,13 @@ const ChannelList = React.memo((props: any) => {
 
 			<MezonBottomSheet
 				title={`${allEventManagement.length} Events`}
-				headerRight={currentClan?.creator_id === user?.userId && <Text style={{ color: 'white' }}>Create</Text>}
 				ref={bottomSheetEventRef}
-			>
+				headerRight={
+					currentClan.creator_id === user.userId &&
+					<TouchableOpacity onPress={handlePressEventCreate}>
+						<Text style={{ color: "white" }}>Create</Text>
+					</TouchableOpacity>
+				}>
 				<EventViewer />
 			</MezonBottomSheet>
 		</ChannelListContext.Provider>
