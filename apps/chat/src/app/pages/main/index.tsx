@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist } from '@mezon/store';
+import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectTheme } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
@@ -98,7 +98,7 @@ function MyApp() {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 

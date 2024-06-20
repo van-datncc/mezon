@@ -1,6 +1,7 @@
-import { useApp, useRoles } from '@mezon/core';
+import { useRoles } from '@mezon/core';
 import {
 	rolesClanActions,
+	selectTheme,
 	setAddMemberRoles,
 	setAddPermissions,
 	setNameRoleNew,
@@ -12,7 +13,7 @@ import {
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
 import ServerSettingRoleManagement from '../SettingRoleManagement';
 
@@ -51,7 +52,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const handleDeleteRole = async (roleId: string) => {
 		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
 	};
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<>
 			<div className="flex items-center space-x-4">

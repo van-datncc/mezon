@@ -1,4 +1,4 @@
-import { useApp, useCategory, useClans } from '@mezon/core';
+import { useCategory, useClans } from '@mezon/core';
 import {
 	defaultNotificationActions,
 	defaultNotificationCategoryActions,
@@ -6,6 +6,7 @@ import {
 	selectAllchannelCategorySetting,
 	selectCurrentClanId,
 	selectDefaultNotificationClan,
+	selectTheme,
 	selectnotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store';
@@ -85,7 +86,7 @@ const lightCustomStyles = {
 };
 
 const ModalNotificationSetting = (props: ModalParam) => {
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const { currentClan } = useClans();
 	const notificationTypes = Object.values(NotificationType);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);

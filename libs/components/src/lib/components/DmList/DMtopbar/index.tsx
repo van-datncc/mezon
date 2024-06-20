@@ -1,5 +1,5 @@
-import { useApp, useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
-import { appActions, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
+import { useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
+import { appActions, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectTheme, useAppDispatch } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
@@ -21,7 +21,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 	const { closeMenu, statusMenu, setStatusMenu } = useMenu();
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {

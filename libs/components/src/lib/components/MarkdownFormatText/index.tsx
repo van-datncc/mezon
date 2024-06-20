@@ -1,4 +1,4 @@
-import { useApp, useEmojiSuggestion, useInvite } from '@mezon/core';
+import { useEmojiSuggestion, useInvite } from '@mezon/core';
 import { ILineMention, MentionTypeEnum, convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
@@ -7,6 +7,8 @@ import ExpiryTimeModal from '../ExpiryTime';
 import ChannelHashtag from './HashTag';
 import MentionUser from './MentionUser';
 import PreClass from './PreClass';
+import { useSelector } from 'react-redux';
+import { selectTheme } from '@mezon/store';
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
@@ -31,7 +33,7 @@ const MarkdownFormatText = ({ mentions, isOnlyEmoji }: MarkdownFormatTextProps) 
 			window.open(children, '_blank');
 		}
 	};
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const checkMention = (syntax: string) => {
 		const isMention = syntax.startsWith('@');

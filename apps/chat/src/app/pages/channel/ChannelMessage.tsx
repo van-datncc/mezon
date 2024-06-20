@@ -1,5 +1,5 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { useApp, useChannels, useChatReaction, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
+import { useChannels, useChatReaction, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
@@ -17,6 +17,7 @@ import {
 	selectPreviousMessageByMessageId,
 	selectReactionBottomState,
 	selectReactionRightState,
+	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
@@ -201,7 +202,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 
 	useEscapeKey(handleCancelEdit);
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	return (
 		<>

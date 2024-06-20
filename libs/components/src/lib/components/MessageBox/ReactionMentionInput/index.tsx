@@ -1,5 +1,4 @@
 import {
-	useApp,
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
@@ -22,6 +21,7 @@ import {
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
+	selectTheme,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -423,7 +423,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const handleSearchUserMention = (search: any, callback: any) => {
 		setValueHightlight(search);
