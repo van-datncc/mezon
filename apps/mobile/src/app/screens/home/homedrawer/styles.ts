@@ -237,7 +237,9 @@ export const styles = StyleSheet.create({
 		width: '22%',
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.secondary,
+		paddingHorizontal: size.s_10,
 		alignItems: 'center',
+		gap: size.s_10
 	},
 	friendItemWrapper: {
 		marginHorizontal: 20,
@@ -531,9 +533,9 @@ export const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
 	wrapperPlusClan: {
-		height: verticalScale(50),
-		width: verticalScale(50),
-		borderRadius: verticalScale(15),
+		height: size.s_50,
+		width: size.s_50,
+		borderRadius: 50,
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',

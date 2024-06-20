@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     groupAvatar: {
-        backgroundColor: Colors.bgToggleOnBtn,
+        backgroundColor: Colors.orange,
         width: size.s_50,
         height: size.s_50,
         borderRadius: 50,

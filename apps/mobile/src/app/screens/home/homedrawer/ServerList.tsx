@@ -1,7 +1,7 @@
 import { Colors } from '@mezon/mobile-ui';
 import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
 import PlusGreenIcon from '../../../../assets/svg/guildAddCategoryChannel.svg';
@@ -9,6 +9,9 @@ import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
 import ListClanPopupProps from './components/ListClanPopup';
 import { styles } from './styles';
+import { UnreadDMBadgeList } from './components/UnreadDMBadgeList';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { SeparatorWithLine } from '../../../components/Common';
 
 const ServerList = React.memo((props: any) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -31,17 +34,21 @@ const ServerList = React.memo((props: any) => {
 		};
 	}, []);
 
+	const navigateToDM = () => {
+		props.navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+	}
+
 	return (
 		<View style={styles.wrapperServerList}>
-			<View style={styles.mb_10}>
-				<ClanIcon icon={<LogoMezon width={40} height={40} />} data={[]} />
-			</View>
-			<View style={{ width: '100%', alignItems: 'center', marginBottom: 10 }}>
-				<View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '50%' }} />
-			</View>
-			<View style={styles.mb_10}>
-				<ClanIcon data={currentClan} onPress={handleChangeClan} />
-			</View>
+			<TouchableOpacity onPress={() => navigateToDM()}>
+				<LogoMezon width={50} height={50} />
+			</TouchableOpacity>
+
+			<SeparatorWithLine style={{width: '60%'}} />
+
+			<UnreadDMBadgeList />
+
+			<ClanIcon data={currentClan} onPress={handleChangeClan} />
 
 			<Tooltip
 				isVisible={isVisible}
