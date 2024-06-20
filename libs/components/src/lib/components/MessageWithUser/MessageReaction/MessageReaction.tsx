@@ -1,7 +1,9 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
-import { useChatReaction, useReference } from '@mezon/core';
+import { useChatReaction } from '@mezon/core';
+import { selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, calculateTotalCount } from '@mezon/utils';
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
 
 type MessageReactionProps = {
@@ -11,16 +13,18 @@ type MessageReactionProps = {
 
 // TODO: refactor component for message lines
 const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
-	const { reactionBottomState, reactionBottomStateResponsive, convertReactionToMatchInterface } = useChatReaction();
+	const smileButtonRef = useRef<HTMLDivElement | null>(null);
+	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
+	const [checkHasEmoji, setCheckHasEmoji] = useState<boolean>(false);
+	const contentDiv = useRef<HTMLDivElement | null>(null);
+	const { convertReactionToMatchInterface } = useChatReaction();
+	const reactionBottomState = useSelector(selectReactionBottomState);
+	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const getReactionsByMessageId = (data: EmojiDataOptionals[], mesId: string) => {
 		return data.filter((item: any) => item.message_id === mesId);
 	};
 	const dataReaction = getReactionsByMessageId(convertReactionToMatchInterface, message.id);
-
-
-	
-	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
-
+	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
 
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
@@ -30,7 +34,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			return false;
 		}
 	};
-	const contentDiv = useRef<HTMLDivElement | null>(null);
 	const [emojiShowUserReaction, setEmojiShowUserReaction] = useState<EmojiDataOptionals>();
 	const checkEmojiToMatchWithEmojiHover = (emoji: EmojiDataOptionals) => {
 		if (emoji.emoji === emojiShowUserReaction?.emoji) {
@@ -41,9 +44,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	};
 
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals | null>();
-	const smileButtonRef = useRef<HTMLDivElement | null>(null);
-	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
-	const [checkHasEmoji, setCheckHasEmoji] = useState<boolean>(false);
 
 	useLayoutEffect(() => {
 		if (dataReaction.length === 0) {

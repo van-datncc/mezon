@@ -14,6 +14,7 @@ type UserReactionPanelProps = {
 
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const dispatch = useDispatch();
+	const { reactionMessageDispatch } = useChatReaction();
 	const { emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
 	const [channelLabel, setChannelLabel] = useState('');
@@ -26,7 +27,6 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			setChannelLabel(currentChannel?.channel_label || '');
 		}
 	}, [message]);
-	const { reactionMessageDispatch } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		await reactionMessageDispatch(
 			id,
