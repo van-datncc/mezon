@@ -33,6 +33,7 @@ function getErrorFromRejectedWithValue(action: any) {
 		config: action.meta.error || {
 			toast: true,
 		},
+		action,
 	};
 }
 

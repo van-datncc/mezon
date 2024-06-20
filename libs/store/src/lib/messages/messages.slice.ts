@@ -1,11 +1,14 @@
-import { EmojiDataOptionals, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageSendPayload, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, lruMemoize } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
-import { shallowEqual } from 'react-redux';
+import { ChannelMessage, ChannelMessageAck, ChannelStreamMode } from 'mezon-js';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
+import { withError } from '../errors/helpers';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { channelsActions } from '../channels/channels.slice';
+import { shallowEqual } from 'react-redux';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -253,11 +256,126 @@ export const updateLastSeenMessage = createAsyncThunk(
 				now.toString(),
 			);
 		} catch (e) {
-			console.log(e);
-			return thunkAPI.rejectWithValue([]);
+			return thunkAPI.rejectWithValue('Error updating last seen message');
 		}
 	},
+	{
+		condition: (args, { getState }) => {
+			const state = getState() as MessagesRootState;
+			const message = selectMessageByMessageId(args.messageId)(state);
+			if (!message) {
+				return false;
+			}
+			if (message.isSending) {
+				return false;
+			}
+			return true;
+		}
+	}
 );
+
+type SendMessagePayload = {
+	clanId: string;
+	channelId: string;
+	content: IMessageSendPayload;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
+	anonymous?: boolean;
+	mentionEveryone?: boolean;
+	mode: number;
+	senderId: string;
+};
+
+export const sendMessage = createAsyncThunk(
+	'messages/sendMessage',
+	async (payload: SendMessagePayload, thunkAPI) => {
+		const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+		const id = Date.now().toString();
+
+
+		async function doSend() {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+
+			const session = mezon.sessionRef.current;
+			const client = mezon.clientRef.current;
+			const socket = mezon.socketRef.current;
+			// const channel = mezon.channelRef.current;
+
+			if (!client || !session || !socket || !channelId) {
+				throw new Error('Client is not initialized');
+			}
+
+			const res = await socket.writeChatMessage(
+				clanId,
+				channelId,
+				// channel.id,
+				'',
+				mode,
+				content,
+				mentions,
+				attachments,
+				references,
+				anonymous,
+				mentionEveryone,
+			);
+			
+			return res;
+		}
+
+		async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
+			try {
+				const res = await doSend();
+				return res;
+			} catch (error) {
+				if (retryCount > 0) {
+					const r = await sendWithRetry(retryCount - 1);
+					return r;
+				} else {
+					throw error;
+				}
+			}
+		}
+		
+		async function fakeItUntilYouMakeIt() {
+			const fakeMessage: ChannelMessage = {
+				id,
+				code: 0, // Add new message
+				channel_id: channelId,
+				channel_label: channelId,
+				// @ts-ignore
+				content: content,
+				create_time: new Date().toISOString(),
+				sender_id: senderId,
+				username: '',
+				avatar: '',
+				isSending: true,
+		
+			};
+			const fakeMess = mapMessageChannelToEntity(fakeMessage);
+
+			thunkAPI.dispatch(messagesActions.newMessage(fakeMess));
+
+			const res = await sendWithRetry(1);
+
+			const timestamp = Date.now() / 1000;
+			thunkAPI.dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+
+			const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
+			
+			thunkAPI.dispatch(messagesActions.markAsSent({id, mess }));
+		}
+
+		try {
+			await fakeItUntilYouMakeIt();
+		} catch (error) {
+			console.error('Error sending message', error);
+			thunkAPI.dispatch(messagesActions.markAsError(id));
+			return thunkAPI.rejectWithValue('Error sending message');
+		}
+	}
+);
+
 
 type UpdateTypingArgs = {
 	channelId: string;
@@ -316,6 +434,10 @@ export type SetCursorChannelArgs = {
 	channelId: string;
 	param: FetchMessageParam;
 };
+export type MarkAsSentArgs = {
+	id: string;
+	mess: IMessageWithUser;
+};
 
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
@@ -331,7 +453,6 @@ export const messagesSlice = createSlice({
 			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		setQuatitiesMessageRemain: (state, action) => {
-			action.payload;
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
@@ -340,7 +461,11 @@ export const messagesSlice = createSlice({
 			let updatedMessagesState = state;
 			switch (code) {
 				case 0:
-					updatedMessagesState = messagesAdapter.addOne(state, action.payload);
+					if(state.entities[action.payload.id]) {
+						messagesAdapter.setOne(state, action.payload);
+					} else {
+						messagesAdapter.addOne(state, action.payload);
+					}
 					break;
 				case 1:
 					updatedMessagesState = messagesAdapter.updateOne(state, {
@@ -379,6 +504,23 @@ export const messagesSlice = createSlice({
 				id: action.payload,
 				changes: {
 					lastSeen: true,
+				},
+			});
+		},
+		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
+			console.log('markAsSent', action.payload);
+			// remove id
+			messagesAdapter.removeOne(state, action.payload.id);
+			// add new message
+			if (!state.entities[action.payload.mess.id]) {
+				messagesAdapter.addOne(state, action.payload.mess);
+			}
+		},
+		markAsError: (state, action: PayloadAction<string>) => {
+			messagesAdapter.updateOne(state, {
+				id: action.payload,
+				changes: {
+					isError: true,
 				},
 			});
 		},
@@ -472,6 +614,7 @@ export const messagesReducer = messagesSlice.reducer;
 
 export const messagesActions = {
 	...messagesSlice.actions,
+	sendMessage,
 	fetchMessages,
 	updateLastSeenMessage,
 	updateTypingUsers,
