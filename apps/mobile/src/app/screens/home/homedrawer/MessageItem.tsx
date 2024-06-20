@@ -220,7 +220,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			try {
 				const tagName = mentionedUser.slice(1);
 				const clanUser = usersClan?.find((userClan) => userClan?.user?.username === tagName);
-				clanUser && setFoundUser(clanUser.user);
+				clanUser && setFoundUser(clanUser?.user);
 				if (!mentionedUser) return;
 				setMessageSelected(EMessageBSToShow.UserInformation);
 			} catch (error) {
@@ -327,7 +327,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							setIsOnlyEmojiPicker(false);
 							setMessageSelected(EMessageBSToShow.UserInformation);
-							setFoundUser(user.user);
+							setFoundUser(user?.user);
 						}}
 						style={styles.wrapperAvatar}
 					>
