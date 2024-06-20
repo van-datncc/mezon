@@ -22,14 +22,22 @@ const styles = StyleSheet.create({
     },
 
     bsContainer: {
-        paddingHorizontal: Metrics.size.xl
+        paddingHorizontal: Metrics.size.xl,
+        flexDirection: "row",
+        justifyContent: "center"
     },
 
     sectionTitle: {
         color: Colors.white,
-        fontSize: 11,
+        fontSize: Fonts.size.h8,
         fontWeight: '600',
         marginBottom: Fonts.size.s_10
+    },
+
+    textApply:{
+        color: Colors.green,
+        fontSize: Fonts.size.h8,
+        fontWeight: "bold",
     }
 })
 

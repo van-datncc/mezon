@@ -57,13 +57,10 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				mezon.joinChatDirectMessage(selectedObjectIdSend.id, '', selectedObjectIdSend.type);
 				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				mezon.joinChatDirectMessage(selectedObjectIdSend.id, '', selectedObjectIdSend.type);
 				sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				await mezon.joinChatChannel(selectedObjectIdSend.id);
 				sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
@@ -311,7 +308,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 							onClick={() => sentToMessage()}
 							className="h-10 px-4 rounded dark:bg-bgSelectItem bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent"
 						>
-							Save
+							Send
 						</Button>
 					</div>
 				</div>

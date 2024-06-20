@@ -1,6 +1,6 @@
 import { ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist } from '@mezon/store';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, directActions, useAppDispatch, selectDirectById, selectAllDirectMessages, selectDmGroupCurrentId, selectDirectsUnreadlist, selectCloseMenu, selectStatusMenu } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import ForwardMessageModal from 'libs/components/src/lib/components/ForwardMessage';
 import MessageModalImage from 'libs/components/src/lib/components/MessageWithUser/MessageModalImage';
@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
-import { useMezon } from '@mezon/transport';
 function MyApp() {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
@@ -28,24 +27,13 @@ function MyApp() {
 	const { directId: currentDmGroupId } = useAppParams();
 	const listDirectMessage = useSelector(selectDirectsUnreadlist);
 	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
-	const listDM = useSelector(selectAllDirectMessages);
-	const mezon = useMezon();
-	const directId = useSelector(selectDmGroupCurrentId)
-	const direct = useSelector(selectDirectById(directId || ""))
-	useEffect(() => {
-		const joinAllDirectMessages = async () => {
-			for (const dm of listDM) {
-				const { channel_id, channel_label, type } = dm;
-				await mezon.joinChatDirectMessage(channel_id || "", channel_label, type);
-			}
-		};
-		joinAllDirectMessages();
-	}, [listDM.length]);
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-	const dispatchDirect = useAppDispatch();
-	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
+	const { setCloseMenu, setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
@@ -72,7 +60,6 @@ function MyApp() {
 		};
 	}, []);
 
-	const currentChannel = useSelector(selectCurrentChannel);
 	const handleMenu = (event: any) => {
 		const elementClick = event.target;
 		const wrapElement = document.querySelector('#menu');

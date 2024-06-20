@@ -8,7 +8,6 @@ import {
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
-	useMenu,
 	useMessageValue,
 	useReference,
 	useThreads,
@@ -17,11 +16,13 @@ import {
 	ChannelsEntity,
 	channelUsersActions,
 	referencesActions,
+	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
+	selectStatusMenu,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -369,7 +370,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const { openReplyMessageState, openEditMessageState } = useReference();
-	const { closeMenu, statusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
 		if (closeMenu && statusMenu) {
 			return;
@@ -444,15 +446,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const directId = useSelector(selectDmGroupCurrentId)
 	const direct = useSelector(selectDirectById(directId || ""))
 	const mezon = useMezon();
-	const handleMentionInputClick = async () => {
-		if (direct !== undefined) {
-			await mezon.joinChatDirectMessage(direct.channel_id || "", direct.channel_label, direct.type);
-		}
-		if (currentChannel !== undefined || currentChannel !== null) {
-			await mezon.joinChatChannel(currentChannel?.channel_id || "");
-		}
-		
-	};
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -493,7 +486,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
-				onClick={handleMentionInputClick}
 				style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
