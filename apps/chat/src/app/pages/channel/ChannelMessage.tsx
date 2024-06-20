@@ -1,5 +1,5 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { useApp, useChannels, useChatReaction, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
+import { useApp, useAuth, useChannels, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
@@ -16,6 +16,7 @@ import {
 	selectPinMessageByChannelId,
 	selectPreviousMessageByMessageId,
 	selectReactionBottomState,
+	selectReactionPlaceActive,
 	selectReactionRightState,
 	useAppDispatch,
 } from '@mezon/store';
@@ -345,7 +346,8 @@ function PopupMessage({
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { idMessageRefOpt } = useReference();
-	const { reactionPlaceActive } = useChatReaction();
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
@@ -386,7 +388,7 @@ export const MemorizedChannelMessage = memo(ChannelMessage);
 
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
-	const { userId } = useChatReaction();
+	const { userId } = useAuth();
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {
