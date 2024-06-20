@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 15
+        paddingHorizontal: size.s_14,
+        paddingVertical: size.s_10,
     },
 
     label: {
@@ -38,9 +39,7 @@ const styles = StyleSheet.create({
     input: {
         paddingVertical: 0,
         color: Colors.white,
-        flexBasis: 20,
         flexGrow: 1,
-        height: size.s_40
     },
 
     clearBtn: {

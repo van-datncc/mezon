@@ -1,8 +1,7 @@
-import { useChatMessage, useChatMessages, useChatReaction, useChatTypings } from '@mezon/core';
+import { useChatMessage, useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, selectAttachmentPhoto, selectDataReactionGetFromMessage, useAppDispatch } from '@mezon/store-mobile';
-import { updateEmojiReactionData } from '@mezon/utils';
+import { channelsActions, selectAttachmentPhoto, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,7 +23,7 @@ type ChannelMessagesProps = {
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
-	const { messages, unreadMessageId, lastMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
+	const { messages, unreadMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
 	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
 	const { markMessageAsSeen } = useChatMessage(unreadMessageId);
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
@@ -66,11 +65,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			if (timeOutRef?.current) clearTimeout(timeOutRef.current);
 		};
 	}, []);
-
-	const { dataReactionServerAndSocket } = useChatReaction();
-	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-
-	const dataReactionCombine = updateEmojiReactionData([...reactDataFirstGetFromMessage, ...dataReactionServerAndSocket]);
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
@@ -132,7 +126,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				message={item}
 				mode={mode}
 				channelId={channelId}
-				dataReactionCombine={dataReactionCombine}
 				channelLabel={channelLabel}
 				preMessage={preMessage}
 				onOpenImage={onOpenImage}

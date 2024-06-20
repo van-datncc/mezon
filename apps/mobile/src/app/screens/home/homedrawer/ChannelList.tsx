@@ -10,11 +10,11 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import { appActions, channelsActions, getStoreAsync, messagesActions, selectCurrentClan, selectIsFromFCMMobile } from '@mezon/store-mobile';
-import { ICategoryChannel } from '@mezon/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import EventViewer from '../../../components/Event';
 import { MezonBottomSheet } from '../../../temp-ui';
 import { ChannelListContext, ChannelListSection } from './Reusables';
@@ -37,7 +37,7 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 
-	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
+	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
 	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>()
 
@@ -86,9 +86,9 @@ const ChannelList = React.memo((props: any) => {
 		bottomSheetMenuRef.current?.present();
 	}
 
-	function handleLongPressCategory(categoryChannel: ICategoryChannel) {
+	function handleLongPressCategory(channel: IChannel | ICategoryChannel) {
 		bottomSheetCategoryMenuRef.current?.present();
-		setCurrentPressedCategory(categoryChannel);
+		setCurrentPressedCategory(channel);
 	}
 
 	function handlePressEventCreate() {
@@ -105,7 +105,7 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<InviteToChannel ref={bottomSheetInviteRef} />
+					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory}/>
 				</View>
 				<View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
 					<TouchableOpacity
@@ -124,9 +124,8 @@ const ChannelList = React.memo((props: any) => {
 							data={item}
 							index={index}
 							onPressHeader={toggleCollapseChannel}
-							onLongPress={() => handleLongPressCategory(item)}
-							collapseItems={collapseChannelItems}
-						/>
+							onLongPress={(channel: IChannel | ICategoryChannel) => handleLongPressCategory(channel)}
+							collapseItems={collapseChannelItems} />
 					)}
 				/>
 			</View>
@@ -135,8 +134,12 @@ const ChannelList = React.memo((props: any) => {
 				<ClanMenu clan={currentClan} inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet ref={bottomSheetCategoryMenuRef}>
-				<CategoryMenu category={currentPressedCategory} />
+			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} >
+				<CategoryMenu
+					bottomSheetRef={bottomSheetCategoryMenuRef}
+          inviteRef={bottomSheetInviteRef}
+					category={currentPressedCategory}
+				/>
 			</MezonBottomSheet>
 
 			<MezonBottomSheet

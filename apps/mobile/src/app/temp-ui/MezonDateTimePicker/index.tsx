@@ -7,8 +7,10 @@ import styles from "./styles";
 import DatePicker from 'react-native-date-picker'
 import { useState } from "react";
 import { CloseIcon, getNearTime } from "@mezon/mobile-components";
-import MezonFakeBox from "../MezonFakeBox";
+import MezonFakeInputBox from "../MezonFakeBox";
 import { useEffect } from "react";
+import { memo } from "react";
+import { useCallback } from "react";
 
 interface IMezonDateTimePicker {
     mode?: "datetime" | "date" | "time",
@@ -18,7 +20,7 @@ interface IMezonDateTimePicker {
     keepTime?: boolean
 }
 
-export default function MezonDateTimePicker({ mode = "date", title, onChange, value, keepTime }: IMezonDateTimePicker) {
+export default memo(function MezonDateTimePicker({ mode = "date", title, onChange, value, keepTime }: IMezonDateTimePicker) {
     const bottomSheetRef = useRef<BottomSheetModalMethods>();
     const [date, setDate] = useState(value || getNearTime(120))
     const [currentDate, setCurrentDate] = useState(value || getNearTime(120));
@@ -28,7 +30,7 @@ export default function MezonDateTimePicker({ mode = "date", title, onChange, va
         setCurrentDate(value || getNearTime(120));
     }, [value])
 
-    function handleChange() {
+    const handleChange = useCallback(() => {
         if (keepTime && mode !== "time" && value) {
             const new_date = new Date(
                 date.getFullYear(),
@@ -46,7 +48,7 @@ export default function MezonDateTimePicker({ mode = "date", title, onChange, va
             onChange && onChange(date);
         }
         bottomSheetRef?.current?.dismiss();
-    }
+    }, [keepTime, mode, value, date]);
 
     function handleClose() {
         bottomSheetRef?.current?.dismiss();
@@ -58,7 +60,7 @@ export default function MezonDateTimePicker({ mode = "date", title, onChange, va
 
     return (
         <View>
-            <MezonFakeBox
+            <MezonFakeInputBox
                 title={title}
                 value={mode === "time"
                     ? currentDate.toLocaleTimeString([], {
@@ -94,4 +96,4 @@ export default function MezonDateTimePicker({ mode = "date", title, onChange, va
             </MezonBottomSheet>
         </View>
     )
-}
+});

@@ -1,9 +1,10 @@
-import { channelsActions, messagesActions, useAppDispatch } from '@mezon/store';
+import { channelsActions, messagesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useClans } from './useClans';
+import { useSelector } from 'react-redux';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -15,7 +16,8 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 	const { currentClanId } = useClans();
 	const dispatch = useAppDispatch();
 
-	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
+	const { clientRef, sessionRef, socketRef } = useMezon();
+	const channel = useSelector(selectCurrentChannel)
 
 	const sendMessage = React.useCallback(
 		async (
@@ -29,7 +31,6 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
-			const channel = channelRef.current;
 
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
@@ -38,7 +39,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			await socket.writeChatMessage(
 				currentClanId,
 				channel.id,
-				channel.chanel_label,
+				channel.channel_label ?? '',
 				mode,
 				content,
 				mentions,
@@ -50,7 +51,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			const timestamp = Date.now() / 1000;
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, dispatch, channelId],
+		[sessionRef, clientRef, socketRef, channel, currentClanId, mode, dispatch, channelId],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -65,7 +66,6 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
-			const channel = channelRef.current;
 
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
@@ -73,10 +73,10 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			if (mode === 4) {
 				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
 			} else {
-				await socket.updateChatMessage(channelId, channel.chanel_label, mode, messageId, editMessage);
+				await socket.updateChatMessage(channelId, channel.channel_label ?? '', mode, messageId, editMessage);
 			}
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId, mode, channelId, channelLabel],
+		[sessionRef, clientRef, socketRef, channel, currentClanId, mode, channelId],
 	);
 
 	return useMemo(
