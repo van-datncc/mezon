@@ -132,7 +132,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} />
 										{child?.props.children[1] &&
 											React.isValidElement(child?.props.children[1]) &&
-											React.cloneElement(child?.props.children[1], propsChild)}
+											React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
