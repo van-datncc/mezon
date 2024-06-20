@@ -98,6 +98,9 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			const disCenterEmojiToRightScreen = screenWidth - disLeftEmojiToLeftScreen - emojiWidth / 2;
 			const disTopEmojiToTopScreen = emojiItemRef.current?.getBoundingClientRect().top;
 
+			const disCenterEmojiToLeftScreen = screenWidth - disCenterEmojiToRightScreen;
+			console.log(disCenterEmojiToLeftScreen);
+
 			if (disCenterEmojiToRightScreen > userPanelWidth! / 2 && disTopEmojiToTopScreen > userPanelHeight!) {
 				setRightUserPanel(disCenterEmojiToRightScreen - userPanelWidth! / 2);
 				setTopUserPanel(disTopEmojiToTopScreen - userPanelHeight!);
@@ -134,9 +137,17 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 				setArrowTop(true);
 				setIsRightLimit(true);
 				return;
+			} else if (disCenterEmojiToLeftScreen < userPanelWidth! / 2 && disTopEmojiToTopScreen > userPanelHeight!) {
+				setRightUserPanel('auto');
+				setTopUserPanel(disTopEmojiToTopScreen - userPanelHeight!);
+				setLeftUserPanel(disCenterEmojiToLeftScreen - emojiWidth / 2);
+				setBottomUserPanel('auto');
+				setArrowBottom(false);
+				setArrowTop(true);
+				setIsRightLimit(true);
 			}
 		}
-	}, [emojiHover, userPanelRef, userPanelRef.current?.getBoundingClientRect().height]);
+	}, [emojiHover, userPanelRef, userPanelRef.current?.getBoundingClientRect().height, window.innerHeight]);
 
 	return (
 		<>
