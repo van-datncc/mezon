@@ -219,8 +219,7 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 		});
 	}, [listUserInvite, searchTerm]);
 
-	const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {
-		await mezon.joinChatDirectMessage(channelSelected.id, '', Number(channelSelected?.type));
+	const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {		
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
@@ -236,7 +235,6 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response?.channel_id) {
-			mezon.joinChatDirectMessage(response.channel_id, '', ChannelType.CHANNEL_TYPE_DM);
 			sendInviteMessage(linkInvite, response.channel_id);
 		}
 	};

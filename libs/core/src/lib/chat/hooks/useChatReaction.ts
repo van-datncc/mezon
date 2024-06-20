@@ -38,22 +38,22 @@ export function useChatReaction() {
 	const dataReactionSocket = useSelector(selectDataSocketUpdate);
 	const combineDataServerAndSocket = [...reactDataFirstGetFromMessage, ...dataReactionSocket];
 	const convertReactionToMatchInterface = updateEmojiReactionData(combineDataServerAndSocket);
-	const { clientRef, sessionRef, socketRef, channelRef } = useMezon();
+	const { clientRef, sessionRef, socketRef } = useMezon();
 	const { userId } = useAuth();
 
 	const reactionMessageDispatch = useCallback(
-		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
+		async (id: string, mode: number, channelId: string, channelLabel:string, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
-			const channel = channelRef.current;
-			if (!client || !session || !socket || !channel || !currentClanId) {
+
+			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeMessageReaction(id, channel.id, channel.chanel_label, mode, messageId, emoji, count, message_sender_id, action_delete);
+			await socket.writeMessageReaction(id, channelId, channelLabel, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
-		[sessionRef, clientRef, socketRef, channelRef, currentClanId],
+		[sessionRef, clientRef, socketRef, currentClanId],
 	);
 
 	const setReactionPlaceActive = useCallback(
@@ -133,7 +133,6 @@ export function useChatReaction() {
 			convertReactionToMatchInterface,
 		}),
 		[
-			reactionActions,
 			userId,
 			reactionMessageDispatch,
 			setReactionPlaceActive,
@@ -151,6 +150,8 @@ export function useChatReaction() {
 			arrowPosition,
 			setArrowPosition,
 			convertReactionToMatchInterface,
+			setUserReactionPanelState,
+			userReactionPanelState,
 		],
 	);
 }

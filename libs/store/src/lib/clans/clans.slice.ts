@@ -236,8 +236,7 @@ export const joinClan = createAsyncThunk<void, JoinClanPayload>(
 	async ({ clanId }, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.joinChatClan(clanId);
-			return;
+			await mezon.socketRef.current?.joinClanChat(clanId);
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}

@@ -34,7 +34,6 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			mezon.joinChatDirectMessage(response.channel_id, '', ChannelType.CHANNEL_TYPE_DM);
 			sendInviteMessage(content, response.channel_id);
 			setContent('');
 		}
