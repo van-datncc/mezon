@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
@@ -16,7 +16,7 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 	const { reactionMessageDispatch } = useChatReaction();
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const emojiHover = useSelector(selectEmojiHover);
-
+	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatch = useDispatch();
 	const { emojiListPNG } = useEmojiSuggestion();
 	const getUrlItem = getSrcEmoji(emoji.emoji ?? '', emojiListPNG);
@@ -34,7 +34,17 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 		message_sender_id: string,
 		action_delete: boolean,
 	) {
-		await reactionMessageDispatch(id, mode ?? 2, messageId ?? '', emoji ?? '', 1, message_sender_id ?? '', false);
+		await reactionMessageDispatch(
+			id,
+			mode ?? 2,
+			currentChannel?.id ?? '',
+			currentChannel?.channel_label ?? '',
+			messageId ?? '',
+			emoji ?? '',
+			1,
+			message_sender_id ?? '',
+			false,
+		);
 	}
 
 	const [topUserPanel, setTopUserPanel] = useState<any>();
@@ -114,31 +124,24 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 				return;
 			}
 		}
-	}, [emojiHover, userPanelRef]);
+	}, [emojiHover, userPanelRef, userPanelRef.current?.getBoundingClientRect().height]);
 
 	return (
 		<>
-			<div className="flex flex-row gap-1">
-				<div
+			{count > 0 && (
+				<ItemDetail
 					ref={emojiItemRef}
-					onMouseEnter={onHoverEnter}
-					onMouseLeave={onHoverLeave}
-					className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row z-40
-						cursor-pointer justify-center items-center relative
-						${userSenderCount! > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
-						`}
-					onClick={() => reactOnExistEmoji(emoji.id ?? '', mode, emoji.message_id ?? '', emoji.emoji ?? '', 1, userId.userId ?? '', false)}
-				>
-					<span className=" absolute left-[5px] ">
-						{' '}
-						<img src={getUrlItem} className="w-4 h-4"></img>{' '}
-					</span>
+					onMouse={onHoverEnter}
+					onLeave={onHoverLeave}
+					userSenderCount={userSenderCount ?? NaN}
+					onClickReactExist={() =>
+						reactOnExistEmoji(emoji.id ?? '', mode, emoji.message_id ?? '', emoji.emoji ?? '', 1, userId.userId ?? '', false)
+					}
+					getUrlItem={getUrlItem}
+					totalCount={count}
+				/>
+			)}
 
-					<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-						<p>{count}</p>
-					</div>
-				</div>
-			</div>
 			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === emoji.message_id && userReactionPanelState && (
 				<div
 					ref={userPanelRef}
@@ -161,6 +164,41 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 }
 
 export default ItemEmoji;
+
+type ItemDetailProps = {
+	ref: React.RefObject<HTMLDivElement>;
+	onMouse: () => void;
+	onLeave: () => void;
+	userSenderCount: number;
+	onClickReactExist: () => void;
+	getUrlItem: string;
+	totalCount: number;
+};
+const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
+	({ onMouse, onLeave, userSenderCount, onClickReactExist, getUrlItem, totalCount }, ref) => {
+		return (
+			<div className="flex flex-row gap-1">
+				<div
+					ref={ref}
+					onMouseEnter={onMouse}
+					onMouseLeave={onLeave}
+					className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row z-40
+			cursor-pointer justify-center items-center relative
+			${userSenderCount > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}
+		  `}
+					onClick={onClickReactExist}
+				>
+					<span className="absolute left-[5px]">
+						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
+					</span>
+					<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
+						<p>{totalCount}</p>
+					</div>
+				</div>
+			</div>
+		);
+	},
+);
 
 type ArrowItemProps = {
 	arrow: boolean;

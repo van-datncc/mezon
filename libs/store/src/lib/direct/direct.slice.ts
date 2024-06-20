@@ -140,9 +140,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			);
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({channelId: directMessageId}))
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.joinChatDirectMessage(directMessageId, channelName, type);
-			return;
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);

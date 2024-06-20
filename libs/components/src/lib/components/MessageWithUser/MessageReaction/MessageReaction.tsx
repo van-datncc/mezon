@@ -6,12 +6,11 @@ import ItemEmoji from './ItemEmoji';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
-	currentChannelId: string;
 	mode: number;
 };
 
 // TODO: refactor component for message lines
-const MessageReaction: React.FC<MessageReactionProps> = ({ currentChannelId, message, mode }) => {
+const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const { reactionBottomState, reactionBottomStateResponsive, convertReactionToMatchInterface } = useChatReaction();
 	const getReactionsByChannelId = (data: EmojiDataOptionals[], mesId: string) => {
 		return data.filter((item: any) => item.message_id === mesId);

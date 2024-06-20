@@ -120,7 +120,6 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const sendToDM = async (dataSend: { text: any }) => {
-		await mezon.joinChatDirectMessage(channelSelected.id, '', Number(channelSelected?.type));
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
@@ -133,13 +132,7 @@ export const Sharing = ({ data, onClose }) => {
 		);
 	};
 
-	const sendToGroup = async (dataSend: { text: any }) => {
-		if (channelSelected.parrent_id !== '0') {
-			await mezon.joinChatChannel(channelSelected.id);
-		} else {
-			await mezon.joinChatThread(channelSelected.id);
-		}
-
+	const sendToGroup = async (dataSend: { text: any }) => {		
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,
