@@ -1,7 +1,9 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { selectCurrentChannel } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { useSelector } from 'react-redux';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
@@ -12,9 +14,13 @@ type UserReactionPanelProps = {
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const { emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { reactionMessageDispatch, arrowPosition } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
-		await reactionMessageDispatch(id, mode, messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessageDispatch(id, mode, 
+			currentChannel?.id ?? '', 
+			currentChannel?.channel_label ?? '', 
+			messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const hideSenderOnPanel = (emojiData: EmojiDataOptionals, senderId: string) => {

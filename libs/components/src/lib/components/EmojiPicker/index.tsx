@@ -1,5 +1,5 @@
 import { useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { selectCurrentChannelId, selectMessageByMessageId } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentChannelId, selectMessageByMessageId } from '@mezon/store';
 import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -55,12 +55,15 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const { setShiftPressed } = useEmojiSuggestion();
+	const currentChannel = useSelector(selectCurrentChannel)
 
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+				currentChannel?.id ?? '',
+				currentChannel?.channel_label ?? '',
 				props.messageEmojiId ?? '',
 				emojiPicked.trim(),
 				1,

@@ -1,7 +1,7 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { selectMemberByUserId } from '@mezon/store-mobile';
+import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useRef, useState } from 'react';
@@ -21,6 +21,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { message, emojiListPNG, openEmojiPicker, mode } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const { userId, reactionMessageDispatch, convertReactionToMatchInterface } = useChatReaction();
+	const currentChannel = useSelector(selectCurrentChannel)
 
 	const reactOnExistEmoji = async (
 		id: string,
@@ -33,7 +34,9 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	) => {
 		await reactionMessageDispatch(
 			id,
-			mode ?? 2,
+			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel.id,
+			currentChannel.channel_label,
 			messageId ?? '',
 			emoji ?? '', 1,
 			message_sender_id ?? '',
@@ -46,7 +49,9 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		const countToRemove = senders.find(sender => sender.sender_id === userId)?.count;
 		await reactionMessageDispatch(
 			id,
-			mode ?? 2,
+			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel.id,
+			currentChannel.channel_label,
 			message.id ?? '',
 			emoji,
 			countToRemove,

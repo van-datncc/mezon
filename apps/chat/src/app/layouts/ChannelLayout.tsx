@@ -3,7 +3,6 @@ import { useApp, useChatReaction, useGifsStickersEmoji, useMenu, useReference, u
 import { selectCurrentChannel, selectReactionTopState } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 

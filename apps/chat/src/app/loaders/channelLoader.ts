@@ -1,5 +1,5 @@
 import { setJumpToMessageId } from '@mezon/core';
-import { channelsActions, getStoreAsync, messagesActions } from '@mezon/store';
+import { channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store';
 import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
 
 export const channelLoader: LoaderFunction = async ({ params, request }) => {
