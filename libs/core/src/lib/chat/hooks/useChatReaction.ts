@@ -110,6 +110,7 @@ export function useChatReaction() {
 			setPositionOfSmileButton,
 			positionOfSmileButton,
 			convertReactionToMatchInterface,
+			dataReactionSocket
 		}),
 		[
 			userId,

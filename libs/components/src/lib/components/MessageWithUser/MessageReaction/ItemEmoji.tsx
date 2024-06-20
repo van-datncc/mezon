@@ -142,7 +142,7 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 				/>
 			)}
 
-			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === emoji.message_id && userReactionPanelState && (
+			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === emoji.message_id && userReactionPanelState && count > 0 && (
 				<div
 					ref={userPanelRef}
 					className=" w-[18rem] flex flex-col items-center z-50"
