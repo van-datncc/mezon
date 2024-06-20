@@ -81,6 +81,21 @@ export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', 
 	}
 });
 
+export const openDirectMessage = createAsyncThunk('direct/openDirectMessage', async (body: ApiDeleteChannelDescRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.openDirectMess(mezon.session, body);
+		if (response) {
+			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
+			return response;
+		} else {
+			return thunkAPI.rejectWithValue([]);
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 type fetchDmGroupArgs = {
 	cursor?: string;
 	limit?: number;
@@ -256,6 +271,7 @@ export const directActions = {
 	createNewDirectMessage,
 	joinDirectMessage,
 	closeDirectMessage,
+	openDirectMessage
 };
 
 const { selectAll, selectEntities } = directAdapter.getSelectors();
