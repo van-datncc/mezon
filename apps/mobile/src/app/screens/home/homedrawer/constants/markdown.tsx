@@ -17,6 +17,7 @@ import {
 	splitBlockCodeRegex,
 	urlRegex,
 } from '../../../../../app/utils/helpers';
+import FastImage from 'react-native-fast-image';
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -187,7 +188,7 @@ export const renderRulesCustom = {
 		const { src } = node.attributes;
 		return (
 			<View key={node.key} style={{ padding: 1 }}>
-				{/* <FastImage source={{ uri: src }} style={styles.iconEmojiInMessage} resizeMode={'contain'} /> */}
+				<FastImage source={{ uri: src }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
 			</View>
 		);
 	},
