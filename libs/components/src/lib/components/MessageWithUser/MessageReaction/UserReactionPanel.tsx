@@ -1,28 +1,38 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel } from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectDirectById } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
-import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
-import { Fragment, useCallback, useState } from 'react';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;
 	mode: number;
+	message: IMessageWithUser;
 };
 
-const UserReactionPanel = ({ emojiShowPanel, mode }: UserReactionPanelProps) => {
-	const currentChannel = useSelector(selectCurrentChannel);
+const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const dispatch = useDispatch();
 	const { emojiListPNG } = useEmojiSuggestion();
 	const userId = useAuth();
+	const [channelLabel, setChannelLabel] = useState('');
+	const currentChannel = useSelector(selectCurrentChannel);
+	const direct = useSelector(selectDirectById(message.channel_id));
+	useEffect(() => {
+		if (direct != undefined) {
+			setChannelLabel('');
+		} else {
+			setChannelLabel(currentChannel?.channel_label || '');
+		}
+	}, [message]);
 	const { reactionMessageDispatch } = useChatReaction();
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
 		await reactionMessageDispatch(
 			id,
 			mode,
-			currentChannel?.id ?? '',
-			currentChannel?.channel_label ?? '',
+			message.channel_id ?? '',
+			channelLabel ?? '',
 			messageId,
 			emoji,
 			countRemoved,
@@ -30,6 +40,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode }: UserReactionPanelProps) => 
 			true,
 		);
 	};
+
 	const [senderList, setSenderList] = useState<SenderInfoOptionals[]>(emojiShowPanel.senders);
 	const hideSenderOnPanel = useCallback((emojiData: EmojiDataOptionals, senderId: string) => {
 		const newEmojiData = { ...emojiData };
@@ -133,5 +144,5 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};

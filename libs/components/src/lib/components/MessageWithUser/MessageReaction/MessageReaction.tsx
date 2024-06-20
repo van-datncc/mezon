@@ -1,9 +1,7 @@
 import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
 import { useChatReaction, useReference } from '@mezon/core';
-import { selectDataSocketUpdate } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, calculateTotalCount } from '@mezon/utils';
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
 
 type MessageReactionProps = {
@@ -14,13 +12,17 @@ type MessageReactionProps = {
 // TODO: refactor component for message lines
 const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const { reactionBottomState, reactionBottomStateResponsive, convertReactionToMatchInterface } = useChatReaction();
-	const dataReactionSocket = useSelector(selectDataSocketUpdate);
 	const getReactionsByMessageId = (data: EmojiDataOptionals[], mesId: string) => {
 		return data.filter((item: any) => item.message_id === mesId);
 	};
 	const dataReaction = getReactionsByMessageId(convertReactionToMatchInterface, message.id);
+
+
+	
 	const { idMessageRefReaction, setIdReferenceMessageReaction } = useReference();
+
 	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
+
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
 		if (message.id === idMessageRefReaction) {
 			return true;
@@ -37,6 +39,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			return false;
 		}
 	};
+
 	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals | null>();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
@@ -73,7 +76,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 						{hoverEmoji &&
 							checkMessageToMatchMessageRef(message) &&
 							checkEmojiToMatchWithEmojiHover(hoverEmoji) &&
-							emojiShowUserReaction && <UserReactionPanel emojiShowPanel={emojiShowUserReaction} mode={mode} />}
+							emojiShowUserReaction && <UserReactionPanel message={message} emojiShowPanel={emojiShowUserReaction} mode={mode} />}
 					</div>
 				)}
 
@@ -85,7 +88,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 					{dataReaction?.map((emoji: EmojiDataOptionals, index: number) => {
 						return (
 							<Fragment key={`${index + message.id}`}>
-								<ItemEmoji mode={mode} emoji={emoji} />
+								<ItemEmoji message={message} mode={mode} emoji={emoji} />
 							</Fragment>
 						);
 					})}

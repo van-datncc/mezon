@@ -1,7 +1,8 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
-import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { reactionActions, selectCurrentChannel, selectDirectById, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
@@ -9,15 +10,15 @@ import UserReactionPanel from './UserReactionPanel';
 type EmojiItemProps = {
 	emoji: EmojiDataOptionals;
 	mode: number;
+	message: IMessageWithUser;
 };
 
-function ItemEmoji({ emoji, mode }: EmojiItemProps) {
+function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const dispatch = useDispatch();
 	const userId = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const emojiHover = useSelector(selectEmojiHover);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const { emojiListPNG } = useEmojiSuggestion();
 	const getUrlItem = getSrcEmoji(emoji.emoji ?? '', emojiListPNG);
 	const count = calculateTotalCount(emoji.senders);
@@ -25,22 +26,38 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
 	const userPanelRef = useRef<HTMLDivElement | null>(null);
 
-	const reactOnExistEmoji = useCallback(
-		async (id: string, mode: number, messageId: string, emoji: string, count: number, message_sender_id: string, action_delete: boolean) => {
-			await reactionMessageDispatch(
-				id,
-				mode ?? 2,
-				currentChannel?.id ?? '',
-				currentChannel?.channel_label ?? '',
-				messageId ?? '',
-				emoji ?? '',
-				1,
-				message_sender_id ?? '',
-				false,
-			);
-		},
-		[reactionMessageDispatch, currentChannel],
-	);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const [channelLabel, setChannelLabel] = useState('');
+	const direct = useSelector(selectDirectById(message.channel_id));
+
+	useEffect(() => {
+		if (direct != undefined) {
+			setChannelLabel('');
+		} else {
+			setChannelLabel(currentChannel?.channel_label || '');
+		}
+	}, [message]);
+	async function reactOnExistEmoji(
+		id: string,
+		mode: number,
+		messageId: string,
+		emoji: string,
+		count: number,
+		message_sender_id: string,
+		action_delete: boolean,
+	) {
+		await reactionMessageDispatch(
+			id,
+			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			message.channel_id,
+			channelLabel ?? '',
+			messageId ?? '',
+			emoji ?? '',
+			1,
+			message_sender_id ?? '',
+			false,
+		);
+	}
 
 	const [topUserPanel, setTopUserPanel] = useState<any>();
 	const [bottomUserPanel, setBottomUserPanel] = useState<any>();
@@ -150,7 +167,7 @@ function ItemEmoji({ emoji, mode }: EmojiItemProps) {
 					}}
 				>
 					<ArrowItem arrow={arrowTop} isRightLimit={isRightLimit} emojiCross={emoji} />
-					<UserReactionPanel emojiShowPanel={emojiHover!} mode={mode} />
+					<UserReactionPanel message={message} emojiShowPanel={emojiHover!} mode={mode} />
 					<ArrowItem arrow={arrowBottom} isRightLimit={isRightLimit} emojiCross={emoji} />
 				</div>
 			)}
