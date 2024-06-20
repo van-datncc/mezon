@@ -1,4 +1,4 @@
-import { channelsActions, messagesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { channelsActions, messagesActions, selectCurrentChannel, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -15,7 +15,7 @@ export type UseChatSendingOptions = {
 export function useChatSending({ channelId, channelLabel, mode }: UseChatSendingOptions) {
 	const { currentClanId } = useClans();
 	const dispatch = useAppDispatch();
-
+	const direct = useSelector(selectDirectById(channelId));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel)
 
@@ -67,13 +67,13 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			const client = clientRef.current;
 			const socket = socketRef.current;
 
-			if (!client || !session || !socket || !channel || !currentClanId) {
+			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-			if (mode === 4) {
+			if (mode === 4 || mode === 3) {
 				await socket.updateChatMessage(channelId, '', mode, messageId, editMessage);
 			} else {
-				await socket.updateChatMessage(channelId, channel.channel_label ?? '', mode, messageId, editMessage);
+				await socket.updateChatMessage(channelId, channel?.channel_label ?? '', mode, messageId, editMessage);
 			}
 		},
 		[sessionRef, clientRef, socketRef, channel, currentClanId, mode, channelId],

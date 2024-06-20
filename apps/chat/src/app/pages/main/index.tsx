@@ -31,7 +31,9 @@ function MyApp() {
 	const { quantityPendingRequest } = useFriends();
 
 	const dispatch = useDispatch();
-	const { setCloseMenu, setStatusMenu, closeMenu, statusMenu } = useMenu();
+	const { setCloseMenu, setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
