@@ -26,7 +26,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			return false;
 		}
 	};
-
 	const [reactionSocketByMessageId, setReationSocketByMessageId] = useState<EmojiDataOptionals[]>([]);
 	function filterByMessageId(array: EmojiDataOptionals[], messageId: string) {
 		return array.filter((item) => item.message_id === messageId);
@@ -47,7 +46,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	}, [message]);
 
 	useEffect(() => {
-		const combine = [...reactionSocketByMessageId, ...reactionMessage];
+		const sortedReactionMessage = [...reactionMessage].sort((a, b) => (a?.emoji || '').localeCompare(b?.emoji || ''));
+		const combine = [...sortedReactionMessage, ...reactionSocketByMessageId];
 		const result = updateEmojiReactionData(combine);
 		setDataReactionCombine(result);
 	}, [reactionSocketByMessageId, reactionMessage]);

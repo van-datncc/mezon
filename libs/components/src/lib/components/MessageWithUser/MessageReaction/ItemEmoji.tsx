@@ -159,7 +159,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 
 	return (
 		<>
-			{count > 0 && (
+			{count > 0 && emoji.message_id === message.id && (
 				<ItemDetail
 					ref={emojiItemRef}
 					onMouse={onHoverEnter}
