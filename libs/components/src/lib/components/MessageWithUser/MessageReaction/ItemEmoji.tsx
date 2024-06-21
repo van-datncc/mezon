@@ -49,7 +49,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			message.channel_id,
-			channelLabel ?? '',
 			messageId ?? '',
 			emoji ?? '',
 			1,
@@ -160,7 +159,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 
 	return (
 		<>
-			{count > 0 && emoji.message_id === message.id && (
+			{count > 0 && (
 				<ItemDetail
 					ref={emojiItemRef}
 					onMouse={onHoverEnter}
@@ -174,7 +173,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 				/>
 			)}
 
-			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === message.id && userReactionPanelState && count > 0 && (
+			{emojiHover?.emoji === emoji.emoji && userReactionPanelState && count > 0 && (
 				<div
 					ref={userPanelRef}
 					className=" w-[18rem] flex flex-col items-center z-50"

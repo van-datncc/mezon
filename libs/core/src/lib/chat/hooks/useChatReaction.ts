@@ -15,7 +15,6 @@ export function useChatReaction() {
 			id: string,
 			mode: number,
 			channelId: string,
-			channelLabel: string,
 			messageId: string,
 			emoji: string,
 			count: number,
@@ -29,7 +28,7 @@ export function useChatReaction() {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeMessageReaction(id, channelId, channelLabel, mode, messageId, emoji, count, message_sender_id, action_delete);
+			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, message_sender_id, action_delete);
 		},
 		[sessionRef, clientRef, socketRef, currentClanId],
 	);

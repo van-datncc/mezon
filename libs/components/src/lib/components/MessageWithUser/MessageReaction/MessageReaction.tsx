@@ -27,19 +27,17 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 		}
 	};
 
-	// const dataSocketConvert = useSelector(selectDataSocketUpdate);
-
-	// const [reactionSocketByMessageId, setReationSocketByMessageId] = useState<EmojiDataOptionals[]>([]);
-	// function filterByMessageId(array: EmojiDataOptionals[], messageId: string) {
-	// 	return array.filter((item) => item.message_id === messageId);
-	// }
-
+	const [reactionSocketByMessageId, setReationSocketByMessageId] = useState<EmojiDataOptionals[]>([]);
+	function filterByMessageId(array: EmojiDataOptionals[], messageId: string) {
+		return array.filter((item) => item.message_id === messageId);
+	}
 	const dataSocketConvert = useSelector(selectDataSocketUpdate);
 	const [reactionMessage, setReactionMessage] = useState<EmojiDataOptionals[]>([]);
 	const [dataReactionCombine, setDataReactionCombine] = useState<EmojiDataOptionals[]>([]);
-	// useEffect(() => {
-	// 	setReationSocketByMessageId(filterByMessageId(dataSocketConvert, message.id));
-	// }, [dataSocketConvert]);
+
+	useEffect(() => {
+		setReationSocketByMessageId(filterByMessageId(dataSocketConvert, message.id));
+	}, [dataSocketConvert]);
 
 	useEffect(() => {
 		if (message.reactions && message.reactions?.length > 0) {
@@ -49,10 +47,10 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	}, [message]);
 
 	useEffect(() => {
-		const combine = [...dataSocketConvert, ...reactionMessage];
+		const combine = [...reactionSocketByMessageId, ...reactionMessage];
 		const result = updateEmojiReactionData(combine);
 		setDataReactionCombine(result);
-	}, [dataSocketConvert, reactionMessage]);
+	}, [reactionSocketByMessageId, reactionMessage]);
 
 	useLayoutEffect(() => {
 		if (dataReactionCombine.length === 0) {

@@ -28,17 +28,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		}
 	}, [message]);
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
-		await reactionMessageDispatch(
-			id,
-			mode,
-			message.channel_id ?? '',
-			channelLabel ?? '',
-			messageId,
-			emoji,
-			countRemoved,
-			message_sender_id,
-			true,
-		);
+		await reactionMessageDispatch(id, mode, message.channel_id ?? '', messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const [senderList, setSenderList] = useState<SenderInfoOptionals[]>(emojiShowPanel.senders);
@@ -59,7 +49,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 
 	return (
 		<>
-			{count > 0 && (
+			{count > 0 && emojiShowPanel.message_id === message.id && (
 				<div className="flex flex-col justify-center ">
 					<div
 						onMouseLeave={onLeavePanel}

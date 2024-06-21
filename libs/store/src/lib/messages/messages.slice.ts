@@ -196,23 +196,16 @@ export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({
 
 type UpdateMessageArgs = {
 	channelId: string;
-	channelLabel: string;
 	messageId: string;
 };
 
 export const updateLastSeenMessage = createAsyncThunk(
 	'messages/updateLastSeenMessage',
-	async ({ channelId, channelLabel, messageId }: UpdateMessageArgs, thunkAPI) => {
+	async ({ channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(
-				channelId,
-				channelLabel,
-				ChannelStreamMode.STREAM_MODE_CHANNEL,
-				messageId,
-				now.toString(),
-			);
+			await mezon.socketRef.current?.writeLastSeenMessage(channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
 		} catch (e) {
 			return thunkAPI.rejectWithValue('Error updating last seen message');
 		}
@@ -235,7 +228,6 @@ export const updateLastSeenMessage = createAsyncThunk(
 type SendMessagePayload = {
 	clanId: string;
 	channelId: string;
-	channelLabel: string;
 	content: IMessageSendPayload;
 	mentions?: Array<ApiMessageMention>;
 	attachments?: Array<ApiMessageAttachment>;
@@ -247,7 +239,7 @@ type SendMessagePayload = {
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId, channelLabel } = payload;
+	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
@@ -262,18 +254,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			throw new Error('Client is not initialized');
 		}
 
-		const res = await socket.writeChatMessage(
-			clanId,
-			channelId,
-			channelLabel,
-			mode,
-			content,
-			mentions,
-			attachments,
-			references,
-			anonymous,
-			mentionEveryone,
-		);
+		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
 		return res;
 	}
@@ -297,7 +278,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			id,
 			code: 0, // Add new message
 			channel_id: channelId,
-			channel_label: channelLabel,
 			// @ts-ignore
 			content: content,
 			create_time: new Date().toISOString(),
@@ -348,13 +328,12 @@ export const updateTypingUsers = createAsyncThunk(
 
 export type SendMessageArgs = {
 	channelId: string;
-	channelLabel: string;
 	mode: number;
 };
 
-export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ channelId, channelLabel, mode }: SendMessageArgs, thunkAPI) => {
+export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ channelId, mode }: SendMessageArgs, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const ack = mezon.socketRef.current?.writeMessageTyping(channelId, channelLabel, mode);
+	const ack = mezon.socketRef.current?.writeMessageTyping(channelId, mode);
 	return ack;
 });
 
@@ -471,7 +450,6 @@ export const messagesSlice = createSlice({
 			});
 		},
 		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
-			console.log('markAsSent', action.payload);
 			const { mess, id } = action.payload;
 			const channelId = mess.channel_id;
 
