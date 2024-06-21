@@ -1,6 +1,6 @@
 import { ForwardMessageModal, MessageModalImage, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, selectDirectsUnreadlist, selectCloseMenu, selectStatusMenu, selectOpenModalAttachment } from '@mezon/store';
+import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { selectAllClans, selectCurrentChannel, selectCurrentClan, selectDirectsUnreadlist, selectTheme, selectCloseMenu, selectStatusMenu, selectOpenModalAttachment } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useState } from 'react';
@@ -98,7 +98,7 @@ function MyApp() {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);

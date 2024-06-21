@@ -1,11 +1,11 @@
-import { useApp, useAppNavigation, useAuth, useChannels, useClans, useDirect, useFriends } from '@mezon/core';
+import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 import { useSelector } from 'react-redux';
-import { selectAllDirectMessages } from '@mezon/store';
+import { selectAllDirectMessages, selectAllUsesClan, selectTheme } from '@mezon/store';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -21,14 +21,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { listChannels } = useChannels();
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const { friends } = useFriends();
 
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
 	const itemRef = useRef<HTMLDivElement | null>(null);
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length

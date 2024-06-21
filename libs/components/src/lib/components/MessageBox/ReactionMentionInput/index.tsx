@@ -1,9 +1,9 @@
 import {
-	useApp,
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
 	useClans,
+	useChatReaction,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -16,6 +16,7 @@ import {
 	channelUsersActions,
 	reactionActions,
 	referencesActions,
+	selectAllUsesClan,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -24,6 +25,7 @@ import {
 	selectMessageByMessageId,
 	selectReactionRightState,
 	selectStatusMenu,
+	selectTheme,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -119,7 +121,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
@@ -427,7 +429,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const handleSearchUserMention = (search: any, callback: any) => {
 		setValueHightlight(search);

@@ -1,10 +1,11 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useApp, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
+import { getJumpToMessageId, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
 import {
 	messagesActions,
 	selectHasMoreMessageByChannelId,
 	selectMessageIdsByChannelIdV2,
 	selectQuantitiesMessageRemain,
+	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,7 +29,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
 	const { idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
 	// share logic to load more message
