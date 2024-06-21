@@ -1,3 +1,4 @@
+import { useClans } from '@mezon/core';
 import { authActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
@@ -50,7 +51,9 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 				>
 					Delete clan
 				</button>
-				<LogoutModal isOpen={openModal} handleLogOut={handleLogOut} onClose={handleCloseModal} />
+				{openModal &&
+					<LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />
+				}
 			</div>
 		</div>
 	);

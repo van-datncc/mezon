@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
-import { useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, selectIsShowMemberList, selectReactionTopState, selectStatusMenu } from '@mezon/store';
+import { useApp, useChatReaction, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
+import { selectCloseMenu, selectCurrentChannel, selectPositionEmojiButtonSmile, selectReactionTopState, selectStatusMenu } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
@@ -14,12 +14,13 @@ const ChannelLayout = () => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const { isShowCreateThread } = useThreads();
-	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const { positionOfSmileButton, setUserReactionPanelState } = useChatReaction();
+	const { isShowMemberList } = useApp();
+	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
+
+
 
 	const HEIGHT_EMOJI_PANEL: number = 457;
 	const WIDTH_EMOJI_PANEL: number = 500;
-
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
 	let topPositionEmojiPanel: string;
@@ -31,7 +32,6 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
-
 
 
 	return (

@@ -1,5 +1,5 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { useChannels, useChatReaction, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
+import { useApp, useAuth, useChannels, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
@@ -16,6 +16,7 @@ import {
 	selectPinMessageByChannelId,
 	selectPreviousMessageByMessageId,
 	selectReactionBottomState,
+	selectReactionPlaceActive,
 	selectReactionRightState,
 	selectTheme,
 	useAppDispatch,
@@ -73,6 +74,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	const [deleteMessage, setDeleteMessage] = useState(false);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const user = useSelector(selectMemberByUserId(message.sender_id));
+	// TODO: separate EditSendMessage and SendMessage to different hooks
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
@@ -306,7 +308,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 				{lastSeen && <UnreadMessageBreak />}
 				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>
-			<MessageReaction currentChannelId={channelId || ''} message={message} mode={mode} />
+			<MessageReaction message={message} mode={mode} />
 		</>
 	);
 }
@@ -345,7 +347,8 @@ function PopupMessage({
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { idMessageRefOpt } = useReference();
-	const { reactionPlaceActive } = useChatReaction();
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
@@ -386,7 +389,7 @@ export const MemorizedChannelMessage = memo(ChannelMessage);
 
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
-	const { userId } = useChatReaction();
+	const { userId } = useAuth();
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {

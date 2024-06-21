@@ -1,19 +1,20 @@
 import { useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 interface ModalProps {
 	isOpen: boolean;
+	RolesClan: RolesClanEntity[];
 	onClose: () => void;
 }
 
-export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
-	const { RolesClan, updateRole } = useRoles();
+export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClose }) => {
+	const { updateRole } = useRoles();
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
-	const usersClan = useSelector(selectAllUsesClan);
 	const currentClan = useSelector(selectCurrentClan);
+	const usersClan = useSelector(selectAllUsesClan);
 	const addUsers = useSelector(getNewAddMembers);
 
 	const clickRole = useSelector(getSelectedRoleId);
@@ -30,13 +31,13 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 			const filteredMemberIds = membersNotInRoles.filter((member) => addUsers.includes(member.id)).map((member) => member.id);
 			setSelectedUsers(filteredMemberIds);
 		}
-	}, [isOpen, memberRoles]);
+	}, [addUsers, isOpen, memberRoles, membersNotInRoles]);
 
 	const [searchResults, setSearchResults] = useState<any[]>([]);
 
 	useEffect(() => {
 		setSearchResults(membersNotInRoles);
-	}, [clickRole, memberRoles]);
+	}, [clickRole, memberRoles, membersNotInRoles]);
 
 	const handleUserToggle = (permissionId: string) => {
 		setSelectedUsers((prevPermissions) => {
@@ -51,7 +52,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 	useEffect(() => {
 		const results = membersNotInRoles.filter((member) => member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()));
 		setSearchResults(results);
-	}, [searchTerm]);
+	}, [membersNotInRoles, searchTerm]);
 
 	const handleUpdateRole = async () => {
 		if (clickRole === 'New Role') {

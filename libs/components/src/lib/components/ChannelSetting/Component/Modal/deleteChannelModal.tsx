@@ -1,4 +1,4 @@
-import { useAppNavigation } from '@mezon/core';
+import { useAppNavigation, useClans } from '@mezon/core';
 import { selectCurrentChannelId, useAppDispatch, selectChannelFirst, channelsActions, selectChannelSecond, selectCurrentClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';

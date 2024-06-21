@@ -2,6 +2,7 @@ import {
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
+	useClans,
 	useChatReaction,
 	useClickUpToEdit,
 	useEmojiSuggestion,
@@ -13,6 +14,7 @@ import {
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	reactionActions,
 	referencesActions,
 	selectAllUsesClan,
 	selectCloseMenu,
@@ -21,11 +23,13 @@ import {
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
+	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
+import { useMezon } from '@mezon/transport';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
@@ -56,7 +60,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import { useMezon } from '@mezon/transport';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -106,7 +109,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setIdReferenceMessageReply,
 		setOpenReplyMessageState,
 	} = useReference();
-	const { setReactionPlaceActive } = useChatReaction();
+
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
@@ -123,7 +126,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
-	const { reactionRightState } = useChatReaction();
+	const reactionRightState = useSelector(selectReactionRightState);
+
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
@@ -267,7 +271,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				dispatch(threadsActions.setIsPrivate(0));
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
-			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
 		},
 		[
@@ -443,8 +447,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onFinishUpload?.();
 		}
 	}, [props, props.finishUpload]);
-	const directId = useSelector(selectDmGroupCurrentId)
-	const direct = useSelector(selectDirectById(directId || ""))
+	const directId = useSelector(selectDmGroupCurrentId);
+	const direct = useSelector(selectDirectById(directId || ''));
 	const mezon = useMezon();
 	return (
 		<div className="relative">

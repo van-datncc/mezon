@@ -33,6 +33,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 		const store = await getStoreAsync();
 		createClans(nameClan?.trim(), urlImage).then((res) => {
 			if (res && res.clan_id) {
+        store.dispatch(clansActions.joinClan({ clanId: res.clan_id }));
 				store.dispatch(clansActions.changeCurrentClan({ clanId: res.clan_id }));
 				setVisible(false);
 			}
