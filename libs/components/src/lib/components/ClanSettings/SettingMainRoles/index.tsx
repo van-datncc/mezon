@@ -104,15 +104,16 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								setOpenEdit={setOpenEdit}
 							/>
 						)}
-						{showModal &&
-							<DeleteModal
-								handleDelete={() => handleDeleteRole(selectedRoleId)}
-								onClose={() => setShowModal(false)}
-							/>
-                    	}
+						
 					</tbody>
 				</table>
 			</div>
+			{showModal &&
+				<DeleteModal
+					handleDelete={() => handleDeleteRole(selectedRoleId)}
+					onClose={() => setShowModal(false)}
+				/>
+			}
 			<ServerSettingRoleManagement flagOption={openEdit} handleClose={() => setOpenEdit(false)} RolesClan={RolesClan}/>
 		</>
 	);
