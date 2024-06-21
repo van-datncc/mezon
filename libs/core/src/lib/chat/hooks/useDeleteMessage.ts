@@ -28,7 +28,7 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 			}
 			dispatch(messagesActions.remove(messageId));
 
-			await socket.removeChatMessage(channelId, channel.channel_label ?? '', mode, messageId);
+			await socket.removeChatMessage(channelId, mode, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channel, currentClanId, dispatch, channelId, mode],
 	);

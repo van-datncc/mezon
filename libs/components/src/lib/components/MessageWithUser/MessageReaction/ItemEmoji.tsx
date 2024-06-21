@@ -49,7 +49,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			message.channel_id,
-			channelLabel ?? '',
 			messageId ?? '',
 			emoji ?? '',
 			1,

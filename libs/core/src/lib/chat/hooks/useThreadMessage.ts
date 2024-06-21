@@ -1,11 +1,10 @@
 import { channelsActions, messagesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useClans } from './useClans';
 import { useSelector } from 'react-redux';
-import { ChannelStreamMode } from 'mezon-js';
 
 export type UseThreadMessage = {
 	channelId: string;
@@ -37,9 +36,9 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(currentClanId, thread.id, thread.channel_label ?? '', mode, {t: content.t}, mentions, attachments, references);
+			await socket.writeChatMessage(currentClanId, thread.id, mode, {t: content.t}, mentions, attachments, references);
 			if(content.contentThread){
-				await socket.writeChatMessage(currentClanId, thread.id, thread.channel_label ?? '', mode, {t: content.contentThread}, [], [], undefined);
+				await socket.writeChatMessage(currentClanId, thread.id, mode, {t: content.contentThread}, [], [], undefined);
 			}
 
 			const timestamp = Date.now() / 1000;
@@ -49,10 +48,10 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		if (channelId && channelLabel) {
-			dispatch(messagesActions.sendTypingUser({ channelId, channelLabel, mode }));
+		if (channelId) {
+			dispatch(messagesActions.sendTypingUser({ channelId, mode }));
 		}
-	}, [channelId, channelLabel, dispatch, mode]);
+	}, [channelId, dispatch, mode]);
 
 	const EditSendMessage = React.useCallback(
 		async (content: string, messageId: string) => {
@@ -66,9 +65,9 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			if (!client || !session || !socket || !thread || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(channelId, channelLabel, mode, messageId, editMessage);
+			await socket.updateChatMessage(channelId, mode, messageId, editMessage);
 		},
-		[sessionRef, clientRef, socketRef, thread, currentClanId, mode, channelId, channelLabel],
+		[sessionRef, clientRef, socketRef, thread, currentClanId, mode, channelId],
 	);
 
 	return useMemo(
