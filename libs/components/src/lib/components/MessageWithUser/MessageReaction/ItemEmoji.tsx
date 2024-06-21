@@ -214,7 +214,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 					ref={ref}
 					onMouseEnter={onMouse}
 					onMouseLeave={onLeave}
-					className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row z-40
+					className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row z-40 noselect
 					cursor-pointer justify-center items-center relative
 					${userSenderCount > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}`}
 					onClick={onClickReactExist}
@@ -222,7 +222,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 					<span className="absolute left-[5px]">
 						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
 					</span>
-					<div className="text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
+					<div className=" text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
 						<p>{totalCount}</p>
 					</div>
 				</div>
