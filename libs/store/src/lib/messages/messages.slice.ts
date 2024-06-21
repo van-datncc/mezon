@@ -166,8 +166,9 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
-
-		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
+		if(messages.length >0){
+			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
+		}
 
 		if (response.last_seen_message?.id) {
 			thunkAPI.dispatch(
