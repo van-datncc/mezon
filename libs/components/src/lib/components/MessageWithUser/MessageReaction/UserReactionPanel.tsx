@@ -32,7 +32,6 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			id,
 			mode,
 			message.channel_id ?? '',
-			channelLabel ?? '',
 			messageId,
 			emoji,
 			countRemoved,

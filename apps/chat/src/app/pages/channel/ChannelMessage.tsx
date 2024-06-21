@@ -1,5 +1,5 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { useAuth, useChannels, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
+import { useAuth, useChannels, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
@@ -8,6 +8,7 @@ import {
 	selectAllDirectMessages,
 	selectCurrentChannel,
 	selectIdMessageRefEdit,
+	selectIdMessageRefOption,
 	selectLastSeenMessage,
 	selectMemberByUserId,
 	selectMessageEntityById,
@@ -349,7 +350,7 @@ function PopupMessage({
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { idMessageRefOpt } = useReference();
+	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
