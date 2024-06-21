@@ -1,4 +1,4 @@
-import { GifStickerEmojiPopup, ReactionBottom, UserReactionPanel } from '@mezon/components';
+import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
 import { useChatReaction } from '@mezon/core';
 import { selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, calculateTotalCount } from '@mezon/utils';
@@ -25,8 +25,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	};
 	const dataReaction = getReactionsByMessageId(convertReactionToMatchInterface, message.id);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
-	const [showSenderPanelIn1s, setShowSenderPanelIn1s] = useState(true);
-
 	const checkMessageToMatchMessageRef = (message: IMessageWithUser) => {
 		if (message.id === idMessageRefReaction) {
 			return true;
@@ -34,16 +32,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			return false;
 		}
 	};
-	const [emojiShowUserReaction, setEmojiShowUserReaction] = useState<EmojiDataOptionals>();
-	const checkEmojiToMatchWithEmojiHover = (emoji: EmojiDataOptionals) => {
-		if (emoji.emoji === emojiShowUserReaction?.emoji) {
-			return true;
-		} else {
-			return false;
-		}
-	};
-
-	const [hoverEmoji, setHoverEmoji] = useState<EmojiDataOptionals | null>();
 
 	useLayoutEffect(() => {
 		if (dataReaction.length === 0) {
@@ -71,15 +59,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			)}
 
 			<div ref={contentDiv} className="flex  gap-2  ml-14">
-				{showSenderPanelIn1s && (
-					<div className="hidden max-sm:block max-sm:-top-[0] absolute">
-						{hoverEmoji &&
-							checkMessageToMatchMessageRef(message) &&
-							checkEmojiToMatchWithEmojiHover(hoverEmoji) &&
-							emojiShowUserReaction && <UserReactionPanel message={message} emojiShowPanel={emojiShowUserReaction} mode={mode} />}
-					</div>
-				)}
-
 				<div
 					className=" w-fit flex flex-wrap gap-2 whitespace-pre-wrap"
 					onMouseEnter={() => setShowIconSmile(true)}
