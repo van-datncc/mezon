@@ -3,7 +3,6 @@ import {
 	useChannels,
 	useChatMessages,
 	useChatReaction,
-	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -15,6 +14,7 @@ import {
 	ChannelsEntity,
 	channelUsersActions,
 	referencesActions,
+	selectAllUsesClan,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -118,7 +118,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });

@@ -1,5 +1,5 @@
-import { UserRestrictionZone, useCategory, useClanRestriction, useClans, useEscapeKey } from '@mezon/core';
-import { categoriesActions, channelsActions, selectCategoryIdSortChannel, selectTheme, useAppDispatch } from '@mezon/store';
+import { UserRestrictionZone, useCategory, useClanRestriction, useEscapeKey } from '@mezon/core';
+import { categoriesActions, channelsActions, selectCategoryIdSortChannel, selectCurrentClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
 	const appearanceTheme = useSelector(selectTheme);
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);

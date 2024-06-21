@@ -1,5 +1,5 @@
-import { useClans, useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from '@mezon/store';
+import { useRoles } from '@mezon/core';
+import { getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddMembersModal } from '../AddMembersModal';
@@ -8,10 +8,10 @@ import { UsersClanEntity } from '@mezon/utils';
 const SettingManageMembers = () => {
 	const { RolesClan, updateRole } = useRoles();
 	const dispatchRole = useDispatch();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const addUsers: string[] = useSelector(getNewAddMembers);
 	const clickRole = useSelector(getSelectedRoleId);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const activeRole = RolesClan.find((role) => role.id === clickRole);

@@ -1,5 +1,5 @@
-import { UserRestrictionZone, useClanRestriction, useClans, useRoles } from '@mezon/core';
-import { selectCurrentChannelId, selectMemberByUserId } from '@mezon/store';
+import { UserRestrictionZone, useClanRestriction, useRoles } from '@mezon/core';
+import { selectCurrentChannelId, selectCurrentClan, selectMemberByUserId } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 	const { RolesClan, updateRole } = useRoles(currentChannelId || '');
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const activeRoles = RolesClan.filter((role) => role.active === 1);

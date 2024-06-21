@@ -1,5 +1,5 @@
-import { useAuth, useCategory, useClans, useOnClickOutside } from '@mezon/core';
-import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useAuth, useCategory, useOnClickOutside } from '@mezon/core';
+import { categoriesActions, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -25,7 +25,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
 	const { userProfile } = useAuth();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));

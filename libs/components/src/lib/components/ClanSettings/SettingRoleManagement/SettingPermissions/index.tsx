@@ -1,8 +1,9 @@
-import { useClans, useRoles, useUserPolicy } from '@mezon/core';
+import { useRoles, useUserPolicy } from '@mezon/core';
 import {
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
+	selectCurrentClan,
 	setAddPermissions,
 	setRemovePermissions,
 	setSelectedPermissions,
@@ -21,7 +22,7 @@ export type ModalSettingSave = {
 const SettingPermissions = () => {
 	const dispatch = useDispatch();
 	const { RolesClan } = useRoles();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');
 	const clickRole = useSelector(getSelectedRoleId);
 	const [searchTerm, setSearchTerm] = useState('');

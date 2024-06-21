@@ -1,5 +1,5 @@
-import { useClans, useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, setAddMemberRoles } from '@mezon/store';
+import { useRoles } from '@mezon/core';
+import { getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -12,7 +12,8 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 	const { RolesClan, updateRole } = useRoles();
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
-	const { usersClan, currentClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
+	const currentClan = useSelector(selectCurrentClan);
 	const addUsers = useSelector(getNewAddMembers);
 
 	const clickRole = useSelector(getSelectedRoleId);

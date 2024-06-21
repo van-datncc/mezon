@@ -1,4 +1,4 @@
-import { useClans, useRoles } from '@mezon/core';
+import { useRoles } from '@mezon/core';
 import {
 	getIsShow,
 	getNewAddMembers,
@@ -6,6 +6,7 @@ import {
 	getNewNameRole,
 	getRemovePermissions,
 	getSelectedRoleId,
+	selectCurrentClan,
 	setNameRoleNew,
 	setSelectedPermissions,
 } from '@mezon/store';
@@ -32,7 +33,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const addUsers = useSelector(getNewAddMembers);
 	const { RolesClan } = useRoles();
 	const dispatch = useDispatch();
-	const { currentClan } = useClans();
+	const currentClan = useSelector(selectCurrentClan);
 	const isChange = useSelector(getIsShow);
 
 	const handleClose = () => {
