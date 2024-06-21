@@ -175,7 +175,6 @@ export default function DirectMessage() {
 							{directId && (
 								<ChannelTyping
 									channelId={directId}
-									channelLabel={''}
 									mode={
 										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 									}
