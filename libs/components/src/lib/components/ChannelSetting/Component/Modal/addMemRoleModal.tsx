@@ -4,7 +4,7 @@ import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import * as Icons from '../../../Icons';
 import { useRoles } from '@mezon/core';
 import { useMemo, useState } from 'react';
-import { channelUsersActions, selectAllRolesClan, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
+import { channelUsersActions, selectAllRolesClan, selectAllUsesClan, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 interface AddMemRoleProps {
 	onClose: () => void;

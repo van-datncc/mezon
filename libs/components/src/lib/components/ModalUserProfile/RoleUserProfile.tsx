@@ -1,5 +1,5 @@
 import { UserRestrictionZone, useClanRestriction, useClans, useRoles } from '@mezon/core';
-import { selectAllRolesClan, selectCurrentChannelId, selectMemberByUserId } from '@mezon/store';
+import { selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
