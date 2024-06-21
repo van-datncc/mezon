@@ -49,7 +49,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 
 	return (
 		<>
-			{count && count > 0 && emojiShowPanel.message_id === message.id && (
+			{count > 0 && (
 				<div className="flex flex-col justify-center ">
 					<div
 						onMouseLeave={onLeavePanel}
