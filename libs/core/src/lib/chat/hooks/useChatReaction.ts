@@ -1,19 +1,13 @@
-import { selectCurrentClanId, selectDataReactionGetFromMessage, selectDataSocketUpdate } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { updateEmojiReactionData } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useClans } from './useClans';
 
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
 
 export function useChatReaction() {
-	const currentClanId = useSelector(selectCurrentClanId);
-	const reactDataFirstGetFromMessage = useSelector(selectDataReactionGetFromMessage);
-	const dataReactionSocket = useSelector(selectDataSocketUpdate);
-	const combineDataServerAndSocket = [...reactDataFirstGetFromMessage, ...dataReactionSocket];
-	const convertReactionToMatchInterface = updateEmojiReactionData(combineDataServerAndSocket);
+	const { currentClanId } = useClans();
 	const { clientRef, sessionRef, socketRef } = useMezon();
 
 	const reactionMessageDispatch = useCallback(
@@ -42,8 +36,7 @@ export function useChatReaction() {
 	return useMemo(
 		() => ({
 			reactionMessageDispatch,
-			convertReactionToMatchInterface,
 		}),
-		[reactionMessageDispatch, convertReactionToMatchInterface],
+		[reactionMessageDispatch],
 	);
 }
