@@ -31,7 +31,8 @@ const ChannelList = React.memo((props: any) => {
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 
-	const { allEventManagement } = useEventManagement();
+	// const { allEventManagement } = useEventManagement();
+	const allEventManagement = [];
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
@@ -146,7 +147,7 @@ const ChannelList = React.memo((props: any) => {
 				title={`${allEventManagement.length} Events`}
 				ref={bottomSheetEventRef}
 				headerRight={
-					currentClan.creator_id === user.userId &&
+					currentClan?.creator_id === user?.userId &&
 					<TouchableOpacity onPress={handlePressEventCreate}>
 						<Text style={{ color: "white" }}>Create</Text>
 					</TouchableOpacity>

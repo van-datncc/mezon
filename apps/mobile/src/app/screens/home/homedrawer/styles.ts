@@ -239,7 +239,6 @@ export const styles = StyleSheet.create({
 		width: '22%',
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.secondary,
-		paddingHorizontal: size.s_10,
 		alignItems: 'center',
 		gap: size.s_10
 	},

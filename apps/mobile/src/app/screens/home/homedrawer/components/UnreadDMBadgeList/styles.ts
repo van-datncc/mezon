@@ -3,7 +3,12 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-        gap: size.s_10,
+        maxHeight: '34%',
+    },
+    listDMBadge: {
+        maxHeight: '100%',
+        width: '100%',
+        paddingHorizontal: size.s_10
     },
     groupAvatar: {
         backgroundColor: Colors.orange,
@@ -15,7 +20,6 @@ export const styles = StyleSheet.create({
     },
     badge: {
         backgroundColor: Colors.red,
-        paddingHorizontal: size.s_2,
         position: 'absolute',
         borderRadius: size.s_14,
         borderWidth: 3,
@@ -31,5 +35,8 @@ export const styles = StyleSheet.create({
         color: Colors.white,
         fontWeight: 'bold',
         top: -2
+    },
+    mb10: {
+        marginBottom: size.s_10,
     }
 })

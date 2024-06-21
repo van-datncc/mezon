@@ -46,6 +46,7 @@ export const isVideo = (url?: string) => {
 };
 
 export const normalizeString = (str: string) => {
+  if (!str) return '';
   const normalizedStr = str.replace(/\s+/g, '').trim();
   return normalizedStr.toLowerCase();
 }
