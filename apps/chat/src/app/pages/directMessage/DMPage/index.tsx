@@ -1,34 +1,37 @@
 import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat } from '@mezon/components';
+import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import {
-	useApp,
-	useAppNavigation,
-	useAppParams,
-	useChatMessages,
-	useChatReaction,
-	useDragAndDrop,
-	useGifsStickersEmoji,
-	useReference,
-	useThreads,
-} from '@mezon/core';
-import { RootState, directActions, selectCloseMenu, selectDefaultChannelIdByClanId, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectMessageByChannelId, selectReactionTopState, selectStatusMenu, useAppDispatch } from '@mezon/store';
+	RootState,
+	directActions,
+	selectCloseMenu,
+	selectDefaultChannelIdByClanId,
+	selectDmGroupCurrent,
+	selectIsShowMemberListDM,
+	selectIsUseProfileDM,
+	selectMessageByChannelId,
+	selectPositionEmojiButtonSmile,
+	selectReactionTopState,
+	selectStatusMenu,
+	useAppDispatch,
+} from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import ModalUserProfile from '../../../../../../../libs/components/src/lib/components/ModalUserProfile';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
-import ModalUserProfile from '../../../../../../../libs/components/src/lib/components/ModalUserProfile';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
-		useEffect(() => {
-			if (lastMessage) {
-				const timestamp = Date.now() / 1000;
-				dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-				dispatch(directActions.updateLastSeenTime(lastMessage));
-			}
-		}, [channelId, dispatch, lastMessage]);
+	useEffect(() => {
+		if (lastMessage) {
+			const timestamp = Date.now() / 1000;
+			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(directActions.updateLastSeenTime(lastMessage));
+		}
+	}, [channelId, dispatch, lastMessage]);
 }
 export default function DirectMessage() {
 	// TODO: move selector to store
@@ -64,7 +67,7 @@ export default function DirectMessage() {
 	const statusMenu = useSelector(selectStatusMenu);
 	const { isShowCreateThread } = useThreads();
 	const { isShowMemberList } = useApp();
-	const { positionOfSmileButton } = useChatReaction();
+	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 
 	const HEIGHT_EMOJI_PANEL: number = 457;
 	const WIDTH_EMOJI_PANEL: number = 500;
@@ -87,7 +90,10 @@ export default function DirectMessage() {
 			setDraggingState(true);
 		}
 	};
-	const checkTypeDm = useMemo(() => Number(type) === ChannelType.CHANNEL_TYPE_GROUP ? isShowMemberListDM : isUseProfileDM, [isShowMemberListDM, isUseProfileDM, type]);
+	const checkTypeDm = useMemo(
+		() => (Number(type) === ChannelType.CHANNEL_TYPE_GROUP ? isShowMemberListDM : isUseProfileDM),
+		[isShowMemberListDM, isUseProfileDM, type],
+	);
 
 	return (
 		<>
@@ -181,16 +187,20 @@ export default function DirectMessage() {
 						</div>
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<div className={`dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}>
+						<div
+							className={`dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
+						>
 							<MemberListGroupChat directMessageId={directId} />
 						</div>
 					)}
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
-						<div className={`dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}>
-							<ModalUserProfile 
-								userID = {Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id} 
-								classWrapper='w-full' 
-								classBanner='h-[120px]' 
+						<div
+							className={`dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}
+						>
+							<ModalUserProfile
+								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
+								classWrapper="w-full"
+								classBanner="h-[120px]"
 								hiddenRole={true}
 								showNote={true}
 							/>
