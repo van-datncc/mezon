@@ -518,7 +518,6 @@ export const messagesSlice = createSlice({
 			});
 		},
 		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
-			console.log('markAsSent', action.payload);
 			const { mess, id } = action.payload;
 			const channelId = mess.channel_id;
 			

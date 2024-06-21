@@ -146,7 +146,7 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										<MessageContent message={message} user={user} isCombine={isCombine} newMessage={newMessage} isSending={message.isSending} isError={message.isError} />
-										{child?.props.children[1] && React.isValidElement(child?.props.children[1]) && React.cloneElement(child?.props.children[1], propsChild)}
+										{child?.props.children[1] && React.isValidElement(child?.props.children[1]) && React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
