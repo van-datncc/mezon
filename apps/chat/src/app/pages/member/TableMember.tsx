@@ -1,4 +1,3 @@
-import { useClans } from '@mezon/core';
 import TableMemberHeader from './TableMemberHeader';
 import TableMemberItem from './TableMemberItem';
 import { useSelector } from 'react-redux';
