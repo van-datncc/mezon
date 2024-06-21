@@ -1,5 +1,5 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
-import { MezonPolicyProvider, useApp, useAuth, useClans, useThreads } from '@mezon/core';
+import { MezonPolicyProvider, useApp, useAuth, useThreads } from '@mezon/core';
 import { selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectCurrentVoiceChannel, selectStatusMenu } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';

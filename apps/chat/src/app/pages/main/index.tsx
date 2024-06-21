@@ -12,6 +12,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
 function MyApp() {
+	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const [openListClans, setOpenListClans] = useState(false);
@@ -101,6 +102,19 @@ function MyApp() {
 	};
 
 	const appearanceTheme = useSelector(selectTheme);
+	useEffect(()=>{
+		switch(appearanceTheme){
+			case "dark":
+				elementHTML.classList.add('dark');
+				break;
+			case "light":
+				elementHTML.classList.remove('dark');
+				break;
+			default:
+				break;
+		}
+	}, [appearanceTheme])
+	
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 
