@@ -1,9 +1,8 @@
-import { channelsActions, messagesActions, selectCurrentChannel, useAppDispatch } from '@mezon/store';
+import { channelsActions, messagesActions, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo, useState } from 'react';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useClans } from './useClans';
 import { useSelector } from 'react-redux';
 import { ChannelStreamMode } from 'mezon-js';
 
@@ -14,7 +13,7 @@ export type UseThreadMessage = {
 };
 
 export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMessage) {
-	const { currentClanId } = useClans();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 
 	const { clientRef, sessionRef, socketRef } = useMezon();

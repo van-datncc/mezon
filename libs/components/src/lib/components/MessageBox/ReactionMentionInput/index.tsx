@@ -2,7 +2,6 @@ import {
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
-	useClans,
 	useChatReaction,
 	useClickUpToEdit,
 	useEmojiSuggestion,
