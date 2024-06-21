@@ -160,7 +160,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 
 	return (
 		<>
-			{count > 0 && (
+			{count > 0 && emoji.message_id === message.id && (
 				<ItemDetail
 					ref={emojiItemRef}
 					onMouse={onHoverEnter}
@@ -174,7 +174,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 				/>
 			)}
 
-			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === emoji.message_id && userReactionPanelState && count > 0 && (
+			{emojiHover?.emoji === emoji.emoji && emojiHover?.message_id === message.id && userReactionPanelState && count > 0 && (
 				<div
 					ref={userPanelRef}
 					className=" w-[18rem] flex flex-col items-center z-50"
