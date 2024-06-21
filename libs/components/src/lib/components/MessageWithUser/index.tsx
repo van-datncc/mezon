@@ -1,4 +1,4 @@
-import { selectCurrentChannelId } from '@mezon/store';
+import { selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { IChannelMember, IMessageWithUser, TIME_COMBINE, checkSameDay, getTimeDifferenceInSeconds } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -9,7 +9,7 @@ import MessageAvatar from './MessageAvatar';
 import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
-import { useAuth, useChatMessages, useNotification, useReference } from '@mezon/core';
+import { useAuth, useChatMessages, useNotification } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import MessageContent from './MessageContent';
 
@@ -34,7 +34,9 @@ function MessageWithUser({ message, preMessage, user, isMessNotifyMention, mode,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
-	const { openReplyMessageState, idMessageRefReply, idMessageToJump, idMessageRefEdit } = useReference();
+	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const userLogin = useAuth();

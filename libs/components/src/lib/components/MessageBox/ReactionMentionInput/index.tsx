@@ -16,12 +16,18 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllUsesClan,
+	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectDataReferences,
 	selectDirectById,
 	selectDmGroupCurrentId,
+	selectIdMessageRefReply,
 	selectMessageByMessageId,
+	selectOpenEditMessageState,
+	selectOpenReplyMessageState,
+	selectOpenThreadMessageState,
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
@@ -100,22 +106,22 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
 	const {
-		dataReferences,
 		setDataReferences,
-		openThreadMessageState,
 		setOpenThreadMessageState,
-		idMessageRefReply,
 		setIdReferenceMessageReply,
 		setOpenReplyMessageState,
+		setAttachmentData,
 	} = useReference();
-
+	const dataReferences = useSelector(selectDataReferences);
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
-	const { attachmentDataRef, setAttachmentData } = useReference();
+	const attachmentDataRef = useSelector(selectAttachmentData);
 	const [content, setContent] = useState('');
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -372,7 +378,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
-	const { openReplyMessageState, openEditMessageState } = useReference();
+	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
