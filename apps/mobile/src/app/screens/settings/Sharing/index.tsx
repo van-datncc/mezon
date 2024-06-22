@@ -171,7 +171,7 @@ export const Sharing = ({ data, onClose }) => {
 			await sendToGroup(dataSend);
 		}
 		setIsLoading(false);
-		// onClose();
+		onClose();
 	};
 
 	const convertFileFormat = async () => {
