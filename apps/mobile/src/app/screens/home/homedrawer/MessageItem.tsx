@@ -82,8 +82,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
-	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references?.[0]?.message_ref_id || ''));
-	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
+	const [messageRefId, setMessageRefId] = useState<string>('');
+	const [senderId, setSenderId] = useState<string>('');
+	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
+	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
@@ -100,7 +102,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message.references, user]);
+	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
 	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
@@ -120,6 +122,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return { videos, images, documents };
 	};
+
+	useEffect(() => {
+		if (message.references && message.references.length > 0) {
+			const messageReferenceId = message.references[0].message_ref_id;
+			const messageReferenceUserId = message.references[0].message_sender_id;
+			setMessageRefId(messageReferenceId ?? '');
+			setSenderId(messageReferenceUserId ?? '');
+		}
+	}, [message]);
 
 	useEffect(() => {
 		const { videos, images, documents } = classifyAttachments(attachments ?? []);
