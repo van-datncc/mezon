@@ -28,17 +28,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		}
 	}, [message]);
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
-		await reactionMessageDispatch(
-			id,
-			mode,
-			message.channel_id ?? '',
-			channelLabel ?? '',
-			messageId,
-			emoji,
-			countRemoved,
-			message_sender_id,
-			true,
-		);
+		await reactionMessageDispatch(id, mode, message.channel_id ?? '', messageId, emoji, countRemoved, message_sender_id, true);
 	};
 
 	const [senderList, setSenderList] = useState<SenderInfoOptionals[]>(emojiShowPanel.senders);
@@ -66,7 +56,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 						onClick={(e) => e.stopPropagation()}
 						className={`z-50   w-[18rem]
 						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem]
-				 		${window.innerWidth < 640 ? 'absolute  bottom-7' : 'p-1 bottom-0'}`}
+				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emoji={emojiShowPanel.emoji} emojiListPNG={emojiListPNG} count={count} />
 						{senderList.map((sender: SenderInfoOptionals, index: number) => {

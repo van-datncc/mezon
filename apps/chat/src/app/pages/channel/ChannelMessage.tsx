@@ -1,5 +1,5 @@
 import { ChannelMessageOpt, MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { useApp, useChannels, useChatReaction, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey, useReference } from '@mezon/core';
+import { useAuth, useChannels, useChatSending, useDeleteMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import {
 	directActions,
 	messagesActions,
@@ -8,6 +8,7 @@ import {
 	selectAllDirectMessages,
 	selectCurrentChannel,
 	selectIdMessageRefEdit,
+	selectIdMessageRefOption,
 	selectLastSeenMessage,
 	selectMemberByUserId,
 	selectMessageEntityById,
@@ -16,7 +17,9 @@ import {
 	selectPinMessageByChannelId,
 	selectPreviousMessageByMessageId,
 	selectReactionBottomState,
+	selectReactionPlaceActive,
 	selectReactionRightState,
+	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
 import { EmojiPlaces, IMessageWithUser } from '@mezon/utils';
@@ -51,12 +54,11 @@ type EmojiData = {
 	display: string;
 };
 
-const neverMatchingRegex = /($a)/;
 
 const convertToPlainTextHashtag = (text: string) => {
 	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 	const result = text.replace(regex, (match, symbol, p1, p2) => {
-		return symbol === '#' ? `#${p2}` : `@${p1}`;
+		return symbol === '#' ? `<#${p2}>` : `@${p1}`;
 	});
 	return result;
 };
@@ -76,6 +78,8 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
 	const dispatch = useAppDispatch();
+
+	const { emojiListPNG } = useEmojiSuggestion();
 
 	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 
@@ -189,20 +193,21 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	};
 
 	const { emojis } = useEmojiSuggestion();
-	const queryEmojis = (query: string, callback: (data: EmojiData[]) => void) => {
+	const neverMatchingRegex = /($a)/;
+	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
-		const matches = emojis
+		const matches = emojiListPNG
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.emoji, emoji: emojiDisplay?.emoji, display: emojiDisplay?.shortname }));
+			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
-
+	
 	const mentionList = UserMentionList(channelId);
 
 	useEscapeKey(handleCancelEdit);
 
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	return (
 		<>
@@ -279,6 +284,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 												<SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />
 											)}
 											className="dark:bg-[#3B416B] bg-bgLightModeButton"
+											appendSpaceOnAdd={true}
 										/>
 									</MentionsInput>
 									<div className="text-xs flex">
@@ -344,8 +350,9 @@ function PopupMessage({
 	deleteSendMessage,
 }: PopupMessageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { idMessageRefOpt } = useReference();
-	const { reactionPlaceActive } = useChatReaction();
+	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
+	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+
 	const channelMessageOptRef = useRef<HTMLDivElement>(null);
 	const getDivHeightToTop = () => {
 		const channelMessageDiv = channelMessageOptRef.current;
@@ -386,7 +393,7 @@ export const MemorizedChannelMessage = memo(ChannelMessage);
 
 function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 	const dispatch = useAppDispatch();
-	const { userId } = useChatReaction();
+	const { userId } = useAuth();
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
 	const handleClickEdit = (event: React.MouseEvent<HTMLLIElement>) => {

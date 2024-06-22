@@ -1,10 +1,8 @@
 import {
-	useApp,
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
 	useChatReaction,
-	useClans,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -15,17 +13,28 @@ import {
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	reactionActions,
 	referencesActions,
+	selectAllUsesClan,
+	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectDataReferences,
 	selectDirectById,
 	selectDmGroupCurrentId,
+	selectIdMessageRefReply,
 	selectMessageByMessageId,
+	selectOpenEditMessageState,
+	selectOpenReplyMessageState,
+	selectOpenThreadMessageState,
+	selectReactionRightState,
 	selectStatusMenu,
+	selectTheme,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
+import { useMezon } from '@mezon/transport';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
@@ -56,7 +65,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import { useMezon } from '@mezon/transport';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -98,32 +106,33 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
 	const {
-		dataReferences,
 		setDataReferences,
-		openThreadMessageState,
 		setOpenThreadMessageState,
-		idMessageRefReply,
 		setIdReferenceMessageReply,
 		setOpenReplyMessageState,
+		setAttachmentData,
 	} = useReference();
-	const { setReactionPlaceActive } = useChatReaction();
+	const dataReferences = useSelector(selectDataReferences);
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
-	const { attachmentDataRef, setAttachmentData } = useReference();
+	const attachmentDataRef = useSelector(selectAttachmentData);
 	const [content, setContent] = useState('');
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
-	const { usersClan } = useClans();
+	const usersClan = useSelector(selectAllUsesClan);
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojiListPNG } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
-	const { reactionRightState } = useChatReaction();
+	const reactionRightState = useSelector(selectReactionRightState);
+
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
@@ -267,7 +276,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				dispatch(threadsActions.setIsPrivate(0));
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
-			setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE);
+			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
 		},
 		[
@@ -369,7 +378,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 	const editorRef = useRef<HTMLInputElement | null>(null);
-	const { openReplyMessageState, openEditMessageState } = useReference();
+	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	useEffect(() => {
@@ -425,7 +435,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
-	const { appearanceTheme } = useApp();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const handleSearchUserMention = (search: any, callback: any) => {
 		setValueHightlight(search);
@@ -443,8 +453,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onFinishUpload?.();
 		}
 	}, [props, props.finishUpload]);
-	const directId = useSelector(selectDmGroupCurrentId)
-	const direct = useSelector(selectDirectById(directId || ""))
+	const directId = useSelector(selectDmGroupCurrentId);
+	const direct = useSelector(selectDirectById(directId || ''));
 	const mezon = useMezon();
 	return (
 		<div className="relative">
