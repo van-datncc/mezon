@@ -15,7 +15,6 @@ import {
 	selectOpenEditMessageState,
 	selectOpenOptionMessageState,
 	selectPinMessageByChannelId,
-	selectPreviousMessageByMessageId,
 	selectReactionBottomState,
 	selectReactionPlaceActive,
 	selectReactionRightState,
@@ -54,7 +53,6 @@ type EmojiData = {
 	display: string;
 };
 
-
 const convertToPlainTextHashtag = (text: string) => {
 	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
 	const result = text.replace(regex, (match, symbol, p1, p2) => {
@@ -64,8 +62,7 @@ const convertToPlainTextHashtag = (text: string) => {
 };
 
 export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Readonly<MessageProps>) {
-	const message = useSelector((state) => selectMessageEntityById(state, messageId));
-	const messPre = useSelector(selectPreviousMessageByMessageId(channelId, messageId));
+	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const reactionRightState = useSelector(selectReactionRightState);
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
@@ -202,7 +199,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
-	
+
 	const mentionList = UserMentionList(channelId);
 
 	useEscapeKey(handleCancelEdit);
@@ -214,7 +211,6 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 			<div className="fullBoxText relative group">
 				<MessageWithUser
 					message={mess as IMessageWithUser}
-					preMessage={messPre as IMessageWithUser}
 					user={user}
 					mode={mode}
 					newMessage={newMessage}

@@ -5,12 +5,14 @@ import {
 	differenceInSeconds,
 	format,
 	formatDistanceToNowStrict,
+	fromUnixTime,
 	isSameDay,
 	startOfDay,
 	subDays,
 } from 'date-fns';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
+import { TIME_COMBINE } from '../constant';
 import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
@@ -243,4 +245,22 @@ export function searchMentionsHashtag(searchValue: any, list: any[]) {
 
 export const ValidateSpecialCharacters = () => {
 	return /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]{1,64}$/u;
+};
+
+export const checkSameDayByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
+	const date1 = fromUnixTime(unixTime1 / 1000);
+	const date2 = fromUnixTime(unixTime2 / 1000);
+
+	return isSameDay(date1, date2);
+};
+
+export const checkContinuousMessagesByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
+	return Math.abs(unixTime1 - unixTime2) <= TIME_COMBINE * 1000;
+};
+
+export const checkSameDayByCreateTime = (createTime1: string | Date, createTime2: string | Date) => {
+	const ct1 = typeof createTime1 === 'string' ? createTime1 : createTime1.toISOString();
+	const ct2 = typeof createTime2 === 'string' ? createTime2 : createTime2.toISOString();
+
+	return Boolean(ct1 && ct2 && ct1.startsWith(ct2.substring(0, 10)));
 };
