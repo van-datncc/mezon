@@ -372,7 +372,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							style={styles.messageBoxTop}
 						>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username || 'Anonymous'}</Text>
-							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
+							<Text style={styles.dateMessageBox}>{props?.message?.create_time ? convertTimeString(props?.message?.create_time) : ''}</Text>
 						</TouchableOpacity>
 					) : null}
 					{videos.length > 0 && renderVideos()}

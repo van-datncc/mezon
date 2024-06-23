@@ -1,7 +1,12 @@
 import { useChatMessage, useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, selectAttachmentPhoto, useAppDispatch } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	selectAttachmentPhoto,
+	selectHasMoreMessageByChannelId,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,14 +28,15 @@ type ChannelMessagesProps = {
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
-	const { messages, unreadMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
+	const { messages, unreadMessageId, loadMoreMessage } = useChatMessages({ channelId });
+	const { typingUsers } = useChatTypings({ channelId, mode });
 	const { markMessageAsSeen } = useChatMessage(unreadMessageId);
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
 	const flatListRef = useRef(null);
 	const footerImagesModalRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const attachments = useSelector(selectAttachmentPhoto());
+	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const dispatch = useAppDispatch();
 
@@ -193,7 +199,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				maxToRenderPerBatch={5}
 				initialNumToRender={5}
 				windowSize={10}
-				onEndReached={onLoadMore}
+				onEndReached={!!messages?.length && onLoadMore}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 			/>

@@ -155,6 +155,9 @@ export const navigateToNotification = async (notification: any, navigation: any,
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				// TODO: handle navigation
 			}
+			else {
+				store.dispatch(appActions.setIsFromFCMMobile(false));
+			}
 		}
 
 		// TODO: handle navigation

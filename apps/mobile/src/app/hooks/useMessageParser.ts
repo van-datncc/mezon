@@ -20,20 +20,24 @@ export function useMessageParser(message: IMessageWithUser) {
 	}, [content]);
 
 	const messageTime = useMemo(() => {
+		if (!message?.create_time) return '';
 		return convertTimeString(message?.create_time as string);
 	}, [message]);
 
 	const messageDate = useMemo(() => {
+		if (!message?.create_time) return '';
 		return convertDateString(message?.create_time as string);
 	}, [message]);
 
 	const messageHour = useMemo(() => {
+		if (!message?.create_time) return '';
 		return convertTimeHour(message?.create_time || ('' as string));
 	}, [message]);
 
-  const messageTimeDifference = useMemo(()=>{
-    return getTimeDifferenceDate(message?.create_time as string)
-  }, [message])
+	const messageTimeDifference = useMemo(() => {
+		if (!message?.create_time) return '';
+		return getTimeDifferenceDate(message?.create_time as string);
+	}, [message]);
 
 	return {
 		content,
@@ -43,6 +47,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		mentions,
 		lines,
 		messageDate,
-    messageTimeDifference
+		messageTimeDifference,
 	};
 }

@@ -33,6 +33,7 @@ export interface IMessageReactionProps {
 export interface IDetailReactionBottomSheet {
 	allReactionDataOnOneMessage: EmojiDataOptionals[];
 	emojiSelectedId: string | null;
+	userId: string | null;
 	onClose: () => void;
 	emojiListPNG?: IEmojiImage[];
 	removeEmoji?: (emoji: EmojiDataOptionals) => void;
