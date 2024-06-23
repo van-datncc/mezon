@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useCategory, useEventManagement } from '@mezon/core';
+import { useAuth, useCategory } from '@mezon/core';
 import {
 	CalendarIcon,
 	STORAGE_KEY_CLAN_CURRENT_CACHE,
@@ -9,13 +9,23 @@ import {
 	save,
 } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
-import { appActions, channelsActions, getStoreAsync, messagesActions, selectCurrentClan, selectIsFromFCMMobile } from '@mezon/store-mobile';
+import {
+	appActions,
+	channelsActions,
+	getStoreAsync,
+	messagesActions,
+	selectAllEventManagement,
+	selectCurrentClan,
+	selectIsFromFCMMobile,
+} from '@mezon/store-mobile';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
 import EventViewer from '../../../components/Event';
+import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../../temp-ui';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
@@ -23,15 +33,13 @@ import CategoryMenu from './components/CategoryMenu';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import { styles } from './styles';
-import { useNavigation } from '@react-navigation/native';
-import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 
-	const { allEventManagement } = useEventManagement();
+	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
@@ -39,7 +47,7 @@ const ChannelList = React.memo((props: any) => {
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
 	const user = useAuth();
-	const navigation = useNavigation<AppStackScreenProps['navigation']>()
+	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -105,7 +113,7 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory}/>
+					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory} />
 				</View>
 				<View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
 					<TouchableOpacity
@@ -125,7 +133,8 @@ const ChannelList = React.memo((props: any) => {
 							index={index}
 							onPressHeader={toggleCollapseChannel}
 							onLongPress={(channel: IChannel | ICategoryChannel) => handleLongPressCategory(channel)}
-							collapseItems={collapseChannelItems} />
+							collapseItems={collapseChannelItems}
+						/>
 					)}
 				/>
 			</View>
@@ -134,23 +143,21 @@ const ChannelList = React.memo((props: any) => {
 				<ClanMenu clan={currentClan} inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} >
-				<CategoryMenu
-					bottomSheetRef={bottomSheetCategoryMenuRef}
-          inviteRef={bottomSheetInviteRef}
-					category={currentPressedCategory}
-				/>
+			<MezonBottomSheet ref={bottomSheetCategoryMenuRef}>
+				<CategoryMenu bottomSheetRef={bottomSheetCategoryMenuRef} inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet
 				title={`${allEventManagement.length} Events`}
 				ref={bottomSheetEventRef}
 				headerRight={
-					currentClan.creator_id === user.userId &&
-					<TouchableOpacity onPress={handlePressEventCreate}>
-						<Text style={{ color: "white" }}>Create</Text>
-					</TouchableOpacity>
-				}>
+					currentClan?.creator_id === user?.userId && (
+						<TouchableOpacity onPress={handlePressEventCreate}>
+							<Text style={{ color: 'white' }}>Create</Text>
+						</TouchableOpacity>
+					)
+				}
+			>
 				<EventViewer />
 			</MezonBottomSheet>
 		</ChannelListContext.Provider>

@@ -119,7 +119,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	};
 
 	const filteredDataDM = useMemo(() => {
-		return filterDmGroupsByChannelLabel(dmGroupChatList).filter(dm => normalizeString(dm.channel_label).includes(normalizeString(searchText)));
+		return filterDmGroupsByChannelLabel(dmGroupChatList)?.filter?.(dm => normalizeString(dm.channel_label)?.includes(normalizeString(searchText)));
 	}, [dmGroupChatList, searchText]);
 
 	const navigateToAddFriendScreen = () => {
