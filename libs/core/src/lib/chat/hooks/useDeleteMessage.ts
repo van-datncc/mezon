@@ -25,7 +25,12 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 			if (!client || !session || !socket || !channel || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			dispatch(messagesActions.remove(messageId));
+			dispatch(
+				messagesActions.remove({
+					channelId,
+					messageId,
+				}),
+			);
 
 			await socket.removeChatMessage(channelId, mode, messageId);
 		},
