@@ -61,7 +61,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	};
 
 	const allReactionDataOnOneMessage = useMemo(() => {
-		return convertReactionToMatchInterface.filter((emoji: EmojiDataOptionals) =>
+		return convertReactionToMatchInterface?.filter?.((emoji: EmojiDataOptionals) =>
 			emoji.message_id === message.id && emoji.senders.some(sender => sender.count > 0))
 			.map(emoji => {
 				if (Number(emoji.id) === 0) {
@@ -110,7 +110,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 					);
 				})}
 
-			{allReactionDataOnOneMessage.length  ? (
+			{allReactionDataOnOneMessage?.length  ? (
 				<Pressable onPress={() => openEmojiPicker?.()} style={styles.addEmojiIcon}>
 					<FaceIcon color={Colors.gray72} />
 				</Pressable>
@@ -195,7 +195,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 	}, [removeEmoji, checkToFocusOtherEmoji, currentEmojiSelected])
 
 	const emojiKeyList = useMemo(() => {
-		return allReactionDataOnOneMessage.map(emojiData => emojiData.id)
+		return allReactionDataOnOneMessage?.map?.(emojiData => emojiData.id)
 	}, [allReactionDataOnOneMessage])
 
 	const isExistingMyEmoji = useMemo(() => {
@@ -268,7 +268,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 				}}
 			>
 				<View style={styles.bottomSheetWrapper}>
-					{allReactionDataOnOneMessage.length ? (
+					{allReactionDataOnOneMessage?.length ? (
 						<View>
 							<View style={styles.contentHeader}>
 								<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabHeaderWrapper}>

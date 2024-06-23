@@ -148,46 +148,13 @@ export const fetchMessages = createAsyncThunk(
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
-		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
-			if (!message.reactions) return [];
-			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
-			message.reactions.forEach((reaction) => {
-				const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
-
-				if (!emojiDataItems[key]) {
-					emojiDataItems[key] = {
-						id: reaction.id,
-						emoji: reaction.emoji,
-						senders: [
-							{
-								sender_id: reaction.sender_id,
-								count: reaction.count,
-								emojiIdList: [],
-								sender_name: '',
-								avatar: '',
-							},
-						],
-						channel_id: message.channel_id,
-						message_id: message.id,
-					};
-				} else {
-					const existingItem = emojiDataItems[key];
-
-					if (existingItem.senders.length > 0) {
-						existingItem.senders[0].count = reaction.count;
-					}
-				}
-			});
-			return Object.values(emojiDataItems);
-		});
-
-		if (reactionData.length > 0) {
-			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
-		}
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
-
-		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
+		if (messages.length > 0) {
+			thunkAPI.dispatch(
+				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }),
+			);
+		}
 
 		if (response.last_seen_message?.id) {
 			thunkAPI.dispatch(
@@ -580,10 +547,6 @@ export const messagesSlice = createSlice({
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
 		},
-
-		setDataReactionGetFromMessage(state, action) {
-			state.dataReactionGetFromLoadMessage = action.payload;
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -752,8 +715,6 @@ export const selectMessageByMessageId = (messageId: string) =>
 	});
 
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
-
-export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
 
 // V2
 

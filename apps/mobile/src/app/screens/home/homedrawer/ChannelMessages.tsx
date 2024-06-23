@@ -87,7 +87,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
 	const onLoadMore = () => {
 		setIsLoadMore(true);
-		loadMoreMessage().finally(() => setIsLoadMore(false));
+		if (!isLoadMore) loadMoreMessage().finally(() => setIsLoadMore(false));
 	};
 
 	const handleScroll = (event: { nativeEvent: { contentOffset: { y: any } } }) => {
@@ -118,21 +118,24 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		footerImagesModalRef?.current?.scrollToIndex({ animated: true, index: 0 });
 		setVisibleImageModal(true);
 	}, []);
-	
-	const renderItem = useCallback(({ item, index }) => {
-		const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
-		return (
-			<MessageItem
-				message={item}
-				mode={mode}
-				channelId={channelId}
-				channelLabel={channelLabel}
-				preMessage={preMessage}
-				onOpenImage={onOpenImage}
-			/>
-		);
-	}, [messages, mode, channelId, channelLabel, onOpenImage]);
-	
+
+	const renderItem = useCallback(
+		({ item, index }) => {
+			const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
+			return (
+				<MessageItem
+					message={item}
+					mode={mode}
+					channelId={channelId}
+					channelLabel={channelLabel}
+					preMessage={preMessage}
+					onOpenImage={onOpenImage}
+				/>
+			);
+		},
+		[messages, mode, channelId, channelLabel, onOpenImage],
+	);
+
 	const RenderFooterModal = () => {
 		return (
 			<View style={styles.wrapperFooterImagesModal}>
