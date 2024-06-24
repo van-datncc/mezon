@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useCategory, useEventManagement } from '@mezon/core';
+import { useAuth, useCategory } from '@mezon/core';
 import {
 	CalendarIcon,
 	STORAGE_KEY_CLAN_CURRENT_CACHE,
@@ -9,7 +9,7 @@ import {
 	save,
 } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
-import { appActions, channelsActions, getStoreAsync, messagesActions, selectCurrentClan, selectIsFromFCMMobile } from '@mezon/store-mobile';
+import { appActions, channelsActions, getStoreAsync, messagesActions, selectAllEventManagement, selectCurrentClan, selectIsFromFCMMobile } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -31,8 +31,7 @@ const ChannelList = React.memo((props: any) => {
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 
-	// const { allEventManagement } = useEventManagement();
-	const allEventManagement = [];
+	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
