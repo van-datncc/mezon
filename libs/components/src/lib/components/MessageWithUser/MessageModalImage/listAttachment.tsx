@@ -1,5 +1,5 @@
 import { AttachmentEntity } from "@mezon/store";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import ItemAttachment from "./itemAttachment";
 
 type ListAttachmentProps = {
@@ -29,22 +29,26 @@ const ListAttachment = (props: ListAttachmentProps) => {
 		}
 	}, [setPosition, setScale, urlImg]);
 
-    const [previousDate, setPreviousDate] = useState('');
+    let previousDate: any;
 
     return (
         <div className="w-full md:w-[250px] h-[120px] md:h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col px-[10px] md:px-0 md:py-5 overflow-y-hidden gap-x-2 md:gap-y-5">
             <div className="w-full h-full dark:bg-[#0B0B0B] bg-bgLightModeSecond flex md:flex-col py-0 md:py-5 overflow-y-scroll gap-x-2 md:gap-y-5 hide-scrollbar items-center">
-                {attachments.map((attachment) => 
-                    <ItemAttachment 
-                        key={attachment.id}
-                        attachment={attachment} 
-                        urlImg={urlImg} 
-                        previousDate={previousDate} 
-                        setPreviousDate={setPreviousDate} 
-                        selectedImageRef={selectedImageRef}
-                        setUrlImg={setUrlImg}
-                        handleDrag={handleDrag}
-                    />
+                {attachments.map((attachment) => {
+                    const currentDate = new Date(attachment.create_time || '').toLocaleDateString();
+                    const showDate = previousDate !== currentDate;
+                    previousDate = currentDate;
+                    return (
+                        <ItemAttachment 
+                            key={attachment.id}
+                            attachment={attachment} 
+                            urlImg={urlImg} 
+                            previousDate={currentDate} 
+                            selectedImageRef={selectedImageRef}
+                            showDate={showDate}
+                            setUrlImg={setUrlImg}
+                            handleDrag={handleDrag}
+                    />)}
                 )}
             </div>
         </div>

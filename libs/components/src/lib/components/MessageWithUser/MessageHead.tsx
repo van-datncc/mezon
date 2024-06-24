@@ -84,13 +84,13 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
 				>
-					{clanProfile?.nick_name || username || 'Anonymous'}
+					{clanProfile?.nick_name || username || message.username || 'Anonymous'}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
 			{isShowPanelChannel && (
 				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] w-[360px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
+					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
 						left: `20px`,
 						top: positionBottom ? '' : `${positionTop}px`,
@@ -100,7 +100,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} />
+					<ShortUserProfile userID={user?.user?.id || ''} message={message}/>
 				</div>
 			)}
 		</div>

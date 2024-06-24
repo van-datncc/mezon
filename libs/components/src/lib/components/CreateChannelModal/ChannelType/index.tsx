@@ -45,8 +45,9 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 	};
 
 	return (
-		<div
+		<label
 			className={`Frame403 self-stretch px-2 py-2 dark:bg-bgSecondary bg-bgModifierHoverLight rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'dark:hover:bg-bgHover hover:bg-[#bababa]'}  ${error ? 'border border-red-500' : ' border border-none'}`}
+			htmlFor={type.toString()}
 		>
 			<div className="ChannelChat w-6 h-6 relative">{iconMap[type as ChannelType]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">
@@ -71,6 +72,6 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 					/>
 				</div>
 			</div>
-		</div>
+		</label>
 	);
 };

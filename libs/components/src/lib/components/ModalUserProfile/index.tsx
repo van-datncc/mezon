@@ -1,6 +1,6 @@
 import { useDirect, useSendInviteMessage } from '@mezon/core';
-import { selectAllAccount, selectMemberByUserId } from '@mezon/store';
-import { useEffect, useState } from 'react';
+import { selectAddFriends, selectAllAccount, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 import AboutUserProfile from './AboutUserProfile';
@@ -8,6 +8,9 @@ import AvatarProfile from './AvatarProfile';
 import NoteUserProfile from './NoteUserProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
+import { IMessageWithUser } from '@mezon/utils';
+import { Icons } from '../../components';
+import { Tooltip } from 'flowbite-react';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -15,12 +18,14 @@ type ModalUserProfileProps = {
 	classBanner?: string;
 	hiddenRole?: boolean;
 	showNote?: boolean;
+	message?: IMessageWithUser;
 };
 
-const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote }: ModalUserProfileProps) => {
+const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote, message }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
+	const appearanceTheme = useSelector(selectTheme);
 
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 
@@ -58,9 +63,49 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 		getColor();
 	}, [userID, []]);
 
+	const checkAddFriend = useSelector(selectAddFriends(userById?.user?.id || ''));
+	const checkUser = useMemo(() => userProfile?.user?.id === userID,[userID, userProfile?.user?.id]);
+
 	return (
 		<div className={classWrapper}>
-			<div className={classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} style={{ backgroundColor: color }}></div>
+			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
+				{!checkUser &&
+					<>
+						{ checkAddFriend ? 
+							<Tooltip
+								content='Friend'
+								trigger="hover"
+								animation="duration-500"
+								style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							>
+								<div className='p-2 rounded-full bg-black'>
+									<Icons.IconFriend className='text-white size-4'/>
+								</div>
+							</Tooltip> :
+							<Tooltip
+								content='Add friend'
+								trigger="hover"
+								animation="duration-500"
+								style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							>
+								<div className='p-2 rounded-full bg-black'>
+									<Icons.AddPerson className='text-white size-4'/>
+								</div>
+							</Tooltip>
+						}
+						<Tooltip
+							content='More'
+							trigger="hover"
+							animation="duration-500"
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+						>
+							<div className='p-2 rounded-full bg-black'>
+								<Icons.ThreeDot defaultSize='size-4 text-white'/>
+							</div>
+						</Tooltip>
+					</>
+				}
+			</div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
@@ -70,10 +115,10 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : 'Anonymous'}
+							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : message?.username}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
-							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : 'Unknown'}
+							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : message?.username}
 						</p>
 					</div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}

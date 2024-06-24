@@ -40,10 +40,11 @@ const LocationModal = (props: LocationModalProps) => {
 				<p className="text-slate-400 text-center">So no one gets lost on where to go.</p>
 			</div>
 			<div className={`flex flex-col mb-4 ${errorVoice ? 'gap-y-2' : 'gap-y-4'}`}>
-				<div
+				<label
 					className={`w-full rounded flex justify-between items-center p-2 ${errorVoice ? 'bg-transparent opacity-80' : 'dark:bg-[#2B2D31] bg-bgLightModeButton'}`}
+					htmlFor='Speaker'
 				>
-					<div className="flex items-center gap-x-2">
+					<div className="flex items-center gap-x-2" >
 						<Icons.Speaker />
 						<div>
 							<h4 className={`font-semibold ${choiceSpeaker ? 'dark:text-white text-black' : 'text-slate-400'}`}>Voice Channel</h4>
@@ -60,8 +61,8 @@ const LocationModal = (props: LocationModalProps) => {
 						value="Speaker"
 						id="Speaker"
 					/>
-				</div>
-				<div className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2">
+				</label>
+				<label className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2" htmlFor='Hashtag'>
 					<div className="flex items-center gap-x-2">
 						<Icons.Location />
 						<div>
@@ -79,7 +80,7 @@ const LocationModal = (props: LocationModalProps) => {
 						value="Hashtag"
 						id="Hashtag"
 					/>
-				</div>
+				</label>
 			</div>
 			{choiceSpeaker && (
 				<div>
