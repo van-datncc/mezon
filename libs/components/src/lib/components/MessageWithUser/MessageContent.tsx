@@ -66,7 +66,7 @@ const MessageContent = ({ user, message, isCombine, newMessage, isSending, isErr
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 					return (
 						<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
-							<MessageImage attachmentData={image} />
+							<MessageImage messageIdRightClick={message.id} attachmentData={image} />
 						</div>
 					);
 				})}

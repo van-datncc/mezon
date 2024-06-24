@@ -1,11 +1,12 @@
-import { useAuth, useChatMessages, useNotification } from '@mezon/core';
+import { useAuth, useChatMessages, useNotification, useOnClickOutside, useRightClick } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
-import { IChannelMember } from '@mezon/utils';
+import { IChannelMember, RightClickPos } from '@mezon/utils';
 import classNames from 'classnames';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
+import ContextMenu from '../RightClick/ContextMenu';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -56,7 +57,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 	const [classNameHighlightParentDiv, setClassNameHighlightParentDiv] = useState<string>('');
 	const [classNameHighlightChildDiv, setClassNameHighlightChildDiv] = useState<string>('');
 	const [classNameNotification, setClassNameNotification] = useState<string>('');
-
+	const { setRightClickXy } = useRightClick();
+	const { setMessageRightClick } = useRightClick();
 	const messageDividerClass = classNames(
 		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
 		{ hidden: !message.isStartedMessageOfTheDay || isMessNotifyMention },
@@ -126,6 +128,20 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 		}
 	}, [message.references]);
 
+	const [isMenuVisible, setMenuVisible] = useState(false);
+	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
+		event.preventDefault();
+		setRightClickXy({ x: event.pageX, y: event.pageY });
+		setMenuVisible(true);
+		setMessageRightClick(message.id);
+	};
+
+	const handleCloseMenu = () => {
+		setMenuVisible(false);
+	};
+
+	useOnClickOutside(divMessageWithUser, handleCloseMenu);
+
 	return (
 		<>
 			<div className={messageDividerClass}>
@@ -138,7 +154,12 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 					<div className={childDivClass}></div>
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
-						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
+						<div
+							className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12"
+							ref={divMessageWithUser}
+							onContextMenu={handleContextMenu}
+							onClick={handleCloseMenu}
+						>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} />
@@ -174,6 +195,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 				{child?.props.children[0] &&
 					React.isValidElement(child?.props.children[0]) &&
 					React.cloneElement(child?.props.children[0], propsChild)}
+				{/* {isMenuVisible && <ContextMenu urlData={''} posClick={RightClickPos.MESSAGE_ON_CHANNEL} onClose={handleCloseMenu} />} */}
 			</div>
 		</>
 	);
