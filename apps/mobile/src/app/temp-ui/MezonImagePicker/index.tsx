@@ -1,5 +1,5 @@
 import { PenIcon } from "@mezon/mobile-components";
-import { DimensionValue, View } from "react-native";
+import { DimensionValue, Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import styles from "./styles";
@@ -24,9 +24,10 @@ interface IMezonImagePickerProps {
     defaultValue: string;
     height?: DimensionValue;
     width?: DimensionValue;
+    showHelpText?: boolean;
 }
 
-export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60 }: IMezonImagePickerProps) {
+export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60, showHelpText }: IMezonImagePickerProps) {
     const [image, setImage] = useState<string>(defaultValue);
     const currentChannel = useSelector(selectCurrentChannel);
     const { sessionRef, clientRef } = useMezon();
@@ -84,14 +85,17 @@ export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, 
         <TouchableOpacity onPress={handleImage}>
             <View style={styles.bannerContainer}>
                 <View style={[styles.bannerWrapper, { height, width }]}>
-                    <FastImage
-                        source={{ uri: image }}
-                        resizeMode="cover"
-                        style={{ height: "100%" }}
-                    />
+                    {image || !showHelpText
+                        ? <FastImage
+                            source={{ uri: image }}
+                            resizeMode="cover"
+                            style={{ height: "100%" }}
+                        />
+                        : <Text style={styles.textPlaceholder}>Choose an image</Text>}
                 </View>
 
                 <View style={styles.btnWrapper}>
+                    {/* TODO: change icon */}
                     <PenIcon height={12} width={12} color="gray" />
                 </View>
             </View>

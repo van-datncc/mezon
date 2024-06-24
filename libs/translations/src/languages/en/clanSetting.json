@@ -22,8 +22,8 @@
         "userManagement": {
             "title": "User Management",
             "members": "Members",
-            "role": "Role",
-            "invite": "Invite",
+            "role": "Roles",
+            "invite": "Invites",
             "bans": "Bans"
         }
     }
