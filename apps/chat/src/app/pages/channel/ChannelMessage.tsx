@@ -251,7 +251,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 												<SuggestItem name={suggestion.display ?? ''} avatarUrl={(suggestion as any).avatarUrl} subText="" />
 											)}
 											className="dark:bg-[#3B416B] bg-bgLightModeButton"
-											style={mentionStyle}
+											style={{ fontWeight: 'inherit', borderRadius: '3px' }}
 										/>
 										<Mention
 											markup="#[__display__](__id__)"
@@ -284,7 +284,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 										/>
 									</MentionsInput>
 									<div className="text-xs flex">
-										<p className="pr-[3px]">escape to</p>
+										<p className="pr-[3px] dark:text-textDarkTheme text-textLightTheme">escape to</p>
 										<p
 											className="pr-[3px] text-[#3297ff]"
 											style={{ cursor: 'pointer' }}
@@ -295,7 +295,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 										>
 											cancel
 										</p>
-										<p className="pr-[3px]">• enter to</p>
+										<p className="pr-[3px] dark:text-textDarkTheme text-textLightTheme">• enter to</p>
 										<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handelSave}>
 											save
 										</p>
