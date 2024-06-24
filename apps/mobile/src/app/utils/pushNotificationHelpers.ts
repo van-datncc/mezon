@@ -1,9 +1,10 @@
 import { STORAGE_KEY_CLAN_CURRENT_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
-import messaging from '@react-native-firebase/messaging';
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { Alert, Linking, Platform } from 'react-native';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
+import { APP_SCREEN } from '../navigation/ScreenTypes';
 const IS_ANDROID = Platform.OS === 'android';
 
 export const checkNotificationPermission = async () => {
@@ -113,6 +114,32 @@ export const handleFCMToken = async () => {
 	}
 };
 
+export const isShowNotification = (currentChannelId, currentDmId, remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+	if (!remoteMessage?.notification?.title) {
+		return false;
+	}
+
+	const link = remoteMessage?.data?.link as string;
+	const directMessageId = link.match(clanDirectMessageLinkRegex)?.[1] || '';
+	const channelMessageId = link.match(clanAndChannelIdLinkRegex)?.[2] || '';
+
+	const areOnChannel = currentChannelId === channelMessageId;
+	const areOnDirectMessage = currentDmId === directMessageId;
+
+	if (areOnChannel && currentDmId) {
+		return true;
+	}
+
+	if (
+		channelMessageId && areOnChannel ||
+		directMessageId && areOnDirectMessage
+	) {
+		return false;
+	}
+
+	return true;
+}
+
 export const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
 	const link = notification?.data?.link;
 	if (link) {
@@ -153,7 +180,9 @@ export const navigateToNotification = async (notification: any, navigation: any,
 
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				store.dispatch(appActions.setIsFromFCMMobile(false));
-				// TODO: handle navigation
+				if (navigation) {
+					navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: messageId } })
+				}
 			}
 			else {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -207,6 +236,10 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 			currentClan,
 			time: 0,
 		});
+	});
+
+	messaging().setBackgroundMessageHandler(async remoteMessage => {
+		console.log('Message handled in the background!', remoteMessage);
 	});
 
 	return notifee.onForegroundEvent(({ type, detail }) => {
