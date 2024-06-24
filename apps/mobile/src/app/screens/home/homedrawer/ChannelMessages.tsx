@@ -1,7 +1,13 @@
 import { useChatMessage, useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, selectAttachmentPhoto, useAppDispatch } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	selectAttachmentPhoto,
+	selectHasMoreMessageByChannelId,
+	selectMessageIdsByChannelId,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -13,6 +19,7 @@ import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import { styles } from './styles';
+import { cloneDeep } from 'lodash';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -23,14 +30,15 @@ type ChannelMessagesProps = {
 };
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
-	const { messages, unreadMessageId, hasMoreMessage, loadMoreMessage } = useChatMessages({ channelId });
-	const { typingUsers } = useChatTypings({ channelId, channelLabel, mode });
-	const { markMessageAsSeen } = useChatMessage(unreadMessageId);
+	const { loadMoreMessage } = useChatMessages({ channelId });
+	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const { typingUsers } = useChatTypings({ channelId, mode });
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
 	const flatListRef = useRef(null);
 	const footerImagesModalRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const attachments = useSelector(selectAttachmentPhoto());
+	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const dispatch = useAppDispatch();
 
@@ -76,14 +84,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		return '';
 	}, [typingUsers]);
 
-	useEffect(() => {
-		if (messages?.[0]) {
-			const timestamp = Date.now() / 1000;
-			markMessageAsSeen(messages?.[0]);
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: messages?.[0].channel_id, timestamp }));
-		}
-	}, [markMessageAsSeen, messages]);
-
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
 	const onLoadMore = () => {
 		setIsLoadMore(true);
@@ -120,15 +120,13 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	}, []);
 
 	const renderItem = useCallback(
-		({ item, index }) => {
-			const preMessage = messages.length > index + 1 ? messages[index + 1] : undefined;
+		({ item }) => {
 			return (
 				<MessageItem
 					message={item}
 					mode={mode}
 					channelId={channelId}
 					channelLabel={channelLabel}
-					preMessage={preMessage}
 					onOpenImage={onOpenImage}
 				/>
 			);
@@ -177,6 +175,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			</View>
 		);
 	};
+	
+	const dataReverse = useMemo(() => {
+		const data = cloneDeep(messages);
+		return data.reverse();
+	}, [messages])
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
@@ -184,16 +187,16 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			<FlatList
 				ref={flatListRef}
 				inverted
-				data={messages || []}
+				data={dataReverse || []}
 				onScroll={handleScroll}
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
-				keyExtractor={(item) => `${item?.id}`}
+				keyExtractor={(item) => `${item}`}
 				maxToRenderPerBatch={5}
 				initialNumToRender={5}
 				windowSize={10}
-				onEndReached={onLoadMore}
+				onEndReached={!!messages?.length && onLoadMore}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 			/>

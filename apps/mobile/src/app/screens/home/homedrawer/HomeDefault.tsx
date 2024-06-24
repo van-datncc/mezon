@@ -135,7 +135,7 @@ const HomeDefault = React.memo((props: any) => {
 						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
 							<TouchableOpacity
 								style={{ flex: 1 }}
-								onPress={() => onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text')}
+								onPress={() => onShowKeyboardBottomSheet(false, 0, 'text')}
 							></TouchableOpacity>
 						</Block>
 					)}

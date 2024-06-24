@@ -127,15 +127,17 @@ export const Sharing = ({ data, onClose }) => {
 	};
 
 	const sendToDM = async (dataSend: { text: any }) => {
+		const store = await getStoreAsync();
+		store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
+		
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
-			'',
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{ t: dataSend.text },
 			[],
 			getAttachmentUnique(attachmentDataRef) || [],
-			[],
+			[]
 		);
 	};
 
@@ -146,7 +148,6 @@ export const Sharing = ({ data, onClose }) => {
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,
-			channelSelected.channel_label,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
 			{ t: dataSend.text },
 			[], //mentions

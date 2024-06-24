@@ -1,27 +1,57 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
-import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { selectAllAccount, selectCurrentChannel, selectDataSocketUpdate, selectMemberByUserId } from '@mezon/store-mobile';
+import {
+	EmojiDataOptionals,
+	SenderInfoOptionals,
+	calculateTotalCount,
+	convertReactionDataFromMessage,
+	getSrcEmoji,
+	updateEmojiReactionData,
+} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import { useSelector } from 'react-redux';
+import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
 import { IDetailReactionBottomSheet, IMessageReactionProps } from '../../types';
 import { styles } from './styles';
-import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
-import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useCallback } from 'react';
 
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { message, emojiListPNG, openEmojiPicker, mode } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
-	const { userId, reactionMessageDispatch, convertReactionToMatchInterface } = useChatReaction();
-	const currentChannel = useSelector(selectCurrentChannel)
+	const { reactionMessageDispatch } = useChatReaction();
+	const userProfile = useSelector(selectAllAccount);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const dataSocketConvert = useSelector(selectDataSocketUpdate);
+
+	const userId = useMemo(() => userProfile?.user?.id, [userProfile]);
+
+	const filterByMessageId = useCallback((array: EmojiDataOptionals[], messageId: string) => {
+		return array.filter((item) => item.message_id === messageId);
+	}, []);
+
+	const reactionMessage = useMemo(() => {
+		if (message.reactions && message.reactions?.length > 0) {
+			return convertReactionDataFromMessage(message);
+		}
+		return [];
+	}, [message]);
+
+	const reactionSocketByMessageId = useMemo(() => {
+		return filterByMessageId(dataSocketConvert, message.id);
+	}, [dataSocketConvert, message.id]);
+
+	const dataReactionCombine = useMemo(() => {
+		const sortedReactionMessage = [...reactionMessage].sort((a, b) => (a?.emoji || '').localeCompare(b?.emoji || ''));
+		const combine = [...sortedReactionMessage, ...reactionSocketByMessageId];
+		return updateEmojiReactionData(combine);
+	}, [reactionSocketByMessageId, reactionMessage]);
 
 	const reactOnExistEmoji = async (
 		id: string,
@@ -36,81 +66,79 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			currentChannel.id,
-			currentChannel.channel_label,
 			messageId ?? '',
-			emoji ?? '', 1,
+			emoji ?? '',
+			1,
 			message_sender_id ?? '',
-			false
+			false,
 		);
 	};
 
 	const removeEmoji = async (emojiData: EmojiDataOptionals) => {
 		const { id, emoji, senders } = emojiData;
-		const countToRemove = senders.find(sender => sender.sender_id === userId)?.count;
+		const countToRemove = senders.find((sender) => sender.sender_id === userId)?.count;
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			currentChannel.id,
-			currentChannel.channel_label,
 			message.id ?? '',
 			emoji,
 			countToRemove,
 			userId ?? '',
-			true
+			true,
 		);
 	};
 
 	const allReactionDataOnOneMessage = useMemo(() => {
-		return convertReactionToMatchInterface?.filter?.((emoji: EmojiDataOptionals) =>
-			emoji.message_id === message.id && emoji.senders.some(sender => sender.count > 0))
-			.map(emoji => {
+		return dataReactionCombine
+			?.filter?.((emoji: EmojiDataOptionals) => emoji.message_id === message.id && emoji.senders.some((sender) => sender.count > 0))
+			.map((emoji) => {
 				if (Number(emoji.id) === 0) {
 					const tempId = `${emoji.message_id}-${emoji.emoji}`;
-					return { ...emoji, id: tempId }
+					return { ...emoji, id: tempId };
 				}
 				return emoji;
-			})
-	}, [convertReactionToMatchInterface, message])
+			});
+	}, [dataReactionCombine, message]);
 
 	return (
 		<View style={styles.reactionWrapper}>
-			{allReactionDataOnOneMessage
-				?.map((emojiItemData: EmojiDataOptionals, index) => {
-					const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
-					const isMyReaction = userSender?.count && userSender.count > 0;
+			{allReactionDataOnOneMessage?.map((emojiItemData: EmojiDataOptionals, index) => {
+				const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
+				const isMyReaction = userSender?.count && userSender.count > 0;
 
-					if (calculateTotalCount(emojiItemData.senders) === 0) {
-						return null;
-					}
+				if (calculateTotalCount(emojiItemData.senders) === 0) {
+					return null;
+				}
 
-					return (
-						<Pressable
-							onLongPress={() => setCurrentEmojiSelectedId(emojiItemData.id)}
-							onPress={() =>
-								reactOnExistEmoji(
-									emojiItemData.id ?? '',
-									ChannelStreamMode.STREAM_MODE_CHANNEL,
-									message.id ?? '',
-									emojiItemData.emoji ?? '',
-									1,
-									userId ?? '',
-									false,
-								)
-							}
-							key={index + emojiItemData.id}
-							style={[styles.reactItem, isMyReaction ? styles.myReaction : styles.otherReaction]}
-						>
-							<FastImage
-								source={{ uri: getSrcEmoji(emojiItemData.emoji ?? '', emojiListPNG || []) }}
-								style={styles.iconEmojiReaction}
-								resizeMode={'contain'}
-							/>
-							<Text style={styles.reactCount}>{calculateTotalCount(emojiItemData.senders)}</Text>
-						</Pressable>
-					);
-				})}
+				return (
+					<Pressable
+						onLongPress={() => setCurrentEmojiSelectedId(emojiItemData.id)}
+						onPress={() =>
+							reactOnExistEmoji(
+								emojiItemData.id ?? '',
+								ChannelStreamMode.STREAM_MODE_CHANNEL,
+								message.id ?? '',
+								emojiItemData.emoji ?? '',
+								1,
+								userId ?? '',
+								false,
+							)
+						}
+						key={index + emojiItemData.id}
+						style={[styles.reactItem, isMyReaction ? styles.myReaction : styles.otherReaction]}
+					>
+						<FastImage
+							source={{ uri: getSrcEmoji(emojiItemData.emoji ?? '', emojiListPNG || []) }}
+							style={styles.iconEmojiReaction}
+							resizeMode={'contain'}
+						/>
+						<Text style={styles.reactCount}>{calculateTotalCount(emojiItemData.senders)}</Text>
+					</Pressable>
+				);
+			})}
 
-			{allReactionDataOnOneMessage?.length  ? (
+			{allReactionDataOnOneMessage?.length ? (
 				<Pressable onPress={() => openEmojiPicker?.()} style={styles.addEmojiIcon}>
 					<FaceIcon color={Colors.gray72} />
 				</Pressable>
@@ -122,14 +150,14 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 				onClose={() => setCurrentEmojiSelectedId(null)}
 				emojiListPNG={emojiListPNG}
 				removeEmoji={removeEmoji}
+				userId={userId}
 			/>
 		</View>
 	);
 });
 
 const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
-	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, emojiListPNG, removeEmoji } = props;
-	const { userId } = useChatReaction();
+	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, emojiListPNG, removeEmoji, userId } = props;
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 	const [showConfirmDeleteEmoji, setShowConfirmDeleteEmoji] = useState<boolean>(false);
@@ -160,23 +188,22 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 	const selectEmoji = (emojiId: string) => {
 		setSelectedTabId(emojiId);
 		setShowConfirmDeleteEmoji(false);
-	}
+	};
 
 	const currentEmojiSelected = useMemo(() => {
 		if (selectedTabId) {
-			return allReactionDataOnOneMessage.find((emoji) => emoji.id === selectedTabId)
+			return allReactionDataOnOneMessage.find((emoji) => emoji.id === selectedTabId);
 		}
 		return null;
-	}, [selectedTabId, allReactionDataOnOneMessage])
+	}, [selectedTabId, allReactionDataOnOneMessage]);
 
 	const onSelectUserId = (userId: string) => {
 		onClose();
 		setSelectedUserId(userId);
-	}
-	
+	};
+
 	const checkToFocusOtherEmoji = useCallback(() => {
-		const areStillEmoji = currentEmojiSelected.senders.filter(sender => sender.sender_id !== userId)
-			.some(sender => sender.count !== 0);
+		const areStillEmoji = currentEmojiSelected.senders.filter((sender) => sender.sender_id !== userId).some((sender) => sender.count !== 0);
 		if (areStillEmoji) return;
 
 		const emojiDeletedIndex = allReactionDataOnOneMessage.findIndex((emoji) => emoji.id === currentEmojiSelected.id);
@@ -186,21 +213,21 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 			nextFocusEmoji = allReactionDataOnOneMessage[emojiDeletedIndex - 1];
 		}
 		setSelectedTabId(nextFocusEmoji?.id || null);
-	}, [allReactionDataOnOneMessage, currentEmojiSelected, userId])
+	}, [allReactionDataOnOneMessage, currentEmojiSelected, userId]);
 
 	const onRemoveEmoji = useCallback(async () => {
 		await removeEmoji(currentEmojiSelected);
 		checkToFocusOtherEmoji();
 		setShowConfirmDeleteEmoji(false);
-	}, [removeEmoji, checkToFocusOtherEmoji, currentEmojiSelected])
+	}, [removeEmoji, checkToFocusOtherEmoji, currentEmojiSelected]);
 
 	const emojiKeyList = useMemo(() => {
-		return allReactionDataOnOneMessage?.map?.(emojiData => emojiData.id)
-	}, [allReactionDataOnOneMessage])
+		return allReactionDataOnOneMessage?.map?.((emojiData) => emojiData.id);
+	}, [allReactionDataOnOneMessage]);
 
 	const isExistingMyEmoji = useMemo(() => {
-		return currentEmojiSelected?.senders?.find(sender => sender?.sender_id === userId)?.count > 0;
-	}, [currentEmojiSelected, userId])
+		return currentEmojiSelected?.senders?.find((sender) => sender?.sender_id === userId)?.count > 0;
+	}, [currentEmojiSelected, userId]);
 
 	const getContent = () => {
 		return (
@@ -214,13 +241,13 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 									<TrashIcon />
 									<Text style={styles.confirmText}>{t('reactions.removeActions')}</Text>
 								</Pressable>
-							): (
+							) : (
 								<Pressable onPress={() => setShowConfirmDeleteEmoji(true)}>
 									<TrashIcon />
 								</Pressable>
 							)}
 						</View>
-					): null}
+					) : null}
 				</View>
 
 				{allReactionDataOnOneMessage
@@ -236,8 +263,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 								<MemberReact userId={sender.sender_id} onSelectUserId={onSelectUserId} />
 							</View>
 						);
-					})
-				}
+					})}
 			</View>
 		);
 	};
@@ -277,7 +303,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 							</View>
 							<View>{getContent()}</View>
 						</View>
-					): (
+					) : (
 						<View style={styles.noActionsWrapper}>
 							<Text style={styles.noActionTitle}>{t('reactions.noActionTitle')}</Text>
 							<Text style={styles.noActionContent}>{t('reactions.noActionDescription')}</Text>
@@ -290,8 +316,8 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 	);
 });
 
-const MemberReact = React.memo((props: { userId: string, onSelectUserId: (userId: string) => void }) => {
-	const {userId, onSelectUserId} = props;
+const MemberReact = React.memo((props: { userId: string; onSelectUserId: (userId: string) => void }) => {
+	const { userId, onSelectUserId } = props;
 	const user = useSelector(selectMemberByUserId(userId || ''));
 	const showUserInformation = () => {
 		onSelectUserId(user.user?.id);
@@ -302,11 +328,7 @@ const MemberReact = React.memo((props: { userId: string, onSelectUserId: (userId
 			<View style={styles.imageWrapper}>
 				{user?.user?.avatar_url ? (
 					<View>
-						<Image
-							source={{ uri: user?.user?.avatar_url }}
-							resizeMode='contain'
-							style={styles.image}
-						/>
+						<Image source={{ uri: user?.user?.avatar_url }} resizeMode="contain" style={styles.image} />
 					</View>
 				) : (
 					<View style={styles.avatarBoxDefault}>
