@@ -31,6 +31,7 @@ type ChannelMessagesProps = {
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
 	const { loadMoreMessage } = useChatMessages({ channelId });
+	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const { typingUsers } = useChatTypings({ channelId, mode });
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
 	const flatListRef = useRef(null);
