@@ -2,9 +2,13 @@
   "header": {
     "save": "Lưu"
   },
+  "toast": {
+    "saveSuccess": "Lưu thành công",
+    "notBlank": "Không được để trống"
+},
   "menu": {
     "serverName": {
-      "title": "Tên Máy Chủ"
+      "title": "Tên Clan"
     },
     "inactive": {
       "title": "Cài Đặt Không Hoạt Động",
@@ -24,6 +28,14 @@
     "deleteServer": {
       "title": "Xóa Máy Chủ",
       "delete": "Xóa Máy Chủ"
+    }
+  },
+  "fields": {
+    "defaultNotification": {
+      "title": "Cài đặt thông báo mặc định",
+      "description": "Thiết lập này sẽ xác định liệu các thành viên chưa thiết lập rõ ràng cài đặt thông báo của họ có nhận thông báo cho mọi tin nhắn được gửi trong máy chủ này hay không. Chúng tôi強烈建議 (cuong liệt khuyen nghị - strongly recommend) cho các cộng đồng clan chỉ nên đặt thông báo cho @mentions.",
+      "allMessages": "Tất cả tin nhắn",
+      "onlyMentions": "Chỉ @mentions"
     }
   }
 }
