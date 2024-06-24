@@ -8,6 +8,7 @@ export const styles = StyleSheet.create({
     listDMBadge: {
         maxHeight: '100%',
         width: '100%',
+        flexGrow:0,
         paddingHorizontal: size.s_10
     },
     groupAvatar: {

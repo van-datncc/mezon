@@ -415,7 +415,7 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isMe, isSending, content, id } = action.payload;
 			if (!channelId || !messageId) return state;
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -425,15 +425,26 @@ export const messagesSlice = createSlice({
 			const channelEntity = state.channelMessages[channelId];
 			switch (code) {
 				case 0: {
-					const existingMessage = channelEntity?.entities?.[messageId];
-					if (existingMessage) {
-						channelMessagesAdapter.updateOne(channelEntity, {
-							id: messageId,
-							changes: action.payload,
-						});
-					} else {
-						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
-					}
+					
+					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
+
+					// remove sending message
+					if (isMe && !isSending) {
+						const newContent = content;
+
+						const sendingMessages = state.channelMessages[channelId].ids.filter((id) => state.channelMessages[channelId].entities[id].isSending);
+						if (sendingMessages && sendingMessages.length) {
+							for (const mid of sendingMessages) {
+								const message = state.channelMessages[channelId].entities[mid];
+			
+								if (message?.content?.t === newContent?.t) {
+									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
+									break;
+								}
+							}
+						}
+					}	
+
 					break;
 				}
 				case 1: {
@@ -747,7 +758,7 @@ const handleUpdateIsCombineMessage = (
 	messageIds: string[],
 	needUpdateFirstMessage = true,
 ) => {
-	if (!messageIds?.length) return;
+	if (!messageIds?.length) return channelEntity;
 	const entities = channelEntity.entities;
 
 	const firstMessage = entities[messageIds[0]];
@@ -774,6 +785,8 @@ const handleUpdateIsCombineMessage = (
 		prevMessageCreateTime = create_time;
 		prevMessageCreationTimeMs = creationTimeMs || 0;
 	});
+
+	return channelEntity;
 };
 
 const handleSetManyMessages = ({
@@ -801,7 +814,7 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
 
-	if (index === -1) return;
+	if (index === -1) return channelEntity;
 
 	const { isStartedMessageGroup, isStartedMessageOfTheDay } = channelEntity.entities[messageId];
 	const nextMessageId = channelEntity.ids[index + 1];
@@ -817,26 +830,11 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
 	const messageId = adapterPayload.id;
 	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
-
-	const index = state.channelMessages[channelId].ids.indexOf(messageId);
-	if (index === -1) return;
+	const channelEntity = state.channelMessages[channelId];
+	const index = channelEntity.ids.indexOf(messageId);
+	if (index === -1) return channelEntity;
 
 	const startIndex = Math.max(index - 1, 0);
 
-	// remove sending message
-	if (adapterPayload.isMe && !adapterPayload.isSending) {
-		const newContent = adapterPayload.content;
-
-		const sendingMessages = state.channelMessages[channelId].ids.filter((id) => state.channelMessages[channelId].entities[id].isSending);
-		if (sendingMessages && sendingMessages.length) {
-			for (const id of sendingMessages) {
-				const message = state.channelMessages[channelId].entities[id];
-				if (message?.content?.t === newContent?.t) {
-					state.channelMessages[channelId] = channelMessagesAdapter.removeOne(state.channelMessages[channelId], id);
-				}
-			}
-		}
-	}
-
-	return handleUpdateIsCombineMessage(state.channelMessages[channelId], state.channelMessages[channelId].ids.slice(startIndex, startIndex + 3), false);
+	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), false);
 };

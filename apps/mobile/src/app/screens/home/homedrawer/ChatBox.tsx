@@ -266,7 +266,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
 				switch (props.mode) {
 					case ChannelStreamMode.STREAM_MODE_CHANNEL:
-						sendMessage({ t: text }, mentionData, attachmentDataUnique || [], reference, false);
+						sendMessage({ t: text }, mentionData, attachmentDataUnique || [], reference, false, false);
 						break;
 					case ChannelStreamMode.STREAM_MODE_DM:
 					case ChannelStreamMode.STREAM_MODE_GROUP:

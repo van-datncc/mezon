@@ -52,7 +52,6 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 					message={mess as IMessageWithUser}
 					user={user}
 					mode={mode}
-					newMessage={message.content.t}
 					popup={
 						<ChannelMessagePopup
 							reactionRightState={reactionRightState}

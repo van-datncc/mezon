@@ -45,9 +45,9 @@ export const UnreadDMBadgeList = React.memo(() => {
     return (
         <View style={styles.container}>
             <ScrollView style={styles.listDMBadge} showsVerticalScrollIndicator={false}>
-                {unReadDirectMessageList.map((dm: DirectEntity, index) => {
+                {!!unReadDirectMessageList?.length && unReadDirectMessageList?.map((dm: DirectEntity, index) => {
                     return (
-                        <TouchableOpacity key={dm.id} onPress={() => navigateToDirectMessageMDetail(dm?.channel_id)} style={[!(index === unReadDirectMessageList.length - 1) && styles.mb10]}>
+                        <TouchableOpacity key={dm.id} onPress={() => navigateToDirectMessageMDetail(dm?.channel_id)} style={[styles.mb10]}>
                             <View style={{paddingHorizontal: size.s_10}}>
                                 {getBadge(dm)}
                             </View>

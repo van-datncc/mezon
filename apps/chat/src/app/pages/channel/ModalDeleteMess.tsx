@@ -53,7 +53,6 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 							user={user as IChannelMember}
 							isMessNotifyMention={true}
 							mode={mode}
-							newMessage={mess.content.t}
 							isMention={true}
 						/>
 					</div>
