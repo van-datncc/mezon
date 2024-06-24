@@ -5,7 +5,7 @@ import {
 	selectHasMoreMessageByChannelId,
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
-	selectMessageIdsByChannelIdV2,
+	selectMessageIdsByChannelId,
 	selectMessageMetionId,
 	selectQuantitiesMessageRemain,
 	selectTheme,
@@ -24,7 +24,7 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const messages = useSelector((state) => selectMessageIdsByChannelIdV2(state, channelId));
+	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
