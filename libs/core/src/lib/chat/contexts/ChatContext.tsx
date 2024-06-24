@@ -10,11 +10,11 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
-	referencesActions,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { sleep } from 'libs/store/src/lib/helpers';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -32,7 +32,6 @@ import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
-import { sleep } from 'libs/store/src/lib/helpers';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -91,7 +90,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			dispatch(directActions.updateDMSocket(message));
-			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(messagesActions.newMessage(mess));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -119,7 +117,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
-				dispatch(friendsActions.fetchListFriends({noCache: true}));
+				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
 		[dispatch],
@@ -130,11 +128,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onerror = useCallback((event: unknown) => {
 		try {
-		  console.log(event);
+			console.log(event);
 		} catch (error) {
-		  console.error("An error occurred while handling the error:", error);
+			console.error('An error occurred while handling the error:', error);
 		}
-	  }, []);
+	}, []);
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			if (e && e.sender_id === userId) {
@@ -165,7 +163,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-        dispatch(clansActions.joinClan({clanId: channelCreated.clan_id as string}));
+				dispatch(clansActions.joinClan({ clanId: channelCreated.clan_id as string }));
 			}
 		},
 		[dispatch],

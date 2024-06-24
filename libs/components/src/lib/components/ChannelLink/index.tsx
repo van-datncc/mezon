@@ -1,17 +1,17 @@
-import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useReference, useThreads } from '@mezon/core';
-import { channelsActions, selectAllAccount, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
+import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
+import { channelsActions, referencesActions, selectAllAccount, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
 import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
+import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
 import * as Icons from '../Icons';
 import { AddPerson, SettingProfile } from '../Icons';
 import PanelChannel from '../PanelChannel';
-import { Spinner } from 'flowbite-react';
-import { useSelector } from 'react-redux';
 
 export type ChannelLinkProps = {
 	clanId?: string;
@@ -29,7 +29,7 @@ export type Coords = {
 	distanceToBottom: number;
 };
 
-enum StatusVoiceChannel  {
+enum StatusVoiceChannel {
 	Active = 1,
 	No_Active = 0,
 }
@@ -54,8 +54,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		mouseY: 0,
 		distanceToBottom: 0,
 	});
-
-	const { setOpenReplyMessageState, setOpenEditMessageState } = useReference();
 
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
@@ -90,7 +88,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const dispatch = useAppDispatch();
 
 	const handleVoiceChannel = (id: string) => {
-		if(channel.status === StatusVoiceChannel.Active){
+		if (channel.status === StatusVoiceChannel.Active) {
 			const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
 			voice.setVoiceOptions((prev) => ({
 				...prev,
@@ -112,8 +110,8 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = () => {
 		setTurnOffThreadMessage();
-		setOpenEditMessageState(false);
-		setOpenReplyMessageState(false);
+		dispatch(referencesActions.setOpenEditMessageState(false));
+		dispatch(referencesActions.setOpenReplyMessageState(false));
 		if (closeMenu) {
 			setStatusMenu(false);
 		}
@@ -121,18 +119,22 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 
 	const openModalJoinVoiceChannel = useCallback(
 		(url: string) => {
-			if(channel.status === 1){
+			if (channel.status === 1) {
 				const urlVoice = `https://meet.google.com/${url}`;
-				window.open(urlVoice, "_blank", "noreferrer");
+				window.open(urlVoice, '_blank', 'noreferrer');
 			}
-		},[channel.status]
+		},
+		[channel.status],
 	);
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
 					className={`${classes[state]} ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
-					onClick={() => {handleVoiceChannel(channel.id); openModalJoinVoiceChannel(channel.meeting_code || '')}}
+					onClick={() => {
+						handleVoiceChannel(channel.id);
+						openModalJoinVoiceChannel(channel.meeting_code || '');
+					}}
 					role="link"
 				>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
@@ -154,9 +156,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 							? `${channel?.channel_label.substring(0, 20)}...`
 							: channel?.channel_label}
 					</p>
-					{channel.status === StatusVoiceChannel.No_Active &&
-						<Spinner aria-label="Loading spinner"/>
-					}
+					{channel.status === StatusVoiceChannel.No_Active && <Spinner aria-label="Loading spinner" />}
 				</span>
 			) : (
 				<Link to={channelPath} onClick={handleClick}>
@@ -173,7 +173,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 							{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
 						</div>
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${(currentURL === channelPath || isUnReadChannel) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${currentURL === channelPath || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20
@@ -227,14 +227,14 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				</>
 			)}
 
-			{ openSetting && 
+			{openSetting && (
 				<SettingChannel
 					onClose={() => {
 						setOpenSetting(false);
 					}}
 					channel={channel}
 				/>
-			}
+			)}
 			{isShowPanelChannel && (
 				<PanelChannel
 					onDeleteChannel={handleDeleteChannel}

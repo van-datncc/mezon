@@ -36,7 +36,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
-import { channelIdRegex, codeBlockRegex, isImage, linkGoogleMeet, splitBlockCodeRegex, isVideo } from '../../../utils/helpers';
+import { isImage, linkGoogleMeet, isVideo } from '../../../utils/helpers';
 import { MessageAction, MessageItemBS } from './components';
 import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
@@ -46,7 +46,6 @@ import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMes
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
-import Toast from 'react-native-toast-message';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 
