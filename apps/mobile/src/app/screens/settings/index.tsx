@@ -1,4 +1,4 @@
-import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
+import { LogoutIcon, NittroIcon, NittroWheelIcon, UserCircleIcon } from '@mezon/mobile-components';
 import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { Colors } from '@mezon/mobile-ui';
 import React from 'react';
@@ -46,13 +46,13 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.getNitro'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <NittroWheelIcon width={24} height={24} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <UserCircleIcon width={20} height={20} />,
 		},
 		{
 			onPress: () => reserve(),
