@@ -119,6 +119,7 @@ export const markdownStyles = {
 		color: Colors.textGray,
 		lineHeight: size.s_20,
 	},
+  unknownChannel: {fontStyle: 'italic'}
 };
 
 export type IMarkdownProps = {
@@ -172,7 +173,7 @@ export const renderRulesCustom = {
 				);
 			}
 			return (
-				<Text key={node.key} style={[styles.mention]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+				<Text key={node.key} style={[styles.mention, content.includes('# unknown') && styles.unknownChannel]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 					{content}
 				</Text>
 			);
@@ -390,8 +391,7 @@ const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsE
 						if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
 							return `[${channel.channel_label}](##voice${channelId})`;
 						}
-
-						return `[#${channel.channel_label}](#${channelId})`;
+						return channel['channel_id'] ? `[#${channel.channel_label}](#${channelId})` : `[\\# ${channel.channel_label}](#${channelId})`;
 					}
 				}
 			}
@@ -406,7 +406,7 @@ const getChannelById = (channelHashtagId: string, channelsEntities: Record<strin
 		return channel;
 	} else {
 		return {
-			channel_label: channelHashtagId,
+			channel_label: 'unknown',
 		};
 	}
 };

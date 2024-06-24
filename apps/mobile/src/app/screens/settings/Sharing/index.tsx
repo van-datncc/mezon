@@ -1,7 +1,14 @@
 import { useCategory, useReference } from '@mezon/core';
 import { CloseIcon, PenIcon, SearchIcon, SendIcon, getAttachmentUnique } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	clansActions,
+	directActions,
+	getStoreAsync,
+	selectCurrentClan,
+	selectDirectsOpenlist
+} from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -132,7 +139,10 @@ export const Sharing = ({ data, onClose }) => {
 		);
 	};
 
-	const sendToGroup = async (dataSend: { text: any }) => {		
+	const sendToGroup = async (dataSend: { text: any }) => {
+		const store = await getStoreAsync();
+		store.dispatch(clansActions.joinClan({ clanId: channelSelected.channel_id }));
+		
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,

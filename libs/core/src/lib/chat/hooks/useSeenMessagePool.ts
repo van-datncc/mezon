@@ -14,13 +14,14 @@ export function useSeenMessagePool() {
 
 	const initWorker = useCallback(() => {
 		seenMessagePool.registerSeenMessageWorker((action) => {
-			dispatch(
-				messagesActions.updateLastSeenMessage({
-					channelId: action.channelId,
-					channelLabel: action.channelLabel,
-					messageId: action.messageId,
-				}),
-			);
+			// temp check fake message
+			if (action.messageId?.length !== 13)
+				dispatch(
+					messagesActions.updateLastSeenMessage({
+						channelId: action.channelId,
+						messageId: action.messageId,
+					}),
+				);
 		});
 	}, [dispatch]);
 

@@ -1,10 +1,14 @@
 import { ChatWelcome } from '@mezon/components';
-import { getJumpToMessageId, useApp, useJumpToMessage, useMessages, useNotification, useReference } from '@mezon/core';
+import { getJumpToMessageId, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
 	messagesActions,
 	selectHasMoreMessageByChannelId,
-	selectMessageIdsByChannelIdV2,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectMessageIdsByChannelId,
+	selectMessageMetionId,
 	selectQuantitiesMessageRemain,
+	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -20,15 +24,17 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const messages = useSelector((state) => selectMessageIdsByChannelIdV2(state, channelId));
+	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
 	const { jumpToMessage } = useJumpToMessage();
-	const { idMessageRefReply, idMessageToJump, messageMentionId } = useReference();
-	const { appearanceTheme } = useApp();
+	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
+	const messageMentionId = useSelector(selectMessageMetionId);
+	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
 	// share logic to load more message

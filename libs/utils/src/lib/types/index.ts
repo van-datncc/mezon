@@ -165,6 +165,8 @@ export type IMessage = ChannelMessage & {
 	creationTime?: Date;
 	creationTimeMs?: number;
 	lastSeen?: boolean;
+	isSending?: boolean;
+	isError?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -370,9 +372,6 @@ export type EmojiDataOptionals = {
 export type SenderInfoOptionals = {
 	sender_id?: string;
 	count: number | undefined;
-	emojiIdList?: string[];
-	sender_name?: string;
-	avatar?: string;
 };
 
 export interface IGifCategory {

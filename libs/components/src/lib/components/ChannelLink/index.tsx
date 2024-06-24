@@ -19,7 +19,7 @@ export type ChannelLinkProps = {
 	createInviteLink: (clanId: string, channelId: string) => void;
 	isPrivate?: number;
 	isUnReadChannel?: boolean;
-	numberNotication?: number;
+	numberNotification?: number;
 	channelType?: number;
 };
 
@@ -40,7 +40,7 @@ export const classes = {
 	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton',
 };
 
-function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotication, channelType }: ChannelLinkProps) {
+function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, channelType }: ChannelLinkProps) {
 	const userProfile = useSelector(selectAllAccount);
 	const currentClan = useSelector(selectCurrentClan);
 	const voice = useMezonVoice();
@@ -185,7 +185,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 			)}
 
 			{currentClan?.creator_id === userProfile?.user?.id ? (
-				numberNotication !== 0 ? (
+				numberNotification !== 0 ? (
 					<>
 						<AddPerson
 							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black ${currentURL === channelPath ? '' : ''}`}
@@ -198,7 +198,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 						<div
 							className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red600 rounded-full text-xs text-center top-2`}
 						>
-							{numberNotication}
+							{numberNotification}
 						</div>
 					</>
 				) : (
@@ -219,22 +219,22 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black  ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
 						onClick={handleCreateLinkInvite}
 					/>
-					{numberNotication !== 0 && (
+					{numberNotification !== 0 && (
 						<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs">
-							{numberNotication}
+							{numberNotification}
 						</div>
 					)}
 				</>
 			)}
 
-			<SettingChannel
-				open={openSetting}
-				onClose={() => {
-					setOpenSetting(false);
-				}}
-				channel={channel}
-			/>
-			{/* <p>{numberNotication}</p> */}
+			{ openSetting && 
+				<SettingChannel
+					onClose={() => {
+						setOpenSetting(false);
+					}}
+					channel={channel}
+				/>
+			}
 			{isShowPanelChannel && (
 				<PanelChannel
 					onDeleteChannel={handleDeleteChannel}
@@ -248,7 +248,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 			{showModal && (
 				<DeleteModal
 					onClose={() => setShowModal(false)}
-					channelLable={channel.channel_label || ''}
+					channelLabel={channel.channel_label || ''}
 					channelId={channel.channel_id as string}
 				/>
 			)}
