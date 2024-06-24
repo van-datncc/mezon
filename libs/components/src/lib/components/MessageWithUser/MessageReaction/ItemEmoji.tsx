@@ -176,7 +176,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			{emojiHover?.emoji === emoji.emoji && userReactionPanelState && count > 0 && emojiHover?.message_id === message.id && (
 				<div
 					ref={userPanelRef}
-					className=" w-[18rem] flex flex-col items-center z-50"
+					className=" w-[18rem] flex flex-col items-center z-50 h-50"
 					style={{
 						position: 'fixed',
 						top: topUserPanel,

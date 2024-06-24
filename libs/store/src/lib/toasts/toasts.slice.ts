@@ -14,7 +14,7 @@ const initialState = toastsAdapter.getInitialState();
 const addToast = createAsyncThunk(
   'toasts/addToast',
   async (payload: ToastPayload, thunkAPI) => {
-    const id = Date.now();
+    const id = payload?.id || Date.now().toString();
     
     const newToast: Toast = {
       id,
@@ -56,7 +56,7 @@ export const toastsSlice = createSlice({
   initialState,
   reducers: {
     addOneToast: toastsAdapter.addOne,
-    removeToast: (state, action: PayloadAction<number>) => {
+    removeToast: (state, action: PayloadAction<string>) => {
       toastsAdapter.removeOne(state, action.payload);
     },
     clearToasts: (state) => {
