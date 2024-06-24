@@ -91,8 +91,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 		}
 	}, [messageRClicked]);
 
-	console.log(posClick);
-
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
 		const menuRefWidth = menuRef.current?.getBoundingClientRect().width || 0;
@@ -102,22 +100,28 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 		if (menuRefHeight && menuRefWidth) {
 			const isBottomLimit = distanceCursorToBottom < menuRefHeight;
 			const isRightLimit = distanceCursorToRight < menuRefWidth;
+
+
 			if (isBottomLimit && isRightLimit) {
+				console.log(1);
 				setTopMenu('auto');
 				setBottomMenu(30);
 				setLeftMenu('auto');
 				setRightMenu(30);
 			} else if (!isBottomLimit && isRightLimit) {
+				console.log(2);
 				setTopMenu(rightClickXy.y);
 				setBottomMenu('auto');
 				setLeftMenu('auto');
 				setRightMenu(30);
-			} else if (isBottomLimit && !isRightLimit) {
+			} else if (isBottomLimit && !isRightLimit || menuRefHeight < 250 && distanceCursorToBottom < 350) {
+				console.log(3);
 				setTopMenu('auto');
 				setBottomMenu(30);
 				setLeftMenu(rightClickXy.x);
 				setRightMenu('auto');
 			} else if (!isBottomLimit && !isRightLimit) {
+				console.log(4);
 				setTopMenu(rightClickXy.y);
 				setBottomMenu(30);
 				setLeftMenu(rightClickXy.x);
@@ -133,7 +137,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2 z-50"
+			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 			onClick={onClose}
 		>

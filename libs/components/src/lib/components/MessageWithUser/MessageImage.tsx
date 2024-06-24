@@ -32,11 +32,12 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
 	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
+		event.preventDefault();
+		event.stopPropagation();
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.IMAGE_ON_CHANNEL));
 		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMenuVisible(true);
 		setMessageRightClick(messageIdRightClick);
-		event.preventDefault();
 	};
 
 	const handleCloseMenu = () => {
@@ -48,8 +49,7 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 			<img
 				onContextMenu={handleContextMenu}
 				className={
-					'max-w-[100%] max-h-[30vh] object-cover my-2 rounded border border-red-400 ' +
-					(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
+					'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' + (!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
 				}
 				src={attachmentData.url?.toString()}
 				alt={attachmentData.url}

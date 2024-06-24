@@ -92,6 +92,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 	const [isMenuVisible, setMenuVisible] = useState(false);
 	const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
 		event.preventDefault();
+		event.stopPropagation();
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.MESSAGE_ON_CHANNEL));
 		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMenuVisible(true);
