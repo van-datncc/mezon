@@ -15,7 +15,7 @@ export function useMessageParser(message: IMessageWithUser) {
 	}, [message]);
 
 	const lines = useMemo(() => {
-		const values = content.t;
+		const values = content?.t;
 		return values;
 	}, [content]);
 

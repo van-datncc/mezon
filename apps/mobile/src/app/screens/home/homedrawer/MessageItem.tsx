@@ -18,6 +18,7 @@ import {
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	useAppDispatch,
+	selectMessageEntityById,
 } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
@@ -47,11 +48,11 @@ import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
 import Toast from 'react-native-toast-message';
 import { RenderVideoChat } from './components/RenderVideoChat';
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
 	message: IMessageWithUser;
-	preMessage?: IMessageWithUser;
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -70,12 +71,14 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, preMessage, onOpenImage, isNumberOfLine } = props;
+	const { mode, onOpenImage, isNumberOfLine } = props;
+	const message = useSelector((state) => selectMessageEntityById(state, props.channelId, props.message));
+	
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
-	const { attachments, lines } = useMessageParser(props.message);
-	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
+	const { attachments, lines } = useMessageParser(message);
+	const user = useSelector(selectMemberByUserId(message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
@@ -87,21 +90,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
+	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const hasIncludeMention = useMemo(() => {
-		return message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	}, [message, userLogin]);
-	const isCombine = useMemo(() => {
-		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
-		return (
-			timeDiff < TIME_COMBINE &&
-			preMessage?.user?.id === message?.user?.id &&
-			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
-		);
-	}, [message, preMessage]);
+	const isCombine = !message.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
 	const videoRef = React.useRef(null);
 
@@ -122,6 +119,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return { videos, images, documents };
 	};
+	
+	useEffect(() => {
+		if (message) {
+			const timestamp = Date.now() / 1000;
+			markMessageAsSeen(message);
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
+		}
+	}, [dispatch, markMessageAsSeen, message]);
 
 	useEffect(() => {
 		if (message.references && message.references.length > 0) {
@@ -276,7 +281,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, []);
 
 	const onConfirmDeleteMessage = () => {
-		DeleteSendMessage(props.message.id);
+		DeleteSendMessage(message.id);
 	};
 
 	const setMessageSelected = (type: EMessageBSToShow) => {
