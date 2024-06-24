@@ -22,7 +22,6 @@ export function useReference() {
 	const attachmentDataRef = useSelector(selectAttachmentData);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 
 	const setStatusLoadingAttachment = useCallback(
