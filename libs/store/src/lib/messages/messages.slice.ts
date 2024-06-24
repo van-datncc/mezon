@@ -426,7 +426,7 @@ export const messagesSlice = createSlice({
 			switch (code) {
 				case 0: {
 					
-					handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
+					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 
 					// remove sending message
 					if (isMe && !isSending) {
@@ -436,22 +436,9 @@ export const messagesSlice = createSlice({
 						if (sendingMessages && sendingMessages.length) {
 							for (const mid of sendingMessages) {
 								const message = state.channelMessages[channelId].entities[mid];
-														
-								const isStartedMessageGroup = message.isStartedMessageGroup;
-								const isStartedMessageOfTheDay = message.isStartedMessageOfTheDay;
-
+			
 								if (message?.content?.t === newContent?.t) {
-									state.channelMessages[channelId] = {
-										...state.channelMessages[channelId],
-										ids: state.channelMessages[channelId].ids.filter((id) => id !== message.id),
-									}
-									// workaround copy isStartedMessageGroup, isStartedMessageOfTheDay from sending message to new message
-									// cannot set directly to new message because it will be removed by channelMessagesAdapter.addOne
-									state.channelMessages[channelId].entities[id] = {
-										...state.channelMessages[channelId].entities[id],
-										isStartedMessageGroup,
-										isStartedMessageOfTheDay,
-									}
+									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
 									break;
 								}
 							}
@@ -771,7 +758,7 @@ const handleUpdateIsCombineMessage = (
 	messageIds: string[],
 	needUpdateFirstMessage = true,
 ) => {
-	if (!messageIds?.length) return;
+	if (!messageIds?.length) return channelEntity;
 	const entities = channelEntity.entities;
 
 	const firstMessage = entities[messageIds[0]];
@@ -798,6 +785,8 @@ const handleUpdateIsCombineMessage = (
 		prevMessageCreateTime = create_time;
 		prevMessageCreationTimeMs = creationTimeMs || 0;
 	});
+
+	return channelEntity;
 };
 
 const handleSetManyMessages = ({
@@ -825,7 +814,7 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
 
-	if (index === -1) return;
+	if (index === -1) return channelEntity;
 
 	const { isStartedMessageGroup, isStartedMessageOfTheDay } = channelEntity.entities[messageId];
 	const nextMessageId = channelEntity.ids[index + 1];
@@ -843,7 +832,7 @@ const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: Mess
 	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
-	if (index === -1) return;
+	if (index === -1) return channelEntity;
 
 	const startIndex = Math.max(index - 1, 0);
 
