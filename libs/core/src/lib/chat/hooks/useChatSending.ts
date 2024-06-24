@@ -51,7 +51,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(messagesActions.sendTypingUser({ channelId, mode }));
-	}, [channelId, channelLabel, dispatch, mode]);
+	}, [channelId, dispatch, mode]);
 
 	// TODO: why "Edit" not "edit"?
 	// Move this function to to a new action of messages slice
