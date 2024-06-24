@@ -82,7 +82,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
-	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references[0]?.message_ref_id || ''));
+	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references?.[0]?.message_ref_id || ''));
 	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const channelsEntities = useSelector(selectChannelsEntities);
@@ -100,7 +100,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
-	const isShowInfoUser = useMemo(() => !isCombine || (message.references.length && !!user), [isCombine, message.references, user]);
+	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message.references, user]);
 	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
