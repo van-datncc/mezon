@@ -42,12 +42,13 @@ import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
-import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
