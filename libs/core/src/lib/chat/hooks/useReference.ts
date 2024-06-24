@@ -65,12 +65,12 @@ export function useReference() {
 		[dispatch],
 	);
 
-	const setOpenReplyMessageState = useCallback(
-		(status: boolean) => {
-			dispatch(referencesActions.setOpenReplyMessageState(status));
-		},
-		[dispatch],
-	);
+	// const setOpenReplyMessageState = useCallback(
+	// 	(status: boolean) => {
+	// 		dispatch(referencesActions.setOpenReplyMessageState(status));
+	// 	},
+	// 	[dispatch],
+	// );
 
 	const setOpenThreadMessageState = useCallback(
 		(status: boolean) => {
@@ -133,7 +133,7 @@ export function useReference() {
 			setDataReferences,
 			setIdMessageToJump,
 			setOpenEditMessageState,
-			setOpenReplyMessageState,
+			// setOpenReplyMessageState,
 			setOpenThreadMessageState,
 			dataReferences,
 			openEditMessageState,
@@ -161,7 +161,7 @@ export function useReference() {
 			setDataReferences,
 			setIdMessageToJump,
 			setOpenEditMessageState,
-			setOpenReplyMessageState,
+			// setOpenReplyMessageState,
 			setOpenThreadMessageState,
 			dataReferences,
 			openEditMessageState,
