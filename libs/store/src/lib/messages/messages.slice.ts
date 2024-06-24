@@ -1,14 +1,29 @@
-import { EmojiDataOptionals, IMessageSendPayload, IMessageWithUser, LIMIT_MESSAGE, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, lruMemoize } from '@reduxjs/toolkit';
+import {
+	EmojiDataOptionals,
+	IMessageSendPayload,
+	IMessageWithUser,
+	LIMIT_MESSAGE,
+	LoadingStatus,
+	checkContinuousMessagesByCreateTimeMs,
+	checkSameDayByCreateTime,
+} from '@mezon/utils';
+import {
+	EntityState,
+	PayloadAction,
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSelectorCreator,
+	createSlice,
+	weakMapMemoize,
+} from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ChannelMessage, ChannelMessageAck, ChannelStreamMode } from 'mezon-js';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
-import { seenMessagePool } from './SeenMessagePool';
-import { withError } from '../errors/helpers';
+import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
-import { shallowEqual } from 'react-redux';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
+import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 export const MESSAGES_FEATURE_KEY = 'messages';
@@ -39,6 +54,8 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 export interface MessagesEntity extends IMessageWithUser {
 	id: string; // Primary ID
 	channel_id: string;
+	isStartedMessageGroup?: boolean;
+	isStartedMessageOfTheDay?: boolean;
 }
 
 export type UserTypingState = {
@@ -53,7 +70,7 @@ export type FetchMessageParam = {
 	hasMore?: boolean;
 };
 
-export interface MessagesState extends EntityState<MessagesEntity, string> {
+export interface MessagesState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isSending?: boolean;
@@ -63,7 +80,12 @@ export interface MessagesState extends EntityState<MessagesEntity, string> {
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
-	channelMessagesIds: Record<string, string[]>;
+	channelMessages: Record<
+		string,
+		EntityState<MessagesEntity, string> & {
+			id: string;
+		}
+	>;
 }
 
 export type FetchMessagesMeta = {
@@ -82,8 +104,6 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 }
 
 export const TYPING_TIMEOUT = 3000;
-
-
 
 export const fetchMessagesCached = memoize(
 	(mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>
@@ -128,46 +148,13 @@ export const fetchMessages = createAsyncThunk(
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
-		const reactionData: EmojiDataOptionals[] = messages.flatMap((message) => {
-			if (!message.reactions) return [];
-			const emojiDataItems: Record<string, EmojiDataOptionals> = {};
-			message.reactions.forEach((reaction) => {
-				const key = `${message.id}_${reaction.sender_id}_${reaction.emoji}`;
-
-				if (!emojiDataItems[key]) {
-					emojiDataItems[key] = {
-						id: reaction.id,
-						emoji: reaction.emoji,
-						senders: [
-							{
-								sender_id: reaction.sender_id,
-								count: reaction.count,
-								emojiIdList: [],
-								sender_name: '',
-								avatar: '',
-							},
-						],
-						channel_id: message.channel_id,
-						message_id: message.id,
-					};
-				} else {
-					const existingItem = emojiDataItems[key];
-
-					if (existingItem.senders.length > 0) {
-						existingItem.senders[0].count = reaction.count;
-					}
-				}
-			});
-			return Object.values(emojiDataItems);
-		});
-
-		if (reactionData.length > 0) {
-			thunkAPI.dispatch(messagesActions.setDataReactionGetFromMessage(reactionData));
-		}
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
-
-		thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }));
+		if (messages.length > 0) {
+			thunkAPI.dispatch(
+				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }),
+			);
+		}
 
 		if (response.last_seen_message?.id) {
 			thunkAPI.dispatch(
@@ -245,20 +232,15 @@ export const updateLastSeenMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(
-				channelId,
-				ChannelStreamMode.STREAM_MODE_CHANNEL,
-				messageId,
-				now.toString(),
-			);
+			await mezon.socketRef.current?.writeLastSeenMessage(channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
 		} catch (e) {
 			return thunkAPI.rejectWithValue('Error updating last seen message');
 		}
 	},
 	{
-		condition: (args, { getState }) => {
+		condition: ({ channelId, messageId }, { getState }) => {
 			const state = getState() as MessagesRootState;
-			const message = selectMessageByMessageId(args.messageId)(state);
+			const message = selectMessageEntityById(state, channelId, messageId);
 			if (!message) {
 				return false;
 			}
@@ -266,8 +248,8 @@ export const updateLastSeenMessage = createAsyncThunk(
 				return false;
 			}
 			return true;
-		}
-	}
+		},
+	},
 );
 
 type SendMessagePayload = {
@@ -283,92 +265,78 @@ type SendMessagePayload = {
 	senderId: string;
 };
 
-export const sendMessage = createAsyncThunk(
-	'messages/sendMessage',
-	async (payload: SendMessagePayload, thunkAPI) => {
-		const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
-		const id = Date.now().toString();
+export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
+	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+	const id = Date.now().toString();
 
+	async function doSend() {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-		async function doSend() {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const session = mezon.sessionRef.current;
+		const client = mezon.clientRef.current;
+		const socket = mezon.socketRef.current;
+		// const channel = mezon.channelRef.current;
 
-			const session = mezon.sessionRef.current;
-			const client = mezon.clientRef.current;
-			const socket = mezon.socketRef.current;
-			// const channel = mezon.channelRef.current;
-
-			if (!client || !session || !socket || !channelId) {
-				throw new Error('Client is not initialized');
-			}
-
-			const res = await socket.writeChatMessage(
-				clanId,
-				channelId,
-				mode,
-				content,
-				mentions,
-				attachments,
-				references,
-				anonymous,
-				mentionEveryone,
-			);
-			
-			return res;
+		if (!client || !session || !socket || !channelId) {
+			throw new Error('Client is not initialized');
 		}
 
-		async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
-			try {
-				const res = await doSend();
-				return res;
-			} catch (error) {
-				if (retryCount > 0) {
-					const r = await sendWithRetry(retryCount - 1);
-					return r;
-				} else {
-					throw error;
-				}
-			}
-		}
-		
-		async function fakeItUntilYouMakeIt() {
-			const fakeMessage: ChannelMessage = {
-				id,
-				code: 0, // Add new message
-				channel_id: channelId,
-				// @ts-ignore
-				content: content,
-				create_time: new Date().toISOString(),
-				sender_id: senderId,
-				username: '',
-				avatar: '',
-				isSending: true,
-		
-			};
-			const fakeMess = mapMessageChannelToEntity(fakeMessage);
+		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
-			thunkAPI.dispatch(messagesActions.newMessage(fakeMess));
+		return res;
+	}
 
-			const res = await sendWithRetry(1);
-
-			const timestamp = Date.now() / 1000;
-			thunkAPI.dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
-
-			const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
-			
-			thunkAPI.dispatch(messagesActions.markAsSent({id, mess }));
-		}
-
+	async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
 		try {
-			await fakeItUntilYouMakeIt();
+			const res = await doSend();
+			return res;
 		} catch (error) {
-			console.error('Error sending message', error);
-			thunkAPI.dispatch(messagesActions.markAsError(id));
-			return thunkAPI.rejectWithValue('Error sending message');
+			if (retryCount > 0) {
+				const r = await sendWithRetry(retryCount - 1);
+				return r;
+			} else {
+				throw error;
+			}
 		}
 	}
-);
 
+	async function fakeItUntilYouMakeIt() {
+		const fakeMessage: ChannelMessage = {
+			id,
+			code: 0, // Add new message
+			channel_id: channelId,
+			// @ts-ignore
+			content: content,
+			create_time: new Date().toISOString(),
+			sender_id: senderId,
+			username: '',
+			avatar: '',
+			isSending: true,
+			references: [],
+		};
+		const fakeMess = mapMessageChannelToEntity(fakeMessage);
+
+		// need to discuss later
+		// thunkAPI.dispatch(messagesActions.newMessage(fakeMess));
+
+		const res = await sendWithRetry(1);
+
+		const timestamp = Date.now() / 1000;
+		thunkAPI.dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+
+		const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
+
+		thunkAPI.dispatch(messagesActions.markAsSent({ id, mess }));
+	}
+
+	try {
+		await fakeItUntilYouMakeIt();
+	} catch (error) {
+		console.error('Error sending message', error);
+		thunkAPI.dispatch(messagesActions.markAsError({ messageId: id, channelId }));
+		return thunkAPI.rejectWithValue('Error sending message');
+	}
+});
 
 type UpdateTypingArgs = {
 	channelId: string;
@@ -409,11 +377,11 @@ export type SetUserTypingArgs = {
 	isTyping: boolean;
 };
 
-const messagesAdapter = createEntityAdapter<MessagesEntity>({
+const channelMessagesAdapter = createEntityAdapter<MessagesEntity>({
 	sortComparer: orderMessageByTimeMsAscending,
 });
 
-export const initialMessagesState: MessagesState = messagesAdapter.getInitialState({
+export const initialMessagesState: MessagesState = {
 	loadingStatus: 'not loaded',
 	error: null,
 	isSending: false,
@@ -423,8 +391,8 @@ export const initialMessagesState: MessagesState = messagesAdapter.getInitialSta
 	openOptionMessageState: false,
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
-	channelMessagesIds: {},
-});
+	channelMessages: {},
+};
 
 export type SetCursorChannelArgs = {
 	channelId: string;
@@ -437,17 +405,6 @@ export type MarkAsSentArgs = {
 
 export const buildTypingUserKey = (channelId: string, userId: string) => `${channelId}__${userId}`;
 
-const filterChannelMessagesIds = (updatedMessagesState: MessagesState, channelId: string) => {
-	return updatedMessagesState.ids.filter((id) => updatedMessagesState.entities[id]?.channel_id === channelId);
-};
-
-function updateChannelMessagesIds(state: MessagesState, channelId: string, updatedMessagesState: MessagesState) {
-	state.channelMessagesIds = {
-		...state.channelMessagesIds,
-		[channelId]: filterChannelMessagesIds(updatedMessagesState, channelId),
-	}
-}
-
 export const messagesSlice = createSlice({
 	name: MESSAGES_FEATURE_KEY,
 	initialState: initialMessagesState,
@@ -459,19 +416,29 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const code = action.payload.code;
-			const channelId = action.payload.channel_id;
-			let updatedMessagesState = state;
+			const { code, channel_id: channelId, id: messageId } = action.payload;
+			if (!channelId || !messageId) return state;
+			if (!state.channelMessages[channelId]) {
+				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
+					id: channelId,
+				});
+			}
+			const channelEntity = state.channelMessages[channelId];
 			switch (code) {
-				case 0:
-					if(state.entities[action.payload.id]) {
-						messagesAdapter.setOne(state, action.payload);
+				case 0: {
+					const existingMessage = channelEntity?.entities?.[messageId];
+					if (existingMessage) {
+						channelMessagesAdapter.updateOne(channelEntity, {
+							id: messageId,
+							changes: action.payload,
+						});
 					} else {
-						messagesAdapter.addOne(state, action.payload);
+						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 					}
 					break;
-				case 1:
-					updatedMessagesState = messagesAdapter.updateOne(state, {
+				}
+				case 1: {
+					channelMessagesAdapter.updateOne(channelEntity, {
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
@@ -479,72 +446,77 @@ export const messagesSlice = createSlice({
 						},
 					});
 					break;
-				case 2:
-					updatedMessagesState = messagesAdapter.removeOne(state, action.payload.id);
+				}
+				case 2: {
+					handleRemoveOneMessage({ state, channelId, messageId });
 					break;
+				}
 				default:
 					break;
 			}
 
-			if (channelId) {
-				// TODO: check duplicates with setChannelLastMessage
-				state.unreadMessagesEntries = {
-					...state.unreadMessagesEntries,
-					[action.payload.channel_id]: action.payload.id,
-				};
-				const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
+			// TODO: check duplicates with setChannelLastMessage
+			state.unreadMessagesEntries = {
+				...state.unreadMessagesEntries,
+				[action.payload.channel_id]: action.payload.id,
+			};
+			const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
 
-				if (state?.typingUsers?.[typingUserKey]) {
-					delete state.typingUsers[typingUserKey];
-				}
-
-				// update channelMessagesIds
-				updateChannelMessagesIds(state, channelId, updatedMessagesState)
+			if (state?.typingUsers?.[typingUserKey]) {
+				delete state.typingUsers[typingUserKey];
 			}
 		},
 
-		markMessageAsLastSeen: (state, action: PayloadAction<string>) => {
-			messagesAdapter.updateOne(state, {
-				id: action.payload,
-				changes: {
-					lastSeen: true,
-				},
-			});
-		},
 		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
 			const { mess, id } = action.payload;
 			const channelId = mess.channel_id;
-			
-			// Add the new message if it doesn't exist
-			if (!state.entities[mess.id]) {
-				messagesAdapter.addOne(state, mess);
+			const channelEntity = state.channelMessages?.[channelId];
+			if (!channelEntity) {
+				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
+					id: channelId,
+				});
 			}
-				
+
 			// Remove the message with the old id
-			messagesAdapter.removeOne(state, id);
-		
-			state.channelMessagesIds[channelId] = filterChannelMessagesIds(state, channelId);
+			const updatedState = handleRemoveOneMessage({ state, channelId, messageId: id });
+			if (updatedState) state.channelMessages[channelId] = updatedState;
+
+			// Add the new message if it doesn't exist
+			// if (!channelEntity.entities?.[mess.id]) {
+			// 	handleAddOneMessage({ state, channelId, adapterPayload: mess });
+			// }
 		},
-		markAsError: (state, action: PayloadAction<string>) => {
-			messagesAdapter.updateOne(state, {
-				id: action.payload,
+		markAsError: (
+			state,
+			action: PayloadAction<{
+				messageId: string;
+				channelId: string;
+			}>,
+		) => {
+			const channelId = action.payload.channelId;
+			if (!state.channelMessages?.[channelId]) {
+				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
+					id: channelId,
+				});
+			}
+			channelMessagesAdapter.updateOne(state.channelMessages[channelId], {
+				id: action.payload.messageId,
 				changes: {
 					isError: true,
 				},
 			});
 		},
-		remove: (state, action: PayloadAction<string>) => {
-			const message = state.entities[action.payload];
-			messagesAdapter.removeOne(state, action.payload);
-			const channelId = message?.channel_id;
-			if (channelId) {
-				state.channelMessagesIds[channelId] = filterChannelMessagesIds(state, channelId);
-			}
+		remove: (
+			state,
+			action: PayloadAction<{
+				channelId: string;
+				messageId: string;
+			}>,
+		) => {
+			const { channelId, messageId } = action.payload;
+			handleRemoveOneMessage({ state, channelId, messageId });
 		},
-		removeAll: (state) => {
-			messagesAdapter.removeAll(state);
-			state.channelMessagesIds = {};
-		},
+		removeAll: () => initialMessagesState,
 		setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
@@ -575,10 +547,6 @@ export const messagesSlice = createSlice({
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
 		},
-
-		setDataReactionGetFromMessage(state, action) {
-			state.dataReactionGetFromLoadMessage = action.payload;
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -586,17 +554,19 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[], string, FetchMessagesMeta>) => {
-				const isNew = action.payload.some(({ id }) => !state.entities[id]);
-
-				if (!isNew) return state;
-
-				const reversedMessages = action.payload.reverse();
-				messagesAdapter.setMany(state, reversedMessages);
-				state.loadingStatus = 'loaded';
 				const channelId = action?.meta?.arg?.channelId;
-				if (channelId) {
-					state.channelMessagesIds[channelId] = filterChannelMessagesIds(state, channelId);
-				}
+
+				state.loadingStatus = 'loaded';
+
+				const isNew = channelId && action.payload.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
+				if (!isNew || !channelId) return state;
+				const reversedMessages = action.payload.reverse();
+
+				handleSetManyMessages({
+					state,
+					channelId,
+					adapterPayload: reversedMessages,
+				});
 			})
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
@@ -640,25 +610,15 @@ export const messagesActions = {
 	jumpToMessage,
 };
 
-/*
- * Export selectors to query state. For use with the `useSelector` hook.
- *
- * e.g.
- * ```
- * import { useSelector } from 'react-redux';
- *
- * // ...
- *
- * const entities = useSelector(selectAllMessages);
- * ```
- *
- * See: https://react-redux.js.org/next/api/hooks#useselector
- */
-const { selectAll, selectEntities, selectById } = messagesAdapter.getSelectors();
-
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];
 
-export const selectAllMessages = createSelector(getMessagesState, selectAll);
+export const selectAllMessages = createSelector(getMessagesState, (messageState) => {
+	const res: MessagesEntity[] = [];
+	Object.values(messageState.channelMessages || {}).forEach((item) => {
+		res.concat(Object.values(item?.entities || {}));
+	});
+	return res;
+});
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 	if (a.creationTimeMs && b.creationTimeMs) {
@@ -674,17 +634,21 @@ export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEnti
 	return 0;
 }
 
-export const selectMessagesEntities = createSelector(getMessagesState, selectEntities);
+export const selectMessagesEntities = createSelector(getMessagesState, (messageState) => {
+	let res: Record<string, MessagesEntity> = {};
+	Object.values(messageState.channelMessages || {}).forEach((item) => {
+		res = { ...res, ...item.entities };
+	});
 
-export const selectChannelMessagesIds = createSelector(getMessagesState, (state) => state.channelMessagesIds);
+	return res;
+});
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
 export const selectMessageByChannelId = (channelId?: string | null) =>
-	createSelector(selectMessagesEntities, (entities) => {
-		const messages = Object.values(entities);
-		const sortedMessages = messages.slice().sort(orderMessageByDate);
-		return sortedMessages.filter((message) => message && message.channel_id === channelId);
+	createSelector(getMessagesState, (messagesState) => {
+		const messages = channelId && messagesState.channelMessages[channelId] ? Object.values(messagesState.channelMessages[channelId]) : [];
+		return messages.slice().sort(orderMessageByDate);
 	});
 
 export const selectMessageByUserId = (channelId?: string | null, senderId?: string | null) =>
@@ -695,11 +659,6 @@ export const selectMessageByUserId = (channelId?: string | null, senderId?: stri
 export const selectLastMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectMessageByChannelId(channelId), (messages) => {
 		return messages.shift();
-	});
-
-export const selectLastMessageIdByChannelId = (channelId?: string | null) =>
-	createSelector(selectLastMessageByChannelId(channelId), (message) => {
-		return message?.id;
 	});
 
 export const selectUnreadMessageEntries = createSelector(getMessagesState, (state) => state.unreadMessagesEntries);
@@ -751,52 +710,133 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 	});
 
 export const selectMessageByMessageId = (messageId: string) =>
-	createSelector(selectMessagesEntities, (messageEntities) => messageEntities[messageId]);
+	createSelector(selectMessagesEntities, (messageEntities) => {
+		return messageEntities[messageId];
+	});
 
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
 
-export const selectDataReactionGetFromMessage = createSelector(getMessagesState, (state) => state.dataReactionGetFromLoadMessage);
-
 // V2
 
-export const selectMessageIdsByChannelIdV2 = createSelector(
-	[selectChannelMessagesIds, (_, channelId) => channelId],
-	(channelMessagesIds, channelId) => {
-		return channelId ? channelMessagesIds?.[channelId] : null;
+const createCachedSelector = createSelectorCreator({
+	memoize: weakMapMemoize,
+	argsMemoize: weakMapMemoize,
+});
+
+export const selectMessageIdsByChannelId = createCachedSelector(
+	(state, channelId: string) => {
+		const messagesState = getMessagesState(state);
+		return messagesState.channelMessages[channelId]?.ids || null;
 	},
-	{
-		memoize: lruMemoize,
-		memoizeOptions: {
-			equalityCheck: shallowEqual,
-			resultEqualityCheck: shallowEqual,
-			maxSize: 10,
-		},
-		argsMemoize: lruMemoize,
-		argsMemoizeOptions: {
-			equalityCheck: shallowEqual,
-			resultEqualityCheck: shallowEqual,
-			maxSize: 10,
-		},
+	(messagesState: string[] | null) => {
+		return messagesState || [];
 	},
 );
 
-export const selectMessageEntityById = createSelector([getMessagesState, (_, messageId) => messageId], (messagesState, messageId) =>
-	selectById(messagesState, messageId),
+export const selectMessageEntityById = createCachedSelector(
+	(state, channelId, messageId) => {
+		const messagesState = getMessagesState(state);
+		return messagesState.channelMessages[channelId]?.entities?.[messageId] || null;
+	},
+	(messagesState) => {
+		return messagesState || {};
+	},
 );
 
-export const selectPreviousMessageByMessageId = (channelId: string, messageId: string) =>
-	createSelector([(state) => selectMessageIdsByChannelIdV2(state, channelId), getMessagesState], (messageIds, messagesState) => {
-		const prevMessageId = messageIds?.find((_, index) => messageIds[index + 1] === messageId);
-		if (!prevMessageId) return undefined;
-		const prevMessageEntity = selectById(messagesState, prevMessageId);
-		if (prevMessageEntity && typeof prevMessageEntity.content === 'object' && typeof (prevMessageEntity.content as any).id === 'string') {
-			return prevMessageEntity.content;
-		}
-		return prevMessageEntity;
-	});
+export const selectLastMessageIdByChannelId = createSelector(selectMessageIdsByChannelId, (ids) => {
+	return ids.at(-1);
+});
 
 export const selectLastSeenMessage = (channelId: string, messageId: string) =>
-	createSelector([selectLastMessageIdByChannelId(channelId), selectUnreadMessageIdByChannelId(channelId)], (lastMessageId, unreadMessageId) => {
-		return Boolean(messageId === unreadMessageId && messageId !== lastMessageId);
-	});
+	createSelector(
+		[(state) => selectLastMessageIdByChannelId(state, channelId), selectUnreadMessageIdByChannelId(channelId)],
+		(lastMessageId, unreadMessageId) => {
+			return Boolean(messageId === unreadMessageId && messageId !== lastMessageId);
+		},
+	);
 
+const handleUpdateIsCombineMessage = (
+	channelEntity: EntityState<MessagesEntity, string> & {
+		id: string;
+	},
+	messageIds: string[],
+	needUpdateFirstMessage = true,
+) => {
+	if (!messageIds?.length) return;
+	const entities = channelEntity.entities;
+
+	const firstMessage = entities[messageIds[0]];
+	let prevMessageSenderId = firstMessage.sender_id || '';
+	let prevMessageCreateTime = firstMessage.create_time || '';
+	let prevMessageCreationTimeMs = firstMessage.creationTimeMs || 0;
+
+	if (needUpdateFirstMessage) {
+		firstMessage.isStartedMessageGroup = true;
+		firstMessage.isStartedMessageOfTheDay = true;
+	}
+
+	messageIds.slice(1, messageIds.length).forEach((id) => {
+		const { sender_id, creationTimeMs, create_time } = entities[id];
+		const isSameDay = checkSameDayByCreateTime(create_time, prevMessageCreateTime);
+		const isContinuousMessages = checkContinuousMessagesByCreateTimeMs(creationTimeMs || 0, prevMessageCreationTimeMs);
+
+		const isStartedMessageGroup = Boolean(sender_id !== prevMessageSenderId || !isSameDay || !isContinuousMessages);
+
+		entities[id].isStartedMessageGroup = isStartedMessageGroup;
+		entities[id].isStartedMessageOfTheDay = !isSameDay;
+
+		prevMessageSenderId = sender_id;
+		prevMessageCreateTime = create_time;
+		prevMessageCreationTimeMs = creationTimeMs || 0;
+	});
+};
+
+const handleSetManyMessages = ({
+	state,
+	channelId,
+	adapterPayload,
+}: {
+	state: MessagesState;
+	channelId?: string;
+	adapterPayload: MessagesEntity[];
+}) => {
+	if (!channelId) return state;
+	if (!state.channelMessages[channelId])
+		state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
+			id: channelId,
+		});
+
+	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
+
+	const channelEntity = state.channelMessages[channelId];
+	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(0, adapterPayload.length + 1));
+};
+
+const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: MessagesState; channelId: string; messageId: string }) => {
+	const channelEntity = state.channelMessages[channelId];
+	const index = channelEntity.ids.indexOf(messageId);
+
+	if (index === -1) return;
+
+	const { isStartedMessageGroup, isStartedMessageOfTheDay } = channelEntity.entities[messageId];
+	const nextMessageId = channelEntity.ids[index + 1];
+
+	if (nextMessageId && isStartedMessageGroup) {
+		channelEntity.entities[nextMessageId].isStartedMessageGroup = isStartedMessageGroup;
+		channelEntity.entities[nextMessageId].isStartedMessageOfTheDay = isStartedMessageOfTheDay;
+	}
+
+	return channelMessagesAdapter.removeOne(channelEntity, messageId);
+};
+
+const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
+	const messageId = adapterPayload.id;
+	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
+	const channelEntity = state.channelMessages[channelId];
+	const index = channelEntity.ids.indexOf(messageId);
+	if (index === -1) return;
+
+	const startIndex = Math.max(index - 1, 0);
+
+	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), false);
+};

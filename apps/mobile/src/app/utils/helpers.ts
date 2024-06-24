@@ -46,9 +46,8 @@ export const isVideo = (url?: string) => {
 };
 
 export const normalizeString = (str: string) => {
-  if (!str) return '';
-  const normalizedStr = str.replace(/\s+/g, '').trim();
-  return normalizedStr.toLowerCase();
+  const normalizedStr = str?.replace?.(/\s+/g, '')?.trim();
+  return normalizedStr?.toLowerCase?.();
 }
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
 export const mentionRegex = /(?<=(^|[^`]))(@\S+|#[^\s#]+)(?=\s|$)|<#\d+>/g;

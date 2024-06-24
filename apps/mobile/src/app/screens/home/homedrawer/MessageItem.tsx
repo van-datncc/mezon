@@ -82,10 +82,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
+<<<<<<< HEAD
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
+=======
+	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(props.message?.references?.[0]?.message_ref_id || ''));
+	const repliedSender = useSelector(selectMemberByUserId(messageRefFetchFromServe?.user?.id || ''));
+>>>>>>> 33fd868fd196bbd34d4968d93fb903705577a269
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
@@ -102,7 +107,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
 		);
 	}, [message, preMessage]);
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
+	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message.references, user]);
 	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
