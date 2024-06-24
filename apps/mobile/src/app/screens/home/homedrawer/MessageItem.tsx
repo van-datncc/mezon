@@ -205,9 +205,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			const checkIsImage = isImage(document?.url?.toLowerCase());
-			if (checkIsImage) {
-				return imageItem({ image: document, index, checkImage: false });
+			const isShowImage = isImage(document?.url?.toLowerCase());
+			if (isShowImage) {
+				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
+				
+				return imageItem({ image: document, index, checkImage: checkImage });
 			}
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
 
