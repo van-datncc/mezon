@@ -25,11 +25,11 @@ export type MessageWithUserProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	newMessage?: string;
-	child?: JSX.Element;
 	isMention?: boolean;
+	popup?: JSX.Element;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, isMention, popup }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -44,7 +44,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 
 	const attachments = useMemo(() => message.attachments, [message.attachments]);
 
-	const propsChild = { isCombine };
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
@@ -145,9 +144,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 											isSending={message.isSending}
 											isError={message.isError}
 										/>
-										{child?.props.children[1] &&
-											React.isValidElement(child?.props.children[1]) &&
-											React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
@@ -164,9 +160,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 						)}
 					</div>
 				</div>
-				{child?.props.children[0] &&
-					React.isValidElement(child?.props.children[0]) &&
-					React.cloneElement(child?.props.children[0], propsChild)}
+				{!!popup && popup}
 			</div>
 		</>
 	);

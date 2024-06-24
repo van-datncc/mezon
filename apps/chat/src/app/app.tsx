@@ -24,9 +24,11 @@ export function App() {
 	const { store, persistor } = useMemo(() => {
 		return initStore(mezon, preloadedState);
 	}, [mezon]);
+
 	if (!store) {
 		return <>loading...</>;
 	}
+	
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 			<RouterProvider router={routes} />
@@ -47,7 +49,7 @@ function AppWrapper() {
 		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<VoiceContextProvider>
-						<App />
+					<App />
 				</VoiceContextProvider>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
