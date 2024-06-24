@@ -1,13 +1,12 @@
-import { directActions, getStoreAsync } from '@mezon/store';
-import { LoaderFunction } from 'react-router-dom';
+import { directActions } from '@mezon/store';
+import { CustomLoaderFunction } from './appLoader';
 
-export const directMessageLoader: LoaderFunction = async ({ params }) => {
+export const directMessageLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
 	const { directId, type } = params;
-	const store = await getStoreAsync();
 	if (!directId) {
 		throw new Error('DirectMessage ID null');
 	}
-	store.dispatch(
+	dispatch(
 		directActions.joinDirectMessage({
 			directMessageId: directId,
 			channelName: '',

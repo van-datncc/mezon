@@ -1,23 +1,23 @@
 import { setJumpToMessageId } from '@mezon/core';
-import { channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store';
-import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
+import { channelsActions, messagesActions } from '@mezon/store';
+import { ShouldRevalidateFunction } from 'react-router-dom';
+import { CustomLoaderFunction } from './appLoader';
 
-export const channelLoader: LoaderFunction = async ({ params, request }) => {
+export const channelLoader: CustomLoaderFunction = async ({ params, request, dispatch }) => {
 	const { channelId, clanId } = params;
 	const messageId = new URL(request.url).searchParams.get('messageId');
 
-	const store = await getStoreAsync();
 	if (!channelId) {
 		throw new Error('Channel ID null');
 	}
 
 	if (messageId) {
 		setJumpToMessageId(messageId);
-		store.dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
+		dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	}
 
-	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-	store.dispatch(
+	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+	dispatch(
 		channelsActions.setIdChannelSelected({
 			clanId: clanId || '',
 			channelId,
