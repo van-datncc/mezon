@@ -1,3 +1,4 @@
+import { RightClickPos } from '@mezon/utils';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 export const RIGHT_CLICK_FEATURE_KEY = 'rightClick';
@@ -7,6 +8,7 @@ export interface RightClickState {
 	error?: string | null;
 	rightClickXy: { x: number; y: number };
 	messageIdClickedRightClicked: string;
+	posClickActive: RightClickPos;
 }
 
 export const initialRightClickState: RightClickState = {
@@ -17,6 +19,7 @@ export const initialRightClickState: RightClickState = {
 		y: NaN,
 	},
 	messageIdClickedRightClicked: '',
+	posClickActive: RightClickPos.NONE,
 };
 
 export const rightClickSlice = createSlice({
@@ -28,6 +31,9 @@ export const rightClickSlice = createSlice({
 		},
 		setMessageRightClick: (state, action) => {
 			state.messageIdClickedRightClicked = action.payload;
+		},
+		setPosClickActive: (state, action) => {
+			state.posClickActive = action.payload;
 		},
 	},
 });
@@ -41,3 +47,5 @@ export const getRightClickState = (rootState: { [RIGHT_CLICK_FEATURE_KEY]: Right
 export const selectRightClickXy = createSelector(getRightClickState, (state: RightClickState) => state.rightClickXy);
 
 export const selectMessageIdRightClicked = createSelector(getRightClickState, (state: RightClickState) => state.messageIdClickedRightClicked);
+
+export const selectPosClickingActive = createSelector(getRightClickState, (state: RightClickState) => state.posClickActive);

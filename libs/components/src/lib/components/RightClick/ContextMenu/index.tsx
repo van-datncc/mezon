@@ -1,16 +1,20 @@
 import { useAuth, useClans, useRightClick } from '@mezon/core';
 import { selectMessageByMessageId } from '@mezon/store';
 import {
-	editAndDeleteMessageList,
+	deleteMessageList,
+	editMessageList,
 	imageList,
 	linkList,
 	listClickDefault,
 	pinMessageList,
-	removeMessageReactionList,
+	removeAllReactionList,
+	removeReactionList,
+	reportMessageList,
 	speakMessageList,
 	viewReactionList,
 } from '@mezon/ui';
 import { RightClickPos } from '@mezon/utils';
+import { selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
@@ -18,10 +22,10 @@ import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
 	onClose: () => void;
 	urlData: string;
-	posClick: RightClickPos;
 }
 
-const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }) => {
+const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
+	const posClick = useSelector(selectPosClickingActive);
 	const { rightClickXy } = useRightClick();
 	const menuRef = useRef<HTMLDivElement | null>(null);
 	const [topMenu, setTopMenu] = useState<number | 'auto'>('auto');
@@ -37,29 +41,31 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 	const { userId } = useAuth();
 	const [listTextToMatch, setListTextToMatch] = useState<any[]>(listClickDefault);
 
-	const yesClanYesMessYesReactionYesText = [
-		...listClickDefault, // all case
-		...pinMessageList, // yes clan
-		...editAndDeleteMessageList, // yes message
-		...viewReactionList, // yes reaction
-		...removeMessageReactionList, // yes reaction
-		...speakMessageList, // yesText
-	];
-
 	const checkOwnerClan = currentClan?.creator_id === userId;
 	const checkOwnerMessage = messageRClicked.sender_id === userId;
 	const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
-	const checkImageHasText = messageRClicked.content.t === '';
+	const checkImageHasText = messageRClicked.content.t !== '';
 
 	useLayoutEffect(() => {
 		if (checkOwnerClan) {
 			const combineOwnerClan = [...listClickDefault, ...pinMessageList];
 			setListTextToMatch(combineOwnerClan);
 			if (checkOwnerMessage) {
-				const combineOwnerMessage = [...combineOwnerClan, ...editAndDeleteMessageList];
+				const combineOwnerMessage = [...combineOwnerClan, ...editMessageList, ...deleteMessageList];
 				setListTextToMatch(combineOwnerMessage);
 				if (checkMessHasReaction) {
-					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList, ...removeMessageReactionList];
+					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
+					setListTextToMatch(combineHasReaction);
+					if (checkImageHasText) {
+						const combineHasText = [...combineHasReaction, ...speakMessageList];
+						setListTextToMatch(combineHasText);
+					}
+				}
+			} else if (!checkOwnerMessage) {
+				const combineNoOwnerMessage = [...combineOwnerClan, ...reportMessageList, ...deleteMessageList];
+				setListTextToMatch(combineNoOwnerMessage);
+				if (checkMessHasReaction) {
+					const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
 					setListTextToMatch(combineHasReaction);
 					if (checkImageHasText) {
 						const combineHasText = [...combineHasReaction, ...speakMessageList];
@@ -67,10 +73,25 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 					}
 				}
 			}
-		} else if (!checkOwnerClan){
-			const combineNoOwnerClan = [...listClickDefault]
+		} else if (!checkOwnerClan) {
+			const combineNoOwnerClan = [...listClickDefault];
+			setListTextToMatch(combineNoOwnerClan);
+			if (checkOwnerMessage) {
+				const combineOwnerMessage = [...combineNoOwnerClan, ...deleteMessageList];
+				setListTextToMatch(combineOwnerMessage);
+				if (checkMessHasReaction) {
+					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList];
+					setListTextToMatch(combineHasReaction);
+					if (checkImageHasText) {
+						const combineHasText = [...combineHasReaction, ...speakMessageList];
+						setListTextToMatch(combineHasText);
+					}
+				}
+			}
 		}
 	}, [messageRClicked]);
+
+	console.log(posClick);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -125,7 +146,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 					</Fragment>
 				);
 			})}
-			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className="h-[0.5px] bg-white my-2"></hr>}
+			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 				imageList.map((item: any) => {
 					return (
@@ -136,7 +157,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, posClick }
 						</Fragment>
 					);
 				})}
-			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className="h-[0.5px] bg-white my-2"></hr>}
+			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 				linkList.map((item: any) => {
 					return (

@@ -16,38 +16,27 @@ export const linkList = [
 ];
 
 export const listClickDefault = [
-	{ id: 0, name: '0. Add Reaction', symbol: <CopyImageIcon /> },
-	{ id: 4, name: '4. Reply', symbol: <SaveImageIcon /> },
-	{ id: 5, name: '5. Create Thread', symbol: <SaveImageIcon /> },
-	{ id: 6, name: '6. Copy Text', symbol: <CopyLinkIcon /> },
-	{ id: 7, name: '7. Apps', symbol: <OpenLinkIcon /> },
-	{ id: 8, name: '8. Mark Unread', symbol: <OpenLinkIcon /> },
-	{ id: 9, name: '9. Copy Message Link', symbol: <OpenLinkIcon /> },
+	{ id: 0, name: 'Add Reaction', symbol: <CopyImageIcon /> },
+	{ id: 4, name: 'Reply', symbol: <SaveImageIcon /> },
+	{ id: 5, name: 'Create Thread', symbol: <SaveImageIcon /> },
+	{ id: 6, name: 'Copy Text', symbol: <CopyLinkIcon /> },
+	{ id: 7, name: 'Apps', symbol: <OpenLinkIcon /> },
+	{ id: 8, name: 'Mark Unread', symbol: <OpenLinkIcon /> },
+	{ id: 9, name: 'Copy Message Link', symbol: <OpenLinkIcon /> },
 ];
 
-export const pinMessageList = [
-	{ id: 3, name: '3. Pin Message', symbol: <SaveImageIcon /> },
-]
+export const pinMessageList = [{ id: 3, name: 'Pin Message', symbol: <SaveImageIcon /> }];
 
-export const speakMessageList = [
-	{ id: 10, name: '10. Speak Message', symbol: <OpenLinkIcon /> },
-]
+export const speakMessageList = [{ id: 10, name: 'Speak Message', symbol: <OpenLinkIcon /> }];
 
-export const editAndDeleteMessageList = [
-	{ id: 2, name: '2. Edit Message', symbol: <CopyImageIcon /> }, 
-	{ id: 13, name: '13. Delete Message', symbol: <OpenLinkIcon /> }, 
-];
+export const editMessageList = [{ id: 2, name: 'Edit Message', symbol: <CopyImageIcon /> }];
 
-export const removeMessageReactionList = [
-	{ id: 11, name: '11. Remove Reaction', symbol: <OpenLinkIcon /> }, 
-	{ id: 12, name: '12. Remove All Reaction', symbol: <OpenLinkIcon /> }, 
-];
+export const deleteMessageList = [{ id: 13, name: 'Delete Message', symbol: <OpenLinkIcon /> }];
 
-export const reportMessageList= [
-	{ id: 14, name: '14. Report Message', symbol: <OpenLinkIcon /> }
-];
+export const removeReactionList = [{ id: 11, name: 'Remove Reaction', symbol: <OpenLinkIcon /> }];
 
-export const viewReactionList = [
-	{ id: 1, name: '1. View Reactions', symbol: <CopyImageIcon /> },
-]
+export const removeAllReactionList = [{ id: 12, name: 'Remove All Reaction', symbol: <OpenLinkIcon /> }];
 
+export const reportMessageList = [{ id: 14, name: 'Report Message', symbol: <OpenLinkIcon /> }];
+
+export const viewReactionList = [{ id: 1, name: 'View Reactions', symbol: <CopyImageIcon /> }];

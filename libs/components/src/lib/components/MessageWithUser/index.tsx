@@ -2,9 +2,10 @@ import { useAuth, useChatMessages, useNotification, useOnClickOutside, useRightC
 import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { IChannelMember, RightClickPos } from '@mezon/utils';
 import classNames from 'classnames';
+import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
 import ContextMenu from '../RightClick/ContextMenu';
 import MessageAttachment from './MessageAttachment';
@@ -31,6 +32,7 @@ export type MessageWithUserProps = {
 };
 
 function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
+	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -87,6 +89,19 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
+	const [isMenuVisible, setMenuVisible] = useState(false);
+	const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		dispatch(rightClickAction.setPosClickActive(RightClickPos.MESSAGE_ON_CHANNEL));
+		setRightClickXy({ x: event.pageX, y: event.pageY });
+		setMenuVisible(true);
+		setMessageRightClick(message.id);
+	};
+
+	const handleCloseMenu = () => {
+		setMenuVisible(false);
+	};
+
 	useEffect(() => {
 		let resetTimeoutId: NodeJS.Timeout | null = null;
 
@@ -127,18 +142,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 			setCheckMessageHasReply(false);
 		}
 	}, [message.references]);
-
-	const [isMenuVisible, setMenuVisible] = useState(false);
-	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
-		event.preventDefault();
-		setRightClickXy({ x: event.pageX, y: event.pageY });
-		setMenuVisible(true);
-		setMessageRightClick(message.id);
-	};
-
-	const handleCloseMenu = () => {
-		setMenuVisible(false);
-	};
 
 	useOnClickOutside(divMessageWithUser, handleCloseMenu);
 
@@ -195,7 +198,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 				{child?.props.children[0] &&
 					React.isValidElement(child?.props.children[0]) &&
 					React.cloneElement(child?.props.children[0], propsChild)}
-				{/* {isMenuVisible && <ContextMenu urlData={''} posClick={RightClickPos.MESSAGE_ON_CHANNEL} onClose={handleCloseMenu} />} */}
+				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
 			</div>
 		</>
 	);

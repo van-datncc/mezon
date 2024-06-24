@@ -1,7 +1,9 @@
 import { useAttachments, useOnClickOutside, useRightClick } from '@mezon/core';
 import { RightClickPos, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import ContextMenu from '../RightClick/ContextMenu';
 
 export type MessageImage = {
@@ -10,6 +12,7 @@ export type MessageImage = {
 };
 
 function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
+	const dispatch = useDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
@@ -28,11 +31,12 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	};
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
-	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
-		event.preventDefault();
+	const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+		dispatch(rightClickAction.setPosClickActive(RightClickPos.IMAGE_ON_CHANNEL));
 		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMenuVisible(true);
 		setMessageRightClick(messageIdRightClick);
+		event.preventDefault();
 	};
 
 	const handleCloseMenu = () => {
@@ -50,7 +54,7 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 				onClick={() => handleClick(attachmentData.url || '')}
 				style={imgStyle}
 			/>
-			{isMenuVisible && <ContextMenu urlData={attachmentData.url ?? ''} posClick={RightClickPos.IMAGE_ON_CHANNEL} onClose={handleCloseMenu} />}
+			{isMenuVisible && <ContextMenu urlData={attachmentData.url ?? ''} onClose={handleCloseMenu} />}
 		</div>
 	);
 }

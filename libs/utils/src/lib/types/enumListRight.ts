@@ -6,6 +6,7 @@ export enum RightClickList {
 }
 
 export enum RightClickPos {
+	NONE = 'NONE',
 	IMAGE_VIEWER = 'IMAGE_VIEWER',
 	MESSAGE_ON_CHANNEL = 'MESSAGE_ON_CHANNEL',
 	IMAGE_ON_CHANNEL = 'IMAGE_ON_CHANNEL',

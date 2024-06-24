@@ -92,7 +92,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 					})}
 					{checkHasEmoji && (
 						<div className="w-6 h-6  justify-center flex flex-row items-center cursor-pointer relative">
-							{showIconSmile && <ReactionBottom smileButtonRef={smileButtonRef} />}
+							{showIconSmile && <ReactionBottom smileButtonRef={smileButtonRef} messageIdRefReaction={message.id} />}
 						</div>
 					)}
 				</div>

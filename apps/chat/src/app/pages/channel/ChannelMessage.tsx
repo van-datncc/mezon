@@ -305,10 +305,10 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 						</>
 					}
 				/>
-				{lastSeen && <UnreadMessageBreak />}
-				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>
 			<MessageReaction message={message} mode={mode} />
+			{lastSeen && <UnreadMessageBreak />}
+			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 		</>
 	);
 }
