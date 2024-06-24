@@ -1,8 +1,15 @@
-import { useAppNavigation, useJumpToMessage, useNotification, useReference } from '@mezon/core';
-import { INotification, selectChannelById, selectCurrentChannelId, selectCurrentClan, selectMemberClanByUserId } from '@mezon/store';
+import { useAppNavigation, useJumpToMessage, useNotification } from '@mezon/core';
+import {
+	INotification,
+	referencesActions,
+	selectChannelById,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	selectMemberClanByUserId,
+} from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MessageWithUser from '../MessageWithUser';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
@@ -44,6 +51,7 @@ function parseObject(obj: any) {
 }
 
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
+	const dispatch = useDispatch();
 	const { deleteNotify } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const currentClan = useSelector(selectCurrentClan);
@@ -51,7 +59,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const data = parseObject(notify.content);
 	const { toChannelPage, navigate } = useAppNavigation();
 	const { jumpToMessage } = useJumpToMessage();
-	const { setMessageMentionId } = useReference();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	data.content = JSON.parse(data.content);
@@ -59,7 +66,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const dispatchMessageMention = async () => {
 		if (currentChannelId !== data.channel_id) {
 			await navigate(toChannelPage(data.channel_id, currentClan?.id ?? ''));
-			setMessageMentionId(data.message_id);
+			dispatch(referencesActions.setMessageMentionId(data.message_id));
 		} else {
 			jumpToMessage(data.message_id);
 		}
@@ -114,7 +121,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					user={user as IChannelMember}
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					newMessage={''}
 					isMention={true}
 				/>
 			</div>

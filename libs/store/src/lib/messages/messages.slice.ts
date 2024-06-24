@@ -14,8 +14,7 @@ import {
 	createEntityAdapter,
 	createSelector,
 	createSelectorCreator,
-	createSlice,
-	weakMapMemoize,
+	createSlice, weakMapMemoize
 } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -234,7 +233,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastSeenMessage(channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
 		} catch (e) {
-			return thunkAPI.rejectWithValue('Error updating last seen message');
+			console.error('Error updating last seen message', e);
 		}
 	},
 	{
@@ -313,11 +312,11 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			avatar: '',
 			isSending: true,
 			references: [],
+			isMe: true,
 		};
 		const fakeMess = mapMessageChannelToEntity(fakeMessage);
 
-		// need to discuss later
-		// thunkAPI.dispatch(messagesActions.newMessage(fakeMess));
+		thunkAPI.dispatch(messagesActions.newMessage(fakeMess));
 
 		const res = await sendWithRetry(1);
 
@@ -416,7 +415,7 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isMe, isSending, content, id } = action.payload;
 			if (!channelId || !messageId) return state;
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -426,15 +425,26 @@ export const messagesSlice = createSlice({
 			const channelEntity = state.channelMessages[channelId];
 			switch (code) {
 				case 0: {
-					const existingMessage = channelEntity?.entities?.[messageId];
-					if (existingMessage) {
-						channelMessagesAdapter.updateOne(channelEntity, {
-							id: messageId,
-							changes: action.payload,
-						});
-					} else {
-						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
-					}
+					
+					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
+
+					// remove sending message
+					if (isMe && !isSending) {
+						const newContent = content;
+
+						const sendingMessages = state.channelMessages[channelId].ids.filter((id) => state.channelMessages[channelId].entities[id].isSending);
+						if (sendingMessages && sendingMessages.length) {
+							for (const mid of sendingMessages) {
+								const message = state.channelMessages[channelId].entities[mid];
+			
+								if (message?.content?.t === newContent?.t) {
+									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
+									break;
+								}
+							}
+						}
+					}	
+
 					break;
 				}
 				case 1: {
@@ -468,23 +478,9 @@ export const messagesSlice = createSlice({
 		},
 
 		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
-			const { mess, id } = action.payload;
-			const channelId = mess.channel_id;
-			const channelEntity = state.channelMessages?.[channelId];
-			if (!channelEntity) {
-				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
-					id: channelId,
-				});
-			}
-
-			// Remove the message with the old id
-			const updatedState = handleRemoveOneMessage({ state, channelId, messageId: id });
-			if (updatedState) state.channelMessages[channelId] = updatedState;
-
-			// Add the new message if it doesn't exist
-			// if (!channelEntity.entities?.[mess.id]) {
-			// 	handleAddOneMessage({ state, channelId, adapterPayload: mess });
-			// }
+			// the message is sent successfully
+			// will be inserted to the list
+			// from onChatMessage listener
 		},
 		markAsError: (
 			state,
@@ -762,7 +758,7 @@ const handleUpdateIsCombineMessage = (
 	messageIds: string[],
 	needUpdateFirstMessage = true,
 ) => {
-	if (!messageIds?.length) return;
+	if (!messageIds?.length) return channelEntity;
 	const entities = channelEntity.entities;
 
 	const firstMessage = entities[messageIds[0]];
@@ -789,6 +785,8 @@ const handleUpdateIsCombineMessage = (
 		prevMessageCreateTime = create_time;
 		prevMessageCreationTimeMs = creationTimeMs || 0;
 	});
+
+	return channelEntity;
 };
 
 const handleSetManyMessages = ({
@@ -816,7 +814,7 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
 
-	if (index === -1) return;
+	if (index === -1) return channelEntity;
 
 	const { isStartedMessageGroup, isStartedMessageOfTheDay } = channelEntity.entities[messageId];
 	const nextMessageId = channelEntity.ids[index + 1];
@@ -834,7 +832,7 @@ const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: Mess
 	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
-	if (index === -1) return;
+	if (index === -1) return channelEntity;
 
 	const startIndex = Math.max(index - 1, 0);
 

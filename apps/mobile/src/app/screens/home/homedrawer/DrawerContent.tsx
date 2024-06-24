@@ -8,7 +8,7 @@ const DrawerContent = React.memo((props: any) => {
 
     return (
         <View {...props.dProps} style={styles.containerDrawerContent}>
-            <ServerList />
+            <ServerList navigation={props.dProps.navigation} />
             <ChannelList navigation={props.dProps.navigation} />
         </View>
     )
