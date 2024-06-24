@@ -33,7 +33,6 @@ import React, { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
-import { sleep } from 'libs/store/src/lib/helpers';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -114,7 +113,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
-				dispatch(friendsActions.fetchListFriends({noCache: true}));
+				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
 		[dispatch],
@@ -126,8 +125,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [reconnect, dispatch]);
 
 	const onerror = useCallback((event: unknown) => {
-		console.log('Socket error', event);
-	  }, []);
+		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
+	  }, [dispatch]);
 
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
@@ -159,7 +158,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-        dispatch(clansActions.joinClan({clanId: channelCreated.clan_id as string}));
+				dispatch(clansActions.joinClan({ clanId: channelCreated.clan_id as string }));
 			}
 		},
 		[dispatch],

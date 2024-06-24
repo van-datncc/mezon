@@ -3,15 +3,9 @@ import {
 	referencesActions,
 	selectAttachmentData,
 	selectDataReferences,
-	selectIdMessageRefEdit,
 	selectIdMessageRefOption,
-	selectIdMessageRefReaction,
-	selectIdMessageRefReply,
 	selectIdMessageToJump,
-	selectMessageMetionId,
-	selectOpenEditMessageState,
 	selectOpenOptionMessageState,
-	selectOpenReplyMessageState,
 	selectOpenThreadMessageState,
 	selectStatusLoadingAttachment,
 	threadsActions,
@@ -24,18 +18,11 @@ import { useSelector } from 'react-redux';
 export function useReference() {
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
-	const openEditMessageState = useSelector(selectOpenEditMessageState);
-	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const attachmentDataRef = useSelector(selectAttachmentData);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply);
-	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const idMessageRefOpt = useSelector(selectIdMessageRefOption);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
-	const messageMentionId = useSelector(selectMessageMetionId);
 
 	const setStatusLoadingAttachment = useCallback(
 		(status: boolean) => {
@@ -58,20 +45,6 @@ export function useReference() {
 		[dispatch],
 	);
 
-	const setOpenEditMessageState = useCallback(
-		(status: boolean) => {
-			dispatch(referencesActions.setOpenEditMessageState(status));
-		},
-		[dispatch],
-	);
-
-	const setOpenReplyMessageState = useCallback(
-		(status: boolean) => {
-			dispatch(referencesActions.setOpenReplyMessageState(status));
-		},
-		[dispatch],
-	);
-
 	const setOpenThreadMessageState = useCallback(
 		(status: boolean) => {
 			dispatch(threadsActions.setOpenThreadMessageState(status));
@@ -86,44 +59,9 @@ export function useReference() {
 		[dispatch],
 	);
 
-	const setIdReferenceMessageReply = useCallback(
-		(idMessageRefReply: string) => {
-			dispatch(referencesActions.setIdReferenceMessageReply(idMessageRefReply));
-		},
-		[dispatch],
-	);
-
-	const setIdReferenceMessageReaction = useCallback(
-		(idMessageRefReaction: string) => {
-			dispatch(referencesActions.setIdReferenceMessageReaction(idMessageRefReaction));
-		},
-		[dispatch],
-	);
-
-	const setIdReferenceMessageEdit = useCallback(
-		(idMessageRefEdit: string) => {
-			dispatch(referencesActions.setIdReferenceMessageEdit(idMessageRefEdit));
-		},
-		[dispatch],
-	);
-
-	const setIdReferenceMessageOption = useCallback(
-		(idMessageRefOpt: string) => {
-			dispatch(referencesActions.setIdReferenceMessageOption(idMessageRefOpt));
-		},
-		[dispatch],
-	);
-
 	const setOpenOptionMessageState = useCallback(
 		(status: boolean) => {
 			dispatch(messagesActions.setOpenOptionMessageState(status));
-		},
-		[dispatch],
-	);
-
-	const setMessageMentionId = useCallback(
-		(message: any) => {
-			dispatch(referencesActions.setMessageMentionId(message));
 		},
 		[dispatch],
 	);
@@ -132,58 +70,30 @@ export function useReference() {
 		() => ({
 			setDataReferences,
 			setIdMessageToJump,
-			setOpenEditMessageState,
-			setOpenReplyMessageState,
 			setOpenThreadMessageState,
 			dataReferences,
-			openEditMessageState,
-			openReplyMessageState,
 			openThreadMessageState,
 			attachmentDataRef,
 			setAttachmentData,
 			openOptionMessageState,
-			idMessageRefReply,
-			setIdReferenceMessageReply,
-			idMessageRefReaction,
-			setIdReferenceMessageReaction,
 			idMessageToJump,
-			idMessageRefEdit,
-			setIdReferenceMessageEdit,
-			idMessageRefOpt,
-			setIdReferenceMessageOption,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
-			messageMentionId,
-			setMessageMentionId,
 		}),
 		[
 			setDataReferences,
 			setIdMessageToJump,
-			setOpenEditMessageState,
-			setOpenReplyMessageState,
 			setOpenThreadMessageState,
 			dataReferences,
-			openEditMessageState,
-			openReplyMessageState,
 			openThreadMessageState,
 			attachmentDataRef,
 			setAttachmentData,
 			openOptionMessageState,
-			idMessageRefReply,
-			setIdReferenceMessageReply,
-			idMessageRefReaction,
-			setIdReferenceMessageReaction,
 			idMessageToJump,
-			idMessageRefEdit,
-			setIdReferenceMessageEdit,
-			idMessageRefOpt,
-			setIdReferenceMessageOption,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
-			messageMentionId,
-			setMessageMentionId,
 		],
 	);
 }
