@@ -18,7 +18,6 @@ const ChannelMessageThread = (props: ChannelMessageThreadProps) => {
 				user={user}
 				isMessNotifyMention={true}
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-				newMessage={message.content.t}
 				isMention={true}
 			/>
 		</div>

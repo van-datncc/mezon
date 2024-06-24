@@ -24,12 +24,11 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
-	newMessage?: string;
 	isMention?: boolean;
 	popup?: JSX.Element;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, isMention, popup }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, popup }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -147,7 +146,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 											message={message}
 											user={user}
 											isCombine={isCombine}
-											newMessage={newMessage}
 											isSending={message.isSending}
 											isError={message.isError}
 										/>

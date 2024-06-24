@@ -69,24 +69,24 @@ const Attachments = ({ attachments }: { attachments: ApiMessageAttachment[] }) =
 	);
 };
 
-const MessageText = ({ message, newMessage, lines }: { message: IMessageWithUser, newMessage?: string, lines: string }) => (
+const MessageText = ({ message, lines }: { message: IMessageWithUser, lines: string }) => (
 	<div className="flex w-full">
 		<div id={message.id} className="w-full">
-			<MessageLine line={newMessage || lines} />
+			<MessageLine line={lines} />
 		</div>
 		<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
-			{newMessage || (message.update_time && message.create_time < message.update_time) ? '(edited)' : ''}
+			{(message.update_time && message.create_time < message.update_time) ? '(edited)' : ''}
 		</p>
 	</div>
 );
 
-const MessageContent = ({ user, message, isCombine, newMessage, isSending, isError }: IMessageContentProps) => {
+const MessageContent = ({ user, message, isCombine, isSending, isError }: IMessageContentProps) => {
 	const { attachments, lines } = useMessageParser(message);
 
 	return (
 		<>
 			<Attachments attachments={attachments ?? []} />
-			<MessageText message={message} newMessage={newMessage} lines={lines as string} />
+			<MessageText message={message} lines={lines as string} />
 		</>
 	);
 };
