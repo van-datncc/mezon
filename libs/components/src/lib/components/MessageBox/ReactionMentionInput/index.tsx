@@ -104,7 +104,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { setDataReferences, setOpenThreadMessageState, setIdReferenceMessageReply, setAttachmentData } = useReference();
+	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
@@ -227,7 +227,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
 				setAttachmentData([]);
-				setIdReferenceMessageReply('');
+				dispatch(referencesActions.setIdReferenceMessageReply(''));
 				dispatch(referencesActions.setOpenReplyMessageState(false));
 				setMentionEveryone(false);
 				setDataReferences([]);
