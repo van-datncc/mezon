@@ -293,7 +293,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 					<div
 						className={`h-20 overflow-y-auto dark:bg-bgProfileBody bg-bgLightModeThird p-[5px] rounded ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
 					>
-						<MessageContent message={selectedMessage} newMessage="" />
+						<MessageContent message={selectedMessage} />
 					</div>
 					<div className="flex justify-end p-4 rounded-b gap-4">
 						<Button

@@ -16,6 +16,7 @@ import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
 import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 import { useCallback } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -88,7 +89,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         navigation.goBack()
     }
     return (
-        <View style={styles.dmMessageContainer}>
+        <SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
             <View style={styles.headerWrapper}>
                 <Pressable onPress={() => handleBack()}>
                     <ArrowLeftIcon color={Colors.textGray} />
@@ -154,8 +155,8 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 					)}
 				</View>
 			): null}
-           
-        </View>
+        
+        </SafeAreaView>
 
         
     )
