@@ -415,7 +415,7 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isMe, isSending, content, id } = action.payload;
 			if (!channelId || !messageId) return state;
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -425,15 +425,39 @@ export const messagesSlice = createSlice({
 			const channelEntity = state.channelMessages[channelId];
 			switch (code) {
 				case 0: {
-					const existingMessage = channelEntity?.entities?.[messageId];
-					if (existingMessage) {
-						channelMessagesAdapter.updateOne(channelEntity, {
-							id: messageId,
-							changes: action.payload,
-						});
-					} else {
-						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
-					}
+					
+					handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
+
+					// remove sending message
+					if (isMe && !isSending) {
+						const newContent = content;
+
+						const sendingMessages = state.channelMessages[channelId].ids.filter((id) => state.channelMessages[channelId].entities[id].isSending);
+						if (sendingMessages && sendingMessages.length) {
+							for (const mid of sendingMessages) {
+								const message = state.channelMessages[channelId].entities[mid];
+														
+								const isStartedMessageGroup = message.isStartedMessageGroup;
+								const isStartedMessageOfTheDay = message.isStartedMessageOfTheDay;
+
+								if (message?.content?.t === newContent?.t) {
+									state.channelMessages[channelId] = {
+										...state.channelMessages[channelId],
+										ids: state.channelMessages[channelId].ids.filter((id) => id !== message.id),
+									}
+									// workaround copy isStartedMessageGroup, isStartedMessageOfTheDay from sending message to new message
+									// cannot set directly to new message because it will be removed by channelMessagesAdapter.addOne
+									state.channelMessages[channelId].entities[id] = {
+										...state.channelMessages[channelId].entities[id],
+										isStartedMessageGroup,
+										isStartedMessageOfTheDay,
+									}
+									break;
+								}
+							}
+						}
+					}	
+
 					break;
 				}
 				case 1: {
@@ -817,26 +841,11 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
 	const messageId = adapterPayload.id;
 	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
-
-	const index = state.channelMessages[channelId].ids.indexOf(messageId);
+	const channelEntity = state.channelMessages[channelId];
+	const index = channelEntity.ids.indexOf(messageId);
 	if (index === -1) return;
 
 	const startIndex = Math.max(index - 1, 0);
 
-	// remove sending message
-	if (adapterPayload.isMe && !adapterPayload.isSending) {
-		const newContent = adapterPayload.content;
-
-		const sendingMessages = state.channelMessages[channelId].ids.filter((id) => state.channelMessages[channelId].entities[id].isSending);
-		if (sendingMessages && sendingMessages.length) {
-			for (const id of sendingMessages) {
-				const message = state.channelMessages[channelId].entities[id];
-				if (message?.content?.t === newContent?.t) {
-					state.channelMessages[channelId] = channelMessagesAdapter.removeOne(state.channelMessages[channelId], id);
-				}
-			}
-		}
-	}
-
-	return handleUpdateIsCombineMessage(state.channelMessages[channelId], state.channelMessages[channelId].ids.slice(startIndex, startIndex + 3), false);
+	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), false);
 };

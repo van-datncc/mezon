@@ -17,7 +17,6 @@ const MessageChannel = ({ message }: MessageChannelProps) => {
 				user={user}
 				isMessNotifyMention={true}
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-				newMessage={message.content && JSON.parse(message.content).t}
 				isMention={true}
 			/>
 		</div>
