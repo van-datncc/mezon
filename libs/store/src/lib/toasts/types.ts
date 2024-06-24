@@ -1,7 +1,6 @@
-import { ToastTransition } from "react-toastify";
 
 export interface Toast {
-	id: number;
+	id: string;
 	message?: string;
 	position: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 	autoClose?: number; // milliseconds
@@ -14,6 +13,7 @@ export interface Toast {
   }
 
 export type ToastPayload = {
+	id?: string;
 	message?: string;
 	type?: 'success' | 'error' | 'info' | 'warning' | 'default';
 	position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';

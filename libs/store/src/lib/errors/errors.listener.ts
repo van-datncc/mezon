@@ -54,7 +54,7 @@ function createErrorToast(error: any): ToastPayload {
 	let toast: Toast = {
 		message: error.message,
 		type: 'error',
-		id: Date.now(),
+		id: Date.now().toString(),
 		position: 'top-right',
 	};
 
