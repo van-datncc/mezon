@@ -213,7 +213,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 					ref={ref}
 					onMouseEnter={onMouse}
 					onMouseLeave={onLeave}
-					className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row z-40 noselect
+					className={`rounded-md w-fit min-w-12 gap-3 h-6 flex flex-row noselect
 					cursor-pointer justify-center items-center relative
 					${userSenderCount > 0 ? 'dark:bg-[#373A54] bg-gray-200 border-blue-600 border' : 'dark:bg-[#2B2D31] bg-bgLightMode border-[#313338]'}`}
 					onClick={onClickReactExist}
@@ -246,7 +246,7 @@ function ArrowItem({ arrow, isRightLimit, emojiCross, isLeftLimit }: ArrowItemPr
 	return (
 		<div
 			onMouseEnter={onHover}
-			className="w-full h-3  z-50 cursor-pointer"
+			className="w-full h-3  cursor-pointer"
 			style={{
 				display: 'flex',
 				justifyContent: isRightLimit && !isLeftLimit ? 'flex-end' : !isRightLimit && isLeftLimit ? 'flex-start' : 'center',
