@@ -1,5 +1,5 @@
 import { size } from "@mezon/mobile-ui"
-import { View } from "react-native"
+import { View, ViewStyle } from "react-native"
 import { styles } from "./styles"
 
 export const SeparatorWithSpace = () => {
@@ -8,8 +8,8 @@ export const SeparatorWithSpace = () => {
 	)
 }
 
-export const SeparatorWithLine = () => {
+export const SeparatorWithLine = ({style}: {style?: ViewStyle }) => {
 	return (
-		<View style={styles.line} />
+		<View style={[styles.line, style]} />
 	)
 }

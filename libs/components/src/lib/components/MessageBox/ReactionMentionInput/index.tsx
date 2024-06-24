@@ -2,7 +2,6 @@ import {
 	useChannelMembers,
 	useChannels,
 	useChatMessages,
-	useChatReaction,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -105,13 +104,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const {
-		setDataReferences,
-		setOpenThreadMessageState,
-		setIdReferenceMessageReply,
-		setOpenReplyMessageState,
-		setAttachmentData,
-	} = useReference();
+	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
@@ -234,15 +227,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
 				setValueTextInput('', props.isThread);
 				setAttachmentData([]);
-				setIdReferenceMessageReply('');
-				setOpenReplyMessageState(false);
+				dispatch(referencesActions.setIdReferenceMessageReply(''));
+				dispatch(referencesActions.setOpenReplyMessageState(false));
 				setMentionEveryone(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
-				dispatch(referencesActions.setOpenReplyMessageState(false));
 			} else {
 				if (openThreadMessageState) {
 					props.onSend(
@@ -274,8 +266,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setContent('');
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
-				dispatch(referencesActions.setOpenReplyMessageState(false));
 			}
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
 		},
