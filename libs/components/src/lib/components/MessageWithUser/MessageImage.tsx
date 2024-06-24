@@ -31,7 +31,7 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	};
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
-	const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.IMAGE_ON_CHANNEL));
 		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMenuVisible(true);
@@ -44,10 +44,12 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	};
 	useOnClickOutside(imageRef, handleCloseMenu);
 	return (
-		<div ref={imageRef} className="break-all" onContextMenu={handleContextMenu}>
+		<div ref={imageRef} className="break-all">
 			<img
+				onContextMenu={handleContextMenu}
 				className={
-					'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' + (!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
+					'max-w-[100%] max-h-[30vh] object-cover my-2 rounded border border-red-400 ' +
+					(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
 				}
 				src={attachmentData.url?.toString()}
 				alt={attachmentData.url}
