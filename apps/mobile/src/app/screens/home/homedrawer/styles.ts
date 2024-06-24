@@ -503,7 +503,9 @@ export const styles = StyleSheet.create({
 		alignSelf: 'center',
 		alignItems: 'center',
 		width: width,
-		marginBottom: verticalScale(60),
+		paddingBottom: verticalScale(60),
+		paddingTop: verticalScale(20),
+		backgroundColor: Colors.secondary,
 	},
 	footerImagesModal: {
 		maxWidth: '70%',
