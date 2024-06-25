@@ -5,8 +5,7 @@ import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import ListRolePermission from './listRolePermission';
 import ListMemberPermission from './listMemberPermission';
-import { channelMembersActions, channelsActions, useAppDispatch } from '@mezon/store';
-import { ChannelType } from 'mezon-js';
+import { channelsActions, useAppDispatch } from '@mezon/store';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
