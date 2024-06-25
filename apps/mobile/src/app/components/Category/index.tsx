@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';

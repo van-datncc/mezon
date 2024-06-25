@@ -65,7 +65,8 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 
 	const checkAddFriend = useSelector(selectAddFriends(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID,[userID, userProfile?.user?.id]);
-
+	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
+	
 	return (
 		<div className={classWrapper}>
 			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
@@ -115,10 +116,10 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : message?.username}
+							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : (checkAnonymous ? 'Anonymous' : message?.username)}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
-							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : message?.username}
+							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : (checkAnonymous ? 'Anonymous' : message?.username)}
 						</p>
 					</div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}

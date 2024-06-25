@@ -1,11 +1,18 @@
-import { ChannelType } from 'mezon-js';
+import {
+	channelUsersActions,
+	selectAllRolesClan,
+	selectAllUsesClan,
+	selectCurrentClanId,
+	selectMembersByChannelId,
+	selectRolesByChannelId,
+	useAppDispatch,
+} from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
-import * as Icons from '../../../Icons';
-import { useRoles } from '@mezon/core';
+import { ChannelType } from 'mezon-js';
 import { useMemo, useState } from 'react';
-import { channelUsersActions, selectAllRolesClan, selectAllUsesClan, selectCurrentClanId, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
+import * as Icons from '../../../Icons';
 interface AddMemRoleProps {
 	onClose: () => void;
 	channel: IChannel;
@@ -16,39 +23,39 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
-	const RolesAddChannel = RolesChannel.filter((role) =>typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
-	const RolesNotAddChannel = RolesClan.filter(role => !RolesAddChannel.map(RoleAddChannel => RoleAddChannel.id).includes(role.id));
-	
+	const RolesAddChannel = RolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
+	const RolesNotAddChannel = RolesClan.filter((role) => !RolesAddChannel.map((RoleAddChannel) => RoleAddChannel.id).includes(role.id));
+
 	const usersClan = useSelector(selectAllUsesClan);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
 	const listUserInvite = useMemo(() => {
-		const memberIds = rawMembers.filter(member => member.userChannelId !== "0").map(member => member.user?.id);
-		return usersClan.filter(user => !memberIds.some(userId => userId === user.id));
-	}, [usersClan, rawMembers]);  
-	const listMembersNotInChannel = listUserInvite ? listUserInvite.map(member => member.user):[];
+		const memberIds = rawMembers.filter((member) => member.userChannelId !== '0').map((member) => member.user?.id);
+		return usersClan.filter((user) => !memberIds.some((userId) => userId === user.id));
+	}, [usersClan, rawMembers]);
+	const listMembersNotInChannel = listUserInvite ? listUserInvite.map((member) => member.user) : [];
 	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
 	const dispatch = useAppDispatch();
 	const handleCheckboxUserChange = (event: React.ChangeEvent<HTMLInputElement>, userId: string) => {
-        const isChecked = event.target.checked;
-        if (isChecked) {
-            setSelectedUserIds(prevIds => [...prevIds, userId]);
-        } else {
-            setSelectedUserIds(prevIds => prevIds.filter(id => id !== userId));
-        }
-    };
-	const handleCheckboxRoleChange = (event: React.ChangeEvent<HTMLInputElement>, roleId:string) => {
-        const isChecked = event.target.checked;
-        if (isChecked) {
-            setSelectedRoleIds(prevIds => [...prevIds, roleId]);
-        } else {
-            setSelectedRoleIds(prevIds => prevIds.filter(id => id !== roleId));
-        }
-    };
-	
+		const isChecked = event.target.checked;
+		if (isChecked) {
+			setSelectedUserIds((prevIds) => [...prevIds, userId]);
+		} else {
+			setSelectedUserIds((prevIds) => prevIds.filter((id) => id !== userId));
+		}
+	};
+	const handleCheckboxRoleChange = (event: React.ChangeEvent<HTMLInputElement>, roleId: string) => {
+		const isChecked = event.target.checked;
+		if (isChecked) {
+			setSelectedRoleIds((prevIds) => [...prevIds, roleId]);
+		} else {
+			setSelectedRoleIds((prevIds) => prevIds.filter((id) => id !== roleId));
+		}
+	};
+
 	const handleAddMember = async () => {
 		onClose();
-		if(selectedUserIds.length > 0){
+		if (selectedUserIds.length > 0) {
 			const body = {
 				channelId: channel.id,
 				channelType: channel.type,
@@ -66,7 +73,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 			await dispatch(channelUsersActions.addChannelRoles(body));
 		}
 	};
-	
+
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
@@ -86,7 +93,11 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 					</p>
 				</div>
 				<div className="py-3">
-					<InputField type="text" placeholder="enter" className="bg-black pl-3 py-[6px] w-full border-0 outline-none rounded" />
+					<InputField
+						type="text"
+						placeholder="enter"
+						className="dark:bg-bgTertiary bg-bgLightTertiary pl-3 py-[6px] w-full border-0 outline-none rounded"
+					/>
 					<p className="text-xs pt-2">Add individual members by starting with @ or type a role name</p>
 				</div>
 				<div className="max-h-[270px] overflow-y-scroll hide-scrollbar">
@@ -94,18 +105,24 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 						<p className="uppercase font-bold text-xs pb-4">Roles</p>
 						<div>
 							{RolesNotAddChannel.map((role, index) => (
-								<div className={`flex justify-between py-2 'hover:bg-[#43444B] px-[6px]' rounded`} key={role.id}>
-									<div className="flex gap-x-2 items-center">
+								<div
+									className={'flex justify-between py-2 dark:hover:bg-[#43444B] hover:bg-[#E1E2E4] px-[6px] rounded'}
+									key={role.id}
+								>
+									<label className="flex gap-x-2 items-center w-full">
+										<div className="relative flex flex-row justify-center">
 											<input
 												id={`checkbox-item-${index}`}
 												type="checkbox"
 												value={role.title}
 												onChange={(event) => handleCheckboxRoleChange(event, role?.id || '')}
-												className="peer relative appearance-none w-5 h-5 border rounded-sm focus:outline-none checked:bg-gray-300"
-											></input>
+												className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
+											/>
+											<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
+										</div>
 										<Icons.RoleIcon defaultSize="w-[23px] h-5" />
 										<p className="text-sm">{role.title}</p>
-									</div>
+									</label>
 								</div>
 							))}
 						</div>
@@ -114,17 +131,23 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 						<p className="uppercase font-bold text-xs pb-4">Members</p>
 						<div>
 							{listMembersNotInChannel.map((user) => (
-								<div className={`flex justify-between py-2 rounded hover:bg-[#43444B] px-[6px]`} key={user?.id}>
-									<div className="flex gap-x-2 items-center">
-										<input
-											type="checkbox"
-											value={user?.display_name}
-											onChange={(event) => handleCheckboxUserChange(event, user?.id || '')}
-											className="peer relative appearance-none w-5 h-5 border rounded-sm focus:outline-none checked:bg-gray-300"
-										/>
+								<div
+									className={`flex justify-between py-2 rounded hover:bg-[#E1E2E4] dark:hover:bg-[#43444B] px-[6px]`}
+									key={user?.id}
+								>
+									<label className="flex gap-x-2 items-center w-full">
+										<div className="relative flex flex-row justify-center">
+											<input
+												type="checkbox"
+												value={user?.display_name}
+												onChange={(event) => handleCheckboxUserChange(event, user?.id || '')}
+												className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
+											/>
+											<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
+										</div>
 										<img src={user?.avatar_url} alt={user?.display_name} className="size-6 object-cover rounded-full" />
 										<p className="text-sm">{user?.display_name}</p>
-									</div>
+									</label>
 								</div>
 							))}
 						</div>

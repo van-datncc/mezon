@@ -4,7 +4,8 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import Images from 'apps/mobile/src/assets/Images';
 import React, { useEffect } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import Toast from 'react-native-toast-message';
 
 const WEB_CLIENT_ID = '285548761692-l9bdt00br2jg1fgh4c23dlb9rvkvqqs0.apps.googleusercontent.com';

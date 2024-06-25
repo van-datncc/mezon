@@ -50,7 +50,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], ch
 			.filter(Boolean)
 			.filter((i) => i !== '@' && i !== '#');
 
-		return parts.map((part, index) => (
+		return parts?.map?.((part, index) => (
 			<Text key={`${index}-${part}-renderTextWithMention'}`}>
 				{!part ? (
 					<Text />
@@ -64,8 +64,8 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], ch
 	};
 
 	const renderTextWithEmoji = (text: string, emojiListPNG?: IEmojiImage[]) => {
-		const parts = text.split(highlightEmojiRegex);
-		return parts.map((part, index) => {
+		const parts = text?.split?.(highlightEmojiRegex);
+		return parts?.map?.((part, index) => {
 			const isHighlighted = highlightEmojiRegex.test(part);
 			return (
 				<Text key={index} style={isHighlighted && { fontWeight: 'bold', color: Colors.bgViolet }}>
