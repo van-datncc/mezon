@@ -175,10 +175,10 @@ export const styles = StyleSheet.create({
 	channelListSearch: {
 		width: '100%',
 		paddingHorizontal: 8,
-		marginBottom: 20,
+		marginBottom: size.s_16,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		gap: 10,
+		gap: size.s_8,
 	},
 	channelListSearchWrapperInput: {
 		backgroundColor: Colors.tertiaryWeight,

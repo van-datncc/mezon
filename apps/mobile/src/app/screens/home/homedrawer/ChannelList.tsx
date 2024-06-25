@@ -8,7 +8,7 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelsActions,
@@ -115,7 +115,7 @@ const ChannelList = React.memo((props: any) => {
 					</View>
 					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory} />
 				</View>
-				<View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
 						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
 						onPress={() => bottomSheetEventRef?.current?.present()}
