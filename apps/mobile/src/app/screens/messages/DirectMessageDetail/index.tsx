@@ -30,18 +30,6 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, dispatch, lastMessage]);
 }
 
-function useChannelSeen(channelId: string) {
-	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
-	useEffect(() => {
-		if (lastMessage) {
-			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directActions.updateLastSeenTime(lastMessage));
-		}
-	}, [channelId, dispatch, lastMessage]);
-}
-
 export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any, route: any}) => {
     const directMessageId = route.params?.directMessageId as string;
     const from = route.params?.from;
@@ -119,7 +107,6 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
                         </View>
                     )}
                     <Text style={styles.titleText} numberOfLines={1}>{currentDmGroup?.channel_label}</Text>
-                    <ChevronIcon width={10} height={10} />
                 </Pressable>
                 <View style={styles.actions}>
                     {/* TODO: update later */}
