@@ -392,7 +392,7 @@ export const styles = StyleSheet.create({
 	},
 	dateMessageBox: {
 		fontSize: size.small,
-		color: Colors.gray48,
+		color: Colors.gray72,
 	},
 	contentMessageCombine: {
 		padding: size.s_2,
