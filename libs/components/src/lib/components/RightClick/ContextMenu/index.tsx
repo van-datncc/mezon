@@ -61,7 +61,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 					}
 				}
 			} else if (!checkOwnerMessage) {
-				const combineNoOwnerMessage = [...combineOwnerClan, ...reportMessageList, ...deleteMessageList];
+				const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList, ...deleteMessageList];
 				setListTextToMatch(combineNoOwnerMessage);
 				if (checkMessHasReaction) {
 					const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
@@ -70,19 +70,51 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 						const combineHasText = [...combineHasReaction, ...speakMessageList];
 						setListTextToMatch(combineHasText);
 					}
+				} else if (!checkMessHasReaction) {
+					const combineNotReaction = [...combineNoOwnerMessage, ...pinMessageList];
+					setListTextToMatch(combineNotReaction);
+					if (checkMessHasText) {
+						const combineHasText = [...combineNotReaction, ...speakMessageList];
+						setListTextToMatch(combineHasText);
+					}
 				}
 			}
 		} else if (!checkOwnerClan) {
 			const combineNoOwnerClan = [...listClickDefault];
 			setListTextToMatch(combineNoOwnerClan);
 			if (checkOwnerMessage) {
-				const combineOwnerMessage = [...combineNoOwnerClan, ...deleteMessageList];
+				const combineOwnerMessage = [...combineNoOwnerClan, ...deleteMessageList, ...editMessageList];
 				setListTextToMatch(combineOwnerMessage);
 				if (checkMessHasReaction) {
 					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList];
 					setListTextToMatch(combineHasReaction);
 					if (checkMessHasText) {
 						const combineHasText = [...combineHasReaction, ...speakMessageList];
+						setListTextToMatch(combineHasText);
+					}
+				} else if (!checkMessHasReaction) {
+					const combineNotReaction = [...combineOwnerMessage];
+					setListTextToMatch(combineNotReaction);
+					if (checkMessHasText) {
+						const combineHasText = [...combineNotReaction, ...speakMessageList];
+						setListTextToMatch(combineHasText);
+					}
+				}
+			} else if (!checkOwnerMessage) {
+				const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
+				setListTextToMatch(combineNoOwnerMessage);
+				if (checkMessHasReaction) {
+					const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList];
+					setListTextToMatch(combineHasReaction);
+					if (checkMessHasText) {
+						const combineHasText = [...combineHasReaction, ...speakMessageList];
+						setListTextToMatch(combineHasText);
+					}
+				} else if (!checkMessHasReaction) {
+					const combineNotReaction = [...combineNoOwnerMessage];
+					setListTextToMatch(combineNotReaction);
+					if (checkMessHasText) {
+						const combineHasText = [...combineNotReaction, ...speakMessageList];
 						setListTextToMatch(combineHasText);
 					}
 				}
@@ -131,7 +163,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2 shadow-xl"
+			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2  shadow-xl"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 			onClick={onClose}
 		>
