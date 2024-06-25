@@ -84,7 +84,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
 				>
-					{clanProfile?.nick_name || username || 'Anonymous'}
+					{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || 'Anonymous'}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
