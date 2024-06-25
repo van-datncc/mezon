@@ -20,7 +20,8 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, TextInput, View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChatBox from '../../../screens/home/homedrawer/ChatBox';
@@ -41,7 +42,7 @@ export default function CreateThreadForm() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const navigation = useNavigation();
 	const formikRef = useRef(null);
-	const { threadRef } = useMezon();
+	const threadRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread } = useThreads();
 	const thread = threadRef.current;

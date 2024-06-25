@@ -138,6 +138,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	useEffect(() => {
+		if (message.references && message.references.length > 0) {
+			const messageReferenceId = message.references[0].message_ref_id;
+			const messageReferenceUserId = message.references[0].message_sender_id;
+			setMessageRefId(messageReferenceId ?? '');
+			setSenderId(messageReferenceUserId ?? '');
+		}
+	}, [message]);
+
+	useEffect(() => {
 		const { videos, images, documents } = classifyAttachments(attachments ?? []);
 		setVideos(videos);
 		setImages(images);
@@ -171,7 +180,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				activeOpacity={0.8}
 				key={index}
 				onPress={() => {
-					onOpenImage(image);
+					onOpenImage({
+						...image,
+						uploader: message.sender_id,
+						create_time: message.create_time,
+					});
 				}}
 			>
 				<FastImage

@@ -1,4 +1,5 @@
-import { View , Text} from "react-native";
+import { View } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import { styles } from "./MuteThreadDetailModal.styles";
 import { AngleRight, MuteIcon } from "@mezon/mobile-components";
 import { TouchableOpacity } from "react-native-gesture-handler";

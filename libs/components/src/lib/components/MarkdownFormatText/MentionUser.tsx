@@ -76,7 +76,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 		<>
 			{showProfileUser && (
 				<div
-					className="dark:bg-black bg-gray-200 mt-[10px] w-[360px] rounded-lg flex flex-col z-10 fixed opacity-100"
+					className="dark:bg-black bg-gray-200 mt-[10px] w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
 					style={{
 						left: `${positionLeft}px`,
 						top: positionBottom ? '' : `${positionTop}px`,

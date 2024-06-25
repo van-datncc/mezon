@@ -8,6 +8,12 @@ export type DirectMessProp = {
 	readonly directMessage: Readonly<any>;
 };
 
+export type directMessageValueProps = {
+  type: string;
+  channelId: string;
+  clanId: string;
+}
+
 function DMListItem({ directMessage }: DirectMessProp) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -55,6 +61,8 @@ function DMListItem({ directMessage }: DirectMessProp) {
     }
   };
 
+  const directMessageValue: directMessageValueProps = {type: directMessage.type, channelId: directMessage.channel_id, clanId: directMessage.channel_label};
+
   return (
     <div
       key={directMessage.channel_id}
@@ -76,6 +84,8 @@ function DMListItem({ directMessage }: DirectMessProp) {
         isHideIconStatus={false}
         key={directMessage.channel_id}
         isUnReadDirect={isUnReadChannel}
+        directMessageValue={directMessageValue}
+        isHideAnimation={true}
       />
       {isHovered && (
         <button

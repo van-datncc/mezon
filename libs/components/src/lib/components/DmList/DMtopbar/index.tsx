@@ -1,4 +1,4 @@
-import { useApp, useDirect, useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
+import { useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
 import { appActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import * as Icons from '../../Icons/index';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import { ChannelType } from 'mezon-js';
 
@@ -38,12 +38,43 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		},
 		[dispatch],
 	);
+
+	const inputRef = useRef<HTMLInputElement | null>(null);
+	const [openEditName, setOpenEditName] = useState(false);
+	const [label, setLabel] = useState(currentDmGroup?.channel_label);
+	const handleOpenEditName = () => {
+		if(currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP ){
+			setOpenEditName(true);
+		}
+	}
+
+	const handleChange = (event: any) => {
+		setLabel(event.target.value);
+	};
+
+	const handleKeyDown = (event: any) => {
+		if (event.key === 'Enter') {
+			setOpenEditName(false);
+		}
+	};
+
+	useEffect(() => {
+		if (openEditName && inputRef.current) {
+			inputRef.current.focus();
+		}
+  	}, [openEditName]);
+
+	useEffect(() => {
+		setOpenEditName(false);
+		setLabel(currentDmGroup?.channel_label);
+	},[currentDmGroup?.channel_label, dmGroupId])
+
 	return (
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
 		>
 			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
-				<div className="flex flex-row gap-1 items-center">
+				<div className="flex flex-row gap-1 items-center flex-1">
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 					</div>
@@ -60,10 +91,13 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						isHideIconStatus={false}
 						key={currentDmGroup?.channel_id}
 					/>
-					<h2 className="shrink-1 dark:text-white text-black text-ellipsis">{currentDmGroup?.channel_label}</h2>
+					{!openEditName && <h2 className="shrink-1 dark:text-white text-black text-ellipsis" onClick={handleOpenEditName}>{label}</h2>}
+					{openEditName && 
+						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='bg-transparent w-full'/>
+					}
 				</div>
 
-				<div className=" items-center h-full ml-auto hidden flex-1 justify-end ssm:flex">
+				<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>

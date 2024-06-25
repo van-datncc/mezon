@@ -1,12 +1,16 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentClanId } from '@mezon/store';
-import { useRef, useState } from 'react';
+import { ChannelMembersEntity, channelMembersActions, selectAllAccount, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import { OfflineStatus, OnlineStatus } from '../Icons';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
+import { directMessageValueProps } from '../DmList/DMListItem';
+import { Channel } from 'diagnostics_channel';
+import { ChannelType } from 'mezon-js';
+import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -22,6 +26,8 @@ export type MemberProfileProps = {
 	isOffline?: boolean;
 	isHideAnimation?: boolean;
 	isUnReadDirect?: boolean;
+	directMessageValue?: directMessageValueProps;
+	isMemberGroupDm?: boolean;
 };
 
 function MemberProfile({
@@ -39,7 +45,10 @@ function MemberProfile({
 	isOffline,
 	isHideAnimation,
 	isUnReadDirect,
+	directMessageValue,
+	isMemberGroupDm,
 }: MemberProfileProps) {
+	const dispatch = useAppDispatch();
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
 	const [positionTop, setPositionTop] = useState(false);
@@ -112,6 +121,14 @@ function MemberProfile({
 
 	useOnClickOutside(panelRef, handleClickOutSide);
 
+	const [numMember, setNumMember] = useState(0);
+	useEffect(() => {
+		if(Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP){
+			dispatch(channelMembersActions.fetchChannelMembers({clanId: '', channelId: directMessageValue?.channelId || '', channelType: ChannelType.CHANNEL_TYPE_DM}))
+				.then(members => setNumMember((members.payload as ChannelUserListChannelUser[]).length));
+		}
+	},[])
+
 	return (
 		<div className="relative group">
 			<div
@@ -149,17 +166,21 @@ function MemberProfile({
 								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode">{userProfile?.user?.username}</p>
 							</>
 						)}
+						
 					</div>
 					{!isHideUserName && (
 						<p
 							className={`text-base font-medium
 							${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'} nameMemberProfile
-							${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+							${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
+							${isMemberGroupDm ? 'max-w-[140px] overflow-x-hidden text-ellipsis' : ''}
+							`}
 							title={name && name.length > numberCharacterCollapse ? name : undefined}
 						>
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
 						</p>
 					)}
+					{numMember !==0 && <p className='dark:text-[#AEAEAE] text-colorTextLightMode'>{numMember} Members</p>}
 				</div>
 			</div>
 			{isShowPanelMember && (
@@ -167,12 +188,12 @@ function MemberProfile({
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed md:right-[245px] right-auto left-5 sbm:left-[185px] md:left-auto w-[360px] max-w-[89vw]`}
+					className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed md:right-[245px] right-auto left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
 					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
 					onMouseDown={handleDefault}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} />
+					<ShortUserProfile userID={user?.user?.id || ''}/>
 				</div>
 			) : null}
 

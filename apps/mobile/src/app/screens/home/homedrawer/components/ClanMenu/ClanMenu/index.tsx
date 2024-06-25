@@ -27,7 +27,6 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
     const user = useAuth();
     const navigation = useNavigation<AppStackScreenProps['navigation']>();
-    const { clans } = useClans();
     const { dismiss } = useBottomSheetModal();
 
     const handleOpenInvite = () => {
@@ -81,10 +80,6 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
             title: t('menu.optionsMenu.editServerProfile'),
         },
         {
-            onPress: () => reserve(),
-            title: t('menu.optionsMenu.editServerProfile'),
-        },
-        {
             title: t('menu.optionsMenu.showAllChannels'),
             component: <ToggleBtn />
         },
@@ -107,7 +102,14 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         },
         {
             onPress: () => reserve(),
+            isShow: user.userId !== clan.creator_id,
             title: t('menu.optionsMenu.leaveServer'),
+            textStyle: { color: "red" }
+        },
+        {
+            onPress: () => reserve(),
+            isShow: user.userId === clan.creator_id,
+            title: t('menu.optionsMenu.deleteClan'),
             textStyle: { color: "red" }
         },
     ]

@@ -121,7 +121,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 					user={user as IChannelMember}
 					isMessNotifyMention={true}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					newMessage={''}
 					isMention={true}
 				/>
 			</div>

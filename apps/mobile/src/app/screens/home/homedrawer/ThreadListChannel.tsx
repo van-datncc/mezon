@@ -1,10 +1,9 @@
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import LongCornerIcon from '../../../../assets/svg/long-corner.svg';
-import ShortCornerIcon from '../../../../assets/svg/short-corner.svg';
 import { styles } from './styles';
+import ThreadListItem from './ThreadListItem';
+import { View } from 'react-native';
 
 type ThreadListChannelProps = {
 	threads: IChannel[];
@@ -20,18 +19,12 @@ const ThreadListChannel = React.memo(({ threads, currentChanel, onPress }: Threa
 				const isActive = currentChanel?.channel_id === thread.channel_id;
 
 				return (
-					<TouchableOpacity
-						key={thread.id}
-						activeOpacity={1}
-						onPress={() => {
-							onPress(thread);
-						}}
-						style={[styles.threadItem]}
-					>
-						{isActive && <View style={[styles.threadItemActive, isFirstThread && styles.threadFirstItemActive]} />}
-						{isFirstThread ? <ShortCornerIcon /> : <LongCornerIcon />}
-						<Text style={styles.titleThread}>{thread?.channel_label}</Text>
-					</TouchableOpacity>
+					<ThreadListItem
+						thread={thread}
+						isActive={isActive}
+						isFirstThread={isFirstThread}
+						onPress={onPress}
+					/>
 				);
 			})}
 		</View>

@@ -8,6 +8,7 @@ import { Coords } from '../../../ChannelLink';
 import * as Icons from '../../../Icons';
 import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
 import PanelEventItem from './panelEventItem';
+import ModalDelEvent from './modalDelEvent';
 
 export type ItemEventManagementProps = {
 	option: string;
@@ -38,6 +39,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const [openPanel, setOpenPanel] = useState(false);
+	const [openModalDelEvent, setOpenModalDelEvent] = useState(false);
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
@@ -66,8 +68,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const panelRef = useRef(null);
 	useOnClickOutside(panelRef, () => setOpenPanel(false));
 
-	const checkTimeVoice = differenceTime(end || '') + 30 < 0;
-	const checkTimeLocation = differenceTime(end || '') < 0;
+	const checkTimeVoice = useMemo(() => differenceTime(end || '') + 30 < 0,[end]);
+	const checkTimeLocation = useMemo(() => differenceTime(end || '') < 0, [end]);
 	useEffect(() => {
 		if (checkTimeVoice && checkOptionVoice) {
 			deleteEventManagement(event?.clan_id || '', event?.id || '');
@@ -166,10 +168,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					coords={coords}
 					onHandle={handleStopPropagation}
 					checkUserCreate={checkUserCreate || true}
-					event={event}
+					setOpenModalDelEvent={setOpenModalDelEvent}
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}
+			{openModalDelEvent && <ModalDelEvent event={event} onClose={() => setOpenPanel(false)} setOpenModalDelEvent={setOpenModalDelEvent} onHandle={handleStopPropagation}/>}
 		</div>
 	);
 };

@@ -9,6 +9,11 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
 import MezonMenuItem from '../../temp-ui/MezonMenuItem';
+import {
+	AccessibilityIcon, BoostTier2Icon, BrandDiscordIcon, ClipIcon, FriendIcon, GiftIcon, GlobeEarthIcon, GroupIcon, ImageTextIcon, KeyIcon, LanguageIcon, LaptopPhoneIcon, MicrophoneIcon, NitroWheelIcon, PaintPaletteIcon, PuzzlePieceIcon, QRCodeCameraIcon, SettingsIcon, ShieldIcon, UserCircleIcon, BellIcon, CircleQuestionIcon, CircleInformationIcon, DoorExitIcon
+}
+	// @ts-ignore
+	from 'libs/mobile-components/src/lib/icons2';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['setting']);
@@ -46,61 +51,61 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.getNitro'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <NitroWheelIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <UserCircleIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.privacySafety'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <ShieldIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.familyCenter'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <GroupIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.authorizedApp'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <KeyIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.device'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <LaptopPhoneIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.connection'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <PuzzlePieceIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.clip'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <ClipIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.friendRequests'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <FriendIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <QRCodeCameraIcon />,
 		},
 	]
 
@@ -108,20 +113,20 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		{
 			onPress: () => reserve(),
 			expandable: true,
-			title: t('paymentSettings.serverBoots'),
-			icon: <NittroIcon width={20} height={20} />,
+			title: t('paymentSettings.serverBoost'),
+			icon: <BoostTier2Icon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.nitroGift'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <GiftIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.restoreSubscription'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <NitroWheelIcon />,
 		},
 	]
 
@@ -130,54 +135,54 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.voice'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <MicrophoneIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.appearance'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <PaintPaletteIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.accessibility'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <AccessibilityIcon />,
 		},
 		{
 			onPress: () => navigateToLanguageSetting(),
 			title: t('appSettings.language'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <LanguageIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.chat'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <ImageTextIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.webBrowser'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <GlobeEarthIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.notifications'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <BellIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.appIcon'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <BrandDiscordIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
-			title: t('appSettings.advance'),
-			icon: <NittroIcon width={20} height={20} />,
+			title: t('appSettings.advanced'),
+			icon: <SettingsIcon />,
 		},
 	]
 
@@ -186,19 +191,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.support'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <CircleQuestionIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.uploadLog'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <CircleInformationIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.acknowledgement'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <CircleInformationIcon />,
 		},
 	]
 
@@ -207,7 +212,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
-			icon: <NittroIcon width={20} height={20} />,
+			icon: <CircleInformationIcon width={20} height={20} />,
 		},
 	]
 
@@ -244,7 +249,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				isLast
 				onPress={() => confirmLogout()}
 				title={t('logOut')}
-				icon={<LogoutIcon width={20} height={20} color={Colors.textRed} />}
+				icon={<DoorExitIcon color={Colors.textRed} />}
 			/>
 		</ScrollView>
 	);

@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import React from 'react'
 import Feather from 'react-native-vector-icons/Feather'
 import { darkColor } from '../../../constants/Colors';

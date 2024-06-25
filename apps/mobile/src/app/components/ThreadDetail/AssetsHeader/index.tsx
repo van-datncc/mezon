@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { GestureResponderEvent, LayoutAnimation, LayoutChangeEvent, Pressable, Text, View } from "react-native";
+import { GestureResponderEvent, LayoutAnimation, LayoutChangeEvent, Pressable, View } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import styles from "./style";
 import { useEffect } from "react";
 import { useCallback } from "react";
