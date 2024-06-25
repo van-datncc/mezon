@@ -113,7 +113,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		{
 			onPress: () => reserve(),
 			expandable: true,
-			title: t('paymentSettings.serverBoots'),
+			title: t('paymentSettings.serverBoost'),
 			icon: <BoostTier2Icon />,
 		},
 		{
@@ -181,7 +181,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		{
 			onPress: () => reserve(),
 			expandable: true,
-			title: t('appSettings.advance'),
+			title: t('appSettings.advanced'),
 			icon: <SettingsIcon />,
 		},
 	]

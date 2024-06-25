@@ -14,7 +14,7 @@
     },
     "paymentSettings": {
         "title": "Cài đặt thanh toán",
-        "serverBoots": "Nâng cấp clan",
+        "serverBoost": "Nâng cấp clan",
         "nitroGift": "Tặng nitro",
         "restoreSubscription": "Khôi phục đăng ký"
     },
@@ -28,7 +28,7 @@
         "webBrowser": "Trình duyệt web",
         "notifications": "Thông báo",
         "appIcon": "Biểu tượng",
-        "advance": "Nâng cao"
+        "advanced": "Nâng cao"
     },
     "supportSettings": {
         "title": "Hỗ trợ",
