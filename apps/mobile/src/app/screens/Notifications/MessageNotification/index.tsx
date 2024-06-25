@@ -1,11 +1,11 @@
  import  React, { useEffect, useState } from 'react';
 import { IMessageNotifyProps } from '../types';
-import { View , Text, Linking} from 'react-native';
+import { View , Linking} from 'react-native';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import FastImage from 'react-native-fast-image';
  import ImageView from 'react-native-image-view';
 import VideoPlayer from 'react-native-video-player';
-import { Metrics } from '@mezon/mobile-ui';
+import { Text, Metrics } from '@mezon/mobile-ui';
 import { styles as s } from './MessageNotification.styles';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';

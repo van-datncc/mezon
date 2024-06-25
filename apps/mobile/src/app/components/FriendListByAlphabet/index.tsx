@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, FlatList } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import { styles } from "./styles";
 import { FriendsEntity } from "@mezon/store-mobile";
 import { SeparatorWithLine, SeparatorWithSpace } from "../Common";
