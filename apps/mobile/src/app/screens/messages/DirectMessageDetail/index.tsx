@@ -83,9 +83,10 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 
     const handleBack = () => {
         if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
-            navigation.navigate(APP_SCREEN.MESSAGES.HOME)
+            navigation.navigate(APP_SCREEN.MESSAGES.HOME);
             return;
         }
+        dispatch(directActions.setDmGroupCurrentId(''))
         navigation.goBack()
     }
     return (

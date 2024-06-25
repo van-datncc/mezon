@@ -1,31 +1,25 @@
 import { AttachmentEntity } from "@mezon/store";
-import { useEffect } from "react";
 
 type ItemAttachmentProps = {
     attachment: AttachmentEntity;
     urlImg: string;
     previousDate: any;
-    setPreviousDate: React.Dispatch<React.SetStateAction<string>>;
     selectedImageRef: React.MutableRefObject<HTMLDivElement | null>;
+    showDate: boolean;
     setUrlImg: React.Dispatch<React.SetStateAction<string>>;
     handleDrag: (e: any) => void;
 }
 
 const ItemAttachment = (props: ItemAttachmentProps) => {
-    const {attachment, urlImg, previousDate, setPreviousDate, selectedImageRef, setUrlImg, handleDrag} = props;
+    const {attachment, urlImg, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag} = props;
     const url = attachment.url;
     const isSelected = url === urlImg;
-    const currentDate = new Date(attachment.create_time || '').toLocaleDateString();
-    const showDate = previousDate !== currentDate;
-    useEffect(() => {
-        setPreviousDate(currentDate);
-    },[currentDate, setPreviousDate])
     return (
         <div
             className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-fit dark:border-white border-colorTextLightMode' : 'border-transparent'}`}
             ref={isSelected ? selectedImageRef : null}
         >
-            {showDate && <div className={`dark:text-white text-black mb-1 text-center sbm:block hidden`}>{currentDate}</div>}
+            {showDate && <div className={`dark:text-white text-black mb-1 text-center sbm:block hidden`}>{previousDate}</div>}
             <div className={isSelected ? 'flex items-center' : 'relative'} onClick={() => setUrlImg(url || '')}>
                 <img
                     src={url}

@@ -216,6 +216,8 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 			coverScreen={true}
 			avoidKeyboard={false}
 			onBackdropPress={onClose}
+			swipeDirection={'down'}
+			onSwipeComplete={onClose}
 			backdropColor={'rgba(0,0,0, 0.7)'}
 		>
 			<View style={styles.sheetContainer}>

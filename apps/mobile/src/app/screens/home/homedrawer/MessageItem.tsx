@@ -171,7 +171,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				activeOpacity={0.8}
 				key={index}
 				onPress={() => {
-					onOpenImage(image);
+					onOpenImage({
+						...image,
+						uploader: message.sender_id,
+						create_time: message.create_time,
+					});
 				}}
 			>
 				<FastImage
