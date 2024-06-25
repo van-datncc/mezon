@@ -159,3 +159,5 @@ const { selectAll } = friendsAdapter.getSelectors();
 
 export const getFriendsState = (rootState: { [FRIEND_FEATURE_KEY]: FriendsState }): FriendsState => rootState[FRIEND_FEATURE_KEY];
 export const selectAllFriends = createSelector(getFriendsState, selectAll);
+
+export const selectAddFriends = (userID: string) => createSelector(selectAllFriends, (friends) => friends.some(friend => friend.state === 0 && friend.id === userID));

@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
 import styles from "./styles";
 import { useClans } from "@mezon/core";
-import { MezonMenu, reserve, IMezonMenuSectionProps, IMezonMenuItemProps, MezonInput, MezonImagePicker } from "../../../temp-ui";
+import { MezonMenu, reserve, IMezonMenuSectionProps, IMezonMenuItemProps, MezonInput, MezonImagePicker, MezonOption } from "../../../temp-ui";
 import { useTranslation } from "react-i18next";
 import MezonToggleButton from "../../../temp-ui/MezonToggleButton";
 import { useState } from "react";
@@ -18,8 +18,9 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
     const [loading, setLoading] = useState<boolean>(false);
 
     navigation.setOptions({
+        headerBackTitleVisible: false,
         headerRight: () => <Pressable onPress={handleSave} disabled={loading}>
-            <Text style={{ color: "green", paddingHorizontal: 10, opacity: loading ? 0.5 : 1 }}>
+            <Text style={{ color: "green", paddingHorizontal: 20, opacity: loading ? 0.5 : 1 }}>
                 {t("header.save")}
             </Text>
         </Pressable>
@@ -112,7 +113,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
         },
     ]
 
-    const menu: IMezonMenuSectionProps[] = [
+    const generalMenu: IMezonMenuSectionProps[] = [
         {
             items: inactiveMenu,
             title: t("menu.inactive.title"),
@@ -122,21 +123,45 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
             items: systemMessageMenu,
             title: t("menu.systemMessage.title"),
             bottomDescription: t("menu.systemMessage.description")
-        },
+        }
+    ]
+
+    const dangerMenu: IMezonMenuSectionProps[] = [
         {
             items: deleteMenu
         }
     ]
 
+    const optionData = [
+        {
+            title: t("fields.defaultNotification.allMessages"),
+            value: 0,
+        },
+        {
+            title: t("fields.defaultNotification.onlyMentions"),
+            value: 1,
+        }
+    ]
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <MezonImagePicker defaultValue={banner} height={200} width={"100%"} onLoad={handleLoad} />
+            <MezonImagePicker defaultValue={banner} height={200} width={"100%"} onLoad={handleLoad} showHelpText />
 
             <View style={{ marginVertical: 10 }}>
-                <MezonInput value={clanName} onTextChange={setClanName} label={t("menu.serverName.title")} />
+                <MezonInput
+                    value={clanName}
+                    onTextChange={setClanName}
+                    label={t("menu.serverName.title")} />
             </View>
 
-            <MezonMenu menu={menu} />
+            <MezonMenu menu={generalMenu} />
+
+            <MezonOption
+                title={t('fields.defaultNotification.title')}
+                bottomDescription={t('fields.defaultNotification.description')}
+                data={optionData} />
+
+            <MezonMenu menu={dangerMenu} />
         </ScrollView>
     )
 }

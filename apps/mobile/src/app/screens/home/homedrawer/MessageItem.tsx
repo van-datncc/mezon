@@ -18,6 +18,7 @@ import {
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	useAppDispatch,
+	selectMessageEntityById,
 } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
@@ -41,6 +42,8 @@ import { renderTextContent } from './constants';
 import { EMessageBSToShow } from './enums';
 import { styles } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +53,6 @@ import { RenderVideoChat } from './components/RenderVideoChat';
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
 	message: IMessageWithUser;
-	preMessage?: IMessageWithUser;
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -69,12 +71,14 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { message, mode, preMessage, onOpenImage, isNumberOfLine } = props;
+	const { mode, onOpenImage, isNumberOfLine } = props;
+	const message = useSelector((state) => selectMessageEntityById(state, props.channelId, props.message));
+	
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
-	const { attachments, lines } = useMessageParser(props.message);
-	const user = useSelector(selectMemberByUserId(props?.message?.sender_id));
+	const { attachments, lines } = useMessageParser(message);
+	const user = useSelector(selectMemberByUserId(message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
@@ -86,22 +90,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
+	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const hasIncludeMention = useMemo(() => {
-		return message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
+		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	}, [message, userLogin]);
-	const isCombine = useMemo(() => {
-		const timeDiff = getTimeDifferenceInSeconds(preMessage?.create_time as string, message?.create_time as string);
-		return (
-			timeDiff < TIME_COMBINE &&
-			preMessage?.user?.id === message?.user?.id &&
-			checkSameDay(preMessage?.create_time as string, message?.create_time as string)
-		);
-	}, [message, preMessage]);
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message.references, user]);
+	const isCombine = !message.isStartedMessageGroup;
+	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
 	const videoRef = React.useRef(null);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
@@ -121,6 +119,23 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return { videos, images, documents };
 	};
+	
+	useEffect(() => {
+		if (message) {
+			const timestamp = Date.now() / 1000;
+			markMessageAsSeen(message);
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
+		}
+	}, [dispatch, markMessageAsSeen, message]);
+
+	useEffect(() => {
+		if (message.references && message.references.length > 0) {
+			const messageReferenceId = message.references[0].message_ref_id;
+			const messageReferenceUserId = message.references[0].message_sender_id;
+			setMessageRefId(messageReferenceId ?? '');
+			setSenderId(messageReferenceUserId ?? '');
+		}
+	}, [message]);
 
 	useEffect(() => {
 		if (message.references && message.references.length > 0) {
@@ -165,7 +180,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				activeOpacity={0.8}
 				key={index}
 				onPress={() => {
-					onOpenImage(image);
+					onOpenImage({
+						...image,
+						uploader: message.sender_id,
+						create_time: message.create_time,
+					});
 				}}
 			>
 				<FastImage
@@ -200,9 +219,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
-			const checkIsImage = isImage(document?.url?.toLowerCase());
-			if (checkIsImage) {
-				return imageItem({ image: document, index, checkImage: false });
+			const isShowImage = isImage(document?.url?.toLowerCase());
+			if (isShowImage) {
+				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
+				
+				return imageItem({ image: document, index, checkImage: checkImage });
 			}
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
 
@@ -275,7 +296,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, []);
 
 	const onConfirmDeleteMessage = () => {
-		DeleteSendMessage(props.message.id);
+		DeleteSendMessage(message.id);
 	};
 
 	const setMessageSelected = (type: EMessageBSToShow) => {
@@ -371,7 +392,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							style={styles.messageBoxTop}
 						>
 							<Text style={styles.userNameMessageBox}>{user?.user?.username || 'Anonymous'}</Text>
-							<Text style={styles.dateMessageBox}>{convertTimeString(props?.message?.create_time)}</Text>
+							<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
 						</TouchableOpacity>
 					) : null}
 					{videos.length > 0 && renderVideos()}
