@@ -1,13 +1,21 @@
-import React, { memo, useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
+import { MessageReaction, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import {
+	selectCurrentChannel,
+	selectIdMessageRefEdit,
+	selectLastSeenMessage,
+	selectMemberByUserId,
+	selectMessageEntityById,
+	selectOpenEditMessageState,
+	selectOpenOptionMessageState,
+	selectReactionBottomState,
+	selectReactionRightState,
+} from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { selectIdMessageRefEdit, selectLastSeenMessage, selectMemberByUserId, selectMessageEntityById, selectOpenEditMessageState, selectOpenOptionMessageState, selectReactionBottomState, selectReactionRightState, selectTheme } from '@mezon/store';
-import { useChannels } from '@mezon/core';
-import ModalDeleteMess from './ModalDeleteMess';
-import ChannelMessagePopup from './ChannelMessagePopup';
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
+import { memo, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import MessageInput from './MessageInput';
+import ModalDeleteMess from './ModalDeleteMess';
 import { useDeleteMessageHook } from './useDeleteMessage';
 
 type MessageProps = {
@@ -27,6 +35,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	const isEditing = useMemo(() => {
 		return openEditMessageState && idMessageRefEdit === messageId;
@@ -48,33 +57,17 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	return (
 		<>
 			<div className="fullBoxText relative group">
-				<MessageWithUser
-					message={mess as IMessageWithUser}
-					user={user}
-					mode={mode}
-					popup={
-						<ChannelMessagePopup
-							reactionRightState={reactionRightState}
-							mess={mess as IMessageWithUser}
-							reactionBottomState={reactionBottomState}
-							openEditMessageState={isEditing}
-							openOptionMessageState={openOptionMessageState}
-							mode={mode}
-							deleteSendMessage={DeleteSendMessage}
-						/>
-					}
-				/>
-				{
-					isEditing ? (
-						<MessageInput
-							messageId={messageId}
-							channelId={channelId}
-							mode={mode}
-							channelLabel={channelLabel}
-							message={mess as IMessageWithUser}
-						/>
-					) : null
-				}
+				<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} />
+
+				{isEditing ? (
+					<MessageInput
+						messageId={messageId}
+						channelId={channelId}
+						mode={mode}
+						channelLabel={channelLabel}
+						message={mess as IMessageWithUser}
+					/>
+				) : null}
 				{lastSeen && <UnreadMessageBreak />}
 				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>

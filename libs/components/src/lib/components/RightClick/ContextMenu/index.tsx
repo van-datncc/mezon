@@ -40,82 +40,83 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	const { userId } = useAuth();
 	const [listTextToMatch, setListTextToMatch] = useState<any[]>(listClickDefault);
 
-	const checkOwnerClan = currentClan?.creator_id === userId;
-	const checkOwnerMessage = messageRClicked.sender_id === userId;
-	const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
-	const checkMessHasText = messageRClicked.content.t !== '';
-
 	useLayoutEffect(() => {
-		if (checkOwnerClan) {
-			const combineOwnerClan = [...listClickDefault, ...pinMessageList];
-			setListTextToMatch(combineOwnerClan);
-			if (checkOwnerMessage) {
-				const combineOwnerMessage = [...combineOwnerClan, ...editMessageList, ...deleteMessageList];
-				setListTextToMatch(combineOwnerMessage);
-				if (checkMessHasReaction) {
-					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
-					setListTextToMatch(combineHasReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineHasReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
+		if (messageRClicked) {
+			const checkOwnerClan = currentClan?.creator_id === userId;
+			const checkOwnerMessage = messageRClicked.sender_id === userId;
+			const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
+			const checkMessHasText = messageRClicked.content.t !== '';
+			if (checkOwnerClan) {
+				const combineOwnerClan = [...listClickDefault, ...pinMessageList];
+				setListTextToMatch(combineOwnerClan);
+				if (checkOwnerMessage) {
+					const combineOwnerMessage = [...combineOwnerClan, ...editMessageList, ...deleteMessageList];
+					setListTextToMatch(combineOwnerMessage);
+					if (checkMessHasReaction) {
+						const combineHasReaction = [...combineOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
+						setListTextToMatch(combineHasReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineHasReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
+					}
+				} else if (!checkOwnerMessage) {
+					const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList, ...deleteMessageList];
+					setListTextToMatch(combineNoOwnerMessage);
+					if (checkMessHasReaction) {
+						const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
+						setListTextToMatch(combineHasReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineHasReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
+					} else if (!checkMessHasReaction) {
+						const combineNotReaction = [...combineNoOwnerMessage, ...pinMessageList];
+						setListTextToMatch(combineNotReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineNotReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
 					}
 				}
-			} else if (!checkOwnerMessage) {
-				const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList, ...deleteMessageList];
-				setListTextToMatch(combineNoOwnerMessage);
-				if (checkMessHasReaction) {
-					const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
-					setListTextToMatch(combineHasReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineHasReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
+			} else if (!checkOwnerClan) {
+				const combineNoOwnerClan = [...listClickDefault];
+				setListTextToMatch(combineNoOwnerClan);
+				if (checkOwnerMessage) {
+					const combineOwnerMessage = [...combineNoOwnerClan, ...deleteMessageList, ...editMessageList];
+					setListTextToMatch(combineOwnerMessage);
+					if (checkMessHasReaction) {
+						const combineHasReaction = [...combineOwnerMessage, ...viewReactionList];
+						setListTextToMatch(combineHasReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineHasReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
+					} else if (!checkMessHasReaction) {
+						const combineNotReaction = [...combineOwnerMessage];
+						setListTextToMatch(combineNotReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineNotReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
 					}
-				} else if (!checkMessHasReaction) {
-					const combineNotReaction = [...combineNoOwnerMessage, ...pinMessageList];
-					setListTextToMatch(combineNotReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineNotReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
-					}
-				}
-			}
-		} else if (!checkOwnerClan) {
-			const combineNoOwnerClan = [...listClickDefault];
-			setListTextToMatch(combineNoOwnerClan);
-			if (checkOwnerMessage) {
-				const combineOwnerMessage = [...combineNoOwnerClan, ...deleteMessageList, ...editMessageList];
-				setListTextToMatch(combineOwnerMessage);
-				if (checkMessHasReaction) {
-					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList];
-					setListTextToMatch(combineHasReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineHasReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
-					}
-				} else if (!checkMessHasReaction) {
-					const combineNotReaction = [...combineOwnerMessage];
-					setListTextToMatch(combineNotReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineNotReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
-					}
-				}
-			} else if (!checkOwnerMessage) {
-				const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
-				setListTextToMatch(combineNoOwnerMessage);
-				if (checkMessHasReaction) {
-					const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList];
-					setListTextToMatch(combineHasReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineHasReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
-					}
-				} else if (!checkMessHasReaction) {
-					const combineNotReaction = [...combineNoOwnerMessage];
-					setListTextToMatch(combineNotReaction);
-					if (checkMessHasText) {
-						const combineHasText = [...combineNotReaction, ...speakMessageList];
-						setListTextToMatch(combineHasText);
+				} else if (!checkOwnerMessage) {
+					const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
+					setListTextToMatch(combineNoOwnerMessage);
+					if (checkMessHasReaction) {
+						const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList];
+						setListTextToMatch(combineHasReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineHasReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
+					} else if (!checkMessHasReaction) {
+						const combineNotReaction = [...combineNoOwnerMessage];
+						setListTextToMatch(combineNotReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineNotReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
 					}
 				}
 			}
@@ -161,26 +162,31 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	}
 
 	return (
-		<div
-			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2  shadow-xl"
-			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
-			onClick={onClose}
-		>
-			{sortListById(listTextToMatch)?.map((item: any) => {
-				return <MenuItem urlData={urlData} item={item} key={item.name} />;
-			})}
-			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
-			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
-				imageList.map((item: any) => {
-					return <MenuItem urlData={urlData} item={item} key={item.name} />;
-				})}
-			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
-			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
-				linkList.map((item: any) => {
-					return <MenuItem urlData={urlData} item={item} key={item.name} />;
-				})}
-		</div>
+		<>
+			{' '}
+			{messageRClicked !== undefined && (
+				<div
+					ref={menuRef}
+					className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2  shadow-xl"
+					style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
+					onClick={onClose}
+				>
+					{sortListById(listTextToMatch)?.map((item: any) => {
+						return <MenuItem urlData={urlData} item={item} key={item.name} />;
+					})}
+					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
+					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
+						imageList.map((item: any) => {
+							return <MenuItem urlData={urlData} item={item} key={item.name} />;
+						})}
+					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
+					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
+						linkList.map((item: any) => {
+							return <MenuItem urlData={urlData} item={item} key={item.name} />;
+						})}
+				</div>
+			)}
+		</>
 	);
 };
 
