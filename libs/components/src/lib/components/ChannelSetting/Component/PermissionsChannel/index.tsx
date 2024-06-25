@@ -15,7 +15,6 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
-	const [memberChannekPrivate, setMemberChannelPrivate] = useState(false)
 	const dispatch = useAppDispatch();
 	const handleToggle = () => {
 		setValueToggle(!valueToggle);
