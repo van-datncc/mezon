@@ -583,5 +583,13 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 		width: '80%',
     fontStyle: 'italic'
+  },
+  inviteIconWrapper: {
+    alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 50,
+		backgroundColor: Colors.tertiaryWeight,
+		width: 30,
+		height: 30,
   }
 });

@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
-import PlusGreenIcon from '../../../../assets/svg/guildAddCategoryChannel.svg';
 import LogoMezon from '../../../../assets/svg/logoMezon.svg';
 import { ClanIcon } from './Reusables';
 import ListClanPopupProps from './components/ListClanPopup';
@@ -12,6 +11,7 @@ import { styles } from './styles';
 import { UnreadDMBadgeList } from './components/UnreadDMBadgeList';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { SeparatorWithLine } from '../../../components/Common';
+import { PlusGreenIcon } from '@mezon/mobile-components';
 
 const ServerList = React.memo((props: any) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -49,7 +49,7 @@ const ServerList = React.memo((props: any) => {
 
 			<UnreadDMBadgeList />
 
-			<ClanIcon data={currentClan} onPress={handleChangeClan} />
+			<ClanIcon data={currentClan} onPress={handleChangeClan} isActive={true} />
 
 			<Tooltip
 				isVisible={isVisible}
@@ -67,7 +67,7 @@ const ServerList = React.memo((props: any) => {
 						setIsVisible(!isVisible);
 					}}
 				>
-					<PlusGreenIcon width={30} height={30} />
+					<PlusGreenIcon width={30} height={30}/>
 				</Pressable>
 			</Tooltip>
 		</View>

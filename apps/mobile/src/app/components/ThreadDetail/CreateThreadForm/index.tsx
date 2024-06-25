@@ -41,13 +41,11 @@ export default function CreateThreadForm() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const navigation = useNavigation();
 	const formikRef = useRef(null);
-	const { threadRef } = useMezon();
 	const { openThreadMessageState } = useReference();
-	const { valueThread } = useThreads();
-	const thread = threadRef.current;
+	const { valueThread , threadCurrentChannel} = useThreads();
 	const { sendMessageThread } = useThreadMessage({
-		channelId: thread?.id as string,
-		channelLabel: thread?.chanel_label as string,
+		channelId: threadCurrentChannel?.id as string,
+		channelLabel: threadCurrentChannel?.channel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
 
@@ -182,7 +180,7 @@ export default function CreateThreadForm() {
 							{valueThread && openThreadMessageState && (
 								<View style={styles.messageBox}>
 									<MessageItem
-										message={valueThread}
+										message={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}
 										channelLabel={currentChannel?.channel_label}
