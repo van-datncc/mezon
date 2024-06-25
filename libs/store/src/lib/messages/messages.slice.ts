@@ -140,6 +140,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
+		console.log(response.messages);
 		if (!response.messages) {
 			return [];
 		}
