@@ -436,7 +436,7 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_14,
 		paddingVertical: size.s_6,
 		fontSize: size.s_14,
-		color: Colors.gray48,
+		color: Colors.textGray,
 	},
 	iconUserClan: {
 		alignItems: 'center',
