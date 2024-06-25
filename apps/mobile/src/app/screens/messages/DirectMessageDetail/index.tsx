@@ -30,17 +30,6 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, dispatch, lastMessage]);
 }
 
-function useChannelSeen(channelId: string) {
-	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
-	useEffect(() => {
-		if (lastMessage) {
-			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directActions.updateLastSeenTime(lastMessage));
-		}
-	}, [channelId, dispatch, lastMessage]);
-}
 
 export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any, route: any}) => {
     const directMessageId = route.params?.directMessageId as string;
@@ -80,7 +69,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         );
         return null;
     }, [currentDmGroup]);
-  
+
     useEffect(() => {
         if (currentDmGroup?.id) {
             directMessageLoader()
@@ -168,9 +157,9 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 					)}
 				</View>
 			): null}
-        
+
         </SafeAreaView>
 
-        
+
     )
 }
