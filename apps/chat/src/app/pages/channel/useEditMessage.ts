@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useChatSending } from '@mezon/core';
 import { referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
+import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
   const handleCancelEdit = useCallback(() => {
     dispatch(referencesActions.setOpenEditMessageState(false));
     dispatch(referencesActions.setIdReferenceMessageEdit(''));
+    dispatch(rightClickAction.setMessageRightClick(''))
   }, [dispatch]);
 
   const handleSend = useCallback(

@@ -35,7 +35,7 @@ function PopupOption({ message, deleteSendMessage }: PopupOptionProps) {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(messagesActions.setOpenOptionMessageState(false));
-		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+		
 		event.stopPropagation();
 	};
 

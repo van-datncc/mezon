@@ -1,5 +1,5 @@
 import { useAuth, useClans, useRightClick } from '@mezon/core';
-import { selectMessageByMessageId } from '@mezon/store';
+import { selectCurrentChannel, selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
 import {
 	deleteMessageList,
 	editMessageList,
@@ -11,6 +11,7 @@ import {
 	removeReactionList,
 	reportMessageList,
 	speakMessageList,
+	unPinMessageList,
 	viewReactionList,
 } from '@mezon/ui';
 import { RightClickPos } from '@mezon/utils';
@@ -21,9 +22,10 @@ import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
 	onClose: () => void;
 	urlData: string;
+	mode:number
 }
 
-const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
+const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, mode }) => {
 	const posClick = useSelector(selectPosClickingActive);
 	const { rightClickXy } = useRightClick();
 	const menuRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +36,9 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	const WINDOW_HEIGHT = window.innerHeight;
 	const WINDOW_WIDTH = window.innerWidth;
 	const { getMessageIdRightClicked } = useRightClick();
+	const getMessageRclicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
+	const listPinMessages = useSelector(selectPinMessageByChannelId(getMessageRclicked.channel_id));
+	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === getMessageRclicked.id);
 
 	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 	const { currentClan } = useClans();
@@ -47,7 +52,12 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 			const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
 			const checkMessHasText = messageRClicked.content.t !== '';
 			if (checkOwnerClan) {
-				const combineOwnerClan = [...listClickDefault, ...pinMessageList];
+				let combineOwnerClan: any[] = [];
+				if (messageExists) {
+					combineOwnerClan = [...listClickDefault, ...unPinMessageList];
+				} else {
+					combineOwnerClan = [...listClickDefault, ...pinMessageList];
+				}
 				setListTextToMatch(combineOwnerClan);
 				if (checkOwnerMessage) {
 					const combineOwnerMessage = [...combineOwnerClan, ...editMessageList, ...deleteMessageList];
@@ -71,7 +81,12 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 							setListTextToMatch(combineHasText);
 						}
 					} else if (!checkMessHasReaction) {
-						const combineNotReaction = [...combineNoOwnerMessage, ...pinMessageList];
+						let combineNotReaction: any[] = [];
+						if (messageExists) {
+							combineNotReaction = [...combineNoOwnerMessage, ...unPinMessageList];
+						} else {
+							combineNotReaction = [...combineNoOwnerMessage, ...pinMessageList];
+						}
 						setListTextToMatch(combineNotReaction);
 						if (checkMessHasText) {
 							const combineHasText = [...combineNotReaction, ...speakMessageList];
@@ -121,7 +136,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 				}
 			}
 		}
-	}, [messageRClicked]);
+	}, [messageRClicked,messageExists]);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -167,22 +182,22 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 			{messageRClicked !== undefined && (
 				<div
 					ref={menuRef}
-					className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2  shadow-xl"
+					className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
 					style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 					onClick={onClose}
 				>
 					{sortListById(listTextToMatch)?.map((item: any) => {
-						return <MenuItem urlData={urlData} item={item} key={item.name} />;
+						return <MenuItem mode={mode} urlData={urlData} item={item} key={item.name} />;
 					})}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 						imageList.map((item: any) => {
-							return <MenuItem urlData={urlData} item={item} key={item.name} />;
+							return <MenuItem mode={mode} urlData={urlData} item={item} key={item.name} />;
 						})}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 						linkList.map((item: any) => {
-							return <MenuItem urlData={urlData} item={item} key={item.name} />;
+							return <MenuItem mode={mode} urlData={urlData} item={item} key={item.name} />;
 						})}
 				</div>
 			)}

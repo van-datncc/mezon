@@ -208,8 +208,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 						)}
 					</div>
 				</div>
-				{showOptStatus && <ChannelMessageOpt message={message} />}
-				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
+				{showOptStatus && <ChannelMessageOpt mode={mode} message={message} />}
+				{isMenuVisible && <ContextMenu mode={mode} urlData={''} onClose={handleCloseMenu} />}
 			</div>
 		</>
 	);

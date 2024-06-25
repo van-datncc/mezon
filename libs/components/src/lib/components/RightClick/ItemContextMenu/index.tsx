@@ -1,20 +1,37 @@
-import { messagesActions, referencesActions } from '@mezon/store';
+import { useDeleteMessage } from '@mezon/core';
+import {
+	directActions,
+	messagesActions,
+	pinMessageActions,
+	referencesActions,
+	selectAllDirectMessages,
+	selectCurrentChannel,
+	selectMessageByMessageId,
+	useAppDispatch,
+} from '@mezon/store';
 import { RightClickList } from '@mezon/utils';
+import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { selectMessageIdRightClicked } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { memo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import ItemDetail from '../ItemDetail';
 import { handleCopyImage, handleCopyLink, handleOpenLink, handleSaveImage } from './function';
 
 interface IMenuItem {
 	item: any;
 	urlData: string;
+	mode: number;
 }
 
-const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
-	const dispatch = useDispatch();
+const MenuItem: React.FC<IMenuItem> = ({ item, urlData, mode }) => {
+	const dispatch = useAppDispatch();
 	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
+	const getMessageRclicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const { DeleteSendMessage } = useDeleteMessage({ channelId: currentChannel?.id || '', channelLabel: currentChannel?.channel_label || '', mode });
+
 	const clickItem = () => {
 		if (item.name === RightClickList.COPY_IMAGE) {
 			return handleCopyImage(urlData);
@@ -33,6 +50,36 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(messagesActions.setOpenOptionMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(getMessageIdRightClicked));
+			return;
+		}
+		if (item.name === RightClickList.REPLY) {
+			dispatch(referencesActions.setIdReferenceMessageReply(getMessageIdRightClicked));
+			dispatch(referencesActions.setOpenReplyMessageState(true));
+			dispatch(referencesActions.setOpenEditMessageState(false));
+			dispatch(messagesActions.setOpenOptionMessageState(false));
+			return;
+		}
+		if (item.name === RightClickList.COPY_TEXT) {
+			dispatch(referencesActions.setOpenEditMessageState(false));
+			dispatch(messagesActions.setOpenOptionMessageState(false));
+			dispatch(referencesActions.setDataReferences(null));
+			return;
+		}
+		if (item.name === RightClickList.FORWARD_MESSAGE) {
+			if (dmGroupChatList.length === 0) {
+				dispatch(directActions.fetchDirectMessage({}));
+			}
+			dispatch(toggleIsShowPopupForwardTrue());
+			dispatch(setSelectedMessage(getMessageRclicked));
+		}
+		if (item.name === RightClickList.PIN_MESSAGE) {
+			dispatch(pinMessageActions.setChannelPinMessage({ channel_id: getMessageRclicked.channel_id, message_id: getMessageRclicked.id }));
+		}
+		if (item.name === RightClickList.UNPIN_MESSAGE) {
+			dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: getMessageRclicked.channel_id, message_id: getMessageRclicked.id }));
+		}
+		if (item.name === RightClickList.DELETE_MESSAGE) {
+			DeleteSendMessage(getMessageRclicked.id);
 		}
 	};
 
@@ -40,6 +87,10 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 		<div>
 			{item.name === RightClickList.COPY_LINK ? (
 				<CopyToClipboard text={urlData}>
+					<ItemDetail item={item} onClick={clickItem} />
+				</CopyToClipboard>
+			) : item.name === RightClickList.COPY_TEXT ? (
+				<CopyToClipboard text={getMessageRclicked.content.t ?? ''}>
 					<ItemDetail item={item} onClick={clickItem} />
 				</CopyToClipboard>
 			) : (
