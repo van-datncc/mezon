@@ -1,4 +1,4 @@
-import { useAuth, useChatMessages, useNotification, useOnClickOutside, useRightClick } from '@mezon/core';
+import { useAuth, useChatMessages, useNotification, useRightClick } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { IChannelMember, RightClickPos } from '@mezon/utils';
 import classNames from 'classnames';
@@ -35,7 +35,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
-	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -158,8 +157,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 		}
 	}, [message.references]);
 
-	useOnClickOutside(divMessageWithUser, handleCloseMenu);
-
 	useEffect(() => {
 		if (isHover || message.id === getMessageIdRightClicked) {
 			setShowOptStatus(true);
@@ -182,7 +179,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 					<div className={childDivClass}></div>
 					<div className={parentDivClass} onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
 						{checkMessageHasReply && <MessageReply message={message} />}
-						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
+						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="w-full relative h-full">
 								{isHeadfull && <MessageHead message={message} user={user} isCombine={isCombine} />}
