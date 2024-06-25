@@ -1,7 +1,7 @@
-import { friendsActions, getStoreAsync } from '@mezon/store';
+import { friendsActions } from '@mezon/store';
+import { CustomLoaderFunction } from './appLoader';
 
-export const friendsLoader = async () => {
-	const store = await getStoreAsync();
-	store.dispatch(friendsActions.fetchListFriends({}));
+export const friendsLoader: CustomLoaderFunction = async ({ dispatch }) => {
+	dispatch(friendsActions.fetchListFriends({}));
 	return null;
 };
