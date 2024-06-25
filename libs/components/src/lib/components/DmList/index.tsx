@@ -8,9 +8,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ForwardMessageModal from '../ForwardMessage';
 import * as Icons from '../Icons';
 import { IconFriends } from '../Icons';
-import DMListItem from './DMListItem';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
 import { Tooltip } from 'flowbite-react';
+import ListDMChannel from './listDMChannel';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
@@ -95,12 +95,7 @@ function DirectMessageList() {
 				className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
-					{sortedFilteredDataDM.map((directMessage: any, index: number) => {
-						return <DMListItem
-						key={index}
-						directMessage={directMessage}
-					  />;
-					})}
+					<ListDMChannel listDM={sortedFilteredDataDM}/>
 				</div>
 			</div>
 		</>

@@ -12,7 +12,8 @@ import {
 } from '@mezon/store-mobile';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';

@@ -19,7 +19,8 @@
             "allowDirectMessage": "Allow Direct Message",
             "allowMessageRequest": "Allow Message Request",
             "reportServer": "Report Clan",
-            "leaveServer": "Leave Clan"
+            "leaveServer": "Leave Clan",
+            "deleteClan": "Delete Clan"
         },
         "devMode": {
             "title": "Development Mode",

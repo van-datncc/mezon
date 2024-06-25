@@ -19,7 +19,8 @@
             "allowDirectMessage": "Cho phép gửi tin nhắn trực tiếp",
             "allowMessageRequest": "Cho phép gửi yêu cầu tin nhắn",
             "reportServer": "Báo cáo clan",
-            "leaveServer": "Rời clan"
+            "leaveServer": "Rời clan",
+            "deleteClan": "Xóa Clan"
         },
         "devMode": {
             "title": "Chế độ nhà phát triển",

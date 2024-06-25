@@ -17,7 +17,7 @@ function MemberItem({ user, listProfile, isOffline }: MemberItemProps) {
 		<MemberProfile
 			numberCharacterCollapse={30}
 			avatar={user?.user?.avatar_url ?? ''}
-			name={clanProfile?.nick_name || user?.user?.username || ''}
+			name={clanProfile?.nick_name || user?.user?.display_name ||user?.user?.username || ''}
 			status={userStatus}
 			isHideStatus={true}
 			isHideIconStatus={userStatus ? false : true}
