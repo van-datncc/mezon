@@ -2,16 +2,16 @@ import { useAuth, useChatMessages, useNotification } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import classNames from 'classnames';
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
+import { useHover } from 'usehooks-ts';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
-import { useHover } from 'usehooks-ts'
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
@@ -27,9 +27,10 @@ export type MessageWithUserProps = {
 	mode: number;
 	isMention?: boolean;
 	popup?: JSX.Element;
+	isEditing?: boolean;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, popup }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, popup, isEditing }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -39,7 +40,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const containerRef = useRef<HTMLDivElement>(null);
-	const isHover = useHover(containerRef)
+	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
 
 	const isCombine = !message.isStartedMessageGroup;
@@ -63,7 +64,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	}, [message.isStartedMessageOfTheDay, isMessNotifyMention]);
 
 	const messageDividerClass = classNames(
-		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent'
+		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
 	);
 
 	const isHeadfull = useMemo(() => {
@@ -136,11 +137,13 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 
 	return (
 		<>
-			{shouldShowDateDivider && <div className={messageDividerClass}>
-				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-				<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
-				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-			</div>}
+			{shouldShowDateDivider && (
+				<div className={messageDividerClass}>
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+				</div>
+			)}
 			<div className={containerClass} ref={containerRef}>
 				<div className="relative rounded-sm overflow-visible">
 					<div className={childDivClass}></div>
@@ -148,19 +151,24 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
+
 							<div className="w-full relative h-full">
-								{isHeadfull && <MessageHead message={message} user={user} isCombine={isCombine} />}
-								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
-									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
-										<MessageContent
-											message={message}
-											user={user}
-											isCombine={isCombine}
-											isSending={message.isSending}
-											isError={message.isError}
-										/>
+								<MessageHead message={message} user={user} isCombine={isCombine} />
+								{isEditing ? (
+									''
+								) : (
+									<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+										<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+											<MessageContent
+												message={message}
+												user={user}
+												isCombine={isCombine}
+												isSending={message.isSending}
+												isError={message.isError}
+											/>
+										</div>
 									</div>
-								</div>
+								)}
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>
@@ -175,7 +183,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 						)}
 					</div>
 				</div>
-				{(!!popup && isHover) && popup}
+				{!!popup && isHover && popup}
 			</div>
 		</>
 	);
