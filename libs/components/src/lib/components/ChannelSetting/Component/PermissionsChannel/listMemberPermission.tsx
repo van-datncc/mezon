@@ -3,7 +3,7 @@ import { useAuth } from "@mezon/core";
 import { channelUsersActions, selectAllAccount, selectMembersByChannelId, useAppDispatch } from "@mezon/store";
 import { IChannel } from "@mezon/utils";
 import { ApiUser } from "mezon-js/api.gen"
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 type ListMemberPermissionProps = {

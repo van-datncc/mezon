@@ -15,8 +15,7 @@ import {
 } from '@mezon/ui';
 import { RightClickPos } from '@mezon/utils';
 import { selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
-import { Fragment, useLayoutEffect, useRef, useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
@@ -44,7 +43,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	const checkOwnerClan = currentClan?.creator_id === userId;
 	const checkOwnerMessage = messageRClicked.sender_id === userId;
 	const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
-	const checkImageHasText = messageRClicked.content.t !== '';
+	const checkMessHasText = messageRClicked.content.t !== '';
 
 	useLayoutEffect(() => {
 		if (checkOwnerClan) {
@@ -56,7 +55,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 				if (checkMessHasReaction) {
 					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
 					setListTextToMatch(combineHasReaction);
-					if (checkImageHasText) {
+					if (checkMessHasText) {
 						const combineHasText = [...combineHasReaction, ...speakMessageList];
 						setListTextToMatch(combineHasText);
 					}
@@ -67,7 +66,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 				if (checkMessHasReaction) {
 					const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
 					setListTextToMatch(combineHasReaction);
-					if (checkImageHasText) {
+					if (checkMessHasText) {
 						const combineHasText = [...combineHasReaction, ...speakMessageList];
 						setListTextToMatch(combineHasText);
 					}
@@ -82,7 +81,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 				if (checkMessHasReaction) {
 					const combineHasReaction = [...combineOwnerMessage, ...viewReactionList];
 					setListTextToMatch(combineHasReaction);
-					if (checkImageHasText) {
+					if (checkMessHasText) {
 						const combineHasText = [...combineHasReaction, ...speakMessageList];
 						setListTextToMatch(combineHasText);
 					}
@@ -101,29 +100,24 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 			const isBottomLimit = distanceCursorToBottom < menuRefHeight;
 			const isRightLimit = distanceCursorToRight < menuRefWidth;
 
-
 			if (isBottomLimit && isRightLimit) {
-				console.log(1);
 				setTopMenu('auto');
-				setBottomMenu(30);
+				setBottomMenu(60);
 				setLeftMenu('auto');
-				setRightMenu(30);
+				setRightMenu(60);
 			} else if (!isBottomLimit && isRightLimit) {
-				console.log(2);
 				setTopMenu(rightClickXy.y);
 				setBottomMenu('auto');
 				setLeftMenu('auto');
-				setRightMenu(30);
-			} else if (isBottomLimit && !isRightLimit || menuRefHeight < 250 && distanceCursorToBottom < 350) {
-				console.log(3);
+				setRightMenu(60);
+			} else if ((isBottomLimit && !isRightLimit) || (menuRefHeight < 250 && distanceCursorToBottom < 350)) {
 				setTopMenu('auto');
-				setBottomMenu(30);
+				setBottomMenu(60);
 				setLeftMenu(rightClickXy.x);
 				setRightMenu('auto');
 			} else if (!isBottomLimit && !isRightLimit) {
-				console.log(4);
 				setTopMenu(rightClickXy.y);
-				setBottomMenu(30);
+				setBottomMenu(60);
 				setLeftMenu(rightClickXy.x);
 				setRightMenu('auto');
 			}
@@ -137,40 +131,22 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
+			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2 shadow-xl"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 			onClick={onClose}
 		>
 			{sortListById(listTextToMatch)?.map((item: any) => {
-				return (
-					<Fragment key={item.name}>
-						<CopyToClipboard text={urlData}>
-							<MenuItem urlData={urlData} item={item} />
-						</CopyToClipboard>
-					</Fragment>
-				);
+				return <MenuItem urlData={urlData} item={item} key={item.name} />;
 			})}
 			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 				imageList.map((item: any) => {
-					return (
-						<Fragment key={item.name}>
-							<CopyToClipboard text={urlData}>
-								<MenuItem urlData={urlData} item={item} />
-							</CopyToClipboard>
-						</Fragment>
-					);
+					return <MenuItem urlData={urlData} item={item} key={item.name} />;
 				})}
 			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 				linkList.map((item: any) => {
-					return (
-						<Fragment key={item.name}>
-							<CopyToClipboard text={urlData}>
-								<MenuItem urlData={urlData} item={item} />
-							</CopyToClipboard>
-						</Fragment>
-					);
+					return <MenuItem urlData={urlData} item={item} key={item.name} />;
 				})}
 		</div>
 	);
