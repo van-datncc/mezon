@@ -49,10 +49,11 @@ import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
+import { isEmpty } from 'lodash';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
-	message: IMessageWithUser;
+	message: string;
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -121,7 +122,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 	
 	useEffect(() => {
-		if (message) {
+		if (!isEmpty(message)) {
 			const timestamp = Date.now() / 1000;
 			markMessageAsSeen(message);
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));

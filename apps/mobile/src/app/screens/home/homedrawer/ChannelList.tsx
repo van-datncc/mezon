@@ -106,7 +106,7 @@ const ChannelList = React.memo((props: any) => {
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
-			<View style={[styles.mainList, { backgroundColor: Colors.surface }]}>
+			<View style={[styles.mainList, { backgroundColor: Colors.secondary }]}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
 				<View style={styles.channelListSearch}>
 					<View style={styles.channelListSearchWrapperInput}>

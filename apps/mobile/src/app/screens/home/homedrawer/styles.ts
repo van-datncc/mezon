@@ -13,6 +13,8 @@ export const styles = StyleSheet.create({
 
 	wrapperChatBox: {
 		backgroundColor: Colors.secondary,
+		borderTopWidth: 0.5,
+		borderTopColor: Colors.gray48,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 	},
@@ -40,9 +42,9 @@ export const styles = StyleSheet.create({
 		fontSize: 19,
 	},
 	iconContainer: {
-		width: 35,
-		height: 35,
-		borderRadius: 50,
+		width: size.s_40,
+		height: size.s_40,
+		borderRadius: size.s_40,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -55,7 +57,7 @@ export const styles = StyleSheet.create({
 	wrapperInput: {
 		position: 'relative',
 		justifyContent: 'center',
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		paddingVertical: size.s_4,
 		borderRadius: size.s_22,
 	},
@@ -69,7 +71,7 @@ export const styles = StyleSheet.create({
 		paddingRight: size.s_40,
 		fontSize: size.medium,
 		paddingTop: size.s_8,
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		color: Colors.tertiary,
 		textAlignVertical: 'center',
 	},
@@ -87,16 +89,17 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 	},
 	homeDefault: {
-		backgroundColor: '#2b2d31',
+		backgroundColor: Colors.secondary,
 		flex: 1,
 	},
 	wrapperChannelMessage: {
 		flex: 1,
 		justifyContent: 'space-between',
+		backgroundColor: Colors.secondary,
 	},
 	listChannels: {
 		paddingTop: size.s_14,
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondary,
 	},
 	channelListSection: {
 		width: '100%',
@@ -128,8 +131,10 @@ export const styles = StyleSheet.create({
 		borderRadius: 5,
 	},
 	channelListItemActive: {
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		borderRadius: size.s_10,
+		borderWidth: 0.4,
+		borderColor: Colors.gray48
 	},
 	channelListItemTitle: {
 		fontSize: size.s_14,
@@ -167,6 +172,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	channelListSearchInput: {
+		height: size.s_34,
 		padding: 0,
 		flex: 1,
 	},
@@ -175,8 +181,8 @@ export const styles = StyleSheet.create({
     position: 'relative'
 	},
 	clanIcon: {
-		height: verticalScale(55),
-		width: verticalScale(55),
+		height: verticalScale(50),
+		width: verticalScale(50),
 		borderRadius: verticalScale(50),
 		overflow: 'hidden',
 		alignItems: 'center',
@@ -238,7 +244,7 @@ export const styles = StyleSheet.create({
 		paddingTop: size.s_20,
 		width: '22%',
 		justifyContent: 'flex-start',
-		backgroundColor: Colors.secondary,
+		backgroundColor: Colors.primary,
 		alignItems: 'center',
 		gap: size.s_10
 	},
@@ -275,18 +281,24 @@ export const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 	},
 	threadItemActive: {
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		borderRadius: size.s_10,
+		borderWidth: 0.4,
+		borderColor: Colors.gray48,
 		position: 'absolute',
 		width: '95%',
-		height: '85%',
+		height: '90%',
 		right: 0,
-		top: size.s_20,
+		top: size.s_16,
 	},
 	threadFirstItemActive: {
 		height: '160%',
 		right: 0,
 		top: size.s_2,
+		backgroundColor: Colors.secondaryLight,
+		borderRadius: size.s_10,
+		borderWidth: 0.4,
+		borderColor: Colors.gray48
 	},
 	wrapperMessageBox: {
 		flexDirection: 'row',
@@ -357,11 +369,11 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		marginRight: size.s_10,
 		fontWeight: '600',
-		color: Colors.white,
+		color: Colors.caribbeanGreen,
 	},
 	dateMessageBox: {
 		fontSize: size.small,
-		color: Colors.gray72,
+		color: Colors.gray48,
 	},
 	contentMessageCombine: {
 		padding: size.s_2,
@@ -405,7 +417,7 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_14,
 		paddingVertical: size.s_6,
 		fontSize: size.s_14,
-		color: Colors.gray72,
+		color: Colors.gray48,
 	},
 	iconUserClan: {
 		alignItems: 'center',
@@ -442,7 +454,7 @@ export const styles = StyleSheet.create({
 	},
 	wrapperAttachmentPreview: {
 		backgroundColor: Colors.secondary,
-		borderTopColor: Colors.gray72,
+		borderTopColor: Colors.gray48,
 		paddingVertical: size.s_10,
 	},
 	fileViewer: {
@@ -536,13 +548,14 @@ export const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
 	wrapperPlusClan: {
-		height: size.s_50,
-		width: size.s_50,
+		marginTop: verticalScale(5),
+		height: verticalScale(50),
+		width: verticalScale(50),
 		borderRadius: 50,
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 	},
 	overlay: {
 		position: 'absolute',
