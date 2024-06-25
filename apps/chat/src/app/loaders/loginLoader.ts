@@ -1,8 +1,7 @@
-import { getStoreAsync, selectInitialPath } from '@mezon/store';
-import { LoaderFunction } from 'react-router-dom';
+import { CustomLoaderFunction } from './appLoader';
 
 export interface ILoginLoaderData {
-    initialPath: string;
+	initialPath: string;
 	redirectTo?: string;
 }
 
@@ -21,17 +20,13 @@ function getRedirectTo(initialPath?: string): string {
 	return '/chat/direct/friends';
 }
 
-export const loginLoader: LoaderFunction = async () => {
-	const store = await getStoreAsync();
-
-	const initialPath = selectInitialPath(store.getState());
-
+export const loginLoader: CustomLoaderFunction = async ({ initialPath }) => {
 	const redirectTo = getRedirectTo(initialPath);
 
 	return {
-        initialPath,
+		initialPath,
 		redirectTo,
-    } as ILoginLoaderData;
+	} as ILoginLoaderData;
 };
 
 export const shouldRevalidateLogin = () => {

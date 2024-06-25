@@ -1,18 +1,18 @@
-import { clansActions, getStoreAsync } from '@mezon/store';
-import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
+import { clansActions } from '@mezon/store';
+import { ShouldRevalidateFunction } from 'react-router-dom';
+import { CustomLoaderFunction } from './appLoader';
 
 export type ClanLoaderData = {
 	clanId: string;
 };
 
-export const clanLoader: LoaderFunction = async ({ params }) => {
+export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
 	const { clanId } = params;
-	const store = await getStoreAsync();
 	if (!clanId) {
 		throw new Error('Clan ID null');
 	}
-	store.dispatch(clansActions.joinClan({clanId}));
-	store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+	dispatch(clansActions.joinClan({ clanId }));
+	dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	return {
 		clanId,
 	} as ClanLoaderData;

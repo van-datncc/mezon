@@ -31,6 +31,10 @@ export function useMessageParser(message: IMessageWithUser) {
 		return convertTimeHour(message?.create_time || ('' as string));
 	}, [message]);
 
+	const isEdited = message.update_time && message.create_time < message.update_time || false;
+
+	const hasAttachments = attachments && attachments.length > 0;
+
 	return {
 		content,
 		messageTime,
@@ -39,5 +43,7 @@ export function useMessageParser(message: IMessageWithUser) {
 		mentions,
 		lines,
 		messageDate,
+		hasAttachments,
+		isEdited,
 	};
 }

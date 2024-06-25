@@ -714,7 +714,7 @@ export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (s
 
 // V2
 
-const createCachedSelector = createSelectorCreator({
+export const createCachedSelector = createSelectorCreator({
 	memoize: weakMapMemoize,
 	argsMemoize: weakMapMemoize,
 });
