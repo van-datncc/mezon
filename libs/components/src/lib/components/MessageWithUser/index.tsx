@@ -43,11 +43,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
-
 	const isCombine = !message.isStartedMessageGroup;
-
 	const attachments = useMemo(() => message.attachments, [message.attachments]);
-
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
@@ -208,8 +205,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 						)}
 					</div>
 				</div>
-				{showOptStatus && <ChannelMessageOpt mode={mode} message={message} />}
-				{isMenuVisible && <ContextMenu mode={mode} urlData={''} onClose={handleCloseMenu} />}
+				{showOptStatus && <ChannelMessageOpt message={message} />}
+				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
 			</div>
 		</>
 	);

@@ -1,5 +1,5 @@
 import { useAuth, useClans, useRightClick } from '@mezon/core';
-import { selectCurrentChannel, selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
+import { selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
 import {
 	deleteMessageList,
 	editMessageList,
@@ -22,10 +22,9 @@ import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
 	onClose: () => void;
 	urlData: string;
-	mode:number
 }
 
-const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, mode }) => {
+const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	const posClick = useSelector(selectPosClickingActive);
 	const { rightClickXy } = useRightClick();
 	const menuRef = useRef<HTMLDivElement | null>(null);
@@ -39,7 +38,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, mode }) =>
 	const getMessageRclicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 	const listPinMessages = useSelector(selectPinMessageByChannelId(getMessageRclicked.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === getMessageRclicked.id);
-
 	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 	const { currentClan } = useClans();
 	const { userId } = useAuth();
@@ -136,7 +134,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, mode }) =>
 				}
 			}
 		}
-	}, [messageRClicked,messageExists]);
+	}, [messageRClicked, messageExists]);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -178,7 +176,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, mode }) =>
 
 	return (
 		<>
-			{' '}
 			{messageRClicked !== undefined && (
 				<div
 					ref={menuRef}
@@ -187,17 +184,17 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData, mode }) =>
 					onClick={onClose}
 				>
 					{sortListById(listTextToMatch)?.map((item: any) => {
-						return <MenuItem mode={mode} urlData={urlData} item={item} key={item.name} />;
+						return <MenuItem urlData={urlData} item={item} key={item.name} />;
 					})}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 						imageList.map((item: any) => {
-							return <MenuItem mode={mode} urlData={urlData} item={item} key={item.name} />;
+							return <MenuItem urlData={urlData} item={item} key={item.name} />;
 						})}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
 					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
 						linkList.map((item: any) => {
-							return <MenuItem mode={mode} urlData={urlData} item={item} key={item.name} />;
+							return <MenuItem urlData={urlData} item={item} key={item.name} />;
 						})}
 				</div>
 			)}

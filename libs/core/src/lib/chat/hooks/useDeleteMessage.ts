@@ -5,18 +5,17 @@ import { useSelector } from 'react-redux';
 
 export type UseDeleteMessageOptions = {
 	channelId: string;
-	channelLabel: string;
 	mode: number;
 };
 
-export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMessageOptions) {
+export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
 
-	const DeleteSendMessage = React.useCallback(
+	const deleteSendMessage = React.useCallback(
 		async (messageId: string) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -32,6 +31,7 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 				}),
 			);
 
+			console.log(channelId, mode, messageId);
 			await socket.removeChatMessage(channelId, mode, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channel, currentClanId, dispatch, channelId, mode],
@@ -39,8 +39,8 @@ export function useDeleteMessage({ channelId, channelLabel, mode }: UseDeleteMes
 
 	return useMemo(
 		() => ({
-			DeleteSendMessage,
+			deleteSendMessage,
 		}),
-		[DeleteSendMessage],
+		[deleteSendMessage],
 	);
 }

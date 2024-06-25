@@ -8,14 +8,12 @@ import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
-	mode: number;
 };
 
-const ChannelMessageOpt = ({ message, mode }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 	const dispatch = useAppDispatch();
 
 	const { userId } = useAuth();
-
 	const { setOpenThreadMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
@@ -130,7 +128,7 @@ const ChannelMessageOpt = ({ message, mode }: ChannelMessageOptProps) => {
 					</button>
 				</div>
 
-				{isMenuVisible && <ContextMenu mode={mode} urlData={''} onClose={handleCloseMenu} />}
+				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
 			</div>
 		</div>
 	);

@@ -11,7 +11,7 @@ import {
 } from '@mezon/store';
 import { RightClickList } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { selectMessageIdRightClicked } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { selectMessageIdRightClicked, selectModeActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { memo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
@@ -21,16 +21,20 @@ import { handleCopyImage, handleCopyLink, handleOpenLink, handleSaveImage } from
 interface IMenuItem {
 	item: any;
 	urlData: string;
-	mode: number;
 }
 
-const MenuItem: React.FC<IMenuItem> = ({ item, urlData, mode }) => {
+const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 	const dispatch = useAppDispatch();
 	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 	const getMessageRclicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { DeleteSendMessage } = useDeleteMessage({ channelId: currentChannel?.id || '', channelLabel: currentChannel?.channel_label || '', mode });
+	const getModeActive = useSelector(selectModeActive);
+
+	const { deleteSendMessage } = useDeleteMessage({
+		channelId: currentChannel?.id || '',
+		mode: getModeActive,
+	});
 
 	const clickItem = () => {
 		if (item.name === RightClickList.COPY_IMAGE) {
@@ -79,7 +83,8 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData, mode }) => {
 			dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: getMessageRclicked.channel_id, message_id: getMessageRclicked.id }));
 		}
 		if (item.name === RightClickList.DELETE_MESSAGE) {
-			DeleteSendMessage(getMessageRclicked.id);
+			console.log(getMessageRclicked);
+			deleteSendMessage(getMessageRclicked.id);
 		}
 	};
 
