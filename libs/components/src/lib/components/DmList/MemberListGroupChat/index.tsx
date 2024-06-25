@@ -1,14 +1,17 @@
 import { Icons, MemberProfile } from '@mezon/components';
 import { useAppParams } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectMembersByChannelId } from '@mezon/store';
+import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
-export type MemberListProps = { className?: string; directMessageId: string | undefined };
+export type MemberListProps = { 
+	className?: string; 
+	directMessageId: string | undefined;
+	createId?:string | undefined;
+};
 
-function MemberListGroupChat({ directMessageId }: MemberListProps) {
+function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	const { directId } = useAppParams();
 	const rawMembers = useSelector(selectMembersByChannelId(directId));
-	const userProfile = useSelector(selectAllAccount);
 	return (
 		<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">
 			<div>
@@ -27,7 +30,7 @@ function MemberListGroupChat({ directMessageId }: MemberListProps) {
 									user={user}
 									isMemberGroupDm={true}
 								/>
-								{userProfile?.user?.id === user.user?.id && <Icons.IconUserCreateDM className='size-[14px] text-[#E7A931]'/>}
+								{createId === user.user?.id && <Icons.IconUserCreateDM className='size-[14px] text-[#E7A931]'/>}
 							</div>
 						))}
 					</div>
