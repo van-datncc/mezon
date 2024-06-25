@@ -3,8 +3,7 @@ import { IMezonMenuSectionProps, MezonMenu, MezonRadioButton } from "../../temp-
 import { View } from "react-native";
 import { useState } from "react";
 
-interface IMezonOptionProps {
-    title?: string;
+interface IMezonOptionProps extends Omit<IMezonMenuSectionProps, "items"> {
     onChange?: (value: number | string) => void;
     data: {
         description?: string;
@@ -14,7 +13,7 @@ interface IMezonOptionProps {
     value?: number | string;
 }
 
-export default function MezonOption({ data, title, onChange, value }: IMezonOptionProps) {
+export default function MezonOption({ data, onChange, value, ...menuProps }: IMezonOptionProps) {
     const [currentValue, setCurrentValue] = useState<number | string>(value || data?.[0]?.value || 0);
 
     function handleChange(value: number | string) {
@@ -24,7 +23,6 @@ export default function MezonOption({ data, title, onChange, value }: IMezonOpti
 
     const menu = useMemo(() => ([
         {
-            title: title,
             items: data.map((item) => ({
                 ...item,
                 component: (
@@ -35,7 +33,8 @@ export default function MezonOption({ data, title, onChange, value }: IMezonOpti
                     />
                 ),
                 onPress: () => handleChange(item.value)
-            }))
+            })),
+            ...menuProps
         }
     ]) satisfies IMezonMenuSectionProps[], [data, currentValue]);
 

@@ -223,7 +223,6 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
-			'',
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{ t: dataSend.text },
 			[],

@@ -102,6 +102,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 						type="text"
 						className="dark:bg-bgSurface bg-bgModifierHoverLight mb-2 mt-4 py-2"
 						placeholder={`${userProfile?.user?.username}'s clan`}
+						maxLength={64}
 					/>
 					{checkvalidate && (
 						<p className="text-[#e44141] text-xs italic font-thin">

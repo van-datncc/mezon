@@ -63,11 +63,11 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 			</div>
 			{isShowPanelChannel ? (
 				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] w-[360px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed left-5 sbm:left-0 md:left-[409px] `}
+					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed left-5 sbm:left-0 md:left-[409px] `}
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} />
+					<ShortUserProfile userID={user?.user?.id || ''} message={message}/>
 				</div>
 			) : null}
 		</div>

@@ -34,7 +34,7 @@ const UserProfile = React.memo(({ userId, user, onClose }: userProfileProps) => 
 	const listDM = useSelector(selectDirectsOpenlist);
 
 	const userRolesClan = useMemo(() => {
-		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
+		return userById?.role_id ? RolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 
 	const checkOwner = (userId: string) => {
@@ -100,7 +100,7 @@ const UserProfile = React.memo(({ userId, user, onClose }: userProfileProps) => 
 							</View>
 						)}
 					</View>
-					{userById?.user?.about_me || userRolesClan.length ? (
+					{userById?.user?.about_me || userRolesClan?.length ? (
 						<View style={[styles.userInfo]}>
 							{userById?.user?.about_me && (
 								<View>
@@ -108,7 +108,7 @@ const UserProfile = React.memo(({ userId, user, onClose }: userProfileProps) => 
 									<Text style={[styles.aboutMeText]}>{userById?.user?.about_me}</Text>
 								</View>
 							)}
-							{userRolesClan.length
+							{userRolesClan?.length
 								? (<View style={[styles.roles]}>
 									<Text style={[styles.title]}>{t('aboutMe.roles.headerTitle')}</Text>
 									{userRolesClan.map((role, index) => (

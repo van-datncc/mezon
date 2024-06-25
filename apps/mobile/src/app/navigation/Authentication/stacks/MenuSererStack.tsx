@@ -1,6 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { APP_SCREEN } from "../../ScreenTypes";
-import { Colors } from "@mezon/mobile-ui";
+import { Colors, Fonts } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 import CategoryCreator from "../../../components/Category";
 import ClanSetting from "../../../components/ClanSettings";
@@ -27,8 +27,8 @@ export const MenuClanStacks = ({ }: any) => {
                     backgroundColor: Colors.primary
                 },
                 headerTitleStyle: {
-                    fontSize: 14,
-                    fontWeight: 'normal'
+                    fontSize: Fonts.size.h6,
+                    fontWeight: 'bold'
                 }
             }}>
 

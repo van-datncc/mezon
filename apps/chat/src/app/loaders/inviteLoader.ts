@@ -1,17 +1,15 @@
-import { getStoreAsync, inviteActions } from '@mezon/store';
-import { LoaderFunction, ShouldRevalidateFunction } from 'react-router-dom';
+import { inviteActions } from '@mezon/store';
+import { ShouldRevalidateFunction } from 'react-router-dom';
+import { CustomLoaderFunction } from './appLoader';
 
-export const inviteLoader: LoaderFunction = async ({ params }) => {
+export const inviteLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
 	const { inviteId } = params;
-	const store = await getStoreAsync();
 	if (!inviteId) {
 		throw new Error('inviteId ID null');
 	}
-	store.dispatch(
-		inviteActions.getLinkInvite({ inviteId: inviteId })
-	);
+	dispatch(inviteActions.getLinkInvite({ inviteId: inviteId }));
 
-	return null
+	return null;
 };
 export const shouldRevalidateInvite: ShouldRevalidateFunction = (ctx) => {
 	const { currentParams, nextParams } = ctx;
@@ -20,4 +18,3 @@ export const shouldRevalidateInvite: ShouldRevalidateFunction = (ctx) => {
 
 	return currentInviteId !== nextInviteId;
 };
-

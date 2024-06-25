@@ -10,11 +10,12 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
+	referencesActions,
+	toastActions,
 	useAppDispatch,
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { sleep } from 'libs/store/src/lib/helpers';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -76,24 +77,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessageEvent) => {
+			const senderId = message.sender_id;
+
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
 
-			const senderId = message.sender_id;
-
-			// Workaround for the case when the user sends a message to himself
-			//  delay 1s to update the message
-			// wait for the response from the server to update the message first
-			// before updating the message from the socket
-			if (senderId === userId) {
-				await sleep(100);
-			}
+			mess.isMe = senderId === userId;
 
 			dispatch(directActions.updateDMSocket(message));
-			dispatch(messagesActions.newMessage(mess));
+			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
+			dispatch(messagesActions.newMessage(mess));
 		},
 		[dispatch, userId],
 	);
@@ -123,16 +119,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 	const ondisconnect = useCallback(() => {
-		reconnect().catch((e) => 'trying to reconnect');
-	}, [reconnect]);
+		console.log('Socket disconnected');
+		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
+		reconnect();
+	}, [reconnect, dispatch]);
 
 	const onerror = useCallback((event: unknown) => {
-		try {
-			console.log(event);
-		} catch (error) {
-			console.error('An error occurred while handling the error:', error);
-		}
-	}, []);
+		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
+	  }, [dispatch]);
+
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
 			if (e && e.sender_id === userId) {
@@ -192,6 +187,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
+	const onHeartbeatTimeout = useCallback(() => {
+		console.log('Heartbeat timeout');
+		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
+		reconnect()
+	}, [dispatch, reconnect]);
+
 	useEffect(() => {
 		const socket = socketRef.current;
 		if (!socket) {
@@ -224,6 +225,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		socket.onchannelupdated = onchannelupdated;
 
+		socket.onheartbeattimeout = onHeartbeatTimeout;
+
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelmessage = () => {};
@@ -251,6 +254,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelcreated,
 		onchanneldeleted,
 		onchannelupdated,
+		onHeartbeatTimeout,
 	]);
 
 	useEffect(() => {
