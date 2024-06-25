@@ -28,7 +28,7 @@ function AttachmentSwitcher({ mode: _mode, onChange }: AttachmentPickerProps) {
 
 	return (
 		<TouchableOpacity onPress={onPickerPress}>
-			<PlusIcon width={22} height={22} />
+			<PlusIcon width={20} height={20} />
 		</TouchableOpacity>
 	);
 }
