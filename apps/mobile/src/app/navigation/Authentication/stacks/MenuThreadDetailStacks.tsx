@@ -8,7 +8,8 @@ import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import { useSelector } from 'react-redux';
 import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
 import CreateThreadModal from '../../../components/ThreadDetail';

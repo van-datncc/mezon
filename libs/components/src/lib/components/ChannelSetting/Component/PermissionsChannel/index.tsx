@@ -1,11 +1,11 @@
 import { IChannel } from '@mezon/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Icons from '../../../Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import ListRolePermission from './listRolePermission';
 import ListMemberPermission from './listMemberPermission';
-
+import { channelsActions, useAppDispatch } from '@mezon/store';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
@@ -15,7 +15,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
-
+	const dispatch = useAppDispatch();
 	const handleToggle = () => {
 		setValueToggle(!valueToggle);
 	};
@@ -24,8 +24,9 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		setValueToggle(valueToggleInit);
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		setValueToggleInit(valueToggle);
+		await dispatch(channelsActions.updateChannelPrivate({channel_id: channel.id,channel_private: channel.channel_private || 0}));
 	};
 
 	const openAddMemRoleModal = () => {

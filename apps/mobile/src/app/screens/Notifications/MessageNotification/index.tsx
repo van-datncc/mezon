@@ -1,11 +1,11 @@
  import  React, { useEffect, useState } from 'react';
 import { IMessageNotifyProps } from '../types';
-import { View , Text, Linking} from 'react-native';
+import { View , Linking} from 'react-native';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import FastImage from 'react-native-fast-image';
  import ImageView from 'react-native-image-view';
 import VideoPlayer from 'react-native-video-player';
-import { Metrics } from '@mezon/mobile-ui';
+import { Text, Metrics } from '@mezon/mobile-ui';
 import { styles as s } from './MessageNotification.styles';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { mentionRegex, mentionRegexSplit, urlPattern, validURL } from '../../../utils/helpers';
@@ -101,8 +101,8 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 	};
 
   const renderTextWithLinks = (text: string, matches: RegExpMatchArray) => {
-		const parts = text.split(urlPattern);
-		return parts.map((part, index) => {
+		const parts = text?.split?.(urlPattern);
+		return parts?.map?.((part, index) => {
 			if (!part) return <View />;
 			return (
 				<Text
@@ -136,7 +136,7 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 			.filter(Boolean)
 			.filter((i) => i !== '@' && i !== '#');
 
-		return parts.map((part, index) => {
+		return parts?.map?.((part, index) => {
 			if (!part) return <View />;
 			return (
 				<Text
@@ -159,11 +159,11 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
   const renderTextContent = () => {
 		const isLinkPreview = validURL(newMessage);
 
-		const matchesMention = newMessage.match(mentionRegex);
+		const matchesMention = newMessage?.match?.(mentionRegex);
 		if (matchesMention?.length) {
 			return <Text>{renderTextWithMention(newMessage, matchesMention)}</Text>;
 		}
-		const matches = newMessage.match(urlPattern);
+		const matches = newMessage?.match?.(urlPattern);
 		if (isLinkPreview) {
 			return <Text>{renderTextWithLinks(newMessage, matches)}</Text>;
 		}

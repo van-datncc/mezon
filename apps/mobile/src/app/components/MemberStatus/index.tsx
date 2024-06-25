@@ -1,5 +1,6 @@
 import { useChannelMembers } from "@mezon/core";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import { ScrollView } from "react-native-gesture-handler";
 import MemberItem from "./MemberItem";
 import style from "./style";
