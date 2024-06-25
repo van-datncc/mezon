@@ -323,7 +323,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							</View>
 						)}
 						<Text style={styles.repliedContentText} numberOfLines={1}>
-							{messageRefFetchFromServe.content.t}
+							{messageRefFetchFromServe?.content?.t?.trim()}
 						</Text>
 					</Pressable>
 				</View>

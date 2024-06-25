@@ -2,6 +2,7 @@ import { ChannelMembersEntity } from "@mezon/utils";
 import { Image, Text, View } from "react-native";
 import { OfflineStatus, OnlineStatus } from "@mezon/mobile-components"
 import style from "./style";
+import { useMemo } from "react";
 interface IProps {
     user: ChannelMembersEntity;
     status?: boolean;
@@ -17,6 +18,11 @@ export default function MemberProfile({
     numCharCollapse = 6,
     isOffline
 }: IProps) {
+    const name = useMemo(() => {
+        if (user) {
+            return user.user.display_name || user.user.username
+        }
+    }, [user])
     return (
         <View style={{ ...style.container, opacity: isOffline ? 0.5 : 1 }} >
 
@@ -42,8 +48,8 @@ export default function MemberProfile({
                     <Text style={style.textName}>
                         {
                             user.user.username.length > numCharCollapse
-                                ? `${user.user.username.substring(0, numCharCollapse)}...`
-                                : user.user.username
+                                ? `${name.substring(0, numCharCollapse)}...`
+                                : name
                         }
                     </Text>
                 }

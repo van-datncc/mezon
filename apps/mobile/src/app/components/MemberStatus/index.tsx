@@ -1,26 +1,49 @@
+import React from 'react';
 import { useChannelMembers } from "@mezon/core";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import MemberItem from "./MemberItem";
 import style from "./style";
-import { AddMemberIcon, AngleRightIcon } from "@mezon/mobile-components";
+import { AddMemberIcon, AngleRightIcon, ChevronIcon, UserGroupIcon } from "@mezon/mobile-components";
 import { useContext, useMemo, useState } from "react";
 import { threadDetailContext } from "../ThreadDetail/MenuThreadDetail";
 import { ChannelType } from "mezon-js";
 import { UserInformationBottomSheet } from "../UserInformationBottomSheet";
 import { ChannelMembersEntity } from "@mezon/utils";
+import { useNavigation } from "@react-navigation/native";
+import { APP_SCREEN } from "../../navigation/ScreenTypes";
+import { useTranslation } from "react-i18next";
+import { DirectEntity } from '@mezon/store-mobile';
 
-export default function MemberListStatus() {
+export const MemberListStatus = React.memo(() => {
     const currentChannel = useContext(threadDetailContext);
+    const navigation = useNavigation<any>();
     const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannel?.id });
     const [ selectedUser, setSelectedUser ] = useState<ChannelMembersEntity | null>(null);
+    const { t } = useTranslation();
 
     const isDMThread = useMemo(() => {
         return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
     }, [currentChannel])
 
+    const navigateToNewGroupScreen = () => {
+		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.NEW_GROUP, params: { directMessage: currentChannel as DirectEntity } });
+	};
+
     return (
         <ScrollView contentContainerStyle={style.container}>
+            {currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
+                <TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={style.actionItem}>
+                    <View style={[style.actionIconWrapper]}>
+                        <UserGroupIcon />
+                    </View>
+                    <View style={{flex: 1}}>
+                        <Text style={style.actionTitle}>{t('message:newMessage.newGroup')}</Text>
+                        <Text style={style.newGroupContent} numberOfLines={1}>{t('message:newMessage.createGroupWith')} {currentChannel?.channel_label}</Text>
+                    </View>
+                    <ChevronIcon height={15} width={15} />
+                </TouchableOpacity>
+            ): null}
             {currentChannel?.channel_avatar?.length !== 1 ? (
                 <Pressable>
                     <View style={style.inviteBtn}>
@@ -71,4 +94,4 @@ export default function MemberListStatus() {
             <UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={() => setSelectedUser(null)}  />
         </ScrollView>
     )
-}
+})
