@@ -1,23 +1,24 @@
 import { Icons } from '@mezon/components';
 import { useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions } from '@mezon/store';
+import { reactionActions, referencesActions } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 type ReactionBottomProps = {
 	smileButtonRef: React.RefObject<HTMLDivElement>;
+	messageIdRefReaction: string;
 };
 
-const ReactionBottom = ({ smileButtonRef }: ReactionBottomProps) => {
+const ReactionBottom = ({ smileButtonRef, messageIdRefReaction }: ReactionBottomProps) => {
 	const dispatch = useDispatch();
-
 	const [highlightColor, setHighLightColor] = useState('#AEAEAE');
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const handleClickOpenEmojiBottom = useCallback(
 		(event: React.MouseEvent<HTMLDivElement>) => {
 			setSubPanelActive(SubPanelName.EMOJI_REACTION_BOTTOM);
 			event.stopPropagation();
+			dispatch(referencesActions.setIdReferenceMessageReaction(messageIdRefReaction));
 		},
 		[setSubPanelActive],
 	);
