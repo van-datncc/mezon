@@ -71,7 +71,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 							{notify?.subject} - {channelInfo?.channel_label}:
 						</Text>
 						<View style={s.contentMessage}>
-							<MessageNotification message={data} newMessage={messageContent?.t}></MessageNotification>
+							<MessageNotification message={data}></MessageNotification>
 						</View>
 					</View>
 					<Text style={s.notifyDuration}>{messageTimeDifference}</Text>

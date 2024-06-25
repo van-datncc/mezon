@@ -5,6 +5,9 @@ import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from 
 import styles from "./styles";
 import { useTranslation } from "react-i18next";
 import LogoClanSelector from "./LogoClanSelector";
+import { ChannelListIcon, CircleInformationIcon, ClipboardListIcon, GameControllerIcon, GroupIcon, HammerIcon, LinkIcon, ModerationIcon, ReactionIcon, ShieldUserIcon, ShopSparkleIcon, TreeHouseIcon, WebhookIcon }
+    // @ts-ignore
+    from "libs/mobile-components/src/lib/icons2";
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.SETTINGS;
 
@@ -30,49 +33,49 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
                 navigation.navigate(APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING)
             },
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <CircleInformationIcon />
         },
         {
             title: t('menu.settings.moderation'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ModerationIcon />
         },
         {
             title: t('menu.settings.auditLog'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ClipboardListIcon />
         },
         {
             title: t('menu.settings.channels'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ChannelListIcon />
         },
         {
             title: t('menu.settings.integrations'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <GameControllerIcon />
         },
         {
             title: t('menu.settings.emoji'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ReactionIcon />
         },
         {
             title: t('menu.settings.webhooks'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <WebhookIcon />
         },
         {
             title: t('menu.settings.security'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ShieldUserIcon />
         }
     ]
 
@@ -81,7 +84,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
             title: t('menu.community.enableCommunity'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <TreeHouseIcon />
         }
     ]
 
@@ -90,7 +93,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
             title: t('menu.subscriptions.getStarted'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ShopSparkleIcon />
         }
     ]
 
@@ -99,25 +102,25 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
             title: t('menu.userManagement.members'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <GroupIcon />
         },
         {
             title: t('menu.userManagement.role'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <ShieldUserIcon />
         },
         {
             title: t('menu.userManagement.invite'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <LinkIcon />
         },
         {
             title: t('menu.userManagement.bans'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HashSignLockIcon />
+            icon: <HammerIcon />
         }
     ]
 

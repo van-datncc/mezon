@@ -246,7 +246,16 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleReact = async (mode, messageId, emoji: IEmojiImage, senderId) => {
-		await reactionMessageDispatch('', mode, currentChannel.id, currentChannel.channel_label, messageId || '', emoji.shortname, 1, senderId ?? '', false);
+		await reactionMessageDispatch(
+			'',
+			mode,
+			message.channel_id ?? '',
+			messageId ?? '',
+			emoji?.shortname?.trim(),
+			1,
+			senderId ?? '',
+			false,
+		);
 		onClose();
 	};
 

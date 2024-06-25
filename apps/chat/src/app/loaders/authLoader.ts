@@ -1,8 +1,9 @@
-import { accountActions, authActions, clansActions, getStoreAsync, selectInitialPath } from '@mezon/store';
+import { accountActions, authActions, clansActions } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
+import { CustomLoaderFunction } from './appLoader';
 
 export interface IAuthLoaderData {
-    isLogin: boolean;
+	isLogin: boolean;
 	redirect?: string;
 }
 
@@ -21,33 +22,28 @@ function getRedirectTo(initialPath?: string): string {
 	return '';
 }
 
-
-export const authLoader = async () => {
-	const store = await getStoreAsync();
-	store.dispatch(clansActions.joinClan({clanId: "0"}),);
+export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
+	dispatch(clansActions.joinClan({ clanId: '0' }));
 	try {
-		const response = await store.dispatch(authActions.refreshSession());
+		const response = await dispatch(authActions.refreshSession());
 		if ((response as unknown as IWithError).error) {
 			throw new Error('Session expired');
 		}
-	
-		const profileResponse = await store.dispatch(accountActions.getUserProfile());
-		
+
+		const profileResponse = await dispatch(accountActions.getUserProfile());
+
 		if ((profileResponse as unknown as IWithError).error) {
 			throw new Error('Session expired');
 		}
 		return {
-			isLogin: true
+			isLogin: true,
 		} as IAuthLoaderData;
 	} catch (error) {
-		const initialPath = selectInitialPath(store.getState());
-		
-		const redirectTo = getRedirectTo(initialPath)
+		const redirectTo = getRedirectTo(initialPath);
 		const redirect = redirectTo ? `/guess/login?redirect=${redirectTo}` : '/guess/login';
-
 		return {
 			isLogin: false,
-			redirect: redirect
+			redirect: redirect,
 		} as IAuthLoaderData;
 	}
 };

@@ -28,7 +28,7 @@ export default function ChannelListHeader({ onPress, clan }: IProps) {
 
             <TouchableOpacity  activeOpacity={0.8} onPress={handlePress} style={styles.listHeader}>
                 <View style={styles.titleNameWrapper}>
-                    <Text style={styles.titleServer}>{clan?.clan_name}</Text>
+                    <Text numberOfLines={1} style={styles.titleServer}>{clan?.clan_name}</Text>
                     <VerifyIcon width={18} height={18} />
                 </View>
 

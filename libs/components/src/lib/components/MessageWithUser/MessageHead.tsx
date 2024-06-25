@@ -90,7 +90,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 			</div>
 			{isShowPanelChannel && (
 				<div
-					className={`dark:bg-black bg-gray-200 mt-[10px] w-[360px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
+					className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 opacity-100 fixed `}
 					style={{
 						left: `20px`,
 						top: positionBottom ? '' : `${positionTop}px`,
@@ -100,7 +100,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} />
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} />
 				</div>
 			)}
 		</div>

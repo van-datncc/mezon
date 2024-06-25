@@ -83,14 +83,13 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 							<ul className="flex flex-col gap-y-[5px] max-h-[200px]">
 								{searchResults.map((permission) => (
 									<li key={permission.id} className="flex items-center justify-between">
-										<span>{permission?.user?.display_name}</span>
-										<label>
-											<input
-												type="checkbox"
-												checked={selectedUsers.includes(permission.id)}
-												onChange={() => handleUserToggle(permission.id)}
-											/>
-										</label>
+										<label htmlFor={permission.id} className='text-start w-full'>{permission?.user?.display_name}</label>
+										<input
+											id={permission.id}
+											type="checkbox"
+											checked={selectedUsers.includes(permission.id)}
+											onChange={() => handleUserToggle(permission.id)}
+										/>
 									</li>
 								))}
 							</ul>

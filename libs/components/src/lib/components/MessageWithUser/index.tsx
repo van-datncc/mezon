@@ -2,7 +2,7 @@ import { useAuth, useChatMessages, useNotification } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons/index';
@@ -11,6 +11,7 @@ import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageReply from './MessageReply';
+import { useHover } from 'usehooks-ts'
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
@@ -24,12 +25,11 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
-	newMessage?: string;
-	child?: JSX.Element;
 	isMention?: boolean;
+	popup?: JSX.Element;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, popup }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
 	const divMessageWithUser = useRef<HTMLDivElement>(null);
@@ -38,63 +38,37 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
+	const containerRef = useRef<HTMLDivElement>(null);
+	const isHover = useHover(containerRef)
 	const userLogin = useAuth();
 
 	const isCombine = !message.isStartedMessageGroup;
 
 	const attachments = useMemo(() => message.attachments, [message.attachments]);
 
-	const propsChild = { isCombine };
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const checkReferences = message.references?.length !== 0;
-
 	const [checkMessageReply, setCheckMessageReply] = useState(false);
 	const [checkMessageToMove, setCheckMessageToMove] = useState(false);
 	const [checkMessageIncludeMention, setCheckMessageIncludeMention] = useState<boolean | undefined>(false);
-
-	useEffect(() => {
-		setCheckMessageReply(checkReplied);
-		setCheckMessageToMove(checkMessageTargetToMoved);
-		setCheckMessageIncludeMention(hasIncludeMention ?? undefined);
-	}, [checkReplied, checkMessageTargetToMoved, hasIncludeMention, idMessageToJump]);
-
+	const [checkMessageHasReply, setCheckMessageHasReply] = useState<boolean>(false);
 	const [classNameHighlightParentDiv, setClassNameHighlightParentDiv] = useState<string>('');
 	const [classNameHighlightChildDiv, setClassNameHighlightChildDiv] = useState<string>('');
 	const [classNameNotification, setClassNameNotification] = useState<string>('');
 
-	useEffect(() => {
-		let resetTimeoutId: NodeJS.Timeout | null = null;
-
-		if (idMessageNotifed === message.id) {
-			setClassNameNotification('bg-[#383B47]');
-			resetTimeoutId = setTimeout(() => {
-				setClassNameNotification('');
-				setMessageNotifedId('');
-			}, 2000);
-		}
-		return () => {
-			if (resetTimeoutId) {
-				clearTimeout(resetTimeoutId);
-			}
-		};
-	}, [idMessageNotifed, message.id]);
-
-	useEffect(() => {
-		if (checkMessageReply || checkMessageToMove) {
-			setClassNameHighlightParentDiv('dark:bg-[#383B47]');
-			setClassNameHighlightChildDiv('dark:bg-blue-500');
-		} else if (checkMessageIncludeMention) {
-			setClassNameHighlightParentDiv('dark:bg-[#403D38]');
-			setClassNameHighlightChildDiv('dark:bg-[#F0B132]');
-		}
-	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
+	const shouldShowDateDivider = useMemo(() => {
+		return message.isStartedMessageOfTheDay && !isMessNotifyMention;
+	}, [message.isStartedMessageOfTheDay, isMessNotifyMention]);
 
 	const messageDividerClass = classNames(
-		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
-		{ hidden: !message.isStartedMessageOfTheDay || isMessNotifyMention },
+		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent'
 	);
+
+	const isHeadfull = useMemo(() => {
+		return isCombine && !checkReferences;
+	}, [isCombine, checkReferences]);
 
 	const containerClass = classNames('relative', 'message-container', {
 		'mt-3': !isCombine || checkReferences,
@@ -119,35 +93,72 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
+	useEffect(() => {
+		let resetTimeoutId: NodeJS.Timeout | null = null;
+
+		if (idMessageNotifed === message.id) {
+			setClassNameNotification('bg-[#383B47]');
+			resetTimeoutId = setTimeout(() => {
+				setClassNameNotification('');
+				setMessageNotifedId('');
+			}, 2000);
+		}
+		return () => {
+			if (resetTimeoutId) {
+				clearTimeout(resetTimeoutId);
+			}
+		};
+	}, [idMessageNotifed, message.id, setMessageNotifedId]);
+
+	useEffect(() => {
+		if (checkMessageReply || checkMessageToMove) {
+			setClassNameHighlightParentDiv('dark:bg-[#383B47]');
+			setClassNameHighlightChildDiv('dark:bg-blue-500');
+		} else if (checkMessageIncludeMention) {
+			setClassNameHighlightParentDiv('dark:bg-[#403D38]');
+			setClassNameHighlightChildDiv('dark:bg-[#F0B132]');
+		}
+	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
+
+	useEffect(() => {
+		setCheckMessageReply(checkReplied);
+		setCheckMessageToMove(checkMessageTargetToMoved);
+		setCheckMessageIncludeMention(hasIncludeMention ?? undefined);
+	}, [checkReplied, checkMessageTargetToMoved, hasIncludeMention, idMessageToJump]);
+
+	useLayoutEffect(() => {
+		if (message.references && message.references?.length > 0) {
+			setCheckMessageHasReply(true);
+		} else {
+			setCheckMessageHasReply(false);
+		}
+	}, [message.references]);
+
 	return (
 		<>
-			<div className={messageDividerClass}>
+			{shouldShowDateDivider && <div className={messageDividerClass}>
 				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
 				<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
 				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-			</div>
-			<div className={containerClass}>
+			</div>}
+			<div className={containerClass} ref={containerRef}>
 				<div className="relative rounded-sm overflow-visible">
 					<div className={childDivClass}></div>
 					<div className={parentDivClass}>
-						<MessageReply message={message} />
+						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="w-full relative h-full">
-								<MessageHead message={message} user={user} isCombine={isCombine} />
+								{isHeadfull && <MessageHead message={message} user={user} isCombine={isCombine} />}
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										<MessageContent
 											message={message}
 											user={user}
 											isCombine={isCombine}
-											newMessage={newMessage}
 											isSending={message.isSending}
 											isError={message.isError}
 										/>
-										{child?.props.children[1] &&
-											React.isValidElement(child?.props.children[1]) &&
-											React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
@@ -164,9 +175,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 						)}
 					</div>
 				</div>
-				{child?.props.children[0] &&
-					React.isValidElement(child?.props.children[0]) &&
-					React.cloneElement(child?.props.children[0], propsChild)}
+				{(!!popup && isHover) && popup}
 			</div>
 		</>
 	);

@@ -72,7 +72,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 				</View>
 			) : (
 				<View>
-					<Image source={{ uri: directMessage.channel_avatar[0] }} style={styles.friendAvatar} />
+					<Image source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
 					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 				</View>
 			)}
@@ -101,6 +101,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
+	console.log('dmGroupChatList', dmGroupChatList);
 	const { t } = useTranslation(['dmMessage', 'common']);
 
 	const sortDM = (a, b) => {

@@ -1,5 +1,6 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { createCachedSelector } from '../messages/messages.slice';
 
 export const APP_FEATURE_KEY = 'app';
 
@@ -94,7 +95,7 @@ export const selectError = createSelector(getAppState, (state: AppState) => stat
 
 export const selectIsShowMemberList = createSelector(getAppState, (state: AppState) => state.isShowMemberList);
 
-export const selectInitialPath = createSelector(getAppState, (state: AppState) => state.initialPath);
+export const selectInitialPath = createCachedSelector(getAppState, (state: AppState) => state.initialPath);
 
 export const selectCloseMenu = createSelector(getAppState, (state: AppState) => state.closeMenu);
 
