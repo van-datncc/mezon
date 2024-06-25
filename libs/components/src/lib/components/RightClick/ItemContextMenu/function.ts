@@ -54,4 +54,6 @@ const handleOpenLink = (urlData: string) => {
 	window.open(urlData, '_blank');
 };
 
+
+
 export { convertImageToBlobFile, handleCopyImage, handleCopyLink, handleOpenLink, handleSaveImage };

@@ -1,6 +1,10 @@
+import { messagesActions, referencesActions } from '@mezon/store';
 import { RightClickList } from '@mezon/utils';
+import { selectMessageIdRightClicked } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { memo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { ItemDetail } from '../ItemDetail';
+import { useDispatch, useSelector } from 'react-redux';
+import ItemDetail from '../ItemDetail';
 import { handleCopyImage, handleCopyLink, handleOpenLink, handleSaveImage } from './function';
 
 interface IMenuItem {
@@ -9,6 +13,8 @@ interface IMenuItem {
 }
 
 const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
+	const dispatch = useDispatch();
+	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 	const clickItem = () => {
 		if (item.name === RightClickList.COPY_IMAGE) {
 			return handleCopyImage(urlData);
@@ -21,6 +27,12 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 		}
 		if (item.name === RightClickList.OPEN_LINK) {
 			return handleOpenLink(urlData);
+		}
+		if (item.name === RightClickList.EDIT_MESSAGE) {
+			dispatch(referencesActions.setOpenReplyMessageState(false));
+			dispatch(referencesActions.setOpenEditMessageState(true));
+			dispatch(messagesActions.setOpenOptionMessageState(false));
+			dispatch(referencesActions.setIdReferenceMessageEdit(getMessageIdRightClicked));
 		}
 	};
 
@@ -37,4 +49,4 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 	);
 };
 
-export default MenuItem;
+export default memo(MenuItem);

@@ -15,7 +15,7 @@ import {
 } from '@mezon/ui';
 import { RightClickPos } from '@mezon/utils';
 import { selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
@@ -190,4 +190,4 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	);
 };
 
-export default ContextMenu;
+export default memo(ContextMenu);
