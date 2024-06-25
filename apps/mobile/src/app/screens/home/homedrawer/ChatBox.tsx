@@ -4,6 +4,7 @@ import {
 	AddThread,
 	AngleRightIcon,
 	MicrophoneIcon,
+	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	SendIcon,
 	convertMentionsToText,
 	getAttachmentUnique,
@@ -141,27 +142,27 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
 
-	async function loadMessage() {
-		const messages = await load("temp_message");
+	async function loadMessageCache() {
+		const messages = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
 		setAllMessages(messages);
 		return messages[props?.channelId] || "";
 	}
 
-	function setMessage(text: string) {
-		save("temp_message", {
+	function setMessageCache(text: string) {
+		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 			...allMessages,
 			[props?.channelId]: text,
 		});
 	}
 
 	useEffect(() => {
-		loadMessage().then((message) => {
+		loadMessageCache().then((message) => {
 			setText(message);
 		});
 	}, [props?.channelId])
 
 	useEffect(() => {
-		setMessage(text);
+		setMessageCache(text);
 	}, [text])
 
 	//start: DM stuff
