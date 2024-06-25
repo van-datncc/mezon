@@ -1,5 +1,6 @@
 import React from "react";
-import { TouchableOpacity, View, Image, Text, Pressable } from "react-native";
+import { TouchableOpacity, View, Image, Pressable } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import { styles } from "./styles";
 import { FriendsEntity } from "@mezon/store-mobile";
 import { useMemberStatus } from "@mezon/core";
