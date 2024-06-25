@@ -11,6 +11,7 @@ export interface RightClickState {
 	messageIdClickedRightClicked: string;
 	posClickActive: RightClickPos;
 	modeActive: ChannelStreamMode;
+	reactionOnMessageList: string[];
 }
 
 export const initialRightClickState: RightClickState = {
@@ -23,6 +24,7 @@ export const initialRightClickState: RightClickState = {
 	messageIdClickedRightClicked: '',
 	posClickActive: RightClickPos.NONE,
 	modeActive: ChannelStreamMode.STREAM_MODE_CHANNEL,
+	reactionOnMessageList: [],
 };
 
 export const rightClickSlice = createSlice({
@@ -41,6 +43,9 @@ export const rightClickSlice = createSlice({
 		setModeActive: (state, action) => {
 			state.modeActive = action.payload;
 		},
+		setReactionMessageList: (state, action) => {
+			state.reactionOnMessageList = action.payload;
+		},
 	},
 });
 
@@ -57,3 +62,5 @@ export const selectMessageIdRightClicked = createSelector(getRightClickState, (s
 export const selectPosClickingActive = createSelector(getRightClickState, (state: RightClickState) => state.posClickActive);
 
 export const selectModeActive = createSelector(getRightClickState, (state: RightClickState) => state.modeActive);
+
+export const selectReactionOnMessageList = createSelector(getRightClickState, (state: RightClickState) => state.reactionOnMessageList);

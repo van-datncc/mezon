@@ -15,8 +15,8 @@ import {
 	viewReactionList,
 } from '@mezon/ui';
 import { RightClickPos } from '@mezon/utils';
-import { selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
-import { memo, useLayoutEffect, useRef, useState } from 'react';
+import { selectPosClickingActive, selectReactionOnMessageList } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
@@ -42,6 +42,20 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 	const { currentClan } = useClans();
 	const { userId } = useAuth();
 	const [listTextToMatch, setListTextToMatch] = useState<any[]>(listClickDefault);
+	const getListReactionMessageId = useSelector(selectReactionOnMessageList);
+	const checkReactionHasExistRealtime = (arrayMessageIdReaction: string[], messageId: string) => {
+		return arrayMessageIdReaction.includes(messageId);
+	};
+	const [checkReactionRealtime, setCheckReactionRealtime] = useState<boolean>(false);
+
+	useEffect(() => {
+		const check = checkReactionHasExistRealtime(getListReactionMessageId, getMessageIdRightClicked);
+		if (check) {
+			setCheckReactionRealtime(true);
+		} else {
+			setCheckReactionRealtime(false);
+		}
+	}, [getListReactionMessageId]);
 
 	useLayoutEffect(() => {
 		if (messageRClicked) {
@@ -49,6 +63,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 			const checkOwnerMessage = messageRClicked?.sender_id === userId;
 			const checkMessHasReaction = messageRClicked?.reactions && messageRClicked?.reactions?.length > 0;
 			const checkMessHasText = messageRClicked?.content.t !== '';
+
 			if (checkOwnerClan) {
 				let combineOwnerClan: any[] = [];
 				if (messageExists) {
@@ -60,25 +75,32 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 				if (checkOwnerMessage) {
 					const combineOwnerMessage = [...combineOwnerClan, ...editMessageList, ...deleteMessageList];
 					setListTextToMatch(combineOwnerMessage);
-					if (checkMessHasReaction) {
+					if (checkMessHasReaction || checkReactionRealtime) {
 						const combineHasReaction = [...combineOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
 						setListTextToMatch(combineHasReaction);
 						if (checkMessHasText) {
 							const combineHasText = [...combineHasReaction, ...speakMessageList];
 							setListTextToMatch(combineHasText);
 						}
+					} else if (!checkMessHasReaction && !checkReactionRealtime) {
+						const combineNoReaction = [...combineOwnerMessage];
+						setListTextToMatch(combineNoReaction);
+						if (checkMessHasText) {
+							const combineHasText = [...combineNoReaction, ...speakMessageList];
+							setListTextToMatch(combineHasText);
+						}
 					}
 				} else if (!checkOwnerMessage) {
 					const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList, ...deleteMessageList];
 					setListTextToMatch(combineNoOwnerMessage);
-					if (checkMessHasReaction) {
+					if (checkMessHasReaction || checkReactionRealtime) {
 						const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList, ...removeReactionList, ...removeAllReactionList];
 						setListTextToMatch(combineHasReaction);
 						if (checkMessHasText) {
 							const combineHasText = [...combineHasReaction, ...speakMessageList];
 							setListTextToMatch(combineHasText);
 						}
-					} else if (!checkMessHasReaction) {
+					} else if (!checkMessHasReaction && !checkReactionRealtime) {
 						let combineNotReaction: any[] = [];
 						if (messageExists) {
 							combineNotReaction = [...combineNoOwnerMessage, ...unPinMessageList];
@@ -98,14 +120,14 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 				if (checkOwnerMessage) {
 					const combineOwnerMessage = [...combineNoOwnerClan, ...deleteMessageList, ...editMessageList];
 					setListTextToMatch(combineOwnerMessage);
-					if (checkMessHasReaction) {
+					if (checkMessHasReaction || checkReactionRealtime) {
 						const combineHasReaction = [...combineOwnerMessage, ...viewReactionList];
 						setListTextToMatch(combineHasReaction);
 						if (checkMessHasText) {
 							const combineHasText = [...combineHasReaction, ...speakMessageList];
 							setListTextToMatch(combineHasText);
 						}
-					} else if (!checkMessHasReaction) {
+					} else if (!checkMessHasReaction && !checkReactionRealtime) {
 						const combineNotReaction = [...combineOwnerMessage];
 						setListTextToMatch(combineNotReaction);
 						if (checkMessHasText) {
@@ -116,14 +138,14 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 				} else if (!checkOwnerMessage) {
 					const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
 					setListTextToMatch(combineNoOwnerMessage);
-					if (checkMessHasReaction) {
+					if (checkMessHasReaction || checkReactionRealtime) {
 						const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList];
 						setListTextToMatch(combineHasReaction);
 						if (checkMessHasText) {
 							const combineHasText = [...combineHasReaction, ...speakMessageList];
 							setListTextToMatch(combineHasText);
 						}
-					} else if (!checkMessHasReaction) {
+					} else if (!checkMessHasReaction && !checkReactionRealtime) {
 						const combineNotReaction = [...combineNoOwnerMessage];
 						setListTextToMatch(combineNotReaction);
 						if (checkMessHasText) {
@@ -134,7 +156,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 				}
 			}
 		}
-	}, [messageRClicked, messageExists]);
+	}, [messageRClicked, messageExists, checkReactionRealtime]);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
