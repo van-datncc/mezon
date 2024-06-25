@@ -62,7 +62,7 @@ export const codeBlockRegexGlobal = /```[\s\S]*?```/g;
 export const splitBlockCodeRegex = /(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
 
 export const validURL = (string: string) => {
-  const res = string.match(urlPattern);
+  const res = string?.match?.(urlPattern);
   return res !== null;
 };
 

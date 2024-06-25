@@ -4,7 +4,8 @@ import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { styles } from './styles';
 

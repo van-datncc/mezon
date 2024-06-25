@@ -216,15 +216,11 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 			coverScreen={true}
 			avoidKeyboard={false}
 			onBackdropPress={onClose}
-			swipeDirection={'down'}
 			onSwipeComplete={onClose}
 			backdropColor={'rgba(0,0,0, 0.7)'}
 		>
 			<View style={styles.sheetContainer}>
 				<View style={styles.headerModal}>
-					<TouchableOpacity onPress={onClose}>
-						<CrossIcon height={16} width={16} />
-					</TouchableOpacity>
 					<Text style={styles.headerText}>Forward Message</Text>
 					<View style={{ width: 16 }}></View>
 				</View>

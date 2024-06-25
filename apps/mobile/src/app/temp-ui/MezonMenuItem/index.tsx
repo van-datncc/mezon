@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { AngleRightIcon } from "@mezon/mobile-components";
 
 export interface IMezonMenuItemProps {
+    isShow?: boolean;
     title: string,
     icon?: any,
     onPress?: () => void,
@@ -14,8 +15,9 @@ export interface IMezonMenuItemProps {
     disabled?: boolean,
     description?: string,
 }
-export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled, description }: IMezonMenuItemProps) {
+export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled, description, isShow = true }: IMezonMenuItemProps) {
     return (
+        isShow &&
         <TouchableOpacity
             disabled={disabled}
             onPress={() => { onPress && onPress() }}
