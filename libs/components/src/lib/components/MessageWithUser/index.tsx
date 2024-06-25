@@ -1,8 +1,15 @@
 import { useAuth, useChatMessages, useNotification, useRightClick } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectCurrentChannelId,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectMessageByMessageId,
+	selectOpenReplyMessageState,
+} from '@mezon/store';
 import { IChannelMember, RightClickPos } from '@mezon/utils';
 import classNames from 'classnames';
-import { rightClickAction, selectMessageIdRightClicked } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useDispatch, useSelector } from 'react-redux';
@@ -58,6 +65,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 	const [classNameNotification, setClassNameNotification] = useState<string>('');
 	const { setRightClickXy } = useRightClick();
 	const { setMessageRightClick } = useRightClick();
+	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
+	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay && !isMessNotifyMention;
@@ -94,23 +103,23 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
-	const [isMenuVisible, setMenuVisible] = useState(false);
+	const posClickActive = useSelector(selectPosClickingActive);
+
 	const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
 		event.preventDefault();
 		event.stopPropagation();
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.MESSAGE_ON_CHANNEL));
 		setRightClickXy({ x: event.pageX, y: event.pageY });
-		setMenuVisible(true);
 		setMessageRightClick(message.id);
 	};
 
 	const handleCloseMenu = () => {
-		setMessageRightClick('');
+		if (message.id === getMessageIdRightClicked) {
+			setMessageRightClick('');
+		}
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-		setMenuVisible(false);
 	};
 
-	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 	const [showOptStatus, setShowOptStatus] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -206,7 +215,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 					</div>
 				</div>
 				{showOptStatus && <ChannelMessageOpt message={message} />}
-				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
+				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && <ContextMenu urlData={''} />}
 			</div>
 		</>
 	);

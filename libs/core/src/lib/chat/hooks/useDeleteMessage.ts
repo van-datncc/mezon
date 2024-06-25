@@ -31,7 +31,6 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 				}),
 			);
 
-			console.log(channelId, mode, messageId);
 			await socket.removeChatMessage(channelId, mode, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channel, currentClanId, dispatch, channelId, mode],

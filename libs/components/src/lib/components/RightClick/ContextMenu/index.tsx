@@ -20,11 +20,10 @@ import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
-	onClose: () => void;
 	urlData: string;
 }
 
-const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
+const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 	const posClick = useSelector(selectPosClickingActive);
 	const { rightClickXy } = useRightClick();
 	const menuRef = useRef<HTMLDivElement | null>(null);
@@ -35,6 +34,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	const WINDOW_HEIGHT = window.innerHeight;
 	const WINDOW_WIDTH = window.innerWidth;
 	const { getMessageIdRightClicked } = useRightClick();
+
 	const getMessageRclicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 	const listPinMessages = useSelector(selectPinMessageByChannelId(getMessageRclicked.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === getMessageRclicked.id);
@@ -46,9 +46,9 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	useLayoutEffect(() => {
 		if (messageRClicked) {
 			const checkOwnerClan = currentClan?.creator_id === userId;
-			const checkOwnerMessage = messageRClicked.sender_id === userId;
-			const checkMessHasReaction = messageRClicked.reactions && messageRClicked.reactions?.length > 0;
-			const checkMessHasText = messageRClicked.content.t !== '';
+			const checkOwnerMessage = messageRClicked?.sender_id === userId;
+			const checkMessHasReaction = messageRClicked?.reactions && messageRClicked?.reactions?.length > 0;
+			const checkMessHasText = messageRClicked?.content.t !== '';
 			if (checkOwnerClan) {
 				let combineOwnerClan: any[] = [];
 				if (messageExists) {
@@ -175,30 +175,25 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ onClose, urlData }) => {
 	}
 
 	return (
-		<>
-			{messageRClicked !== undefined && (
-				<div
-					ref={menuRef}
-					className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
-					style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
-					onClick={onClose}
-				>
-					{sortListById(listTextToMatch)?.map((item: any) => {
-						return <MenuItem urlData={urlData} item={item} key={item.name} />;
-					})}
-					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
-					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
-						imageList.map((item: any) => {
-							return <MenuItem urlData={urlData} item={item} key={item.name} />;
-						})}
-					{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
-					{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
-						linkList.map((item: any) => {
-							return <MenuItem urlData={urlData} item={item} key={item.name} />;
-						})}
-				</div>
-			)}
-		</>
+		<div
+			ref={menuRef}
+			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
+			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
+		>
+			{sortListById(listTextToMatch)?.map((item: any) => {
+				return <MenuItem urlData={urlData} item={item} key={item.name} />;
+			})}
+			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
+			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
+				imageList.map((item: any) => {
+					return <MenuItem urlData={urlData} item={item} key={item.name} />;
+				})}
+			{posClick === RightClickPos.IMAGE_ON_CHANNEL && <hr className=" border-t-[#2E2F34]  my-2"></hr>}
+			{posClick === RightClickPos.IMAGE_ON_CHANNEL &&
+				linkList.map((item: any) => {
+					return <MenuItem urlData={urlData} item={item} key={item.name} />;
+				})}
+		</div>
 	);
 };
 

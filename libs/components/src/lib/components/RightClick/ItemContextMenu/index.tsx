@@ -9,9 +9,9 @@ import {
 	selectMessageByMessageId,
 	useAppDispatch,
 } from '@mezon/store';
-import { RightClickList } from '@mezon/utils';
+import { RightClickList, RightClickPos } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { selectMessageIdRightClicked, selectModeActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { rightClickAction, selectMessageIdRightClicked, selectModeActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { memo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
@@ -38,36 +38,33 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 
 	const clickItem = () => {
 		if (item.name === RightClickList.COPY_IMAGE) {
-			return handleCopyImage(urlData);
+			handleCopyImage(urlData);
 		}
 		if (item.name === RightClickList.SAVE_IMAGE) {
-			return handleSaveImage(urlData);
+			handleSaveImage(urlData);
 		}
 		if (item.name === RightClickList.COPY_LINK) {
-			return handleCopyLink(urlData);
+			handleCopyLink(urlData);
 		}
 		if (item.name === RightClickList.OPEN_LINK) {
-			return handleOpenLink(urlData);
+			handleOpenLink(urlData);
 		}
 		if (item.name === RightClickList.EDIT_MESSAGE) {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(messagesActions.setOpenOptionMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(getMessageIdRightClicked));
-			return;
 		}
 		if (item.name === RightClickList.REPLY) {
 			dispatch(referencesActions.setIdReferenceMessageReply(getMessageIdRightClicked));
 			dispatch(referencesActions.setOpenReplyMessageState(true));
 			dispatch(referencesActions.setOpenEditMessageState(false));
 			dispatch(messagesActions.setOpenOptionMessageState(false));
-			return;
 		}
 		if (item.name === RightClickList.COPY_TEXT) {
 			dispatch(referencesActions.setOpenEditMessageState(false));
 			dispatch(messagesActions.setOpenOptionMessageState(false));
 			dispatch(referencesActions.setDataReferences(null));
-			return;
 		}
 		if (item.name === RightClickList.FORWARD_MESSAGE) {
 			if (dmGroupChatList.length === 0) {
@@ -77,15 +74,15 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 			dispatch(setSelectedMessage(getMessageRclicked));
 		}
 		if (item.name === RightClickList.PIN_MESSAGE) {
-			dispatch(pinMessageActions.setChannelPinMessage({ channel_id: getMessageRclicked.channel_id, message_id: getMessageRclicked.id }));
+			dispatch(pinMessageActions.setChannelPinMessage({ channel_id: getMessageRclicked?.channel_id, message_id: getMessageRclicked?.id }));
 		}
 		if (item.name === RightClickList.UNPIN_MESSAGE) {
-			dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: getMessageRclicked.channel_id, message_id: getMessageRclicked.id }));
+			dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: getMessageRclicked?.channel_id, message_id: getMessageRclicked?.id }));
 		}
 		if (item.name === RightClickList.DELETE_MESSAGE) {
-			console.log(getMessageRclicked);
 			deleteSendMessage(getMessageRclicked.id);
 		}
+		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 	};
 
 	return (

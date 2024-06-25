@@ -1,9 +1,8 @@
 import { useAttachments, useRightClick } from '@mezon/core';
 import { RightClickPos, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
-import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { rightClickAction, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ContextMenu from '../RightClick/ContextMenu';
 
 export type MessageImage = {
@@ -17,31 +16,27 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	const { setRightClickXy, setMessageRightClick } = useRightClick();
+	const posClickActive = useSelector(selectPosClickingActive);
+
 	const handleClick = (url: string) => {
 		if (!isDimensionsValid && !checkImage) {
 			setOpenModalAttachment(true);
 			setAttachment(url);
 		}
-		handleCloseMenu();
 	};
 	const imgStyle = {
 		width: isDimensionsValid ? `${attachmentData.width}%` : undefined,
 		height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
 	};
 
-	const [isMenuVisible, setMenuVisible] = useState(false);
 	const handleContextMenu = (event: React.MouseEvent<HTMLImageElement>) => {
 		event.preventDefault();
 		event.stopPropagation();
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.IMAGE_ON_CHANNEL));
 		setRightClickXy({ x: event.pageX, y: event.pageY });
-		setMenuVisible(true);
 		setMessageRightClick(messageIdRightClick);
 	};
 
-	const handleCloseMenu = () => {
-		setMenuVisible(false);
-	};
 	return (
 		<div className="break-all">
 			<img
@@ -54,7 +49,7 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 				onClick={() => handleClick(attachmentData.url || '')}
 				style={imgStyle}
 			/>
-			{isMenuVisible && <ContextMenu urlData={attachmentData.url ?? ''} onClose={handleCloseMenu} />}
+			{posClickActive === RightClickPos.IMAGE_ON_CHANNEL && <ContextMenu urlData={attachmentData.url ?? ''} />}
 		</div>
 	);
 }

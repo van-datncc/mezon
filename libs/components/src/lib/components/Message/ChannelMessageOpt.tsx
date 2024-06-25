@@ -2,7 +2,7 @@ import { ContextMenu, Icons } from '@mezon/components';
 import { useAuth, useGifsStickersEmoji, useReference, useRightClick, useThreads } from '@mezon/core';
 import { reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser, RightClickPos, SubPanelName } from '@mezon/utils';
-import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { rightClickAction, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -21,13 +21,13 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 	const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 	const { setMessageRightClick } = useRightClick();
 	const { setRightClickXy } = useRightClick();
-	const [isMenuVisible, setMenuVisible] = useState(false);
 	const refOpt = useRef<HTMLDivElement>(null);
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
 		event.stopPropagation();
 	};
+	const posClickActive = useSelector(selectPosClickingActive);
 
 	const handleClickEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -69,14 +69,9 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 		setValueThread(message);
 	};
 
-	const handleCloseMenu = () => {
-		setMenuVisible(false);
-	};
-
 	const handleClickOption = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();
 		event.stopPropagation();
-		setMenuVisible(true);
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.MORE));
 		setMessageRightClick(message.id);
 		setRightClickXy({ x: position.left, y: position.top });
@@ -128,7 +123,7 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 					</button>
 				</div>
 
-				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
+				{posClickActive === RightClickPos.MORE && <ContextMenu urlData={''} />}
 			</div>
 		</div>
 	);
