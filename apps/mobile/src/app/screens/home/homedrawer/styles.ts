@@ -1,4 +1,4 @@
-import { Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Fonts, Metrics, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 const width = Dimensions.get('window').width;
 const inputWidth = width * 0.6;
@@ -101,6 +101,13 @@ export const styles = StyleSheet.create({
 		paddingTop: size.s_14,
 		backgroundColor: Colors.secondary,
 	},
+	channelListLink: {
+		display: "flex",
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingRight: Metrics.size.l
+	},
 	channelListSection: {
 		width: '100%',
 		paddingHorizontal: 8,
@@ -123,7 +130,6 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 	},
 	channelListItem: {
-		width: '100%',
 		paddingHorizontal: 10,
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -144,6 +150,19 @@ export const styles = StyleSheet.create({
 	},
 	channelListItemTitleActive: {
 		color: Colors.white,
+	},
+	channelDotWrapper: {
+		backgroundColor: Colors.red,
+		height: 20,
+		width: 20,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+	},
+	channelDot: {
+		color: Colors.white,
+		fontSize: Fonts.size.h8,
 	},
 	dotIsNew: {
 		position: 'absolute',
@@ -178,7 +197,7 @@ export const styles = StyleSheet.create({
 	},
 	wrapperClanIcon: {
 		alignItems: 'center',
-    position: 'relative'
+		position: 'relative'
 	},
 	clanIcon: {
 		height: verticalScale(50),
@@ -221,7 +240,7 @@ export const styles = StyleSheet.create({
 	},
 	clanIconActive: {
 		backgroundColor: Colors.black,
-    borderRadius: verticalScale(15),
+		borderRadius: verticalScale(15),
 	},
 	containerThreadList: {
 		paddingLeft: size.s_24,
@@ -256,9 +275,9 @@ export const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: Colors.borderPrimary,
 	},
-  friendItemWrapperInvited: {
-   opacity: 0.6
-  },
+	friendItemWrapperInvited: {
+		opacity: 0.6
+	},
 	friendItemContent: {
 		flexDirection: 'row',
 	},
@@ -267,15 +286,15 @@ export const styles = StyleSheet.create({
 		paddingLeft: 10,
 		lineHeight: 20,
 		color: Colors.white,
-    maxWidth: 200
+		maxWidth: 200
 	},
 	inviteButton: {
 		paddingVertical: 8,
 		paddingHorizontal: 12,
 	},
-  invitedButton: {
-    borderRadius: 15
-  },
+	invitedButton: {
+		borderRadius: 15
+	},
 	threadItem: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
@@ -574,27 +593,27 @@ export const styles = StyleSheet.create({
 	mb_10: {
 		marginBottom: verticalScale(10),
 	},
-  aboveMessageDeleteReply: {
+	aboveMessageDeleteReply: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
 		gap: 5,
 	},
-  iconMessageDeleteReply: {
-    backgroundColor: Colors.bgCharcoal,
-    width: size.s_20,
-    height: size.s_20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingRight: size.s_6,
-    borderRadius: 50,
-    marginLeft: size.s_6
-  },
-  messageDeleteReplyText: {
-    fontSize: size.small,
+	iconMessageDeleteReply: {
+		backgroundColor: Colors.bgCharcoal,
+		width: size.s_20,
+		height: size.s_20,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingRight: size.s_6,
+		borderRadius: 50,
+		marginLeft: size.s_6
+	},
+	messageDeleteReplyText: {
+		fontSize: size.small,
 		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
-    fontStyle: 'italic'
-  }
+		fontStyle: 'italic'
+	}
 });
