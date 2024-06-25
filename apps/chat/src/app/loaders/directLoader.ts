@@ -1,11 +1,8 @@
-import { directActions, getStoreAsync } from '@mezon/store';
-import { LoaderFunction } from 'react-router-dom';
+import { directActions } from '@mezon/store';
+import { CustomLoaderFunction } from './appLoader';
 
-export const directLoader: LoaderFunction = async () => {
-	const store = await getStoreAsync();
-	store.dispatch(
-		directActions.fetchDirectMessage({}),
-	);
+export const directLoader: CustomLoaderFunction = async ({ dispatch }) => {
+	dispatch(directActions.fetchDirectMessage({}));
 
 	return null;
 };

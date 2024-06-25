@@ -1,20 +1,34 @@
-import { appActions, getStoreAsync } from '@mezon/store';
-import { LoaderFunction } from 'react-router-dom';
+import { AppDispatch, appActions } from '@mezon/store';
+import { LoaderFunctionArgs } from 'react-router-dom';
 
 export interface IAppLoaderData {
-    pathname: string;
+	pathname: string;
 }
 
-export const appLoader: LoaderFunction = async () => {
-	const store = await getStoreAsync();
+type DataFunctionValue = Response | NonNullable<unknown> | null;
+type DataFunctionReturnValue = Promise<DataFunctionValue> | DataFunctionValue;
 
+// this any type is from lib itself
+export type CustomLoaderFunction<Context = any> = {
+	(
+		args: LoaderFunctionArgs<Context> & {
+			dispatch: AppDispatch;
+			initialPath?: string;
+		},
+		handlerCtx?: unknown,
+	): DataFunctionReturnValue;
+} & {
+	hydrate?: boolean;
+};
+
+export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const { pathname } = window.location;
 
-	store.dispatch(appActions.setInitialPath(pathname));
+	dispatch(appActions.setInitialPath(pathname));
 
 	return {
-        pathname
-    } as IAppLoaderData;
+		pathname,
+	} as IAppLoaderData;
 };
 
 export const shouldRevalidateApp = () => {

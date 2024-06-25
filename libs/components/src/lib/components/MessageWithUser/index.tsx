@@ -6,6 +6,7 @@ import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHover } from 'usehooks-ts';
 import * as Icons from '../Icons/index';
 import ContextMenu from '../RightClick/ContextMenu';
 import MessageAttachment from './MessageAttachment';
@@ -26,12 +27,11 @@ export type MessageWithUserProps = {
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
-	newMessage?: string;
-	child?: JSX.Element;
 	isMention?: boolean;
+	popup?: JSX.Element;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage, child, isMention }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, popup }: Readonly<MessageWithUserProps>) {
 	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
@@ -41,13 +41,14 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const { idMessageNotifed, setMessageNotifedId } = useNotification();
+	const containerRef = useRef<HTMLDivElement>(null);
+	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
 
 	const isCombine = !message.isStartedMessageGroup;
 
 	const attachments = useMemo(() => message.attachments, [message.attachments]);
 
-	const propsChild = { isCombine };
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
@@ -61,10 +62,18 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 	const [classNameNotification, setClassNameNotification] = useState<string>('');
 	const { setRightClickXy } = useRightClick();
 	const { setMessageRightClick } = useRightClick();
+
+	const shouldShowDateDivider = useMemo(() => {
+		return message.isStartedMessageOfTheDay && !isMessNotifyMention;
+	}, [message.isStartedMessageOfTheDay, isMessNotifyMention]);
+
 	const messageDividerClass = classNames(
 		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
-		{ hidden: !message.isStartedMessageOfTheDay || isMessNotifyMention },
 	);
+
+	const isHeadfull = useMemo(() => {
+		return isCombine && !checkReferences;
+	}, [isCombine, checkReferences]);
 
 	const containerClass = classNames('relative', 'message-container', {
 		'mt-3': !isCombine || checkReferences,
@@ -118,7 +127,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 				clearTimeout(resetTimeoutId);
 			}
 		};
-	}, [idMessageNotifed, message.id]);
+	}, [idMessageNotifed, message.id, setMessageNotifedId]);
 
 	useEffect(() => {
 		if (checkMessageReply || checkMessageToMove) {
@@ -148,12 +157,14 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 
 	return (
 		<>
-			<div className={messageDividerClass}>
-				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-				<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
-				<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-			</div>
-			<div className={containerClass}>
+			{shouldShowDateDivider && (
+				<div className={messageDividerClass}>
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+				</div>
+			)}
+			<div className={containerClass} ref={containerRef}>
 				<div className="relative rounded-sm overflow-visible">
 					<div className={childDivClass}></div>
 					<div className={parentDivClass}>
@@ -166,20 +177,16 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 						>
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 							<div className="w-full relative h-full">
-								<MessageHead message={message} user={user} isCombine={isCombine} />
+								{isHeadfull && <MessageHead message={message} user={user} isCombine={isCombine} />}
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										<MessageContent
 											message={message}
 											user={user}
 											isCombine={isCombine}
-											newMessage={newMessage}
 											isSending={message.isSending}
 											isError={message.isError}
 										/>
-										{child?.props.children[1] &&
-											React.isValidElement(child?.props.children[1]) &&
-											React.cloneElement(child?.props.children[1])}
 									</div>
 								</div>
 								<MessageAttachment attachments={attachments} />
@@ -196,10 +203,9 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, newMessage,
 						)}
 					</div>
 				</div>
-				{child?.props.children[0] &&
-					React.isValidElement(child?.props.children[0]) &&
-					React.cloneElement(child?.props.children[0], propsChild)}
+
 				{isMenuVisible && <ContextMenu urlData={''} onClose={handleCloseMenu} />}
+				{!!popup && isHover && popup}
 			</div>
 		</>
 	);

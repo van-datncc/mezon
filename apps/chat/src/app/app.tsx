@@ -1,7 +1,6 @@
 import { MezonStoreProvider, initStore } from '@mezon/store';
 import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { RouterProvider } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { VoiceContextProvider } from '@mezon/voice';
@@ -10,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
-import { routes } from './routes/index';
+import { Routes } from './routes';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
@@ -24,12 +23,14 @@ export function App() {
 	const { store, persistor } = useMemo(() => {
 		return initStore(mezon, preloadedState);
 	}, [mezon]);
+
 	if (!store) {
 		return <>loading...</>;
 	}
+	
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<RouterProvider router={routes} />
+			<Routes />
 		</MezonStoreProvider>
 	);
 }
@@ -47,7 +48,7 @@ function AppWrapper() {
 		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<VoiceContextProvider>
-						<App />
+					<App />
 				</VoiceContextProvider>
 			</MezonContextProvider>
 		</GoogleOAuthProvider>

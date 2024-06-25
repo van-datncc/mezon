@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuth, useReference } from '@mezon/core';
 import { getAppInfo } from '@mezon/mobile-components';
-import { fcmActions, selectCurrentClan, selectLoadingMainMobile } from '@mezon/store-mobile';
+import { fcmActions, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrentId, selectLoadingMainMobile } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -16,6 +16,7 @@ import { Sharing } from '../../screens/settings/Sharing';
 import {
 	checkNotificationPermission,
 	createLocalNotification,
+	isShowNotification,
 	handleFCMToken,
 	navigateToNotification,
 	setupNotificationListeners,
@@ -36,10 +37,14 @@ export const Authentication = () => {
 	const navigation = useNavigation<any>();
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	const [fileShared, setFileShared] = useState<any>();
 	const { setAttachmentData } = useReference();
+	const currentDmGroupIdRef = useRef(currentDmGroupId);
+  	const currentChannelRef = useRef(currentClan);
 
 	useEffect(() => {
 		if (userProfile?.email) loadFRMConfig();
@@ -50,10 +55,25 @@ export const Authentication = () => {
 	}, [navigation, currentClan]);
 
 	useEffect(() => {
+		currentDmGroupIdRef.current = currentDmGroupId;
+	}, [currentDmGroupId]);
+	
+	useEffect(() => {
+		currentChannelRef.current = currentChannel;
+	}, [currentChannel]);
+
+
+	useEffect(() => {
 		checkNotificationPermission();
 
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			if (remoteMessage.notification?.title) {
+			if	(
+					isShowNotification(
+						currentChannelRef.current?.id,
+						currentDmGroupIdRef.current,
+						remoteMessage
+					)
+				) {
 				Toast.show({
 					type: 'info',
 					text1: remoteMessage.notification?.title,
@@ -61,7 +81,7 @@ export const Authentication = () => {
 					onPress: async () => {
 						Toast.hide();
 						navigation.navigate(APP_SCREEN.HOME);
-						await navigateToNotification(remoteMessage, null, null);
+						await navigateToNotification(remoteMessage, navigation, null);
 						navigation.dispatch(DrawerActions.closeDrawer());
 					},
 				});

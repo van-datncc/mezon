@@ -1,22 +1,19 @@
-import { useEventManagement } from '@mezon/core';
 import { Coords } from '../../../ChannelLink';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
-import { EventManagementEntity } from '@mezon/store';
 
 type PanelEventItemProps = {
     coords: Coords;
     checkUserCreate: boolean;
-    event: EventManagementEntity | undefined;
     onHandle: (e: any) => void;
+    setOpenModalDelEvent: React.Dispatch<React.SetStateAction<boolean>>;
     onClose: () => void;
 }
 
 function PanelEventItem(props: PanelEventItemProps) {
-    const { coords, checkUserCreate, event, onHandle, onClose } = props;
-    const { deleteEventManagement } = useEventManagement();
+    const { coords, checkUserCreate, onHandle, setOpenModalDelEvent, onClose } = props;
 
     const handleDeleteEvent = async () =>{
-        await deleteEventManagement(event?.clan_id || '', event?.id || '');
+        setOpenModalDelEvent(true);
         onClose();
     }
 

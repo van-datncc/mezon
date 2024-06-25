@@ -107,7 +107,8 @@ const HomeScreen = React.memo((props: any) => {
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		if (currentClan) {
-      store.dispatch(clansActions.joinClan({ clanId: currentClan.clan_id }));
+		store.dispatch(clansActions.joinClan({clanId: "0"}),);
+      	store.dispatch(clansActions.joinClan({ clanId: currentClan.clan_id }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
 		}
 		return null;

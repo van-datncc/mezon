@@ -240,6 +240,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		backgroundColor: Colors.secondary,
 		alignItems: 'center',
+		gap: size.s_10
 	},
 	friendItemWrapper: {
 		marginHorizontal: 20,
@@ -502,7 +503,9 @@ export const styles = StyleSheet.create({
 		alignSelf: 'center',
 		alignItems: 'center',
 		width: width,
-		marginBottom: verticalScale(60),
+		paddingBottom: verticalScale(60),
+		paddingTop: verticalScale(20),
+		backgroundColor: Colors.secondary,
 	},
 	footerImagesModal: {
 		maxWidth: '70%',
@@ -533,9 +536,9 @@ export const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
 	wrapperPlusClan: {
-		height: verticalScale(50),
-		width: verticalScale(50),
-		borderRadius: verticalScale(50),
+		height: size.s_50,
+		width: size.s_50,
+		borderRadius: 50,
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',

@@ -3,12 +3,12 @@ import { View, Text, Pressable, Image, Platform, DeviceEventEmitter } from 'reac
 import { styles } from './styles';
 import { Colors } from '@mezon/mobile-ui';
 import { ActionEmitEvent, ArrowLeftIcon, ChevronIcon, UserGroupIcon } from '@mezon/mobile-components';
-import { useMemberStatus } from '@mezon/core';
+import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChannelStreamMode } from 'mezon-js';
 import ChatBox from '../../home/homedrawer/ChatBox';
 import { useSelector } from 'react-redux';
-import { directActions, getStoreAsync, selectDmGroupCurrent } from '@mezon/store-mobile';
+import { clansActions, directActions, getStoreAsync, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
@@ -16,6 +16,19 @@ import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
 import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 import { useCallback } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+function useChannelSeen(channelId: string) {
+	const dispatch = useAppDispatch();
+	const { lastMessage } = useChatMessages({ channelId });
+	useEffect(() => {
+		if (lastMessage) {
+			const timestamp = Date.now() / 1000;
+			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(directActions.updateLastSeenTime(lastMessage));
+		}
+	}, [channelId, dispatch, lastMessage]);
+}
 
 export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any, route: any}) => {
     const directMessageId = route.params?.directMessageId as string;
@@ -24,6 +37,8 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
     const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
+    const dispatch = useAppDispatch();
+    useChannelSeen(directMessageId || '');
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -43,6 +58,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 
     const directMessageLoader = useCallback(async () => {
         const store = await getStoreAsync();
+        store.dispatch(clansActions.joinClan({ clanId: currentDmGroup.clan_id }));
         store.dispatch(
             directActions.joinDirectMessage({
                 directMessageId: currentDmGroup.id,
@@ -59,15 +75,22 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         }
     }, [currentDmGroup, directMessageLoader])
 
+    useEffect(() => {
+        if(from && from === APP_SCREEN.HOME) {
+            dispatch(directActions.fetchDirectMessage({noCache: true}));
+        }
+    }, [from])
+
     const handleBack = () => {
         if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
-            navigation.navigate(APP_SCREEN.MESSAGES.HOME)
+            navigation.navigate(APP_SCREEN.MESSAGES.HOME);
             return;
         }
+        dispatch(directActions.setDmGroupCurrentId(''))
         navigation.goBack()
     }
     return (
-        <View style={styles.dmMessageContainer}>
+        <SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
             <View style={styles.headerWrapper}>
                 <Pressable onPress={() => handleBack()}>
                     <ArrowLeftIcon color={Colors.textGray} />
@@ -133,8 +156,8 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 					)}
 				</View>
 			): null}
-           
-        </View>
+        
+        </SafeAreaView>
 
         
     )

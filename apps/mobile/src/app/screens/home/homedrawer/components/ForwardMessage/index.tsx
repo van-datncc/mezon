@@ -46,9 +46,9 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: any) => {
 				return {
-					id: itemDM?.user_id[0] ?? '',
+					id: itemDM?.user_id?.[0] ?? '',
 					name: itemDM?.channel_label ?? '',
-					avatarUser: itemDM?.channel_avatar[0] ?? '',
+					avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 					idDM: itemDM?.id ?? '',
 					typeChat: 3,
 				};
@@ -104,14 +104,23 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 		try {
 			for (const selectedObjectIdSend of selectedObjectIdSends) {
 				if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-					sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
+					sendForwardMessage(
+						'',
+						selectedObjectIdSend.id,
+						ChannelStreamMode.STREAM_MODE_DM,
+						selectedMessage,
+					);
 				} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-					sendForwardMessage('', selectedObjectIdSend.id, '', ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
+					sendForwardMessage(
+						'',
+						selectedObjectIdSend.id,
+						ChannelStreamMode.STREAM_MODE_GROUP,
+						selectedMessage,
+					);
 				} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 					sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
-						selectedObjectIdSend.channel_label || '',
 						ChannelStreamMode.STREAM_MODE_CHANNEL,
 						selectedMessage,
 					);
@@ -207,6 +216,8 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 			coverScreen={true}
 			avoidKeyboard={false}
 			onBackdropPress={onClose}
+			swipeDirection={'down'}
+			onSwipeComplete={onClose}
 			backdropColor={'rgba(0,0,0, 0.7)'}
 		>
 			<View style={styles.sheetContainer}>
