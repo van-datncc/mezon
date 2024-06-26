@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 export * from './attachmentThumb';
 export * from './iconInEmojiPanel';
 export * from './uploadThumbnail';
+export * from './iconRightClick';
+
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (

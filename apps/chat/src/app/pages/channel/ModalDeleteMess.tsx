@@ -14,14 +14,13 @@ type ModalDeleteMessProps = {
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { mess, closeModal, mode } = props;
 	const user = useSelector(selectMemberClanByUserId(mess.sender_id || ''));
-	const { DeleteSendMessage } = useDeleteMessage({
+	const { deleteSendMessage } = useDeleteMessage({
 		channelId: mess.channel_id,
-		channelLabel: mess.channel_label,
 		mode: mode,
 	});
 
 	const handleDeleteMess = () => {
-		DeleteSendMessage(mess.id);
+		deleteSendMessage(mess.id);
 		closeModal();
 	}
 

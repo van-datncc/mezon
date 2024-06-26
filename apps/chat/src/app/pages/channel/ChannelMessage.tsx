@@ -1,13 +1,18 @@
-import React, { memo, useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
+import { MessageReaction, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import {
+	selectIdMessageRefEdit,
+	selectLastSeenMessage,
+	selectMemberByUserId,
+	selectMessageEntityById,
+	selectOpenEditMessageState,
+} from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { MessageReaction, MessageWithUser, UnreadMessageBreak, UserMentionList } from '@mezon/components';
-import { selectIdMessageRefEdit, selectLastSeenMessage, selectMemberByUserId, selectMessageEntityById, selectOpenEditMessageState, selectOpenOptionMessageState, selectReactionBottomState, selectReactionRightState, selectTheme } from '@mezon/store';
-import { useChannels } from '@mezon/core';
-import ModalDeleteMess from './ModalDeleteMess';
-import ChannelMessagePopup from './ChannelMessagePopup';
+import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
+import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { memo, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import MessageInput from './MessageInput';
+import ModalDeleteMess from './ModalDeleteMess';
 import { useDeleteMessageHook } from './useDeleteMessage';
 
 type MessageProps = {
@@ -18,15 +23,13 @@ type MessageProps = {
 };
 
 export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Readonly<MessageProps>) {
+	const dispatch = useDispatch();
 	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
-	const reactionRightState = useSelector(selectReactionRightState);
-	const reactionBottomState = useSelector(selectReactionBottomState);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const user = useSelector(selectMemberByUserId(message.sender_id));
-	const { deleteMessage, setDeleteMessage, DeleteSendMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
+	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 
 	const isEditing = useMemo(() => {
 		return openEditMessageState && idMessageRefEdit === messageId;
@@ -45,40 +48,30 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 		return message;
 	}, [message]);
 
+	useEffect(() => {
+		dispatch(rightClickAction.setModeActive(mode));
+	}, [mode]);
+
 	return (
 		<>
 			<div className="fullBoxText relative group">
-				<MessageWithUser
-					message={mess as IMessageWithUser}
-					user={user}
-					mode={mode}
-					popup={
-						<ChannelMessagePopup
-							reactionRightState={reactionRightState}
-							mess={mess as IMessageWithUser}
-							reactionBottomState={reactionBottomState}
-							openEditMessageState={isEditing}
-							openOptionMessageState={openOptionMessageState}
-							mode={mode}
-							deleteSendMessage={DeleteSendMessage}
-						/>
-					}
-				/>
-				{
-					isEditing ? (
-						<MessageInput
-							messageId={messageId}
-							channelId={channelId}
-							mode={mode}
-							channelLabel={channelLabel}
-							message={mess as IMessageWithUser}
-						/>
-					) : null
-				}
+				<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} />
+
+				{isEditing ? (
+					<MessageInput
+						messageId={messageId}
+						channelId={channelId}
+						mode={mode}
+						channelLabel={channelLabel}
+						message={mess as IMessageWithUser}
+					/>
+				) : null}
 				{lastSeen && <UnreadMessageBreak />}
 				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>
 			<MessageReaction message={message} mode={mode} />
+			{lastSeen && <UnreadMessageBreak />}
+			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 		</>
 	);
 }

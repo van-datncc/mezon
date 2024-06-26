@@ -73,6 +73,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 					headerStyle: {
 						backgroundColor: Colors.secondary,
 					},
+					headerLeftLabelVisible: false,
 				}}
 			/>
 			<Stack.Screen
