@@ -36,9 +36,11 @@ export type MessageWithUserProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	isMention?: boolean;
+	popup?: JSX.Element;
+	isEditing?: boolean;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, isEditing }: Readonly<MessageWithUserProps>) {	
 	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
@@ -186,20 +188,25 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 					<div className={parentDivClass} onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
-							<MessageAvatar user={user} message={message} isCombine={isCombine} />
+							<MessageAvatar user={user} message={message} isCombine={isCombine} isEditing={isEditing}/>
+
 							<div className="w-full relative h-full">
-								{isHeadfull && <MessageHead message={message} user={user} isCombine={isCombine} />}
-								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
-									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
-										<MessageContent
-											message={message}
-											user={user}
-											isCombine={isCombine}
-											isSending={message.isSending}
-											isError={message.isError}
-										/>
+								<MessageHead message={message} user={user} isCombine={isCombine} />
+								{isEditing ? (
+									''
+								) : (
+									<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+										<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+											<MessageContent
+												message={message}
+												user={user}
+												isCombine={isCombine}
+												isSending={message.isSending}
+												isError={message.isError}
+											/>
+										</div>
 									</div>
-								</div>
+								)}
 								<MessageAttachment attachments={attachments} />
 							</div>
 						</div>

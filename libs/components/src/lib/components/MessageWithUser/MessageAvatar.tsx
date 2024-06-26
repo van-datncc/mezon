@@ -8,9 +8,10 @@ type IMessageAvatarProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
+	isEditing?: boolean;
 };
 
-const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
+const MessageAvatar = ({ user, message, isCombine, isEditing }: IMessageAvatarProps) => {
 	const { hasAvatar, avatarChar, avatarImg, username } = useMessageSender(user);
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -37,9 +38,9 @@ const MessageAvatar = ({ user, message, isCombine }: IMessageAvatarProps) => {
 
 	if ((message.references?.length === 0 && isCombine)) {
 		return (
-			<div className="w-10 flex items-center justify-center min-w-10">
+			isEditing ? "" : (<div className="w-10 flex items-center justify-center min-w-10">
 				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>
-			</div>
+			</div>)
 		);
 	}
 	return (
