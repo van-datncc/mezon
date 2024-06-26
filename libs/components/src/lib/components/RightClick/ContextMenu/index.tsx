@@ -1,5 +1,5 @@
-import { useAuth, useClanRestriction, useClans, useRightClick } from '@mezon/core';
-import { selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
+import { useAuth, useChatReaction, useClanRestriction, useRightClick } from '@mezon/core';
+import { selectCurrentChannelId, selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
 import {
 	deleteMessageList,
 	editMessageList,
@@ -16,8 +16,8 @@ import {
 } from '@mezon/ui';
 import { EPermission, RightClickPos, getSrcEmoji } from '@mezon/utils';
 import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
-import { selectPosClickingActive, selectReactionOnMessageList } from 'libs/store/src/lib/rightClick/rightClick.slice';
-import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { selectMessageIdRightClicked, selectModeActive, selectPosClickingActive, selectReactionOnMessageList } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
 interface IContextMenuProps {
@@ -40,7 +40,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 	const listPinMessages = useSelector(selectPinMessageByChannelId(getMessageRclicked.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === getMessageRclicked.id);
 	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
-	const { currentClan } = useClans();
 	const { userId } = useAuth();
 	const [listTextToMatch, setListTextToMatch] = useState<any[]>(listClickDefault);
 	const getListReactionMessageId = useSelector(selectReactionOnMessageList);
@@ -251,11 +250,29 @@ interface IReactionItem {
 
 const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode }) => {
 	const { emojiListPNG } = useDataEmojiSvg();
+	const { reactionMessageDispatch } = useChatReaction();
 	const getUrl = getSrcEmoji(emojiShortCode, emojiListPNG ?? []);
+	const getModeActive = useSelector(selectModeActive);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked)
+	const handleClickEmoji = useCallback(async () => {
+		// await reactionMessageDispatch('', getModeActive, currentChannelId, getMessageIdRightClicked, emojiShortCode, 1, );
+	}, []);
 
 	return (
-		<div className="w-10 h-10  rounded-full flex justify-center items-center bg-[#232428] cursor-pointer">
+		<div className="w-10 h-10  rounded-full flex justify-center items-center hover:bg-[#232428] bg-[#1E1F22] cursor-pointer">
 			<img src={getUrl} className="w-5 h-5"></img>
 		</div>
 	);
 };
+
+// await reactionMessageDispatch(
+// 	'',
+// 	props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+// 	channelID ?? '',
+// 	props.messageEmojiId ?? '',
+// 	emojiPicked.trim(),
+// 	1,
+// 	messageEmoji?.sender_id ?? '',
+// 	false,
+// );
