@@ -4,9 +4,12 @@ import {
 	AddThread,
 	AngleRightIcon,
 	MicrophoneIcon,
+	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	SendIcon,
 	convertMentionsToText,
 	getAttachmentUnique,
+	load,
+	save,
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
@@ -80,9 +83,9 @@ interface IChatBoxProps {
 	mode: ChannelStreamMode;
 	messageAction?: EMessageActionType;
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
-  hiddenIcon?: {
-    threadIcon: boolean
-  }
+	hiddenIcon?: {
+		threadIcon: boolean
+	}
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<TextInput>();
@@ -133,10 +136,34 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
+	const [allMessages, setAllMessages] = useState<{ [key: string]: string }>({});
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
+
+	async function loadMessageCache() {
+		const messages = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+		setAllMessages(messages);
+		return messages[props?.channelId] || "";
+	}
+
+	function setMessageCache(text: string) {
+		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
+			...allMessages,
+			[props?.channelId]: text,
+		});
+	}
+
+	useEffect(() => {
+		loadMessageCache().then((message) => {
+			setText(message);
+		});
+	}, [props?.channelId])
+
+	useEffect(() => {
+		setMessageCache(text);
+	}, [text])
 
 	//start: DM stuff
 	const {
@@ -252,15 +279,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		} else {
 			const reference = currentSelectedReplyMessage
 				? [
-						{
-							message_id: '',
-							message_ref_id: currentSelectedReplyMessage.id,
-							ref_type: 0,
-							message_sender_id: currentSelectedReplyMessage.user.id,
-							content: JSON.stringify(currentSelectedReplyMessage.content),
-							has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
-						},
-					]
+					{
+						message_id: '',
+						message_ref_id: currentSelectedReplyMessage.id,
+						ref_type: 0,
+						message_sender_id: currentSelectedReplyMessage.user.id,
+						content: JSON.stringify(currentSelectedReplyMessage.content),
+						has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
+					},
+				]
 				: undefined;
 			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
@@ -478,9 +505,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			})) ?? [];
 		const convertedMentions: UserMentionsOpt[] = mentionList
 			? mentionList.map((mention) => ({
-					user_id: mention.id.toString() ?? '',
-					username: mention.display ?? '',
-				}))
+				user_id: mention.id.toString() ?? '',
+				username: mention.display ?? '',
+			}))
 			: [];
 		if (mentions?.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {
