@@ -1,11 +1,11 @@
 import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
+import { directActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 import { useSelector } from 'react-redux';
-import { directActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
+import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -31,12 +31,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const listMemSearch = useMemo(() => {
-		const listDMSearch = listDM.length
+		const listDMSearch = listDM?.length
 			? listDM.map((itemDM: any) => {
 					return {
-						id: itemDM?.user_id[0] ?? '',
+						id: itemDM?.user_id?.[0] ?? '',
 						name: itemDM?.channel_label ?? '',
-						avatarUser: itemDM?.channel_avatar[0] ?? '',
+						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						typeChat: 3,
 					};
@@ -93,7 +93,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			if (user?.idDM) {
-				dispatch(directActions.openDirectMessage({channel_id: user.idDM || ""}))
+				dispatch(directActions.openDirectMessage({ channel_id: user.idDM || '' }));
 				const directChat = toDmGroupPageFromMainApp(user.idDM, user?.typeChat ?? 2);
 				navigate(directChat);
 			} else {
