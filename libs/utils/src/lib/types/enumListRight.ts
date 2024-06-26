@@ -11,6 +11,7 @@ export enum RightClickList {
 	MARK_UNREAD = 'Mark Unread',
 	COPY_MESSAGE_LINK = 'Copy Message Link',
 	PIN_MESSAGE = 'Pin Message',
+	UNPIN_MESSAGE = 'Unpin Message',
 	SPEAK_MESSAGE = 'Speak Message',
 	EDIT_MESSAGE = 'Edit Message',
 	DELETE_MESSAGE = 'Delete Message',

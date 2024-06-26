@@ -1,5 +1,5 @@
 import { RightClickList } from '@mezon/utils';
-import { useLayoutEffect, useState } from 'react';
+import { memo, useLayoutEffect, useState } from 'react';
 
 interface IItemDetail {
 	item: any;
@@ -7,7 +7,7 @@ interface IItemDetail {
 	onClick: () => void;
 }
 
-export const ItemDetail: React.FC<IItemDetail> = ({ item, urlData, onClick }) => {
+const ItemDetail: React.FC<IItemDetail> = ({ item, urlData, onClick }) => {
 	const [redColor, setRedColor] = useState<boolean>(false);
 	useLayoutEffect(() => {
 		if (
@@ -37,3 +37,4 @@ export const ItemDetail: React.FC<IItemDetail> = ({ item, urlData, onClick }) =>
 		</span>
 	);
 };
+export default memo(ItemDetail);

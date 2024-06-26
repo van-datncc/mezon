@@ -1,5 +1,6 @@
 import { RightClickPos } from '@mezon/utils';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { ChannelStreamMode } from 'mezon-js';
 
 export const RIGHT_CLICK_FEATURE_KEY = 'rightClick';
 
@@ -9,6 +10,8 @@ export interface RightClickState {
 	rightClickXy: { x: number; y: number };
 	messageIdClickedRightClicked: string;
 	posClickActive: RightClickPos;
+	modeActive: ChannelStreamMode;
+	reactionOnMessageList: string[];
 }
 
 export const initialRightClickState: RightClickState = {
@@ -20,6 +23,8 @@ export const initialRightClickState: RightClickState = {
 	},
 	messageIdClickedRightClicked: '',
 	posClickActive: RightClickPos.NONE,
+	modeActive: ChannelStreamMode.STREAM_MODE_CHANNEL,
+	reactionOnMessageList: [],
 };
 
 export const rightClickSlice = createSlice({
@@ -35,6 +40,12 @@ export const rightClickSlice = createSlice({
 		setPosClickActive: (state, action) => {
 			state.posClickActive = action.payload;
 		},
+		setModeActive: (state, action) => {
+			state.modeActive = action.payload;
+		},
+		setReactionMessageList: (state, action) => {
+			state.reactionOnMessageList = action.payload;
+		},
 	},
 });
 
@@ -49,3 +60,7 @@ export const selectRightClickXy = createSelector(getRightClickState, (state: Rig
 export const selectMessageIdRightClicked = createSelector(getRightClickState, (state: RightClickState) => state.messageIdClickedRightClicked);
 
 export const selectPosClickingActive = createSelector(getRightClickState, (state: RightClickState) => state.posClickActive);
+
+export const selectModeActive = createSelector(getRightClickState, (state: RightClickState) => state.modeActive);
+
+export const selectReactionOnMessageList = createSelector(getRightClickState, (state: RightClickState) => state.reactionOnMessageList);

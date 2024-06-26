@@ -1,8 +1,16 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
 import { selectDataSocketUpdate, selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
-import { EmojiDataOptionals, IMessageWithUser, calculateTotalCount, convertReactionDataFromMessage, updateEmojiReactionData } from '@mezon/utils';
-import { useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import {
+	EmojiDataOptionals,
+	IMessageWithUser,
+	SenderInfoOptionals,
+	calculateTotalCount,
+	convertReactionDataFromMessage,
+	updateEmojiReactionData,
+} from '@mezon/utils';
+import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
 
 type MessageReactionProps = {
@@ -37,7 +45,12 @@ const useCheckHasEmoji = (dataReactionCombine: EmojiDataOptionals[]) => {
 	}, [dataReactionCombine]);
 };
 
+const extractMessageIds = (data: EmojiDataOptionals[]) => {
+	return data.filter((item) => item.senders.some((sender: SenderInfoOptionals) => sender.count && sender.count > 0)).map((item) => item.message_id);
+};
+
 const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
+	const dispatch = useDispatch();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
 
@@ -50,8 +63,13 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const reactionMessage = useConvertedReactions(message);
 	const dataReactionCombine = useCombinedReactions(reactionMessage, reactionSocketByMessageId);
 	const checkHasEmoji = useCheckHasEmoji(dataReactionCombine);
-
 	const isMessageMatched = message.id === idMessageRefReaction;
+
+	useEffect(() => {
+		const handleDataReaction = updateEmojiReactionData(dataSocketConvert);
+		const filter = extractMessageIds(handleDataReaction);
+		dispatch(rightClickAction.setReactionMessageList(filter));
+	}, [dataSocketConvert]);
 
 	return (
 		<div className="relative pl-3">
