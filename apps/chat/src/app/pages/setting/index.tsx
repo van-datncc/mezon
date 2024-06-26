@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 
 const Setting = () => {
 	const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
-	const [currentSetting, setCurrentSetting] = useState<string>(isShowSettingFooter.initTab);
+	const [currentSetting, setCurrentSetting] = useState<string>(isShowSettingFooter?.initTab || 'Account');
 	const handleSettingItemClick = (settingName: string) => {
 		setCurrentSetting(settingName);
 	};
@@ -21,11 +21,11 @@ const Setting = () => {
 	}
 
 	useEffect(() => {
-		setCurrentSetting(isShowSettingFooter.initTab);
-	},[isShowSettingFooter.initTab]);
+		setCurrentSetting(isShowSettingFooter?.initTab || 'Account');
+	},[isShowSettingFooter?.initTab]);
 	return (
 		<div>
-			{isShowSettingFooter.status ? (
+			{isShowSettingFooter?.status ? (
 				<div className=" z-10 flex fixed inset-0  w-screen">
 					<div className="flex text-gray- w-screen relative">
 						<div className={`${!menuIsOpen ? 'hidden' : 'flex'} text-gray- w-1/6 xl:w-1/4 min-w-56 relative`}>
