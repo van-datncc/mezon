@@ -21,6 +21,7 @@ import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
+import MessageReaction from './MessageReaction/MessageReaction';
 import MessageReply from './MessageReply';
 import { useMessageParser } from './useMessageParser';
 
@@ -181,9 +182,9 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 				</div>
 			)}
 			<div className={containerClass} ref={containerRef}>
-				<div className="relative rounded-sm overflow-visible ">
+				<div className="relative rounded-sm overflow-visible" onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
 					<div className={childDivClass}></div>
-					<div className={parentDivClass} onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
+					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
@@ -213,6 +214,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 							</div>
 						)}
 					</div>
+					<MessageReaction message={message} mode={mode} />
 				</div>
 				{showOptStatus && <ChannelMessageOpt message={message} />}
 				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && <ContextMenu urlData={''} />}
