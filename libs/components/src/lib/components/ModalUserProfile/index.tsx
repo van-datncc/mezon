@@ -87,7 +87,7 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
-				{!checkUser && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal}/>}
+				{!checkUser && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal} user={userById}/>}
 			</div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}

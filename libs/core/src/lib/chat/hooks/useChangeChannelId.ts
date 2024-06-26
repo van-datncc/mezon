@@ -1,34 +1,27 @@
-import { channelsActions, selectCurrentClanId, selectIdChannelSelectedByClanId, useAppDispatch } from "@mezon/store";
+import { channelsActions, useAppDispatch } from "@mezon/store";
 import { useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
 
 export function useChangeChannelId() {
     const dispatch = useAppDispatch();
-    const currentClanId = useSelector(selectCurrentClanId);
-    const idChannelSelected = useSelector(selectIdChannelSelectedByClanId(currentClanId || ''));
 
     const setIdChannelSelected = useCallback(
-		(channelId: string) => {
+		(channelId: string, clanId: string) => {
             dispatch(
                 channelsActions.setIdChannelSelected({
-                    clanId: currentClanId || '',
+                    clanId,
                     channelId,
                 }),
             );
 			
 		},
-		[currentClanId, dispatch],
+		[dispatch],
 	);
 
     return useMemo(
 		() => ({
-			currentClanId,
-            idChannelSelected,
             setIdChannelSelected,
 		}),
 		[
-            currentClanId,
-            idChannelSelected,
             setIdChannelSelected,
         ],
 	);

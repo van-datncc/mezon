@@ -1,5 +1,5 @@
 import { Icons } from "@mezon/components"
-import { selectTheme } from "@mezon/store";
+import { ChannelMembersEntity, selectTheme } from "@mezon/store";
 import { Tooltip } from "flowbite-react"
 import { useSelector } from "react-redux";
 import { OpenModalProps } from "..";
@@ -8,11 +8,12 @@ import { PopupAddFriend, PopupFriend, PopupOption } from "./PopupShortUser";
 type GroupIconBannerProps = {
     checkAddFriend: boolean;
     openModal: OpenModalProps;
+    user: ChannelMembersEntity | null;
     setOpenModal: React.Dispatch<React.SetStateAction<OpenModalProps>>;
 }
 
 const GroupIconBanner = (props: GroupIconBannerProps) => {
-    const {checkAddFriend, openModal, setOpenModal} = props;
+    const {checkAddFriend, openModal, user, setOpenModal} = props;
 	const appearanceTheme = useSelector(selectTheme);
 
     const handleDefault = (event: any) => {
@@ -22,7 +23,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
     return(
         <>
             {checkAddFriend ? 
-                <div className='p-2 rounded-full bg-black relative h-fit' onClick={(e) => {handleDefault(e);setOpenModal({openAddFriend: false, openOption: false, openFriend: !openModal.openFriend})}}>
+                <div className='p-2 rounded-full bg-[#000000b2] relative h-fit' onClick={(e) => {handleDefault(e);setOpenModal({openAddFriend: false, openOption: false, openFriend: !openModal.openFriend})}}>
                     <Tooltip
                         content='Friend'
                         trigger="hover"
@@ -31,9 +32,9 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
                     >
                             <Icons.IconFriend className='text-white size-4'/>
                     </Tooltip>
-                    {openModal.openFriend && <PopupFriend/>}
+                    {openModal.openFriend && <PopupFriend user={user}/>}
                 </div>:
-                <div className='p-2 rounded-full bg-black relative h-fit' onClick={(e) => {handleDefault(e);setOpenModal({openFriend: false, openOption: false, openAddFriend: !openModal.openAddFriend})}}>
+                <div className='p-2 rounded-full bg-[#000000b2] relative h-fit' onClick={(e) => {handleDefault(e);setOpenModal({openFriend: false, openOption: false, openAddFriend: !openModal.openAddFriend})}}>
                     <Tooltip
                         content='Add friend'
                         trigger="hover"
@@ -42,10 +43,10 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
                     >
                             <Icons.AddPerson className='text-white size-4'/>
                     </Tooltip>
-                    {openModal.openAddFriend && <PopupAddFriend/>}
+                    {openModal.openAddFriend && <PopupAddFriend user={user}/>}
                 </div>
             }
-            <div className='p-2 rounded-full bg-black relative h-fit' onClick={(e) => {handleDefault(e);setOpenModal(({openAddFriend: false, openFriend: false, openOption: !openModal.openOption}))}}>
+            <div className='p-2 rounded-full bg-[#000000b2] relative h-fit' onClick={(e) => {handleDefault(e);setOpenModal(({openAddFriend: false, openFriend: false, openOption: !openModal.openOption}))}}>
                 <Tooltip
                     content='More'
                     trigger="hover"

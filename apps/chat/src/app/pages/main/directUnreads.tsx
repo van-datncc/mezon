@@ -37,7 +37,7 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 								className="clan w-full aspect-square"
 							/>
 							{currentDirect.count_mess_unread !== 0 && (
-								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
+								<div className="absolute border-[4px] dark:border-bgPrimary border-white w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
 									{currentDirect.count_mess_unread}
 								</div>
 							)}
