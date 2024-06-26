@@ -171,6 +171,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<FlatList
 				data={filteredDataDM}
 				style={styles.dmMessageListContainer}
+				showsVerticalScrollIndicator={false}
 				keyExtractor={(dm) => dm.id.toString()}
 				ItemSeparatorComponent={SeparatorListFriend}
 				renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}

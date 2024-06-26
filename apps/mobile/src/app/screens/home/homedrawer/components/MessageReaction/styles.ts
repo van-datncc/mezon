@@ -18,12 +18,14 @@ export const styles = StyleSheet.create({
 	},
 	reactItem: {
 		flexDirection: 'row',
+		alignItems: 'center',
 		gap: size.s_2,
 		padding: size.s_2,
 		borderRadius: 5,
 	},
 	reactCount: {
 		color: Colors.white,
+		fontSize: size.small
 	},
 	bottomSheetWrapper: {
 		flex: 1,
@@ -103,12 +105,12 @@ export const styles = StyleSheet.create({
 		color: Colors.bgGrayDark,
 	},
 	addEmojiIcon: {
-		width: size.s_20,
-		height: size.s_20,
+		width: size.s_18,
+		height: size.s_18,
 	},
 	iconEmojiReaction: {
-		width: size.s_20,
-		height: size.s_20,
+		width: size.s_18,
+		height: size.s_18,
 		marginRight: size.s_2,
 	},
 	iconEmojiReactionDetail: {

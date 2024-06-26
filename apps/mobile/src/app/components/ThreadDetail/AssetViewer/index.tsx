@@ -9,10 +9,10 @@ import PinMessage from "../../PinMessage";
 
 const TabList = [
     "Members",
-    "Media",
+    // "Media",
     "Pins",
-    "Links",
-    "Files"
+    // "Links",
+    // "Files"
 ]
 
 export const AssetsViewer = React.memo(() => {
@@ -40,7 +40,7 @@ export const AssetsViewer = React.memo(() => {
             <View style={styles.container}>
                 <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
                     <MemberListStatus />
-                    <Page2 />
+                    {/*<Page2 />*/}
                     <PinMessage />
                     <Page2 />
                     <Page2 />

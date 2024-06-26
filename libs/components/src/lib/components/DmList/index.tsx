@@ -90,7 +90,7 @@ function DirectMessageList() {
 					</button>
 				</div>
 			</div>
-			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
+			{openPopupForward && <ForwardMessageModal  openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>

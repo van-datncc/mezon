@@ -107,8 +107,10 @@ const lightThemeColor = {
 }
 
 const colors = {
-	primary: isDarkTheme ? '#000000' : '#FFFFFF',
-	secondary: isDarkTheme ? '#151515' : '#F0F0F0',
+	primary: isDarkTheme ? '#1E1F22' : '#FFFFFF',
+	secondary: isDarkTheme ? '#242427' : '#F0F0F0',
+	secondaryWeight: isDarkTheme ? '#212122' : '#F0F0F0',
+	secondaryLight: isDarkTheme ? '#2A2D31' : '#F0F0F0',
 	surface: isDarkTheme ? '#0B0B0B' : '#F7F7F7',
 	transparent: 'rgba(0,0,0,0)',
 	white: isDarkTheme ? '#FFFFFF' : '#000000',
@@ -116,7 +118,7 @@ const colors = {
 	textGray: isDarkTheme ? '#c7c7c7' : '#c7c7c7',
 	titleReset: isDarkTheme ? 'rgba(148, 154, 164, 1)' : 'rgb(44,44,45)',
 	gray72: isDarkTheme ? '#727272' : '#727272',
-	tertiary: isDarkTheme ? '#bcbcbc' : '#AEAEAE',
+	tertiary: isDarkTheme ? '#ccc' : '#AEAEAE',
 	tertiaryWeight: isDarkTheme ? '#1E1E1E' : '#E1E1E1',
 	gray48: isDarkTheme ? '#484848' : '#484848',
 	gray4850: isDarkTheme ? '#484848e0' : '#484848e0',
@@ -133,7 +135,7 @@ const colors = {
 	textRed: '#E53935',
 	textViolet: '#5a62f4',
 	azureBlue: '#4173c3',
-	caribbeanGreen: '#0bbc73',
+	caribbeanGreen: '#1FA07C',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',

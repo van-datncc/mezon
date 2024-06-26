@@ -25,21 +25,22 @@ export { default as MemberProfile } from './components/MemberProfile';
 export { default as Message } from './components/Message';
 export { default as ChannelMessageOpt } from './components/Message/ChannelMessageOpt';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
-export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
 export { default as AttachmentLoading } from './components/MessageBox/AttachmentLoading';
+export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
-export { default as MessageModalImage } from './components/MessageWithUser/MessageModalImage';
 export { default as MessageImage } from './components/MessageWithUser/MessageImage';
+export { default as MessageModalImage } from './components/MessageWithUser/MessageModalImage';
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
 export { default as SearchModal } from './components/SearchModal/index';
-export { default as ModalNotificationSetting } from './components/notificationSetting/index';
 export { default as ToastController } from './components/ToastController/ToastController';
+export { default as ModalNotificationSetting } from './components/notificationSetting/index';
 
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
+export { default as ForwardMessageModal } from './components/ForwardMessage';
 export * as Icons from './components/Icons';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
@@ -47,6 +48,8 @@ export { default as MessageVideo } from './components/MessageWithUser/MessageVid
 export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
+export { default as ContextMenu } from './components/RightClick/ContextMenu';
+export { default as ItemContextMenu } from './components/RightClick/ItemContextMenu';
 export { default as SearchMessageChannelRender } from './components/SearchMessageChannel/SearchMessageChannelRender';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as SettingAppearance } from './components/SettingAppearance';
@@ -54,7 +57,5 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
-export { default as ForwardMessageModal } from './components/ForwardMessage';
-
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/Firebase/firebase';

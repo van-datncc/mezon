@@ -43,6 +43,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
+import { rightClickReducer } from './rightClick/rightClick.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -110,6 +111,7 @@ const reducer = {
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
+	rightClick: rightClickReducer,
 };
 
 let storeInstance = configureStore({
