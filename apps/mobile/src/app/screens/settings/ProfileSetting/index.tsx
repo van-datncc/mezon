@@ -19,9 +19,15 @@ export enum EProfileTab {
 
 export interface IUserProfileValue {
     username: string;
-    imgUrl: string,
-    displayName: string,
-    aboutMe: string,
+    imgUrl: string;
+    displayName: string;
+    aboutMe: string;
+}
+
+export interface IClanProfileValue {
+    username: string;
+    displayName: string;
+    imgUrl: string;
 }
 
 export const ProfileSetting = ({ navigation }: { navigation: any }) => {
@@ -29,18 +35,29 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
     const [tab, setTab] = useState<number>(0);
     const [triggerToSaveTab, setTriggerToSaveTab] = useState<EProfileTab | null>(null);
     const { t } = useTranslation(['profileSetting']);
+
     const [originUserProfileValue, setOriginUserProfileValue] = useState<IUserProfileValue>({
         username: '',
         imgUrl: '',
         displayName: '',
         aboutMe: '',
     });
-
     const [currentUserProfileValue, setCurrentUserProfileValue] = useState<IUserProfileValue>({
         username: '',
         imgUrl: '',
         displayName: '',
         aboutMe: '',
+    });
+
+    const [originClanProfileValue, setOriginClanProfileValue] = useState<IClanProfileValue>({
+        username: '',
+        imgUrl: '',
+        displayName: '',
+    });
+    const [currentClanProfileValue, setCurrentClanProfileValue] = useState<IClanProfileValue>({
+        username: '',
+        imgUrl: '',
+        displayName: '',
     });
 
     const checkIsNotChanged = (): boolean => {
@@ -138,7 +155,9 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
                         userProfileValue={currentUserProfileValue}
                         setCurrentUserProfileValue={setCurrentUserProfileValue}
                     />,
-                    <ServerProfile trigger={0}/>,
+                    <ServerProfile
+                        triggerToSave={triggerToSaveTab}
+                    />,
                 ]}
             />
         </View>
