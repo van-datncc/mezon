@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams } from '@mezon/core';
-import { selectAllIdChannelSelected, selectDefaultCategory, selectDefaultChannelIdByClanId, selectIdChannelSelectedByClanId } from '@mezon/store';
+import { selectAllIdChannelSelected, selectDefaultCategory, selectDefaultChannelIdByClanId } from '@mezon/store';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from './ChannelMessages';
@@ -8,7 +8,7 @@ export default function ChannelIndex() {
 	const { clanId } = useAppParams();
 	const defaultCategory = useSelector(selectDefaultCategory);
 	const isSelectedChannel = useSelector(selectAllIdChannelSelected);
-	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || '', defaultCategory.category_id, isSelectedChannel));
+	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || '', defaultCategory?.category_id, isSelectedChannel));
 	const { navigate } = useAppNavigation();
 
 	useEffect(() => {
