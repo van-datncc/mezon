@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { styles } from './styles';
 

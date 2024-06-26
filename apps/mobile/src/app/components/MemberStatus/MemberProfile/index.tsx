@@ -1,6 +1,6 @@
 import { ChannelMembersEntity } from "@mezon/utils";
 import { Image, View } from "react-native";
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import { OfflineStatus, OnlineStatus } from "@mezon/mobile-components"
 import style from "./style";
 import { useMemo } from "react";

@@ -16,6 +16,7 @@ import { ChannelType, User } from "mezon-js";
 import { APP_SCREEN } from "../../../navigation/ScreenTypes";
 import { UserInformationBottomSheet } from "../../../components/UserInformationBottomSheet";
 import { useEffect } from "react";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any}) => {
     const directMessage = route?.params?.directMessage as DirectEntity;
@@ -59,7 +60,7 @@ export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any
     }, [])
 
     const createNewGroup = async () => {
-        if (friendIdSelectedList.length === 0) return; 
+        if (friendIdSelectedList.length === 0) return;
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: friendIdSelectedList.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
@@ -75,6 +76,7 @@ export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any
 
     const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)
     return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={styles.newGroupContainer}>
                 <View style={styles.headerWrapper}>
@@ -116,5 +118,6 @@ export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any
                 <UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
             </View>
         </TouchableWithoutFeedback>
+      </SafeAreaView>
     )
 }

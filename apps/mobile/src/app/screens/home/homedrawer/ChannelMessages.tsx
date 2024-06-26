@@ -7,7 +7,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { Swing } from 'react-native-animated-spinkit';
+import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItem from './MessageItem';
@@ -173,7 +173,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
 			{visibleImageModalOverlay && (
 				<View style={styles.overlay}>
-					<Swing size={size.s_34 * 2} color={Colors.bgViolet} />
+					<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
 				</View>
 			)}
 			<ImageListModal

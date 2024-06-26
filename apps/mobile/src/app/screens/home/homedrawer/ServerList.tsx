@@ -74,7 +74,7 @@ const ServerList = React.memo((props: any) => {
 						setIsVisible(!isVisible);
 					}}
 				>
-					<PlusGreenIcon width={30} height={30}/>
+					<PlusGreenIcon width={30} height={30} color={Colors.caribbeanGreen} />
 				</Pressable>
 			</Tooltip>
 		</View>
