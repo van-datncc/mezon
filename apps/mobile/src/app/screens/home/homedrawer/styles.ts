@@ -224,7 +224,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		borderBottomWidth: 0.5,
+		borderBottomWidth: 1,
 		borderBottomColor: Colors.gray48,
 		backgroundColor: Colors.secondary,
 	},
