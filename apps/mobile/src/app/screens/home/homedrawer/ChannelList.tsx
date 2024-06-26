@@ -47,7 +47,7 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
-  const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<IChannel>(null);
@@ -103,7 +103,7 @@ const ChannelList = React.memo((props: any) => {
 		bottomSheetCategoryMenuRef.current?.present();
 		setCurrentPressedCategory(category);
 	}
-	
+
 	function handleLongPressChannel(channel: IChannel) {
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
@@ -124,18 +124,18 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-          <Pressable
-            style={styles.inviteIconWrapper}
-            onPress={
-              () =>{
-                setIsUnKnownChannel(false);
-                bottomSheetInviteRef.current.open()
-              }
-            }
-				  >
-					<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
-				</Pressable>
-				<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
+					<Pressable
+						style={styles.inviteIconWrapper}
+						onPress={
+							() => {
+								setIsUnKnownChannel(false);
+								bottomSheetInviteRef.current.open()
+							}
+						}
+					>
+						<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
+					</Pressable>
+					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
@@ -171,7 +171,7 @@ const ChannelList = React.memo((props: any) => {
 			</MezonBottomSheet>
 
 			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent>
-				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedCategory} />
+				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet
