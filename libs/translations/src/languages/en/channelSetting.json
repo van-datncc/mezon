@@ -1,0 +1,45 @@
+{
+    "fields": {
+        "channelName": {
+            "title": "Channel Name",
+            "placeholder": "Input Channel Name"
+        },
+        "channelDescription": {
+            "title": "Channel Topic"
+        },
+        "channelCategory": {
+            "title": "Category"
+        },
+        "channelPermission": {
+            "title": "",
+            "permission": "Channel Permission",
+            "description": "Change privacy settings and customize how members can interact with this channel."
+        },
+        "channelNotifications": {
+            "title": "",
+            "notification": "Notification Settings",
+            "pinned": "Pinned Messages",
+            "invite": "Invites"
+        },
+        "channelSlowMode": {
+            "title": "Slowmode Cooldown",
+            "description": "Members will be restricted to sending one message and creating one thread per this interval, unless they have Mange Channel or Manage Messages permissions."
+        },
+        "channelHideInactivity": {
+            "title": "Hide After Inactivity",
+            "description": "New threads will not show in the channel list after being inactive for the specified duration",
+            "_1hour": "1 Hour",
+            "_24hours": "24 Hours",
+            "_3days": "3 Days",
+            "_1Week": "1 Week"
+        },
+        "channelWebhooks": {
+            "title": "",
+            "webhook": "Webhook"
+        },
+        "channelDelete": {
+            "title": "",
+            "delete": "Delete Channel"
+        }
+    }
+}
