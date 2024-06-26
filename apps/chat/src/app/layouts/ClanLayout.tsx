@@ -1,6 +1,6 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile } from '@mezon/components';
 import { MezonPolicyProvider, useApp, useAuth, useThreads } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectCurrentVoiceChannel, selectStatusMenu } from '@mezon/store';
+import { selectAllAccount, selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectCurrentVoiceChannel, selectStatusMenu } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,20 +12,15 @@ import ThreadsMain from '../pages/thread';
 const ClanLayout = () => {
 	const { clanId } = useLoaderData() as ClanLoaderData;
 	const currentClan = useSelector(selectCurrentClan);
-	const { userProfile } = useAuth();
+  const userProfile = useSelector(selectAllAccount);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const { isShowCreateThread } = useThreads();
 	const { setIsShowMemberList } = useApp();
 
-	const [openSetting, setOpenSetting] = useState(false);
-
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentVoiceChannel = useSelector(selectCurrentVoiceChannel);
-	const handleOpenCreate = () => {
-		setOpenSetting(true);
-	};
 
 	useEffect(() => {
 		if (isShowCreateThread) {
@@ -42,11 +37,10 @@ const ClanLayout = () => {
 					<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 					<ChannelList channelCurrentType={currentVoiceChannel?.type} />
 					<FooterProfile
-						name={userProfile?.user?.display_name || ''}
+						name={userProfile?.user?.display_name || userProfile?.user?.username ||  ''}
 						status={userProfile?.user?.online}
 						avatar={userProfile?.user?.avatar_url || ''}
 						userId={userProfile?.user?.id || ''}
-						openSetting={handleOpenCreate}
 						channelCurrent={currentChannel}
 					/>
 				</div>
@@ -64,12 +58,7 @@ const ClanLayout = () => {
 						</div>
 					</>
 				)}
-				<Setting
-					open={openSetting}
-					onClose={() => {
-						setOpenSetting(false);
-					}}
-				/>
+				<Setting />
 			</MezonPolicyProvider>
 		</div>
 	);

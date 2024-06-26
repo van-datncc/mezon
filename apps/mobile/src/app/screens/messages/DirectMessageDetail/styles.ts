@@ -18,11 +18,12 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        gap: size.s_4,
+        gap: size.s_8,
     },
     titleText: {
         color: Colors.textGray,
         fontSize: size.label,
+        flex: 1
     },
     content: {
         flex: 1,

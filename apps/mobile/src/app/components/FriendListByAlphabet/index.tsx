@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, FlatList } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import { styles } from "./styles";
 import { FriendsEntity } from "@mezon/store-mobile";
 import { SeparatorWithLine, SeparatorWithSpace } from "../Common";
@@ -7,9 +8,18 @@ import { FriendItem } from "../FriendItem";
 import { useTranslation } from "react-i18next";
 import { IFriendGroupByCharacter, IListUserByAlphabetProps } from "./type";
 import { useCallback } from "react";
+import { useEffect } from "react";
 
 export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps) => {
-    const { friendList, isSearching, showAction, selectMode, handleFriendAction, onSelectedChange } = props;
+    const {
+        friendList,
+        isSearching,
+        showAction,
+        selectMode,
+        selectedFriendDefault = [],
+        handleFriendAction,
+        onSelectedChange
+    } = props;
     const [ friendIdSelectedList, setFriendIdSelectedList ] = useState<string[]>([]);
     const { t } = useTranslation(['friends']);
 
@@ -34,10 +44,16 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
         return 0;
     }
 
+    useEffect(() => {
+        if (selectedFriendDefault?.length) {
+            setFriendIdSelectedList(selectedFriendDefault);
+        }
+    }, [selectedFriendDefault])
+
     const allFriendGroupByAlphabet = useMemo(() => {
         const groupedByCharacter = friendList.reduce((acc, friend) => {
             const name = showAction ?  friend.user.username : friend.user.display_name;
-            const firstNameCharacter = name.charAt(0).toUpperCase();
+            const firstNameCharacter = name?.charAt(0)?.toUpperCase();
             if (!acc[firstNameCharacter]) {
                 acc[firstNameCharacter] = [];
             }
@@ -65,7 +81,8 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
                             friend={item}
                             showAction={showAction}
                             selectMode={selectMode}
-                            isChecked={friendIdSelectedList.includes(item.user.id)}
+                            disabled={selectedFriendDefault.includes(item?.user?.id)}
+                            isChecked={friendIdSelectedList.includes(item?.user?.id)}
                             handleFriendAction={handleFriendAction}
                             onSelectChange={onSelectChange}
                         />}
@@ -90,7 +107,8 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
                                 friend={item}
                                 showAction={showAction}
                                 selectMode={selectMode}
-                                isChecked={friendIdSelectedList.includes(item.user.id)}
+                                disabled={selectedFriendDefault.includes(item?.user?.id)}
+                                isChecked={friendIdSelectedList.includes(item?.user?.id)}
                                 handleFriendAction={handleFriendAction}
                                 onSelectChange={onSelectChange}
                             />}

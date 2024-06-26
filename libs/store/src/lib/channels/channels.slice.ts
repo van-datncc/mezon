@@ -3,7 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -139,6 +139,20 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 	}
 });
 
+export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPrivate', async (body: ApiChangeChannelPrivateRequest, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.updateChannelPrivate(mezon.session, body);
+		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
+		if (response) {
+			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId: clanID, channelId: body.channel_id || "", noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 type fetchChannelsArgs = {
 	clanId: string;
 	cursor?: string;
@@ -250,7 +264,30 @@ export const channelsSlice = createSlice({
 			const payload = action.payload;
 			channelsAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: { channel_label: payload.channel_label, status: payload.status },
+				changes: { 
+					channel_label: payload.channel_label, 
+					status: payload.status
+					 },
+			});
+		},
+		updateChannelPrivateSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
+			const payload = action.payload;
+			const entity = state.entities[payload.channel_id];
+			let channelPrivate: number
+			if (entity) {
+				if (entity.channel_private && entity.channel_private === 1) {
+					channelPrivate = 0
+				} else {
+					channelPrivate = 1
+				}
+			} else {
+				channelPrivate = 1
+			}
+			channelsAdapter.updateOne(state, {
+				id: payload.channel_id,
+				changes: { 
+					channel_private: channelPrivate
+					 },
 			});
 		},
 		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
@@ -344,6 +381,7 @@ export const channelsActions = {
 	createNewChannel,
 	deleteChannel,
 	updateChannel,
+	updateChannelPrivate,
 };
 
 /*

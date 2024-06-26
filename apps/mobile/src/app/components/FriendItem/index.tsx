@@ -1,5 +1,6 @@
 import React from "react";
-import { TouchableOpacity, View, Image, Text, Pressable } from "react-native";
+import { TouchableOpacity, View, Image, Pressable } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import { styles } from "./styles";
 import { FriendsEntity } from "@mezon/store-mobile";
 import { useMemberStatus } from "@mezon/core";
@@ -20,11 +21,20 @@ export interface IFriendItem {
     showAction?: boolean;
     selectMode?: boolean;
     isChecked?: boolean;
+    disabled?: boolean;
     onSelectChange?: (item: FriendsEntity, isChecked: boolean) => void;
     handleFriendAction: (friend: FriendsEntity, action: EFriendItemAction) => void
 }
 
-export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChange, isChecked, showAction = true, selectMode = false }: IFriendItem) => {
+export const FriendItem = React.memo(({
+    friend,
+    handleFriendAction,
+    onSelectChange,
+    isChecked,
+    disabled = false,
+    showAction = true,
+    selectMode = false }: IFriendItem
+) => {
     const userStatus = useMemberStatus(friend.id || '');
 	
 	const isFriend = friend.state === 0;
@@ -33,6 +43,7 @@ export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChan
 
     const onPressAction = (actionType: EFriendItemAction) => {
         if (selectMode) {
+            if (disabled) return;
             onSelectChange(friend, !isChecked);
             return;
         }
@@ -45,15 +56,16 @@ export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChan
     
     return (
         <TouchableOpacity
+            disabled={disabled}
             style={styles.userItem}
             onPress={() => onPressAction(showAction ? EFriendItemAction.ShowInformation : EFriendItemAction.MessageDetail)}
             onLongPress={() => onLongPress()}
         >
             <View>
                 {friend.user.avatar_url ? (
-                    <Image source={{ uri: friend.user.avatar_url }} style={styles.friendAvatar} />
+                    <Image source={{ uri: friend?.user?.avatar_url }} style={[styles.friendAvatar, disabled && styles.avatarDisabled]} />
                 ): (
-                    <Text style={styles.textAvatar}>{friend?.user?.username?.charAt?.(0)}</Text>
+                    <Text style={[styles.textAvatar, disabled && styles.avatarDisabled]}>{friend?.user?.username?.charAt?.(0)}</Text>
                 )}
                 {!isPendingFriendRequest ? (
                     <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
@@ -65,7 +77,7 @@ export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChan
                         {(isPendingFriendRequest || !showAction) && friend?.user?.display_name ? (
                             <Text style={[styles.defaultText, (isPendingFriendRequest || !showAction) && styles.whiteText]}>{friend.user.display_name}</Text>
                         ): null}
-                        <Text style={styles.defaultText}>{friend.user.username}</Text>
+                        <Text style={[styles.defaultText, disabled && styles.disabled]}>{friend?.user?.display_name || friend?.user?.username}</Text>
                     </View>
                     {isFriend && showAction && !selectMode ? (
                         <View style={styles.friendAction}>
@@ -95,11 +107,17 @@ export const FriendItem = React.memo(({ friend, handleFriendAction, onSelectChan
                         <View style={styles.checkboxWrapper}>
                             <BouncyCheckbox
                                 size={20}
+                                disabled={disabled}
                                 isChecked={isChecked}
                                 onPress={(value) => onSelectChange(friend, value)}
                                 fillColor={Colors.bgButton}
                                 iconStyle={{ borderRadius: 5 }}
-                                innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white, borderRadius: 5 }}
+                                innerIconStyle={{
+                                    borderWidth: 1.5,
+                                    borderColor: isChecked ? Colors.bgButton : Colors.white,
+                                    borderRadius: 5,
+                                    opacity: disabled ? .4 : 1
+                                }}
                                 textStyle={{ fontFamily: "JosefinSans-Regular" }}
                             />
                         </View>

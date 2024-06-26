@@ -10,7 +10,6 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
-	referencesActions,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -85,7 +84,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			mess.isMe = senderId === userId;
 
 			dispatch(directActions.updateDMSocket(message));
-			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
@@ -120,13 +118,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 	const ondisconnect = useCallback(() => {
 		console.log('Socket disconnected');
-		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
+		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
 	}, [reconnect, dispatch]);
 
-	const onerror = useCallback((event: unknown) => {
-		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
-	  }, [dispatch]);
+	const onerror = useCallback(
+		(event: unknown) => {
+			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		},
+		[dispatch],
+	);
 
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
@@ -176,7 +177,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelupdated = useCallback(
 		(channelUpdated: ChannelUpdatedEvent) => {
 			if (channelUpdated) {
-				dispatch(channelsActions.updateChannelSocket(channelUpdated));
+				if (channelUpdated.channel_label === "") {
+					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
+					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, channelType: 1, noCache: true}),)
+				}else {
+					dispatch(channelsActions.updateChannelSocket(channelUpdated));
+				}
 			}
 		},
 		[dispatch],
@@ -184,8 +190,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onHeartbeatTimeout = useCallback(() => {
 		console.log('Heartbeat timeout');
-		dispatch(toastActions.addToast({ message: "Socket connection failed", type: "error", id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect()
+		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		reconnect();
 	}, [dispatch, reconnect]);
 
 	useEffect(() => {

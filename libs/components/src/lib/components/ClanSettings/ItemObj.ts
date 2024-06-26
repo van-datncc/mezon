@@ -9,6 +9,7 @@ export const ItemSetting = {
 	EMOJI: 'emoji',
 	STICKERS: 'Stickers',
 	DELETE_SERVER: 'delete_server',
+	INTEGRATIONS: "integrations",
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -16,4 +17,5 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
+	{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' },
 ];

@@ -1,5 +1,5 @@
 import { IMessageWithUser, convertDateString, convertTimeHour, convertTimeString } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
 	const attachments = useMemo(() => {
@@ -31,7 +31,11 @@ export function useMessageParser(message: IMessageWithUser) {
 		return convertTimeHour(message?.create_time || ('' as string));
 	}, [message]);
 
-	const isEdited = message.update_time && message.create_time < message.update_time || false;
+	const [isEdited, setIsEdited] = useState(false)
+
+	useEffect(()=>{
+		setIsEdited(message.update_time && message.create_time < message.update_time || false);
+	}, [message.update_time, message.create_time])
 
 	const hasAttachments = attachments && attachments.length > 0;
 

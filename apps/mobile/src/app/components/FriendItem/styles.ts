@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
     friendAvatar: {
         width: size.s_40,
         height: size.s_40,
-        borderRadius: 50
+        borderRadius: 50,
     },
     friendItemContent: {
         flexDirection: 'row',
@@ -29,6 +29,12 @@ export const styles = StyleSheet.create({
     },
     defaultText: {
         color: Colors.textGray
+    },
+    avatarDisabled: {
+        opacity: .4
+    },
+    disabled: {
+        color: Colors.gray72
     },
     statusCircle: {
         position: 'absolute',

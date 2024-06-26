@@ -4,7 +4,8 @@ import React from 'react';
 import { SettingIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
+import { Text } from '@mezon/mobile-ui';
 import { FriendScreen } from '../../../screens/friend';
 import { AddFriendScreen } from '../../../screens/friend/AddFriend';
 import { RequestFriendScreen } from '../../../screens/friend/RequestFriend';
@@ -72,6 +73,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 					headerStyle: {
 						backgroundColor: Colors.secondary,
 					},
+					headerLeftLabelVisible: false,
 				}}
 			/>
 			<Stack.Screen

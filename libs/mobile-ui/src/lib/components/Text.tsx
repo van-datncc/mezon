@@ -45,6 +45,7 @@ export const Text: React.FC<ITextWrapperProps> = ({
 		<TextRN
 			style={[
 				style,
+				styles.styleDefault,
 				h1 && styles.h1,
 				h2 && styles.h2,
 				h25 && styles.h25,
@@ -123,4 +124,7 @@ const styles = StyleSheet.create({
 	bold: {
 		fontWeight: 'bold',
 	},
+	styleDefault: {
+		fontFamily: 'OpenSans-Bold',
+	}
 });

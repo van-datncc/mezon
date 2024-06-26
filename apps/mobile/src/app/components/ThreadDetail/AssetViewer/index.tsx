@@ -1,19 +1,21 @@
-import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from "react-native";
+import React from 'react';
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from "react-native";
+import { Text } from '@mezon/mobile-ui';
 import styles from "./style"
-import MemberListStatus from "../../MemberStatus";
+import { MemberListStatus } from "../../MemberStatus";
 import AssetsHeader from "../AssetsHeader";
 import { useState, useRef } from "react";
 import PinMessage from "../../PinMessage";
 
 const TabList = [
     "Members",
-    "Media",
+    // "Media",
     "Pins",
-    "Links",
-    "Files"
+    // "Links",
+    // "Files"
 ]
 
-export default function AssetsViewer() {
+export const AssetsViewer = React.memo(() => {
     const [pageID, setPageID] = useState<number>(0);
     const ref = useRef<ScrollView>();
 
@@ -38,7 +40,7 @@ export default function AssetsViewer() {
             <View style={styles.container}>
                 <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
                     <MemberListStatus />
-                    <Page2 />
+                    {/*<Page2 />*/}
                     <PinMessage />
                     <Page2 />
                     <Page2 />
@@ -47,7 +49,7 @@ export default function AssetsViewer() {
         </>
 
     )
-}
+})
 
 // Just for testing purposes
 function Page2() {

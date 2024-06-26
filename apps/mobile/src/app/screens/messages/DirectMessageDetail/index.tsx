@@ -68,7 +68,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         );
         return null;
     }, [currentDmGroup]);
-  
+
     useEffect(() => {
         if (currentDmGroup?.id) {
             directMessageLoader()
@@ -107,7 +107,6 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
                         </View>
                     )}
                     <Text style={styles.titleText} numberOfLines={1}>{currentDmGroup?.channel_label}</Text>
-                    <ChevronIcon width={10} height={10} />
                 </Pressable>
                 <View style={styles.actions}>
                     {/* TODO: update later */}
@@ -156,9 +155,9 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 					)}
 				</View>
 			): null}
-        
+
         </SafeAreaView>
 
-        
+
     )
 }

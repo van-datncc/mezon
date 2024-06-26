@@ -1,17 +1,17 @@
+import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
+import { View } from 'react-native';
 import 'react-native-gesture-handler';
-import Feather from 'react-native-vector-icons/Feather';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import Notifications from '../../screens/Notifications';
 import HomeScreen from '../../screens/home/HomeScreen';
 import MessagesScreen from '../../screens/messages/MessagesScreen';
 import ProfileScreen from '../../screens/profile/ProfileScreen';
 import { APP_SCREEN } from '../ScreenTypes';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const TabStack = createBottomTabNavigator();
 
@@ -28,7 +28,7 @@ const BottomNavigator = () => {
 						paddingBottom: hiddenBottomTab ? 10 : 20,
 						borderTopWidth: 0,
 						elevation: 0,
-						backgroundColor: Colors.secondary,
+						backgroundColor: hiddenBottomTab ? Colors.secondary : Colors.secondary,
 					},
 					tabBarActiveTintColor: '#FFFFFF',
 				}}
@@ -40,7 +40,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Servers',
-						tabBarIcon: ({ color }) => <MaterialIcons name="home-work" color={color} size={28} />,
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <HomeTab color={color} />),
 					}}
 				/>
 				<TabStack.Screen
@@ -49,7 +49,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Messages',
-						tabBarIcon: ({ color }) => <Feather name="message-circle" color={color} size={28} />,
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <MessageTab color={color} />),
 					}}
 				/>
 				<TabStack.Screen
@@ -58,7 +58,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Notifications',
-						tabBarIcon: ({ color }) => <Feather name="bell" color={color} size={28} />,
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <NotiTab color={color} />),
 					}}
 				/>
 				<TabStack.Screen
@@ -67,7 +67,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Profile',
-						tabBarIcon: ({ color }) => <Feather name="user" color={color} size={28} />,
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <ProfileTab color={color} />),
 					}}
 				/>
 			</TabStack.Navigator>

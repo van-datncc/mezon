@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 export * from './attachmentThumb';
 export * from './iconInEmojiPanel';
 export * from './uploadThumbnail';
+export * from './iconRightClick';
+
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -2760,6 +2762,66 @@ export function IconShareEventVoice() {
 			</path>
 			<path fill="currentColor" d="M14.7 10.7a1 1 0 1 0-1.4-1.4l-4 4a1 1 0 0 0 1.4 1.4l4-4Z">
 			</path>
+		</svg>
+	);
+}
+
+export const IconUserCreateDM = ({ className='' }: {className: string}) => {
+	return (
+		<svg aria-label="Group Owner" aria-hidden="false" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className={className}> 
+			<path fill="currentColor" d="M5 18a1 1 0 0 0-1 1 3 3 0 0 0 3 3h10a3 3 0 0 0 3-3 1 1 0 0 0-1-1H5ZM3.04 7.76a1 1 0 0 0-1.52 1.15l2.25 6.42a1 1 0 0 0 .94.67h14.55a1 1 0 0 0 .95-.71l1.94-6.45a1 1 0 0 0-1.55-1.1l-4.11 3-3.55-5.33.82-.82a.83.83 0 0 0 0-1.18l-1.17-1.17a.83.83 0 0 0-1.18 0l-1.17 1.17a.83.83 0 0 0 0 1.18l.82.82-3.61 5.42-4.41-3.07Z">
+			</path>
+		</svg>
+	)
+}
+
+export function WebhooksIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="icon_d5408a"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="m7.7 16.95 3.68-6.76a1 1 0 0 0-.5-1.4A3 3 0 1 1 15 6a1 1 0 1 0 2 0 5 5 0 1 0-7.85 4.1L5.95 16a2 2 0 1 0 1.78 3h8.54a2 2 0 1 0 0-2H7.73l-.02-.05Z"
+				className=""
+			></path>
+			<path
+				fill="currentColor"
+				d="M13.8 6.86A2 2 0 1 0 12.16 8l4.53 6.58a1 1 0 0 0 .82.43h.5a3 3 0 1 1-1.98 5.25 1 1 0 0 0-.66-.25h-.01a1 1 0 0 0-.66 1.75A4.98 4.98 0 0 0 23 18a5 5 0 0 0-4.97-5L13.8 6.86ZM5.97 13.88a1 1 0 0 1-.72 1.21 3 3 0 1 0 2.73 5.16 1 1 0 1 1 1.33 1.5A4.98 4.98 0 0 1 1 18a5 5 0 0 1 3.75-4.84 1 1 0 0 1 1.22.72Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function ClockIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="detailsIcon_d5408a"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm1-18a1 1 0 1 0-2 0v7c0 .27.1.52.3.7l3 3a1 1 0 0 0 1.4-1.4L13 11.58V5Z"
+				clip-rule="evenodd"
+				className=""
+			></path>
 		</svg>
 	);
 }

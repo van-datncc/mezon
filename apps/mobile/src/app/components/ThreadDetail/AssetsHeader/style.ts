@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     },
     b: {
         position: "absolute",
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.bgViolet,
         height: 3,
         top: 0,
         borderRadius: 50,

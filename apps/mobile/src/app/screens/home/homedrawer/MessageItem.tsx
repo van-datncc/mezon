@@ -49,10 +49,11 @@ import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
+import { isEmpty } from 'lodash';
 
 const widthMedia = Metrics.screenWidth - 150;
 export type MessageItemProps = {
-	message: IMessageWithUser;
+	message: string;
 	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -73,7 +74,6 @@ const arePropsEqual = (prevProps, nextProps) => {
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { mode, onOpenImage, isNumberOfLine } = props;
 	const message = useSelector((state) => selectMessageEntityById(state, props.channelId, props.message));
-	
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
@@ -87,6 +87,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
+  const [isMessageReplyDeleted, setIsMessageReplyDeleted] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
@@ -119,14 +120,27 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return { videos, images, documents };
 	};
-	
+
+  useEffect(()=>{
+    setIsMessageReplyDeleted(!messageRefFetchFromServe && message?.references && message?.references?.length)
+  },[ messageRefFetchFromServe, message.references])
+
 	useEffect(() => {
-		if (message) {
+		if (!isEmpty(message)) {
 			const timestamp = Date.now() / 1000;
 			markMessageAsSeen(message);
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 		}
 	}, [dispatch, markMessageAsSeen, message]);
+
+	useEffect(() => {
+		if (message.references && message.references.length > 0) {
+			const messageReferenceId = message.references[0].message_ref_id;
+			const messageReferenceUserId = message.references[0].message_sender_id;
+			setMessageRefId(messageReferenceId ?? '');
+			setSenderId(messageReferenceUserId ?? '');
+		}
+	}, [message]);
 
 	useEffect(() => {
 		if (message.references && message.references.length > 0) {
@@ -213,7 +227,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const isShowImage = isImage(document?.url?.toLowerCase());
 			if (isShowImage) {
 				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
-				
+
 				return imageItem({ image: document, index, checkImage: checkImage });
 			}
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
@@ -327,12 +341,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							</View>
 						)}
 						<Text style={styles.repliedContentText} numberOfLines={1}>
-							{messageRefFetchFromServe.content.t}
+							{messageRefFetchFromServe?.content?.t?.trim()}
 						</Text>
 					</Pressable>
 				</View>
 			) : null}
-			{!messageRefFetchFromServe && message?.references?.length && message.references ? (
+			{isMessageReplyDeleted ? (
 				<View style={styles.aboveMessageDeleteReply}>
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />

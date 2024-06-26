@@ -25,8 +25,8 @@ export const styles = StyleSheet.create({
         borderRadius: size.s_14,
         borderWidth: 3,
         borderColor: Colors.secondary,
-        minWidth: size.s_24,
-        height: size.s_24,
+        minWidth: size.s_22,
+        height: size.s_22,
         alignItems: 'center',
         justifyContent: 'center',
         bottom: -3,
@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
     badgeText: {
         color: Colors.white,
         fontWeight: 'bold',
-        top: -2
+        fontSize: size.small
     },
     mb10: {
         marginBottom: size.s_10,

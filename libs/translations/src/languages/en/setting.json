@@ -6,17 +6,17 @@
         "privacySafety": "Privacy & Safety",
         "familyCenter": "Family Center",
         "authorizedApp": "Authorized Apps",
-        "device": "Device",
+        "device": "Devices",
         "connection": "Connections",
-        "clip": "Clip",
+        "clip": "Clips",
         "friendRequests": "Friend Requests",
-        "QRScan": "QR Scan"
+        "QRScan": "Scan QR Code"
     },
     "paymentSettings": {
         "title": "Payment Settings",
-        "serverBoots": "Clan Boots",
+        "serverBoost": "Clan Boost",
         "nitroGift": "Nitro Gifting",
-        "restoreSubscription": "Restore subscription"
+        "restoreSubscription": "Restore Subscription"
     },
     "appSettings": {
         "title": "App Settings",
@@ -28,12 +28,12 @@
         "webBrowser": "Web Browser",
         "notifications": "Notifications",
         "appIcon": "App Icon",
-        "advance": "Advance"
+        "advanced": "Advanced"
     },
     "supportSettings": {
         "title": "Support",
         "support": "Support",
-        "uploadLog": "Upload log",
+        "uploadLog": "Upload debug logs to Mezon Support",
         "acknowledgement": "Acknowledgement"
     },
     "whatsNew": {

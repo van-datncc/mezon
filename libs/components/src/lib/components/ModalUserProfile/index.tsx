@@ -1,4 +1,4 @@
-import { useDirect, useSendInviteMessage } from '@mezon/core';
+import { useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { selectAddFriends, selectAllAccount, selectMemberByUserId, selectTheme } from '@mezon/store';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -65,7 +65,14 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 
 	const checkAddFriend = useSelector(selectAddFriends(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID,[userID, userProfile?.user?.id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
 
+	const {setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab} = useSettingFooter();
+	const openSetting = () => {
+		setIsShowSettingFooterStatus(true);
+		setIsShowSettingFooterInitTab('Profiles');
+	}
+	
 	return (
 		<div className={classWrapper}>
 			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
@@ -115,17 +122,17 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : message?.username}
+							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : (checkAnonymous ? 'Anonymous' : message?.username)}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
-							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : message?.username}
+							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : (checkAnonymous ? 'Anonymous' : message?.username)}
 						</p>
 					</div>
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile userById={userById} /> : !hiddenRole && <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? <StatusProfile userById={userById} /> : (!hiddenRole && userById) && <RoleUserProfile userID={userID} />}
 
 					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole ? (
-						<div className="w-full items-center">
+						<div className="w-full items-center mt-2">
 							<input
 								type="text"
 								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgDisable bg-bgLightModeSecond p-[5px] "
@@ -146,6 +153,7 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 							<NoteUserProfile />
 						</>
 					)}
+					{(!isFooterProfile && checkUser) && <button className='rounded dark:bg-slate-800 bg-bgLightModeButton py-2 hover:bg-opacity-50 mt-2' onClick={openSetting}>Edit Profile</button>}
 				</div>
 			</div>
 		</div>

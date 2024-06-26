@@ -1,4 +1,4 @@
-import { Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Fonts, Metrics, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 const width = Dimensions.get('window').width;
 const inputWidth = width * 0.6;
@@ -13,6 +13,8 @@ export const styles = StyleSheet.create({
 
 	wrapperChatBox: {
 		backgroundColor: Colors.secondary,
+		borderTopWidth: 0.5,
+		borderTopColor: Colors.gray48,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 	},
@@ -40,9 +42,9 @@ export const styles = StyleSheet.create({
 		fontSize: 19,
 	},
 	iconContainer: {
-		width: 35,
-		height: 35,
-		borderRadius: 50,
+		width: size.s_40,
+		height: size.s_40,
+		borderRadius: size.s_40,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -55,7 +57,7 @@ export const styles = StyleSheet.create({
 	wrapperInput: {
 		position: 'relative',
 		justifyContent: 'center',
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		paddingVertical: size.s_4,
 		borderRadius: size.s_22,
 	},
@@ -69,7 +71,7 @@ export const styles = StyleSheet.create({
 		paddingRight: size.s_40,
 		fontSize: size.medium,
 		paddingTop: size.s_8,
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		color: Colors.tertiary,
 		textAlignVertical: 'center',
 	},
@@ -87,16 +89,24 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 	},
 	homeDefault: {
-		backgroundColor: '#2b2d31',
+		backgroundColor: Colors.secondary,
 		flex: 1,
 	},
 	wrapperChannelMessage: {
 		flex: 1,
 		justifyContent: 'space-between',
+		backgroundColor: Colors.secondary,
 	},
 	listChannels: {
 		paddingTop: size.s_14,
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondary,
+	},
+	channelListLink: {
+		display: "flex",
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingRight: Metrics.size.l
 	},
 	channelListSection: {
 		width: '100%',
@@ -120,7 +130,6 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 	},
 	channelListItem: {
-		width: '100%',
 		paddingHorizontal: 10,
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -128,8 +137,10 @@ export const styles = StyleSheet.create({
 		borderRadius: 5,
 	},
 	channelListItemActive: {
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		borderRadius: size.s_10,
+		borderWidth: 0.4,
+		borderColor: Colors.gray48
 	},
 	channelListItemTitle: {
 		fontSize: size.s_14,
@@ -139,6 +150,19 @@ export const styles = StyleSheet.create({
 	},
 	channelListItemTitleActive: {
 		color: Colors.white,
+	},
+	channelDotWrapper: {
+		backgroundColor: Colors.red,
+		height: 20,
+		width: 20,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+	},
+	channelDot: {
+		color: Colors.white,
+		fontSize: Fonts.size.h8,
 	},
 	dotIsNew: {
 		position: 'absolute',
@@ -151,10 +175,10 @@ export const styles = StyleSheet.create({
 	channelListSearch: {
 		width: '100%',
 		paddingHorizontal: 8,
-		marginBottom: 20,
+		marginBottom: size.s_16,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		gap: 10,
+		gap: size.s_8,
 	},
 	channelListSearchWrapperInput: {
 		backgroundColor: Colors.tertiaryWeight,
@@ -167,16 +191,17 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	channelListSearchInput: {
+		height: size.s_34,
 		padding: 0,
 		flex: 1,
 	},
 	wrapperClanIcon: {
 		alignItems: 'center',
-    position: 'relative'
+		position: 'relative'
 	},
 	clanIcon: {
-		height: verticalScale(55),
-		width: verticalScale(55),
+		height: verticalScale(50),
+		width: verticalScale(50),
 		borderRadius: verticalScale(50),
 		overflow: 'hidden',
 		alignItems: 'center',
@@ -215,7 +240,7 @@ export const styles = StyleSheet.create({
 	},
 	clanIconActive: {
 		backgroundColor: Colors.black,
-    borderRadius: verticalScale(15),
+		borderRadius: verticalScale(15),
 	},
 	containerThreadList: {
 		paddingLeft: size.s_24,
@@ -238,7 +263,7 @@ export const styles = StyleSheet.create({
 		paddingTop: size.s_20,
 		width: '22%',
 		justifyContent: 'flex-start',
-		backgroundColor: Colors.secondary,
+		backgroundColor: Colors.primary,
 		alignItems: 'center',
 		gap: size.s_10
 	},
@@ -250,9 +275,9 @@ export const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: Colors.borderPrimary,
 	},
-  friendItemWrapperInvited: {
-   opacity: 0.6
-  },
+	friendItemWrapperInvited: {
+		opacity: 0.6
+	},
 	friendItemContent: {
 		flexDirection: 'row',
 	},
@@ -261,32 +286,38 @@ export const styles = StyleSheet.create({
 		paddingLeft: 10,
 		lineHeight: 20,
 		color: Colors.white,
-    maxWidth: 200
+		maxWidth: 200
 	},
 	inviteButton: {
 		paddingVertical: 8,
 		paddingHorizontal: 12,
 	},
-  invitedButton: {
-    borderRadius: 15
-  },
+	invitedButton: {
+		borderRadius: 15
+	},
 	threadItem: {
 		flexDirection: 'row',
 		alignItems: 'flex-end',
 	},
 	threadItemActive: {
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 		borderRadius: size.s_10,
+		borderWidth: 0.4,
+		borderColor: Colors.gray48,
 		position: 'absolute',
 		width: '95%',
-		height: '85%',
+		height: '90%',
 		right: 0,
-		top: size.s_20,
+		top: size.s_16,
 	},
 	threadFirstItemActive: {
 		height: '160%',
 		right: 0,
 		top: size.s_2,
+		backgroundColor: Colors.secondaryLight,
+		borderRadius: size.s_10,
+		borderWidth: 0.4,
+		borderColor: Colors.gray48
 	},
 	wrapperMessageBox: {
 		flexDirection: 'row',
@@ -357,7 +388,7 @@ export const styles = StyleSheet.create({
 		fontSize: size.medium,
 		marginRight: size.s_10,
 		fontWeight: '600',
-		color: Colors.white,
+		color: Colors.caribbeanGreen,
 	},
 	dateMessageBox: {
 		fontSize: size.small,
@@ -405,7 +436,7 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_14,
 		paddingVertical: size.s_6,
 		fontSize: size.s_14,
-		color: Colors.gray72,
+		color: Colors.textGray,
 	},
 	iconUserClan: {
 		alignItems: 'center',
@@ -442,7 +473,7 @@ export const styles = StyleSheet.create({
 	},
 	wrapperAttachmentPreview: {
 		backgroundColor: Colors.secondary,
-		borderTopColor: Colors.gray72,
+		borderTopColor: Colors.gray48,
 		paddingVertical: size.s_10,
 	},
 	fileViewer: {
@@ -536,13 +567,14 @@ export const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
 	wrapperPlusClan: {
-		height: size.s_50,
-		width: size.s_50,
+		marginTop: verticalScale(5),
+		height: verticalScale(50),
+		width: verticalScale(50),
 		borderRadius: 50,
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: Colors.secondaryLight,
 	},
 	overlay: {
 		position: 'absolute',
@@ -561,27 +593,53 @@ export const styles = StyleSheet.create({
 	mb_10: {
 		marginBottom: verticalScale(10),
 	},
-  aboveMessageDeleteReply: {
+	aboveMessageDeleteReply: {
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
 		gap: 5,
 	},
-  iconMessageDeleteReply: {
-    backgroundColor: Colors.bgCharcoal,
-    width: size.s_20,
-    height: size.s_20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingRight: size.s_6,
-    borderRadius: 50,
-    marginLeft: size.s_6
-  },
-  messageDeleteReplyText: {
-    fontSize: size.small,
+	iconMessageDeleteReply: {
+		backgroundColor: Colors.bgCharcoal,
+		width: size.s_20,
+		height: size.s_20,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingRight: size.s_6,
+		borderRadius: 50,
+		marginLeft: size.s_6
+	},
+	messageDeleteReplyText: {
+		fontSize: size.small,
 		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
-    fontStyle: 'italic'
-  }
+    	fontStyle: 'italic'
+  	},
+	badge: {
+		backgroundColor: Colors.red,
+		position: 'absolute',
+		borderRadius: size.s_14,
+		borderWidth: 3,
+		borderColor: Colors.secondary,
+		minWidth: size.s_22,
+		height: size.s_22,
+		alignItems: 'center',
+		justifyContent: 'center',
+		bottom: -3,
+		right: -5
+	},
+	badgeText: {
+		color: Colors.white,
+		fontWeight: 'bold',
+		fontSize: size.small
+	},
+	inviteIconWrapper: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 50,
+		backgroundColor: Colors.tertiaryWeight,
+		width: 30,
+		height: 30,
+	}
 });
