@@ -11,17 +11,20 @@ interface IProps {
     isHideIconStatus?: boolean;
     isHideUserName?: boolean;
     isOffline?: boolean;
+    nickName?: string;
 }
 
 export default function MemberProfile({
     user, status,
     isHideIconStatus, isHideUserName,
     numCharCollapse = 6,
-    isOffline
+    isOffline,
+    nickName
 }: IProps) {
+
     const name = useMemo(() => {
         if (user) {
-            return user.user.display_name || user.user.username
+          return nickName || user.user.display_name || user.user.username
         }
     }, [user])
     return (

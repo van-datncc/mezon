@@ -9,31 +9,40 @@ import { useMessageSender } from '../../../hooks/useMessageSender';
 import MessageNotification from '../MessageNotification';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { styles as s } from './NotificationItem.styles';
+import MessageItem from '../../home/homedrawer/MessageItem';
+import { ChannelStreamMode } from 'mezon-js';
 
 function parseObject(obj: any) {
 	let attachments;
 	let mentions;
 	let reactions;
 	let references;
+  let content;
 	try {
-		attachments = JSON.parse(obj.attachments);
+		attachments = JSON.parse(obj?.attachments);
 	} catch (err) {
 		attachments = {};
 	}
 	try {
-		mentions = JSON.parse(obj.mentions);
+		mentions = JSON.parse(obj?.mentions);
 	} catch (err) {
 		mentions = {};
 	}
 	try {
-		references = JSON.parse(obj.references);
+		references = JSON.parse(obj?.references);
 	} catch (err) {
 		references = {};
 	}
 	try {
-		reactions = JSON.parse(obj.reactions);
+		reactions = JSON.parse(obj?.reactions);
 	} catch (err) {
 		reactions = {};
+	}
+
+  try {
+    content = JSON.parse(obj?.content);
+	} catch (err) {
+		content = {};
 	}
 	const parsedObj = {
 		...obj,
@@ -41,6 +50,7 @@ function parseObject(obj: any) {
 		mentions,
 		reactions,
 		references,
+    content
 	};
 	return parsedObj;
 }
@@ -49,8 +59,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user as any);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
-	const data = parseObject(notify.content);
-	const messageContent = JSON.parse(data.content);
+	const data = parseObject(notify?.content);
 	const { messageTimeDifference } = useMessageParser(data);
 	return (
 		<TouchableOpacity
@@ -71,7 +80,12 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 							{notify?.subject} - {channelInfo?.channel_label}:
 						</Text>
 						<View style={s.contentMessage}>
-							<MessageNotification message={data}></MessageNotification>
+            <MessageItem
+										message={data}
+										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+										channelId={data?.channel_id}
+										channelLabel={data?.channel_label}
+									/>
 						</View>
 					</View>
 					<Text style={s.notifyDuration}>{messageTimeDifference}</Text>
