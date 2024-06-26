@@ -68,7 +68,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         );
         return null;
     }, [currentDmGroup]);
-  
+
     useEffect(() => {
         if (currentDmGroup?.id) {
             directMessageLoader()
@@ -155,9 +155,9 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 					)}
 				</View>
 			): null}
-        
+
         </SafeAreaView>
 
-        
+
     )
 }
