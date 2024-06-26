@@ -81,8 +81,8 @@ const UserProfile = React.memo(({ userId, user, onClose }: userProfileProps) => 
 				</View>
 				<View style={[styles.container]}>
 					<View style={[styles.userInfo]}>
-						<Text style={[styles.userName]}>{userById?.user?.username || user?.username}</Text>
-						<Text style={[styles.subUserName]}>{userById?.user?.display_name || user?.display_name}</Text>
+						<Text style={[styles.userName]}>{userById ? userById?.user?.display_name : user?.username}</Text>
+						<Text style={[styles.subUserName]}>{userById ? userById?.user?.username : user?.username}</Text>
 						{!checkOwner(userById?.user?.google_id || '') && (
 							<View style={[styles.userAction]}>
 								<TouchableOpacity onPress={() => navigateToMessageDetail()} style={[styles.actionItem]}>

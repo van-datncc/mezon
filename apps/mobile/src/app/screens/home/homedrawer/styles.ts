@@ -614,6 +614,14 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
-		fontStyle: 'italic'
-	}
+    fontStyle: 'italic'
+  },
+  inviteIconWrapper: {
+    alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 50,
+		backgroundColor: Colors.tertiaryWeight,
+		width: 30,
+		height: 30,
+  }
 });

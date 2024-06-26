@@ -74,7 +74,6 @@ const arePropsEqual = (prevProps, nextProps) => {
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { mode, onOpenImage, isNumberOfLine } = props;
 	const message = useSelector((state) => selectMessageEntityById(state, props.channelId, props.message));
-	
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
@@ -88,6 +87,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
+  const [isMessageReplyDeleted, setIsMessageReplyDeleted] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
@@ -120,7 +120,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 		return { videos, images, documents };
 	};
-	
+
+  useEffect(()=>{
+    setIsMessageReplyDeleted(!messageRefFetchFromServe && message?.references && message?.references?.length)
+  },[ messageRefFetchFromServe, message.references])
+
 	useEffect(() => {
 		if (!isEmpty(message)) {
 			const timestamp = Date.now() / 1000;
@@ -223,7 +227,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const isShowImage = isImage(document?.url?.toLowerCase());
 			if (isShowImage) {
 				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
-				
+
 				return imageItem({ image: document, index, checkImage: checkImage });
 			}
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
@@ -342,7 +346,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					</Pressable>
 				</View>
 			) : null}
-			{!messageRefFetchFromServe && message?.references?.length && message.references ? (
+			{isMessageReplyDeleted ? (
 				<View style={styles.aboveMessageDeleteReply}>
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />

@@ -1,8 +1,14 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { createCachedSelector } from '../messages/messages.slice';
+import { boolean } from 'yup';
 
 export const APP_FEATURE_KEY = 'app';
+
+interface showSettingFooterProps {
+	status: boolean;
+	initTab: string;
+}
 
 export interface AppState {
 	themeApp: 'light' | 'dark' | 'system';
@@ -18,6 +24,7 @@ export interface AppState {
 	hasInternetMobile: boolean;
 	loadingMainMobile: boolean;
 	isFromFcmMobile: boolean;
+	isShowSettingFooter: showSettingFooterProps;
 }
 
 export const initialAppState: AppState = {
@@ -33,6 +40,7 @@ export const initialAppState: AppState = {
 	hasInternetMobile: false,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
+	isShowSettingFooter: {status: false, initTab: 'Account'},
 };
 
 export const appSlice = createSlice({
@@ -75,6 +83,18 @@ export const appSlice = createSlice({
 		setIsFromFCMMobile: (state, action) => {
 			state.isFromFcmMobile = action.payload;
 		},
+		setIsShowSettingFooterStatus: (state, action) => {
+			state.isShowSettingFooter = {
+				...state.isShowSettingFooter,
+				status: action.payload,
+			};
+		},
+		setIsShowSettingFooterInitTab: (state, action) => {
+			state.isShowSettingFooter = {
+				...state.isShowSettingFooter,
+				initTab: action.payload,
+			};
+		},
 	},
 });
 
@@ -112,3 +132,5 @@ export const selectHasInternetMobile = createSelector(getAppState, (state: AppSt
 export const selectLoadingMainMobile = createSelector(getAppState, (state: AppState) => state.loadingMainMobile);
 
 export const selectIsFromFCMMobile = createSelector(getAppState, (state: AppState) => state.isFromFcmMobile);
+
+export const selectIsShowSettingFooter = createSelector(getAppState, (state: AppState) => state.isShowSettingFooter);
