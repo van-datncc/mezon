@@ -5,7 +5,7 @@ import { SettingIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { Pressable } from 'react-native';
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import { FriendScreen } from '../../../screens/friend';
 import { AddFriendScreen } from '../../../screens/friend/AddFriend';
 import { RequestFriendScreen } from '../../../screens/friend/RequestFriend';

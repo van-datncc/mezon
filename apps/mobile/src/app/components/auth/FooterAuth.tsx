@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import React from 'react'
 interface FooterAuthProps {
     content: string;

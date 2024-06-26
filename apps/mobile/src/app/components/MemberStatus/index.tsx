@@ -1,7 +1,7 @@
 import React from 'react';
 import { useChannelMembers } from "@mezon/core";
 import { Pressable, TouchableOpacity, View } from "react-native";
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
 import MemberItem from "./MemberItem";
 import style from "./style";
