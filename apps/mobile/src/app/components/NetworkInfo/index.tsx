@@ -4,7 +4,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import { hasNotch } from 'react-native-device-info';
 import Animated, { BounceIn } from 'react-native-reanimated';
 import { useDispatch } from 'react-redux';

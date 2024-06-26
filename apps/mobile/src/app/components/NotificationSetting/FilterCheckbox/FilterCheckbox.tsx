@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox/build/dist/BouncyCheckbox";
 import { styles } from "../NotificationSetting.styles";
 import { Colors } from "@mezon/mobile-ui";
