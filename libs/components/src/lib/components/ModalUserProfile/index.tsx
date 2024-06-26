@@ -1,5 +1,5 @@
 import { useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAddFriends, selectAllAccount, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { selectAddFriends, selectAllAccount, selectMemberByUserId } from '@mezon/store';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -9,8 +9,7 @@ import NoteUserProfile from './NoteUserProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
 import { IMessageWithUser } from '@mezon/utils';
-import { Icons } from '../../components';
-import { Tooltip } from 'flowbite-react';
+import GroupIconBanner from './StatusProfile/groupIconBanner';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -21,15 +20,27 @@ type ModalUserProfileProps = {
 	message?: IMessageWithUser;
 };
 
+export type OpenModalProps = {
+	openFriend: boolean,
+	openAddFriend: boolean,
+	openOption: boolean,
+}
+
 const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote, message }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-	const appearanceTheme = useSelector(selectTheme);
 
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 
 	const [content, setContent] = useState<string>('');
+
+	const initOpenModal = {
+		openFriend: false,
+		openAddFriend: false,
+		openOption: false,
+	};
+	const [openModal, setOpenModal] = useState<OpenModalProps>(initOpenModal);
 
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
@@ -74,44 +85,9 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	}
 	
 	return (
-		<div className={classWrapper}>
+		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
-				{!checkUser &&
-					<>
-						{ checkAddFriend ? 
-							<Tooltip
-								content='Friend'
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-							>
-								<div className='p-2 rounded-full bg-black'>
-									<Icons.IconFriend className='text-white size-4'/>
-								</div>
-							</Tooltip> :
-							<Tooltip
-								content='Add friend'
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-							>
-								<div className='p-2 rounded-full bg-black'>
-									<Icons.AddPerson className='text-white size-4'/>
-								</div>
-							</Tooltip>
-						}
-						<Tooltip
-							content='More'
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
-						>
-							<div className='p-2 rounded-full bg-black'>
-								<Icons.ThreeDot defaultSize='size-4 text-white'/>
-							</div>
-						</Tooltip>
-					</>
-				}
+				{!checkUser && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal}/>}
 			</div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
