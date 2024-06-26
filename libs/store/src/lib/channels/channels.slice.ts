@@ -72,6 +72,7 @@ export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
 	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
+			thunkAPI.dispatch(channelsActions.setIdChannelSelected({clanId, channelId}));
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({channelId}));
@@ -437,9 +438,17 @@ export const selectChannelSecond = createSelector(selectAllChannels, (channels) 
 export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
-export const selectDefaultChannelIdByClanId = (clanId: string) =>
+export const selectDefaultChannelIdByClanId = (clanId: string, categoryId?: string, isSelectedChannel?: any) =>
 	createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const filteredChannels = channels.filter((channel) => channel.parrent_id === '0');
+		const filteredChannels = channels.filter((channel) => {
+			if(isSelectedChannel && isSelectedChannel[clanId]){
+				return channel.channel_id === isSelectedChannel[clanId];
+			}
+			if (categoryId) {
+				return channel.parrent_id === '0' && channel.category_id === categoryId;
+			}
+			return channel.parrent_id === '0';
+		});
 		return filteredChannels.length > 0 ? filteredChannels[0].id : null;
 	});
 
