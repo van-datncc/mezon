@@ -2,14 +2,6 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-	inviteToChannelWrapper: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderRadius: 50,
-		backgroundColor: Colors.tertiaryWeight,
-		width: size.s_34,
-		height: size.s_34,
-	},
 	radioContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',

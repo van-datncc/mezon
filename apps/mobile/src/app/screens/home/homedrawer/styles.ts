@@ -615,7 +615,7 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 		width: '80%',
     	fontStyle: 'italic'
-  },
+  	},
 	badge: {
 		backgroundColor: Colors.red,
 		position: 'absolute',
@@ -634,4 +634,12 @@ export const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		fontSize: size.small
 	},
+	inviteIconWrapper: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 50,
+		backgroundColor: Colors.tertiaryWeight,
+		width: 30,
+		height: 30,
+	}
 });
