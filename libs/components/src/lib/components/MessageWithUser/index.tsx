@@ -214,10 +214,11 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 							</div>
 						)}
 					</div>
-					<MessageReaction message={message} mode={mode} />
+					
 				</div>
 				{(isHover || (visibleOpt && message.id === getMessageIdRightClicked)) && <ChannelMessageOpt message={message} />}
 				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && message.id === getMessageIdRightClicked && <ContextMenu urlData={''} />}
+				<MessageReaction message={message} mode={mode} />
 			</div>
 		</>
 	);
