@@ -55,23 +55,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	return (
 		<>
 			<div className="fullBoxText relative group">
-				<MessageWithUser
-					message={mess as IMessageWithUser}
-					user={user}
-					mode={mode}
-					isEditing={isEditing}
-					popup={
-						<ChannelMessagePopup
-							reactionRightState={reactionRightState}
-							mess={mess as IMessageWithUser}
-							reactionBottomState={reactionBottomState}
-							openEditMessageState={isEditing}
-							openOptionMessageState={openOptionMessageState}
-							mode={mode}
-							deleteSendMessage={DeleteSendMessage}
-						/>
-					}
-				/>
+			<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} isEditing={isEditing}/>
 				{
 					isEditing ? (
 						<MessageInput

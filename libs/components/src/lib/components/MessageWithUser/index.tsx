@@ -40,7 +40,7 @@ export type MessageWithUserProps = {
 	isEditing?: boolean;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, isEditing }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, isEditing }: Readonly<MessageWithUserProps>) {	
 	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
@@ -75,7 +75,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	}, [message.isStartedMessageOfTheDay, isMessNotifyMention]);
 
 	const messageDividerClass = classNames(
-		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',,
+		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
 	);
 
 	const isHeadfull = useMemo(() => {
@@ -176,13 +176,11 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	return (
 		<>
 			{shouldShowDateDivider && (
-				(
 				<div className={messageDividerClass}>
-						<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-						<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
-						<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-					</div>
-			)
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
+					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+				</div>
 			)}
 			<div className={containerClass} ref={containerRef}>
 				<div className="relative rounded-sm overflow-visible ">
@@ -190,7 +188,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 					<div className={parentDivClass} onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
-							<MessageAvatar user={user} message={message} isCombine={isCombine} />
+							<MessageAvatar user={user} message={message} isCombine={isCombine} isEditing={isEditing}/>
 
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} />
@@ -225,7 +223,6 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 				</div>
 				{showOptStatus && <ChannelMessageOpt message={message} />}
 				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && <ContextMenu urlData={''} />}
-				{!!popup && isHover && popup}
 			</div>
 		</>
 	);
