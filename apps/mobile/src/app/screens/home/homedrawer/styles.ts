@@ -224,7 +224,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		borderBottomWidth: 0.5,
+		borderBottomWidth: 1,
 		borderBottomColor: Colors.gray48,
 		backgroundColor: Colors.secondary,
 	},
@@ -247,6 +247,7 @@ export const styles = StyleSheet.create({
 		paddingBottom: size.s_14,
 	},
 	titleThread: {
+		flex: 1,
 		fontSize: size.s_14,
 		fontWeight: '600',
 		marginLeft: size.s_6,
@@ -614,6 +615,32 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
-		fontStyle: 'italic'
+    	fontStyle: 'italic'
+  	},
+	badge: {
+		backgroundColor: Colors.red,
+		position: 'absolute',
+		borderRadius: size.s_14,
+		borderWidth: 3,
+		borderColor: Colors.secondary,
+		minWidth: size.s_22,
+		height: size.s_22,
+		alignItems: 'center',
+		justifyContent: 'center',
+		bottom: -3,
+		right: -5
+	},
+	badgeText: {
+		color: Colors.white,
+		fontWeight: 'bold',
+		fontSize: size.small
+	},
+	inviteIconWrapper: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 50,
+		backgroundColor: Colors.tertiaryWeight,
+		width: 30,
+		height: 30,
 	}
 });

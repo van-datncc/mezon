@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GestureResponderEvent, LayoutAnimation, LayoutChangeEvent, Pressable, View } from "react-native";
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import styles from "./style";
 import { useEffect } from "react";
 import { useCallback } from "react";
@@ -56,7 +56,7 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
                         onLayout={(e) => onLayout(e, index)}
                         onPress={(e) => handlePress(e, index)}
                     >
-                        <Text style={{ color: index === selected ? Colors.green : Colors.white }}>
+                        <Text style={{ color: index === selected ? Colors.textViolet : Colors.white }}>
                             {title}
                         </Text>
                     </Pressable>

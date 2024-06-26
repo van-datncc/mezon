@@ -1,4 +1,4 @@
-import { MessageReaction, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import {
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
@@ -55,8 +55,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	return (
 		<>
 			<div className="fullBoxText relative group">
-				<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} />
-
+				<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} isEditing={isEditing} />
 				{isEditing ? (
 					<MessageInput
 						messageId={messageId}

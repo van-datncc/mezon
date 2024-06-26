@@ -4,7 +4,7 @@ import { selectTheme } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Mention, MentionsInput } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
@@ -137,8 +137,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
+	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		const value = event.target.value;
+		setEditMessage(value);
+	};
+
 	return (
-		<div className="inputEdit relative top-[-25px] w-full flex">
+		<div className="inputEdit w-full flex">
 			<div className="w-16"></div>
 			<div className='w-full'>
 				<MentionsInput
@@ -147,9 +152,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					value={editMessage}
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
-					onChange={(e, newValue) => {
-						setEditMessage(newValue);
-					}}
+					onChange={handleChange}
 					rows={editMessage?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
 					style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}

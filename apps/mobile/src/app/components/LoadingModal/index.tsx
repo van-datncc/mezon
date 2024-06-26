@@ -1,7 +1,7 @@
 import { Colors, size, verticalScale } from '@mezon/mobile-ui';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Swing } from 'react-native-animated-spinkit';
+import { Flow } from 'react-native-animated-spinkit';
 
 type IProps = {
 	isVisible: boolean;
@@ -11,7 +11,7 @@ const LoadingModal = ({ isVisible }: IProps) => {
 	if (!isVisible) return <View />;
 	return (
 		<View style={styles.centeredView}>
-			<Swing size={size.s_34 * 2} color={Colors.bgViolet} />
+			<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
 		</View>
 	);
 };

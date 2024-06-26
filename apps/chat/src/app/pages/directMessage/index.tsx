@@ -11,9 +11,6 @@ export default function Direct() {
 	const [openSetting, setOpenSetting] = useState(false);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const handleOpenCreate = () => {
-		setOpenSetting(true);
-	};
 
 	useEscapeKey(() => setOpenSetting(false));
 
@@ -28,17 +25,11 @@ export default function Direct() {
 					name={userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}
 					avatar={userProfile?.user?.avatar_url || ''}
-					openSetting={handleOpenCreate}
 					userId={userProfile?.user?.id}
 				/>
 			</div>
 			<MainContentDirect />
-			<Setting
-				open={openSetting}
-				onClose={() => {
-					setOpenSetting(false);
-				}}
-			/>
+			<Setting />
 		</>
 	);
 }

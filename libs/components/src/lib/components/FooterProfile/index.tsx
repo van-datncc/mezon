@@ -1,7 +1,6 @@
-import { useAuth, useOnClickOutside, useVoice } from '@mezon/core';
+import { useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
-	selectMemberByUserId,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	selectTheme,
@@ -23,11 +22,10 @@ export type FooterProfileProps = {
 	status?: boolean;
 	avatar: string;
 	userId?: string;
-	openSetting: () => void;
 	channelCurrent?: ChannelsEntity | null;
 };
 
-function FooterProfile({ name, status, avatar, userId, openSetting, channelCurrent }: FooterProfileProps) {
+function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
@@ -54,6 +52,11 @@ function FooterProfile({ name, status, avatar, userId, openSetting, channelCurre
 	const handleCloseModalCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
 	};
+
+	const {setIsShowSettingFooterStatus} = useSettingFooter();
+	const openSetting = () => {
+		setIsShowSettingFooterStatus(true);
+	}
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 	

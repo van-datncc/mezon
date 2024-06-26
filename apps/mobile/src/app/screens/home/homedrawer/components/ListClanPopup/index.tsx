@@ -81,7 +81,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 				]}
 			>
 				<View style={styles.wrapperPlusClan}>
-					<PlusGreenIcon width={30} height={30} />
+					<PlusGreenIcon width={30} height={30} color={Colors.caribbeanGreen} />
 				</View>
 				<Text style={styles.clanName}>{t('addClan')}</Text>
 			</Pressable>

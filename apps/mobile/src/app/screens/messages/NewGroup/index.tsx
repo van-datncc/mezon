@@ -9,20 +9,24 @@ import { useFriends } from "@mezon/core";
 import { useThrottledCallback } from "use-debounce";
 import { normalizeString } from "../../../utils/helpers";
 import { FriendListByAlphabet } from "../../../components/FriendListByAlphabet";
-import { FriendsEntity, directActions, useAppDispatch } from "@mezon/store-mobile";
+import { DirectEntity, FriendsEntity, directActions, useAppDispatch } from "@mezon/store-mobile";
 import { EFriendItemAction } from "../../../components/FriendItem";
 import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
 import { ChannelType, User } from "mezon-js";
 import { APP_SCREEN } from "../../../navigation/ScreenTypes";
 import { UserInformationBottomSheet } from "../../../components/UserInformationBottomSheet";
+import { useEffect } from "react";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
+export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any}) => {
+    const directMessage = route?.params?.directMessage as DirectEntity;
     const [searchText, setSearchText] = useState<string>('');
     const { t } = useTranslation(['common', 'friends']);
     const [ friendIdSelectedList, setFriendIdSelectedList ] = useState<string[]>([]);
     const { friends: allUser } = useFriends();
     const dispatch = useAppDispatch();
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedFriendDefault, setSelectedFriendDefault] = useState<string[]>([]);
 
     const friendList: FriendsEntity[] = useMemo(() => {
         return allUser.filter((user) => user.state === 0)
@@ -45,12 +49,18 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
         }
     }, [])
 
+    useEffect(() => {
+        if (directMessage?.id) {
+            setSelectedFriendDefault(directMessage?.user_id || []);
+        }
+    }, [directMessage])
+
     const onSelectedChange = useCallback((friendIdSelected: string[]) => {
         setFriendIdSelectedList(friendIdSelected);
     }, [])
 
     const createNewGroup = async () => {
-        if (friendIdSelectedList.length === 0) return; 
+        if (friendIdSelectedList.length === 0) return;
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: friendIdSelectedList.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
@@ -66,6 +76,7 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
 
     const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)
     return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={styles.newGroupContainer}>
                 <View style={styles.headerWrapper}>
@@ -100,11 +111,13 @@ export const NewGroupScreen = ({ navigation }: { navigation: any }) => {
                         handleFriendAction={handleFriendAction}
                         selectMode={true}
                         onSelectedChange={onSelectedChange}
+                        selectedFriendDefault={selectedFriendDefault}
                     />
                 </View>
 
                 <UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
             </View>
         </TouchableWithoutFeedback>
+      </SafeAreaView>
     )
 }
