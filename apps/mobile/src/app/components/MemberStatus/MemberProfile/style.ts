@@ -1,4 +1,4 @@
-import { Colors, Fonts } from "@mezon/mobile-ui";
+import { Colors, Fonts, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 const style = StyleSheet.create({
@@ -6,27 +6,27 @@ const style = StyleSheet.create({
         height: 35,
         width: 35,
         overflow: "hidden",
-        borderRadius: 9999,
+        borderRadius: 50,
     },
 
     avatarContainer: {
         position: "relative",
         width: 35,
         height: 35,
-        borderRadius: 9999
+        borderRadius: 50
     },
 
     statusWrapper: {
         backgroundColor: Colors.secondary,
-        padding: 3,
+        padding: 2,
         position: "absolute",
         bottom: -4,
         right: -4,
-        borderRadius: 9999,
+        borderRadius: 50,
     },
 
     nameContainer: {
-        paddingVertical: 20,
+        paddingVertical: size.s_20,
         flexGrow: 1,
         borderBottomColor: Colors.borderDim,
     },
@@ -35,15 +35,13 @@ const style = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: 20,
-        paddingLeft: 20,
+        gap: size.s_12,
+        paddingLeft: size.s_12,
         width: "100%"
     },
 
     textName: {
-        color: Colors.green,
-        fontSize: Fonts.size.small,
-        fontWeight: "700"
+        color: Colors.textGray,
     }
 })
 

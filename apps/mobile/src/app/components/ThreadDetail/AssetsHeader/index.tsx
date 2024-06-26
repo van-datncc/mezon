@@ -56,7 +56,7 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
                         onLayout={(e) => onLayout(e, index)}
                         onPress={(e) => handlePress(e, index)}
                     >
-                        <Text style={{ color: index === selected ? Colors.green : Colors.white }}>
+                        <Text style={{ color: index === selected ? Colors.textViolet : Colors.white }}>
                             {title}
                         </Text>
                     </Pressable>

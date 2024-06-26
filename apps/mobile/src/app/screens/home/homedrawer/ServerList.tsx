@@ -1,7 +1,7 @@
 import { Colors } from '@mezon/mobile-ui';
 import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, TouchableOpacity, View } from 'react-native';
+import { Pressable, TouchableOpacity, View, Text } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
 import LogoMezon from '../../../../assets/svg/logoMezon.svg';
@@ -11,6 +11,7 @@ import { styles } from './styles';
 import { UnreadDMBadgeList } from './components/UnreadDMBadgeList';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { SeparatorWithLine } from '../../../components/Common';
+import { useFriends } from '@mezon/core';
 import { PlusGreenIcon } from '@mezon/mobile-components';
 
 const ServerList = React.memo((props: any) => {
@@ -18,6 +19,7 @@ const ServerList = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const timeoutRef = useRef<any>();
+	const { quantityPendingRequest } = useFriends();
 
 	const handleChangeClan = async (clanId: string) => {
 		timeoutRef.current = setTimeout(() => {
@@ -43,6 +45,11 @@ const ServerList = React.memo((props: any) => {
 		<View style={styles.wrapperServerList}>
 			<TouchableOpacity onPress={() => navigateToDM()}>
 				<LogoMezon width={50} height={50} />
+				{quantityPendingRequest ? (
+					<View style={styles.badge}>
+						<Text style={styles.badgeText}>{quantityPendingRequest}</Text>
+					</View>
+				): null}
 			</TouchableOpacity>
 
 			<SeparatorWithLine style={{width: '60%'}} />

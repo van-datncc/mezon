@@ -1,17 +1,18 @@
+import React, { useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon, UnMuteIcon } from '@mezon/mobile-components';
-import { selectCurrentChannel } from '@mezon/store-mobile';
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Text } from '@mezon/mobile-ui';
-import { useSelector } from 'react-redux';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import styles from './style';
+import { useMemo } from 'react';
+import { threadDetailContext } from '../MenuThreadDetail';
 
-export default function ActionRow() {
-	const currentChannel = useSelector(selectCurrentChannel);
+export const ActionRow = React.memo(() => {
+	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const { statusMute } = useStatusMuteChannel();
 	const [isChannel, setIsChannel] = useState<boolean>();
@@ -48,9 +49,16 @@ export default function ActionRow() {
 			hidden: true,
 		},
 	];
+
+	const filteredActionList = useMemo(() => {
+		if (currentChannel?.clan_id === "0") {
+			return actionList.filter((item) => ['Mute', 'Search'].includes(item.title))
+		}
+		return actionList;
+	}, [currentChannel, isChannel])
 	return (
 		<View style={styles.container}>
-			{actionList.map((action, index) =>
+			{filteredActionList.map((action, index) =>
 				action?.hidden ? (
 					<Pressable key={index.toString()} onPress={action.action}>
 						<View style={styles.iconBtn}>
@@ -63,3 +71,4 @@ export default function ActionRow() {
 		</View>
 	);
 }
+)
