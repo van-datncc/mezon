@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from "react-native";
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import styles from "./style"
 import { MemberListStatus } from "../../MemberStatus";
 import AssetsHeader from "../AssetsHeader";

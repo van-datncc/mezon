@@ -8,11 +8,13 @@ export const styles = StyleSheet.create({
     },
     headerWrapper: {
         flexDirection: 'row',
-        padding: size.s_14,
-        gap: size.s_14,
         borderBottomColor: Colors.borderPrimary,
         borderBottomWidth: 1,
         alignItems: 'center',
+    },
+    backButton: {
+        padding: size.s_16,
+        borderRadius: 50
     },
     channelTitle: {
         alignItems: 'center',

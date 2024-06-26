@@ -3,7 +3,6 @@ import {
 	referencesActions,
 	selectAttachmentData,
 	selectDataReferences,
-	selectIdMessageRefOption,
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
 	selectOpenThreadMessageState,

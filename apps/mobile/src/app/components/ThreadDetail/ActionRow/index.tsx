@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon, UnMuteIcon } from '@mezon/mobile-components';
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import styles from './style';
