@@ -1,6 +1,15 @@
 import { ForwardMessageModal, MessageModalImage, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
-import { selectAllClans, selectCurrentChannel, selectCurrentClan, selectDirectsUnreadlist, selectTheme, selectCloseMenu, selectStatusMenu, selectOpenModalAttachment } from '@mezon/store';
+import {
+	selectAllClans,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDirectsUnreadlist,
+	selectOpenModalAttachment,
+	selectStatusMenu,
+	selectTheme,
+} from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,7 +31,7 @@ function MyApp() {
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
 	};
-	
+
 	const { directId: currentDmGroupId } = useAppParams();
 	const listDirectMessage = useSelector(selectDirectsUnreadlist);
 	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
@@ -100,19 +109,19 @@ function MyApp() {
 	};
 
 	const appearanceTheme = useSelector(selectTheme);
-	useEffect(()=>{
-		switch(appearanceTheme){
-			case "dark":
+	useEffect(() => {
+		switch (appearanceTheme) {
+			case 'dark':
 				elementHTML.classList.add('dark');
 				break;
-			case "light":
+			case 'light':
 				elementHTML.classList.remove('dark');
 				break;
 			default:
 				break;
 		}
-	}, [appearanceTheme])
-	
+	}, [appearanceTheme]);
+
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -148,7 +157,7 @@ function MyApp() {
 					</NavLinkComponent>
 				</NavLink>
 				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
-					<DirectUnreads key={dmGroupChatUnread.id} directMessage ={dmGroupChatUnread}/>
+					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 				))}
 				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
 				{currentClan?.id && (

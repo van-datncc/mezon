@@ -8,10 +8,10 @@ import PinMessage from "../../PinMessage";
 
 const TabList = [
     "Members",
-    "Media",
+    // "Media",
     "Pins",
-    "Links",
-    "Files"
+    // "Links",
+    // "Files"
 ]
 
 export default function AssetsViewer() {
@@ -39,7 +39,7 @@ export default function AssetsViewer() {
             <View style={styles.container}>
                 <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
                     <MemberListStatus />
-                    <Page2 />
+                    {/*<Page2 />*/}
                     <PinMessage />
                     <Page2 />
                     <Page2 />

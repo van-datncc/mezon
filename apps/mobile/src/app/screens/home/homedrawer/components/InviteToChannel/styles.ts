@@ -7,8 +7,8 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		borderRadius: 50,
 		backgroundColor: Colors.tertiaryWeight,
-		width: 30,
-		height: 30,
+		width: size.s_34,
+		height: size.s_34,
 	},
 	radioContainer: {
 		flexDirection: 'row',

@@ -4,9 +4,12 @@ import {
 	AddThread,
 	AngleRightIcon,
 	MicrophoneIcon,
+	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	SendIcon,
 	convertMentionsToText,
 	getAttachmentUnique,
+	load,
+	save,
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
@@ -80,9 +83,9 @@ interface IChatBoxProps {
 	mode: ChannelStreamMode;
 	messageAction?: EMessageActionType;
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
-  hiddenIcon?: {
-    threadIcon: boolean
-  }
+	hiddenIcon?: {
+		threadIcon: boolean
+	}
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<TextInput>();
@@ -133,10 +136,34 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
+	const [allMessages, setAllMessages] = useState<{ [key: string]: string }>({});
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
+
+	async function loadMessageCache() {
+		const messages = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+		setAllMessages(messages);
+		return messages[props?.channelId] || "";
+	}
+
+	function setMessageCache(text: string) {
+		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
+			...allMessages,
+			[props?.channelId]: text,
+		});
+	}
+
+	useEffect(() => {
+		loadMessageCache().then((message) => {
+			setText(message);
+		});
+	}, [props?.channelId])
+
+	useEffect(() => {
+		setMessageCache(text);
+	}, [text])
 
 	//start: DM stuff
 	const {
@@ -252,15 +279,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		} else {
 			const reference = currentSelectedReplyMessage
 				? [
-						{
-							message_id: '',
-							message_ref_id: currentSelectedReplyMessage.id,
-							ref_type: 0,
-							message_sender_id: currentSelectedReplyMessage.user.id,
-							content: JSON.stringify(currentSelectedReplyMessage.content),
-							has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
-						},
-					]
+					{
+						message_id: '',
+						message_ref_id: currentSelectedReplyMessage.id,
+						ref_type: 0,
+						message_sender_id: currentSelectedReplyMessage.user.id,
+						content: JSON.stringify(currentSelectedReplyMessage.content),
+						has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
+					},
+				]
 				: undefined;
 			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
@@ -478,9 +505,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			})) ?? [];
 		const convertedMentions: UserMentionsOpt[] = mentionList
 			? mentionList.map((mention) => ({
-					user_id: mention.id.toString() ?? '',
-					username: mention.display ?? '',
-				}))
+				user_id: mention.id.toString() ?? '',
+				username: mention.display ?? '',
+			}))
 			: [];
 		if (mentions?.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {
@@ -647,19 +674,19 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			<View style={styles.containerInput}>
 				{text.length > 0 && !isShowAttachControl ? (
 					<TouchableOpacity
-						style={[styles.iconContainer, { backgroundColor: Colors.darkGray }]}
+						style={[styles.iconContainer, { backgroundColor: Colors.secondaryLight }]}
 						onPress={() => setIsShowAttachControl(!isShowAttachControl)}
 					>
 						<AngleRightIcon width={18} height={18} />
 					</TouchableOpacity>
 				) : (
 					<>
-						<View style={[styles.iconContainer, { backgroundColor: Colors.darkGray }]}>
+						<View style={[styles.iconContainer, { backgroundColor: Colors.secondaryLight }]}>
 							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						</View>
 						{!props?.hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id) && (
 							<TouchableOpacity
-								style={[styles.iconContainer, { backgroundColor: Colors.darkGray, marginRight: isShowAttachControl ? size.s_10 : 0 }]}
+								style={[styles.iconContainer, { backgroundColor: Colors.secondaryLight, marginRight: isShowAttachControl ? size.s_10 : 0 }]}
 								onPress={() => navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD })}
 							>
 								<AddThread width={22} height={22} />
@@ -683,7 +710,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						{...textInputProps}
 						style={[
 							styles.inputStyle,
-							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_30 : inputWidthWhenHasInput },
+							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
 						children={renderTextContent(text, emojiListPNG, channelsEntities)}

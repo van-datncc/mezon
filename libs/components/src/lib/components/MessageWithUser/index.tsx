@@ -1,12 +1,22 @@
-import { useAuth, useChatMessages, useNotification } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
-import { IChannelMember } from '@mezon/utils';
+import { useAuth, useChatMessages, useNotification, useRightClick } from '@mezon/core';
+import {
+	MessagesEntity,
+	selectCurrentChannelId,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectMessageByMessageId,
+	selectOpenReplyMessageState,
+} from '@mezon/store';
+import { IChannelMember, RightClickPos } from '@mezon/utils';
 import classNames from 'classnames';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
 import * as Icons from '../Icons/index';
+import ChannelMessageOpt from '../Message/ChannelMessageOpt';
+import ContextMenu from '../RightClick/ContextMenu';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -30,10 +40,10 @@ export type MessageWithUserProps = {
 	isEditing?: boolean;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, popup, isEditing }: Readonly<MessageWithUserProps>) {
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, isEditing }: Readonly<MessageWithUserProps>) {
+	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
-	const divMessageWithUser = useRef<HTMLDivElement>(null);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -42,11 +52,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
-
 	const isCombine = !message.isStartedMessageGroup;
-
 	const attachments = useMemo(() => message.attachments, [message.attachments]);
-
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
@@ -58,13 +65,17 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	const [classNameHighlightParentDiv, setClassNameHighlightParentDiv] = useState<string>('');
 	const [classNameHighlightChildDiv, setClassNameHighlightChildDiv] = useState<string>('');
 	const [classNameNotification, setClassNameNotification] = useState<string>('');
+	const { setRightClickXy } = useRightClick();
+	const { setMessageRightClick } = useRightClick();
+	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
+	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
 
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay && !isMessNotifyMention;
 	}, [message.isStartedMessageOfTheDay, isMessNotifyMention]);
 
 	const messageDividerClass = classNames(
-		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
+		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',,
 	);
 
 	const isHeadfull = useMemo(() => {
@@ -93,6 +104,25 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 	);
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
+
+	const posClickActive = useSelector(selectPosClickingActive);
+
+	const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		event.stopPropagation();
+		dispatch(rightClickAction.setPosClickActive(RightClickPos.MESSAGE_ON_CHANNEL));
+		setRightClickXy({ x: event.pageX, y: event.pageY });
+		setMessageRightClick(message.id);
+	};
+
+	const handleCloseMenu = () => {
+		if (message.id === getMessageIdRightClicked) {
+			setMessageRightClick('');
+		}
+		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
+	};
+
+	const [showOptStatus, setShowOptStatus] = useState<boolean>(false);
 
 	useEffect(() => {
 		let resetTimeoutId: NodeJS.Timeout | null = null;
@@ -135,21 +165,31 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 		}
 	}, [message.references]);
 
+	useEffect(() => {
+		if (isHover || message.id === getMessageIdRightClicked) {
+			setShowOptStatus(true);
+		} else {
+			setShowOptStatus(false);
+		}
+	}, [isHover, getMessageIdRightClicked]);
+
 	return (
 		<>
 			{shouldShowDateDivider && (
+				(
 				<div className={messageDividerClass}>
-					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-					<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
-					<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
-				</div>
+						<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+						<span className="text-center px-3 whitespace-nowrap">{messageDate}</span>
+						<div className="w-full border-b-[1px] dark:border-borderDivider border-borderDividerLight opacity-50 text-center"></div>
+					</div>
+			)
 			)}
 			<div className={containerClass} ref={containerRef}>
-				<div className="relative rounded-sm overflow-visible">
+				<div className="relative rounded-sm overflow-visible ">
 					<div className={childDivClass}></div>
-					<div className={parentDivClass}>
+					<div className={parentDivClass} onContextMenu={handleContextMenu} onClick={handleCloseMenu}>
 						{checkMessageHasReply && <MessageReply message={message} />}
-						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12" ref={divMessageWithUser}>
+						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
 							<MessageAvatar user={user} message={message} isCombine={isCombine} />
 
 							<div className="w-full relative h-full">
@@ -183,6 +223,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 						)}
 					</div>
 				</div>
+				{showOptStatus && <ChannelMessageOpt message={message} />}
+				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && <ContextMenu urlData={''} />}
 				{!!popup && isHover && popup}
 			</div>
 		</>
