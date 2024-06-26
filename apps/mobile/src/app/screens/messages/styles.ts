@@ -43,6 +43,7 @@ export const styles = StyleSheet.create({
 	searchInput: {
 		width: '93%',
 		borderRadius: 20,
+		height: size.s_50,
 		color: Colors.white,
         paddingVertical: size.s_6
 	},
@@ -59,11 +60,12 @@ export const styles = StyleSheet.create({
     messageItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: size.s_8
+        gap: size.s_8,
+        marginBottom: size.s_4,
     },
     friendAvatar: {
-        width: size.s_50,
-        height: size.s_50,
+        width: size.s_40,
+        height: size.s_40,
         borderRadius: 50
     },
     messageContent: {
@@ -94,8 +96,8 @@ export const styles = StyleSheet.create({
     },
     groupAvatar: {
         backgroundColor: Colors.orange,
-        width: size.s_50,
-        height: size.s_50,
+        width: size.s_40,
+        height: size.s_40,
         borderRadius: 50,
         justifyContent: 'center',
         alignItems: 'center'

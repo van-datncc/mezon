@@ -34,7 +34,7 @@ const GoogleLogin = () => {
 			const { idToken } = await GoogleSignin.signIn();
 			await loginByGoogle(idToken);
 		} catch (error) {
-			if (error.message !== 'Sign in action cancelled') {
+			if (error.message !== 'Sign in action cancelled' && error.code != -5) {
 				Toast.show({
 					type: 'error',
 					text1: 'Login Failed',

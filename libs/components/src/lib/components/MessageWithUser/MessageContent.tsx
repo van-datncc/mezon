@@ -34,7 +34,7 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	return { videos, images, documents };
 };
 
-const Attachments = ({ attachments }: { attachments: ApiMessageAttachment[] }) => {
+const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: string }> = ({ attachments, messageId }) => {
 	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
 
 	return (
@@ -55,28 +55,27 @@ const Attachments = ({ attachments }: { attachments: ApiMessageAttachment[] }) =
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
 							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
-								<MessageImage attachmentData={image} />
+								<MessageImage messageIdRightClick={messageId} attachmentData={image} />
 							</div>
 						);
 					})}
 				</div>
 			)}
 
-			{documents.length > 0 && documents.map((document, index) => (
-				<MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} />
-			))}
+			{documents.length > 0 &&
+				documents.map((document, index) => <MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} />)}
 		</>
 	);
 };
 
-const MessageText = ({ message, lines, isEdited }: { message: IMessageWithUser, lines: string, isEdited?: boolean }) => (
+const MessageText = ({ message, lines, isEdited }: { message: IMessageWithUser; lines: string; isEdited?: boolean }) => (
 	<div className="flex w-full">
 		<div id={message.id} className="w-full">
 			<MessageLine line={lines} />
 		</div>
-		{isEdited && <p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
-			(edited)
-		</p>}
+		{isEdited && (
+			<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">(edited)</p>
+		)}
 	</div>
 );
 
@@ -85,7 +84,7 @@ const MessageContent = ({ user, message, isCombine, isSending, isError }: IMessa
 
 	return (
 		<>
-			{hasAttachments && <Attachments attachments={attachments ?? []} />}
+			{hasAttachments && <Attachments messageId={message.id} attachments={attachments ?? []} />}
 			<MessageText message={message} lines={lines as string} isEdited={isEdited} />
 		</>
 	);

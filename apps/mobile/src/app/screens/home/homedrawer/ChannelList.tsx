@@ -8,7 +8,7 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelsActions,
@@ -109,7 +109,7 @@ const ChannelList = React.memo((props: any) => {
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
-			<View style={[styles.mainList, { backgroundColor: Colors.surface }]}>
+			<View style={[styles.mainList, { backgroundColor: Colors.secondary }]}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
 				<View style={styles.channelListSearch}>
 					<View style={styles.channelListSearchWrapperInput}>
@@ -129,7 +129,7 @@ const ChannelList = React.memo((props: any) => {
 				</Pressable>
 				<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
-				<View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
 						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
 						onPress={() => bottomSheetEventRef?.current?.present()}
