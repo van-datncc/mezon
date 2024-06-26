@@ -1,15 +1,22 @@
 import { useAuth, useChatMessages, useNotification, useRightClick } from '@mezon/core';
 import {
 	MessagesEntity,
+	reactionActions,
 	selectCurrentChannelId,
+	selectIdMessageRefReaction,
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
-	selectMessageByMessageId,
 	selectOpenReplyMessageState,
+	selectReactionRightState,
 } from '@mezon/store';
 import { IChannelMember, RightClickPos } from '@mezon/utils';
 import classNames from 'classnames';
-import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import {
+	rightClickAction,
+	selectMessageIdRightClicked,
+	selectPosClickingActive,
+	selectVisibleStatus,
+} from 'libs/store/src/lib/rightClick/rightClick.slice';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useDispatch, useSelector } from 'react-redux';
@@ -67,7 +74,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 	const { setRightClickXy } = useRightClick();
 	const { setMessageRightClick } = useRightClick();
 	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
-	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
+	const visibleOpt = useSelector(selectVisibleStatus);
 
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay && !isMessNotifyMention;
@@ -118,10 +125,9 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 		if (message.id === getMessageIdRightClicked) {
 			setMessageRightClick('');
 		}
+		dispatch(rightClickAction.setVisibleOpt(false));
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 	};
-
-	const [showOptStatus, setShowOptStatus] = useState<boolean>(false);
 
 	useEffect(() => {
 		let resetTimeoutId: NodeJS.Timeout | null = null;
@@ -164,13 +170,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 		}
 	}, [message.references]);
 
-	useEffect(() => {
-		if (isHover || message.id === getMessageIdRightClicked) {
-			setShowOptStatus(true);
-		} else {
-			setShowOptStatus(false);
-		}
-	}, [isHover, getMessageIdRightClicked]);
+
 
 	return (
 		<>
@@ -216,8 +216,8 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention }
 					</div>
 					<MessageReaction message={message} mode={mode} />
 				</div>
-				{showOptStatus && <ChannelMessageOpt message={message} />}
-				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && <ContextMenu urlData={''} />}
+				{(isHover || (visibleOpt && message.id === getMessageIdRightClicked)) && <ChannelMessageOpt message={message} />}
+				{posClickActive === RightClickPos.MESSAGE_ON_CHANNEL && message.id === getMessageIdRightClicked && <ContextMenu urlData={''} />}
 			</div>
 		</>
 	);

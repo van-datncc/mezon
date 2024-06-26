@@ -37,7 +37,9 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode }) => {
 	return (
 		<div
 			onClick={handleClickEmoji}
-			className="w-10 h-10  rounded-full flex justify-center items-center hover:bg-[#232428] bg-[#1E1F22] cursor-pointer"
+			className="w-10 h-10  rounded-full flex justify-center items-center
+			dark:hover:bg-[#232428] dark:bg-[#1E1F22] 
+			bg-[#E3E5E8] hover:bg-[#EBEDEF] cursor-pointer"
 		>
 			<img src={getUrl} className="w-5 h-5"></img>
 		</div>

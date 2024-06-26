@@ -203,11 +203,10 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 	function sortListById(arrayList: any[]) {
 		return arrayList.sort((a, b) => a.id - b.id);
 	}
-
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
+			className="fixed h-fit flex flex-col dark:bg-[#111214] bg-[#FFFFFF] shadow-lg rounded z-40 w-[12rem] p-2"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 		>
 			<ReactionPart emojiList={emojiList} />
