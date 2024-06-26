@@ -49,10 +49,10 @@ export const styles = StyleSheet.create({
 	},
     statusCircle: {
         position: 'absolute',
-        width: 16,
-        height: 16,
+        width: 14,
+        height: 14,
         borderRadius: 10,
-        bottom: 1,
+        bottom: 0,
         right: 0,
         borderWidth: 2,
         borderColor: Colors.secondary,
