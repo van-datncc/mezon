@@ -30,6 +30,15 @@ export interface IListMemberInviteProps {
 	channelID?: string;
 }
 
+interface IChannelListSectionProps {
+	data: ICategoryChannel;
+	index: number;
+	onPressHeader: any;
+	collapseItems: any
+	onLongPressCategory: (channel: ICategoryChannel) => void;
+	onLongPressChannel: (channel: IChannel) => void;
+}
+
 export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean, clanIconStyle?: ViewStyle }) => {
 	return (
 		<TouchableOpacity
@@ -87,7 +96,7 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 	);
 });
 
-export const ChannelListSection = React.memo((props: { data: ICategoryChannel; index: number; onPressHeader: any; onLongPress: (channel: IChannel | ICategoryChannel) => void; collapseItems: any }) => {
+export const ChannelListSection = React.memo((props: IChannelListSectionProps) => {
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
 	const currentChanel = useSelector(selectCurrentChannel);
 
@@ -96,7 +105,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 			<ChannelListHeader
 				title={props.data.category_name}
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
-				onLongPress={() => props?.onLongPress(props.data)}
+				onLongPress={() => props?.onLongPressCategory(props.data)}
 				isCollapsed={isCollapsed}
 			/>
 			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
@@ -109,7 +118,7 @@ export const ChannelListSection = React.memo((props: { data: ICategoryChannel; i
 							key={Math.floor(Math.random() * 9999999).toString() + index}
 							isActive={isActive}
 							currentChanel={currentChanel}
-							onLongPress={() => { props?.onLongPress(item) }}
+							onLongPress={() => { props?.onLongPressChannel(item) }}
 						/>
 					);
 				})}

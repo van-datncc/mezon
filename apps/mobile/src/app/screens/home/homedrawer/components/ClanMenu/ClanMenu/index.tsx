@@ -2,7 +2,6 @@ import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
 import styles from "./styles";
-import { AddFillIcon, BellIcon, KeyframeIcon, SettingIcon } from "@mezon/mobile-components";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
 import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui";
 import Toast from "react-native-toast-message";
@@ -12,11 +11,11 @@ import ClanMenuInfo from "../ClanMenuInfo";
 import MezonToggleButton from "apps/mobile/src/app/temp-ui/MezonToggleButton";
 import { APP_SCREEN, AppStackScreenProps } from "apps/mobile/src/app/navigation/ScreenTypes";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { MutableRefObject } from "react";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useAuth, useClans } from "@mezon/core";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
+import { BellIcon, BoostTier2Icon, GroupPlusIcon, SettingsIcon } from "libs/mobile-components/src/lib/icons2";
 
 interface IServerMenuProps {
     clan: ClansEntity;
@@ -160,23 +159,22 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                     horizontal>
                     <MezonButtonIcon
                         title={`18 ${t("actions.boot")}`}
-                        icon={KeyframeIcon}
-                        iconStyle={{ color: "red" }}
+                        icon={<BoostTier2Icon color={"red"} />}
                         onPress={() => reserve()}
                     />
                     <MezonButtonIcon
                         title={t("actions.invite")}
-                        icon={AddFillIcon}
+                        icon={<GroupPlusIcon />}
                         onPress={handleOpenInvite} />
                     <MezonButtonIcon
                         title={t("actions.notifications")}
-                        icon={BellIcon}
+                        icon={<BellIcon />}
                         onPress={() => reserve()} />
 
                     {user.userId === clan.creator_id &&
                         <MezonButtonIcon
                             title={t("actions.settings")}
-                            icon={SettingIcon}
+                            icon={<SettingsIcon />}
                             onPress={handleOpenSettings}
                         />
                     }

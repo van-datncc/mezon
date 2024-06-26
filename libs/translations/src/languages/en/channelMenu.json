@@ -1,0 +1,31 @@
+{
+    "menu": {
+        "watchMenu": {
+            "title": "",
+            "markAsRead": "Mark As Read"
+        },
+        "inviteMenu": {
+            "title": "",
+            "invite": "Invite",
+            "favorite": "Favorite",
+            "copyLink": "Copy Link"
+        },
+        "notification": {
+            "title": "",
+            "muteCategory": "Mute Channel",
+            "notification": "Notification Settings"
+        },
+        "organizationMenu": {
+            "title": "",
+            "edit": "Edit Channel",
+            "duplicateChannel": "Duplicate Category"
+        },
+        "devMode": {
+            "title": "Development Mode",
+            "copyChannelID": "Copy Clan ID"
+        }
+    },
+    "notify": {
+        "serverIDCopied": "Copied Channel ID"
+    }
+}
