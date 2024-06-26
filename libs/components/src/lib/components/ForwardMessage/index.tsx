@@ -76,9 +76,9 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: any) => {
 					return {
-						id: itemDM?.user_id[0] ?? '',
+						id: itemDM?.user_id?.[0] ?? '',
 						name: itemDM?.channel_label ?? '',
-						avatarUser: itemDM?.channel_avatar[0] ?? '',
+						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						typeChat: 3,
 					};

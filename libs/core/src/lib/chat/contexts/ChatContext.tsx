@@ -88,6 +88,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 			dispatch(messagesActions.newMessage(mess));
+			dispatch(notificationActions.setIsMessageRead(true));
 		},
 		[dispatch, userId],
 	);
@@ -109,6 +110,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onnotification = useCallback(
 		(notification: Notification) => {
 			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+			dispatch(notificationActions.setIsMessageRead(true));
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
@@ -177,10 +179,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelupdated = useCallback(
 		(channelUpdated: ChannelUpdatedEvent) => {
 			if (channelUpdated) {
-				if (channelUpdated.channel_label === "") {
+				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, channelType: 1, noCache: true}),)
-				}else {
+					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, channelType: 1, noCache: true }));
+				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
 			}

@@ -1,6 +1,16 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
 import { useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
-import { channelsActions, selectCloseMenu, selectCurrentChannel, selectIsShowMemberList, selectShowScreen, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import {
+	channelsActions,
+	notificationActions,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectIsMessageRead,
+	selectIsShowMemberList,
+	selectShowScreen,
+	selectStatusMenu,
+	useAppDispatch,
+} from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,11 +21,18 @@ import { ChannelTyping } from './ChannelTyping';
 // TODO: move this to core
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
+	const isMessageRead = useSelector(selectIsMessageRead);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
-	}, [channelId, dispatch]);
+		if (isMessageRead && channelId === currentChannel?.channel_id) {
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(notificationActions.setIsMessageRead(false));
+		} else {
+			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
+		}
+	}, [channelId, currentChannel?.channel_id, dispatch, isMessageRead]);
 }
 
 export default function ChannelMain() {
@@ -99,12 +116,7 @@ export default function ChannelMain() {
 							<div
 								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
-								{currentChannel && (
-									<ChannelTyping
-										channelId={currentChannel?.id}
-										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									/>
-								)}
+								{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
 								{currentChannel ? (
 									<ChannelMessageBox
 										clanId={currentChannel?.clan_id}
