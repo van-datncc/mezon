@@ -247,6 +247,7 @@ export const styles = StyleSheet.create({
 		paddingBottom: size.s_14,
 	},
 	titleThread: {
+		flex: 1,
 		fontSize: size.s_14,
 		fontWeight: '600',
 		marginLeft: size.s_6,
