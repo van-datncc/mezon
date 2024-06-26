@@ -1,4 +1,4 @@
-import { useAuth, useClans, useRightClick } from '@mezon/core';
+import { useAuth, useClanRestriction, useClans, useRightClick } from '@mezon/core';
 import { selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
 import {
 	deleteMessageList,
@@ -14,7 +14,8 @@ import {
 	unPinMessageList,
 	viewReactionList,
 } from '@mezon/ui';
-import { RightClickPos } from '@mezon/utils';
+import { EPermission, RightClickPos, getSrcEmoji } from '@mezon/utils';
+import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { selectPosClickingActive, selectReactionOnMessageList } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -57,14 +58,16 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 		}
 	}, [getListReactionMessageId]);
 
+	const [hasDeleteMessagePermision, { isClanCreator }] = useClanRestriction([EPermission.deleteMessage]);
+	const emojiList = [':anhan:', , ':100:', ':rofl:', ':verify:'];
+
 	useLayoutEffect(() => {
 		if (messageRClicked) {
-			const checkOwnerClan = currentClan?.creator_id === userId;
 			const checkOwnerMessage = messageRClicked?.sender_id === userId;
 			const checkMessHasReaction = messageRClicked?.reactions && messageRClicked?.reactions?.length > 0;
 			const checkMessHasText = messageRClicked?.content.t !== '';
 
-			if (checkOwnerClan) {
+			if (isClanCreator) {
 				let combineOwnerClan: any[] = [];
 				if (messageExists) {
 					combineOwnerClan = [...listClickDefault, ...unPinMessageList];
@@ -114,7 +117,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 						}
 					}
 				}
-			} else if (!checkOwnerClan) {
+			} else if (!isClanCreator) {
 				const combineNoOwnerClan = [...listClickDefault];
 				setListTextToMatch(combineNoOwnerClan);
 				if (checkOwnerMessage) {
@@ -136,7 +139,13 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 						}
 					}
 				} else if (!checkOwnerMessage) {
-					const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
+					let combineNoOwnerMessage: any[] = [];
+					if (hasDeleteMessagePermision) {
+						combineNoOwnerMessage = [...listClickDefault, ...reportMessageList, ...deleteMessageList];
+					} else {
+						combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
+					}
+
 					setListTextToMatch(combineNoOwnerMessage);
 					if (checkMessHasReaction || checkReactionRealtime) {
 						const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList];
@@ -156,7 +165,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 				}
 			}
 		}
-	}, [messageRClicked, messageExists, checkReactionRealtime]);
+	}, [messageRClicked, messageExists, checkReactionRealtime, hasDeleteMessagePermision]);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -202,6 +211,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 		>
+			<ReactionPart emojiList={emojiList} />
 			{sortListById(listTextToMatch)?.map((item: any) => {
 				return <MenuItem urlData={urlData} item={item} key={item.name} />;
 			})}
@@ -220,3 +230,32 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 };
 
 export default memo(ContextMenu);
+
+interface IReactionPart {
+	emojiList: any[];
+}
+
+const ReactionPart: React.FC<IReactionPart> = ({ emojiList }) => {
+	return (
+		<div className="flex justify-evenly gap-x-1 mb-1">
+			{emojiList.map((item, index) => {
+				return <ReactionItem key={item} emojiShortCode={item} />;
+			})}
+		</div>
+	);
+};
+
+interface IReactionItem {
+	emojiShortCode: string;
+}
+
+const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode }) => {
+	const { emojiListPNG } = useDataEmojiSvg();
+	const getUrl = getSrcEmoji(emojiShortCode, emojiListPNG ?? []);
+
+	return (
+		<div className="w-10 h-10  rounded-full flex justify-center items-center bg-[#232428] cursor-pointer">
+			<img src={getUrl} className="w-5 h-5"></img>
+		</div>
+	);
+};
