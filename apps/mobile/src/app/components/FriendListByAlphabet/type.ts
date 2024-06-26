@@ -3,6 +3,7 @@ import { EFriendItemAction } from "../FriendItem";
 
 export interface IListUserByAlphabetProps {
     friendList: FriendsEntity[];
+    selectedFriendDefault?: string[];
     isSearching: boolean;
     showAction?: boolean;
     selectMode?: boolean;

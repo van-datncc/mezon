@@ -19,13 +19,8 @@ const ClanLayout = () => {
 	const { isShowCreateThread } = useThreads();
 	const { setIsShowMemberList } = useApp();
 
-	const [openSetting, setOpenSetting] = useState(false);
-
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentVoiceChannel = useSelector(selectCurrentVoiceChannel);
-	const handleOpenCreate = () => {
-		setOpenSetting(true);
-	};
 
 	useEffect(() => {
 		if (isShowCreateThread) {
@@ -46,7 +41,6 @@ const ClanLayout = () => {
 						status={userProfile?.user?.online}
 						avatar={userProfile?.user?.avatar_url || ''}
 						userId={userProfile?.user?.id || ''}
-						openSetting={handleOpenCreate}
 						channelCurrent={currentChannel}
 					/>
 				</div>
@@ -64,12 +58,7 @@ const ClanLayout = () => {
 						</div>
 					</>
 				)}
-				<Setting
-					open={openSetting}
-					onClose={() => {
-						setOpenSetting(false);
-					}}
-				/>
+				<Setting />
 			</MezonPolicyProvider>
 		</div>
 	);

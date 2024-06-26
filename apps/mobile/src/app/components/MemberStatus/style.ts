@@ -1,4 +1,4 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Colors, size } from "@mezon/mobile-ui";
 import { Dimensions, StyleSheet } from "react-native";
 
 const style = StyleSheet.create({
@@ -13,7 +13,7 @@ const style = StyleSheet.create({
     },
 
     box: {
-        backgroundColor: Colors.primary,
+        backgroundColor: Colors.bgDarkCharcoal,
         marginTop: 10,
         borderRadius: 15,
         width: "100%"
@@ -40,7 +40,29 @@ const style = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
         gap: 10
-    }
+    },
+	actionItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: size.s_12,
+		backgroundColor: Colors.bgDarkCharcoal,
+		padding: size.s_10,
+        borderRadius: size.s_12,
+        marginBottom: size.s_10
+	},
+	actionTitle: {
+		flex: 1,
+		color: Colors.white,
+	},
+    newGroupContent: {
+        color: Colors.textGray,
+        fontSize: size.small
+    },
+    actionIconWrapper: {
+		padding: size.s_8,
+		borderRadius: 50,
+        backgroundColor: Colors.bgViolet
+	},
 })
 
 export default style;

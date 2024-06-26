@@ -28,6 +28,10 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const [positionTop, setPositionTop] = useState(40);
 	const [positionLeft, setPositionLeft] = useState(0);
 	const handModalAddRole = (e: any) => {
+		if(showPopupAddRole) {
+			setShowPopupAddRole(false);
+			return;
+		}
 		setShowPopupAddRole(true);
 		const clickY = e.clientY;
 		const windowHeight = window.innerHeight;
@@ -62,9 +66,9 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	return (
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
-			<div className="mt-2">
+			<div className="mt-2 flex flex-wrap gap-2">
 				{userRolesClan.map((role, index) => (
-					<span key={`${role.id}_${index}`} className="inline-block text-xs border dark:border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgModifierHoverLight mr-2 mb-2">
+					<span key={`${role.id}_${index}`} className="inline-block text-xs border dark:border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgModifierHoverLight">
 						<button
 							className="mr-2 px-1 border border-bgDisable rounded-full dark:bg-bgDisable bg-white hover:bg-gray-400"
 							onClick={() => deleteRole(role.id)}
@@ -87,15 +91,21 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 										onChange={handleInputChange}
 									/>
 									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden hide-scrollbar">
-										{filteredListRoleBySearch.map((role, index) => (
-											<div
-												key={index}
-												className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgLightMode mr-2 dark:hover:bg-[#1d1c1c] hover:bg-bgLightModeButton"
-												onClick={() => addRole(role.id)}
-											>
-												{role.title}
+										{filteredListRoleBySearch.length > 0 ?
+											(filteredListRoleBySearch.map((role, index) => (
+												<div
+													key={index}
+													className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgLightMode mr-2 dark:hover:bg-[#1d1c1c] hover:bg-bgLightModeButton"
+													onClick={() => addRole(role.id)}
+												>
+													{role.title}
+												</div>
+											))) :
+											<div className='flex flex-col py-4 gap-y-4 items-center'>
+												<p className='font-medium dark:text-white text-black'>Nope!</p>
+												<p className='font-normal dark:text-zinc-400 text-colorTextLightMode'>Did you make a typo?</p>
 											</div>
-										))}
+										}
 									</div>
 								</div>
 							) : null}
