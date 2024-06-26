@@ -1,4 +1,4 @@
-import { ICategoryChannel, IChannel } from "@mezon/utils";
+import { IChannel } from "@mezon/utils";
 import React, { MutableRefObject } from "react";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
@@ -11,22 +11,22 @@ import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { BellSlashIcon, ChannelNotificationIcon, EyeIcon, GroupPlusIcon, IDIcon, PlusLargeIcon, SettingsIcon }
+import { BellSlashIcon, ChannelNotificationIcon, CopyIcon, EyeIcon, GroupPlusIcon, IDIcon, LinkIcon, PlusLargeIcon, SettingsIcon, StarIcon }
     // @ts-ignore
     from "libs/mobile-components/src/lib/icons2";
 
 
-interface ICategoryMenuProps {
+interface IChannelMenuProps {
     inviteRef: MutableRefObject<any>;
-    category: ICategoryChannel;
+    channel: IChannel;
 }
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
-export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps) {
+export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
 
-    const { t } = useTranslation(['categoryMenu']);
+    const { t } = useTranslation(['channelMenu']);
     const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>()
 
     const watchMenu: IMezonMenuItemProps[] = [
@@ -45,6 +45,22 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
                 dismiss();
             },
             icon: <GroupPlusIcon />
+        },
+        {
+            title: t('menu.inviteMenu.favorite'),
+            onPress: () => {
+                inviteRef.current.open()
+                dismiss();
+            },
+            icon: <StarIcon />
+        },
+        {
+            title: t('menu.inviteMenu.copyLink'),
+            onPress: () => {
+                inviteRef.current.open()
+                dismiss();
+            },
+            icon: <LinkIcon />
         }
     ]
 
@@ -68,26 +84,18 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
             icon: <SettingsIcon />
         },
         {
-            title: t('menu.organizationMenu.createChannel'),
-            onPress: () => {
-                dismiss();
-                navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
-                    screen: APP_SCREEN.MENU_CLAN.CREATE_CHANNEL,
-                    params: {
-                        categoryId: category?.category_id
-                    }
-                });
-            },
-            icon: <PlusLargeIcon />
+            title: t('menu.organizationMenu.duplicateChannel'),
+            onPress: () => reserve(),
+            icon: <CopyIcon />
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
-            title: t('menu.devMode.copyServerID'),
+            title: t('menu.devMode.copyChannelID'),
             icon: <IDIcon />,
             onPress: () => {
-                Clipboard.setString(category?.category_id);
+                Clipboard.setString(channel?.channel_id);
                 Toast.show({
                     type: 'info',
                     text1: t('notify.serverIDCopied'),
@@ -123,7 +131,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
                         style={{ width: "100%", height: "100%" }}
                     />
                 </View>
-                <Text style={styles.serverName}>{category?.category_name}</Text>
+                <Text style={styles.serverName}>{channel?.channel_label}</Text>
             </View>
 
             <View>

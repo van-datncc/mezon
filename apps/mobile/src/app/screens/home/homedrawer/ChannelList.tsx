@@ -1,7 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
 import {
-	CalendarIcon,
 	STORAGE_KEY_CLAN_CURRENT_CACHE,
 	getInfoChannelByClanId,
 	getUpdateOrAddClanChannelCache,
@@ -33,6 +32,8 @@ import CategoryMenu from './components/CategoryMenu';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import { styles } from './styles';
+import { CalendarIcon } from 'libs/mobile-components/src/lib/icons2';
+import ChannelMenu from './components/ChannelMenu';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -42,10 +43,12 @@ const ChannelList = React.memo((props: any) => {
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
+	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 
-	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
+	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
+	const [currentPressedChannel, setCurrentPressedChannel] = useState<IChannel>(null);
 	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 
@@ -94,9 +97,14 @@ const ChannelList = React.memo((props: any) => {
 		bottomSheetMenuRef.current?.present();
 	}
 
-	function handleLongPressCategory(channel: IChannel | ICategoryChannel) {
+	function handleLongPressCategory(category: ICategoryChannel) {
 		bottomSheetCategoryMenuRef.current?.present();
-		setCurrentPressedCategory(channel);
+		setCurrentPressedCategory(category);
+	}
+
+	function handleLongPressChannel(channel: IChannel) {
+		bottomSheetChannelMenuRef.current?.present();
+		setCurrentPressedChannel(channel);
 	}
 
 	function handlePressEventCreate() {
@@ -113,6 +121,7 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
+					{/* TODO: currentPressedChannel */}
 					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory} />
 				</View>
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
@@ -132,7 +141,8 @@ const ChannelList = React.memo((props: any) => {
 							data={item}
 							index={index}
 							onPressHeader={toggleCollapseChannel}
-							onLongPress={(channel: IChannel | ICategoryChannel) => handleLongPressCategory(channel)}
+							onLongPressCategory={(category) => handleLongPressCategory(category)}
+							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
 							collapseItems={collapseChannelItems}
 						/>
 					)}
@@ -143,8 +153,12 @@ const ChannelList = React.memo((props: any) => {
 				<ClanMenu clan={currentClan} inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet ref={bottomSheetCategoryMenuRef}>
-				<CategoryMenu bottomSheetRef={bottomSheetCategoryMenuRef} inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
+			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} heightFitContent>
+				<CategoryMenu inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
+			</MezonBottomSheet>
+
+			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent>
+				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedCategory} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet

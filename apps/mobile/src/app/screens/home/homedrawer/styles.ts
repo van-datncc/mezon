@@ -297,6 +297,7 @@ export const styles = StyleSheet.create({
 	},
 	threadItem: {
 		flexDirection: 'row',
+		flexGrow: 1,
 		alignItems: 'flex-end',
 	},
 	threadItemActive: {
