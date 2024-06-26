@@ -19,13 +19,17 @@ import { EMaxUserCanInvite } from '../../enums';
 import { friendList } from '../fakeData';
 import { styles } from './styles';
 
+interface IInviteToChannelProp {
+   isUnknownChannel: boolean
+}
+
 export const InviteToChannel = React.memo(
-	React.forwardRef(({currentCategory}: any, refRBSheet: React.Ref<any>) => {
+	React.forwardRef(({ isUnknownChannel}: IInviteToChannelProp, refRBSheet: React.Ref<any>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
-    const [isUnknownChannel, setIsKnownChannel] = useState<boolean>(false);
+
 
 		const { currentClanId, currentClan } = useClans();
 		const { createLinkInviteUser } = useInvite();
@@ -36,10 +40,6 @@ export const InviteToChannel = React.memo(
 		const [expiredTimeSelected, setExpiredTimeSelected] = useState<number>(2);
 		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
 		const { categorizedChannels } = useCategory();
-
-    useEffect(()=>{
-      setIsKnownChannel(!currentCategory?.channel_id)
-    },[currentCategory])
 		const openEditLinkModal = () => {
 			//@ts-ignore
 			refRBSheet?.current?.close();
@@ -120,18 +120,7 @@ export const InviteToChannel = React.memo(
 		}, [categorizedChannels, currentClanId, createLinkInviteUser]);
 
 		return (
-			<View style={styles.inviteToChannelWrapper}>
-				<Pressable
-					onPress={
-            () =>{
-              setIsKnownChannel(false)
-              //@ts-ignore
-              refRBSheet.current.open()
-            }
-					}
-				>
-					<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
-				</Pressable>
+			<View>
 				<BottomSheet
 					ref={refRBSheet}
 					draggable={true}

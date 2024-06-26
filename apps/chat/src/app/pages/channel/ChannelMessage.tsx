@@ -55,17 +55,18 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	return (
 		<>
 			<div className="fullBoxText relative group">
-				<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} />
-
-				{isEditing ? (
-					<MessageInput
-						messageId={messageId}
-						channelId={channelId}
-						mode={mode}
-						channelLabel={channelLabel}
-						message={mess as IMessageWithUser}
-					/>
-				) : null}
+			<MessageWithUser message={mess as IMessageWithUser} user={user} mode={mode} isEditing={isEditing}/>
+				{
+					isEditing ? (
+						<MessageInput
+							messageId={messageId}
+							channelId={channelId}
+							mode={mode}
+							channelLabel={channelLabel}
+							message={mess as IMessageWithUser}
+						/>
+					) : null
+				}
 				{lastSeen && <UnreadMessageBreak />}
 				{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 			</div>

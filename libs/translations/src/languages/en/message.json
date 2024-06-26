@@ -31,7 +31,8 @@
         "to": "To",
         "newGroup": "New Group",
         "addFriend": "Add a Friend",
-        "create": "Create"
+        "create": "Create",
+        "createGroupWith": "Create a new group with"
     },
     "reactions": {
         "noActionTitle": "No Reactions",

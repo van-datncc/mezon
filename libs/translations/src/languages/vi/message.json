@@ -30,7 +30,8 @@
         "to": "Đến",
         "newGroup": "Nhóm Mới",
         "addFriend": "Thêm bạn",
-        "create": "Tạo"
+        "create": "Tạo",
+        "createGroupWith": "Tạo nhóm mới với"
     },
     "reactions": {
         "noActionTitle": "Không có biểu cảm gì cả",

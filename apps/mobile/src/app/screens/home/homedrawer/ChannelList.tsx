@@ -21,7 +21,7 @@ import {
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../components/Event';
@@ -33,6 +33,7 @@ import CategoryMenu from './components/CategoryMenu';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import { styles } from './styles';
+import { darkColor } from '../../../constants/Colors';
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -44,6 +45,7 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+  const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<IChannel | ICategoryChannel>(null);
 	const user = useAuth();
@@ -97,6 +99,7 @@ const ChannelList = React.memo((props: any) => {
 	function handleLongPressCategory(channel: IChannel | ICategoryChannel) {
 		bottomSheetCategoryMenuRef.current?.present();
 		setCurrentPressedCategory(channel);
+    setIsUnKnownChannel(!(channel as IChannel)?.channel_id)
 	}
 
 	function handlePressEventCreate() {
@@ -113,7 +116,18 @@ const ChannelList = React.memo((props: any) => {
 						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
 					</View>
-					<InviteToChannel ref={bottomSheetInviteRef} currentCategory={currentPressedCategory} />
+          <Pressable
+            style={styles.inviteIconWrapper}
+            onPress={
+              () =>{
+                setIsUnKnownChannel(false);
+                bottomSheetInviteRef.current.open()
+              }
+            }
+				  >
+					<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
+				</Pressable>
+				<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
