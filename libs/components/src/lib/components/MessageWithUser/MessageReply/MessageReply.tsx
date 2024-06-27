@@ -2,9 +2,9 @@ import { referencesActions, selectMemberByUserId, selectMessageByMessageId } fro
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../Icons/index';
-import HashTag from '../MarkdownFormatText/HashTag';
-import { useMessageLine } from './useMessageLine';
+import * as Icons from '../../Icons/index';
+import { useMessageLine } from '../useMessageLine';
+import MarkUpOnReply from './MarkUpOnReply';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 };
@@ -16,15 +16,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const dispatch = useDispatch();
-
-	useEffect(() => {
-		if (message.references && message.references.length > 0) {
-			const messageReferenceId = message.references[0].message_ref_id;
-			const messageReferenceUserId = message.references[0].message_sender_id;
-			setMessageId(messageReferenceId ?? '');
-			setSenderId(messageReferenceUserId ?? '');
-		}
-	}, [message]);
 
 	const getIdMessageToJump = useCallback(
 		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
@@ -38,7 +29,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	);
 
 	const [messageLine, setMessageLine] = useState<string>('');
-	const { mentions, isOnlyEmoji } = useMessageLine(messageLine);
+	const { mentions } = useMessageLine(messageLine);
 
 	useEffect(() => {
 		if (messageRefFetchFromServe !== undefined && messageRefFetchFromServe?.content.t !== '') {
@@ -46,43 +37,14 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		}
 	}, [messageRefFetchFromServe?.content.t]);
 
-	interface IHasHashtagOnReply {
-		mention: any[];
-		messageLine: string;
-	}
-
-	const HashtagOnReply = ({ mention }: IHasHashtagOnReply) => {
-		// Extract matchedText and replace in the original message
-		const processedMessage = mention.reduce((acc: any, item, index) => {
-			let channelId = '';
-
-			if (item.matchedText.startsWith('<#')) {
-				const channelIdMatch = item.matchedText.match(/<#(\d+)>/);
-				channelId = channelIdMatch ? channelIdMatch[0] : '';
-			} else if (item.matchedText.startsWith('@')) {
-				// Handle the case starting with @ (username)
-				channelId = item.matchedText; // Remove the @ symbol
-			}
-
-			if (channelId) {
-				acc.push(item.nonMatchText, <HashTagMentionById id={channelId} />);
-			} else {
-				acc.push(item.nonMatchText); // Only push nonMatchText if channelId is empty
-			}
-
-			return acc;
-		}, []);
-		return <span>{processedMessage}</span>;
-	};
-
-	interface IHashtagMentionById {
-		id: string;
-	}
-
-	const HashTagMentionById = ({ id }: IHashtagMentionById) => {
-		console.log(id);
-		return <>{id.startsWith('@') ? <span className=" text-blue-500">{id}</span> : <HashTag channelHastagId={id} />}</>;
-	};
+	useEffect(() => {
+		if (message.references && message.references.length > 0) {
+			const messageReferenceId = message.references[0].message_ref_id;
+			const messageReferenceUserId = message.references[0].message_sender_id;
+			setMessageId(messageReferenceId ?? '');
+			setSenderId(messageReferenceUserId ?? '');
+		}
+	}, [message]);
 
 	return (
 		<div>
@@ -112,14 +74,15 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 									</div>
 									<Icons.ImageThumbnail />
 								</div>
+							) : mentions.length > 0 ? (
+								<MarkUpOnReply onClickToMove={(e) => getIdMessageToJump(messageRefId, e)} mention={mentions} />
 							) : (
-								// <span
-								// 	onClick={(e) => getIdMessageToJump(messageRefId, e)}
-								// 	className="text-[14px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer one-line break-all pt-0"
-								// >
-								// 	{messageRefFetchFromServe?.content?.t}
-								// </span>
-								<HashtagOnReply mention={mentions} messageLine={messageLine} />
+								<span
+									onClick={(e) => getIdMessageToJump(messageRefId, e)}
+									className="text-[14px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer one-line break-all pt-0"
+								>
+									{messageRefFetchFromServe?.content?.t}
+								</span>
 							)}
 						</div>
 					</div>
