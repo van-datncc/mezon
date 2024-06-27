@@ -49,7 +49,7 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
 
     function handlePressNext() {
         if (eventType === OptionEvent.OPTION_LOCATION) {
-            if (location.trim().length === 0) {
+            if (location?.trim()?.length === 0) {
                 Toast.show({
                     type: "error",
                     text1: t("notify.locationBlank")

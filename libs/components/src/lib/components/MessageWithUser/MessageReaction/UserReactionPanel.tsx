@@ -55,7 +55,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 						onMouseLeave={onLeavePanel}
 						onClick={(e) => e.stopPropagation()}
 						className={`z-50   w-[18rem]
-						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem]
+						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] shadow-md
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emoji={emojiShowPanel.emoji} emojiListPNG={emojiListPNG} count={count} />

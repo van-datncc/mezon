@@ -163,7 +163,7 @@ const SettingRightUser = ({
 						</div>
 						<div className="mt-[30px] w-full">
 							<textarea
-								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full ${appearanceTheme ==="light" ? "customScrollLightMode" : ""}`}
+								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full outline-none ${appearanceTheme ==="light" ? "customScrollLightMode" : ""}`}
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}

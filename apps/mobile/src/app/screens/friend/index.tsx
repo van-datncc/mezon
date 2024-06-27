@@ -37,8 +37,8 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 
     const friendRequestCount = useMemo(() => {
         return {
-            sent: allUser.filter(user => user.state === 1).length,
-            received: allUser.filter(user => user.state === 2).length,
+            sent: allUser.filter(user => user.state === 1)?.length,
+            received: allUser.filter(user => user.state === 2)?.length,
         }
     }, [allUser]);
 
@@ -84,13 +84,13 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 				/>
 			</View>
 
-            {filteredFriendList.length === 0 ? (
+            {filteredFriendList?.length === 0 ? (
                 <View>
                     <Text style={styles.defaultText}>{t('friends:noFriendsResultsFound')}</Text>
                 </View>
             ): null}
 
-            {!searchText.trim().length || filteredFriendList.length === 0 ? (
+            {!searchText?.trim()?.length || filteredFriendList?.length === 0 ? (
                 <Pressable style={styles.requestFriendWrapper} onPress={() => navigateToRequestFriendScreen()}>
                     <PaperPlaneIcon width={25} color={Colors.textGray} />
                     <View style={styles.fill}>
@@ -105,7 +105,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
                 </Pressable>
             ): null}
             <FriendListByAlphabet
-                isSearching={Boolean(searchText.trim().length)}
+                isSearching={Boolean(searchText?.trim()?.length)}
                 friendList={filteredFriendList}
                 handleFriendAction={handleFriendAction}
                 showAction={true}

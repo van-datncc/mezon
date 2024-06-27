@@ -1,7 +1,7 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
 import { selectChannelById, selectCurrentChannel } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Icons } from '../../components';
@@ -63,15 +63,15 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		</Link>
 	) : (
 		<>
-			<span 
-				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic" 
+			<span
+				className="font-medium px-0.1 rounded-sm cursor-pointer inline whitespace-nowrap !text-[#3297ff] hover:!text-white dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2] italic"
 				onClick={() => setOpenModal(true)}
 			>
-				# unkonwn
+				# unknown
 			</span>
-			{ openModal && <ModalUnknowChannel onClose={() => setOpenModal(false)}/> }
+			{openModal && <ModalUnknowChannel onClose={() => setOpenModal(false)} />}
 		</>
 	);
 };
 
-export default ChannelHashtag;
+export default memo(ChannelHashtag);

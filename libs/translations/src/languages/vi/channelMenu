@@ -1,0 +1,31 @@
+{
+  "menu": {
+    "watchMenu": {
+      "title": "",
+      "markAsRead": "Đánh dấu là Đã đọc"
+    },
+    "inviteMenu": {
+      "title": "",
+      "invite": "Mời",
+      "favorite": "Yêu thích",
+      "copyLink": "Sao chép liên kết"
+    },
+    "notification": {
+      "title": "",
+      "muteCategory": "Tắt thông báo channel",
+      "notification": "Cài đặt thông báo"
+    },
+    "organizationMenu": {
+      "title": "",
+      "edit": "Chỉnh sửa kênh",
+      "duplicateChannel": "Nhân bản channel"
+    },
+    "devMode": {
+      "title": "Chế độ phát triển",
+      "copyChannelID": "Sao chép Channel ID"
+    }
+  },
+  "notify": {
+    "serverIDCopied": "Đã sao chép Channel ID"
+  }
+}

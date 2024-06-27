@@ -79,7 +79,7 @@ const SettingRightClanEdit = ({
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value);
-		if (e.target.value !== userProfile?.user?.username) {
+		if (e.target.value !== userClansProfile?.nick_name) {
 			setFlagOptionsTrue?.();
 		} else {
 			setFlagOptionsfalse?.();
@@ -128,9 +128,8 @@ const SettingRightClanEdit = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full dark:text-white text-black border border-black px-4 py-2 mt-2 focus:outline-none focus:border-white-500 dark:bg-black bg-[#f0f0f0] font-normal text-sm tracking-wide"
+							className="rounded-[3px] w-full dark:text-white text-black border dark:border-white border-slate-200 px-4 py-2 mt-2 outline-none  dark:bg-black bg-[#f0f0f0] font-normal text-sm tracking-wide"
 							placeholder={displayName}
-							value={displayName}
 						/>
 					</div>
 					<div className="mt-[20px]">

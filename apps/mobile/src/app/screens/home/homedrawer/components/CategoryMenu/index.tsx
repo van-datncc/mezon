@@ -1,4 +1,3 @@
-import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { ICategoryChannel, IChannel } from "@mezon/utils";
 import React, { MutableRefObject } from "react";
 import { Text, View } from "react-native";
@@ -9,22 +8,21 @@ import { reserve, IMezonMenuSectionProps, MezonMenu, IMezonMenuItemProps } from 
 import { useTranslation } from "react-i18next";
 import Clipboard from "@react-native-clipboard/clipboard";
 import Toast from "react-native-toast-message";
-import { NittroIcon } from "@mezon/mobile-components";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
-import { darkColor } from "../../../../../../app/constants/Colors";
-import Feather from 'react-native-vector-icons/Feather';
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
+import { BellSlashIcon, ChannelNotificationIcon, EyeIcon, GroupPlusIcon, IDIcon, PlusLargeIcon, SettingsIcon }
+    // @ts-ignore
+    from "libs/mobile-components/src/lib/icons2";
 
 
 interface ICategoryMenuProps {
-    bottomSheetRef: MutableRefObject<BottomSheetModalMethods>;
-    inviteRef:MutableRefObject<any>;
-    category: IChannel | ICategoryChannel;
+    inviteRef: MutableRefObject<any>;
+    category: ICategoryChannel;
 }
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
-export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: ICategoryMenuProps) {
+export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps) {
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
 
@@ -35,18 +33,18 @@ export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: IC
         {
             title: t('menu.watchMenu.markAsRead'),
             onPress: () => reserve(),
-            icon: <NittroIcon />
+            icon: <EyeIcon />
         }
     ]
 
     const inviteMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.inviteMenu.invite'),
-            onPress: () =>{
-              inviteRef.current.open()
-              bottomSheetRef?.current?.dismiss();
+            onPress: () => {
+                inviteRef.current.open()
+                dismiss();
             },
-            icon: <Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
+            icon: <GroupPlusIcon />
         }
     ]
 
@@ -54,12 +52,12 @@ export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: IC
         {
             title: t('menu.notification.muteCategory'),
             onPress: () => reserve(),
-            icon: <NittroIcon />
+            icon: <BellSlashIcon />
         },
         {
             title: t('menu.notification.notification'),
             onPress: () => reserve(),
-            icon: <NittroIcon />
+            icon: <ChannelNotificationIcon />
         }
     ]
 
@@ -67,7 +65,7 @@ export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: IC
         {
             title: t('menu.organizationMenu.edit'),
             onPress: () => reserve(),
-            icon: <NittroIcon />
+            icon: <SettingsIcon />
         },
         {
             title: t('menu.organizationMenu.createChannel'),
@@ -80,14 +78,14 @@ export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: IC
                     }
                 });
             },
-            icon: <NittroIcon />
+            icon: <PlusLargeIcon />
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.devMode.copyServerID'),
-            icon: <NittroIcon />,
+            icon: <IDIcon />,
             onPress: () => {
                 Clipboard.setString(category?.category_id);
                 Toast.show({
@@ -125,7 +123,7 @@ export default function CategoryMenu({ category, bottomSheetRef, inviteRef }: IC
                         style={{ width: "100%", height: "100%" }}
                     />
                 </View>
-                <Text style={styles.serverName}>{(category as IChannel)?.channel_label|| category?.category_name}</Text>
+                <Text style={styles.serverName}>{category?.category_name}</Text>
             </View>
 
             <View>
