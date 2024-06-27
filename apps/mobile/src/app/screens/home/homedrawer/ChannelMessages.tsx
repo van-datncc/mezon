@@ -1,7 +1,7 @@
 import { useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto, selectCurrentChannel, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { selectAttachmentPhoto, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -32,6 +32,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+	const dispatch = useAppDispatch();
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -113,7 +114,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const renderItem = useCallback(
 		({ item }) => {
-			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage}  />;
+			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} />;
 		},
 		[mode, channelId, channelLabel, onOpenImage],
 	);
