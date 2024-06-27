@@ -1,5 +1,14 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, AngleRight, HashSignLockIcon, MuteIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	AngleRight,
+	HashSignLockIcon,
+	MuteIcon,
+	ThreadIcon,
+	UnMuteIcon,
+	getChannelById,
+	ArrowLeftIcon
+} from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -214,7 +223,7 @@ const HomeDefaultHeader = React.memo(
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
-							<BarsLogo width={20} height={20} />
+							<ArrowLeftIcon width={20} height={20}  />
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
