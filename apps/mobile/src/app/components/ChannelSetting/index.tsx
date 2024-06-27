@@ -215,7 +215,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 
             <MezonMenu menu={bottomMenu} />
 
-            {/* <MezonConfirm
+            <MezonConfirm
                 visible={isVisibleDeleteChannelModal}
                 onVisibleChange={handleDeleteModalVisibleChange}
                 onConfirm={handleDeleteChannel}
@@ -224,7 +224,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
                 content={t('confirm.delete.content', {
                     channelName: channel?.channel_label
                 })}
-            /> */}
+            />
         </ScrollView>
     )
 }
