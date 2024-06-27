@@ -1,4 +1,3 @@
-import { useChatMessages } from '@mezon/core';
 import { AngleRightIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelsEntity, channelsActions, getStoreAsync, messagesActions, selectMemberByUserId } from '@mezon/store-mobile';
@@ -17,7 +16,6 @@ interface IThreadItemProps {
 const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const navigation = useNavigation();
 	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
-	const { messages } = useChatMessages({ channelId: thread.channel_id as string });
 
 	const { username } = useMessageSender(user);
 	const handleNavigateThread = async (thread?: IChannel) => {
@@ -47,7 +45,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 				<View style={styles.threadContent}>
 					<Text style={styles.textThreadCreateBy}>{username}</Text>
 					<Text numberOfLines={1} ellipsizeMode="tail" style={styles.messageContent}>
-						{(messages[0]?.content.t as string) ?? JSON.parse(thread.last_sent_message.content).t}
+						{!!JSON.parse(thread?.last_sent_message?.content)?.['t'] ? JSON.parse(thread?.last_sent_message?.content)?.['t'] : ''}
 					</Text>
 					<Text style={styles.bullet}>•</Text>
 					<Text style={styles.createTime}>{timeMessage}</Text>

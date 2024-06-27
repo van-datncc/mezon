@@ -16,7 +16,7 @@ export default function MezonMenuSection({ title, items, bottomDescription }: IM
             <View style={styles.section}>
                 {items.map((item, index) => (
                     <MezonMenuItem
-                        isLast={index === items.length - 1}
+                        isLast={index === items?.length - 1}
                         key={index.toString()}
                         {...item}
                     />

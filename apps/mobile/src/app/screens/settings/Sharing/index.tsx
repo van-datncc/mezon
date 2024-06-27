@@ -128,7 +128,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToDM = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
+		store.dispatch(clansActions.joinClan({ clanId: channelSelected?.clan_id }));
 		
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',

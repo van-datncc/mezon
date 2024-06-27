@@ -1,10 +1,9 @@
 import { Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, channelMembersActions, selectAllAccount, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
@@ -29,6 +28,7 @@ export type MemberProfileProps = {
 	directMessageValue?: directMessageValueProps;
 	isMemberGroupDm?: boolean;
 	positionType?: MemberProfileType;
+	countMember?: number;
 };
 
 function MemberProfile({
@@ -49,6 +49,7 @@ function MemberProfile({
 	directMessageValue,
 	isMemberGroupDm,
 	positionType,
+	countMember,
 }: MemberProfileProps) {
 	const dispatch = useAppDispatch();
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
@@ -124,19 +125,6 @@ function MemberProfile({
 
 	useOnClickOutside(panelRef, handleClickOutSide);
 
-	const [numMember, setNumMember] = useState(0);
-	useEffect(() => {
-		if (Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP) {
-			dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: '',
-					channelId: directMessageValue?.channelId || '',
-					channelType: ChannelType.CHANNEL_TYPE_DM,
-				}),
-			).then((members) => setNumMember((members.payload as ChannelUserListChannelUser[]).length));
-		}
-	}, []);
-
 	return (
 		<div className="relative group">
 			<div
@@ -198,7 +186,10 @@ function MemberProfile({
 							)}
 						</div>
 					)}
-					{numMember !== 0 && <p className="dark:text-[#AEAEAE] text-colorTextLightMode">{numMember} Members</p>}
+
+					{Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP && (
+						<p className="dark:text-[#AEAEAE] text-colorTextLightMode">{countMember} Members</p>
+					)}
 				</div>
 			</div>
 			{isShowPanelMember && (

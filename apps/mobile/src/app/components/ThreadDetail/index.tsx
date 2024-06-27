@@ -15,7 +15,7 @@ export default function CreateThreadModal() {
 		<View style={styles.createChannelContainer}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
 				{threadChannelOnline?.length ? (
-					<GroupThread title={`${threadChannelOnline.length} ${t('joinedThreads')}`}>
+					<GroupThread title={`${threadChannelOnline?.length} ${t('joinedThreads')}`}>
 						{threadChannelOnline?.map((thread) => (
 							<ThreadItem thread={thread} key={thread.id} />
 						))}
@@ -29,7 +29,7 @@ export default function CreateThreadModal() {
 					</GroupThread>
 				) : null}
 			</ScrollView>
-			{threadChannel.length === 0 && <EmptyThread />}
+			{threadChannel?.length === 0 && <EmptyThread />}
 		</View>
 	);
 }

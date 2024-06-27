@@ -95,7 +95,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
         <View style={styles.listUserByAlphabetContainer}>
             {isSearching ? (
                 <View>
-                    {friendList.length ? (
+                    {friendList?.length ? (
                         <Text style={styles.friendText}>{t('friends:friends')}</Text>
                     ): null}
                     <View style={styles.groupWrapper}>

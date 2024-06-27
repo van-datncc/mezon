@@ -84,8 +84,8 @@ const MessageContent = ({ user, message, isCombine, isSending, isError }: IMessa
 
 	return (
 		<>
-			{hasAttachments && <Attachments messageId={message.id} attachments={attachments ?? []} />}
 			<MessageText message={message} lines={lines as string} isEdited={isEdited} />
+			{hasAttachments && <Attachments messageId={message.id} attachments={attachments ?? []} />}
 		</>
 	);
 };
