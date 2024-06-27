@@ -1,5 +1,5 @@
 import { useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
-import { appActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { appActions, channelsActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
@@ -9,7 +9,7 @@ import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
-import { ChannelType } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -55,7 +55,17 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const handleKeyDown = (event: any) => {
 		if (event.key === 'Enter') {
 			setOpenEditName(false);
+			handleSave()
 		}
+	};
+
+	const handleSave = async () => {
+		const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: dmGroupId|| '',
+			channel_label: label,
+			category_id: '',
+		};
+		await dispatch(channelsActions.updateChannel(updateChannel));
 	};
 
 	useEffect(() => {
