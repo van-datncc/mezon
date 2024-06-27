@@ -8,6 +8,7 @@ import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { clansActions } from '../clans/clans.slice';
+import { directActions } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
@@ -133,7 +134,11 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			if (body.category_id === '') {
+				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			} else {
+				thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			}
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
