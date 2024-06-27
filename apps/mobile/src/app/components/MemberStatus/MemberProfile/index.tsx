@@ -24,7 +24,7 @@ export default function MemberProfile({
 
     const name = useMemo(() => {
         if (user) {
-          return nickName || user.user.display_name || user.user.username
+          return nickName || user?.user?.display_name || user?.user?.username
         }
     }, [user])
     return (
