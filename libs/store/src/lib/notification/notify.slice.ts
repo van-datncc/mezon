@@ -20,6 +20,7 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	messageNotifedId: string;
+	isMessageRead: boolean;
 }
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
@@ -49,6 +50,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	notificationMentions: [],
 	error: null,
 	messageNotifedId: '',
+	isMessageRead: false,
 });
 const NOTIFICATION_CODE = -9;
 
@@ -60,6 +62,9 @@ export const notificationSlice = createSlice({
 		remove: notificationAdapter.removeOne,
 		setMessageNotifedId(state, action) {
 			state.messageNotifedId = action.payload;
+		},
+		setIsMessageRead(state, action) {
+			state.isMessageRead = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -116,20 +121,17 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 			).length,
 	);
 
-export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) =>{
+export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) => {
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
-}
-);
+});
 
 export const selectNotificationMessageCountByChannelId = (channelId: string, after = 0) =>
-	createSelector(
-		selectNotificationMessages,
-		(notifications) => {
-
-			return notifications.filter(
-				(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-			).length;
-		}
-);
+	createSelector(selectNotificationMessages, (notifications) => {
+		return notifications.filter(
+			(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
+		).length;
+	});
 
 export const selectMessageNotifed = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifedId);
+
+export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);

@@ -27,8 +27,8 @@ const ItemDetail: React.FC<IItemDetail> = ({ item, urlData, onClick }) => {
 				cursor-pointer rounded-sm 
 				${
 					redColor
-						? 'text-[#E13542] hover:text-[#FFFFFF] dark:hover:bg-[#E13542] hover:bg-bgLightModeButton'
-						: 'text-[#81858A] hover:text-[#FFFFFF] dark:hover:bg-[#4B5CD6] hover:bg-bgLightModeButton'
+						? 'text-[#E13542] hover:text-[#FFFFFF] dark:hover:bg-[#E13542] hover:bg-[#4B5CD6]'
+						: 'text-[#81858A] hover:text-[#FFFFFF] dark:hover:bg-[#4B5CD6] hover:bg-[#4B5CD6]'
 				} font-medium
 				 `}
 		>

@@ -13,10 +13,8 @@ import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelMembersActions,
-	directActions,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	selectDmGroupCurrentId,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IMessageWithUser } from '@mezon/utils';
@@ -48,9 +46,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
 	const dispatch = useAppDispatch();
 
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-	const prevChannelRef = useRef<ChannelsEntity>();
-	const currentDmGroupIdRef = useRef<string>();
+	const prevChannelIdRef = useRef<string>();
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -92,23 +88,17 @@ const HomeDefault = React.memo((props: any) => {
 	useFocusEffect(
 		useCallback(() => {
 			setIsFocusChannelView(true);
-			if (prevChannelRef.current !== currentChannel || (currentDmGroupIdRef.current !== currentDmGroupId && currentDmGroupId)) {
+			if (prevChannelIdRef.current !== currentChannel?.channel_id) {
 				fetchMemberChannel();
 			}
-			prevChannelRef.current = currentChannel;
-			currentDmGroupIdRef.current = currentDmGroupId;
+			prevChannelIdRef.current = currentChannel?.channel_id;
 			return () => {
 				setIsFocusChannelView(false);
-				currentDmGroupIdRef.current = null;
 			};
-		}, [currentChannel, currentDmGroupId]),
+		}, [currentChannel?.channel_id]),
 	);
 
 	const fetchMemberChannel = async () => {
-		if (currentDmGroupId) {
-			dispatch(directActions.setDmGroupCurrentId(''));
-		}
-
 		await dispatch(
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',

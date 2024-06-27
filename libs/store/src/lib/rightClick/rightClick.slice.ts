@@ -12,6 +12,7 @@ export interface RightClickState {
 	posClickActive: RightClickPos;
 	modeActive: ChannelStreamMode;
 	reactionOnMessageList: string[];
+	visibleOpt: boolean;
 }
 
 export const initialRightClickState: RightClickState = {
@@ -25,6 +26,7 @@ export const initialRightClickState: RightClickState = {
 	posClickActive: RightClickPos.NONE,
 	modeActive: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	reactionOnMessageList: [],
+	visibleOpt: false,
 };
 
 export const rightClickSlice = createSlice({
@@ -46,6 +48,9 @@ export const rightClickSlice = createSlice({
 		setReactionMessageList: (state, action) => {
 			state.reactionOnMessageList = action.payload;
 		},
+		setVisibleOpt: (state, action) => {
+			state.visibleOpt = action.payload;
+		},
 	},
 });
 
@@ -64,3 +69,5 @@ export const selectPosClickingActive = createSelector(getRightClickState, (state
 export const selectModeActive = createSelector(getRightClickState, (state: RightClickState) => state.modeActive);
 
 export const selectReactionOnMessageList = createSelector(getRightClickState, (state: RightClickState) => state.reactionOnMessageList);
+
+export const selectVisibleStatus = createSelector(getRightClickState, (state: RightClickState) => state.visibleOpt);
