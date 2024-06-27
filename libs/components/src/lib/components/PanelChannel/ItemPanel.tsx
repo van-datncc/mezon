@@ -11,7 +11,7 @@ type ItemPanelProps = {
 const ItemPanel = ({ children, dropdown, type, onClick }: ItemPanelProps) => {
 	return (
 		<button onClick={onClick} className="flex items-center w-full justify-between rounded-sm hover:bg-bgSelectItem hover:[&>*]:text-[#fff] pr-2">
-			<li className="text-[14px] dark:text-[#B5BAC1] text-colorTextLightMode font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">{children}</li>
+			<li className="text-[14px] dark:text-[#B5BAC1] text-colorTextLightMode font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none textWhiteHoverImportant m-0">{children}</li>
 			{dropdown && <Icons.RightIcon defaultFill="#fff" />}
 			{type === 'checkbox' && <Checkbox id="accept" defaultChecked />}
 			{type === 'radio' && <Radio className="" value="change here" />}

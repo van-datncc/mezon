@@ -197,7 +197,7 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 								{isEditing ? (
 									''
 								) : (
-									<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+									<div className="justify-start items-center inline-flex w-full h-full textChat">
 										<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 											<MessageContent
 												message={message}
