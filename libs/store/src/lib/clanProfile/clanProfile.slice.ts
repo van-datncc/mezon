@@ -47,7 +47,6 @@ type updateLinkUserClanProfile = {
 export const updateUserClanProfile = createAsyncThunk(
 	'userclanProfile/updateUserClanProfile',
 	async ({ clanId, username, avatarUrl }: updateLinkUserClanProfile, thunkAPI) => {
-		console.log('avatar_url ', avatarUrl);
 		const mezon = ensureClient(getMezonCtx(thunkAPI));
 		const body: ApiUpdateClanProfileRequest = {
 			clan_id: clanId,

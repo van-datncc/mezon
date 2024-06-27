@@ -54,7 +54,7 @@ export default function BannerAvatar({ avatar, onChange }: IBannerAvatarProps) {
     }
 
     return (
-        <View style={{ display: "flex" }}>
+        <View>
             <View style={[styles.bannerContainer, { backgroundColor: color }]}>
                 <View style={styles.btnGroup}>
                     <TouchableOpacity

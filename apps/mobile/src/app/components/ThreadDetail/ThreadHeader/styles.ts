@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
 		color: Colors.white,
 		marginLeft: size.s_6,
 		fontSize: size.h5,
-    fontWeight: '600',
+    fontWeight: '700'
 	},
 	groupAvatar: {
 		backgroundColor: Colors.bgToggleOnBtn,

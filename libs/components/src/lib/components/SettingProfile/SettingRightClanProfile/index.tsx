@@ -34,7 +34,7 @@ const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileCli
 				<p className="mt-[20px] font-bold text-sm dark:text-[#CCCCCC] text-black tracking-wide">CHOOSE A CLAN</p>
 				<select
 					name="clan"
-					className="block w-full mt-1 dark:bg-black bg-[#f0f0f0] border border-black dark:text-white text-black rounded px-4 py-3 font-normal text-sm tracking-wide"
+					className="block w-full mt-1 dark:bg-black bg-[#f0f0f0] border dark:border-white border-slate-200 dark:text-white text-black rounded px-4 py-3 font-normal text-sm tracking-wide outline-none"
 					disabled={flagOption}
 					value={selectedClanId}
 					onChange={handleClanChange}

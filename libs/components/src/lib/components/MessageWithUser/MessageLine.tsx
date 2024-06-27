@@ -10,7 +10,7 @@ const MessageLine = ({ line }: MessageLineProps) => {
 	const { mentions, isOnlyEmoji } = useMessageLine(line);
 
 	return (
-		<div className="pt-[0.2rem]  pl-0 mb-0.5">
+		<div className="pl-0 mb-0.5">
 			<MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} />
 		</div>
 	);

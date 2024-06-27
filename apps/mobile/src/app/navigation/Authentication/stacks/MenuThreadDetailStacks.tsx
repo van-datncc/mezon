@@ -90,7 +90,7 @@ export const MenuThreadDetailStacks = ({}: any) => {
 											)}
 										</View>
 									)}
-									<Text style={{ color: Colors.white, fontSize: size.h6 }}>
+									<Text style={{ color: Colors.white, fontSize: size.h6 , fontWeight: '700'}}>
 										{openThreadMessageState ? 'New Thread' : currentChannel?.channel_label}
 									</Text>
 									<AngleRight width={14} height={14} style={{ marginLeft: size.s_10 }}></AngleRight>

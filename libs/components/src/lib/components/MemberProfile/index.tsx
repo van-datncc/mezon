@@ -28,6 +28,7 @@ export type MemberProfileProps = {
 	isUnReadDirect?: boolean;
 	directMessageValue?: directMessageValueProps;
 	isMemberGroupDm?: boolean;
+	countMember?: number
 };
 
 function MemberProfile({
@@ -47,6 +48,7 @@ function MemberProfile({
 	isUnReadDirect,
 	directMessageValue,
 	isMemberGroupDm,
+	countMember,
 }: MemberProfileProps) {
 	const dispatch = useAppDispatch();
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
@@ -121,14 +123,6 @@ function MemberProfile({
 
 	useOnClickOutside(panelRef, handleClickOutSide);
 
-	const [numMember, setNumMember] = useState(0);
-	useEffect(() => {
-		if(Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP){
-			dispatch(channelMembersActions.fetchChannelMembers({clanId: '', channelId: directMessageValue?.channelId || '', channelType: ChannelType.CHANNEL_TYPE_DM}))
-				.then(members => setNumMember((members.payload as ChannelUserListChannelUser[]).length));
-		}
-	},[])
-
 	return (
 		<div className="relative group">
 			<div
@@ -180,7 +174,8 @@ function MemberProfile({
 							{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
 						</p>
 					)}
-					{numMember !==0 && <p className='dark:text-[#AEAEAE] text-colorTextLightMode'>{numMember} Members</p>}
+					
+					{Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP  && <p className='dark:text-[#AEAEAE] text-colorTextLightMode'>{countMember} Members</p>}
 				</div>
 			</div>
 			{isShowPanelMember && (

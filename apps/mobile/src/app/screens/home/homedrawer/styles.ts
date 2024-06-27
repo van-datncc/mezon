@@ -590,8 +590,8 @@ export const styles = StyleSheet.create({
 	},
 	channelContainer: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },
-	threadHeaderLabel: { color: Colors.white, fontFamily: 'bold', marginLeft: size.s_6, fontSize: size.label, width: '85%'},
-	channelHeaderLabel: { color: Colors.textGray, marginLeft: size.s_6, fontSize: size.medium, maxWidth: '85%' },
+	threadHeaderLabel: { color: Colors.white, fontWeight:"700", marginLeft: size.s_10, fontSize: size.label , width: '85%'},
+	channelHeaderLabel: { color: Colors.textGray, marginLeft: size.s_10, fontSize: size.medium, maxWidth: '85%' },
 	mb_10: {
 		marginBottom: verticalScale(10),
 	},
