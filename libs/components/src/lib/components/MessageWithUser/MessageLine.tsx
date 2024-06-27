@@ -11,8 +11,6 @@ type MessageLineProps = {
 const MessageLine = ({ line, messageId }: MessageLineProps) => {
 	const { mentions, isOnlyEmoji, imageLinks } = useMessageLine(line);
 
-	console.log(imageLinks);
-
 	return (
 		<div className="pt-[0.2rem] pl-0">
 			<MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} />
