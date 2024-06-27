@@ -4,12 +4,14 @@ import { Image } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { directActions, selectDirectById, useAppDispatch } from '@mezon/store';
+import { useLayoutEffect, useState } from 'react';
 
 export type DirectMessUnreadProp = {
 	readonly directMessage: Readonly<any>;
 };
 
 function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
+	const [countMessUnread, setCountMessUnread] = useState<number>()
 	const currentDirect = useSelector(selectDirectById(directMessage.id))
 	const dispatch = useAppDispatch();
 	const openDirectMessage = (direct: any) => {
@@ -22,9 +24,14 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 			}),
 		  );
 	}
+	useLayoutEffect(() => {
+		if (currentDirect?.count_mess_unread) {
+			setCountMessUnread(currentDirect?.count_mess_unread);
+		}
+	}, [currentDirect?.count_mess_unread]);
 	return (
 		<div>
-			<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '8px' }}></div>
+			<div className="py-0 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '8px' }}></div>
 			<div onClick={()=>openDirectMessage(directMessage)}>
 				<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`} >
 					<NavLinkComponent clanName={directMessage.channel_label || ""}>
@@ -36,9 +43,9 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 								height={48}
 								className="clan w-full aspect-square"
 							/>
-							{currentDirect.count_mess_unread !== 0 && (
-								<div className="absolute border-[4px] border-bgPrimary w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
-									{currentDirect.count_mess_unread}
+							{countMessUnread !== undefined && countMessUnread !== 0 && (
+								<div className="absolute border-[4px] dark:border-bgPrimary border-white w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
+									{countMessUnread >= 100 ? '99+' : countMessUnread}
 								</div>
 							)}
 						</div>
