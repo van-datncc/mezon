@@ -29,7 +29,7 @@ import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
 import MessageHead from './MessageHead';
 import MessageReaction from './MessageReaction/MessageReaction';
-import MessageReply from './MessageReply';
+import MessageReply from './MessageReply/MessageReply';
 import { useMessageParser } from './useMessageParser';
 
 export type ReactedOutsideOptional = {
