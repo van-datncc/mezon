@@ -1,4 +1,3 @@
-import { SpeakerIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IEmojiImage, getSrcEmoji } from '@mezon/utils';
@@ -7,6 +6,8 @@ import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
+import FontAwesome from 'react-native-vector-icons/Feather';
+import FastImage from 'react-native-fast-image';
 import {
 	channelIdRegex,
 	codeBlockRegex,
@@ -17,7 +18,6 @@ import {
 	splitBlockCodeRegex,
 	urlRegex,
 } from '../../../../../app/utils/helpers';
-import FastImage from 'react-native-fast-image';
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -164,16 +164,20 @@ export const renderRulesCustom = {
 		if (payload.startsWith('@') || payload.startsWith('#')) {
 			if (payload.includes('##voice')) {
 				return (
-					<Text key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
-						<View style={[styles.voiceChannel]}>
-							<SpeakerIcon style={{ bottom: 0 }} width={12} height={12} color={Colors.white} />
-							<Text style={styles.textVoiceChannel}>{content}</Text>
-						</View>
+					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+						<Text>
+							<FontAwesome name="volume-2" size={14} color={Colors?.white} />{' '}
+						</Text>
+						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
 				);
 			}
 			return (
-				<Text key={node.key} style={[styles.mention, content.includes('# unknown') && styles.unknownChannel]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+				<Text
+					key={node.key}
+					style={[styles.mention, content.includes('# unknown') && styles.unknownChannel]}
+					onPress={() => openUrl(node.attributes.href, onLinkPress)}
+				>
 					{content}
 				</Text>
 			);
