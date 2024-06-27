@@ -60,9 +60,9 @@ export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any
     }, [])
 
     const createNewGroup = async () => {
-        if (friendIdSelectedList.length === 0) return;
+        if (friendIdSelectedList?.length === 0) return;
         const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-			type: friendIdSelectedList.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
+			type: friendIdSelectedList?.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
 			user_ids: friendIdSelectedList,
 		};
@@ -106,7 +106,7 @@ export const NewGroupScreen = ({navigation, route}: {navigation: any, route: any
                     </View>
 
                     <FriendListByAlphabet
-                        isSearching={Boolean(searchText.trim().length)}
+                        isSearching={Boolean(searchText?.trim()?.length)}
                         friendList={filteredFriendList}
                         handleFriendAction={handleFriendAction}
                         selectMode={true}

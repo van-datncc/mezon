@@ -51,7 +51,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
     const handleTextChange = (type: EAddFriendBy, text: string) => {
         switch (type) {
             case EAddFriendBy.Username:
-                if ((text || '').trim().length) {
+                if ((text || '')?.trim()?.length) {
                     setRequestAddFriend({...requestAddFriend, usernames: [text]});
                 } else {
                     setRequestAddFriend({...requestAddFriend, usernames: []});
@@ -79,7 +79,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	};
 
     const sentFriendRequest = async () => {
-        if (!(requestAddFriend.usernames[0] || '').trim().length) return null;
+        if (!(requestAddFriend.usernames[0] || '')?.trim()?.length) return null;
         if (inputRef?.current) {
             inputRef.current.blur();
         }

@@ -6,7 +6,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
-import MessageNotification from '../MessageNotification';
 import { ENotifyBsToShow, NotifyProps } from '../types';
 import { styles as s } from './NotificationItem.styles';
 import MessageItem from '../../home/homedrawer/MessageItem';

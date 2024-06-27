@@ -12,10 +12,14 @@ export const styles = StyleSheet.create({
 	channelText: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'center',
+		flex: 1,
+		alignSelf: 'center',
+		maxWidth: '70%'
 	},
 	channelLabel: {
 		color: Colors.white,
-		marginLeft: 10,
+		marginLeft: size.s_6,
 		fontSize: size.h5,
     fontWeight: '700'
 	},

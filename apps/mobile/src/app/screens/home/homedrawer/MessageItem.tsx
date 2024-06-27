@@ -137,7 +137,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [dispatch, markMessageAsSeen, message, props.messageId]);
 
 	useEffect(() => {
-		if (message.references && message.references.length > 0) {
+		if (message.references && message?.references?.length > 0) {
 			const messageReferenceId = message.references[0].message_ref_id;
 			const messageReferenceUserId = message.references[0].message_sender_id;
 			setMessageRefId(messageReferenceId ?? '');
@@ -146,7 +146,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	useEffect(() => {
-		if (message.references && message.references.length > 0) {
+		if (message.references && message?.references?.length > 0) {
 			const messageReferenceId = message.references[0].message_ref_id;
 			const messageReferenceUserId = message.references[0].message_sender_id;
 			setMessageRefId(messageReferenceId ?? '');
@@ -402,10 +402,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
 						</TouchableOpacity>
 					) : null}
-					{videos.length > 0 && renderVideos()}
-					{images.length > 0 && renderImages()}
+					{videos?.length > 0 && renderVideos()}
+					{images?.length > 0 && renderImages()}
 
-					{documents.length > 0 && renderDocuments()}
+					{documents?.length > 0 && renderDocuments()}
 					{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, channelMember)}
 					<MessageAction
 						message={message}

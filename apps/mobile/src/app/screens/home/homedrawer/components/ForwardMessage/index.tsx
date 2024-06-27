@@ -43,7 +43,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const { t } = useTranslation('message');
 
 	const listMemSearch = useMemo(() => {
-		const listDMSearch = listDM.length
+		const listDMSearch = listDM?.length
 			? listDM.map((itemDM: any) => {
 				return {
 					id: itemDM?.user_id?.[0] ?? '',
@@ -54,7 +54,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 				};
 			})
 			: [];
-		const listGroupSearch = listGroup.length
+		const listGroupSearch = listGroup?.length
 			? listGroup.map((itemGr: any) => {
 				return {
 					id: itemGr?.channel_id ?? '',

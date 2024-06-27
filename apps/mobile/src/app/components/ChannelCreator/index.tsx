@@ -34,7 +34,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
                 <Text style={{
                     color: "white",
                     paddingHorizontal: 20,
-                    opacity: channelName.trim().length > 0 ? 1 : 0.5
+                    opacity: channelName?.trim()?.length > 0 ? 1 : 0.5
                 }}>
                     {t("actions.create")}
                 </Text>

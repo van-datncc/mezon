@@ -103,8 +103,8 @@ const Notifications = () => {
 		store.dispatch(messagesActions.jumpToMessage({ messageId: notify.content.message_id, channelId: notify.content.channel_id }));
 		store.dispatch(
 			channelsActions.joinChannel({
-				clanId: notify.content.clan_id ?? '',
-				channelId: notify.content.channel_id,
+				clanId: notify?.content?.clan_id ?? '',
+				channelId: notify?.content?.channel_id,
 				noFetchMembers: false,
 			}),
 		);
