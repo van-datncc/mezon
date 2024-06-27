@@ -14,6 +14,7 @@ import { notificationSettingActions } from '../notificationSetting/notificationS
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { clansActions } from '../clans/clans.slice';
+import { directActions } from '../direct/direct.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -132,7 +133,11 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
-			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			if (body.category_id === "") {
+				thunkAPI.dispatch(directActions.fetchDirectMessage({noCache: true}))
+			}else{
+				thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			}
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
