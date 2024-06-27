@@ -10,9 +10,10 @@ type IMessageHeadProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
+	isShowFull?: boolean;
 };
 
-const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
+const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
@@ -71,7 +72,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		};
 	}, [positionLeft]);
 
-	if (isCombine && message.references?.length === 0) {
+	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;
 	}
 

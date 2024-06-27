@@ -46,9 +46,10 @@ export type MessageWithUserProps = {
 	isMention?: boolean;
 	popup?: JSX.Element;
 	isEditing?: boolean;
+	isShowFull?: boolean;
 };
 
-function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, isEditing }: Readonly<MessageWithUserProps>) {	
+function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, isEditing, isShowFull }: Readonly<MessageWithUserProps>) {	
 	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { messageDate } = useMessageParser(message);
@@ -189,10 +190,10 @@ function MessageWithUser({ message, user, isMessNotifyMention, mode, isMention, 
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
-							<MessageAvatar user={user} message={message} isCombine={isCombine} isEditing={isEditing}/>
+							<MessageAvatar user={user} message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull}/>
 
 							<div className="w-full relative h-full">
-								<MessageHead message={message} user={user} isCombine={isCombine} />
+								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull}/>
 								{isEditing ? (
 									''
 								) : (
