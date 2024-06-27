@@ -2,50 +2,28 @@ import { IMessageLine } from '@mezon/utils';
 import { useMemo } from 'react';
 
 export function useMessageLine(line: string): IMessageLine {
-
 	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:[a-zA-Z0-9_]*:)(?!`)/g;
-
 	const emojiRegex = /^:\b[a-zA-Z0-9]*\b:$/;
+	const extensionsRegex = /https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?(?:![^.\s]+)?/gi;
 
 	const isOnlyEmoji = useMemo(() => {
 		if (!line?.trim()) {
 			return false;
 		}
-
 		return emojiRegex.test(line);
 	}, [line]);
 
-	const matches = useMemo(() => {
-		if (line) {
-			return line.match(combinedRegex) || [];
-		} else {
-			return [];
-		}
-	}, [line]);
-
-	const mentions = useMemo(() => {
-		// Check if the line is within ``` or `
-		const trimmedLine = line.trim();
-		if ((trimmedLine.startsWith('```') && trimmedLine.endsWith('```')) || 
-			(trimmedLine.startsWith('`') && trimmedLine.endsWith('`'))) {
-			return [
-				{
-					nonMatchText: line,
-					matchedText: '',
-					startIndex: 0,
-					endIndex: line.length,
-				},
-			];
-		}
-
+	const processMatches = (regex: RegExp, inputLine: string) => {
 		let lastIndex = 0;
-		let nonMatchText = line;
+		let nonMatchText = inputLine;
 
-		const mentions = matches.map((match, i) => {
-			const startIndex = line.indexOf(match, lastIndex);
+		const matches = inputLine.match(regex) || [];
+
+		const processedMatches = matches.map((match, i) => {
+			const startIndex = inputLine.indexOf(match, lastIndex);
 			const endIndex = startIndex + match.length;
-			const matchedText = line.substring(startIndex, endIndex);
-			nonMatchText = line.substring(lastIndex, startIndex);
+			const matchedText = inputLine.substring(startIndex, endIndex);
+			nonMatchText = inputLine.substring(lastIndex, startIndex);
 			lastIndex = endIndex;
 			return {
 				nonMatchText,
@@ -54,7 +32,8 @@ export function useMessageLine(line: string): IMessageLine {
 				endIndex,
 			};
 		});
-		if (mentions.length === 0) {
+
+		if (processedMatches.length === 0) {
 			// no matches
 			return [
 				{
@@ -65,19 +44,42 @@ export function useMessageLine(line: string): IMessageLine {
 				},
 			];
 		}
-		if (lastIndex < line.length) {
-			mentions.push({
-				nonMatchText: line.substring(lastIndex),
+
+		if (lastIndex < inputLine.length) {
+			processedMatches.push({
+				nonMatchText: inputLine.substring(lastIndex),
 				matchedText: '',
 				startIndex: lastIndex,
-				endIndex: line.length,
+				endIndex: inputLine.length,
 			});
 		}
-		return mentions;
-	}, [line, matches]);
+
+		return processedMatches;
+	};
+	const imageLinks = useMemo(() => {
+		return processMatches(extensionsRegex, line);
+	}, [line, extensionsRegex]);
+
+	const mentions = useMemo(() => {
+		// Check if the line is within ``` or `
+		const trimmedLine = line.trim();
+		if ((trimmedLine.startsWith('```') && trimmedLine.endsWith('```')) || (trimmedLine.startsWith('`') && trimmedLine.endsWith('`'))) {
+			return [
+				{
+					nonMatchText: line,
+					matchedText: '',
+					startIndex: 0,
+					endIndex: line.length,
+				},
+			];
+		}
+
+		return processMatches(combinedRegex, line);
+	}, [line, combinedRegex]);
 
 	return {
 		mentions,
 		isOnlyEmoji,
+		imageLinks,
 	};
 }

@@ -1,6 +1,6 @@
 import { useAttachments, useRightClick } from '@mezon/core';
 import { RightClickPos, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
-import { rightClickAction, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useDispatch, useSelector } from 'react-redux';
 import ContextMenu from '../RightClick/ContextMenu';
@@ -17,6 +17,7 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
 	const { setRightClickXy, setMessageRightClick } = useRightClick();
 	const posClickActive = useSelector(selectPosClickingActive);
+	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 
 	const handleClick = (url: string) => {
 		if (!isDimensionsValid && !checkImage) {
@@ -38,19 +39,26 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 	};
 
 	return (
-		<div className="break-all">
-			<img
-				onContextMenu={handleContextMenu}
-				className={
-					'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' + (!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
-				}
-				src={attachmentData.url?.toString()}
-				alt={attachmentData.url}
-				onClick={() => handleClick(attachmentData.url || '')}
-				style={imgStyle}
-			/>
-			{posClickActive === RightClickPos.IMAGE_ON_CHANNEL && <ContextMenu urlData={attachmentData.url ?? ''} />}
-		</div>
+		<>
+			{attachmentData.url ? (
+				<div className="break-all">
+					<img
+						onContextMenu={handleContextMenu}
+						className={
+							'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' +
+							(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
+						}
+						src={attachmentData.url?.toString()}
+						alt={attachmentData.url}
+						onClick={() => handleClick(attachmentData.url || '')}
+						style={imgStyle}
+					/>
+					{posClickActive === RightClickPos.IMAGE_ON_CHANNEL && messageIdRightClick === getMessageIdRightClicked && (
+						<ContextMenu urlData={attachmentData.url ?? ''} />
+					)}
+				</div>
+			) : null}
+		</>
 	);
 }
 
