@@ -15,10 +15,9 @@
 		7E3B23803055DCF57B5EA3BF /* libPods-Mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14A6B301E10399B5B77E2307 /* libPods-Mobile.a */; };
 		8062E008C4D06D4A0E6F7C92 /* libPods-Mobile-MobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68857255654E07272F9D78F5 /* libPods-Mobile-MobileTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		E9B83E6B2C18346C00AE249D /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B83E6A2C18346C00AE249D /* ShareViewController.swift */; };
-		E9B83E6E2C18346C00AE249D /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9B83E6C2C18346C00AE249D /* MainInterface.storyboard */; };
-		E9B83E722C18346C00AE249D /* Mezon.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E9B83E682C18346C00AE249D /* Mezon.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CE049B18D263E78C0E28DB71 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF63FBD8F416D85DC93F4BD /* ExpoModulesProvider.swift */; };
 		E9DEDF952BF7326A003F6572 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */; };
+		EB8EF22644D89E2389CBE23D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,13 +28,6 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Mobile;
 		};
-		E9B83E702C18346C00AE249D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E9B83E672C18346C00AE249D;
-			remoteInfo = Mezon;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,7 +37,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				E9B83E722C18346C00AE249D /* Mezon.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 1;
@@ -67,13 +58,13 @@
 		68857255654E07272F9D78F5 /* libPods-Mobile-MobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mobile-MobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DED2867C3377A60B9D7FC8E /* Pods-Mobile-MobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile-MobileTests.release.xcconfig"; path = "Target Support Files/Pods-Mobile-MobileTests/Pods-Mobile-MobileTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Mobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BBF63FBD8F416D85DC93F4BD /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mobile/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		CC2EF50EB870283F95A556F6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Mobile/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DEA8E515101E02E04AB5E543 /* Pods-Mobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile.release.xcconfig"; path = "Target Support Files/Pods-Mobile/Pods-Mobile.release.xcconfig"; sourceTree = "<group>"; };
 		E2115CBEE435D659E16F2226 /* Pods-Mobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile.debug.xcconfig"; path = "Target Support Files/Pods-Mobile/Pods-Mobile.debug.xcconfig"; sourceTree = "<group>"; };
 		E9066E532C18376200405832 /* MezonDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonDebug.entitlements; sourceTree = "<group>"; };
 		E94005A02C17F0A300D5CF58 /* Mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Mobile.entitlements; path = Mobile/Mobile.entitlements; sourceTree = "<group>"; };
 		E9953BD42BF602930070F1CC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		E9B83E682C18346C00AE249D /* Mezon.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Mezon.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9B83E6A2C18346C00AE249D /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		E9B83E6D2C18346C00AE249D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		E9B83E6F2C18346C00AE249D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -81,6 +72,7 @@
 		E9C22F3A2BF59D4200BCBA90 /* MobileRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = MobileRelease.entitlements; path = Mobile/MobileRelease.entitlements; sourceTree = "<group>"; };
 		E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mobile-MobileTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,13 +89,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E3B23803055DCF57B5EA3BF /* libPods-Mobile.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E9B83E652C18346C00AE249D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +130,14 @@
 			name = Mobile;
 			sourceTree = "<group>";
 		};
+		27009074157E97ED0F8861F1 /* Mobile */ = {
+			isa = PBXGroup;
+			children = (
+				BBF63FBD8F416D85DC93F4BD /* ExpoModulesProvider.swift */,
+			);
+			name = Mobile;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,6 +165,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				C834801C67CC46829752F00E /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -183,9 +177,16 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* Mobile.app */,
 				00E356EE1AD99517003FC87E /* MobileTests.xctest */,
-				E9B83E682C18346C00AE249D /* Mezon.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		87E379A998DEB943BCA4AD29 /* MobileTests */ = {
+			isa = PBXGroup;
+			children = (
+				F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */,
+			);
+			name = MobileTests;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -197,6 +198,15 @@
 				6DED2867C3377A60B9D7FC8E /* Pods-Mobile-MobileTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		C834801C67CC46829752F00E /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				27009074157E97ED0F8861F1 /* Mobile */,
+				87E379A998DEB943BCA4AD29 /* MobileTests */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		E9B83E692C18346C00AE249D /* Mezon */ = {
@@ -219,6 +229,7 @@
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "MobileTests" */;
 			buildPhases = (
 				05B0DAEAE709696A5612AA53 /* [CP] Check Pods Manifest.lock */,
+				0565694512A6B67429775EB7 /* [Expo] Configure project */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -240,6 +251,7 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Mobile" */;
 			buildPhases = (
 				FAB8BA77FC9DBE46C823F800 /* [CP] Check Pods Manifest.lock */,
+				EE2A3FCAA2DD499E8AA68B7F /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
@@ -248,33 +260,16 @@
 				A878C0A32B31E89472F79349 /* [CP] Copy Pods Resources */,
 				F2C59326FEC9DCA59A4FEFE3 /* [CP-User] [RNFB] Core Configuration */,
 				E9B83E732C18346C00AE249D /* Embed Foundation Extensions */,
+				C353A8B609E245FEB2526185 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E9B83E712C18346C00AE249D /* PBXTargetDependency */,
 			);
 			name = Mobile;
 			productName = Mobile;
 			productReference = 13B07F961A680F5B00A75B9A /* Mobile.app */;
 			productType = "com.apple.product-type.application";
-		};
-		E9B83E672C18346C00AE249D /* Mezon */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E9B83E762C18346C00AE249D /* Build configuration list for PBXNativeTarget "Mezon" */;
-			buildPhases = (
-				E9B83E642C18346C00AE249D /* Sources */,
-				E9B83E652C18346C00AE249D /* Frameworks */,
-				E9B83E662C18346C00AE249D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Mezon;
-			productName = Mezon;
-			productReference = E9B83E682C18346C00AE249D /* Mezon.appex */;
-			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -291,9 +286,6 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
-					};
-					E9B83E672C18346C00AE249D = {
-						CreatedOnToolsVersion = 15.0.1;
 					};
 				};
 			};
@@ -312,7 +304,6 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* Mobile */,
 				00E356ED1AD99517003FC87E /* MobileTests */,
-				E9B83E672C18346C00AE249D /* Mezon */,
 			);
 		};
 /* End PBXProject section */
@@ -336,14 +327,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E9B83E662C18346C00AE249D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9B83E6E2C18346C00AE249D /* MainInterface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -361,7 +344,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../../../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../../../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../../../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../../../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT \\\"/bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode.sh $REACT_NATIVE_XCODE\\\"\"\n";
+		};
+		0565694512A6B67429775EB7 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Mobile-MobileTests/expo-configure-project.sh\"\n";
 		};
 		05B0DAEAE709696A5612AA53 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -436,6 +438,20 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Mobile/Pods-Mobile-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		C353A8B609E245FEB2526185 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh";
+		};
 		C6904AB491F11FA0B6627311 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,6 +468,25 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Mobile-MobileTests/Pods-Mobile-MobileTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		EE2A3FCAA2DD499E8AA68B7F /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Mobile/expo-configure-project.sh\"\n";
 		};
 		F2C59326FEC9DCA59A4FEFE3 /* [CP-User] [RNFB] Core Configuration */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -496,6 +531,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00E356F31AD99517003FC87E /* MobileTests.m in Sources */,
+				EB8EF22644D89E2389CBE23D /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,14 +541,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E9B83E642C18346C00AE249D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9B83E6B2C18346C00AE249D /* ShareViewController.swift in Sources */,
+				CE049B18D263E78C0E28DB71 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,11 +552,6 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* Mobile */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
-		};
-		E9B83E712C18346C00AE249D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E9B83E672C18346C00AE249D /* Mezon */;
-			targetProxy = E9B83E702C18346C00AE249D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -564,6 +588,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mobile.app/Mobile";
@@ -588,6 +613,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mobile.app/Mobile";
@@ -621,10 +647,11 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
 				PRODUCT_NAME = Mobile;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -657,6 +684,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
 				PRODUCT_NAME = Mobile;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -827,99 +855,6 @@
 			};
 			name = Release;
 		};
-		E9B83E742C18346C00AE249D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = Mezon/MezonDebug.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = E9Y2J54ZH3;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Mezon/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Mezon;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		E9B83E752C18346C00AE249D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = Mezon/MezonRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = E9Y2J54ZH3;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Mezon/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Mezon;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon mobile new";
-				SKIP_INSTALL = YES;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -946,15 +881,6 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E9B83E762C18346C00AE249D /* Build configuration list for PBXNativeTarget "Mezon" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E9B83E742C18346C00AE249D /* Debug */,
-				E9B83E752C18346C00AE249D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

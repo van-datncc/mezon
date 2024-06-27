@@ -1,7 +1,7 @@
 import { useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { selectAllUserClanProfile, selectAttachmentPhoto, selectCurrentClan, selectHasMoreMessageByChannelId, selectMembersByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -33,6 +33,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const dispatch = useAppDispatch();
+  const currentClan = useSelector(selectCurrentClan);
+  const channelMember = useSelector(selectMembersByChannelId(channelId));
+  const clansProfile = useSelector(selectAllUserClanProfile);
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -69,10 +72,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	}, []);
 
 	const typingLabel = useMemo(() => {
-		if (typingUsers.length === 1) {
+		if (typingUsers?.length === 1) {
 			return `${typingUsers[0].user?.username} is typing...`;
 		}
-		if (typingUsers.length > 1) {
+		if (typingUsers?.length > 1) {
 			return 'Several people are typing...';
 		}
 		return '';
@@ -114,7 +117,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const renderItem = useCallback(
 		({ item }) => {
-			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} />;
+			return <MessageItem clansProfile={clansProfile} channelMember={channelMember} messageId={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} currentClan={currentClan} />;
 		},
 		[mode, channelId, channelLabel, onOpenImage],
 	);

@@ -144,7 +144,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			targetMessage: message,
 		};
 		timeoutRef.current = setTimeout(() => {
-			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
+			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_MODAL, payload);
+			} else {
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_FORWARD_IN_DM_MODAL, payload);
+			}
 		}, 500);
 	};
 

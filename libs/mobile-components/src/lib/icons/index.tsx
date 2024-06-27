@@ -922,7 +922,7 @@ export function AvatarUser({ width = 24, height = 24, ...props }: SvgProps) {
 	);
 }
 
-export function PlusGreenIcon({ width = 24, height = 24, color = 'blue', ...props }: SvgProps) {
+export function PlusGreenIcon({ width = 24, height = 24, color = '#005fe9', ...props }: SvgProps) {
 	return (
 		<Svg width={width} height={height} viewBox="0 0 60 61" {...props}>
 			<Path d="M50 33.838H33.333v16.667h-6.666V33.838H10v-6.666h16.667V10.505h6.666V27.17H50v6.667z" fill={color} />

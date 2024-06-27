@@ -48,7 +48,7 @@ const SettingAccount = ({onSettingProfile, menuIsOpen}: SettingAccountProps) => 
 								className="size-24 rounded-full bg-bgSecondary border-[6px] border-solid dark:border-black border-[#F0F0F0] object-cover"
 							/>
 						)}
-						<div className="font-semibold text-lg">{userProfile?.user?.username}</div>
+						<div className="font-semibold text-lg">{userProfile?.user?.display_name}</div>
 					</div>
 					<div className="bg-primary h-fit px-4 py-2 rounded cursor-pointer hover:bg-opacity-80 text-white w-fit text-center" onClick={handleClick}>Edit User Profile</div>
 				</div>
@@ -56,7 +56,7 @@ const SettingAccount = ({onSettingProfile, menuIsOpen}: SettingAccountProps) => 
 					<div className="flex justify-between items-center mb-4">
 						<div>
 							<h4 className="uppercase font-bold text-xs dark:text-zinc-400 text-textLightTheme mb-1">Display Name</h4>
-							<p>You haven't added a display name yet.</p>
+							<p>{userProfile?.user?.display_name}</p>
 						</div>
 						<div className="bg-zinc-600 h-fit rounded px-4 py-2 cursor-pointer hover:bg-opacity-80 text-white" onClick={handleClick}>Edit</div>
 					</div>

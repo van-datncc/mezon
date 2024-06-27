@@ -1,12 +1,12 @@
 import { Colors } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store-mobile';
+import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
 import { IEmojiImage } from '@mezon/utils';
 import React from 'react';
 import { Text } from 'react-native';
 import { channelIdRegex, highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
 
-export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], channelsEntities?: Record<string, ChannelsEntity>) => {
+export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], channelsEntities?: Record<string, ChannelsEntity>, rawMembers: ChannelMembersEntity[]) => {
 	const getChannelById = (channelHashtagId: string) => {
 		const channel = channelsEntities?.[channelHashtagId];
 		if (channel) {
@@ -32,7 +32,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], ch
 		);
 	};
 
-	const renderUserMention = (id: string) => {
+  const renderUserMention = (id: string) => {
 		return (
 			<Text>
 				<Text style={styles.contentMessageMention}>{id}</Text>

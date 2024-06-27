@@ -40,7 +40,7 @@ export default function EventItem({ event, onPress }: IEventItemProps) {
                         </View>
                         <View style={styles.inline}>
                             <MemberListIcon height={10} width={10} />
-                            <Text style={styles.tinyText}>{event.user_ids.length}</Text>
+                            <Text style={styles.tinyText}>{event?.user_ids?.length}</Text>
                         </View>
                     </View>
                 </View>

@@ -65,7 +65,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         onBlur={handleBlur}
                     />
 
-                    {!textarea && value.length > 0 &&
+                    {!textarea && value?.length > 0 &&
                         <TouchableOpacity
                             onPress={handleClearBtn}
                             style={styles.clearBtn}>

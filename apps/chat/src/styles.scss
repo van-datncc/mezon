@@ -661,3 +661,12 @@ input:-webkit-autofill:active {
 	-ms-user-select: none; /* Internet Explorer/Edge */
 	user-select: none; /* Standard syntax */
   }
+
+// css icon 
+.iconWhiteImportant * {
+	color: white !important;
+}
+
+.textWhiteHoverImportant:hover{
+	color: white !important;
+}
