@@ -129,12 +129,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [messageRefFetchFromServe, message.references]);
 
 	useEffect(() => {
-		if (!isEmpty(message)) {
+		if (props?.messageId) {
 			const timestamp = Date.now() / 1000;
 			markMessageAsSeen(message);
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 		}
-	}, [dispatch, markMessageAsSeen, message]);
+	}, [dispatch, markMessageAsSeen, message, props.messageId]);
 
 	useEffect(() => {
 		if (message.references && message.references.length > 0) {
@@ -258,7 +258,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		async (mentionedUser: string) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
-				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.id || userClan?.user?.username );
+				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username );
 				clanUser && setFoundUser(clanUser?.user);
 				if (!mentionedUser) return;
 				setMessageSelected(EMessageBSToShow.UserInformation);

@@ -164,12 +164,12 @@ export const renderRulesCustom = {
 			);
 		}
 
-		if (payload.startsWith('@') || payload.startsWith('#')) {
-			if (payload.includes('##voice')) {
+		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
+			if (payload.includes(TYPE_MENTION.voiceChannel)) {
 				return (
 					<Text key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 						<View style={[styles.voiceChannel]}>
-							<SpeakerIcon style={{ bottom: 0 }} width={12} height={12} color={Colors.white} />
+            <SpeakerIcon style={{ bottom: 0 }} width={12} height={12} color={Colors.white} />
 							<Text style={styles.textVoiceChannel}>{content}</Text>
 						</View>
 					</Text>
@@ -386,14 +386,15 @@ const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsE
 			} else {
 				if (matchesMention.includes(part)) {
 					if (part.startsWith('@')) {
-            const userId = part?.slice(1);
-            const userMentionById = channelMember?.find(user => userId === user?.user?.username);
-            const clanProfileByIdUser = clanProfile?.find(clanProfile => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === userMentionById?.user?.id);
+            const nameMention = part?.slice(1);
+            const userMention = channelMember?.find(user => nameMention === user?.user?.username);
+            const { user } = userMention || {};
+            const clanProfileByIdUser = clanProfile?.find(clanProfile => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id);
             if(clanProfileByIdUser) {
-						  return `[@${clanProfileByIdUser?.nick_name}](@${clanProfileByIdUser?.user_id})`;
+						  return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
             }
-            if(userMentionById)
-						return userMentionById?.user?.display_name ? `[@${userMentionById?.user?.display_name}](@${userMentionById?.id})` : `@[${userMentionById?.user?.username}](@${userMentionById?.id})`;
+            if(userMention)
+						return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
             return `[${part}](${part})`;
 					}
 					if (part.startsWith('<#')) {
