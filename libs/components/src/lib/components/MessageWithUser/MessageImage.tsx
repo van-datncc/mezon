@@ -2,6 +2,7 @@ import { useAttachments, useRightClick } from '@mezon/core';
 import { RightClickPos, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ContextMenu from '../RightClick/ContextMenu';
 
@@ -37,7 +38,15 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 		setRightClickXy({ x: event.pageX, y: event.pageY });
 		setMessageRightClick(messageIdRightClick);
 	};
+	const [imageError, setImageError] = useState(false);
 
+	const handleImageError = () => {
+		setImageError(true);
+	};
+
+	if (imageError || !attachmentData.url) {
+		return null;
+	}
 	return (
 		<>
 			{attachmentData.url ? (
@@ -52,6 +61,7 @@ function MessageImage({ attachmentData, messageIdRightClick }: MessageImage) {
 						alt={attachmentData.url}
 						onClick={() => handleClick(attachmentData.url || '')}
 						style={imgStyle}
+						onError={handleImageError}
 					/>
 					{posClickActive === RightClickPos.IMAGE_ON_CHANNEL && messageIdRightClick === getMessageIdRightClicked && (
 						<ContextMenu urlData={attachmentData.url ?? ''} />
