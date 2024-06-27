@@ -6,6 +6,7 @@ import { Modal } from 'flowbite-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
+import { ChannelType } from 'mezon-js';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -94,8 +95,16 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		async (user: any) => {
 			if (user?.idDM) {
 				dispatch(directActions.openDirectMessage({ channel_id: user.idDM || '' }));
-				const directChat = toDmGroupPageFromMainApp(user.idDM, user?.typeChat ?? 2);
-				navigate(directChat);
+				const result = await dispatch(
+					directActions.joinDirectMessage({
+					  directMessageId: user.idDM,
+					  channelName: '',
+					  type: user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM,
+					}),
+				  );
+				  if (result) {
+					navigate(toDmGroupPageFromMainApp(user.idDM, user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM));
+				  }
 			} else {
 				const response = await createDirectMessageWithUser(user.id);
 				if (response.channel_id) {
