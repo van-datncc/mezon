@@ -53,13 +53,13 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
 	};
 
-	const {setIsShowSettingFooterStatus} = useSettingFooter();
+	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	const openSetting = () => {
 		setIsShowSettingFooterStatus(true);
-	}
+	};
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
-	
+
 	return (
 		<>
 			<button
@@ -77,7 +77,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 							avatar={avatar}
 							isHideStatus={false}
 							numberCharacterCollapse={15}
-							classParent="memberProfile"
+							classParent="memberProfile h-10 w-[120px]"
 						/>
 					</div>
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
