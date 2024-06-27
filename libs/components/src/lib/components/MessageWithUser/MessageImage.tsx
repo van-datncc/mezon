@@ -1,8 +1,7 @@
-import { useAttachments, useRightClick } from '@mezon/core';
+import { useAttachments } from '@mezon/core';
 import { RightClickPos, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useDispatch, useSelector } from 'react-redux';
-import ContextMenu from '../RightClick/ContextMenu';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;

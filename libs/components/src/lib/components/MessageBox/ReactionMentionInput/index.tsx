@@ -49,7 +49,6 @@ import {
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
-import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -252,8 +251,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-			dispatch(rightClickAction.setVisibleOpt(false));
 		},
 		[
 			valueTextInput,
@@ -387,8 +384,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-			dispatch(rightClickAction.setVisibleOpt(false));
+
 		}
 	};
 
@@ -402,11 +398,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleSearchHashtag = (search: any, callback: any) => {
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
-	};
-
-	const handleFocusEditor = () => {
-		dispatch(rightClickAction.setVisibleOpt(false));
-		dispatch(rightClickAction.setPosClickActive(SubPanelName.NONE));
 	};
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
@@ -501,7 +492,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
-				onFocus={handleFocusEditor}
 			>
 				<Mention
 					appendSpaceOnAdd={true}
