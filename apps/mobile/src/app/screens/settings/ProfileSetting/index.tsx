@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, TouchableOpacity, Alert } from 'react-native';
 import styles from './styles';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { Colors } from '@mezon/mobile-ui';
 import { useAuth } from '@mezon/core';
 import { isEqual } from 'lodash';
 import { useEffect } from 'react';
+import { useCallback } from 'react';
 
 export enum EProfileTab {
     UserProfile,
@@ -60,9 +61,13 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
         displayName: '',
     });
 
-    const checkIsNotChanged = (): boolean => {
+    const isUserProfileNotChanged = useMemo(() => {
         return isEqual(originUserProfileValue, currentUserProfileValue);
-    }
+    }, [originUserProfileValue, currentUserProfileValue])
+
+    const isClanProfileNotChanged = useMemo(() => {
+        return isEqual(originClanProfileValue, currentClanProfileValue);
+    }, [originClanProfileValue, currentClanProfileValue])
 
     useEffect(() => {
         if (user?.userId) {
@@ -78,10 +83,15 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
         }
     }, [user])
 
+    const setDefaultValueClanProfile = useCallback((clanProfileValue: IClanProfileValue) => {
+        setOriginClanProfileValue(clanProfileValue);
+        setCurrentClanProfileValue(clanProfileValue);
+    }, [])
+
     navigation.setOptions({
         headerRight: () => (
             <Pressable onPress={() => saveCurrentTab()}>
-                <Text style={[styles.saveChangeButton, checkIsNotChanged() ? styles.notChange : styles.changed]}>
+                <Text style={[styles.saveChangeButton, !isUserProfileNotChanged || !isClanProfileNotChanged ? styles.changed : styles.notChange]}>
                     {t("header.save")}
                 </Text>
             </Pressable>
@@ -94,7 +104,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
     });
 
     const handleBack = () => {
-        if (checkIsNotChanged()) {
+        if (isUserProfileNotChanged && isClanProfileNotChanged) {
             navigation.goBack();
             return;
         }
@@ -121,7 +131,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
     }
 
     const saveCurrentTab = () => {
-        if (checkIsNotChanged()) {
+        if (isUserProfileNotChanged && isClanProfileNotChanged) {
             return;
         }
         if (tab === EProfileTab.UserProfile) {
@@ -135,11 +145,46 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
         }
     }
 
+    const confirmCallback = async (): Promise<boolean> => {
+        return new Promise((resolve) => {
+            Alert.alert(
+                t('changedAlert.title'),
+                t('changedAlert.description'),
+                [
+                    {
+                        text: t('changedAlert.keepEditing'),
+                        style: 'cancel',
+                        onPress: () => resolve(false),
+                    },
+                    {
+                        text: t('changedAlert.discard'),
+                        onPress: () => {
+                            resolve(true)
+                            switch (tab) {
+                                case EProfileTab.UserProfile:
+                                    setCurrentUserProfileValue(originUserProfileValue);
+                                    break;
+                                case EProfileTab.ClanProfile:
+                                    setCurrentClanProfileValue(originClanProfileValue);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        },
+                    },
+                ],
+                { cancelable: false },
+            );
+        })
+    }
+
     return (
         <View style={styles.container}>
             <MezonTabHeader
                 tabIndex={tab}
                 onChange={handleTabChange}
+                isNeedConfirmWhenSwitch={!isUserProfileNotChanged || !isClanProfileNotChanged}
+                confirmCallback={confirmCallback}
                 tabs={[
                     t('switch.userProfile'),
                     t('switch.serverProfile')
@@ -157,6 +202,10 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
                     />,
                     <ServerProfile
                         triggerToSave={triggerToSaveTab}
+                        clanProfileValue={currentClanProfileValue}
+                        isClanProfileNotChanged={isClanProfileNotChanged}
+                        setDefaultValue={setDefaultValueClanProfile}
+                        setCurrentClanProfileValue={setCurrentClanProfileValue}
                     />,
                 ]}
             />

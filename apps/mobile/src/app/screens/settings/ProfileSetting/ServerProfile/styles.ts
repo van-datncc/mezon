@@ -6,7 +6,12 @@ export const styles = StyleSheet.create({
 
     },
     clanItem: {
-        
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+		alignItems: 'center',
+		gap: size.s_12,
+		backgroundColor: Colors.bgDarkSlate,
+		padding: size.s_10,
     },
     selectClanWrapper: {
 
@@ -65,5 +70,10 @@ export const styles = StyleSheet.create({
     },
     nameWrapper: {
         marginBottom: 20
+    },
+    optionTitle: {
+        flexDirection: 'row',
+        gap: size.s_10,
+        alignItems: 'center'
     }
 })

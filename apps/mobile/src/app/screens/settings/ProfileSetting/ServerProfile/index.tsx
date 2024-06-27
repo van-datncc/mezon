@@ -1,47 +1,139 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useAuth } from "@mezon/core";
-import { ClansEntity, selectAllClans, selectCurrentClan, selectUserClanProfileByClanID } from "@mezon/store-mobile";
-import { MezonBottomSheet } from "apps/mobile/src/app/temp-ui";
-import { useRef, useState } from "react";
-import { Dimensions, FlatList, TouchableOpacity, View, Image } from "react-native";
+import { useAuth, useClanProfileSetting } from "@mezon/core";
+import { ClansEntity, selectAllClans, selectCurrentClan } from "@mezon/store-mobile";
+import { MezonBottomSheet, MezonInput } from "../../../../../app/temp-ui";
+import { useCallback, useRef, useState } from "react";
+import { Dimensions, FlatList, TouchableOpacity, View, Image, Alert } from "react-native";
 import { useSelector } from "react-redux";
 import { styles } from "./styles";
-import { SeparatorWithSpace } from "apps/mobile/src/app/components/Common";
+import { SeparatorWithLine } from "../../../../../app/components/Common";
 import { useEffect } from "react";
-import { size, Text } from "@mezon/mobile-ui";
+import { Text } from "@mezon/mobile-ui";
 import { EProfileTab, IClanProfileValue } from "..";
-import { ChevronIcon, HashSignIcon } from "@mezon/mobile-components";
+import { CheckIcon, ChevronIcon, HashSignIcon } from "@mezon/mobile-components";
 import BannerAvatar, { IFile } from "../UserProfile/components/Banner";
 import Toast from "react-native-toast-message";
+import { useTranslation } from "react-i18next";
+import { handleUploadFileMobile, useMezon } from "@mezon/transport";
+import { useNavigation } from "@react-navigation/native";
 
 interface IServerProfile {
     triggerToSave: EProfileTab;
-	clanProfileValue?: IClanProfileValue;
-	setCurrentUserProfileValue?: (updateFn: (prevValue: IClanProfileValue) => IClanProfileValue) => void;
+	clanProfileValue: IClanProfileValue;
+    isClanProfileNotChanged?: boolean;
+    setDefaultValue: (clanProfileValue: IClanProfileValue) => void,
+	setCurrentClanProfileValue: (updateFn: (prevValue: IClanProfileValue) => IClanProfileValue) => void;
 }
 
-export default function ServerProfile({ triggerToSave, clanProfileValue, setCurrentUserProfileValue}: IServerProfile) {
+export default function ServerProfile({
+    triggerToSave,
+    clanProfileValue,
+    isClanProfileNotChanged,
+    setDefaultValue,
+    setCurrentClanProfileValue
+}: IServerProfile) {
     const { userProfile, userId } = useAuth();
-    const bottomSheetDetail = useRef<BottomSheetModal>(null)
+    const { sessionRef, clientRef } = useMezon();
+    const bottomSheetDetail = useRef<BottomSheetModal>(null);
+    const { t } = useTranslation(['profileSetting']);
     const clans = useSelector(selectAllClans);
     const currentClan = useSelector(selectCurrentClan);
     const [selectedClan, setSelectedClan] = useState<ClansEntity>(currentClan);
-    const userClansProfile = useSelector(selectUserClanProfileByClanID(selectedClan?.clan_id || '', userProfile?.user?.id || ''));
+    const { clanProfile, updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
     const [file, setFile] = useState<IFile>(null);
-    
+    const navigation = useNavigation();
+
     const openBottomSheet = () => {
-        bottomSheetDetail.current.present();
+        bottomSheetDetail.current?.present();
     }
+
+    useEffect(() => {
+        if (clanProfile?.id) {
+            const defaultValue: IClanProfileValue = {
+                username: userProfile?.user?.username,
+                displayName: clanProfile?.nick_name,
+                imgUrl: clanProfile?.avartar,
+            }
+
+            setDefaultValue(defaultValue)
+        }
+    }, [clanProfile, setDefaultValue, userProfile?.user?.username])
 
     const onPressHashtag = () => {
 		Toast.show({
 			type: 'info',
-			text1: 'Original known as ' + userProfile.user.username + '#' + userId,
+			text1: 'Original known as ' + userProfile?.user?.username + '#' + userId,
 		});
 	}
 
+    const onValueChange = (newValue: Partial<IClanProfileValue>) => {
+		setCurrentClanProfileValue((prevValue) => ({...prevValue, ...newValue}))
+	}
+
+    const switchClan = (clan: ClansEntity) => {
+        if (isClanProfileNotChanged) {
+            setSelectedClan(clan);
+            return;
+        }
+
+        Alert.alert(
+            t('changedAlert.title'),
+            t('changedAlert.description'),
+            [
+                {
+                    text: t('changedAlert.keepEditing'),
+                    style: 'cancel',
+                },
+                {
+                    text: t('changedAlert.discard'),
+                    onPress: () => setSelectedClan(clan),
+                }
+            ],
+            { cancelable: false },
+        );
+    }
+
+    useEffect(() => {
+		if (triggerToSave === EProfileTab.ClanProfile) {
+			handleUpdateClanProfile();
+		}
+	}, [triggerToSave]);
+
+    const getImageUrlToSave = useCallback(async () => {
+		if (!file) {
+			return clanProfileValue?.imgUrl;
+		}
+		const session = sessionRef.current;
+		const client = clientRef.current;
+
+		if (!file || !client || !session) {
+			throw new Error('Client is not initialized');
+		}
+		const ms = new Date().getTime();
+		const fullFilename = `${selectedClan?.clan_id}/${clanProfileValue?.username}/${ms}`.replace(/-/g, '_') + '/' + file.name;
+		const res = await handleUploadFileMobile(client, session, fullFilename, file);
+
+		return res.url;
+	}, [clientRef, sessionRef, file, clanProfileValue, selectedClan?.clan_id])
+
+    const handleUpdateClanProfile = async () => {
+        const imgUrl = await getImageUrlToSave();
+		const { username = '', displayName } = clanProfileValue;
+		if (clanProfileValue?.imgUrl || clanProfileValue?.displayName) {
+			const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName || username, imgUrl || '');
+            if (response) {
+                Toast.show({
+                    type: 'info',
+                    text1: 'Update clan profile success',
+                });
+                setFile(null);
+                navigation.goBack();
+            }
+		}
+	};
+
     const handleAvatarChange = (data: IFile) => {
-		setCurrentUserProfileValue((prevValue) => ({...prevValue, imgUrl: data?.uri}))
+		setCurrentClanProfileValue((prevValue) => ({...prevValue, imgUrl: data?.uri}))
 		setFile(data);
 	}
     return (
@@ -62,7 +154,7 @@ export default function ServerProfile({ triggerToSave, clanProfileValue, setCurr
                 <ChevronIcon height={15} width={15} />
             </TouchableOpacity>
 
-            <BannerAvatar avatar={userClansProfile?.avartar} onChange={handleAvatarChange} />
+            <BannerAvatar avatar={clanProfileValue?.imgUrl} onChange={handleAvatarChange} />
 
             <View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => onPressHashtag()} style={styles.btnIcon}>
@@ -70,21 +162,45 @@ export default function ServerProfile({ triggerToSave, clanProfileValue, setCurr
 				</TouchableOpacity>
 			</View>
 
+            <View style={styles.clanProfileDetail}>
+                <View style={styles.nameWrapper}>
+                    <Text style={styles.displayNameText}>{clanProfileValue?.displayName || clanProfileValue?.username}</Text>
+                    <Text style={styles.userNameText}>{clanProfileValue?.username}</Text>
+                </View>
 
+                <MezonInput
+                    value={clanProfileValue?.displayName}
+                    onTextChange={(newValue) => onValueChange({displayName: newValue})}
+                    placeHolder={clanProfileValue?.username}
+                    maxCharacter={32}
+                    label={t('fields.displayName.label')}
+                />
+            </View>
 
             <MezonBottomSheet ref={bottomSheetDetail} title="Choose a server">
                 <View style={styles.bottomSheetContainer}>
                     <FlatList
                         data={clans}
                         keyExtractor={(item) => item?.id}
-                        ItemSeparatorComponent={SeparatorWithSpace}
+                        ItemSeparatorComponent={SeparatorWithLine}
                         renderItem={({ item }) => {
                             return (
-                                <TouchableOpacity style={styles.clanItem} onPress={() => setSelectedClan(item)}>
-                                    <Image style={{height: 30, width: 30}} source={{uri: item?.logo || ''}} />
-                                    <Text>{item?.clan_name}</Text>
+                                <TouchableOpacity style={styles.clanItem} onPress={() => switchClan(item)}>
+                                    <View style={styles.optionTitle}>
+                                        <View style={[styles.clanAvatarWrapper]}>
+                                            {item?.logo ? (
+                                                <Image style={styles.avatar} source={{uri: item?.logo}} resizeMode="cover" />
+                                            ): (
+                                                <View style={styles.avatar}>
+                                                    <Text style={styles.textAvatar}>{item?.clan_name?.charAt(0).toUpperCase()}</Text>
+                                                </View>
+                                            )}
+                                        </View>
+        
+                                        <Text style={styles.clanName}>{item?.clan_name}</Text>
+                                    </View>
                                     {item?.clan_id === selectedClan?.clan_id ? (
-                                        <Text>checked</Text>
+                                        <CheckIcon color='green' />
                                     ): null}
                                 </TouchableOpacity>
                             )
