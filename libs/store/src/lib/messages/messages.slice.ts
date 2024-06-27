@@ -431,7 +431,7 @@ export const messagesSlice = createSlice({
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 
 					// remove sending message
-					if (isMe && !isSending) {
+					if ((isMe && !isSending) || (!isMe && !isSending)) {
 						const newContent = content;
 
 						const sendingMessages = state.channelMessages[channelId].ids.filter(
