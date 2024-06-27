@@ -1,6 +1,7 @@
 import { Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, channelMembersActions, selectAllAccount, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
@@ -27,6 +28,7 @@ export type MemberProfileProps = {
 	isUnReadDirect?: boolean;
 	directMessageValue?: directMessageValueProps;
 	isMemberGroupDm?: boolean;
+	positionType?: MemberProfileType;
 };
 
 function MemberProfile({
@@ -46,6 +48,7 @@ function MemberProfile({
 	isUnReadDirect,
 	directMessageValue,
 	isMemberGroupDm,
+	positionType,
 }: MemberProfileProps) {
 	const dispatch = useAppDispatch();
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
@@ -139,7 +142,7 @@ function MemberProfile({
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
-				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
+				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${positionType === MemberProfileType.FOOTER_PROFILE ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
 					{avatar ? (
@@ -161,7 +164,7 @@ function MemberProfile({
 				</a>
 				<div className="flex flex-col items-start">
 					<div
-						className={`absolute top-[22px] max-w-[76px] overflow-x-hidden transition-all duration-300 flex flex-col items-start ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
@@ -177,14 +180,16 @@ function MemberProfile({
 					{!isHideUserName && (
 						<div className="flex flex-row items-center w-full overflow-x-hidden">
 							<p
-								className={`text-base font-medium
-                ${classParent == '' ? 'bg-transparent whitespace-nowrap overflow-x-hidden text-ellipsis max-w-[140px]' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight leading-[26px] max-w-[76px] whitespace-nowrap overflow-x-hidden text-ellipsis'} nameMemberProfile
-                ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
-							${isMemberGroupDm ? 'max-w-[140px] overflow-x-hidden text-ellipsis' : ''}
+								className={`text-base font-medium nameMemberProfile
+                  ${positionType === MemberProfileType.FOOTER_PROFILE ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}
+                  ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
 							`}
-								title={name && name.length > numberCharacterCollapse ? name : undefined}
+								title={name}
 							>
-								{name && name.length > numberCharacterCollapse ? `${name.substring(0, numberCharacterCollapse)}...` : name}
+								{name}
 							</p>
 							{currentClan?.creator_id === user?.user?.id && (
 								<button className="w-[14px] h-[14px] ml-1">

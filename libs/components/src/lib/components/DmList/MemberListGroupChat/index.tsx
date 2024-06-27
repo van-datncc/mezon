@@ -1,12 +1,13 @@
 import { Icons, MemberProfile } from '@mezon/components';
 import { useAppParams } from '@mezon/core';
 import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
+import { MemberProfileType } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 
-export type MemberListProps = { 
-	className?: string; 
+export type MemberListProps = {
+	className?: string;
 	directMessageId: string | undefined;
-	createId?:string | undefined;
+	createId?: string | undefined;
 };
 
 function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
@@ -19,7 +20,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 				{
 					<div className="flex flex-col gap-4 text-[#AEAEAE]">
 						{rawMembers.map((user: ChannelMembersEntity) => (
-							<div className='flex items-center' key={user.id}>
+							<div className="flex items-center hihi" key={user.id}>
 								<MemberProfile
 									numberCharacterCollapse={30}
 									avatar={user?.user?.avatar_url ?? ''}
@@ -28,9 +29,9 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 									isHideStatus={true}
 									listProfile={true}
 									user={user}
-									isMemberGroupDm={true}
+									positionType={MemberProfileType.DM_MEMBER_GROUP}
 								/>
-								{createId === user.user?.id && <Icons.IconUserCreateDM className='size-[14px] text-[#E7A931]'/>}
+								{createId === user.user?.id && <Icons.IconUserCreateDM className="size-[14px] text-[#E7A931]" />}
 							</div>
 						))}
 					</div>
