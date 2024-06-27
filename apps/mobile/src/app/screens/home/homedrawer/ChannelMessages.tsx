@@ -112,17 +112,31 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		setVisibleImageModal(true);
 	}, [setIdxSelectedImageModal, setVisibleImageModal]);
 
-	const renderItem = useCallback(
-		({ item }) => {
-			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} />;
-		},
-		[mode, channelId, channelLabel, onOpenImage],
-	);
-
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
 		return data.reverse();
 	}, [messages]);
+
+	const jumpToRepliedMessage = useCallback((messageId: string) => {
+		const indexToJump = dataReverse.findIndex(message => message === messageId);
+		if (indexToJump !== -1 && flatListRef.current) {
+			flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
+		}
+	}, [dataReverse])
+
+	const renderItem = useCallback(
+		({ item }) => {
+			return <MessageItem
+				message={item}
+				mode={mode}
+				channelId={channelId}
+				channelLabel={channelLabel}
+				onOpenImage={onOpenImage}
+				jumpToRepliedMessage={jumpToRepliedMessage}
+			/>;
+		},
+		[mode, channelId, channelLabel, onOpenImage, jumpToRepliedMessage],
+	);
 
 	const onImageModalChange = useCallback(
 		(idx: number) => {

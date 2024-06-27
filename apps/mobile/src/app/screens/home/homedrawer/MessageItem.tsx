@@ -19,15 +19,13 @@ import {
 	selectMessageByMessageId,
 	useAppDispatch,
 	selectMessageEntityById,
+	selectIdMessageToJump,
+	referencesActions,
 } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	IChannelMember,
-	IMessageWithUser,
-	TIME_COMBINE,
-	checkSameDay,
 	convertTimeString,
-	getTimeDifferenceInSeconds,
 	notImplementForGifOrStickerSendFromPanel,
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
@@ -65,6 +63,7 @@ export type MessageItemProps = {
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
+	jumpToRepliedMessage?: (messageId: string) => void;
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -72,7 +71,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { mode, onOpenImage, isNumberOfLine } = props;
+	const { mode, onOpenImage, isNumberOfLine, jumpToRepliedMessage } = props;
 	const message = useSelector((state) => selectMessageEntityById(state, props.channelId, props.message));
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
@@ -93,7 +92,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
-	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
+	const { deleteSendMessage } = useDeleteMessage({ channelId: props.channelId, mode: props.mode });
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const hasIncludeMention = useMemo(() => {
@@ -102,6 +101,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const isCombine = !message.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
 	const videoRef = React.useRef(null);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
+	const checkMessageTargetToMoved = useMemo(() => {
+		return idMessageToJump === message.id;
+	}, [idMessageToJump, message.id]);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -301,15 +304,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, []);
 
 	const onConfirmDeleteMessage = () => {
-		DeleteSendMessage(message.id);
+		deleteSendMessage(message.id);
 	};
+
+	const handleJumpToMessage = (messageId: string) => {
+		dispatch(referencesActions.setIdMessageToJump(messageId));
+		jumpToRepliedMessage(messageRefFetchFromServe?.id);
+	}
 
 	const setMessageSelected = (type: EMessageBSToShow) => {
 		setOpenBottomSheet(type);
-	};
-
-	const jumpToRepliedMessage = () => {
-		console.log('message to jump', messageRefFetchFromServe);
 	};
 
 	const isEdited = useMemo(() => {
@@ -322,13 +326,20 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	return (
-		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
+		<View
+			style={[
+				styles.messageWrapper,
+				isCombine && { marginTop: 0 },
+				hasIncludeMention && styles.highlightMessageMention,
+				checkMessageTargetToMoved && styles.highlightMessageReply
+			]}
+		>
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-					<Pressable onPress={() => jumpToRepliedMessage()} style={styles.repliedMessageWrapper}>
+					<Pressable onPress={() => handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
 								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />

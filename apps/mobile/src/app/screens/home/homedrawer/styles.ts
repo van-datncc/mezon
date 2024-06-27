@@ -355,6 +355,12 @@ export const styles = StyleSheet.create({
 		borderLeftWidth: 2,
 		paddingTop: size.s_2,
 	},
+	highlightMessageReply: {
+		backgroundColor: Colors.bgReply,
+		borderLeftColor: Colors.borderMessageReply,
+		borderLeftWidth: 2,
+		paddingTop: size.s_2,
+	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
 		color: Colors.white,
