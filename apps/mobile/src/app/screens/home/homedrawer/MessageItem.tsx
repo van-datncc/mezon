@@ -103,8 +103,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const videoRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const checkMessageTargetToMoved = useMemo(() => {
-		return idMessageToJump === message.id;
-	}, [idMessageToJump, message.id]);
+		return idMessageToJump === message?.id;
+	}, [idMessageToJump, message?.id]);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -138,8 +138,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	useEffect(() => {
 		if (message.references && message.references.length > 0) {
-			const messageReferenceId = message.references[0].message_ref_id;
-			const messageReferenceUserId = message.references[0].message_sender_id;
+			const messageReferenceId = message.references[0]?.message_ref_id;
+			const messageReferenceUserId = message.references[0]?.message_sender_id;
 			setMessageRefId(messageReferenceId ?? '');
 			setSenderId(messageReferenceUserId ?? '');
 		}
