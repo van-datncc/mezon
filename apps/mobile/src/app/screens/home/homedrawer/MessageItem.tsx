@@ -19,6 +19,7 @@ import {
 	selectMessageByMessageId,
 	useAppDispatch,
 	selectMessageEntityById,
+	selectLastSeenMessage,
 } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
@@ -65,8 +66,6 @@ export type MessageItemProps = {
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
-	isNewContent?: boolean;
-
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -95,6 +94,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
+	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.message));
 	const { DeleteSendMessage } = useDeleteMessage({ channelId: props.channelId, channelLabel: props.channelLabel, mode: props.mode });
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
@@ -325,7 +325,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	return (
 		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
-			{props.isNewContent &&
+			{lastSeen &&
 				<View style={styles.newMessageLine}>
 					<View style={styles.newMessageContainer}>
 						<Text style={styles.newMessageText}>NEW MESSAGE</Text>

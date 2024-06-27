@@ -32,8 +32,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const dispatch = useAppDispatch();
-	const channel = useSelector(selectCurrentChannel);
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -48,8 +46,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		uploader: attachment.uploader,
 		create_time: attachment.create_time,
 	});
-
-	const [newMessageID, setNewMessageID] = useState("");
 
 	const formatAttachments: any[] = useMemo(() => {
 		const imageSelectedUrl = imageSelected ? createAttachmentObject(imageSelected) : {};
@@ -117,23 +113,15 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const renderItem = useCallback(
 		({ item }) => {
-			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} isNewContent={newMessageID === item} />;
+			return <MessageItem message={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage}  />;
 		},
-		[mode, channelId, channelLabel, onOpenImage, newMessageID],
+		[mode, channelId, channelLabel, onOpenImage],
 	);
 
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
 		return data.reverse();
 	}, [messages]);
-
-	useEffect(() => {
-		const idx = messages.findLastIndex((id) => id === channel?.last_seen_message?.id);
-
-		if (idx !== -1 && idx - 1 >= 0) {
-			setNewMessageID(messages[idx - 1]);
-		}
-	}, [messages])
 
 	const onImageModalChange = useCallback(
 		(idx: number) => {
