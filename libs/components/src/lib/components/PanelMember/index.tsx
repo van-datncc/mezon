@@ -2,7 +2,7 @@ import { useAuth } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanelMember from './GroupPanelMember';
@@ -32,6 +32,9 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 		onRemoveMember();
 	};
 
+	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id,[currentChannel?.creator_id, userProfile?.user?.id]);
+	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id,[member?.user?.id, userProfile?.user?.id]);
+
 	return (
 		<div
 			ref={panelRef}
@@ -47,34 +50,49 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 			<GroupPanelMember>
 				<ItemPanelMember children="Profile" />
 				<ItemPanelMember children="Mention" />
-				<ItemPanelMember children="Message" />
-				<ItemPanelMember children="Call" />
-				<ItemPanelMember children="Add Note" />
-				<ItemPanelMember children="Add Friend Nickname" />
+				{!checkUser &&
+					<>
+						<ItemPanelMember children="Message" />
+						<ItemPanelMember children="Call" />
+						<ItemPanelMember children="Add Note" />
+						<ItemPanelMember children="Add Friend Nickname" />
+					</>
+				}
 			</GroupPanelMember>
 			<GroupPanelMember>
 				<ItemPanelMember children="Mute" type="checkbox" />
-				<Dropdown
-					trigger="hover"
-					dismissOnClick={false}
-					renderTrigger={() => (
-						<div>
-							<ItemPanelMember children="Invite to Clan" dropdown />
-						</div>
-					)}
-					label=""
-					placement="left-start"
-					className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
-				>
-					<ItemPanelMember children="Komu" />
-					<ItemPanelMember children="Clan 1" />
-					<ItemPanelMember children="Clan 2" />
-					<ItemPanelMember children="Clan 3" />
-				</Dropdown>
-				<ItemPanelMember children="Remove Friend" />
-				<ItemPanelMember children="Block" />
+				{checkUser && 
+				<>
+					<ItemPanelMember children="Deafen" type="checkbox" />
+					<ItemPanelMember children="Edit Serve Profile" />
+					<ItemPanelMember children="Apps" />
+				</>
+				}
+				{!checkUser &&
+					<>
+						<Dropdown
+							trigger="hover"
+							dismissOnClick={false}
+							renderTrigger={() => (
+								<div>
+									<ItemPanelMember children="Invite to Clan" dropdown />
+								</div>
+							)}
+							label=""
+							placement="left-start"
+							className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
+						>
+							<ItemPanelMember children="Komu" />
+							<ItemPanelMember children="Clan 1" />
+							<ItemPanelMember children="Clan 2" />
+							<ItemPanelMember children="Clan 3" />
+						</Dropdown>
+						<ItemPanelMember children="Remove Friend" />
+						<ItemPanelMember children="Block" />
+					</>
+				}
 			</GroupPanelMember>
-			{userProfile?.user?.id === currentChannel?.creator_id && (
+			{checkCreateUser && !checkUser && (
 				<GroupPanelMember>
 					<ItemPanelMember children="Move View" />
 					<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
@@ -82,6 +100,11 @@ const PanelMember = ({ coords, member, onClose, onRemoveMember }: PanelMemberPro
 					<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
 				</GroupPanelMember>
 			)}
+			{checkUser && 
+				<GroupPanelMember>
+					<ItemPanelMember children="Roles" />
+				</GroupPanelMember>
+			}
 		</div>
 	);
 };

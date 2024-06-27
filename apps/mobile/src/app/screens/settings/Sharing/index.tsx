@@ -15,7 +15,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Wave } from 'react-native-animated-spinkit';
+import { Flow } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -246,7 +246,7 @@ export const Sharing = ({ data, onClose }) => {
 				<Text style={styles.titleHeader}>Share</Text>
 				{channelSelected ? (
 					isLoading ? (
-						<Wave size={size.s_28} color={Colors.white} />
+						<Flow size={size.s_28} color={Colors.white} />
 					) : (
 						<TouchableOpacity onPress={onSend}>
 							<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />

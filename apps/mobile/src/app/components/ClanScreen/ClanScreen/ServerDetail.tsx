@@ -1,7 +1,7 @@
 
 import { darkColor } from '../../../constants/Colors'
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 import React from 'react'
 import Images from 'apps/mobile/src/assets/Images'
 import Feather from 'react-native-vector-icons/Feather'

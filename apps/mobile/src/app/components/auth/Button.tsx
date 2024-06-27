@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
-import { Text } from '@mezon/mobile-ui';
+import { Text } from 'react-native';
 interface ButtonProps {
 	isValid: boolean;
 	onPress: () => void;

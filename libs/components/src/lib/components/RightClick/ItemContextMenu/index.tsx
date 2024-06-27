@@ -83,6 +83,7 @@ const MenuItem: React.FC<IMenuItem> = ({ item, urlData }) => {
 			deleteSendMessage(getMessageRclicked.id);
 		}
 		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
+		dispatch(rightClickAction.setVisibleOpt(false));
 	};
 
 	return (

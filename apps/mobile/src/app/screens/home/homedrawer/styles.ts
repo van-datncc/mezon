@@ -224,7 +224,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		borderBottomWidth: 0.5,
+		borderBottomWidth: 1,
 		borderBottomColor: Colors.gray48,
 		backgroundColor: Colors.secondary,
 	},
@@ -247,6 +247,7 @@ export const styles = StyleSheet.create({
 		paddingBottom: size.s_14,
 	},
 	titleThread: {
+		flex: 1,
 		fontSize: size.s_14,
 		fontWeight: '600',
 		marginLeft: size.s_6,

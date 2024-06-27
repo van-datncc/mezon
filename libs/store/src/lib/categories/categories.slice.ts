@@ -157,3 +157,5 @@ export const selectCategoryById = (id: string) => createSelector(selectCategorie
 export const selectCurrentCategory = createSelector(selectCategoriesEntities, selectCurrentCategoryId, (categoriesEntities, clanId) =>
 	clanId ? categoriesEntities[clanId] : null,
 );
+
+export const selectDefaultCategory = createSelector(selectAllCategories, categories => categories[0]);

@@ -17,12 +17,6 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	}
 
 	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-	dispatch(
-		channelsActions.setIdChannelSelected({
-			clanId: clanId || '',
-			channelId,
-		}),
-	);
 	return null;
 };
 

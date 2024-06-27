@@ -2,13 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 import { View, Text, Pressable, Image, Platform, DeviceEventEmitter } from 'react-native';
 import { styles } from './styles';
 import { Colors } from '@mezon/mobile-ui';
-import { ActionEmitEvent, ArrowLeftIcon, ChevronIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, ArrowLeftIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChannelStreamMode } from 'mezon-js';
 import ChatBox from '../../home/homedrawer/ChatBox';
 import { useSelector } from 'react-redux';
-import { clansActions, directActions, getStoreAsync, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
+import { channelMembersActions, clansActions, directActions, getStoreAsync, selectCurrentChannel, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
@@ -39,6 +39,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
     const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
     const dispatch = useAppDispatch();
     useChannelSeen(directMessageId || '');
+    const currentChannel = useSelector(selectCurrentChannel);
 
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -56,6 +57,16 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
     }
 
+    const fetchMemberChannel = useCallback(async () => {
+		await dispatch(
+			channelMembersActions.fetchChannelMembers({
+				clanId: currentChannel.clan_id || '',
+				channelId: currentChannel.channel_id || '',
+				channelType: currentChannel.type,
+			}),
+		);
+	}, [currentChannel, dispatch]);
+
     const directMessageLoader = useCallback(async () => {
         const store = await getStoreAsync();
         store.dispatch(clansActions.joinClan({ clanId: currentDmGroup.clan_id }));
@@ -68,6 +79,12 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
         );
         return null;
     }, [currentDmGroup]);
+
+    useEffect(() => {
+        return () => {
+            fetchMemberChannel();
+        }
+    }, [fetchMemberChannel])
 
     useEffect(() => {
         if (currentDmGroup?.id) {
@@ -92,7 +109,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
     return (
         <SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
             <View style={styles.headerWrapper}>
-                <Pressable onPress={() => handleBack()}>
+                <Pressable onPress={() => handleBack()} style={styles.backButton}>
                     <ArrowLeftIcon color={Colors.textGray} />
                 </Pressable>
                 <Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
