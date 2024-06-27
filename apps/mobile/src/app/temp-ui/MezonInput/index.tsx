@@ -1,10 +1,10 @@
 import { StyleProp, Text, TextInput, View, ViewStyle } from "react-native";
 import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { CloseIcon } from "@mezon/mobile-components";
 import { useRef } from "react";
 import { useState } from "react";
 import { size } from "@mezon/mobile-ui";
+import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
 
 interface IMezonInputProps {
     placeHolder?: string;
@@ -69,7 +69,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         <TouchableOpacity
                             onPress={handleClearBtn}
                             style={styles.clearBtn}>
-                            <CloseIcon height={10} width={10} color="black" />
+                            <CircleXIcon height={18} width={18} />
                         </TouchableOpacity>
                     }
                 </View>

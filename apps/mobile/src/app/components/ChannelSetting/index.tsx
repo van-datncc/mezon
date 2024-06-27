@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./styles";
 import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, UserShieldIcon, WebhookIcon } from "libs/mobile-components/src/lib/icons2";
+import MezonSlider from "../../temp-ui/MezonSlider";
 
 export default function ChannelSetting() {
     const { t } = useTranslation(['channelSetting']);
@@ -110,6 +111,12 @@ export default function ChannelSetting() {
             </View>
 
             <MezonMenu menu={topMenu} />
+
+            <MezonSlider
+                maximumValue={0}
+                minimumValue={10}
+                smoothAnimation
+                title={t('fields.channelSlowMode.title')} />
 
             <MezonOption
                 title={t('fields.channelHideInactivity.title')}
