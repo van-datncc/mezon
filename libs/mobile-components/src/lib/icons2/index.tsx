@@ -1,4 +1,4 @@
-import { ClipPath, Defs, G, Path, Svg, SvgProps } from "react-native-svg";
+import { ClipPath, Defs, G, Mask, Path, Svg, SvgProps } from "react-native-svg";
 
 export const ActivityIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
     <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
@@ -18,175 +18,6 @@ export const AnalyticIcon = ({ width, height, color = "white", ...props }: SvgPr
             clipRule="evenodd"
             d="M6 57V15a9 9 0 019-9h42a9 9 0 019 9v42a9 9 0 01-9 9H15a9 9 0 01-9-9zm48-28.77V39a3 3 0 006 0V21a3 3 0 00-3-3H39a3 3 0 000 6h10.77L34.5 39.27l-5.4-5.4a3 3 0 00-4.2 0l-12 12a3 3 0 104.2 4.26L27 40.2l5.4 5.4a3 3 0 004.2 0L54 28.2v.03z"
         />
-    </Svg>
-)
-
-export const AnnouncementsIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const AnnouncementsLockIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const AnnouncementsWarningIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const AppsIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowAngleLeftUpIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowAngleRightUpIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowLargeDownIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowLargeLeftIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowLargeRightIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowSmallDownIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowSmallUpIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ArrowsUpDownIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const AtIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const AttachmentIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const BackspaceIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const BadgeIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const BeakerIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-
-export const BicycleIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const BookCheckIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const CalendarIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const CalendarMinusIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const CalendarPlusIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const CalendarXIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const CameraIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const CameraSwapIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ChannelNotificationIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ChatAlertIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
-    </Svg>
-)
-
-export const ChatCheckIcon = ({ width, height, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-
     </Svg>
 )
 
@@ -348,30 +179,6 @@ export const NitroWheelIcon = ({ width = 24, height = 24, color = "white", ...pr
             d="M21 12a3 3 0 100 6h9a3 3 0 110 6H16.5a3 3 0 100 6H24a3 3 0 110 6h-6a3 3 0 100 6h3.75A24 24 0 1045 12H21zm24 36a12 12 0 100-24.001 12 12 0 000 24z"
         />
         <Path d="M7.5 30a3 3 0 000-6H6a3 3 0 100 6h1.5z" />
-    </Svg>
-)
-
-export const UserCircleIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-        <Path d="M36 3a33 33 0 100 66 33 33 0 000-66zm-.28 9a10.159 10.159 0 0110.54 10.32 10.271 10.271 0 11-20.53.08A10.22 10.22 0 0135.72 12zM57 52.75c-.92 1.13-1.55 2.61-3.18 3.06-1.62-1-1.45-3.32-3.57-4.32a5.93 5.93 0 00-.25 3.14c.14 4.7.14 4.69-4.31 6.46a25.998 25.998 0 01-19.92-.15c-3.87-1.54-3.93-1.75-3.83-5.83V51.5c-2.26.66-2.19 2.93-3.61 4.36-2.43-.86-3.33-3.34-4.89-5.14-1-1.15-.24-2.16.47-3.13 6.4-8.6 15-12.57 25.6-11.31A25.552 25.552 0 0157.2 46.46c2.37 3.09 2.4 3.11-.2 6.29z" />
-    </Svg>
-)
-
-export const UserCircleOnlineIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
-        <G clipPath="url(#clip0_27_154)">
-            <Path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M69 37.14c-.06 1.14-1.35 1.74-2.34 1.2a20.909 20.909 0 00-18.81-.24 1.621 1.621 0 01-1.32 0 26.91 26.91 0 00-33.48 10.65c-.3.45-.3 1.05 0 1.5 1.11 1.74 2.4 3.39 3.84 4.83.72.72 1.92.45 2.4-.45.57-1.14 1.17-2.19 1.74-3.06.42-.63 1.29-.3 1.2.45l-.57 5.88c-.06.57.21 1.11.69 1.41A26.88 26.88 0 0036 63a1.2 1.2 0 011.14.81c.3.99.75 1.95 1.2 2.85.54 1.02-.06 2.28-1.2 2.31L36 69a33.001 33.001 0 1133-31.86zM46.5 22.5a10.5 10.5 0 11-20.999 0 10.5 10.5 0 0121 0z"
-            />
-            <Path d="M72 57a15 15 0 11-30 0 15 15 0 0130 0z" />
-        </G>
-        <Defs>
-            <ClipPath id="clip0_27_154">
-                <Path fill="#fff" d="M0 0H72V72H0z" />
-            </ClipPath>
-        </Defs>
     </Svg>
 )
 
@@ -826,5 +633,171 @@ export const LinkIcon = ({ width = 24, height = 24, color = "white", ...props }:
 export const HammerIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
     <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
         <Path d="M3.69 63.39a3 3 0 010-4.23l22.44-22.41c.6-.6 1.53-.6 2.1 0l6.39 6.36c.6.6.6 1.5 0 2.1L12.18 67.65a3 3 0 01-4.23 0l-4.26-4.26zm19.59-40.11l25.44 25.47a6 6 0 008.49 0l10.62-10.62a6 6 0 000-8.49l-8.82-8.82 1.95-1.98a3 3 0 000-4.2l-4.23-4.26a3 3 0 00-4.23 0l-1.98 1.95-8.16-8.13a6 6 0 00-8.49 0L23.28 14.79a6.001 6.001 0 000 8.49z" />
+    </Svg>
+)
+
+export const CalendarIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M21 3a3 3 0 013 3v2.25c0 .42.33.75.75.75h22.5c.42 0 .75-.33.75-.75V6a3 3 0 016 0v2.25c0 .42.33.75.75.75H57a9 9 0 019 9 3 3 0 01-3 3H9a3 3 0 01-3-3 9 9 0 019-9h2.25c.42 0 .75-.33.75-.75V6a3 3 0 013-3z" />
+        <Path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M6 30a3 3 0 013-3h54a3 3 0 013 3v27a9 9 0 01-9 9H15a9 9 0 01-9-9V30zm10.5 6a1.5 1.5 0 00-1.5 1.5v9c0 .84.66 1.5 1.5 1.5h9a1.5 1.5 0 001.5-1.5v-9a1.5 1.5 0 00-1.5-1.5h-9z"
+        />
+    </Svg>
+)
+
+export const EyeIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M68.43 34.66C65 21.13 49.61 9.3 35.63 9.39 22.1 9.48 6.39 21.86 3.41 34.82a5.14 5.14 0 00.08 2.37C7 50.58 22.2 62.43 35.81 62.47c13.61.04 29.77-12.4 32.7-25.47a5.32 5.32 0 00-.08-2.34zm-6.71 2.82c-3.28 10-15.32 19-25.62 19.08-10.3.08-23.1-9.46-25.96-19.3a4.65 4.65 0 01.57-3.74c5.54-10.18 12.87-18.3 25.63-18.11 12.49.18 19.63 8.27 25 18.31a4.47 4.47 0 01.38 3.76z" />
+        <Path d="M36.07 27.52c-.45 5.26 3.44 9.05 9.08 8 3.31-.59 2.92.89 2.59 2.78-1 5.41-6.52 9.61-12.31 9.37A12 12 0 0124 36.78a12.09 12.09 0 019.19-12.39c2.81-.62 3.17-.26 2.88 3.13z" />
+    </Svg>
+)
+
+export const PlusLargeIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M33.05 52.11c0-3.51-.1-7 0-10.52.08-2-.62-2.59-2.57-2.56-6.17.11-12.34 0-18.51 0A23.856 23.856 0 018.51 39a2.66 2.66 0 01-2.43-2.72 2.74 2.74 0 012.58-3.1c.997-.102 2-.13 3-.08h17c4.83 0 4.38.48 4.39-4.16v-17a18.436 18.436 0 01.14-3.49A2.68 2.68 0 0136 6a2.7 2.7 0 012.9 2.23c.17 1.155.22 2.325.15 3.49 0 6.18.1 12.36 0 18.54 0 2.21.67 2.85 2.83 2.81 6.17-.13 12.34-.05 18.51 0a15.58 15.58 0 013.49.16A2.69 2.69 0 0166 36.14a2.72 2.72 0 01-2.35 2.8 15.66 15.66 0 01-3 .13h-17c-5.12 0-4.61-.63-4.63 4.41v16c0 1 .06 2 0 3-.19 2.5-1.29 3.75-3.19 3.55-1.9-.2-2.8-1.53-2.8-3.45V52.06l.02.05z" />
+    </Svg>
+)
+
+export const ChannelNotificationIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M36.15 6.25c6.48 0 13-.06 19.44 0 6.73.08 10.06 3.43 10.14 10.17.07 5.48.06 11 0 16.45 0 4.13-.18 4.18-4.33 3.4-9.25-1.75-17.86 2-22.64 9.9a21 21 0 00-2.53 15.34c.8 4.12.77 4.18-3.47 4.22-5.65.06-11.31.1-16.95 0-5.88-.12-9.47-3.49-9.53-9.24-.127-13.62-.127-27.247 0-40.88 0-5.78 3.61-9.22 9.43-9.33 6.81-.13 13.63-.03 20.44-.03z" />
+        <Path d="M71.72 57.17a14.76 14.76 0 11-14.31-15 15 15 0 0114.31 15z" />
+    </Svg>
+)
+
+export const IDIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M45.9 42.45c-1.38 1.35-3.24 2.01-5.58 2.01h-4.17V26.61h4.17c2.34 0 4.2.66 5.58 2.01 1.38 1.35 2.04 3.66 2.04 6.93 0 3.3-.66 5.58-2.04 6.93v-.03z" />
+        <Path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M15 5.01a9 9 0 00-9 9v42a9 9 0 009 9h42a9 9 0 009-9v-42a9 9 0 00-9-9H15zm3 45h6.12V21.03H18v28.98zm12-28.98v28.98h10.32c4.38 0 7.8-1.26 10.14-3.75 2.4-2.49 3.6-6.06 3.6-10.74 0-4.68-1.2-8.25-3.6-10.74-2.37-2.49-5.76-3.75-10.14-3.75H30z"
+        />
+    </Svg>
+)
+
+export const UserIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M36 30a12 12 0 100-24 12 12 0 000 24zm-1.41 3A28.59 28.59 0 006 61.59C6 64.02 7.98 66 10.41 66h.66c.72 0 1.32-.51 1.5-1.2.87-3.36 2.52-6.51 3.96-8.73.42-.63 1.29-.3 1.2.45l-.78 7.83c-.06.9.6 1.65 1.5 1.65h35.1a1.499 1.499 0 001.5-1.65l-.81-7.8c-.06-.78.81-1.11 1.23-.48 1.44 2.22 3.09 5.4 3.96 8.7.18.72.78 1.23 1.5 1.23h.66c2.43 0 4.41-1.98 4.41-4.41A28.59 28.59 0 0037.41 33h-2.82z" />
+    </Svg>
+)
+
+export const UserBoxIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M66.12 16.14C66.09 9.36 62.74 6 56 5.93c-6.5-.06-13 0-19.51 0h-20C9.35 6 6 9.23 6 16.29c-.047 13.14-.047 26.3 0 39.48C6 62.56 9.39 65.94 16.12 66c13.18.06 26.357.06 39.53 0 7.13 0 10.44-3.3 10.47-10.36.047-13.173.047-26.34 0-39.5zm-39.05 7.32A9.22 9.22 0 0136.42 15 9.16 9.16 0 0145 24.17a9.16 9.16 0 01-9 8.75 9.192 9.192 0 01-8.93-9.46zM53.86 54.2a3.37 3.37 0 01-3.21 2.68c-1.51.06-1.71-1.34-2.16-2.38-.8-1.87-.74-4.2-2.81-5.53-.24.42-.51.65-.52.91-.54 7.1-.53 7.1-7.89 7.1h-.5c-2.82-.08-5.94.58-8.39-.42-3.05-1.24-.25-5.14-2-7.68-1.9 1.55-2 3.8-2.77 5.7-.43 1.05-.68 2.38-2.21 2.3a3.56 3.56 0 01-3-2.29 6.36 6.36 0 01-.11-3.93A17.79 17.79 0 0136.36 36a17.73 17.73 0 0117.5 14.79 8.363 8.363 0 010 3.41z" />
+    </Svg>
+)
+export const UserCircleIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M36 3a33 33 0 100 66 33 33 0 000-66zm-.28 9a10.159 10.159 0 0110.54 10.32 10.271 10.271 0 11-20.53.08A10.22 10.22 0 0135.72 12zM57 52.75c-.92 1.13-1.55 2.61-3.18 3.06-1.62-1-1.45-3.32-3.57-4.32a5.93 5.93 0 00-.25 3.14c.14 4.7.14 4.69-4.31 6.46a25.998 25.998 0 01-19.92-.15c-3.87-1.54-3.93-1.75-3.83-5.83V51.5c-2.26.66-2.19 2.93-3.61 4.36-2.43-.86-3.33-3.34-4.89-5.14-1-1.15-.24-2.16.47-3.13 6.4-8.6 15-12.57 25.6-11.31A25.552 25.552 0 0157.2 46.46c2.37 3.09 2.4 3.11-.2 6.29z" />
+    </Svg>
+)
+
+export const UserCircleOnlineIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <G clipPath="url(#clip0_27_154)">
+            <Path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M69 37.14c-.06 1.14-1.35 1.74-2.34 1.2a20.909 20.909 0 00-18.81-.24 1.621 1.621 0 01-1.32 0 26.91 26.91 0 00-33.48 10.65c-.3.45-.3 1.05 0 1.5 1.11 1.74 2.4 3.39 3.84 4.83.72.72 1.92.45 2.4-.45.57-1.14 1.17-2.19 1.74-3.06.42-.63 1.29-.3 1.2.45l-.57 5.88c-.06.57.21 1.11.69 1.41A26.88 26.88 0 0036 63a1.2 1.2 0 011.14.81c.3.99.75 1.95 1.2 2.85.54 1.02-.06 2.28-1.2 2.31L36 69a33.001 33.001 0 1133-31.86zM46.5 22.5a10.5 10.5 0 11-20.999 0 10.5 10.5 0 0121 0z"
+            />
+            <Path d="M72 57a15 15 0 11-30 0 15 15 0 0130 0z" />
+        </G>
+        <Defs>
+            <ClipPath id="clip0_27_154">
+                <Path fill="#fff" d="M0 0H72V72H0z" />
+            </ClipPath>
+        </Defs>
+    </Svg>
+)
+
+export const UserMinusIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M34.59 33A28.59 28.59 0 006 61.59C6 64.02 7.98 66 10.41 66h.66c.72 0 1.32-.51 1.5-1.2.87-3.36 2.52-6.51 3.96-8.73.42-.63 1.29-.3 1.2.45l-.75 7.83c-.09.9.6 1.65 1.5 1.65h22.89c.36 0 .51-.93.18-1.08C38.46 63.42 36 60.66 36 57a9 9 0 019-9h15.06c1.14 0 1.83-1.2 1.2-2.16A28.56 28.56 0 0037.41 33h-2.82zM36 30a12 12 0 100-24 12 12 0 000 24z" />
+        <Path d="M45 54a3 3 0 000 6h24a3 3 0 000-6H45z" />
+    </Svg>
+)
+
+export const UserPlayIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M36 30a12 12 0 100-24.001 12 12 0 000 24zm-1.41 3A28.59 28.59 0 006 61.59C6 64.02 7.98 66 10.41 66h.66c.72 0 1.32-.51 1.5-1.2.87-3.36 2.52-6.51 3.96-8.73.42-.63 1.29-.3 1.2.45l-.78 7.83c-.06.9.6 1.65 1.5 1.65h17.19c1.11 0 1.83-1.14 1.5-2.19a21 21 0 0110.95-25.83c1.2-.6 1.38-2.34.15-2.85A28.5 28.5 0 0037.41 33h-2.82z" />
+        <Path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M72 57a15 15 0 11-30 0 15 15 0 0130 0zm-8.31-.6l-9.99-7.5a.75.75 0 00-1.2.6v15c0 .6.72.96 1.2.6l9.99-7.5c.42-.3.42-.9 0-1.2z"
+        />
+    </Svg>
+)
+
+export const UserPlusIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <G clipPath="url(#clip0_27_163)">
+            <Mask
+                id="a"
+                maskUnits="userSpaceOnUse"
+                x={0}
+                y={0}
+                width={72}
+                height={72}
+            >
+                <Path d="M72 72H0V0h72v72z" fill="#fff" />
+            </Mask>
+            <G mask="url(#a)">
+                <Path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M57 42a3 3 0 013 3v9h9a3 3 0 010 6h-9v9a3 3 0 01-6 0v-9h-9a3 3 0 010-6h9v-9a3 3 0 013-3zm-6.516-3.21c.777-.813.777-2.238-.231-2.745A28.482 28.482 0 0037.401 33h-2.802A28.599 28.599 0 006 61.599 4.402 4.402 0 0010.401 66h.66c.72 0 1.335-.51 1.512-1.209.798-3.114 2.301-6.078 3.663-8.265.417-.666 1.314-.273 1.161.498l-1.44 7.182A1.498 1.498 0 0017.427 66h24.06c.81 0 1.122-1.251.435-1.68C39.315 62.688 36 60.018 36 57a9 9 0 019-9h1.5a1.5 1.5 0 001.5-1.5V45c0-2.406.945-4.59 2.484-6.21zM36 30a12 12 0 100-24 12 12 0 000 24z"
+                />
+            </G>
+        </G>
+        <Defs>
+            <ClipPath id="clip0_27_163">
+                <Path fill="#fff" d="M0 0H72V72H0z" />
+            </ClipPath>
+        </Defs>
+    </Svg>
+)
+
+export const UserShieldIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M36 30c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12s-12 5.372-12 12c0 6.627 5.373 12 12 12zM34.547 33c-15.795 0-28.6 12.804-28.6 28.6a4.4 4.4 0 004.4 4.4h.662c.72 0 1.333-.513 1.511-1.21.856-3.338 2.522-6.507 3.958-8.727.405-.627 1.291-.283 1.217.46l-.783 7.827A1.5 1.5 0 0018.405 66H45.72c-1.846-3.527-1.864-7.535-2.022-8.73v-2.971c0-1.16.598-3.656 2.25-4.957 1.268-.998 3.139-2.193 4.412-3.006-.457.264.678-.432 0 0 .897-.58 2.76-1.74 3.744-2.303 1.705-.896 2.426-1.283 4.764-1.283C55.16 38.162 47.196 33 37.347 33h-2.8z" />
+        <Path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M49.665 52.015a3.01 3.01 0 00-1.44 2.567v2.596c0 6.35 3.74 12.104 9.542 14.683.415.185.89.185 1.305 0a16.068 16.068 0 009.542-14.683v-2.596a3.01 3.01 0 00-1.44-2.567l-6.982-4.267a3.397 3.397 0 00-3.545 0l-6.982 4.267zm1.958 2.785l6.797-4.153v9.044h-6.546a12.684 12.684 0 01-.25-2.513v-2.377zm6.797 13.605V59.69h6.545a12.674 12.674 0 01-6.546 8.713z"
+        />
+    </Svg>
+)
+
+export const UserWarningIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <G clipPath="url(#clip0_27_179)">
+            <Path d="M34.435 28.174c6.915 0 12.521-5.606 12.521-12.522 0-6.915-5.606-12.522-12.521-12.522-6.916 0-12.522 5.607-12.522 12.522 0 6.916 5.606 12.522 12.522 12.522zM32.813 31.304c-16.482 0-29.843 13.362-29.843 29.844a4.591 4.591 0 004.59 4.591h.692c.75 0 1.39-.535 1.577-1.261.893-3.484 2.63-6.791 4.129-9.107.423-.655 1.348-.296 1.27.48l-.817 8.167a1.565 1.565 0 001.558 1.721h18.405c0-3.13 1.54-4.867 3.142-7.826l6.31-10.969s3.485-6.31 4.757-8.23c1.038-1.38 2.49-2.51 3.07-2.714-3.131-3.13-10.066-4.696-15.918-4.696h-2.922z" />
+            <Path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M59.199 42.659c-1.236-2.154-4.466-2.154-5.703 0l-12.393 21.59c-1.193 2.078.376 4.62 2.851 4.62h24.787c2.475 0 4.044-2.542 2.852-4.62L59.199 42.66zm-1.456 5.863h-2.79c-.928 0-1.653.803-1.557 1.726l.652 6.314c.052.5.554.818 1.045.712a6.013 6.013 0 011.255-.144c.429 0 .858.059 1.254.144.491.106.994-.213 1.046-.712l.652-6.314a1.565 1.565 0 00-1.557-1.726zm1.735 14.087a3.13 3.13 0 11-6.26 0 3.13 3.13 0 016.26 0z"
+            />
+        </G>
+        <Defs>
+            <ClipPath id="clip0_27_179">
+                <Path fill="#fff" d="M0 0H72V72H0z" />
+            </ClipPath>
+        </Defs>
+    </Svg>
+)
+
+export const StarIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M32.827 10.747c1.013-3.067 5.333-3.067 6.346 0l5.04 15.546h16.32c3.2 0 4.56 4.107 1.947 6l-13.2 9.6 5.067 15.52a3.333 3.333 0 01-5.147 3.734l-13.2-9.6-13.2 9.6c-2.613 1.866-6.133-.667-5.12-3.734l5.04-15.52-13.2-9.6a3.333 3.333 0 011.947-6h16.32l5.066-15.546h-.026z" />
+    </Svg>
+)
+export const CopyIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
+        <Path d="M9 47.999a3 3 0 01-3-3v-15a24 24 0 0124-24h15a3 3 0 013 3v1.5a1.5 1.5 0 01-1.5 1.5H30a18 18 0 00-18 18v16.5a1.5 1.5 0 01-1.5 1.5H9z" />
+        <Path d="M18 54a12 12 0 0012 12h24a12 12 0 0012-12V42h-9a15 15 0 01-15-15v-9H30a12 12 0 00-12 12v24z" />
+        <Path d="M65.19 36a8.999 8.999 0 00-1.8-2.64L50.64 20.64A8.997 8.997 0 0048 18.81V27a9 9 0 009 9h8.19z" />
     </Svg>
 )

@@ -20,8 +20,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDataReferences,
-	selectDirectById,
-	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
 	selectMessageByMessageId,
 	selectOpenEditMessageState,
@@ -33,7 +31,6 @@ import {
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
@@ -41,6 +38,7 @@ import {
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
+	RightClickPos,
 	SubPanelName,
 	ThreadValue,
 	UserMentionsOpt,
@@ -51,6 +49,7 @@ import {
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
+import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -138,23 +137,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
-
-	useEffect(() => {
-		if (getRefMessageReply && getRefMessageReply.attachments) {
-			dispatch(
-				referencesActions.setDataReferences([
-					{
-						message_id: '',
-						message_ref_id: getRefMessageReply.id,
-						ref_type: 0,
-						message_sender_id: getRefMessageReply.sender_id,
-						content: JSON.stringify(getRefMessageReply.content),
-						has_attachment: getRefMessageReply.attachments?.length > 0,
-					},
-				]),
-			);
-		}
-	}, [getRefMessageReply]);
 
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey } = event;
@@ -270,6 +252,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
+			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
+			dispatch(rightClickAction.setVisibleOpt(false));
 		},
 		[
 			valueTextInput,
@@ -374,14 +358,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	useEffect(() => {
-		if (closeMenu && statusMenu) {
-			return;
-		}
-		if ((getRefMessageReply !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
-			return focusToElement(editorRef);
-		}
-	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
 
 	const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
@@ -394,10 +370,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		});
 		return result;
 	};
-
-	useEffect(() => {
-		handleEventAfterEmojiPicked();
-	}, [emojiPicked, addEmojiState]);
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
@@ -415,18 +387,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
+			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
+			dispatch(rightClickAction.setVisibleOpt(false));
 		}
 	};
 
-	useEffect(() => {
-		if (currentChannelId && valueTextInput) {
-			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
-			setContent(convertedHashtag);
-			focusToElement(editorRef);
-		}
-	}, [currentChannelId, valueTextInput]);
-
-	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 	const appearanceTheme = useSelector(selectTheme);
 
 	const handleSearchUserMention = (search: any, callback: any) => {
@@ -439,15 +404,58 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
 
+	const handleFocusEditor = () => {
+		dispatch(rightClickAction.setVisibleOpt(false));
+		dispatch(rightClickAction.setPosClickActive(SubPanelName.NONE));
+	};
+
+	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
+
+	useEffect(() => {
+		if (closeMenu && statusMenu) {
+			return;
+		}
+		if ((getRefMessageReply !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
+			return focusToElement(editorRef);
+		}
+	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
+
+	useEffect(() => {
+		handleEventAfterEmojiPicked();
+	}, [emojiPicked, addEmojiState]);
+
+	useEffect(() => {
+		if (getRefMessageReply && getRefMessageReply.attachments) {
+			dispatch(
+				referencesActions.setDataReferences([
+					{
+						message_id: '',
+						message_ref_id: getRefMessageReply.id,
+						ref_type: 0,
+						message_sender_id: getRefMessageReply.sender_id,
+						content: JSON.stringify(getRefMessageReply.content),
+						has_attachment: getRefMessageReply.attachments?.length > 0,
+					},
+				]),
+			);
+		}
+	}, [getRefMessageReply]);
+
+	useEffect(() => {
+		if (currentChannelId && valueTextInput) {
+			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
+			setContent(convertedHashtag);
+			focusToElement(editorRef);
+		}
+	}, [currentChannelId, valueTextInput]);
+
 	useEffect(() => {
 		if (props.finishUpload) {
 			editorRef.current?.focus();
 			props.onFinishUpload?.();
 		}
 	}, [props, props.finishUpload]);
-	const directId = useSelector(selectDmGroupCurrentId);
-	const direct = useSelector(selectDirectById(directId || ''));
-	const mezon = useMezon();
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -493,6 +501,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
+				onFocus={handleFocusEditor}
 			>
 				<Mention
 					appendSpaceOnAdd={true}

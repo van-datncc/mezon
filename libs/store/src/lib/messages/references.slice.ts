@@ -22,7 +22,6 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefReply: string;
 	idMessageRefReaction: string;
 	idMessageRefEdit: string;
-	idMessageRefOption: string;
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
 }
@@ -44,7 +43,6 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefReply: '',
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
-	idMessageRefOption: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
 });
@@ -92,9 +90,6 @@ export const referencesSlice = createSlice({
 		setIdReferenceMessageEdit(state, action) {
 			state.idMessageRefEdit = action.payload;
 		},
-		setIdReferenceMessageOption(state, action) {
-			state.idMessageRefOption = action.payload;
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -139,8 +134,6 @@ export const selectIdMessageRefReaction = createSelector(getReferencesState, (st
 export const selectIdMessageToJump = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageToJump);
 
 export const selectIdMessageRefEdit = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefEdit);
-
-export const selectIdMessageRefOption = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefOption);
 
 export const selectStatusLoadingAttachment = createSelector(getReferencesState, (state: ReferencesState) => state.statusLoadingAttachment);
 

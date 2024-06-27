@@ -1,4 +1,4 @@
-import { useAuth, useClans, useRightClick } from '@mezon/core';
+import { useAuth, useClanRestriction, useRightClick } from '@mezon/core';
 import { selectMessageByMessageId, selectPinMessageByChannelId } from '@mezon/store';
 import {
 	deleteMessageList,
@@ -14,11 +14,12 @@ import {
 	unPinMessageList,
 	viewReactionList,
 } from '@mezon/ui';
-import { RightClickPos } from '@mezon/utils';
+import { EPermission, RightClickPos } from '@mezon/utils';
 import { selectPosClickingActive, selectReactionOnMessageList } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MenuItem from '../ItemContextMenu';
+import ReactionPart from '../ReactionPart';
 interface IContextMenuProps {
 	urlData: string;
 }
@@ -39,7 +40,6 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 	const listPinMessages = useSelector(selectPinMessageByChannelId(getMessageRclicked.channel_id));
 	const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === getMessageRclicked.id);
 	const messageRClicked = useSelector(selectMessageByMessageId(getMessageIdRightClicked));
-	const { currentClan } = useClans();
 	const { userId } = useAuth();
 	const [listTextToMatch, setListTextToMatch] = useState<any[]>(listClickDefault);
 	const getListReactionMessageId = useSelector(selectReactionOnMessageList);
@@ -57,14 +57,16 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 		}
 	}, [getListReactionMessageId]);
 
+	const [hasDeleteMessagePermision, { isClanCreator }] = useClanRestriction([EPermission.deleteMessage]);
+	const emojiList = [':anhan:', , ':100:', ':rofl:', ':verify:'];
+
 	useLayoutEffect(() => {
 		if (messageRClicked) {
-			const checkOwnerClan = currentClan?.creator_id === userId;
 			const checkOwnerMessage = messageRClicked?.sender_id === userId;
 			const checkMessHasReaction = messageRClicked?.reactions && messageRClicked?.reactions?.length > 0;
 			const checkMessHasText = messageRClicked?.content.t !== '';
 
-			if (checkOwnerClan) {
+			if (isClanCreator) {
 				let combineOwnerClan: any[] = [];
 				if (messageExists) {
 					combineOwnerClan = [...listClickDefault, ...unPinMessageList];
@@ -114,7 +116,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 						}
 					}
 				}
-			} else if (!checkOwnerClan) {
+			} else if (!isClanCreator) {
 				const combineNoOwnerClan = [...listClickDefault];
 				setListTextToMatch(combineNoOwnerClan);
 				if (checkOwnerMessage) {
@@ -136,7 +138,13 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 						}
 					}
 				} else if (!checkOwnerMessage) {
-					const combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
+					let combineNoOwnerMessage: any[] = [];
+					if (hasDeleteMessagePermision) {
+						combineNoOwnerMessage = [...listClickDefault, ...reportMessageList, ...deleteMessageList];
+					} else {
+						combineNoOwnerMessage = [...listClickDefault, ...reportMessageList];
+					}
+
 					setListTextToMatch(combineNoOwnerMessage);
 					if (checkMessHasReaction || checkReactionRealtime) {
 						const combineHasReaction = [...combineNoOwnerMessage, ...viewReactionList];
@@ -156,7 +164,7 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 				}
 			}
 		}
-	}, [messageRClicked, messageExists, checkReactionRealtime]);
+	}, [messageRClicked, messageExists, checkReactionRealtime, hasDeleteMessagePermision]);
 
 	useLayoutEffect(() => {
 		const menuRefHeight = menuRef.current?.getBoundingClientRect().height || 0;
@@ -195,13 +203,13 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ urlData }) => {
 	function sortListById(arrayList: any[]) {
 		return arrayList.sort((a, b) => a.id - b.id);
 	}
-
 	return (
 		<div
 			ref={menuRef}
-			className="fixed h-fit flex flex-col bg-[#111214] rounded z-40 w-[12rem] p-2"
+			className="fixed h-fit flex flex-col dark:bg-[#111214] bg-[#FFFFFF] shadow-lg rounded z-40 w-[12rem] p-2"
 			style={{ top: topMenu, bottom: bottomMenu, left: leftMenu, right: rightMenu }}
 		>
+			<ReactionPart emojiList={emojiList} />
 			{sortListById(listTextToMatch)?.map((item: any) => {
 				return <MenuItem urlData={urlData} item={item} key={item.name} />;
 			})}
