@@ -124,14 +124,16 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
-		const idx = data.findLastIndex((id) => id === channel?.last_seen_message?.id);
-		console.log(idx - 1);
-
-		if (idx !== -1 && idx - 1 >= 0) {
-			setNewMessageID(data[idx - 1]);
-		}
 		return data.reverse();
 	}, [messages]);
+
+	useEffect(() => {
+		const idx = messages.findLastIndex((id) => id === channel?.last_seen_message?.id);
+
+		if (idx !== -1 && idx - 1 >= 0) {
+			setNewMessageID(messages[idx - 1]);
+		}
+	}, [messages])
 
 	const onImageModalChange = useCallback(
 		(idx: number) => {
