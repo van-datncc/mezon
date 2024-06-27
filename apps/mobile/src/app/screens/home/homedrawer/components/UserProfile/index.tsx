@@ -1,7 +1,7 @@
 import { useAuth, useDirect, useMemberStatus, useRoles } from '@mezon/core';
 import { CallIcon, CloseIcon, MessageIcon, VideoIcon } from '@mezon/mobile-components';
 import { Metrics, size } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectCurrentChannelId, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
@@ -27,7 +27,7 @@ const UserProfile = React.memo(({ userId, user, onClose }: userProfileProps) => 
 	const { t } = useTranslation(['userProfile']);
 	const userById = useSelector(selectMemberByUserId(userId ?? ''));
 	const userStatus = useMemberStatus(userId || user?.id);
-	const { RolesClan } = useRoles(currentChannelId || '');
+	const RolesClan = useSelector(selectAllRolesClan);
 	const { color } = useMixImageColor(userById?.user?.avatar_url || userProfile?.user?.avatar_url);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
