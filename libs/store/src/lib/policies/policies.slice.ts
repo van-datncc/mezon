@@ -1,10 +1,10 @@
 import { ApiPermission } from 'mezon-js/api.gen';
 import { IPermissionUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { ThunkConfigWithError } from '../errors';
 import { withError } from '../errors/helpers';
-
+import memoize from 'memoizee';
 export const POLICIES_FEATURE_KEY = 'policies';
 
 /*
@@ -40,12 +40,24 @@ export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPa
 	}
 	return response.permissions.map(mapPermissionUserToEntity);
 });
+const LIST_PERMISSION_CACHED_TIME = 1000 * 60 * 3;
+export const fetchPermissionCached = memoize(
+	(mezon: MezonValueContext) =>
+		mezon.client.getListPermission(mezon.session),
+	{
+		promise: true,
+		maxAge: LIST_PERMISSION_CACHED_TIME,
+		normalizer: (args) => {
+			return args[0].session.username ?? '';
+		},
+	},
+);
 
 export const fetchPermission = createAsyncThunk(
 	'policies/fetchPermission',
 	async (_,thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.getListPermission(mezon.session);
+		const response = await fetchPermissionCached(mezon);
 		if (!response.permissions) {
 			return [];
 		}
