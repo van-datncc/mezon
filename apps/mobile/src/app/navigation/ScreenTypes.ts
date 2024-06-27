@@ -168,17 +168,16 @@ type AppStackParamList = {
   [APP_SCREEN.SETTINGS.STACK]: NavigatorScreenParams<SettingStackParamList>,
 }
 
-type CustomStackScreenProps<
-  U extends ParamListBase,
-  T extends keyof U = string
-> = CompositeScreenProps<
-  // NativeStackScreenProps<U, T>,
-  NativeStackScreenProps<U>,
-  AppStackScreenProps<keyof AppStackParamList>
->;
-
 export type AppStackScreenProps<T extends keyof AppStackParamList = typeof APP_SCREEN.HOME> = StackScreenProps<AppStackParamList, T>;
 
-export type MenuClanScreenProps<T extends keyof MenuClanStackParamList> = CustomStackScreenProps<MenuClanStackParamList, T>
+export type MenuClanScreenProps<T extends keyof MenuClanStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<MenuClanStackParamList, T>,
+    AppStackScreenProps<keyof AppStackParamList>
+  >;
 
-export type MenuChannelScreenProps<T extends keyof MenuChannelStackParamList> = CustomStackScreenProps<MenuChannelStackParamList, T>
+export type MenuChannelScreenProps<T extends keyof MenuChannelStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<MenuChannelStackParamList, T>,
+    AppStackScreenProps<keyof AppStackParamList>
+  >;

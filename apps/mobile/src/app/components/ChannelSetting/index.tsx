@@ -1,13 +1,23 @@
 import { ScrollView, View } from "react-native";
-import { IMezonMenuItemProps, IMezonMenuSectionProps, IMzoneOptionData, MezonInput, MezonMenu, MezonOption } from "../../temp-ui";
+import { IMezonMenuItemProps, IMezonMenuSectionProps, IMzoneOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from "../../temp-ui";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./styles";
 import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, UserShieldIcon, WebhookIcon } from "libs/mobile-components/src/lib/icons2";
-import MezonSlider from "../../temp-ui/MezonSlider";
+import MezonSlider, { IMezonSliderData } from "../../temp-ui/MezonSlider";
+import { channelsActions, selectChannelById, useAppDispatch } from "@mezon/store-mobile";
+import { APP_SCREEN, MenuChannelScreenProps } from "../../navigation/ScreenTypes";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
-export default function ChannelSetting() {
+type ScreenChannelSetting = typeof APP_SCREEN.MENU_CHANNEL.SETTINGS;
+export default function ChannelSetting({ navigation, route }: MenuChannelScreenProps<ScreenChannelSetting>) {
+    const { channelId } = route.params;
     const { t } = useTranslation(['channelSetting']);
+    const dispatch = useAppDispatch();
+    const channel = useSelector(selectChannelById(channelId || ""));
+
+    const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
 
     const categoryMenu = useMemo(() => ([
         {
@@ -55,6 +65,7 @@ export default function ChannelSetting() {
         {
             title: t('fields.channelDelete.delete'),
             textStyle: { color: "red" },
+            onPress: () => handlePressDeleteChannel(),
             icon: <TrashIcon color="red" />
         },
     ]) satisfies IMezonMenuItemProps[], [])
@@ -95,6 +106,86 @@ export default function ChannelSetting() {
         },
     ]) satisfies IMzoneOptionData, [])
 
+    const slowModeOptions = useMemo(() => ([
+        {
+            value: 0,
+            name: t('fields.channelSlowMode.slowModeOff')
+        },
+        {
+            value: 1,
+            name: t('fields.channelSlowMode._5seconds')
+        },
+        {
+            value: 2,
+            name: t('fields.channelSlowMode._10seconds')
+        },
+        {
+            value: 3,
+            name: t('fields.channelSlowMode._15seconds')
+        },
+        {
+            value: 4,
+            name: t('fields.channelSlowMode._30seconds')
+        },
+        {
+            value: 5,
+            name: t('fields.channelSlowMode._1minute')
+        },
+        {
+            value: 6,
+            name: t('fields.channelSlowMode._1minute')
+        },
+        {
+            value: 7,
+            name: t('fields.channelSlowMode._2minutes')
+        },
+        {
+            value: 8,
+            name: t('fields.channelSlowMode._5minutes')
+        },
+        {
+            value: 9,
+            name: t('fields.channelSlowMode._10minutes')
+        },
+        {
+            value: 10,
+            name: t('fields.channelSlowMode._15minutes')
+        },
+        {
+            value: 11,
+            name: t('fields.channelSlowMode._30minutes')
+        },
+        {
+            value: 12,
+            name: t('fields.channelSlowMode._1hour')
+        },
+        {
+            value: 13,
+            name: t('fields.channelSlowMode._2hours')
+        },
+        {
+            value: 14,
+            name: t('fields.channelSlowMode._6hours')
+        },
+    ]) satisfies IMezonSliderData, [])
+
+    const handleDeleteChannel = async () => {
+        await dispatch(channelsActions.deleteChannel({
+            channelId: channel?.channel_id,
+            clanId: channel?.clan_id
+        }));
+
+        navigation.navigate(APP_SCREEN.HOME);
+    };
+
+    const handleDeleteModalVisibleChange = (visible: boolean) => {
+        setIsVisibleDeleteChannelModal(visible);
+    }
+
+    const handlePressDeleteChannel = () => {
+        setIsVisibleDeleteChannelModal(true);
+    }
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.inputWrapper}>
@@ -113,9 +204,7 @@ export default function ChannelSetting() {
             <MezonMenu menu={topMenu} />
 
             <MezonSlider
-                maximumValue={0}
-                minimumValue={10}
-                smoothAnimation
+                data={slowModeOptions}
                 title={t('fields.channelSlowMode.title')} />
 
             <MezonOption
@@ -125,6 +214,17 @@ export default function ChannelSetting() {
             />
 
             <MezonMenu menu={bottomMenu} />
+
+            {/* <MezonConfirm
+                visible={isVisibleDeleteChannelModal}
+                onVisibleChange={handleDeleteModalVisibleChange}
+                onConfirm={handleDeleteChannel}
+                title={t('confirm.delete.title')}
+                confirmText={t('confirm.delete.confirmText')}
+                content={t('confirm.delete.content', {
+                    channelName: channel?.channel_label
+                })}
+            /> */}
         </ScrollView>
     )
 }

@@ -82,12 +82,12 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
             title: t('menu.organizationMenu.edit'),
             onPress: () => {
                 dismiss();
-                navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-                    screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
-                    params: {
-                        channelId: channel?.channel_id
-                    }
-                });
+                // navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+                //     screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
+                //     params: {
+                //         channelId: channel?.channel_id
+                //     }
+                // });
             },
             icon: <SettingsIcon />
         },

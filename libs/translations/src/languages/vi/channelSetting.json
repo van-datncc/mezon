@@ -23,7 +23,20 @@
         },
         "channelSlowMode": {
             "title": "Slowmode Cooldown",
-            "description": "Thành viên sẽ bị hạn chế chỉ gửi được một tin nhắn và tạo một chuỗi theo khoảng thời gian này, trừ khi họ có quyền Quản lý kênh hoặc Quản lý tin nhắn."
+            "description": "Thành viên sẽ bị hạn chế chỉ gửi được một tin nhắn và tạo một chuỗi theo khoảng thời gian này, trừ khi họ có quyền Quản lý kênh hoặc Quản lý tin nhắn.",
+            "_5seconds": "5 giây",
+            "_10seconds": "10 giây",
+            "_15seconds": "15 giây",
+            "_30seconds": "30 giây",
+            "_1minute": "1 phút",
+            "_2minutes": "2 phút",
+            "_5minutes": "5 phút",
+            "_10minutes": "10 phút",
+            "_15minutes": "15 phút",
+            "_30minutes": "30 phút",
+            "_1hour": "1 giờ",
+            "_2hours": "2 giờ",
+            "_6hours": "6 giờ"
         },
         "channelHideInactivity": {
             "title": "Ẩn sau thời gian không hoạt động",
@@ -40,6 +53,13 @@
         "channelDelete": {
             "title": "",
             "delete": "Xóa Channel"
+        }
+    },
+    "confirm": {
+        "delete": {
+            "content": "Bạn có chắc muốn xóa channel #{channelName}?. Hành ddoognj này không thể khôi phục lại",
+            "confirmText": "Xóa",
+            "title": "Xóa channel"
         }
     }
 }

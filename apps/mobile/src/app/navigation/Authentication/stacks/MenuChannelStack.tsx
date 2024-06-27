@@ -29,7 +29,7 @@ export function MenuChannelStacks({ }: any) {
             }}>
 
             <Stack.Screen
-                name={APP_SCREEN.MENU_CLAN.CREATE_CATEGORY}
+                name={APP_SCREEN.MENU_CHANNEL.SETTINGS}
                 component={ChannelSetting}
                 options={{
                     headerTitle: t('menuChannelStack.channelSetting'),
