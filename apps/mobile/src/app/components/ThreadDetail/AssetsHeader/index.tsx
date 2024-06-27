@@ -63,7 +63,7 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
                 ))}
             </View>
 
-            {pos.length > selected && (
+            {pos?.length > selected && (
                 <View style={styles.a}>
                     <View style={{
                         ...styles.b,

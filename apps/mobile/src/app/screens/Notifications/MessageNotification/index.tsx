@@ -173,9 +173,9 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 
   return (
     <View style={[s.wrapperMessageBox]}>
-      	{videos.length > 0 && renderVideos()}
-				{images.length > 0 && renderImages()}
-				{images.length > 0 && (
+      	{videos?.length > 0 && renderVideos()}
+				{images?.length > 0 && renderImages()}
+				{images?.length > 0 && (
 					<ImageView
 						animationType={'none'}
 						images={images.map((i) => {
@@ -195,7 +195,7 @@ const MessageNotification = React.memo((messageProps: IMessageNotifyProps)=>{
 						renderFooter={() => setIsVisibleImage(false)}
 					/>
 				)}
-				{documents.length > 0 && renderDocuments()}
+				{documents?.length > 0 && renderDocuments()}
 				{renderTextContent()}
     </View>
   )

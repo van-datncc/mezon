@@ -37,7 +37,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 			}}
 			screenListeners={{
 				state: (e) => {
-					if (e.data.state.history.length > 1) {
+					if (e.data.state.history?.length > 1) {
 						dispatch(appActions.setHiddenBottomTabMobile(false));
 					} else {
 						dispatch(appActions.setHiddenBottomTabMobile(true));
@@ -115,7 +115,7 @@ const HomeScreen = React.memo((props: any) => {
 	};
 
 	const setCurrentClanLoader = async () => {
-		const lastClanId = clans?.[clans.length - 1]?.clan_id;
+		const lastClanId = clans?.[clans?.length - 1]?.clan_id;
 		const store = await getStoreAsync();
 		if (lastClanId) {
       store.dispatch(clansActions.joinClan({ clanId: lastClanId }));

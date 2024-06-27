@@ -69,10 +69,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	}, []);
 
 	const typingLabel = useMemo(() => {
-		if (typingUsers.length === 1) {
+		if (typingUsers?.length === 1) {
 			return `${typingUsers[0].user?.username} is typing...`;
 		}
-		if (typingUsers.length > 1) {
+		if (typingUsers?.length > 1) {
 			return 'Several people are typing...';
 		}
 		return '';

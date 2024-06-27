@@ -58,7 +58,7 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
     }
 
     function handlePressNext() {
-        if (eventTitle.trim().length === 0) {
+        if (eventTitle?.trim()?.length === 0) {
             Toast.show({
                 type: "error",
                 text1: t("notify.titleBlank")

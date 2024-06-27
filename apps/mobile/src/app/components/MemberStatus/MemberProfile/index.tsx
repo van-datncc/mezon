@@ -48,7 +48,7 @@ export default function MemberProfile({
                 {!isHideUserName &&
                     <Text style={style.textName}>
                         {
-                            user.user.username.length > numCharCollapse
+                            user?.user?.username?.length > numCharCollapse
                                 ? `${name.substring(0, numCharCollapse)}...`
                                 : name
                         }
