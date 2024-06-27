@@ -117,7 +117,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const devMenu: IMezonMenuItemProps[] = [
         {
             onPress: () => {
-                Clipboard.setString(clan.clan_id);
+                Clipboard.setString(clan?.clan_id);
                 Toast.show({
                     type: 'info',
                     text1: t('menu.devMode.serverIDCopied'),

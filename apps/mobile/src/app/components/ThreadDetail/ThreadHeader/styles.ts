@@ -12,12 +12,15 @@ export const styles = StyleSheet.create({
 	channelText: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'center',
+		
 	},
 	channelLabel: {
 		color: Colors.white,
 		marginLeft: 10,
 		fontSize: size.h5,
-    fontWeight: '600'
+    fontWeight: '600',
+		maxWidth: '75%',
 	},
 	groupAvatar: {
 		backgroundColor: Colors.bgToggleOnBtn,

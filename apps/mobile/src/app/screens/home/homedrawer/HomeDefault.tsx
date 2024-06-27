@@ -111,9 +111,9 @@ const HomeDefault = React.memo((props: any) => {
 
 		await dispatch(
 			channelMembersActions.fetchChannelMembers({
-				clanId: currentChannel.clan_id || '',
-				channelId: currentChannel.channel_id || '',
-				channelType: currentChannel.type,
+				clanId: currentChannel?.clan_id || '',
+				channelId: currentChannel?.channel_id || '',
+				channelType: currentChannel?.type,
 			}),
 		);
 	};
@@ -173,7 +173,7 @@ const HomeDefault = React.memo((props: any) => {
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel.clan_id} />
+								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 							) : (
 								<View />
 							)}
@@ -237,11 +237,10 @@ const HomeDefaultHeader = React.memo(
 								)}
 								<View>
 									<View style={styles.threadHeaderBox}>
-										<Text style={styles.threadHeaderLabel}>{currentChannel?.channel_label}</Text>
-										<AngleRight width={10} height={10} style={{ marginLeft: size.s_4 }} />
+										<Text style={styles.threadHeaderLabel} numberOfLines={1}>{currentChannel?.channel_label}</Text>
 									</View>
 									{channelOfThread?.channel_label && (
-										<Text style={styles.channelHeaderLabel}>{channelOfThread?.channel_label}</Text>
+										<Text style={styles.channelHeaderLabel} numberOfLines={1}>{channelOfThread?.channel_label}</Text>
 									)}
 								</View>
 							</View>

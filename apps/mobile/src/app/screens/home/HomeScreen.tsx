@@ -108,14 +108,14 @@ const HomeScreen = React.memo((props: any) => {
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		if (currentClan) {
 		store.dispatch(clansActions.joinClan({clanId: "0"}),);
-      	store.dispatch(clansActions.joinClan({ clanId: currentClan.clan_id }));
-			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan.clan_id }));
+      	store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
 		}
 		return null;
 	};
 
 	const setCurrentClanLoader = async () => {
-		const lastClanId = clans[clans.length - 1].clan_id;
+		const lastClanId = clans?.[clans.length - 1]?.clan_id;
 		const store = await getStoreAsync();
 		if (lastClanId) {
       store.dispatch(clansActions.joinClan({ clanId: lastClanId }));

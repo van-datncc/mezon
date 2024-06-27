@@ -58,7 +58,7 @@ export const DirectMessageDetailScreen = ({navigation, route}: {navigation: any,
 
     const directMessageLoader = useCallback(async () => {
         const store = await getStoreAsync();
-        store.dispatch(clansActions.joinClan({ clanId: currentDmGroup.clan_id }));
+        store.dispatch(clansActions.joinClan({ clanId: currentDmGroup?.clan_id }));
         store.dispatch(
             directActions.joinDirectMessage({
                 directMessageId: currentDmGroup.id,
