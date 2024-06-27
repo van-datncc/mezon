@@ -1,5 +1,5 @@
 import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
-import { directActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
+import { directActions, messagesActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
@@ -202,7 +202,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					break;
 				case 'Enter':
 					if (itemSelect.subText) {
+						event.preventDefault();
 						handleSelectChannel(totalLists.find((item: any) => item.id === idActive));
+						dispatch(messagesActions.setIsFocused(true));
 					} else {
 						handleSelectMem(totalLists.find((item: any) => item.id === idActive));
 					}
