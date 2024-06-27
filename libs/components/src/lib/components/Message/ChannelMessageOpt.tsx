@@ -8,9 +8,10 @@ import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
+	handleContextMenu: (event: React.MouseEvent<HTMLElement>) => void;
 };
 
-const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
 	const dispatch = useAppDispatch();
 	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 	const { userId } = useAuth();
@@ -77,14 +78,9 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 	};
 
 	const handleClickOption = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		event.stopPropagation();
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.MORE));
-		setMessageRightClick(message.id);
-		setRightClickXy({ x: position.left, y: position.top });
-		dispatch(rightClickAction.setVisibleOpt(true));
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+		handleContextMenu(event);
 	};
+
 	const [position, setPosition] = useState({ top: 0, left: 0 });
 
 	useEffect(() => {
@@ -131,8 +127,6 @@ const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
 						<Icons.ThreeDot />
 					</button>
 				</div>
-
-				{posClickActive === RightClickPos.MORE && message.id === getMessageIdRightClicked && <ContextMenu urlData={''} />}
 			</div>
 		</div>
 	);
