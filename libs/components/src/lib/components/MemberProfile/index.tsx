@@ -188,7 +188,7 @@ function MemberProfile({
 					)}
 
 					{Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<p className="dark:text-[#AEAEAE] text-colorTextLightMode">{countMember} Members</p>
+						<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-xs">{countMember} Members</p>
 					)}
 				</div>
 			</div>

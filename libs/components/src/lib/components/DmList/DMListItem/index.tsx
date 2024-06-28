@@ -90,6 +90,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				directMessageValue={directMessageValue}
 				isHideAnimation={true}
 				positionType={MemberProfileType.DM_LIST}
+				countMember={directMessage?.channel_avatar?.length + 1}
 			/>
 			{isHovered && (
 				<button

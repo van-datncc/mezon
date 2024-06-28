@@ -1,6 +1,8 @@
+import { Icons } from '@mezon/components';
 import { UserRestrictionZone, useClanRestriction, useRoles } from '@mezon/core';
-import { selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId } from '@mezon/store';
+import { selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -63,41 +65,66 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], userIDArray || [], []);
 	};
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
 			<div className="mt-2 flex flex-wrap gap-2">
 				{userRolesClan.map((role, index) => (
-					<span key={`${role.id}_${index}`} className="inline-block text-xs border dark:border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgModifierHoverLight">
+					<span key={`${role.id}_${index}`} className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
+						
 						<button
-							className="mr-2 px-1 border border-bgDisable rounded-full dark:bg-bgDisable bg-white hover:bg-gray-400"
+							className="p-0.5 rounded-full bg-white h-fit"
 							onClick={() => deleteRole(role.id)}
 						>
-							x
+							<Tooltip
+								content='Remove role'
+								trigger="hover"
+								animation="duration-500"
+								style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								className='dark:!text-white !text-black'
+							>
+								<Icons.IconRemove className='text-transparent size-2'/>
+							</Tooltip>
 						</button>
 						<span>{role.title}</span>
 					</span>
 				))}
 				<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
-					<span className="font-bold border border-bgDisable rounded-full dark:bg-bgDisable bg-bgModifierHoverLight px-2 relative" onClick={handModalAddRole}>
-						+
+					<div className="relative" onClick={handModalAddRole}>
+						<Tooltip
+							content='Add roles'
+							trigger="hover"
+							animation="duration-500"
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							className='dark:text-white text-black'
+						>
+							<button className='flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300'>
+								<Icons.Plus />
+								<p className='text-xs'>Add Role</p>
+							</button>
+						</Tooltip>
 						<div className="absolute" style={{ top: `${positionTop}px`, left: `${positionLeft}px` }}>
 							{showPopupAddRole ? (
-								<div className="w-[300px] h-fit dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto">
-									<input
-										type="text"
-										className="w-full border-[#1d1c1c] rounded-[5px] dark:bg-[#1d1c1c] bg-bgLightModeSecond px-2"
-										placeholder="Role"
-										onChange={handleInputChange}
-									/>
-									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden hide-scrollbar">
+								<div className="w-[300px] h-fit dark:bg-[#323232] bg-white p-2 dark:text-white text-black overflow-y: auto rounded border border-slate-300 dark:border-slate-700">
+									<div className='relative'>
+										<input
+											type="text"
+											className="w-full border-[#1d1c1c] rounded-[5px] dark:bg-[#1d1c1c] bg-bgLightModeSecond p-2 mb-2"
+											placeholder="Role"
+											onChange={handleInputChange}
+										/>
+										<Icons.Search className="size-5 dark:text-white text-colorTextLightMode absolute right-2 top-2" />
+									</div>
+									<div className="max-h-[100px] overflow-y-scroll overflow-x-hidden hide-scrollbar space-y-1">
 										{filteredListRoleBySearch.length > 0 ?
 											(filteredListRoleBySearch.map((role, index) => (
 												<div
 													key={index}
-													className=" text-xs w-full border border-bgDisable rounded-[10px] px-2 py-1 dark:bg-bgDisable bg-bgLightMode mr-2 dark:hover:bg-[#1d1c1c] hover:bg-bgLightModeButton"
+													className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center"
 													onClick={() => addRole(role.id)}
 												>
+													<div className='size-3 dark:bg-white bg-bgLightModeButton rounded-full'></div>
 													{role.title}
 												</div>
 											))) :
@@ -110,7 +137,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 								</div>
 							) : null}
 						</div>
-					</span>
+					</div>
 				</UserRestrictionZone>
 			</div>
 		</div>
