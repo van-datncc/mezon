@@ -922,7 +922,7 @@ export function AvatarUser({ width = 24, height = 24, ...props }: SvgProps) {
 	);
 }
 
-export function PlusGreenIcon({ width = 24, height = 24, color = 'blue', ...props }: SvgProps) {
+export function PlusGreenIcon({ width = 24, height = 24, color = '#005fe9', ...props }: SvgProps) {
 	return (
 		<Svg width={width} height={height} viewBox="0 0 60 61" {...props}>
 			<Path d="M50 33.838H33.333v16.667h-6.666V33.838H10v-6.666h16.667V10.505h6.666V27.17H50v6.667z" fill={color} />
@@ -1018,4 +1018,28 @@ export function ProfileTab({ width = 24, height = 24, color = '#a1a1a9', ...prop
 			</Defs>
 		</Svg>
 	)
+}
+
+export function SortIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 16 16" {...props}>
+			<Path
+				fill={color}
+				fillRule="evenodd"
+				d="M5.22 10.22a.75.75 0 011.06 0L8 11.94l1.72-1.72a.75.75 0 111.06 1.06l-2.25 2.25a.75.75 0 01-1.06 0l-2.25-2.25a.75.75 0 010-1.06zm5.56-4.44a.75.75 0 01-1.06 0L8 4.06 6.28 5.78a.75.75 0 01-1.06-1.06l2.25-2.25a.75.75 0 011.06 0l2.25 2.25a.75.75 0 010 1.06z"
+				clipRule="evenodd"
+			/>
+		</Svg>
+	);
+}
+
+export function MenuHorizontalIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 32 32" {...props}>
+			<Path
+				d="M9.333 16.001a2.667 2.667 0 10-5.333 0 2.667 2.667 0 005.333 0zm9.334 0a2.667 2.667 0 10-5.334 0 2.667 2.667 0 005.334 0zm6.666-2.666a2.667 2.667 0 110 5.333 2.667 2.667 0 010-5.333z"
+				fill={color}
+			/>
+		</Svg>
+	);
 }

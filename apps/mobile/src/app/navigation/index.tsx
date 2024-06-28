@@ -9,6 +9,20 @@ import i18n from '@mezon/translations';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as Sentry from '@sentry/react-native';
+
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+	dsn: process.env.NX_MOBILE_SENTRY_DSN,
+	tracesSampleRate: 1.0,
+	enabled: !__DEV__,
+	integrations: [
+		new Sentry.ReactNativeTracing({
+			routingInstrumentation,
+		}),
+	],
+});
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,

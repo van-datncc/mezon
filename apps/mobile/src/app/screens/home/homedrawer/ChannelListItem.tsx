@@ -84,7 +84,7 @@ export const ChannelListItem = React.memo(
 							props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT &&
 							(isUnRead ? <HashSignWhiteIcon width={18} height={18} /> : <HashSignIcon width={18} height={18} />)}
 
-						<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]}>{props.data.channel_label}</Text>
+						<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>{props.data.channel_label}</Text>
 					</View>
 
 					{numberNotification > 0 &&

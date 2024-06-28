@@ -128,6 +128,7 @@ const colors = {
 	borderNeutralDisable: '#9091931a',
 	borderPrimary: '#363940',
 	borderMessageHighlight: '#F0B132',
+	borderMessageReply: '#2882f0',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
@@ -151,6 +152,7 @@ const colors = {
 	bgMessageHighlight: '#c99d072b',
 	bgDarkMidnightBlue: '#141c2a',
   midnightIndigoBg: '#3b426e',
+	bgReply: '#383B47',
 	// background button
 	pink: '#e148c7',
 	bgButton: '#5865f2',

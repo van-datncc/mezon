@@ -50,7 +50,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
 							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
-								<MessageImage attachmentData={image} onContextMenu={onContextMenu}/>
+								<MessageImage attachmentData={image}/>
 							</div>
 						);
 					})}

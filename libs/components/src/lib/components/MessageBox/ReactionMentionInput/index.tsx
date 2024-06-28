@@ -12,6 +12,7 @@ import {
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	messagesActions,
 	reactionActions,
 	referencesActions,
 	selectAllUsesClan,
@@ -21,6 +22,7 @@ import {
 	selectCurrentChannelId,
 	selectDataReferences,
 	selectIdMessageRefReply,
+	selectIsFocused,
 	selectMessageByMessageId,
 	selectOpenEditMessageState,
 	selectOpenReplyMessageState,
@@ -49,7 +51,6 @@ import {
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
-import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -93,8 +94,6 @@ export type MentionReactInputProps = {
 	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
-	readonly finishUpload?: boolean;
-	readonly onFinishUpload?: () => void;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -124,6 +123,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const reactionRightState = useSelector(selectReactionRightState);
+	const isFocused = useSelector(selectIsFocused);
 
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
@@ -252,8 +252,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-			dispatch(rightClickAction.setVisibleOpt(false));
+
 		},
 		[
 			valueTextInput,
@@ -387,8 +386,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-			dispatch(rightClickAction.setVisibleOpt(false));
+
 		}
 	};
 
@@ -404,10 +402,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
 
-	const handleFocusEditor = () => {
-		dispatch(rightClickAction.setVisibleOpt(false));
-		dispatch(rightClickAction.setPosClickActive(SubPanelName.NONE));
-	};
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
@@ -450,11 +444,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useEffect(() => {
-		if (props.finishUpload) {
+		if (isFocused) {
 			editorRef.current?.focus();
-			props.onFinishUpload?.();
+			dispatch(messagesActions.setIsFocused(false));
 		}
-	}, [props, props.finishUpload]);
+	}, [dispatch, isFocused]);
 
 	return (
 		<div className="relative">
@@ -501,7 +495,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				allowSpaceInQuery={true}
 				onKeyDown={onKeyDown}
 				forceSuggestionsAboveCursor={true}
-				onFocus={handleFocusEditor}
 			>
 				<Mention
 					appendSpaceOnAdd={true}

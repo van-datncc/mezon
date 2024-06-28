@@ -3,13 +3,14 @@ import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import { useEditMessage } from './useEditMessage';
+import ModalDeleteMess from './ModalDeleteMess';
 
 type MessageInputProps = {
 	messageId: string;
@@ -61,6 +62,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionList = UserMentionList(channelId);
+
+	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
 
@@ -115,7 +118,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			e.preventDefault();
 			e.stopPropagation();
 			if (editMessage?.trim() === '') {
-				handleCancelEdit();
+				if(editMessage.length !==0){
+					handleCancelEdit();
+				} else {
+					setOpenModalDelMess(true);
+				}
 				return;
 			}
 			if (content) {
@@ -210,6 +217,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					</p>
 				</div>
 			</div>
+			{openModalDelMess && <ModalDeleteMess mess={message} closeModal={() => setOpenModalDelMess(false)} mode={mode}/>}
 		</div>
 	);
 };

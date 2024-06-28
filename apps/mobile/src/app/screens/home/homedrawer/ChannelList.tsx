@@ -10,12 +10,15 @@ import {
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	appActions,
+	categoriesActions,
 	channelsActions,
 	getStoreAsync,
 	messagesActions,
 	selectAllEventManagement,
+	selectCategoryIdSortChannel,
 	selectCurrentClan,
 	selectIsFromFCMMobile,
+  useAppDispatch,
 } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -53,6 +56,8 @@ const ChannelList = React.memo((props: any) => {
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<IChannel>(null);
 	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
+	const dispatch = useAppDispatch();
+	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
 	useEffect(() => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
@@ -110,6 +115,10 @@ const ChannelList = React.memo((props: any) => {
 		setIsUnKnownChannel(!channel?.channel_id)
 	}
 
+  function handleOnPressSortChannel(channel: IChannel) {
+		dispatch(categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id], categoryId : channel?.category_id}));
+	}
+
 	function handlePressEventCreate() {
 		bottomSheetEventRef?.current?.dismiss();
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
@@ -143,7 +152,7 @@ const ChannelList = React.memo((props: any) => {
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
 						<CalendarIcon height={20} width={20} />
-						<Text style={{ color: 'white' }}>{`${allEventManagement.length} Events`}</Text>
+						<Text style={{ color: 'white' }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
 				<FlatList
@@ -156,6 +165,7 @@ const ChannelList = React.memo((props: any) => {
 							onPressHeader={toggleCollapseChannel}
 							onLongPressCategory={(category) => handleLongPressCategory(category)}
 							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
+              onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
 							collapseItems={collapseChannelItems}
 						/>
 					)}
@@ -175,7 +185,7 @@ const ChannelList = React.memo((props: any) => {
 			</MezonBottomSheet>
 
 			<MezonBottomSheet
-				title={`${allEventManagement.length} Events`}
+				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}
 				headerRight={
 					currentClan?.creator_id === user?.userId && (

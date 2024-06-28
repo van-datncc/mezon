@@ -133,7 +133,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 			</View>
 
 			<FriendListByAlphabet
-				isSearching={Boolean(searchText.trim().length)}
+				isSearching={Boolean(searchText?.trim()?.length)}
 				friendList={filteredFriendList}
 				handleFriendAction={handleFriendAction}
 				showAction={false}

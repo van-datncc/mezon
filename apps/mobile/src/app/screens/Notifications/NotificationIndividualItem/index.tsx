@@ -17,7 +17,7 @@ function NotificationIndividualItem({ notify, onLongPressNotify, onPressNotify }
 	let notice = notify?.subject;
 
 	if (userName) {
-		const userNameLenght = userName.length;
+		const userNameLenght = userName?.length;
 		notice = notify?.subject?.slice(userNameLenght);
 	}
 

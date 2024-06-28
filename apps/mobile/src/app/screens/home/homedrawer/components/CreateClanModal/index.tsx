@@ -32,9 +32,9 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const handleCreateClan = async () => {
 		const store = await getStoreAsync();
 		createClans(nameClan?.trim(), urlImage).then((res) => {
-			if (res && res.clan_id) {
-        store.dispatch(clansActions.joinClan({ clanId: res.clan_id }));
-				store.dispatch(clansActions.changeCurrentClan({ clanId: res.clan_id }));
+			if (res && res?.clan_id) {
+        store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
+				store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
 				setVisible(false);
 			}
 		});
@@ -128,6 +128,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 						placeholderTextColor={Colors.textGray}
 						value={nameClan}
 						clearButtonMode={'always'}
+            maxLength={64}
 					/>
 					{!isCheckValid && <ErrorInput style={s.errorMessage} errorMessage={t('errorMessage')} />}
 					<Text style={s.community}>

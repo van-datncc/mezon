@@ -1,4 +1,5 @@
 import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
@@ -7,13 +8,12 @@ import {
 	selectOpenEditMessageState,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { useSeenMessagePool } from '@mezon/core';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useMessageContextMenu } from './MessageContextMenuContext';
 import MessageInput from './MessageInput';
 import ModalDeleteMess from './ModalDeleteMess';
 import { useDeleteMessageHook } from './useDeleteMessage';
-import { useMessageContextMenu } from './MessageContextMenuContext';
 
 type MessageProps = {
 	channelId: string;
@@ -37,9 +37,12 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 
 	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 
-	const handleContextMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
-		showMessageContextMenu(event, messageId);
-	}, [showMessageContextMenu, messageId]);
+	const handleContextMenu = useCallback(
+		(event: React.MouseEvent<HTMLElement>) => {
+			showMessageContextMenu(event, messageId);
+		},
+		[showMessageContextMenu, messageId],
+	);
 
 	const mess = useMemo(() => {
 		if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
@@ -49,11 +52,13 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	}, [message]);
 
 	const editor = useMemo(() => {
-		return <MessageInput messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel} message={mess as IMessageWithUser} />
+		return (
+			<MessageInput messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel} message={mess as IMessageWithUser} />
+		);
 	}, [messageId, channelId, mode, channelLabel, mess]);
 
 	const popup = useMemo(() => {
-		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} />
+		return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} />;
 	}, [message, handleContextMenu]);
 
 	useEffect(() => {
@@ -66,15 +71,25 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 
 	return (
 		<>
-			<div className="fullBoxText relative group">
+			<div className="fullBoxText relative group ">
 				<MessageWithUser
+					message={mess as IMessageWithUser}
+					user={user}
+					mode={mode}
 					isEditing={isEditing}
 					popup={popup}
 					editor={editor}
-					message={mess as IMessageWithUser}
-					user={user} mode={mode} 
 					onContextMenu={handleContextMenu}
 				/>
+				{isEditing ? (
+					<MessageInput
+						messageId={messageId}
+						channelId={channelId}
+						mode={mode}
+						channelLabel={channelLabel}
+						message={mess as IMessageWithUser}
+					/>
+				) : null}
 			</div>
 			{lastSeen && <UnreadMessageBreak />}
 			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}

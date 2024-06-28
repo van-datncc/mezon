@@ -82,7 +82,7 @@ export default function NotificationSetting() {
 	const handleRadioBoxPress = (checked: boolean, id: number) => {
 		const notifyOptionSelected = radioBox.map((item) => item && { ...item, isChecked: item.id === id });
 		setRadioBox(notifyOptionSelected);
-		if (notifyOptionSelected.length) {
+		if (notifyOptionSelected?.length) {
 			const notifyOptionSettingSelected = notifyOptionSelected.find((option) => option.isChecked);
 			if (
 				[ENotificationType.ALL_MESSAGE, ENotificationType.MENTION_MESSAGE, ENotificationType.NOTHING_MESSAGE].includes(

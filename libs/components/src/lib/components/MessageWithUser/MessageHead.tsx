@@ -2,7 +2,7 @@ import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
 import { useMessageSender } from './useMessageSender';
@@ -10,9 +10,10 @@ type IMessageHeadProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
+	isShowFull?: boolean;
 };
 
-const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
+const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
@@ -71,7 +72,9 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 		};
 	}, [positionLeft]);
 
-	if (isCombine && message.references?.length === 0) {
+	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
+
+	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;
 	}
 
@@ -84,7 +87,7 @@ const MessageHead = ({ user, message, isCombine }: IMessageHeadProps) => {
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
 				>
-					{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || 'Anonymous'}
+					{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>

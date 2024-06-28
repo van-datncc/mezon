@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 export * from './attachmentThumb';
 export * from './iconInEmojiPanel';
-export * from './uploadThumbnail';
 export * from './iconRightClick';
-
+export * from './uploadThumbnail';
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -18,7 +17,7 @@ export function Discord(props: React.HTMLAttributes<SVGElement>) {
 
 export function OnlineStatus(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<circle cx="6" cy="6" r="6" fill="#16A34A" />
 		</svg>
 	);
@@ -26,7 +25,7 @@ export function OnlineStatus(props: React.HTMLAttributes<SVGElement>) {
 
 export function OfflineStatus(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" strokeWidth="3" />
 		</svg>
 	);
@@ -298,14 +297,15 @@ export function AddPerson(props: React.HTMLAttributes<SVGElement>) {
 }
 
 export function IconFriend(props: React.HTMLAttributes<SVGElement>) {
-	return(
+	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
-			<path fill="currentColor" d="M12 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM11.53 11A9.53 9.53 0 0 0 2 20.53c0 .81.66 1.47 1.47 1.47h.22c.24 0 .44-.17.5-.4.29-1.12.84-2.17 1.32-2.91.14-.21.43-.1.4.15l-.26 2.61c-.02.3.2.55.5.55h6.4a.5.5 0 0 0 .35-.85l-.02-.03a3 3 0 1 1 4.24-4.24l.53.52c.2.2.5.2.7 0l1.8-1.8c.17-.17.2-.43.06-.62A9.52 9.52 0 0 0 12.47 11h-.94Z">
-			</path>
-			<path fill="currentColor" d="M23.7 17.7a1 1 0 1 0-1.4-1.4L18 20.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l5-5Z">
-			</path>
+			<path
+				fill="currentColor"
+				d="M12 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM11.53 11A9.53 9.53 0 0 0 2 20.53c0 .81.66 1.47 1.47 1.47h.22c.24 0 .44-.17.5-.4.29-1.12.84-2.17 1.32-2.91.14-.21.43-.1.4.15l-.26 2.61c-.02.3.2.55.5.55h6.4a.5.5 0 0 0 .35-.85l-.02-.03a3 3 0 1 1 4.24-4.24l.53.52c.2.2.5.2.7 0l1.8-1.8c.17-.17.2-.43.06-.62A9.52 9.52 0 0 0 12.47 11h-.94Z"
+			></path>
+			<path fill="currentColor" d="M23.7 17.7a1 1 0 1 0-1.4-1.4L18 20.58l-2.3-2.3a1 1 0 0 0-1.4 1.42l3 3a1 1 0 0 0 1.4 0l5-5Z"></path>
 		</svg>
-	)
+	);
 }
 
 export function HashtagWithSpeechBubble(props: React.HTMLAttributes<SVGElement>) {
@@ -1134,7 +1134,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 	);
 };
 
-export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5'}) => {
+export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	const [isWhite, setIsWhite] = useState<boolean>(false);
 
 	const handleClick = () => {
@@ -2551,16 +2551,35 @@ export function CloseIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function ArrowLeftCircle(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-circle" viewBox="0 0 16 16" {...props}>
-  			<path fillRule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			fill="currentColor"
+			className="bi bi-arrow-left-circle"
+			viewBox="0 0 16 16"
+			{...props}
+		>
+			<path
+				fillRule="evenodd"
+				d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"
+			/>
 		</svg>
 	);
 }
 
 export function ArrowLeftCircleActive(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16" {...props}>
-  			<path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			fill="currentColor"
+			className="bi bi-arrow-left-circle-fill"
+			viewBox="0 0 16 16"
+			{...props}
+		>
+			<path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
 		</svg>
 	);
 }
@@ -2654,126 +2673,227 @@ export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-contentTertiary te
 
 export function IconClockChannel() {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 120 90" className='w-[120px]'>
+		<svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 120 90" className="w-[120px]">
 			<linearGradient id="a" gradientUnits="userSpaceOnUse" x1="35.37" x2="52.77" y1="10.71" y2="31.55">
-				<stop offset="0" stop-color="#4788ff"/>
-				<stop offset="1" stop-color="#365dec"/>
+				<stop offset="0" stop-color="#4788ff" />
+				<stop offset="1" stop-color="#365dec" />
 			</linearGradient>
 			<linearGradient id="b" gradientUnits="userSpaceOnUse" x1="48.13" x2="106.86" y1="55.69" y2="85.26">
-				<stop offset="0" stop-color="#ffd01a"/>
-				<stop offset="1" stop-color="#ffa600"/>
+				<stop offset="0" stop-color="#ffd01a" />
+				<stop offset="1" stop-color="#ffa600" />
 			</linearGradient>
-			<path d="m83.7 65.31h-47.4v-41.6a23.7 23.7 0 0 1 47.4 0zm-34.49-12.9h21.58v-28.7a10.79 10.79 0 0 0 -21.58 0z" fill="url(#a)"/>
-			<path d="m9.13 17.87 3.39-1.19a.89.89 0 0 0 0-1.68l-3.39-1.18a.88.88 0 0 1 -.55-.55l-1.18-3.39a.89.89 0 0 0 -1.68 0l-1.19 3.39a.89.89 0 0 1 -.54.55l-3.4 1.18a.89.89 0 0 0 0 1.68l3.41 1.19a.9.9 0 0 1 .54.54l1.18 3.39a.89.89 0 0 0 1.68 0l1.18-3.39a.89.89 0 0 1 .55-.54z" fill="#776bff"/>
+			<path d="m83.7 65.31h-47.4v-41.6a23.7 23.7 0 0 1 47.4 0zm-34.49-12.9h21.58v-28.7a10.79 10.79 0 0 0 -21.58 0z" fill="url(#a)" />
+			<path
+				d="m9.13 17.87 3.39-1.19a.89.89 0 0 0 0-1.68l-3.39-1.18a.88.88 0 0 1 -.55-.55l-1.18-3.39a.89.89 0 0 0 -1.68 0l-1.19 3.39a.89.89 0 0 1 -.54.55l-3.4 1.18a.89.89 0 0 0 0 1.68l3.41 1.19a.9.9 0 0 1 .54.54l1.18 3.39a.89.89 0 0 0 1.68 0l1.18-3.39a.89.89 0 0 1 .55-.54z"
+				fill="#776bff"
+			/>
 			<g fill="#00e0a7">
-				<rect height="4.29" rx="1.43" transform="matrix(.70710678 -.70710678 .70710678 .70710678 17.64 83.79)" width="2.86" x="108.54" y="18.46"/>
-				<rect height="4.29" rx="1.43" transform="matrix(.70710678 -.70710678 .70710678 .70710678 14.29 91.89)" width="2.86" x="116.63" y="26.55"/>
-				<rect height="4.29" rx="1.43" transform="matrix(.70710678 .70710678 -.70710678 .70710678 49.15 -77.45)" width="2.86" x="116.63" y="18.46"/>
-				<rect height="4.29" rx="1.43" transform="matrix(.70710678 .70710678 -.70710678 .70710678 52.5 -69.35)" width="2.86" x="108.54" y="26.55"/>
+				<rect
+					height="4.29"
+					rx="1.43"
+					transform="matrix(.70710678 -.70710678 .70710678 .70710678 17.64 83.79)"
+					width="2.86"
+					x="108.54"
+					y="18.46"
+				/>
+				<rect
+					height="4.29"
+					rx="1.43"
+					transform="matrix(.70710678 -.70710678 .70710678 .70710678 14.29 91.89)"
+					width="2.86"
+					x="116.63"
+					y="26.55"
+				/>
+				<rect
+					height="4.29"
+					rx="1.43"
+					transform="matrix(.70710678 .70710678 -.70710678 .70710678 49.15 -77.45)"
+					width="2.86"
+					x="116.63"
+					y="18.46"
+				/>
+				<rect
+					height="4.29"
+					rx="1.43"
+					transform="matrix(.70710678 .70710678 -.70710678 .70710678 52.5 -69.35)"
+					width="2.86"
+					x="108.54"
+					y="26.55"
+				/>
 			</g>
-			<circle cx="110.16" cy="71.6" fill="#ff87ff" r="2.22"/>
-			<rect fill="url(#b)" height="56.67" rx="3.23" width="85.13" x="17.43" y="33.33"/>
-			<rect fill="#ffd01a" height="56.67" rx="3.23" width="66.95" x="17.43" y="33.33"/>
+			<circle cx="110.16" cy="71.6" fill="#ff87ff" r="2.22" />
+			<rect fill="url(#b)" height="56.67" rx="3.23" width="85.13" x="17.43" y="33.33" />
+			<rect fill="#ffd01a" height="56.67" rx="3.23" width="66.95" x="17.43" y="33.33" />
 			<g fill="none" strokeMiterlimit="10">
 				<g stroke="#ffa600" stroke-width="2.262054">
-					<path d="m17.43 81.75h85.14"/>
-					<path d="m17.43 41.58h66.95"/>
-					<path d="m84.38 75.05h18.19"/>
-					<path d="m84.38 68.36h18.19"/>
-					<path d="m84.38 61.66h18.19"/>
-					<path d="m84.38 54.97h18.19"/>
-					<path d="m84.38 48.28h18.19"/>
-					<path d="m84.38 41.58h18.19"/>
+					<path d="m17.43 81.75h85.14" />
+					<path d="m17.43 41.58h66.95" />
+					<path d="m84.38 75.05h18.19" />
+					<path d="m84.38 68.36h18.19" />
+					<path d="m84.38 61.66h18.19" />
+					<path d="m84.38 54.97h18.19" />
+					<path d="m84.38 48.28h18.19" />
+					<path d="m84.38 41.58h18.19" />
 				</g>
-				<path d="m43.24 15.61a18.72 18.72 0 0 1 10.44-9.41" stroke="#9ecdff" stroke-linecap="round" stroke-width="4.095565"/>
+				<path d="m43.24 15.61a18.72 18.72 0 0 1 10.44-9.41" stroke="#9ecdff" stroke-linecap="round" stroke-width="4.095565" />
 			</g>
-			<circle cx="50.91" cy="55.98" fill="#270813" r="5.96"/>
-			<path d="m50.91 56-5.36 11.83a2.05 2.05 0 0 0 1.87 2.89h7a2.05 2.05 0 0 0 1.87-2.89z" fill="#270813"/>
+			<circle cx="50.91" cy="55.98" fill="#270813" r="5.96" />
+			<path d="m50.91 56-5.36 11.83a2.05 2.05 0 0 0 1.87 2.89h7a2.05 2.05 0 0 0 1.87-2.89z" fill="#270813" />
 		</svg>
 	);
 }
 
-export function IconPhoneDM({ isWhite } : {isWhite?: boolean}) {
+export function IconPhoneDM({ isWhite }: { isWhite?: boolean }) {
 	return (
-		<svg className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" d="M2 7.4A5.4 5.4 0 0 1 7.4 2c.36 0 .7.22.83.55l1.93 4.64a1 1 0 0 1-.43 1.25L7 10a8.52 8.52 0 0 0 7 7l1.12-2.24a1 1 0 0 1 1.19-.51l5.06 1.56c.38.11.63.46.63.85C22 19.6 19.6 22 16.66 22h-.37C8.39 22 2 15.6 2 7.71V7.4ZM13 3a1 1 0 0 1 1-1 8 8 0 0 1 8 8 1 1 0 1 1-2 0 6 6 0 0 0-6-6 1 1 0 0 1-1-1Z" >
-			</path>
-			<path fill="currentColor" d="M13 7a1 1 0 0 1 1-1 4 4 0 0 1 4 4 1 1 0 1 1-2 0 2 2 0 0 0-2-2 1 1 0 0 1-1-1Z">
-			</path>
-		</svg>
-	)
-}
-
-export function IconMeetDM({ isWhite } : {isWhite?: boolean}) {
-	return (
-		<svg className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" d="M4 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-2.12a1 1 0 0 0 .55.9l3 1.5a1 1 0 0 0 1.45-.9V7.62a1 1 0 0 0-1.45-.9l-3 1.5a1 1 0 0 0-.55.9V7a3 3 0 0 0-3-3H4Z">
-			</path>
-		</svg>
-	);
-}
-
-export function IconAddFriendDM({ isWhite } : {isWhite?: boolean}) {
-	return(
-		<svg className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" d="M14.5 8a3 3 0 1 0-2.7-4.3c-.2.4.06.86.44 1.12a5 5 0 0 1 2.14 3.08c.01.06.06.1.12.1ZM16.62 13.17c-.22.29-.65.37-.92.14-.34-.3-.7-.57-1.09-.82-.52-.33-.7-1.05-.47-1.63.11-.27.2-.57.26-.87.11-.54.55-1 1.1-.92 1.6.2 3.04.92 4.15 1.98.3.27-.25.95-.65.95a3 3 0 0 0-2.38 1.17ZM15.19 15.61c.13.16.02.39-.19.39a3 3 0 0 0-1.52 5.59c.2.12.26.41.02.41h-8a.5.5 0 0 1-.5-.5v-2.1c0-.25-.31-.33-.42-.1-.32.67-.67 1.58-.88 2.54a.2.2 0 0 1-.2.16A1.5 1.5 0 0 1 2 20.5a7.5 7.5 0 0 1 13.19-4.89ZM9.5 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM15.5 22Z" >
-			</path>
-			<path fill="currentColor" d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z">
-			</path>
+		<svg
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="currentColor"
+				d="M2 7.4A5.4 5.4 0 0 1 7.4 2c.36 0 .7.22.83.55l1.93 4.64a1 1 0 0 1-.43 1.25L7 10a8.52 8.52 0 0 0 7 7l1.12-2.24a1 1 0 0 1 1.19-.51l5.06 1.56c.38.11.63.46.63.85C22 19.6 19.6 22 16.66 22h-.37C8.39 22 2 15.6 2 7.71V7.4ZM13 3a1 1 0 0 1 1-1 8 8 0 0 1 8 8 1 1 0 1 1-2 0 6 6 0 0 0-6-6 1 1 0 0 1-1-1Z"
+			></path>
+			<path fill="currentColor" d="M13 7a1 1 0 0 1 1-1 4 4 0 0 1 4 4 1 1 0 1 1-2 0 2 2 0 0 0-2-2 1 1 0 0 1-1-1Z"></path>
 		</svg>
 	);
 }
 
-export function IconUserProfileDM({ isWhite } : {isWhite?: boolean}) {
+export function IconMeetDM({ isWhite }: { isWhite?: boolean }) {
 	return (
-		<svg className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" fillRule="evenodd" d="M23 12.38c-.02.38-.45.58-.78.4a6.97 6.97 0 0 0-6.27-.08.54.54 0 0 1-.44 0 8.97 8.97 0 0 0-11.16 3.55c-.1.15-.1.35 0 .5.37.58.8 1.13 1.28 1.61.24.24.64.15.8-.15.19-.38.39-.73.58-1.02.14-.21.43-.1.4.15l-.19 1.96c-.02.19.07.37.23.47A8.96 8.96 0 0 0 12 21a.4.4 0 0 1 .38.27c.1.33.25.65.4.95.18.34-.02.76-.4.77L12 23a11 11 0 1 1 11-10.62ZM15.5 7.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd">
-			</path>
-			<path fill="currentColor" d="M24 19a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z">
-			</path>
+		<svg
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="currentColor"
+				d="M4 4a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-2.12a1 1 0 0 0 .55.9l3 1.5a1 1 0 0 0 1.45-.9V7.62a1 1 0 0 0-1.45-.9l-3 1.5a1 1 0 0 0-.55.9V7a3 3 0 0 0-3-3H4Z"
+			></path>
+		</svg>
+	);
+}
+
+export function IconAddFriendDM({ isWhite }: { isWhite?: boolean }) {
+	return (
+		<svg
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="currentColor"
+				d="M14.5 8a3 3 0 1 0-2.7-4.3c-.2.4.06.86.44 1.12a5 5 0 0 1 2.14 3.08c.01.06.06.1.12.1ZM16.62 13.17c-.22.29-.65.37-.92.14-.34-.3-.7-.57-1.09-.82-.52-.33-.7-1.05-.47-1.63.11-.27.2-.57.26-.87.11-.54.55-1 1.1-.92 1.6.2 3.04.92 4.15 1.98.3.27-.25.95-.65.95a3 3 0 0 0-2.38 1.17ZM15.19 15.61c.13.16.02.39-.19.39a3 3 0 0 0-1.52 5.59c.2.12.26.41.02.41h-8a.5.5 0 0 1-.5-.5v-2.1c0-.25-.31-.33-.42-.1-.32.67-.67 1.58-.88 2.54a.2.2 0 0 1-.2.16A1.5 1.5 0 0 1 2 20.5a7.5 7.5 0 0 1 13.19-4.89ZM9.5 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM15.5 22Z"
+			></path>
+			<path fill="currentColor" d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z"></path>
+		</svg>
+	);
+}
+
+export function IconUserProfileDM({ isWhite }: { isWhite?: boolean }) {
+	return (
+		<svg
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M23 12.38c-.02.38-.45.58-.78.4a6.97 6.97 0 0 0-6.27-.08.54.54 0 0 1-.44 0 8.97 8.97 0 0 0-11.16 3.55c-.1.15-.1.35 0 .5.37.58.8 1.13 1.28 1.61.24.24.64.15.8-.15.19-.38.39-.73.58-1.02.14-.21.43-.1.4.15l-.19 1.96c-.02.19.07.37.23.47A8.96 8.96 0 0 0 12 21a.4.4 0 0 1 .38.27c.1.33.25.65.4.95.18.34-.02.76-.4.77L12 23a11 11 0 1 1 11-10.62ZM15.5 7.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+				clipRule="evenodd"
+			></path>
+			<path fill="currentColor" d="M24 19a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"></path>
 		</svg>
 	);
 }
 
 export function IconReplyMessDeleted() {
 	return (
-		<svg width="8" height="8" viewBox="0 0 8 8" className='dark:text-zinc-400 text-colorTextLightMode -ml-[10px] mt-[3px]'>
-			<path d="M0.809739 3.59646L5.12565 0.468433C5.17446 0.431163 5.23323 0.408043 5.2951 0.401763C5.35698 0.395482 5.41943 0.406298 5.4752 0.432954C5.53096 0.45961 5.57776 0.50101 5.61013 0.552343C5.64251 0.603676 5.65914 0.662833 5.6581 0.722939V2.3707C10.3624 2.3707 11.2539 5.52482 11.3991 7.21174C11.4028 7.27916 11.3848 7.34603 11.3474 7.40312C11.3101 7.46021 11.2554 7.50471 11.1908 7.53049C11.1262 7.55626 11.0549 7.56204 10.9868 7.54703C10.9187 7.53201 10.857 7.49695 10.8104 7.44666C8.72224 5.08977 5.6581 5.63359 5.6581 5.63359V7.28135C5.65831 7.34051 5.64141 7.39856 5.60931 7.44894C5.5772 7.49932 5.53117 7.54004 5.4764 7.5665C5.42163 7.59296 5.3603 7.60411 5.29932 7.59869C5.23834 7.59328 5.18014 7.57151 5.13128 7.53585L0.809739 4.40892C0.744492 4.3616 0.691538 4.30026 0.655067 4.22975C0.618596 4.15925 0.599609 4.08151 0.599609 4.00269C0.599609 3.92386 0.618596 3.84612 0.655067 3.77562C0.691538 3.70511 0.744492 3.64377 0.809739 3.59646Z" fill="currentColor">
-			</path>
+		<svg width="8" height="8" viewBox="0 0 8 8" className="dark:text-zinc-400 text-colorTextLightMode -ml-[10px] mt-[3px]">
+			<path
+				d="M0.809739 3.59646L5.12565 0.468433C5.17446 0.431163 5.23323 0.408043 5.2951 0.401763C5.35698 0.395482 5.41943 0.406298 5.4752 0.432954C5.53096 0.45961 5.57776 0.50101 5.61013 0.552343C5.64251 0.603676 5.65914 0.662833 5.6581 0.722939V2.3707C10.3624 2.3707 11.2539 5.52482 11.3991 7.21174C11.4028 7.27916 11.3848 7.34603 11.3474 7.40312C11.3101 7.46021 11.2554 7.50471 11.1908 7.53049C11.1262 7.55626 11.0549 7.56204 10.9868 7.54703C10.9187 7.53201 10.857 7.49695 10.8104 7.44666C8.72224 5.08977 5.6581 5.63359 5.6581 5.63359V7.28135C5.65831 7.34051 5.64141 7.39856 5.60931 7.44894C5.5772 7.49932 5.53117 7.54004 5.4764 7.5665C5.42163 7.59296 5.3603 7.60411 5.29932 7.59869C5.23834 7.59328 5.18014 7.57151 5.13128 7.53585L0.809739 4.40892C0.744492 4.3616 0.691538 4.30026 0.655067 4.22975C0.618596 4.15925 0.599609 4.08151 0.599609 4.00269C0.599609 3.92386 0.618596 3.84612 0.655067 3.77562C0.691538 3.70511 0.744492 3.64377 0.809739 3.59646Z"
+				fill="currentColor"
+			></path>
 		</svg>
 	);
 }
 
 export function IConShareEventLocation() {
-	return(
+	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" d="M13 16V5.41l3.3 3.3a1 1 0 1 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L11 5.4V16a1 1 0 1 0 2 0Z" >
-			</path>
-			<path fill="currentColor" d="M4 15a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Z">
-			</path>
+			<path
+				fill="currentColor"
+				d="M13 16V5.41l3.3 3.3a1 1 0 1 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L11 5.4V16a1 1 0 1 0 2 0Z"
+			></path>
+			<path
+				fill="currentColor"
+				d="M4 15a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Z"
+			></path>
 		</svg>
 	);
-} 
+}
 
 export function IconShareEventVoice() {
-	return(
+	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" d="M16.3 14.7a1 1 0 0 1 0-1.4l2.5-2.5a3.95 3.95 0 1 0-5.6-5.6l-2.5 2.5a1 1 0 1 1-1.4-1.4l2.5-2.5a5.95 5.95 0 1 1 8.4 8.4l-2.5 2.5a1 1 0 0 1-1.4 0ZM7.7 9.3a1 1 0 0 1 0 1.4l-2.5 2.5a3.95 3.95 0 0 0 5.6 5.6l2.5-2.5a1 1 0 1 1 1.4 1.4l-2.5 2.5a5.95 5.95 0 0 1-8.4-8.4l2.5-2.5a1 1 0 0 1 1.4 0Z">
-			</path>
-			<path fill="currentColor" d="M14.7 10.7a1 1 0 1 0-1.4-1.4l-4 4a1 1 0 0 0 1.4 1.4l4-4Z">
-			</path>
+			<path
+				fill="currentColor"
+				d="M16.3 14.7a1 1 0 0 1 0-1.4l2.5-2.5a3.95 3.95 0 1 0-5.6-5.6l-2.5 2.5a1 1 0 1 1-1.4-1.4l2.5-2.5a5.95 5.95 0 1 1 8.4 8.4l-2.5 2.5a1 1 0 0 1-1.4 0ZM7.7 9.3a1 1 0 0 1 0 1.4l-2.5 2.5a3.95 3.95 0 0 0 5.6 5.6l2.5-2.5a1 1 0 1 1 1.4 1.4l-2.5 2.5a5.95 5.95 0 0 1-8.4-8.4l2.5-2.5a1 1 0 0 1 1.4 0Z"
+			></path>
+			<path fill="currentColor" d="M14.7 10.7a1 1 0 1 0-1.4-1.4l-4 4a1 1 0 0 0 1.4 1.4l4-4Z"></path>
 		</svg>
 	);
 }
 
-export const IconUserCreateDM = ({ className='' }: {className: string}) => {
+export const IconUserCreateDM = ({ className = '' }: { className: string }) => {
 	return (
-		<svg aria-label="Group Owner" aria-hidden="false" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className={className}> 
-			<path fill="currentColor" d="M5 18a1 1 0 0 0-1 1 3 3 0 0 0 3 3h10a3 3 0 0 0 3-3 1 1 0 0 0-1-1H5ZM3.04 7.76a1 1 0 0 0-1.52 1.15l2.25 6.42a1 1 0 0 0 .94.67h14.55a1 1 0 0 0 .95-.71l1.94-6.45a1 1 0 0 0-1.55-1.1l-4.11 3-3.55-5.33.82-.82a.83.83 0 0 0 0-1.18l-1.17-1.17a.83.83 0 0 0-1.18 0l-1.17 1.17a.83.83 0 0 0 0 1.18l.82.82-3.61 5.42-4.41-3.07Z">
-			</path>
+		<svg
+			aria-label="Group Owner"
+			aria-hidden="false"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={className}
+		>
+			<path
+				fill="currentColor"
+				d="M5 18a1 1 0 0 0-1 1 3 3 0 0 0 3 3h10a3 3 0 0 0 3-3 1 1 0 0 0-1-1H5ZM3.04 7.76a1 1 0 0 0-1.52 1.15l2.25 6.42a1 1 0 0 0 .94.67h14.55a1 1 0 0 0 .95-.71l1.94-6.45a1 1 0 0 0-1.55-1.1l-4.11 3-3.55-5.33.82-.82a.83.83 0 0 0 0-1.18l-1.17-1.17a.83.83 0 0 0-1.18 0l-1.17 1.17a.83.83 0 0 0 0 1.18l.82.82-3.61 5.42-4.41-3.07Z"
+			></path>
 		</svg>
-	)
-}
+	);
+};
 
 export function WebhooksIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -2821,6 +2941,16 @@ export function ClockIcon(props: React.HTMLAttributes<SVGElement>) {
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm1-18a1 1 0 1 0-2 0v7c0 .27.1.52.3.7l3 3a1 1 0 0 0 1.4-1.4L13 11.58V5Z"
 				clip-rule="evenodd"
 				className=""
+			></path>
+		</svg>
+	);
+}
+export function OwnerIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="false" role="img" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" {...props}>
+			<path
+				fill="#F0B132"
+				d="M5 18a1 1 0 0 0-1 1 3 3 0 0 0 3 3h10a3 3 0 0 0 3-3 1 1 0 0 0-1-1H5ZM3.04 7.76a1 1 0 0 0-1.52 1.15l2.25 6.42a1 1 0 0 0 .94.67h14.55a1 1 0 0 0 .95-.71l1.94-6.45a1 1 0 0 0-1.55-1.1l-4.11 3-3.55-5.33.82-.82a.83.83 0 0 0 0-1.18l-1.17-1.17a.83.83 0 0 0-1.18 0l-1.17 1.17a.83.83 0 0 0 0 1.18l.82.82-3.61 5.42-4.41-3.07Z"
 			></path>
 		</svg>
 	);

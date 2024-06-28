@@ -1,4 +1,4 @@
 export interface IExpireLinkOption {
-    value: number;
+    value: string;
     label: string;
 }

@@ -34,7 +34,7 @@ type fetchPermissionsUserPayload = {
 
 export const fetchPermissionsUser = createAsyncThunk<any, fetchPermissionsUserPayload, ThunkConfigWithError>('policies/fetchPermissionsUser', async ({ clanId }: fetchPermissionsUserPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.GetPermissionOfUserInTheClan(mezon.session, clanId);
+	const response = await mezon.client.getPermissionOfUserInTheClan(mezon.session, clanId);
 	if (!response.permissions) {
 		return [];
 	}

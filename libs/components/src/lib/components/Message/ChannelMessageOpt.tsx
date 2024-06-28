@@ -1,8 +1,7 @@
-import { ContextMenu, Icons } from '@mezon/components';
-import { useAuth, useGifsStickersEmoji, useReference, useRightClick, useThreads } from '@mezon/core';
+import { Icons } from '@mezon/components';
+import { useAuth, useGifsStickersEmoji, useReference, useThreads } from '@mezon/core';
 import { gifsStickerEmojiActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
-import { IMessageWithUser, RightClickPos, SubPanelName } from '@mezon/utils';
-import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
+import { IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -13,25 +12,20 @@ type ChannelMessageOptProps = {
 
 const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
 	const dispatch = useAppDispatch();
-	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
 	const { userId } = useAuth();
 	const { setOpenThreadMessageState } = useReference();
 	const { setIsShowCreateThread, setValueThread } = useThreads();
 	const [thread, setThread] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const { setMessageRightClick } = useRightClick();
-	const { setRightClickXy } = useRightClick();
 	const refOpt = useRef<HTMLDivElement>(null);
 	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 
 		event.stopPropagation();
 	};
-	const posClickActive = useSelector(selectPosClickingActive);
 
 	const handleClickEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -39,7 +33,6 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 
 		event.stopPropagation();
 	};
@@ -62,7 +55,6 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 			} else {
 				dispatch(reactionActions.setReactionTopState(false));
 			}
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 		},
 		[setSubPanelActive],
 	);
@@ -72,7 +64,6 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(threadsActions.setOpenThreadMessageState(true));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 
 		setValueThread(message);
 	};

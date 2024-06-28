@@ -5,5 +5,8 @@
         "channelCreator": "Create Channel",
         "clanOverviewSetting": "Overview Settings",
         "eventCreator": "Create Event"
+    },
+    "menuChannelStack": {
+        "channelSetting": "Channel Settings"
     }
 }
