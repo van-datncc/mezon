@@ -33,8 +33,8 @@ import ChannelListHeader from './components/ChannelList/ChannelListHeader';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import { styles } from './styles';
 import { darkColor } from '../../../constants/Colors';
-import { CalendarIcon } from 'libs/mobile-components/src/lib/icons2';
 import ChannelMenu from './components/ChannelMenu';
+import { Icons } from "@mezon/mobile-components"
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -142,7 +142,7 @@ const ChannelList = React.memo((props: any) => {
 						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
-						<CalendarIcon height={20} width={20} />
+						<Icons.CalendarIcon height={20} width={20} />
 						<Text style={{ color: 'white' }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>

@@ -5,9 +5,7 @@ import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from 
 import styles from "./styles";
 import { useTranslation } from "react-i18next";
 import LogoClanSelector from "./LogoClanSelector";
-import { ChannelListIcon, CircleInformationIcon, ClipboardListIcon, GameControllerIcon, GroupIcon, HammerIcon, LinkIcon, ModerationIcon, ReactionIcon, ShieldUserIcon, ShopSparkleIcon, TreeHouseIcon, WebhookIcon }
-    // @ts-ignore
-    from "libs/mobile-components/src/lib/icons2";
+import { Icons } from "@mezon/mobile-components";
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.SETTINGS;
 
@@ -33,49 +31,49 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
                 navigation.navigate(APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING)
             },
             expandable: true,
-            icon: <CircleInformationIcon />
+            icon: <Icons.CircleInformationIcon />
         },
         {
             title: t('menu.settings.moderation'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ModerationIcon />
+            icon: <Icons.ModerationIcon />
         },
         {
             title: t('menu.settings.auditLog'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ClipboardListIcon />
+            icon: <Icons.ClipboardListIcon />
         },
         {
             title: t('menu.settings.channels'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ChannelListIcon />
+            icon: <Icons.ChannelListIcon />
         },
         {
             title: t('menu.settings.integrations'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <GameControllerIcon />
+            icon: <Icons.GameControllerIcon />
         },
         {
             title: t('menu.settings.emoji'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ReactionIcon />
+            icon: <Icons.ReactionIcon />
         },
         {
             title: t('menu.settings.webhooks'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <WebhookIcon />
+            icon: <Icons.WebhookIcon />
         },
         {
             title: t('menu.settings.security'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ShieldUserIcon />
+            icon: <Icons.ShieldUserIcon />
         }
     ]
 
@@ -84,7 +82,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
             title: t('menu.community.enableCommunity'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <TreeHouseIcon />
+            icon: <Icons.TreeHouseIcon />
         }
     ]
 
@@ -93,7 +91,7 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
             title: t('menu.subscriptions.getStarted'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ShopSparkleIcon />
+            icon: <Icons.ShopSparkleIcon />
         }
     ]
 
@@ -102,25 +100,25 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
             title: t('menu.userManagement.members'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <GroupIcon />
+            icon: <Icons.GroupIcon />
         },
         {
             title: t('menu.userManagement.role'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <ShieldUserIcon />
+            icon: <Icons.ShieldUserIcon />
         },
         {
             title: t('menu.userManagement.invite'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <LinkIcon />
+            icon: <Icons.LinkIcon />
         },
         {
             title: t('menu.userManagement.bans'),
             onPress: () => reserve(),
             expandable: true,
-            icon: <HammerIcon />
+            icon: <Icons.HammerIcon />
         }
     ]
 
