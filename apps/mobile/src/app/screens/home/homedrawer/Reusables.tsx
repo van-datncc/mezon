@@ -15,6 +15,8 @@ import { MezonButton } from '../../../temp-ui';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
 import { ChannelListItem } from './ChannelListItem';
 import { styles } from './styles';
+import { SortIcon } from '@mezon/mobile-components';
+import { Colors } from '@mezon/mobile-ui';
 
 export const ChannelListContext = React.createContext({} as any);
 export interface IFriendListItemProps {
@@ -36,6 +38,7 @@ interface IChannelListSectionProps {
 	onPressHeader: any;
 	collapseItems: any
 	onLongPressCategory: (channel: ICategoryChannel) => void;
+	onPressSortChannel: (channel: ICategoryChannel) => void;
 	onLongPressChannel: (channel: IChannel) => void;
 }
 
@@ -79,7 +82,7 @@ export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string;
 	);
 });
 
-export const ChannelListHeader = React.memo((props: { title: string; onPress: any; onLongPress: () => void; isCollapsed: boolean }) => {
+export const ChannelListHeader = React.memo((props: { title: string; onPress: any; onLongPress: () => void; isCollapsed: boolean, onPressSortChannel: () => void }) => {
 	return (
 		<TouchableOpacity
 			activeOpacity={0.8}
@@ -91,6 +94,9 @@ export const ChannelListHeader = React.memo((props: { title: string; onPress: an
 			<View style={styles.channelListHeaderItem}>
 				<AngleDownIcon width={20} height={20} style={[props?.isCollapsed && { transform: [{ rotate: '-90deg' }] }]} />
 				<Text style={styles.channelListHeaderItemTitle}>{props.title}</Text>
+				<TouchableOpacity onPress={props?.onPressSortChannel} style={styles.sortButton}>
+        <SortIcon width={20} height={20} color={Colors.textGray} />
+        </TouchableOpacity>
 			</View>
 		</TouchableOpacity>
 	);
@@ -106,6 +112,7 @@ export const ChannelListSection = React.memo((props: IChannelListSectionProps) =
 				title={props.data.category_name}
 				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
 				onLongPress={() => props?.onLongPressCategory(props.data)}
+        onPressSortChannel={()=> props?.onPressSortChannel(props?.data)}
 				isCollapsed={isCollapsed}
 			/>
 			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>

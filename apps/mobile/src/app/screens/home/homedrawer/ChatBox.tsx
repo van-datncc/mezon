@@ -159,7 +159,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}
 
 	useEffect(() => {
-		loadMessageCache().then((message) => {
+		loadMessageCache()?.then((message) => {
 			setText(message);
 		});
 	}, [props?.channelId])
