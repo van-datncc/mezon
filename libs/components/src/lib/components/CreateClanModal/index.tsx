@@ -6,11 +6,17 @@ import { ValidateSpecialCharacters } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../Icons';
+import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
 
 export type ModalCreateClansProps = {
 	open: boolean;
 	onClose: () => void;
 };
+
+type openModalErrorProps = {
+	errorType: boolean,
+	errorSize: boolean,
+}
 
 const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { open, onClose } = props;
@@ -34,13 +40,32 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			setCheckValidate(true);
 		}
 	};
+	const [openModalError, seOpenModalError] = useState<openModalErrorProps>(
+		{
+			errorType: false,
+			errorSize: false,
+		}
+	);
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
 		const session = sessionRef.current;
 		const client = clientRef.current;
+		const sizeImage = file?.size;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
+		}
+		const allowedTypes = ['image/jpeg', 'image/png'];
+		if (!allowedTypes.includes(file.type)) {
+			seOpenModalError((prev) => ({...prev, errorType: true}));
+			e.target.value = null;
+			return;
+		}
+
+		if (sizeImage > 1000000) {
+			seOpenModalError((prev) => ({...prev, errorSize: true}));
+			e.target.value = null;
+			return;
 		}
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
@@ -114,6 +139,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					</span>
 				</div>
 			</div>
+			<ModalErrorTypeUpload openModal={openModalError.errorType} handleClose={() => seOpenModalError((prev) => ({...prev, errorType: false}))}/>
+			<ModalOverData openModal={openModalError.errorSize} handleClose={() => seOpenModalError((prev) => ({...prev, errorSize: false}))}/>
 		</Modal>
 	);
 };

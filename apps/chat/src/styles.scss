@@ -254,6 +254,7 @@ input:-webkit-autofill:active {
 	-webkit-line-clamp: 1;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+	max-width: 100%;
 }
 
 // css inBox dropdrow nocation
@@ -669,4 +670,8 @@ input:-webkit-autofill:active {
 
 .textWhiteHoverImportant:hover{
 	color: white !important;
+}
+
+.hoverIconBlackImportant:hover button svg{
+	color: black;
 }

@@ -103,7 +103,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					/>
 					{!openEditName && <h2 className="shrink-1 dark:text-white text-black text-ellipsis" onClick={handleOpenEditName}>{label}</h2>}
 					{openEditName && 
-						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='bg-transparent w-full'/>
+						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded'/>
 					}
 				</div>
 
