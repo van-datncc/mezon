@@ -1,5 +1,6 @@
 import { useMemberStatus } from '@mezon/core';
 import { ChannelMembersEntity, selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
+import { MemberProfileType } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
@@ -17,7 +18,7 @@ function MemberItem({ user, listProfile, isOffline }: MemberItemProps) {
 		<MemberProfile
 			numberCharacterCollapse={30}
 			avatar={user?.user?.avatar_url ?? ''}
-			name={clanProfile?.nick_name || user?.user?.display_name ||user?.user?.username || ''}
+			name={clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || ''}
 			status={userStatus}
 			isHideStatus={true}
 			isHideIconStatus={userStatus ? false : true}
@@ -25,6 +26,7 @@ function MemberItem({ user, listProfile, isOffline }: MemberItemProps) {
 			user={user}
 			listProfile={listProfile}
 			isOffline={isOffline}
+			positionType={MemberProfileType.MEMBER_LIST}
 		/>
 	);
 }

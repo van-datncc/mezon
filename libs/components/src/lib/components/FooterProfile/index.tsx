@@ -8,6 +8,7 @@ import {
 	userClanProfileActions,
 	voiceActions,
 } from '@mezon/store';
+import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
@@ -53,13 +54,13 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
 	};
 
-	const {setIsShowSettingFooterStatus} = useSettingFooter();
+	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	const openSetting = () => {
 		setIsShowSettingFooterStatus(true);
-	}
+	};
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
-	
+
 	return (
 		<>
 			<button
@@ -69,15 +70,19 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
-				<div className={`footer-profile ${appearanceTheme === 'light' && 'lightMode'}`} ref={profileRef} onClick={handleClickFooterProfile}>
+				<div
+					className={`footer-profile min-w-[142px] ${appearanceTheme === 'light' && 'lightMode'}`}
+					ref={profileRef}
+					onClick={handleClickFooterProfile}
+				>
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
 							status={status}
 							avatar={avatar}
 							isHideStatus={false}
-							numberCharacterCollapse={15}
 							classParent="memberProfile"
+							positionType={MemberProfileType.FOOTER_PROFILE}
 						/>
 					</div>
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
