@@ -314,6 +314,14 @@ export enum SubPanelName {
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
 }
 
+export enum MemberProfileType {
+	MEMBER_LIST = 'member_list',
+	FOOTER_PROFILE = 'footer_profile',
+	DM_LIST = 'dm_list_friends',
+	DM_MEMBER_GROUP = 'dm_member_group',
+	LIST_FRIENDS = 'list_friends',
+}
+
 export type IEmoji = {
 	category: string;
 	emoji: string;
