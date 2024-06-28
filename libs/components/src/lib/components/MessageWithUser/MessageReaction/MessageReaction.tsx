@@ -1,5 +1,11 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
-import { selectDataSocketUpdate, selectIdMessageRefReaction, selectReactionBottomState, selectReactionBottomStateResponsive } from '@mezon/store';
+import {
+	reactionActions,
+	selectDataSocketUpdate,
+	selectIdMessageRefReaction,
+	selectReactionBottomState,
+	selectReactionBottomStateResponsive,
+} from '@mezon/store';
 import {
 	EmojiDataOptionals,
 	IMessageWithUser,
@@ -67,6 +73,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	useEffect(() => {
 		const handleDataReaction = updateEmojiReactionData(dataSocketConvert);
 		const filter = extractMessageIds(handleDataReaction);
+		dispatch(reactionActions.setReactionMessageList(filter));
 	}, [dataSocketConvert]);
 
 	return (
