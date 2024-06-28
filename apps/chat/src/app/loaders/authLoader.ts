@@ -23,7 +23,7 @@ function getRedirectTo(initialPath?: string): string {
 }
 
 export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
-	// dispatch(clansActions.joinClan({ clanId: '0' }));
+	dispatch(clansActions.joinClan({ clanId: '0' }));
 	try {
 		const response = await dispatch(authActions.refreshSession());
 		if ((response as unknown as IWithError).error) {

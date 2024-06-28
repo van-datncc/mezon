@@ -97,7 +97,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			<Link
 				to={channelPath}
 				key={thread.channel_id}
-				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full overflow-x-hidden whitespace-nowrap ${active || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
+				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${active || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
 				onClick={() => {

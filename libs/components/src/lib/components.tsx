@@ -49,7 +49,6 @@ export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 
-export { default as ModalUserProfile } from './components/ModalUserProfile';
 export { default as SearchMessageChannelRender } from './components/SearchMessageChannel/SearchMessageChannelRender';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as SettingAppearance } from './components/SettingAppearance';
@@ -57,5 +56,7 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
+export { default as ModalUserProfile } from './components/ModalUserProfile';
+export { ModalOverData, ModalErrorTypeUpload } from './components/ModalError';
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/Firebase/firebase';
