@@ -648,8 +648,8 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		borderRadius: 50,
 		backgroundColor: Colors.tertiaryWeight,
-		width: 30,
-		height: 30,
+		width: 40,
+		height: 40,
 	},
   sortButton: {
     paddingHorizontal: size.s_14, paddingVertical: size.s_6
