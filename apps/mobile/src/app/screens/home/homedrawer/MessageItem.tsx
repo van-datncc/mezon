@@ -21,9 +21,9 @@ import {
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	selectMessageEntityById,
-	selectIdMessageToJump,
+  selectIdMessageToJump,
 	referencesActions,
-	selectLastSeenMessage,
+  selectLastSeenMessage,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store-mobile';
@@ -334,7 +334,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	return (
-		<View
+    <View
 			style={[
 				styles.messageWrapper,
 				isCombine && { marginTop: 0 },
@@ -342,12 +342,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				checkMessageTargetToMoved && styles.highlightMessageReply
 			]}
 		>
-			{lastSeen &&
+      {lastSeen &&
 				<View style={styles.newMessageLine}>
 					<View style={styles.newMessageContainer}>
 						<Text style={styles.newMessageText}>NEW MESSAGE</Text>
-				</View>
-			</View>}
+					</View>
+				</View>}
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>

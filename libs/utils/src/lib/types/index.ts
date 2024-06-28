@@ -168,6 +168,7 @@ export type IMessage = ChannelMessage & {
 	isSending?: boolean;
 	isError?: boolean;
 	isMe?: boolean;
+	isAnonymous?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
