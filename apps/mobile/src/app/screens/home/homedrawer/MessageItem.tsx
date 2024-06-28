@@ -23,6 +23,7 @@ import {
 	selectMessageEntityById,
 	selectIdMessageToJump,
 	referencesActions,
+	selectLastSeenMessage,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store-mobile';
@@ -98,6 +99,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectEmojiImage);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
+	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.message));
 	const { deleteSendMessage } = useDeleteMessage({ channelId: props.channelId, mode: props.mode });
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
@@ -340,6 +342,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				checkMessageTargetToMoved && styles.highlightMessageReply
 			]}
 		>
+			{lastSeen &&
+				<View style={styles.newMessageLine}>
+					<View style={styles.newMessageContainer}>
+						<Text style={styles.newMessageText}>NEW MESSAGE</Text>
+				</View>
+			</View>}
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
@@ -395,6 +403,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				) : (
 					<View style={styles.wrapperAvatarCombine} />
 				)}
+
 				<Pressable
 					style={[styles.rowMessageBox]}
 					onLongPress={() => {
