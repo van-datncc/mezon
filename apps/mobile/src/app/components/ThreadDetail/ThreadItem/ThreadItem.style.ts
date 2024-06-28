@@ -16,5 +16,5 @@ export const styles = StyleSheet.create({
 	textThreadCreateBy: { fontSize: size.medium, color: Colors.textGray, fontWeight: '500' },
 	bullet: { marginHorizontal: 5, fontSize: size.s_18, color: Colors.textGray, marginLeft: size.s_10 },
 	createTime: { fontSize: size.medium, color: Colors.textGray, fontWeight: '500' },
-	messageContent: { marginLeft: size.s_6, fontSize: size.medium, color: Colors.textGray, fontWeight: '500', maxWidth: 170 },
+	messageContent: { marginLeft: size.s_6, fontSize: size.medium, color: Colors.textGray, fontWeight: '500', maxWidth: '25%' },
 });

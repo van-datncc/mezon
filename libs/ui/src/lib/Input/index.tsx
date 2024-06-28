@@ -8,6 +8,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 	className?: string;
 	required?: boolean;
 	maxLength?: number;
+	onkeypress?: any;
 }
 
 const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, required, ...rest }) => {

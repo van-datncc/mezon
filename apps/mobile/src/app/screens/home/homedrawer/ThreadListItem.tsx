@@ -36,7 +36,7 @@ export default function ThreadListItem({ onPress, thread, isActive, isFirstThrea
             <View style={[styles.threadItem]}>
                 {isActive && <View style={[styles.threadItemActive, isFirstThread && styles.threadFirstItemActive]} />}
                 {isFirstThread ? <ShortCornerIcon /> : <LongCornerIcon />}
-                <Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]}>{thread?.channel_label}</Text>
+                <Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]} numberOfLines={1}>{thread?.channel_label}</Text>
             </View>
 
             {numberNotification > 0 &&
