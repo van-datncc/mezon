@@ -128,6 +128,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 						placeholderTextColor={Colors.textGray}
 						value={nameClan}
 						clearButtonMode={'always'}
+            maxLength={64}
 					/>
 					{!isCheckValid && <ErrorInput style={s.errorMessage} errorMessage={t('errorMessage')} />}
 					<Text style={s.community}>
