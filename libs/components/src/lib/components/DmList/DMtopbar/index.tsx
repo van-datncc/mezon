@@ -43,7 +43,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const [openEditName, setOpenEditName] = useState(false);
 	const [label, setLabel] = useState(currentDmGroup?.channel_label);
 	const handleOpenEditName = () => {
-		if(currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP ){
+		if(currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ){
 			setOpenEditName(true);
 		}
 	}
@@ -128,14 +128,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 									<Icons.IconAddFriendDM />
 								</Tooltip>
 							</button>
-							{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP &&
+							{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
 								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} >
 									<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
 										<Icons.MemberList isWhite={isShowMemberListDM}/>
 									</Tooltip>
 								</button>
 							}
-							{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM &&  
+							{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&  
 								<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
 									<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
 										<Icons.IconUserProfileDM />
@@ -153,14 +153,14 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 					</div>
 				</div>
-				{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP &&
+				{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
 					<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className='sbm:hidden'>
 						<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
 							<Icons.MemberList isWhite={isShowMemberListDM}/>
 						</Tooltip>
 					</button>
 				}
-				{ currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM &&  
+				{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&  
 					<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className='sbm:hidden'>
 						<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
 							<Icons.IconUserProfileDM />

@@ -189,7 +189,7 @@ export default function DirectMessage() {
 						<div
 							className={`dark:bg-bgSecondary bg-bgLightSecondary ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
 						>
-							<MemberListGroupChat directMessageId={directId} createId={currentDmGroup.creator_id}/>
+							<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id}/>
 						</div>
 					)}
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
