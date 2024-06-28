@@ -2,17 +2,17 @@ import {
 	appActions,
 	clansActions,
 	directActions,
-	eventManagementActions,
 	friendsActions,
 	getStoreAsync,
 	notificationActions,
 	selectAllClans,
 	selectCurrentClan,
+	selectSession,
 } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import React, { useEffect } from 'react';
-import { SafeAreaView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import BarsLogo from '../../../assets/svg/bars.svg';
 import SearchLogo from '../../../assets/svg/discoverySearch.svg';
@@ -87,6 +87,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const clans = useSelector(selectAllClans);
+	const session = useSelector(selectSession);
 
 	useEffect(() => {
 		if (clans?.length && !currentClan) {
@@ -96,7 +97,7 @@ const HomeScreen = React.memo((props: any) => {
 
 	useEffect(() => {
 		mainLoader();
-	}, []);
+	}, [session?.token]);
 
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
@@ -107,8 +108,8 @@ const HomeScreen = React.memo((props: any) => {
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		if (currentClan) {
-		store.dispatch(clansActions.joinClan({clanId: "0"}),);
-      	store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+			store.dispatch(clansActions.joinClan({ clanId: '0' }));
+			store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
 		}
 		return null;
@@ -118,15 +119,13 @@ const HomeScreen = React.memo((props: any) => {
 		const lastClanId = clans?.[clans?.length - 1]?.clan_id;
 		const store = await getStoreAsync();
 		if (lastClanId) {
-      store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
+			store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: lastClanId }));
 		}
 		return null;
 	};
 
-	return (
-		<DrawerScreen navigation={props.navigation} />
-	);
+	return <DrawerScreen navigation={props.navigation} />;
 });
 
 export default HomeScreen;

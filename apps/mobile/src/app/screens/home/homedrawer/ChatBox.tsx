@@ -11,7 +11,7 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size } from '@mezon/mobile-ui';
 import {
 	RootState,
 	selectAllUsers,
@@ -117,7 +117,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	});
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
-	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
+	const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
 	const [isFocus, setIsFocus] = useState<boolean>(false);

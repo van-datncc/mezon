@@ -97,7 +97,7 @@ const LoginScreen = () => {
 				<View style={styles.googleButton}>
 					{Platform.OS === 'android' && (
 						<Block>
-							<GoogleLogin />
+							<GoogleLogin onGoogleButtonPress={onGoogleButtonPress} />
 							<Text style={styles.orText}>Or</Text>
 						</Block>
 					)}
