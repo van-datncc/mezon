@@ -21,7 +21,9 @@ import {
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	selectMessageEntityById,
-	selectLastSeenMessage,
+  selectIdMessageToJump,
+	referencesActions,
+  selectLastSeenMessage,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store-mobile';
@@ -62,9 +64,10 @@ export type MessageItemProps = {
 	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
-  currentClan?: ClansEntity;
-  clansProfile?:  UserClanProfileEntity[];
-  channelMember?: ChannelMembersEntity[];
+	jumpToRepliedMessage?: (messageId: string) => void;
+	currentClan?: ClansEntity;
+	clansProfile?:  UserClanProfileEntity[];
+	channelMember?: ChannelMembersEntity[];
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -72,7 +75,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile } = props;
+	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message = useMemo(() => {
 		return props?.message ? props?.message : selectedMessage;
@@ -107,6 +110,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
   const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const videoRef = React.useRef(null);
+	const idMessageToJump = useSelector(selectIdMessageToJump);
+	const checkMessageTargetToMoved = useMemo(() => {
+		return idMessageToJump === message?.id;
+	}, [idMessageToJump, message?.id]);
 
 	const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 		const videos: ApiMessageAttachment[] = [];
@@ -308,12 +315,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		deleteSendMessage(message.id);
 	};
 
+	const handleJumpToMessage = (messageId: string) => {
+		dispatch(referencesActions.setIdMessageToJump(messageId));
+		jumpToRepliedMessage(messageRefFetchFromServe?.id);
+	}
+
 	const setMessageSelected = (type: EMessageBSToShow) => {
 		setOpenBottomSheet(type);
-	};
-
-	const jumpToRepliedMessage = () => {
-		console.log('message to jump', messageRefFetchFromServe);
 	};
 
 	const isEdited = useMemo(() => {
@@ -326,21 +334,26 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	return (
-		<View style={[styles.messageWrapper, isCombine && { marginTop: 0 }, hasIncludeMention && styles.highlightMessageMention]}>
-			{lastSeen &&
+    <View
+			style={[
+				styles.messageWrapper,
+				isCombine && { marginTop: 0 },
+				hasIncludeMention && styles.highlightMessageMention,
+				checkMessageTargetToMoved && styles.highlightMessageReply
+			]}
+		>
+      {lastSeen &&
 				<View style={styles.newMessageLine}>
 					<View style={styles.newMessageContainer}>
 						<Text style={styles.newMessageText}>NEW MESSAGE</Text>
 					</View>
 				</View>}
-
-
 			{messageRefFetchFromServe ? (
 				<View style={styles.aboveMessage}>
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-					<Pressable onPress={() => jumpToRepliedMessage()} style={styles.repliedMessageWrapper}>
+					<Pressable onPress={() => handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
 								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />

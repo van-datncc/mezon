@@ -128,6 +128,7 @@ export const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: 'bold',
 		color: Colors.tertiary,
+    flexBasis: '75%'
 	},
 	channelListItem: {
 		paddingHorizontal: 10,
@@ -378,6 +379,12 @@ export const styles = StyleSheet.create({
 	highlightMessageMention: {
 		backgroundColor: Colors.bgMessageHighlight,
 		borderLeftColor: Colors.borderMessageHighlight,
+		borderLeftWidth: 2,
+		paddingTop: size.s_2,
+	},
+	highlightMessageReply: {
+		backgroundColor: Colors.bgReply,
+		borderLeftColor: Colors.borderMessageReply,
 		borderLeftWidth: 2,
 		paddingTop: size.s_2,
 	},
@@ -669,5 +676,8 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.tertiaryWeight,
 		width: 30,
 		height: 30,
-	}
+	},
+  sortButton: {
+    paddingHorizontal: size.s_14, paddingVertical: size.s_6
+  }
 });

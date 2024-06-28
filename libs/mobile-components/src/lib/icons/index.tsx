@@ -1019,3 +1019,16 @@ export function ProfileTab({ width = 24, height = 24, color = '#a1a1a9', ...prop
 		</Svg>
 	)
 }
+
+export function SortIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 16 16" {...props}>
+			<Path
+				fill={color}
+				fillRule="evenodd"
+				d="M5.22 10.22a.75.75 0 011.06 0L8 11.94l1.72-1.72a.75.75 0 111.06 1.06l-2.25 2.25a.75.75 0 01-1.06 0l-2.25-2.25a.75.75 0 010-1.06zm5.56-4.44a.75.75 0 01-1.06 0L8 4.06 6.28 5.78a.75.75 0 01-1.06-1.06l2.25-2.25a.75.75 0 011.06 0l2.25 2.25a.75.75 0 010 1.06z"
+				clipRule="evenodd"
+			/>
+		</Svg>
+	);
+}

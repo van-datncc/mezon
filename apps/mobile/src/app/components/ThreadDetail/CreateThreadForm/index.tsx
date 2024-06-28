@@ -158,6 +158,7 @@ export default function CreateThreadForm() {
 									placeholderTextColor="#7e848c"
 									placeholder="New Thread"
 									style={styles.inputThreadName}
+                  maxLength={64}
 								/>
 								{!isCheckValid && <ErrorInput style={styles.errorMessage} errorMessage={t('errorMessage')} />}
 							</SafeAreaView>
