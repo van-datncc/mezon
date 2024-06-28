@@ -148,7 +148,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	async function loadMessageCache() {
 		const messages = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
 		setAllMessages(messages);
-		return messages[props?.channelId] || "";
+		return messages?.[props?.channelId] || "";
 	}
 
 	function setMessageCache(text: string) {
