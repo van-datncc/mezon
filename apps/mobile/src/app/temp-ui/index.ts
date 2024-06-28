@@ -15,6 +15,7 @@ export * from './MezonTab';
 export * from './MezonBottomSheet'
 export * from './MezonSelect';
 export * from './MezonDateTimePicker';
+export * from './MezonConfirm';
 
 export { default as MezonMenu } from './MezonMenu';
 export { default as MezonOption } from './MezonOption';
@@ -26,4 +27,4 @@ export { default as MezonTab } from './MezonTab';
 export { default as MezonBottomSheet } from './MezonBottomSheet';
 export { default as MezonSelect } from './MezonSelect';
 export { default as MezonDateTimePicker } from "./MezonDateTimePicker"
-
+export { default as MezonConfirm } from "./MezonConfirm";

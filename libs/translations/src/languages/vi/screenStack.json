@@ -4,5 +4,8 @@
         "channelCreator": "Tạo Channel",
         "clanSetting": "Cài đặt Clan",
         "clanOverviewSetting": "Tổng quan"
+    },
+    "menuChannelStack": {
+        "channelSetting": "Cài đặt Channel"
     }
 }
