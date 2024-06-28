@@ -34,10 +34,19 @@ const handleCopyImage = async (urlData: string) => {
 };
 
 const handleSaveImage = (urlData: string) => {
-	const a = document.createElement('a');
-	a.href = urlData;
-	a.download = 'image.png';
-	a.click();
+	fetch(urlData)  
+		.then((response) => response.blob())
+		.then((blob) => {
+			const url = window.URL.createObjectURL(new Blob([blob]));
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'image.png';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(url);
+		})
+		.catch((error) => console.error('Error downloading image:', error));
 };
 
 const handleCopyLink = (urlData: string) => {
@@ -53,7 +62,5 @@ const handleCopyLink = (urlData: string) => {
 const handleOpenLink = (urlData: string) => {
 	window.open(urlData, '_blank');
 };
-
-
 
 export { convertImageToBlobFile, handleCopyImage, handleCopyLink, handleOpenLink, handleSaveImage };
