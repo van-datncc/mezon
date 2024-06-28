@@ -8,6 +8,7 @@ export default function ChannelIndex() {
 	const { clanId } = useAppParams();
 	const defaultCategory = useSelector(selectDefaultCategory);
 	const isSelectedChannel = useSelector(selectAllIdChannelSelected);
+	localStorage.setItem('remember_channel', JSON.stringify(isSelectedChannel));
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || '', defaultCategory?.category_id, isSelectedChannel));
 	const { navigate } = useAppNavigation();
 
