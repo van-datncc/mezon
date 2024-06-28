@@ -6,9 +6,10 @@ import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import { useAuth, useFriends } from '@mezon/core';
 import { useTranslation } from 'react-i18next';
 import { Colors, size } from '@mezon/mobile-ui';
-import { requestAddFriendParam } from '@mezon/store-mobile';
+import { requestAddFriendParam, selectAddFriendError } from '@mezon/store-mobile';
 import Toast from 'react-native-toast-message';
-import { UserPlusIcon } from '@mezon/mobile-components';
+import { CloseIcon } from '@mezon/mobile-components';
+import { useSelector } from 'react-redux';
 
 interface IAddFriendModal {
     type: EAddFriendWays;
@@ -19,6 +20,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
     const { type, onClose } = props;
     const { userProfile } = useAuth();
     const { addFriend } = useFriends();
+    const addFriendError = useSelector(selectAddFriendError);
     const [visibleModal, setVisibleModal] = useState<boolean>(false);
     const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({
 		usernames: [],
@@ -27,6 +29,18 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
     const [isKeyBoardShow, setIsKeyBoardShow] = useState<boolean>(false);
     const { t } = useTranslation('friends');
     const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (addFriendError) {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: addFriendError,
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                }
+            });
+        }
+    }, [addFriendError])
 
     useEffect(() => {
         let timeoutId: NodeJS.Timeout;
@@ -84,13 +98,6 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
             inputRef.current.blur();
         }
         await addFriend(requestAddFriend);
-        Toast.show({
-            type: 'success',
-            props: {
-                text2: t('addFriend.addFriendToast'),
-                leadingIcon: <UserPlusIcon color={Colors.green} width={30} height={17} />
-            }
-        });
         resetField();
     }
 

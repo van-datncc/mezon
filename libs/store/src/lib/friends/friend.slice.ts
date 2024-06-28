@@ -67,11 +67,13 @@ export type requestAddFriendParam = {
 };
 
 export const sendRequestAddFriend = createAsyncThunk('friends/requestFriends', async ({ ids, usernames }: requestAddFriendParam, thunkAPI) => {
+	thunkAPI.dispatch(friendsActions.setErrorMessageMobile(''));
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	await mezon.client
 		.addFriends(mezon.session, ids, usernames)
 		.catch(function (err) {
 			err.json().then((data: any) => {
+				thunkAPI.dispatch(friendsActions.setErrorMessageMobile(data.message));
 				toast.error(data.message);
 			});
 		})
@@ -124,6 +126,9 @@ export const friendsSlice = createSlice({
 		changeCurrentStatusTab: (state, action: PayloadAction<string>) => {
 			state.currentTabStatus = action.payload;
 		},
+		setErrorMessageMobile: (state, action: PayloadAction<string>) => {
+			state.error = action.payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -159,5 +164,6 @@ const { selectAll } = friendsAdapter.getSelectors();
 
 export const getFriendsState = (rootState: { [FRIEND_FEATURE_KEY]: FriendsState }): FriendsState => rootState[FRIEND_FEATURE_KEY];
 export const selectAllFriends = createSelector(getFriendsState, selectAll);
+export const selectAddFriendError = createSelector(getFriendsState, state => state.error);
 
 export const selectAddFriends = (userID: string) => createSelector(selectAllFriends, (friends) => friends.some(friend => friend.state === 0 && friend.id === userID));

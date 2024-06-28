@@ -106,7 +106,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message, userLogin]);
 	const isCombine = !message.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
-  const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const videoRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const checkMessageTargetToMoved = useMemo(() => {
@@ -357,16 +358,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								</View>
 							</View>
 						)}
-						<Text style={styles.repliedContentText} numberOfLines={1}>
-							{messageRefFetchFromServe?.content?.t?.trim()}
-						</Text>
+						<View style={styles.replyContentWrapper}>
+							<Text style={styles.replyDisplayName}>
+								{clanProfileSender?.nick_name || messageRefFetchFromServe?.user?.name || messageRefFetchFromServe?.user?.username || 'Anonymous'}
+							</Text>
+							{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, channelMember, true)}
+						</View>
 					</Pressable>
 				</View>
 			) : null}
 			{isMessageReplyDeleted ? (
 				<View style={styles.aboveMessageDeleteReply}>
 					<View style={styles.iconReply}>
-						<ReplyIcon width={34} height={30} />
+						<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
 					</View>
 					<View style={styles.iconMessageDeleteReply}>
 						<ReplyMessageDeleted width={18} height={9} />

@@ -334,10 +334,14 @@ export const styles = StyleSheet.create({
 		gap: 15,
 	},
 	iconReply: {
-		width: 35,
+		width: size.s_34,
 		height: '100%',
 		alignItems: 'center',
-		paddingLeft: 30,
+		paddingLeft: size.s_30,
+		marginTop: size.s_4,
+	},
+	deletedMessageReplyIcon: {
+		top: size.s_4
 	},
 	replyAvatar: {
 		width: size.s_20,
@@ -366,16 +370,11 @@ export const styles = StyleSheet.create({
 		fontSize: size.s_16,
 		color: Colors.white,
 	},
-	repliedContentText: {
-		fontSize: size.small,
-		color: Colors.tertiary,
-		overflow: 'hidden',
-		width: '80%',
-	},
 	repliedMessageWrapper: {
 		flexDirection: 'row',
 		gap: 8,
 		marginRight: 0,
+		marginTop: size.s_4
 	},
 	wrapperMessageBoxCombine: {
 		// marginBottom: size.s_10,
@@ -392,6 +391,17 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'flex-end',
 		marginBottom: size.s_6,
+	},
+	replyDisplayName: {
+		color: Colors.caribbeanGreen,
+		fontSize: size.small
+	},
+	replyContentWrapper: {
+		width: '85%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		top: -size.s_8,
+		gap: 4
 	},
 	userNameMessageBox: {
 		fontSize: size.medium,
@@ -606,6 +616,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
 		gap: 5,
+		alignItems: 'center'
 	},
 	iconMessageDeleteReply: {
 		backgroundColor: Colors.bgCharcoal,
