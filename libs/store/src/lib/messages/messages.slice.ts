@@ -26,6 +26,8 @@ import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } fr
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 export const MESSAGES_FEATURE_KEY = 'messages';
 
 /*
@@ -35,12 +37,15 @@ export const MESSAGES_FEATURE_KEY = 'messages';
 export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
 	const creationTime = new Date(channelMess.create_time || '');
 	const creationTimeMs = creationTime.getTime();
+	const isAnonymous = channelMess?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
+
 	return {
 		...channelMess,
 		creationTime,
 		creationTimeMs,
 		id: channelMess.id || '',
 		date: new Date().toLocaleString(),
+		isAnonymous,
 		user: {
 			name: channelMess.username || '',
 			username: channelMess.username || '',
@@ -418,7 +423,7 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isSending, content } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content } = action.payload;
 			if (!channelId || !messageId) return state;
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -430,8 +435,10 @@ export const messagesSlice = createSlice({
 				case 0: {
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 
-					// remove sending message
-					if (!isSending) {
+					// remove sending message when receive new message by the same user
+					// potential bug: if the user send the same message multiple times
+					// or the sending message is the same as the received message from the server
+					if (!isSending && (isMe || isAnonymous)) {
 						const newContent = content;
 
 						const sendingMessages = state.channelMessages[channelId].ids.filter(
@@ -444,6 +451,9 @@ export const messagesSlice = createSlice({
 								// for later update, we could use some kind of id to identify the message
 								if (message?.content?.t === newContent?.t) {
 									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
+									
+									// remove the first one and break
+									// prevent removing all sending messages with the same content
 									break;
 								}
 							}
