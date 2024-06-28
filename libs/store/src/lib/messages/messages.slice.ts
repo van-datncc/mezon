@@ -449,9 +449,9 @@ export const messagesSlice = createSlice({
 								const message = state.channelMessages[channelId].entities[mid];
 								// temporary remove sending message that has the same content
 								// for later update, we could use some kind of id to identify the message
-								if (message?.content?.t === newContent?.t) {
+								if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
 									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
-									
+
 									// remove the first one and break
 									// prevent removing all sending messages with the same content
 									break;
