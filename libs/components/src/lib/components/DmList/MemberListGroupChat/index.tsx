@@ -20,7 +20,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 				{
 					<div className="flex flex-col gap-4 text-[#AEAEAE]">
 						{rawMembers.map((user: ChannelMembersEntity) => (
-							<div className="flex items-center hihi" key={user.id}>
+							<div className="flex items-center" key={user.id}>
 								<MemberProfile
 									numberCharacterCollapse={30}
 									avatar={user?.user?.avatar_url ?? ''}
