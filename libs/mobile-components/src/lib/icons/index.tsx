@@ -1032,3 +1032,14 @@ export function SortIcon({ width = 24, height = 24, color = 'white', ...props }:
 		</Svg>
 	);
 }
+
+export function MenuHorizontalIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 32 32" {...props}>
+			<Path
+				d="M9.333 16.001a2.667 2.667 0 10-5.333 0 2.667 2.667 0 005.333 0zm9.334 0a2.667 2.667 0 10-5.334 0 2.667 2.667 0 005.334 0zm6.666-2.666a2.667 2.667 0 110 5.333 2.667 2.667 0 010-5.333z"
+				fill={color}
+			/>
+		</Svg>
+	);
+}
