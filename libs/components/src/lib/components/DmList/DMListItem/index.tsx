@@ -11,8 +11,7 @@ export type DirectMessProp = {
 
 export type directMessageValueProps = {
 	type: string;
-	channelId: string;
-	clanId: string;
+	userId: string[];
 };
 
 function DMListItem({ directMessage }: DirectMessProp) {
@@ -63,8 +62,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 
 	const directMessageValue: directMessageValueProps = {
 		type: directMessage.type,
-		channelId: directMessage.channel_id,
-		clanId: directMessage.channel_label,
+		userId: directMessage.user_id,
 	};
 
 	return (
@@ -90,6 +88,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				directMessageValue={directMessageValue}
 				isHideAnimation={true}
 				positionType={MemberProfileType.DM_LIST}
+				countMember={directMessage?.channel_avatar?.length + 1}
 			/>
 			{isHovered && (
 				<button

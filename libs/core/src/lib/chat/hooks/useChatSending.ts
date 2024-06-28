@@ -5,6 +5,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelStreamMode } from 'mezon-js';
+import { useAppParams } from '../../app/hooks/useAppParams';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -14,16 +15,20 @@ export type UseChatSendingOptions = {
 
 // TODO: separate this hook into 2 hooks for send and edit message
 export function useChatSending({ channelId, channelLabel, mode }: UseChatSendingOptions) {
+	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
 	// If not, using 2 hooks for direct and channel
-	const direct = useSelector(selectDirectById(channelId));
+	const direct = useSelector(selectDirectById(directId || ""));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
-
+	var channelID = channelId
+	if (direct) {
+		channelID = direct.id
+	}
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -34,7 +39,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 			mentionEveryone?: boolean,
 		) => {
 			return dispatch(messagesActions.sendMessage({
-				channelId,
+				channelId: channelID,
 				clanId: currentClanId ?? '',
 				mode,
 				content,
@@ -46,7 +51,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 				senderId: currentUserId,
 			}))
 		},
-		[dispatch, channelId, currentClanId, mode, currentUserId],
+		[dispatch, channelID, currentClanId, mode, currentUserId],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {

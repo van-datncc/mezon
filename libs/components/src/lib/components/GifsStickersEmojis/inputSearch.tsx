@@ -1,4 +1,4 @@
-import { useChatReaction, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
