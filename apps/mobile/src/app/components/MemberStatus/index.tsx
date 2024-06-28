@@ -77,9 +77,9 @@ export const MemberListStatus = React.memo(() => {
 			) : null}
 
 			<View>
-				{onlineMembers.length > 0 && (
+				{onlineMembers?.length > 0 && (
 					<View>
-						<Text style={style.text}>Member - {onlineMembers.length}</Text>
+						<Text style={style.text}>Member - {onlineMembers?.length || '0'}</Text>
 						<View style={style.box}>
 							{onlineMembers.map((user) => (
 								<MemberItem
@@ -93,9 +93,9 @@ export const MemberListStatus = React.memo(() => {
 						</View>
 					</View>
 				)}
-				{offlineMembers.length > 0 && (
+				{offlineMembers?.length > 0 && (
 					<View style={{ marginTop: 20 }}>
-						<Text style={style.text}>Offline - {offlineMembers.length}</Text>
+						<Text style={style.text}>Offline - {offlineMembers?.length}</Text>
 						<View style={style.box}>
 							{offlineMembers.map((user) => (
 								<MemberItem

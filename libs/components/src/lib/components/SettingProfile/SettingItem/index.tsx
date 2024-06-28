@@ -38,7 +38,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px]  ${selectedButton === 'Profiles' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px] font-medium ${selectedButton === 'Profiles' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Profiles');
 						onItemClick && onItemClick('Profiles');
@@ -82,7 +82,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				<button className="pt-2 dark:text-[#84ADFF] text-black mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px]  ${selectedButton === 'Appearance' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px] font-medium ${selectedButton === 'Appearance' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Appearance');
 						onItemClick && onItemClick('Appearance');

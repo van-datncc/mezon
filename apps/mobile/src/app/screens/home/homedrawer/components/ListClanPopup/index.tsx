@@ -40,7 +40,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 	}, [currentClan]);
 
 	const scrollToCurrentClan = () => {
-		const currentIndex = clans.findIndex((clan) => clan.clan_id === currentClan.clan_id);
+		const currentIndex = clans.findIndex((clan) => clan?.clan_id === currentClan?.clan_id);
 
 		if (currentIndex !== -1 && scrollViewRef.current) {
 			const itemHeight = 50;
@@ -56,7 +56,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 				{clans.map((clan) => (
 					<Pressable
 						onPress={() => {
-							handleChangeClan(clan.clan_id);
+							handleChangeClan(clan?.clan_id);
 						}}
 						key={clan.id}
 						style={[styles.serverItem, { backgroundColor: currentClan?.clan_id === clan?.clan_id ? '#141c2a' : Colors.secondary }]}

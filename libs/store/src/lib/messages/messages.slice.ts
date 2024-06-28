@@ -14,7 +14,8 @@ import {
 	createEntityAdapter,
 	createSelector,
 	createSelectorCreator,
-	createSlice, weakMapMemoize
+	createSlice,
+	weakMapMemoize,
 } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -79,6 +80,7 @@ export interface MessagesState {
 	openOptionMessageState: boolean;
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
+	isFocused: boolean;
 	channelMessages: Record<
 		string,
 		EntityState<MessagesEntity, string> & {
@@ -391,6 +393,7 @@ export const initialMessagesState: MessagesState = {
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
 	channelMessages: {},
+	isFocused: false,
 };
 
 export type SetCursorChannelArgs = {
@@ -425,25 +428,26 @@ export const messagesSlice = createSlice({
 			const channelEntity = state.channelMessages[channelId];
 			switch (code) {
 				case 0: {
-					
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 
 					// remove sending message
-					if (isMe && !isSending) {
+					if ((isMe && !isSending) || (!isMe && !isSending)) {
 						const newContent = content;
 
-						const sendingMessages = state.channelMessages[channelId].ids.filter((id) => state.channelMessages[channelId].entities[id].isSending);
+						const sendingMessages = state.channelMessages[channelId].ids.filter(
+							(id) => state.channelMessages[channelId].entities[id].isSending,
+						);
 						if (sendingMessages && sendingMessages.length) {
 							for (const mid of sendingMessages) {
 								const message = state.channelMessages[channelId].entities[mid];
-			
+
 								if (message?.content?.t === newContent?.t) {
 									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
 									break;
 								}
 							}
 						}
-					}	
+					}
 
 					break;
 				}
@@ -542,6 +546,9 @@ export const messagesSlice = createSlice({
 		},
 		setOpenOptionMessageState(state, action) {
 			state.openOptionMessageState = action.payload;
+		},
+		setIsFocused(state, action) {
+			state.isFocused = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -711,6 +718,8 @@ export const selectMessageByMessageId = (messageId: string) =>
 	});
 
 export const selectQuantitiesMessageRemain = createSelector(getMessagesState, (state) => state.quantitiesMessageRemain);
+
+export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 
 // V2
 

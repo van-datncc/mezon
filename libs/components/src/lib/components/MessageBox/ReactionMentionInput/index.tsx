@@ -12,6 +12,7 @@ import {
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	messagesActions,
 	reactionActions,
 	referencesActions,
 	selectAllUsesClan,
@@ -21,6 +22,7 @@ import {
 	selectCurrentChannelId,
 	selectDataReferences,
 	selectIdMessageRefReply,
+	selectIsFocused,
 	selectMessageByMessageId,
 	selectOpenEditMessageState,
 	selectOpenReplyMessageState,
@@ -92,8 +94,6 @@ export type MentionReactInputProps = {
 	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
-	readonly finishUpload?: boolean;
-	readonly onFinishUpload?: () => void;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -123,6 +123,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const reactionRightState = useSelector(selectReactionRightState);
+	const isFocused = useSelector(selectIsFocused);
 
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
@@ -441,11 +442,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, valueTextInput]);
 
 	useEffect(() => {
-		if (props.finishUpload) {
+		if (isFocused) {
 			editorRef.current?.focus();
-			props.onFinishUpload?.();
+			dispatch(messagesActions.setIsFocused(false));
 		}
-	}, [props, props.finishUpload]);
+	}, [dispatch, isFocused]);
 
 	return (
 		<div className="relative">

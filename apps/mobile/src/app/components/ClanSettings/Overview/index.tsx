@@ -31,7 +31,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
         const name = clanName.trim();
         setClanName(name);
 
-        if (name.length === 0) {
+        if (name?.length === 0) {
             Toast.show({
                 type: "error",
                 text1: t("toast.notBlank")

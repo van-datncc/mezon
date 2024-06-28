@@ -14,11 +14,13 @@ import {
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	RootState,
+	selectAllUsers,
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiImage,
 	selectHiddenBottomTabMobile,
 	selectMemberByUserId,
+  selectMembersByChannelId,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
@@ -137,6 +139,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
 	const [allMessages, setAllMessages] = useState<{ [key: string]: string }>({});
+	const rawMembers = useSelector(selectMembersByChannelId(props?.channelId));
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -272,7 +275,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			});
 			return;
 		}
-		const isEditMessage = messageActionListNeedToResolve[messageActionListNeedToResolve.length - 1]?.type === EMessageActionType.EditMessage;
+		const isEditMessage = messageActionListNeedToResolve?.[messageActionListNeedToResolve?.length - 1]?.type === EMessageActionType.EditMessage;
 		if (isEditMessage) {
 			editMessage(text, currentSelectedEditMessage.id);
 			removeAction(EMessageActionType.EditMessage);
@@ -285,7 +288,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						ref_type: 0,
 						message_sender_id: currentSelectedReplyMessage.user.id,
 						content: JSON.stringify(currentSelectedReplyMessage.content),
-						has_attachment: Boolean(currentSelectedReplyMessage.attachments.length),
+						has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
 					},
 				]
 				: undefined;
@@ -433,7 +436,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const onConvertToFiles = useCallback(async (content: string) => {
 		try {
-			if (content.length > MIN_THRESHOLD_CHARS) {
+			if (content?.length > MIN_THRESHOLD_CHARS) {
 				const fileTxtSaved = await writeTextToFile(content);
 				const session = sessionRef.current;
 				const client = clientRef.current;
@@ -713,7 +716,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
-						children={renderTextContent(text, emojiListPNG, channelsEntities)}
+						children={renderTextContent(text, emojiListPNG, channelsEntities, rawMembers)}
 						onContentSizeChange={(e) => {
 							if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
 						}}
