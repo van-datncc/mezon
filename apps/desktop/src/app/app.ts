@@ -153,7 +153,7 @@ export default class App {
 		if (process.platform == 'win32') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
-      App.application.setAppUserModelId('Mezon');
+			App.application.setAppUserModelId('Mezon');
 		}
 	}
 

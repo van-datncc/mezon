@@ -3,13 +3,15 @@ import { IMezonMenuSectionProps, MezonMenu, MezonRadioButton } from "../../temp-
 import { View } from "react-native";
 import { useState } from "react";
 
+export type IMzoneOptionData = {
+    description ?: string;
+    title: string;
+    value: number | string;
+}[]
+
 interface IMezonOptionProps extends Omit<IMezonMenuSectionProps, "items"> {
     onChange?: (value: number | string) => void;
-    data: {
-        description?: string;
-        title: string;
-        value: number | string;
-    }[],
+    data: IMzoneOptionData
     value?: number | string;
 }
 

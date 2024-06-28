@@ -64,6 +64,11 @@ export const APP_SCREEN = {
     OVERVIEW_SETTING: 'ROUTES.MENU_CLAN.OVERVIEW_SETTING'
   },
 
+  MENU_CHANNEL: {
+    STACK: 'ROUTES.MENU_CHANNEL.STACk',
+    SETTINGS: 'ROUTES.MENU_CHANNEL.SETTINGS',
+  },
+
   SETTINGS: {
     STACK: 'ROUTES.SETTINGS.STACK',
     HOME: 'ROUTES.SETTINGS.HOME',
@@ -105,6 +110,12 @@ type MenuThreadStackParamList = {
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: undefined;
   [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: undefined;
+}
+
+type MenuChannelStackParamList = {
+  [APP_SCREEN.MENU_CHANNEL.SETTINGS]: {
+    channelId: string;
+  };
 }
 
 type MenuClanStackParamList = {
@@ -152,19 +163,21 @@ type AppStackParamList = {
   [APP_SCREEN.FRIENDS.STACK]: NavigatorScreenParams<FriendsStackParamList>,
   [APP_SCREEN.PROFILE.STACK]: NavigatorScreenParams<ProfileStackParamList>,
   [APP_SCREEN.MENU_THREAD.STACK]: NavigatorScreenParams<MenuThreadStackParamList>,
+  [APP_SCREEN.MENU_CHANNEL.STACK]: NavigatorScreenParams<MenuChannelStackParamList>,
   [APP_SCREEN.MENU_CLAN.STACK]: NavigatorScreenParams<MenuClanStackParamList>,
   [APP_SCREEN.SETTINGS.STACK]: NavigatorScreenParams<SettingStackParamList>,
 }
 
-type CustomStackScreenProps<
-  U extends ParamListBase,
-  T extends keyof U = string
-> = CompositeScreenProps<
-  // NativeStackScreenProps<U, T>,
-  NativeStackScreenProps<U>,
-  AppStackScreenProps<keyof AppStackParamList>
->;
-
 export type AppStackScreenProps<T extends keyof AppStackParamList = typeof APP_SCREEN.HOME> = StackScreenProps<AppStackParamList, T>;
 
-export type MenuClanScreenProps<T extends keyof MenuClanStackParamList> = CustomStackScreenProps<MenuClanStackParamList, T>
+export type MenuClanScreenProps<T extends keyof MenuClanStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<MenuClanStackParamList, T>,
+    AppStackScreenProps<keyof AppStackParamList>
+  >;
+
+export type MenuChannelScreenProps<T extends keyof MenuChannelStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<MenuChannelStackParamList, T>,
+    AppStackScreenProps<keyof AppStackParamList>
+  >;

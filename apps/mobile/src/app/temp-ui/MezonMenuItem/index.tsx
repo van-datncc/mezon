@@ -1,7 +1,9 @@
 import { StyleProp, Text, TextStyle, TouchableOpacity, View } from "react-native";
 import styles from "./styles";
 import { ReactNode } from "react";
-import { AngleRightIcon } from "@mezon/mobile-components";
+import { ChevronSmallRightIcon }
+    // @ts-ignore
+    from "libs/mobile-components/src/lib/icons2";
 
 export interface IMezonMenuItemProps {
     isShow?: boolean;
@@ -29,7 +31,7 @@ export default function MezonMenuItem({ isLast, title, expandable, icon, onPress
                     {description && <Text style={[styles.btnDescription]}>{description}</Text>}
                 </View>
                 {component}
-                {expandable && <AngleRightIcon height={24} width={24} />}
+                {expandable && <ChevronSmallRightIcon height={18} width={18} />}
             </View>
         </TouchableOpacity>
     )
