@@ -87,7 +87,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 								<Icons.IconRemove className='text-transparent size-2'/>
 							</Tooltip>
 						</button>
-						<span>{role.title}</span>
+						<span className='text-xs' style={{lineHeight: '15px'}}>{role.title}</span>
 					</span>
 				))}
 				<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
@@ -101,7 +101,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						>
 							<button className='flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300'>
 								<Icons.Plus />
-								<p className='text-xs'>Add Role</p>
+								<p className='text-xs m-0'>Add Role</p>
 							</button>
 						</Tooltip>
 						<div className="absolute" style={{ top: `${positionTop}px`, left: `${positionLeft}px` }}>
