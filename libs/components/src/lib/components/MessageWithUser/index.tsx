@@ -27,11 +27,11 @@ export type MessageWithUserProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	isMention?: boolean;
-	popup?: JSX.Element;
 	isEditing?: boolean;
 	isShowFull?: boolean;
 	editor?: JSX.Element;
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
+	popup?: JSX.Element;
 };
 
 function MessageWithUser({
@@ -48,7 +48,6 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const { messageDate } = useMessageParser(message);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -57,6 +56,7 @@ function MessageWithUser({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
+
 	const isCombine = !message.isStartedMessageGroup;
 	const attachments = useMemo(() => message.attachments, [message.attachments]);
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
@@ -77,14 +77,6 @@ function MessageWithUser({
 	const checkMessageHasReply = useMemo(() => {
 		return message.references && message.references?.length > 0;
 	}, [message.references]);
-
-	const messageDividerClass = classNames(
-		'flex flex-row w-full px-4 items-center pt-3 text-zinc-400 text-[12px] font-[600] dark:bg-transparent bg-transparent',
-	);
-
-	const isHeadfull = useMemo(() => {
-		return isCombine && !checkReferences;
-	}, [isCombine, checkReferences]);
 
 	const containerClass = classNames('relative', 'message-container', {
 		'mt-3': !isCombine || checkReferences,
@@ -167,7 +159,6 @@ function MessageWithUser({
 												isError={message.isError}
 											/>
 										)}
-										{isEditing && editor}
 									</div>
 								</div>
 							</div>

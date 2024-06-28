@@ -252,7 +252,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
-
 		},
 		[
 			valueTextInput,
@@ -401,7 +400,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 	};
-
 
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 

@@ -23,12 +23,11 @@ const MessageText = ({ message, lines, isEdited }: { message: IMessageWithUser; 
 );
 
 const MessageContent = ({ message }: IMessageContentProps) => {
-	const { lines, isEdited } = useMessageParser(message);
+	const { attachments, lines, hasAttachments, isEdited } = useMessageParser(message);
 
 	return (
 		<>
 			<MessageText message={message} lines={lines as string} isEdited={isEdited} />
-			{/* {hasAttachments && <Attachments messageId={message.id} attachments={attachments ?? []} />} */}
 		</>
 	);
 };
