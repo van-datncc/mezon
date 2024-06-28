@@ -1,4 +1,4 @@
-import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat } from '@mezon/components';
+import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat, ModalUserProfile } from '@mezon/components';
 import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
 import {
 	RootState,
@@ -19,7 +19,6 @@ import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import ModalUserProfile from '../../../../../../../libs/components/src/lib/components/ModalUserProfile';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
 
@@ -203,6 +202,7 @@ export default function DirectMessage() {
 								classBanner="h-[120px]"
 								hiddenRole={true}
 								showNote={true}
+								showPopupLeft={true}
 							/>
 						</div>
 					)}

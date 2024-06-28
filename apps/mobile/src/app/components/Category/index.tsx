@@ -27,7 +27,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
                 <Text style={{
                     color: "white",
                     paddingHorizontal: 20,
-                    opacity: categoryName.trim().length > 0 ? 1 : 0.5
+                    opacity: categoryName?.trim()?.length > 0 ? 1 : 0.5
                 }}>
                     {t("actions.create")}
                 </Text>

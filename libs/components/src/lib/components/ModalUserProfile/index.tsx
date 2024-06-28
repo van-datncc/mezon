@@ -18,6 +18,7 @@ type ModalUserProfileProps = {
 	hiddenRole?: boolean;
 	showNote?: boolean;
 	message?: IMessageWithUser;
+	showPopupLeft?: boolean;
 };
 
 export type OpenModalProps = {
@@ -26,7 +27,7 @@ export type OpenModalProps = {
 	openOption: boolean,
 }
 
-const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote, message }: ModalUserProfileProps) => {
+const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote, message, showPopupLeft }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -87,7 +88,7 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
-				{!checkUser && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal} user={userById}/>}
+				{!checkUser && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal} user={userById} showPopupLeft={showPopupLeft}/>}
 			</div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}

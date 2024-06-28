@@ -21,6 +21,7 @@
 		"@react-navigation/native": "^6.1.17",
 		"@react-navigation/native-stack": "^6.9.26",
 		"@react-navigation/stack": "^6.3.29",
+		"@sentry/react-native": "^5.24.1",
 		"@testing-library/jest-native": "*",
 		"@testing-library/react-native": "*",
 		"expo": "^50.0.0",

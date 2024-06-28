@@ -44,7 +44,7 @@ export default function EventDetail({ event }: IEventDetailProps) {
 
                     <View style={styles.inline}>
                         <BellIcon height={16} width={16} />
-                        <Text style={styles.smallText}>{event.user_ids.length}</Text>
+                        <Text style={styles.smallText}>{event?.user_ids?.length}</Text>
                     </View>
 
                     {/* TODO: Fix this */}

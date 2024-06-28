@@ -35,7 +35,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 
 		return () => {
 			document.removeEventListener('keydown', handleEnter);
-			};
+		};
 	},[])
 	
 	return (
@@ -53,6 +53,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 							isMessNotifyMention={true}
 							mode={mode}
 							isMention={true}
+							isShowFull={true}
 						/>
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">

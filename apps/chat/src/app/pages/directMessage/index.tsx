@@ -1,10 +1,10 @@
 import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
 import { useAuth, useEscapeKey } from '@mezon/core';
+import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
-import { useSelector } from 'react-redux';
-import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
 
 export default function Direct() {
 	const { userProfile } = useAuth();
@@ -22,7 +22,7 @@ export default function Direct() {
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
 				<FooterProfile
-					name={userProfile?.user?.username || ''}
+					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}
 					avatar={userProfile?.user?.avatar_url || ''}
 					userId={userProfile?.user?.id}

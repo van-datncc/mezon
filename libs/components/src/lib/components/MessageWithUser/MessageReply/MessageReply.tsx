@@ -2,8 +2,9 @@ import { referencesActions, selectMemberByUserId, selectMessageByMessageId } fro
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../Icons/index';
-
+import * as Icons from '../../Icons/index';
+import { useMessageLine } from '../useMessageLine';
+import MarkUpOnReply from './MarkUpOnReply';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 };
@@ -16,15 +17,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const dispatch = useDispatch();
 
-	useEffect(() => {
-		if (message.references && message.references.length > 0) {
-			const messageReferenceId = message.references[0].message_ref_id;
-			const messageReferenceUserId = message.references[0].message_sender_id;
-			setMessageId(messageReferenceId ?? '');
-			setSenderId(messageReferenceUserId ?? '');
-		}
-	}, [message]);
-
 	const getIdMessageToJump = useCallback(
 		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
@@ -35,6 +27,24 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		},
 		[dispatch],
 	);
+
+	const [messageLine, setMessageLine] = useState<string>('');
+	const { mentions } = useMessageLine(messageLine);
+
+	useEffect(() => {
+		if (messageRefFetchFromServe !== undefined && messageRefFetchFromServe?.content.t !== '') {
+			setMessageLine(messageRefFetchFromServe.content.t ?? '');
+		}
+	}, [messageRefFetchFromServe?.content.t]);
+
+	useEffect(() => {
+		if (message.references && message.references.length > 0) {
+			const messageReferenceId = message.references[0].message_ref_id;
+			const messageReferenceUserId = message.references[0].message_sender_id;
+			setMessageId(messageReferenceId ?? '');
+			setSenderId(messageReferenceUserId ?? '');
+		}
+	}, [message]);
 
 	return (
 		<div>
@@ -58,16 +68,18 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								<div className=" flex flex-row items-center">
 									<div
 										onClick={(e) => getIdMessageToJump(messageRefId, e)}
-										className="text-[13px] pr-1 mr-[-5px] hover:text-white cursor-pointer italic text-[#A8BAB8] w-fit one-line break-all pt-0"
+										className="text-[14px] pr-1 mr-[-5px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
 									>
 										Click to see attachment
 									</div>
 									<Icons.ImageThumbnail />
 								</div>
+							) : mentions.length > 0 ? (
+								<MarkUpOnReply onClickToMove={(e) => getIdMessageToJump(messageRefId, e)} mention={mentions} />
 							) : (
 								<span
 									onClick={(e) => getIdMessageToJump(messageRefId, e)}
-									className="text-[13px] hover:text-white cursor-pointer text-[#A8BAB8] one-line break-all pt-0"
+									className="text-[14px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer one-line break-all pt-0"
 								>
 									{messageRefFetchFromServe?.content?.t}
 								</span>
@@ -76,17 +88,17 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 					</div>
 				</div>
 			)}
-			{ !messageRefFetchFromServe && message.references && message?.references.length > 0 &&
-				(<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
+			{!messageRefFetchFromServe && message.references && message?.references.length > 0 && (
+				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
-						<div className='rounded-full dark:bg-bgSurface bg-bgLightModeButton size-4'>
+						<div className="rounded-full dark:bg-bgSurface bg-bgLightModeButton size-4">
 							<Icons.IconReplyMessDeleted />
 						</div>
-						<i className='dark:text-zinc-400 text-colorTextLightMode text-[13px]'>Original message was deleted</i>
+						<i className="dark:text-zinc-400 text-colorTextLightMode text-[13px]">Original message was deleted</i>
 					</div>
-				</div>)
-			}
+				</div>
+			)}
 		</div>
 	);
 };

@@ -1,6 +1,7 @@
 import { Icons, MemberProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends, useMemberStatus } from '@mezon/core';
 import { FriendsEntity } from '@mezon/store';
+import { MemberProfileType } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 
 type FriendProps = {
@@ -52,7 +53,8 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						isHideAnimation={true}
 						key={friend.user?.id}
 						numberCharacterCollapse={100}
-						classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList'}
+						classParent={friend.state !== undefined && friend.state >= 1 ? '' : 'friendList h-10'}
+						positionType={MemberProfileType.LIST_FRIENDS}
 					/>
 				</div>
 				<div>
@@ -62,7 +64,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 								onClick={() => directMessageWithUser(friend.user?.id ?? '')}
 								className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2"
 							>
-								<Icons.IconChat className='dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black'/>
+								<Icons.IconChat className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 							</button>
 							<Dropdown
 								label=""
@@ -71,7 +73,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 								placement="right-start"
 								renderTrigger={() => (
 									<button className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2">
-										<Icons.IconEditThreeDot className='dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black'/>
+										<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 									</button>
 								)}
 							>
