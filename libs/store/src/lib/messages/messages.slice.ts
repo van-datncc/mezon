@@ -418,7 +418,7 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isMe, isSending, content, id } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, content } = action.payload;
 			if (!channelId || !messageId) return state;
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -431,7 +431,7 @@ export const messagesSlice = createSlice({
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 
 					// remove sending message
-					if ((isMe && !isSending) || (!isMe && !isSending)) {
+					if (!isSending) {
 						const newContent = content;
 
 						const sendingMessages = state.channelMessages[channelId].ids.filter(
@@ -440,7 +440,8 @@ export const messagesSlice = createSlice({
 						if (sendingMessages && sendingMessages.length) {
 							for (const mid of sendingMessages) {
 								const message = state.channelMessages[channelId].entities[mid];
-
+								// temporary remove sending message that has the same content
+								// for later update, we could use some kind of id to identify the message
 								if (message?.content?.t === newContent?.t) {
 									state.channelMessages[channelId] = handleRemoveOneMessage({ state, channelId, messageId: mid });
 									break;
