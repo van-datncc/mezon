@@ -43,9 +43,7 @@ const styles = StyleSheet.create({
     },
 
     clearBtn: {
-        padding: 3,
-        borderRadius: 10,
-        backgroundColor: Colors.white
+        borderRadius: 10
     },
 
     lineCountWrapper: {

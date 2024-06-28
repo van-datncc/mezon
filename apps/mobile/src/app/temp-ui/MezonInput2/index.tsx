@@ -3,6 +3,7 @@ import { Text, TextInput, View } from 'react-native';
 import { ErrorInput } from '../../components/ErrorInput';
 import styles from './styles';
 import { validInput } from '../../utils/validate';
+import { Colors } from '@mezon/mobile-ui';
 
 interface IMezonInput2 {
 	placeHolder?: string;
@@ -20,7 +21,7 @@ export default function MezonInput({ label, placeHolder, value, onTextChange, er
 	return (
 		<View>
 			<Text style={styles.label}>{label}</Text>
-			<TextInput placeholderTextColor={'gray'} placeholder={placeHolder} style={styles.input} value={value} onChangeText={onTextChange} />
+			<TextInput placeholderTextColor={Colors.textGray} placeholder={placeHolder} style={styles.input} value={value} onChangeText={onTextChange} maxLength={64}/>
 			{!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
 		</View>
 	);

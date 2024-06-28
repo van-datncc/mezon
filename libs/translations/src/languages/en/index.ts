@@ -23,7 +23,8 @@ import channelCreator from "./channelCreator.json";
 import eventMenu from "./eventMenu.json";
 import eventCreator from "./eventCreator.json";
 import channelMenu from "./channelMenu.json";
-
+import channelSetting from "./channelSetting.json";
+ 
 export default {
 	inviteToChannel,
 	notification,
@@ -49,5 +50,6 @@ export default {
 	categoryMenu,
 	channelCreator,
 	eventCreator,
-	channelMenu
+	channelMenu,
+	channelSetting
 };

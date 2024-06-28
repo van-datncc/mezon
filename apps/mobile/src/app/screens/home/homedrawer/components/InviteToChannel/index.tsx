@@ -14,7 +14,7 @@ import { darkColor } from '../../../../../constants/Colors';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
 import { normalizeString } from '../../../../../utils/helpers';
 import { ListMemberInvite } from '../../Reusables';
-import { LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
+import { ExpireLinkValue, LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import { EMaxUserCanInvite } from '../../enums';
 import { friendList } from '../fakeData';
 import { styles } from './styles';
@@ -37,7 +37,7 @@ export const InviteToChannel = React.memo(
 		const timeoutRef = useRef(null);
 		//TODO: get from API
 		const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
-		const [expiredTimeSelected, setExpiredTimeSelected] = useState<number>(2);
+		const [expiredTimeSelected, setExpiredTimeSelected] = useState<string>(ExpireLinkValue.SevenDays);
 		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
 		const { categorizedChannels } = useCategory();
 		const openEditLinkModal = () => {
@@ -184,7 +184,7 @@ export const InviteToChannel = React.memo(
                     <Feather size={18} name="search" style={{ color: Colors.tertiary }} />
                   </View>
                   <View style={styles.editInviteLinkWrapper}>
-                    <Text style={styles.defaultText}>{t('yourLinkInvite')}</Text>
+                    <Text style={styles.defaultText}>{t('yourLinkInvite')} {expiredTimeSelected} </Text>
                     <Pressable onPress={() => openEditLinkModal()}>
                       <Text style={styles.linkText}>{t('editInviteLink')}</Text>
                     </Pressable>

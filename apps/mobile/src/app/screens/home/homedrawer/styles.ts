@@ -128,6 +128,7 @@ export const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: 'bold',
 		color: Colors.tertiary,
+    flexBasis: '75%'
 	},
 	channelListItem: {
 		paddingHorizontal: 10,
@@ -345,6 +346,32 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.gray48,
 		overflow: 'hidden',
 	},
+
+	newMessageLine: {
+		height: 1,
+		width: "100%",
+		backgroundColor: Colors.red,
+		marginVertical: Metrics.size.xl,
+		position: "relative"
+	},
+
+	newMessageContainer: {
+		position: "absolute",
+		top: -15,
+		left: 0,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		width: "100%"
+	},
+
+	newMessageText: {
+		color: Colors.red,
+		backgroundColor: Colors.secondary,
+		paddingHorizontal: Metrics.size.s,
+		fontWeight: "bold"
+	},
+
 	messageWrapper: {
 		flexDirection: 'column',
 		marginTop: size.s_10,
@@ -352,6 +379,12 @@ export const styles = StyleSheet.create({
 	highlightMessageMention: {
 		backgroundColor: Colors.bgMessageHighlight,
 		borderLeftColor: Colors.borderMessageHighlight,
+		borderLeftWidth: 2,
+		paddingTop: size.s_2,
+	},
+	highlightMessageReply: {
+		backgroundColor: Colors.bgReply,
+		borderLeftColor: Colors.borderMessageReply,
 		borderLeftWidth: 2,
 		paddingTop: size.s_2,
 	},
@@ -616,8 +649,8 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
-    	fontStyle: 'italic'
-  	},
+		fontStyle: 'italic'
+	},
 	badge: {
 		backgroundColor: Colors.red,
 		position: 'absolute',
@@ -641,7 +674,10 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		borderRadius: 50,
 		backgroundColor: Colors.tertiaryWeight,
-		width: 30,
-		height: 30,
-	}
+		width: 40,
+		height: 40,
+	},
+  sortButton: {
+    paddingHorizontal: size.s_14, paddingVertical: size.s_6
+  }
 });

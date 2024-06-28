@@ -22,7 +22,7 @@
         },
         "devMode": {
             "title": "Development Mode",
-            "copyChannelID": "Copy Clan ID"
+            "copyChannelID": "Copy Channel ID"
         }
     },
     "notify": {

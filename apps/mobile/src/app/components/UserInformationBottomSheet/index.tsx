@@ -24,13 +24,13 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 			}
 		}
 	}, [userId, user]);
-    
     return (
         <BottomSheet
             ref={ref}
             height={500}
             onClose={() => onClose()}
             draggable
+            dragOnContent={true}
             customStyles={{
                 container: {
                     backgroundColor: 'transparent',
