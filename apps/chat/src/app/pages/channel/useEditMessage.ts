@@ -17,7 +17,6 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
   const handleCancelEdit = useCallback(() => {
     dispatch(referencesActions.setOpenEditMessageState(false));
     dispatch(referencesActions.setIdReferenceMessageEdit(''));
-    // dispatch(rightClickAction.setMessageRightClick(''))
   }, [dispatch]);
 
   const handleSend = useCallback(
