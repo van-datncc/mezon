@@ -1,5 +1,4 @@
 import { messagesActions, reactionActions, referencesActions } from '@mezon/store';
-import { RightClickPos } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 

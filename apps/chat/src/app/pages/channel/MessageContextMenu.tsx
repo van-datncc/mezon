@@ -115,6 +115,9 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		) {
 			setEnableRemoveOneReactionItem(true);
 			setEnableRemoveAllReactionsItem(true);
+		} else {
+			setEnableRemoveOneReactionItem(false);
+			setEnableRemoveAllReactionsItem(false);
 		}
 	}, [isClanCreator, checkAdmintrator, checkMessageHasReaction(), removeReaction]);
 

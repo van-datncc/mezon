@@ -40,7 +40,6 @@ import {
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
-	RightClickPos,
 	SubPanelName,
 	ThreadValue,
 	UserMentionsOpt,
