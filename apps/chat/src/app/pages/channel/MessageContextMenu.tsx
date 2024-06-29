@@ -1,15 +1,30 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAuth, useClanRestriction } from '@mezon/core';
+import { useAuth, useClanRestriction, useDeleteMessage } from '@mezon/core';
 import {
+	directActions,
+	gifsStickerEmojiActions,
+	reactionActions,
+	referencesActions,
+	selectAllDirectMessages,
 	selectCurrentChannelId,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectReactionOnMessageList,
 	useAppDispatch,
 } from '@mezon/store';
-import { ContextMenuItem, EPermission, MenuBuilder } from '@mezon/utils';
+import {
+	ContextMenuItem,
+	EPermission,
+	MenuBuilder,
+	SubPanelName,
+	handleCopyImage,
+	handleCopyLink,
+	handleOpenLink,
+	handleSaveImage,
+} from '@mezon/utils';
+import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
 import DynamicContextMenu from './DynamicContextMenu';
@@ -17,10 +32,11 @@ import DynamicContextMenu from './DynamicContextMenu';
 type MessageContextMenuProps = {
 	id: string;
 	messageId: string;
-	imgTarget?: boolean | HTMLImageElement | null;
+	elementTarget?: boolean | HTMLElement | null;
 };
 
-function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProps) {
+function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenuProps) {
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const reactionRealtimeList = useSelector(selectReactionOnMessageList);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
@@ -31,7 +47,7 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		return arrayMessageIdReaction.includes(messageId);
 	}, []);
 	const messageHasReaction = useMemo(() => {
-		return message.reactions && message?.reactions?.length > 0 ? true : false;
+		return message?.reactions && message?.reactions?.length > 0 ? true : false;
 	}, [message?.reactions?.length]);
 	const [checkAdmintrator, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
 	const checkSenderMessage = useMemo(() => {
@@ -74,6 +90,37 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
+
+	const [urlImage, setUrlImage] = useState<string>('');
+
+	// add action
+	const { deleteSendMessage } = useDeleteMessage({
+		channelId: currentChannelId || '',
+		mode: 2,
+	});
+
+	const handleReplyMessage = () => {
+		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+		dispatch(referencesActions.setIdMessageToJump(''));
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	};
+
+	const handleEditMessage = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(false));
+		dispatch(reactionActions.setReactionRightState(false));
+		dispatch(referencesActions.setOpenEditMessageState(true));
+		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
+		dispatch(referencesActions.setIdMessageToJump(''));
+	};
+
+	const handleForwardMessage = () => {
+		console.log("forwardMessage")
+		if (dmGroupChatList.length === 0) {
+			dispatch(directActions.fetchDirectMessage({}));
+		}
+		dispatch(toggleIsShowPopupForwardTrue());
+		dispatch(setSelectedMessage(message.id && message.id));
+	};
 
 	// 1. allow view reaction
 	useLayoutEffect(() => {
@@ -142,7 +189,10 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 	// 11. allow image
 
 	useLayoutEffect(() => {
-		if (!!imgTarget) {
+		const checkImageHTML = elementTarget instanceof HTMLImageElement;
+		if (checkImageHTML) {
+			const imgSrc = elementTarget.src;
+			setUrlImage(imgSrc);
 			setEnableCopyLinkItem(true);
 			setEnableOpenLinkItem(true);
 			setEnableCopyImageItem(true);
@@ -153,7 +203,7 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 			setEnableCopyImageItem(false);
 			setEnableSaveImageItem(false);
 		}
-	}, [imgTarget]);
+	}, [elementTarget]);
 
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
@@ -161,34 +211,28 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		builder.addMenuItem(
 			'addReaction', // id
 			'Add Reaction', // lable
-			() => console.log('add reaction'), // callback
-			<Icons.RightArrowRightClick />, // icon
-			null, // sub menu
-			false, // has sub menu?
-			false, // disable ?
+			() => console.log('add reaction'),
+			<Icons.RightArrowRightClick />,
 		);
 
 		builder.when(enableViewReactionItem, (builder) => {
-			builder.addMenuItem(
-				'viewReaction',
-				'View Reaction',
-				() => console.log('view reaction'), // callback
-				<Icons.ViewReactionRightClick />, // icon
-				null, // sub menu
-				false, // has sub menu?
-				false, // disable ?);
-			);
+			builder.addMenuItem('viewReaction', 'View Reaction', () => console.log('view reaction'), <Icons.ViewReactionRightClick />);
 		});
 
 		builder.when(enableEditMessageItem, (builder) => {
 			builder.addMenuItem(
 				'editMessage',
 				'Edit Message',
-				() => console.log('edit reaction'), // callback
-				<Icons.EditMessageRightClick />, // icon
-				null, // sub menu
-				false, // has sub menu?
-				false, // disable ?););
+
+				async () => {
+					try {
+						await handleEditMessage();
+					} catch (error) {
+						console.error('Failed to edit message', error);
+					}
+				},
+
+				<Icons.EditMessageRightClick />,
 			);
 		});
 
@@ -196,44 +240,61 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 			builder.addMenuItem(
 				'pinMessage',
 				'Pin Message',
-				() => console.log('pin message'), // callback
-				<Icons.PinMessageRightClick />, // icon
-				null, // sub menu
-				false, // has sub menu?
-				false, // disable
+				() => console.log('pin message'),
+
+				<Icons.PinMessageRightClick />,
 			);
 		});
 		builder.when(enableUnPinMessageItem, (builder) => {
-			builder.addMenuItem(
-				'unPinMessage',
-				'Unpin Message',
-				() => console.log('unpin message'), // callback
-				<Icons.PinMessageRightClick />, // icon
-				null, // sub menu
-				false, // has sub menu?
-				false, // disable);
-			);
+			builder.addMenuItem('unPinMessage', 'Unpin Message', () => console.log('unpin message'), <Icons.PinMessageRightClick />);
 		});
 
-		builder.addMenuItem('reply', 'Reply', () => console.log('reply'), <Icons.Reply />);
+		builder.addMenuItem(
+			'reply',
+			'Reply',
+			async () => {
+				try {
+					await handleReplyMessage();
+				} catch (error) {
+					console.error('Failed to reply message', error);
+				}
+			},
+
+			<Icons.Reply />,
+		);
 
 		builder.when(enableCreateThreadItem, (builder) => {
-			builder.addMenuItem(
-				'createThread',
-				'Create Thread',
-				() => console.log('create thread'), // callback
-				<Icons.ThreadIconRightClick />, // icon
-				null, // sub menu
-				false, // has sub menu?
-				false, // disable););
-			);
+			builder.addMenuItem('createThread', 'Create Thread', () => console.log('create thread'), <Icons.ThreadIconRightClick />);
 		});
 
-		builder.addMenuItem('copyText', 'Copy Text', () => console.log('copy text'), <Icons.CopyTextRightClick />);
+		builder.addMenuItem(
+			'copyText',
+			'Copy Text',
+			async () => {
+				try {
+					await handleCopyLink(message?.content?.t ?? '');
+				} catch (error) {
+					console.error('Failed to copy text', error);
+				}
+			},
+			<Icons.CopyTextRightClick />,
+		);
 		builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick />);
 		builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('apps'), <Icons.UnreadRightClick />);
 		builder.addMenuItem('copyMessageLink', 'Copy Message Link', () => console.log('apps'), <Icons.CopyMessageLinkRightClick />);
-		builder.addMenuItem('forwardMessage', 'Forward Message', () => console.log('apps'), <Icons.ForwardRightClick />);
+		builder.addMenuItem(
+			'forwardMessage',
+			'Forward Message',
+			() => handleForwardMessage(),
+			// async () => {
+			// 	try {
+			// 		await handleForwardMessage();
+			// 	} catch (error) {
+			// 		console.error('Failed to forward message', error);
+			// 	}
+			// },
+			<Icons.ForwardRightClick />,
+		);
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(
@@ -266,12 +327,17 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 			builder.addMenuItem(
 				'deleteMessage',
 				'Delete Message',
-				() => {
-					console.log('delete message');
+				async () => {
+					try {
+						await deleteSendMessage(message.id);
+					} catch (error) {
+						console.error('Failed to delete message', error);
+					}
 				},
 				<Icons.DeleteMessageRightClick />,
 			);
 		});
+
 		builder.when(enableReportMessageItem, (builder) => {
 			builder.addMenuItem(
 				'reportMessage',
@@ -284,26 +350,42 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		});
 
 		builder.when(enableCopyLinkItem, (builder) => {
-			builder.addMenuItem('copyLink', 'Copy Link', () => {
-				console.log('copy link');
+			builder.addMenuItem('copyLink', 'Copy Link', async () => {
+				try {
+					await handleCopyLink(urlImage ?? '');
+				} catch (error) {
+					console.error('Failed to copy link:', error);
+				}
 			});
 		});
 
 		builder.when(enableOpenLinkItem, (builder) => {
-			builder.addMenuItem('openLink', 'Open Link', () => {
-				console.log('open link');
+			builder.addMenuItem('openLink', 'Open Link', async () => {
+				try {
+					await handleOpenLink(urlImage ?? '');
+				} catch (error) {
+					console.error('Failed to copy image:', error);
+				}
 			});
 		});
 
 		builder.when(enableCopyImageItem, (builder) => {
-			builder.addMenuItem('copyImage', 'Copy Image', () => {
-				console.log('copy image');
+			builder.addMenuItem('copyImage', 'Copy Image', async () => {
+				try {
+					await handleCopyImage(urlImage ?? '');
+				} catch (error) {
+					console.error('Failed to copy image:', error);
+				}
 			});
 		});
 
 		builder.when(enableSaveImageItem, (builder) => {
-			builder.addMenuItem('saveImage', 'Save Image', () => {
-				console.log('save image');
+			builder.addMenuItem('saveImage', 'Save Image', async () => {
+				try {
+					await handleSaveImage(urlImage ?? '');
+				} catch (error) {
+					console.error('Failed to save image:', error);
+				}
 			});
 		});
 
@@ -311,7 +393,6 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 	}, [
 		dispatch,
 		messageId,
-		imgTarget,
 		enableViewReactionItem,
 		enableEditMessageItem,
 		enablePinMessageItem,

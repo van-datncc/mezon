@@ -19,7 +19,7 @@ export class MenuBuilder {
 	addMenuItem(
 		id: string,
 		label: string,
-		handleItemClick?: () => void,
+		handleItemClick?: (...args: any[]) => void,
 		icon?: any,
 		subMenuItems = null,
 		hasSubmenu = false,

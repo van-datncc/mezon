@@ -57,7 +57,6 @@ function MessageWithUser({
 	const userLogin = useAuth();
 
 	const isCombine = !message.isStartedMessageGroup;
-	const attachments = useMemo(() => message.attachments, [message.attachments]);
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);

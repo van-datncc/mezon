@@ -22,13 +22,9 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	preloadMessageContextMenu: () => {},
 });
 
-function isEventFromImage(event: React.MouseEvent<HTMLElement>) {
-	return (event.target as HTMLElement).tagName === 'IMG';
-}
-
 export const MessageContextMenuProvider = ({ children }: { children: React.ReactNode }) => {
 	const [messageId, setMessageId] = useState('');
-	const [imageTarget, setImageTarget] = useState<HTMLImageElement | null>(null);
+	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
 
 	const { show } = useContextMenu({
 		id: MESSAGE_CONTEXT_MENU_ID,
@@ -37,8 +33,8 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 	const menu = useMemo(() => {
 		if (!messageId) return null;
 
-		return <MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageId} imgTarget={imageTarget} />;
-	}, [messageId, imageTarget]);
+		return <MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageId} elementTarget={elementTarget} />;
+	}, [messageId, elementTarget]);
 
 	const preloadMessageContextMenu = useCallback((messageId: string) => {
 		setMessageId(messageId);
@@ -59,9 +55,7 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 	const showMessageContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, messageId: string, props?: MessageContextMenuProps) => {
 			setMessageId(messageId);
-			if (isEventFromImage(event)) {
-				setImageTarget(event.target as HTMLImageElement);
-			} else setImageTarget(null);
+			setElementTarget(event.target as HTMLElement);
 
 			const niceProps = {
 				messageId,
