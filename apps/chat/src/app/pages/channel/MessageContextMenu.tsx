@@ -52,10 +52,9 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 	}, [messageHasReaction, reactionRealtimeList, checkMessageInRealtimeList]);
 
 	const checkMessageInPinneList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
-	const [pinMessage, unPinMessage] = useClanRestriction([EPermission.manageChannel]);
-	const [delMessage, reportMessage] = useClanRestriction([EPermission.manageChannel]);
-	const [removeOneReaction] = useClanRestriction([EPermission.manageChannel]);
-	const [removeAllReactions] = useClanRestriction([EPermission.manageChannel]);
+	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
+	const [delMessage] = useClanRestriction([EPermission.manageChannel]);
+	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
 
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
 	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
@@ -71,6 +70,10 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 	const [enableRemoveOneReactionItem, setEnableRemoveOneReactionItem] = useState<boolean>(false);
 	const [enableRemoveAllReactionItem, setEnableRemoveAllReactionsItem] = useState<boolean>(false);
 	const [enableReportMessageItem, setEnableReportMessageItem] = useState<boolean>(false);
+	const [enableCopyLinkItem, setEnableCopyLinkItem] = useState<boolean>(false);
+	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
+	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
+	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
 
 	// 1. allow view reaction
 	useLayoutEffect(() => {
@@ -86,51 +89,68 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 	// 3. allow pin message
 	useLayoutEffect(() => {
 		if (!pinMessage && !isClanCreator && !checkAdmintrator) {
-			setEnablePinMessageItem(pinMessage);
+			setEnablePinMessageItem(false);
 		}
 	}, [pinMessage, isClanCreator, checkAdmintrator]);
 
 	// 4. allow unpin message
 	useLayoutEffect(() => {
-		if (pinMessage && unPinMessage && checkMessageInPinneList) {
+		if ((checkMessageInPinneList && isClanCreator) || (checkMessageInPinneList && pinMessage)) {
 			setEnablePinMessageItem(false);
 			setEnableUnPinMessageItem(true);
 		}
-	}, [unPinMessage, checkMessageInPinneList, pinMessage]);
+	}, [checkMessageInPinneList, isClanCreator, pinMessage]);
 
 	// 5. allow speak message
 	useLayoutEffect(() => {
 		setEnableSpeakMessageItem(checkMessageHasText);
 	}, [checkMessageHasText]);
 
-	// 6. allow remove one reaction
+	// 6. allow remove one/all reaction
 	useLayoutEffect(() => {
-		setEnableRemoveOneReactionItem(checkMessageHasReaction());
-	}, [removeOneReaction, checkMessageHasReaction()]);
-
-	// 7. allow remove all reactions
-	useLayoutEffect(() => {
-		setEnableRemoveAllReactionsItem(checkMessageHasReaction());
-	}, [removeAllReactions, checkMessageHasReaction()]);
+		if (
+			(isClanCreator && checkMessageHasReaction()) ||
+			(checkAdmintrator && checkMessageHasReaction()) ||
+			(removeReaction && checkMessageHasReaction())
+		) {
+			setEnableRemoveOneReactionItem(true);
+			setEnableRemoveAllReactionsItem(true);
+		}
+	}, [isClanCreator, checkAdmintrator, checkMessageHasReaction(), removeReaction]);
 
 	// 8. allow thread item
 	useLayoutEffect(() => {
-		console.log(createThread, isAllowCreateThread);
-		if (!createThread && !isAllowCreateThread && !isClanCreator && !checkAdmintrator) {
-			setEnableCreateThreadItem(false);
-		} else {
+		if (createThread || isAllowCreateThread || !isClanCreator || checkAdmintrator) {
 			setEnableCreateThreadItem(true);
+		} else {
+			setEnableCreateThreadItem(false);
 		}
 	}, [createThread, isAllowCreateThread, isClanCreator, checkAdmintrator]);
 
 	// 10. allow delete message
 	useLayoutEffect(() => {
-		if (!delMessage && !isAllowDelMessage && !checkSenderMessage) {
-			setEnableDelMessageItem(false);
-		} else {
+		if (delMessage || isAllowDelMessage || checkSenderMessage || isClanCreator || checkAdmintrator) {
 			setEnableDelMessageItem(true);
+		} else {
+			setEnableDelMessageItem(false);
 		}
-	}, [delMessage, isAllowDelMessage, checkSenderMessage]);
+	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanCreator, checkAdmintrator]);
+
+	// 11. allow image
+
+	useLayoutEffect(() => {
+		if (!!imgTarget) {
+			setEnableCopyLinkItem(true);
+			setEnableOpenLinkItem(true);
+			setEnableCopyImageItem(true);
+			setEnableSaveImageItem(true);
+		} else {
+			setEnableCopyLinkItem(false);
+			setEnableOpenLinkItem(false);
+			setEnableCopyImageItem(false);
+			setEnableSaveImageItem(false);
+		}
+	}, [imgTarget]);
 
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
@@ -138,7 +158,7 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		builder.addMenuItem(
 			'addReaction', // id
 			'Add Reaction', // lable
-			() => console.log('add reacte'), // callback
+			() => console.log('add reaction'), // callback
 			<Icons.RightArrowRightClick />, // icon
 			null, // sub menu
 			false, // has sub menu?
@@ -146,48 +166,142 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		);
 
 		builder.when(enableViewReactionItem, (builder) => {
-			builder.addMenuItem('viewReaction', 'View Reaction');
+			builder.addMenuItem(
+				'viewReaction',
+				'View Reaction',
+				() => console.log('view reaction'), // callback
+				<Icons.ViewReactionRightClick />, // icon
+				null, // sub menu
+				false, // has sub menu?
+				false, // disable ?);
+			);
 		});
 
 		builder.when(enableEditMessageItem, (builder) => {
-			builder.addMenuItem('editMessage', 'Edit Message');
+			builder.addMenuItem(
+				'editMessage',
+				'Edit Message',
+				() => console.log('edit reaction'), // callback
+				<Icons.EditMessageRightClick />, // icon
+				null, // sub menu
+				false, // has sub menu?
+				false, // disable ?););
+			);
 		});
 
 		builder.when(enablePinMessageItem, (builder) => {
-			builder.addMenuItem('pinMessage', 'Pin Message');
+			builder.addMenuItem(
+				'pinMessage',
+				'Pin Message',
+				() => console.log('pin message'), // callback
+				<Icons.PinMessageRightClick />, // icon
+				null, // sub menu
+				false, // has sub menu?
+				false, // disable
+			);
 		});
 		builder.when(enableUnPinMessageItem, (builder) => {
-			builder.addMenuItem('unPinMessage', 'Unpin Message');
+			builder.addMenuItem(
+				'unPinMessage',
+				'Unpin Message',
+				() => console.log('unpin message'), // callback
+				<Icons.PinMessageRightClick />, // icon
+				null, // sub menu
+				false, // has sub menu?
+				false, // disable);
+			);
 		});
 
-		builder.addMenuItem('reply', 'Reply');
+		builder.addMenuItem('reply', 'Reply', () => console.log('reply'), <Icons.Reply />);
 
 		builder.when(enableCreateThreadItem, (builder) => {
-			builder.addMenuItem('createThread', 'Create Thread');
+			builder.addMenuItem(
+				'createThread',
+				'Create Thread',
+				() => console.log('create thread'), // callback
+				<Icons.ThreadIconRightClick />, // icon
+				null, // sub menu
+				false, // has sub menu?
+				false, // disable););
+			);
 		});
 
-		builder.addMenuItem('copyText', 'Copy Text');
-		builder.addMenuItem('apps', 'Apps');
-		builder.addMenuItem('markUnread', 'Mark Unread');
-		builder.addMenuItem('copyMessageLink', 'Copy Message Link');
-		builder.addMenuItem('forwardMessage', 'Forward Message');
+		builder.addMenuItem('copyText', 'Copy Text', () => console.log('copy text'), <Icons.CopyTextRightClick />);
+		builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick />);
+		builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('apps'), <Icons.UnreadRightClick />);
+		builder.addMenuItem('copyMessageLink', 'Copy Message Link', () => console.log('apps'), <Icons.CopyMessageLinkRightClick />);
+		builder.addMenuItem('forwardMessage', 'Forward Message', () => console.log('apps'), <Icons.ForwardRightClick />);
 
 		builder.when(enableSpeakMessageItem, (builder) => {
-			builder.addMenuItem('speakMessage', 'Speak Message');
+			builder.addMenuItem(
+				'speakMessage',
+				'Speak Message',
+				() => {
+					console.log('speak Message');
+				},
+				<Icons.SpeakMessageRightClick />,
+			);
 		});
 
 		builder.when(enableRemoveOneReactionItem, (builder) => {
-			builder.addMenuItem('removeReactions', 'Remove Reactions');
+			builder.addMenuItem(
+				'removeReactions',
+				'Remove Reactions',
+				() => {
+					console.log('remove reaction');
+				},
+				<Icons.RightArrowRightClick />,
+			);
 		});
 		builder.when(enableRemoveAllReactionItem, (builder) => {
-			builder.addMenuItem('removeAllReactions', 'Remove All Reactions');
+			builder.addMenuItem('removeAllReactions', 'Remove All Reactions', () => {
+				console.log('remove all reaction');
+			});
 		});
 
 		builder.when(enableDelMessageItem, (builder) => {
-			builder.addMenuItem('deleteMessage', 'Delete Message');
+			builder.addMenuItem(
+				'deleteMessage',
+				'Delete Message',
+				() => {
+					console.log('delete message');
+				},
+				<Icons.DeleteMessageRightClick />,
+			);
 		});
 		builder.when(enableReportMessageItem, (builder) => {
-			builder.addMenuItem('reportMessage', 'Report Message');
+			builder.addMenuItem(
+				'reportMessage',
+				'Report Message',
+				() => {
+					console.log('report message');
+				},
+				<Icons.ReportMessageRightClick />,
+			);
+		});
+
+		builder.when(enableCopyLinkItem, (builder) => {
+			builder.addMenuItem('copyLink', 'Copy Link', () => {
+				console.log('copy link');
+			});
+		});
+
+		builder.when(enableOpenLinkItem, (builder) => {
+			builder.addMenuItem('openLink', 'Open Link', () => {
+				console.log('open link');
+			});
+		});
+
+		builder.when(enableCopyImageItem, (builder) => {
+			builder.addMenuItem('copyImage', 'Copy Image', () => {
+				console.log('copy image');
+			});
+		});
+
+		builder.when(enableSaveImageItem, (builder) => {
+			builder.addMenuItem('saveImage', 'Save Image', () => {
+				console.log('save image');
+			});
 		});
 
 		return builder.build();
@@ -204,44 +318,14 @@ function MessageContextMenu({ id, imgTarget, messageId }: MessageContextMenuProp
 		enableRemoveOneReactionItem,
 		enableRemoveAllReactionItem,
 		enableDelMessageItem,
-    enableReportMessageItem
+		enableReportMessageItem,
+		enableCopyLinkItem,
+		enableOpenLinkItem,
+		enableCopyImageItem,
+		enableSaveImageItem,
 	]);
 
 	return <DynamicContextMenu menuId={id} items={items} />;
 }
 
 export default MessageContextMenu;
-
-// builder.when(isAllowPinMessage, (builder) => {
-// 	builder.addMenuItem('pinMessage', 'Pin Message');
-// 	builder.addMenuItem('unPinMessage', 'Unpin Message');
-// 	builder.addSeparator();
-// });
-
-// builder.when(isSender, (builder) => {
-// 	builder.addMenuItem('editMessage', 'Edit Message', () => {
-// 		dispatch(referencesActions.setOpenReplyMessageState(false));
-// 		dispatch(referencesActions.setOpenEditMessageState(true));
-// 		dispatch(messagesActions.setOpenOptionMessageState(false));
-// 		dispatch(referencesActions.setIdReferenceMessageEdit(messageId));
-// 	});
-// });
-
-// builder.when(couldDelete, (builder) => {
-// 	builder.addMenuItem('deleteMessage', 'Delete Message');
-// });
-
-// builder.addMenuItem('removeReaction', 'Remove Reactions');
-// builder.addMenuItem('removeAllReactions', 'Remove All Reactions');
-// builder.addSeparator();
-
-// builder.addMenuItem('reportMessage', 'Report Message');
-// builder.addSeparator();
-
-// builder.addMenuItem('viewReactions', 'View Reactions');
-// builder.addSeparator();
-
-// builder.when(!!imgTarget, (builder) => {
-// 	builder.addMenuItem('copyImage', 'Copy Image');
-// 	builder.addMenuItem('saveImage', 'Save Image');
-// });

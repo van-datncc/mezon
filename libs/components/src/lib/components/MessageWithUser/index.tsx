@@ -46,7 +46,6 @@ function MessageWithUser({
 	popup,
 	isShowFull,
 }: Readonly<MessageWithUserProps>) {
-	const dispatch = useDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);

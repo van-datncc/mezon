@@ -6,9 +6,10 @@ import { useDispatch } from 'react-redux';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
+	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 };
 
-function MessageImage({ attachmentData }: MessageImage) {
+function MessageImage({ attachmentData, onContextMenu }: MessageImage) {
 	const dispatch = useDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
@@ -39,6 +40,7 @@ function MessageImage({ attachmentData }: MessageImage) {
 			{attachmentData.url ? (
 				<div className="break-all">
 					<img
+						onContextMenu={onContextMenu}
 						className={
 							'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' +
 							(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
