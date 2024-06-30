@@ -1,17 +1,20 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAuth, useClanRestriction, useDeleteMessage } from '@mezon/core';
+import { useAppNavigation, useAuth, useClanRestriction, useDeleteMessage, useReference } from '@mezon/core';
 import {
 	directActions,
 	gifsStickerEmojiActions,
+	pinMessageActions,
 	reactionActions,
 	referencesActions,
+	searchMessagesActions,
 	selectAllDirectMessages,
-	selectCurrentChannelId,
+	selectCurrentChannel,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectReactionOnMessageList,
+	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
 import {
@@ -25,21 +28,28 @@ import {
 	handleSaveImage,
 } from '@mezon/utils';
 import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import DynamicContextMenu from './DynamicContextMenu';
 
 type MessageContextMenuProps = {
 	id: string;
 	messageId: string;
 	elementTarget?: boolean | HTMLElement | null;
+	activeMode?: number | undefined;
 };
 
-function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenuProps) {
+function MessageContextMenu({ id, elementTarget, messageId, activeMode }: MessageContextMenuProps) {
+	const navigate = useNavigate();
+	const { toChannelPage } = useAppNavigation();
+	const { setOpenThreadMessageState } = useReference();
+
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentChannel = useSelector(selectCurrentChannel);
 	const reactionRealtimeList = useSelector(selectReactionOnMessageList);
-	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
+	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
@@ -95,8 +105,8 @@ function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenu
 
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
-		channelId: currentChannelId || '',
-		mode: 2,
+		channelId: currentChannel?.id || '',
+		mode: activeMode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
 
 	const handleReplyMessage = () => {
@@ -114,12 +124,30 @@ function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenu
 	};
 
 	const handleForwardMessage = () => {
-		console.log("forwardMessage")
 		if (dmGroupChatList.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));
 		}
 		dispatch(toggleIsShowPopupForwardTrue());
-		dispatch(setSelectedMessage(message.id && message.id));
+		dispatch(setSelectedMessage(message));
+	};
+
+	const handlePinMessage = () => {
+		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+	};
+
+	const handleUnPinMessage = () => {
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+	};
+
+	const handleCreateThread = () => {
+		setOpenThreadMessageState(false);
+		if (currentChannel && currentChannel?.parrent_id !== '0') {
+			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
+		}
+
+		dispatch(threadsActions.setNameThreadError(''));
+		dispatch(threadsActions.setMessageThreadError(''));
+		dispatch(searchMessagesActions.setIsSearchMessage(false));
 	};
 
 	// 1. allow view reaction
@@ -133,20 +161,26 @@ function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenu
 		setEnableReportMessageItem(!checkSenderMessage);
 	}, [checkSenderMessage]);
 
-	// 3. allow pin message
+	// 3. allow pin/unpin message
 	useLayoutEffect(() => {
-		if (!pinMessage && !isClanCreator && !checkAdmintrator) {
-			setEnablePinMessageItem(false);
+		if (!checkMessageInPinneList) {
+			if (pinMessage || isClanCreator || checkAdmintrator) {
+				setEnablePinMessageItem(true);
+				setEnableUnPinMessageItem(false);
+			} else {
+				setEnablePinMessageItem(false);
+				setEnableUnPinMessageItem(false);
+			}
+		} else if (checkMessageInPinneList) {
+			if (pinMessage || isClanCreator || checkAdmintrator) {
+				setEnablePinMessageItem(false);
+				setEnableUnPinMessageItem(true);
+			} else {
+				setEnablePinMessageItem(false);
+				setEnableUnPinMessageItem(false);
+			}
 		}
-	}, [pinMessage, isClanCreator, checkAdmintrator]);
-
-	// 4. allow unpin message
-	useLayoutEffect(() => {
-		if ((checkMessageInPinneList && isClanCreator) || (checkMessageInPinneList && pinMessage)) {
-			setEnablePinMessageItem(false);
-			setEnableUnPinMessageItem(true);
-		}
-	}, [checkMessageInPinneList, isClanCreator, pinMessage]);
+	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList]);
 
 	// 5. allow speak message
 	useLayoutEffect(() => {
@@ -237,16 +271,10 @@ function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenu
 		});
 
 		builder.when(enablePinMessageItem, (builder) => {
-			builder.addMenuItem(
-				'pinMessage',
-				'Pin Message',
-				() => console.log('pin message'),
-
-				<Icons.PinMessageRightClick />,
-			);
+			builder.addMenuItem('pinMessage', 'Pin Message', () => handlePinMessage(), <Icons.PinMessageRightClick />);
 		});
 		builder.when(enableUnPinMessageItem, (builder) => {
-			builder.addMenuItem('unPinMessage', 'Unpin Message', () => console.log('unpin message'), <Icons.PinMessageRightClick />);
+			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick />);
 		});
 
 		builder.addMenuItem(
@@ -264,7 +292,7 @@ function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenu
 		);
 
 		builder.when(enableCreateThreadItem, (builder) => {
-			builder.addMenuItem('createThread', 'Create Thread', () => console.log('create thread'), <Icons.ThreadIconRightClick />);
+			builder.addMenuItem('createThread', 'Create Thread', () => handleCreateThread(), <Icons.ThreadIconRightClick />);
 		});
 
 		builder.addMenuItem(
@@ -282,19 +310,7 @@ function MessageContextMenu({ id, elementTarget, messageId }: MessageContextMenu
 		builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick />);
 		builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('apps'), <Icons.UnreadRightClick />);
 		builder.addMenuItem('copyMessageLink', 'Copy Message Link', () => console.log('apps'), <Icons.CopyMessageLinkRightClick />);
-		builder.addMenuItem(
-			'forwardMessage',
-			'Forward Message',
-			() => handleForwardMessage(),
-			// async () => {
-			// 	try {
-			// 		await handleForwardMessage();
-			// 	} catch (error) {
-			// 		console.error('Failed to forward message', error);
-			// 	}
-			// },
-			<Icons.ForwardRightClick />,
-		);
+		builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick />);
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(

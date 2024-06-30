@@ -39,9 +39,9 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 
 	const handleContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>) => {
-			showMessageContextMenu(event, messageId);
+			showMessageContextMenu(event, messageId, mode);
 		},
-		[showMessageContextMenu, messageId],
+		[showMessageContextMenu, messageId, mode],
 	);
 
 	const mess = useMemo(() => {
