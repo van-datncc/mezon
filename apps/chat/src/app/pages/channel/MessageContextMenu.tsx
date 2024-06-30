@@ -110,6 +110,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	});
 
 	const handleReplyMessage = () => {
+		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
