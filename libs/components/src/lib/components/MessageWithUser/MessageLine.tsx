@@ -1,6 +1,5 @@
 import MarkdownFormatText from '../MarkdownFormatText';
 import MessageImage from './MessageImage';
-// import MessageImage from './MessageImage';
 import { useMessageLine } from './useMessageLine';
 
 type MessageLineProps = {
