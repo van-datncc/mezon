@@ -675,3 +675,24 @@ input:-webkit-autofill:active {
 .hoverIconBlackImportant:hover button svg{
 	color: black;
 }
+
+
+:root {
+	--contexify-zIndex: 666;
+	--contexify-menu-minWidth: 220px;
+	--contexify-menu-padding: 6px;
+	--contexify-menu-radius: 6px;
+	--contexify-menu-bgColor: #fff;
+	--contexify-menu-shadow: 1px 2px 2px rgba(0, 0, 0, 0.1),
+	2px 4px 4px rgba(0, 0, 0, 0.1),
+	3px 6px 6px rgba(0, 0, 0, 0.1);
+	--contexify-menu-negatePadding: var(--contexify-menu-padding);
+  }
+
+.contexify_item {
+	z-index: var(--contexify-zIndex);
+	min-width: var(--contexify-menu-minWidth);
+	padding: var(--contexify-menu-padding);
+	border-radius: var(--contexify-menu-radius);
+	background-color: var(--contexify-menu-bgColor);
+	box-shadow: var(--contexify-menu-shadow);}

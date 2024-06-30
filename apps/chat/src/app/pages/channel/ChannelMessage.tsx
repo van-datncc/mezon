@@ -10,7 +10,7 @@ import {
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useMessageContextMenu } from './MessageContextMenuContext';
+import { useMessageContextMenu } from './ContextMenu/MessageContextMenuContext';
 import MessageInput from './MessageInput';
 import ModalDeleteMess from './ModalDeleteMess';
 import { useDeleteMessageHook } from './useDeleteMessage';

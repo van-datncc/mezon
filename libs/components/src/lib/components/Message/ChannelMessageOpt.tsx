@@ -23,7 +23,6 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-
 		event.stopPropagation();
 	};
 

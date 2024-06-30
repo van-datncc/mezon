@@ -9,19 +9,31 @@ type Props = {
 };
 
 export default function DynamicContextMenu({ menuId, items }: Props) {
+	console.log(items);
 	const children = useMemo(() => {
 		const elements: React.ReactNode[] = [];
 		for (let index = 0; index < items.length; index++) {
 			const item = items[index];
 
 			elements.push(
-				<Item key={item.label} onClick={item.handleItemClick} disabled={item.disabled}>
+				<Item
+					key={item.label}
+					onClick={item.handleItemClick}
+					disabled={item.disabled}
+					className='contexify_item'
+				>
 					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
 						<span>{item.label}</span>
 						{item.icon}
 					</div>
 				</Item>,
 			);
+
+
+
+
+
+
 			if (index !== items.length - 1) elements.push(<Separator key={`separator-${index}`} />);
 			if (item.hasSubmenu)
 				elements.push(

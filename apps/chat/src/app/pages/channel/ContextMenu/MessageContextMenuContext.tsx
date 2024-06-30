@@ -1,7 +1,7 @@
 import { ChannelStreamMode } from 'mezon-js';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useContextMenu } from 'react-contexify';
-import MessageContextMenu from './MessageContextMenu';
+import MessageContextMenu from '../ContextMenu/MessageContextMenu';
 
 const MESSAGE_CONTEXT_MENU_ID = 'message-context-menu';
 
