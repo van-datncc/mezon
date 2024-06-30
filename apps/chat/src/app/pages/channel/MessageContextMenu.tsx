@@ -110,6 +110,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	});
 
 	const handleReplyMessage = () => {
+		dispatch(reactionActions.setReactionRightState(true));
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
@@ -280,13 +281,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.addMenuItem(
 			'reply',
 			'Reply',
-			async () => {
-				try {
-					await handleReplyMessage();
-				} catch (error) {
-					console.error('Failed to reply message', error);
-				}
-			},
+			() => handleReplyMessage(),
 
 			<Icons.Reply />,
 		);
