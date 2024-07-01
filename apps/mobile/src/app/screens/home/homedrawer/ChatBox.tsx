@@ -286,7 +286,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						message_id: '',
 						message_ref_id: currentSelectedReplyMessage.id,
 						ref_type: 0,
-						message_sender_id: currentSelectedReplyMessage.user.id,
+						message_sender_id: currentSelectedReplyMessage?.user?.id,
 						content: JSON.stringify(currentSelectedReplyMessage.content),
 						has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
 					},

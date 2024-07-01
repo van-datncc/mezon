@@ -231,7 +231,7 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 
 	const filteredListUserBySearch = useMemo(() => {
 		return listUserInvite?.filter((dmGroup) => {
-			return dmGroup.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase());
+			return dmGroup?.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [listUserInvite, searchTerm]);
 

@@ -39,7 +39,7 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 	function handleHashtagPress() {
 		Toast.show({
 			type: 'info',
-			text1: 'Original known as ' + auth.userProfile.user.username + '#' + auth.userId,
+			text1: 'Original known as ' + auth.userProfile?.user?.username + '#' + auth.userId,
 		});
 	}
 
