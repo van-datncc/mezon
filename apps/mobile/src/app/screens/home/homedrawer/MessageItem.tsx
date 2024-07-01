@@ -75,6 +75,8 @@ const arePropsEqual = (prevProps, nextProps) => {
 	return prevProps.message === nextProps.message;
 };
 
+const idUserAnonymous = "1767478432163172999";
+
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
@@ -102,7 +104,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.message));
 	const { deleteSendMessage } = useDeleteMessage({ channelId: props.channelId, mode: props.mode });
-  const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
+  const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous,[message?.sender_id]);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const hasIncludeMention = useMemo(() => {
