@@ -14,7 +14,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
-import { MessageContextMenuProvider } from './MessageContextMenuContext';
+import { MessageContextMenuProvider } from './ContextMenu/MessageContextMenuContext';
 
 type ChannelMessagesProps = {
 	channelId: string;

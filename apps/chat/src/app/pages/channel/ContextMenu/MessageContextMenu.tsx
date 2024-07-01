@@ -1,16 +1,16 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAppNavigation, useAuth, useClanRestriction, useDeleteMessage, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
 	directActions,
 	gifsStickerEmojiActions,
 	pinMessageActions,
 	reactionActions,
 	referencesActions,
-	searchMessagesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectDirectById,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectReactionOnMessageList,
@@ -31,21 +31,17 @@ import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import DynamicContextMenu from './DynamicContextMenu';
 
 type MessageContextMenuProps = {
 	id: string;
 	messageId: string;
 	elementTarget?: boolean | HTMLElement | null;
-	activeMode?: number | undefined;
+	activeMode: number | undefined;
 };
 
 function MessageContextMenu({ id, elementTarget, messageId, activeMode }: MessageContextMenuProps) {
-	const navigate = useNavigate();
-	const { toChannelPage } = useAppNavigation();
 	const { setOpenThreadMessageState } = useReference();
-
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const reactionRealtimeList = useSelector(selectReactionOnMessageList);
@@ -89,8 +85,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableDelMessageItem, setEnableDelMessageItem] = useState<boolean>(false);
 	const [enableEditMessageItem, setEnableEditMessageItem] = useState<boolean>(false);
 	const [enableSpeakMessageItem, setEnableSpeakMessageItem] = useState<boolean>(false);
-	const [enablePinMessageItem, setEnablePinMessageItem] = useState<boolean>(false);
-	const [enableUnPinMessageItem, setEnableUnPinMessageItem] = useState<boolean>(false);
 	const [enableCreateThreadItem, setEnableCreateThreadItem] = useState<boolean>(false);
 	const [enableViewReactionItem, setEnableViewReactionItem] = useState<boolean>(false);
 	const [enableRemoveOneReactionItem, setEnableRemoveOneReactionItem] = useState<boolean>(false);
@@ -102,7 +96,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
 
 	const [urlImage, setUrlImage] = useState<string>('');
-
+	const { directId } = useAppParams();
+	const direct = useSelector(selectDirectById(directId || ''));
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: currentChannel?.id || '',
@@ -140,15 +135,13 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 	};
 
-	const handleCreateThread = () => {
-		setOpenThreadMessageState(false);
-		if (currentChannel && currentChannel?.parrent_id !== '0') {
-			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
-		}
+	const { setIsShowCreateThread, setValueThread } = useThreads();
 
-		dispatch(threadsActions.setNameThreadError(''));
-		dispatch(threadsActions.setMessageThreadError(''));
-		dispatch(searchMessagesActions.setIsSearchMessage(false));
+	const handleCreateThread = () => {
+		setIsShowCreateThread(true);
+		setOpenThreadMessageState(true);
+		dispatch(threadsActions.setOpenThreadMessageState(true));
+		setValueThread(message);
 	};
 
 	// 1. allow view reaction
@@ -163,25 +156,19 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [checkSenderMessage]);
 
 	// 3. allow pin/unpin message
-	useLayoutEffect(() => {
+	const pinMessageStatus = useMemo(() => {
 		if (!checkMessageInPinneList) {
 			if (pinMessage || isClanCreator || checkAdmintrator) {
-				setEnablePinMessageItem(true);
-				setEnableUnPinMessageItem(false);
-			} else {
-				setEnablePinMessageItem(false);
-				setEnableUnPinMessageItem(false);
+				return true;
 			}
 		} else if (checkMessageInPinneList) {
 			if (pinMessage || isClanCreator || checkAdmintrator) {
-				setEnablePinMessageItem(false);
-				setEnableUnPinMessageItem(true);
-			} else {
-				setEnablePinMessageItem(false);
-				setEnableUnPinMessageItem(false);
+				return false;
 			}
+		} else {
+			return undefined;
 		}
-	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList]);
+	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList, message]);
 
 	// 5. allow speak message
 	useLayoutEffect(() => {
@@ -251,7 +238,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		);
 
 		builder.when(enableViewReactionItem, (builder) => {
-			builder.addMenuItem('viewReaction', 'View Reaction', () => console.log('view reaction'), <Icons.ViewReactionRightClick />);
+			builder.addMenuItem(
+				'viewReaction',
+				'View Reaction',
+				() => console.log('view reaction'),
+				<Icons.ViewReactionRightClick defaultSize="w-4 h-4" />,
+			);
 		});
 
 		builder.when(enableEditMessageItem, (builder) => {
@@ -267,33 +259,27 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					}
 				},
 
-				<Icons.EditMessageRightClick />,
+				<Icons.EditMessageRightClick defaultSize="w-4 h-4" />,
 			);
 		});
 
-		builder.when(enablePinMessageItem, (builder) => {
-			builder.addMenuItem('pinMessage', 'Pin Message', () => handlePinMessage(), <Icons.PinMessageRightClick />);
+		builder.when(pinMessageStatus, (builder) => {
+			builder.addMenuItem('pinMessage', 'Pin Message', () => handlePinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
-		builder.when(enableUnPinMessageItem, (builder) => {
-			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick />);
+		builder.when(!pinMessageStatus, (builder) => {
+			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
 		builder.addMenuItem(
 			'reply',
 			'Reply',
-			async () => {
-				try {
-					await handleReplyMessage();
-				} catch (error) {
-					console.error('Failed to reply message', error);
-				}
-			},
+			() => handleReplyMessage(),
 
-			<Icons.Reply />,
+			<Icons.ReplyRightClick defaultSize="w-4 h-4" />,
 		);
 
 		builder.when(enableCreateThreadItem, (builder) => {
-			builder.addMenuItem('createThread', 'Create Thread', () => handleCreateThread(), <Icons.ThreadIconRightClick />);
+			builder.addMenuItem('createThread', 'Create Thread', () => handleCreateThread(), <Icons.ThreadIconRightClick defaultSize="w-4 h-4" />);
 		});
 
 		builder.addMenuItem(
@@ -308,10 +294,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			},
 			<Icons.CopyTextRightClick />,
 		);
-		builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick />);
-		builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('apps'), <Icons.UnreadRightClick />);
-		builder.addMenuItem('copyMessageLink', 'Copy Message Link', () => console.log('apps'), <Icons.CopyMessageLinkRightClick />);
-		builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick />);
+		builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
+		builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('apps'), <Icons.UnreadRightClick defaultSize="w-4 h-4" />);
+		builder.addMenuItem(
+			'copyMessageLink',
+			'Copy Message Link',
+			() => console.log('apps'),
+			<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />,
+		);
+		builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(
@@ -320,7 +311,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				() => {
 					console.log('speak Message');
 				},
-				<Icons.SpeakMessageRightClick />,
+				<Icons.SpeakMessageRightClick defaultSize="w-4 h-4" />,
 			);
 		});
 
@@ -331,7 +322,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				() => {
 					console.log('remove reaction');
 				},
-				<Icons.RightArrowRightClick />,
+				<Icons.RightArrowRightClick defaultSize="w-4 h-4" />,
 			);
 		});
 		builder.when(enableRemoveAllReactionItem, (builder) => {
@@ -351,7 +342,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 						console.error('Failed to delete message', error);
 					}
 				},
-				<Icons.DeleteMessageRightClick />,
+				<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />,
 			);
 		});
 
@@ -362,7 +353,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				() => {
 					console.log('report message');
 				},
-				<Icons.ReportMessageRightClick />,
+				<Icons.ReportMessageRightClick defaultSize="w-4 h-4" />,
 			);
 		});
 
@@ -412,8 +403,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		messageId,
 		enableViewReactionItem,
 		enableEditMessageItem,
-		enablePinMessageItem,
-		enableUnPinMessageItem,
 		enableCreateThreadItem,
 		enableSpeakMessageItem,
 		enableRemoveOneReactionItem,
@@ -424,9 +413,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		enableOpenLinkItem,
 		enableCopyImageItem,
 		enableSaveImageItem,
+		pinMessageStatus,
 	]);
 
-	return <DynamicContextMenu menuId={id} items={items} />;
+	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
 }
 
 export default MessageContextMenu;

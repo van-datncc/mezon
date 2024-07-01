@@ -16,9 +16,9 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const direct = useSelector(selectDirectById(directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
+
 	const deleteSendMessage = React.useCallback(
 		async (messageId: string) => {
-			console.log(channelId, mode);
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -28,8 +28,9 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 			}
 			let channelIdDelete = channelId;
 			if (direct) {
-				channelIdDelete = directId || '';
+				channelIdDelete = direct.id || '';
 			}
+
 			dispatch(
 				messagesActions.remove({
 					channelId: channelIdDelete,

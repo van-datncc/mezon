@@ -2,10 +2,10 @@ interface IconProps {
 	defaultFill?: string;
 	defaultSize?: string;
 }
-export const ReplyRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const ReplyRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -23,9 +23,18 @@ export const ReplyRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', 
 	);
 };
 
-export const CopyTextRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const CopyTextRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
-		<svg className="" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+		<svg
+			className={defaultSize}
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
 			<path
 				fill="currentColor"
 				d="M3 16a1 1 0 0 1-1-1v-5a8 8 0 0 1 8-8h5a1 1 0 0 1 1 1v.5a.5.5 0 0 1-.5.5H10a6 6 0 0 0-6 6v5.5a.5.5 0 0 1-.5.5H3Z"
@@ -37,10 +46,10 @@ export const CopyTextRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE
 	);
 };
 
-export const UnreadRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const UnreadRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -63,10 +72,10 @@ export const UnreadRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE',
 	);
 };
 
-export const CopyMessageLinkRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const CopyMessageLinkRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -85,10 +94,10 @@ export const CopyMessageLinkRightClick: React.FC<IconProps> = ({ defaultFill = '
 	);
 };
 
-export const SpeakMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const SpeakMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -108,10 +117,10 @@ export const SpeakMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AE
 	);
 };
 
-export const PinMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const PinMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -129,10 +138,10 @@ export const PinMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAE
 	);
 };
 
-export const EditMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const EditMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -150,10 +159,10 @@ export const EditMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEA
 	);
 };
 
-export const DeleteMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const DeleteMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -178,10 +187,10 @@ export const DeleteMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#A
 	);
 };
 
-export const RightArrowRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const RightArrowRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="caret_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -199,10 +208,10 @@ export const RightArrowRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAE
 	);
 };
 
-export const ViewReactionRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const ViewReactionRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -222,10 +231,10 @@ export const ViewReactionRightClick: React.FC<IconProps> = ({ defaultFill = '#AE
 	);
 };
 
-export const ReportMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const ReportMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -243,10 +252,10 @@ export const ReportMessageRightClick: React.FC<IconProps> = ({ defaultFill = '#A
 	);
 };
 
-export const ThreadIconRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const ThreadIconRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -264,10 +273,10 @@ export const ThreadIconRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAE
 	);
 };
 
-export const ForwardRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const ForwardRightClick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
 		<svg
-			className="icon_d90b3d"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
