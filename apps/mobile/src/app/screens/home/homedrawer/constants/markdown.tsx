@@ -122,6 +122,24 @@ export const markdownStyles = {
   unknownChannel: {fontStyle: 'italic'}
 };
 
+const styleMessageReply = {
+	body: {
+		color: Colors.tertiary,
+		fontSize: size.small,
+	},
+	textVoiceChannel: {
+		fontSize: size.small,
+		color: Colors.textGray,
+		lineHeight: size.s_20,
+	},
+	mention: {
+		fontSize: size.small,
+		color: Colors.textGray,
+		backgroundColor: '#3b426e',
+		lineHeight: size.s_20,
+	},
+};
+
 export type IMarkdownProps = {
 	lines: string;
 	isEdited?: boolean;
@@ -131,9 +149,10 @@ export type IMarkdownProps = {
 	onMention?: (url: string) => void;
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
-  clanProfile?: UserClanProfileEntity[];
-  currentClan?: ClansEntity;
-  channelMember?:  ChannelMembersEntity[];
+	clanProfile?: UserClanProfileEntity[];
+	currentClan?: ClansEntity;
+	channelMember?:  ChannelMembersEntity[];
+	isMessageReply?: boolean;
 };
 
 /**
@@ -292,7 +311,7 @@ export const removeBlockCode = (text: string) => {
 };
 
 const RenderTextContent = React.memo(
-	({ lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine , clanProfile, currentClan , channelMember}: IMarkdownProps) => {
+	({ lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine , clanProfile, currentClan , channelMember, isMessageReply}: IMarkdownProps) => {
 		if (!lines) return null;
 
 		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
@@ -300,6 +319,7 @@ const RenderTextContent = React.memo(
 		const isExistEmoji = emojiRegex.test(lines);
 		const isExistBlockCode = codeBlockRegex.test(lines);
 
+		let customStyle = {};
 		let content: string = lines?.trim();
 
 		if (matchesMentions) {
@@ -322,16 +342,31 @@ const RenderTextContent = React.memo(
 			content = content + ` [${t('edited')}](${EDITED_FLAG})`;
 		}
 
+		if (isMessageReply) {
+			customStyle = {...styleMessageReply};
+		}
+
 		return isNumberOfLine ? (
 			<View
 				style={{
 					flex: 1,
-					maxHeight: size.s_20 * 10 - size.s_10,
+					maxHeight: isMessageReply ? size.s_18 : size.s_20 * 10 - size.s_10,
 					overflow: 'hidden',
 				}}
 			>
+				{isMessageReply ? (
+					<View style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						zIndex: 1,
+					}}/>
+				): null}
+
 				<Markdown
-					style={markdownStyles as StyleSheet.NamedStyles<any>}
+					style={{...markdownStyles as StyleSheet.NamedStyles<any>, ...customStyle}}
 					rules={renderRulesCustom}
 					onLinkPress={(url) => {
 						if (url.startsWith('@')) {
@@ -436,9 +471,10 @@ export const renderTextContent = (
 	onMention?: (url: string) => void,
 	onChannelMention?: (channel: ChannelsEntity) => void,
 	isNumberOfLine?: boolean,
-  clanProfile?: UserClanProfileEntity[],
-  currentClan?: ClansEntity,
-  channelMember?:  ChannelMembersEntity[],
+	clanProfile?: UserClanProfileEntity[],
+	currentClan?: ClansEntity,
+	channelMember?:  ChannelMembersEntity[],
+	isMessageReply?: boolean,
 ) => {
 	return (
 		<RenderTextContent
@@ -450,9 +486,10 @@ export const renderTextContent = (
 			onMention={onMention}
 			onChannelMention={onChannelMention}
 			isNumberOfLine={isNumberOfLine}
-      clanProfile={clanProfile}
-      currentClan={currentClan}
-      channelMember={channelMember}
+			clanProfile={clanProfile}
+			currentClan={currentClan}
+			channelMember={channelMember}
+			isMessageReply={isMessageReply}
 		/>
 	);
 };
