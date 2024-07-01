@@ -78,7 +78,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				<div className="flex flex-row items-center gap-2">
 					<div>
 						{currentClan?.logo ? (
-							<img src={currentClan.logo} className="rounded-full size-10 object-cover" alt={currentClan.logo} />
+							<img src={currentClan.logo} className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10" alt={currentClan.logo} />
 						) : (
 							<div>
 								{currentClan?.clan_name && (

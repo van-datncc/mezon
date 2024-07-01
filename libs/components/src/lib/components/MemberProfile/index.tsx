@@ -1,6 +1,6 @@
 import { Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembers, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import { directMessageValueProps } from '../DmList/DMListItem';
 import { OfflineStatus, OnlineStatus } from '../Icons';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
+import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -29,6 +30,7 @@ export type MemberProfileProps = {
 	isMemberGroupDm?: boolean;
 	positionType?: MemberProfileType;
 	countMember?: number;
+	dataMemberCreate?: DataMemberCreate;
 };
 
 function MemberProfile({
@@ -50,8 +52,8 @@ function MemberProfile({
 	isMemberGroupDm,
 	positionType,
 	countMember,
+	dataMemberCreate,
 }: MemberProfileProps) {
-	const dispatch = useAppDispatch();
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
 	const [positionTop, setPositionTop] = useState(false);
@@ -126,7 +128,7 @@ function MemberProfile({
 	useOnClickOutside(panelRef, handleClickOutSide);
 
 	return (
-		<div className="relative group">
+		<div className="relative group" onClick={() => console.log('1', dataMemberCreate?.createId, user?.user?.id)}>
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
@@ -179,7 +181,7 @@ function MemberProfile({
 							>
 								{name}
 							</p>
-							{currentClan?.creator_id === user?.user?.id && (
+							{((dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id ) && (
 								<button className="w-[14px] h-[14px] ml-1">
 									<Icons.OwnerIcon />
 								</button>
