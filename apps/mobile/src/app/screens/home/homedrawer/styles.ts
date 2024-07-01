@@ -422,7 +422,7 @@ export const styles = StyleSheet.create({
 	userNameMessageBox: {
 		fontSize: size.medium,
 		marginRight: size.s_10,
-		fontWeight: '600',
+		fontWeight: '700',
 		color: Colors.caribbeanGreen,
 	},
 	dateMessageBox: {
