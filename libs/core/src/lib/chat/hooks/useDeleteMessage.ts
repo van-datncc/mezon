@@ -13,11 +13,12 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { directId } = useAppParams();
-	const direct = useSelector(selectDirectById(directId || ""));
+	const direct = useSelector(selectDirectById(directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
 	const deleteSendMessage = React.useCallback(
 		async (messageId: string) => {
+			console.log(channelId, mode);
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -25,9 +26,9 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-			let channelIdDelete = channelId
+			let channelIdDelete = channelId;
 			if (direct) {
-				channelIdDelete = directId || ""
+				channelIdDelete = directId || '';
 			}
 			dispatch(
 				messagesActions.remove({
