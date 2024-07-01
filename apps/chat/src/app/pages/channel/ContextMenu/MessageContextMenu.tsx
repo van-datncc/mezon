@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
 	directActions,
 	gifsStickerEmojiActions,
@@ -10,6 +10,7 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectDirectById,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectReactionOnMessageList,
@@ -95,7 +96,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
 
 	const [urlImage, setUrlImage] = useState<string>('');
-
+	const { directId } = useAppParams();
+	const direct = useSelector(selectDirectById(directId || ''));
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: currentChannel?.id || '',
@@ -414,7 +416,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		pinMessageStatus,
 	]);
 
-	return <DynamicContextMenu menuId={id} items={items} messageId={message.id} mode={activeMode} />;
+	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
 }
 
 export default MessageContextMenu;

@@ -1,5 +1,5 @@
 import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
-import { selectCurrentChannelId, selectDirectById, selectDmGroupCurrentId } from '@mezon/store';
+import { selectCurrentChannel, selectDirectById } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
 import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { ChannelStreamMode } from 'mezon-js';
@@ -14,28 +14,22 @@ interface IReactionItem {
 
 const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, messageId }) => {
 	const { directId } = useAppParams();
-	const [channelID, setChannelID] = useState('');
-	const direct = useSelector(selectDirectById(directId || ''));
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-
-	console.log(currentDmGroupId);
-	console.log(currentChannelId);
-
 	const { emojiListPNG } = useDataEmojiSvg();
 	const { reactionMessageDispatch } = useChatReaction();
 	const getUrl = getSrcEmoji(emojiShortCode, emojiListPNG ?? []);
 	const userId = useAuth();
 
+	const [channelID, setChannelID] = useState('');
+	const direct = useSelector(selectDirectById(directId || ''));
+	const currentChannel = useSelector(selectCurrentChannel);
+
 	useEffect(() => {
-		console.log(currentDmGroupId);
-		console.log(currentChannelId);
-		if (currentDmGroupId !== '') {
-			return setChannelID(currentDmGroupId ?? '');
+		if (direct !== undefined) {
+			setChannelID(direct.id);
 		} else {
-			return setChannelID(currentChannelId ?? '');
+			setChannelID(currentChannel?.id || '');
 		}
-	}, [currentDmGroupId, currentChannelId, messageId, activeMode]);
+	}, [currentChannel, direct, directId]);
 
 	const handleClickEmoji = useCallback(async () => {
 		await reactionMessageDispatch(
