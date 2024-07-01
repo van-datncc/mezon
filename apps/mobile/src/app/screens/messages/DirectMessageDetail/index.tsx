@@ -69,11 +69,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	};
 
 	const fetchMemberChannel = useCallback(async () => {
+		if (!currentChannel) {
+			return;
+		}
 		await dispatch(
 			channelMembersActions.fetchChannelMembers({
-				clanId: currentChannel.clan_id || '',
-				channelId: currentChannel.channel_id || '',
-				channelType: currentChannel.type,
+				clanId: currentChannel?.clan_id || '',
+				channelId: currentChannel?.channel_id || '',
+				channelType: currentChannel?.type,
 			}),
 		);
 	}, [currentChannel, dispatch]);
