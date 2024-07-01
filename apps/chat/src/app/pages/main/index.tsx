@@ -142,7 +142,7 @@ function MyApp() {
 					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>
 							<Image
-								src={`/assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
+								src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
 								alt={'logoMezon'}
 								width={48}
 								height={48}

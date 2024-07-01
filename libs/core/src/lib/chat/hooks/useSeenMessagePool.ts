@@ -14,14 +14,12 @@ export function useSeenMessagePool() {
 
 	const initWorker = useCallback(() => {
 		seenMessagePool.registerSeenMessageWorker((action) => {
-			// temp check fake message
-			if (action.messageId?.length !== 13)
-				dispatch(
-					messagesActions.updateLastSeenMessage({
-						channelId: action.channelId,
-						messageId: action.messageId,
-					}),
-				);
+			dispatch(
+				messagesActions.updateLastSeenMessage({
+					channelId: action.channelId,
+					messageId: action.messageId,
+				}),
+			);
 		});
 	}, [dispatch]);
 
@@ -30,6 +28,11 @@ export function useSeenMessagePool() {
 	}, []);
 
 	const markMessageAsSeen = useCallback((message: IMessage) => {
+		// if message is sending, do not mark as seen
+		if (message.isSending) {
+			return;
+		}
+		
 		seenMessagePool.addSeenMessage({
 			channelId: message.channel_id || '',
 			channelLabel: message.channel_label,

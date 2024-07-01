@@ -188,12 +188,12 @@ function MemberProfile({
 					)}
 
 					{Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<p className="dark:text-[#AEAEAE] text-colorTextLightMode">{countMember} Members</p>
+						<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-xs">{countMember} Members</p>
 					)}
 				</div>
 			</div>
 			{isShowPanelMember && (
-				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} />
+				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name}/>
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div

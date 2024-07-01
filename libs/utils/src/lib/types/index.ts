@@ -26,7 +26,6 @@ import {
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
 
-export * from './enumListRight';
 export * from './permissions';
 export * from './thumbnailPos';
 
@@ -168,6 +167,7 @@ export type IMessage = ChannelMessage & {
 	isSending?: boolean;
 	isError?: boolean;
 	isMe?: boolean;
+	isAnonymous?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
