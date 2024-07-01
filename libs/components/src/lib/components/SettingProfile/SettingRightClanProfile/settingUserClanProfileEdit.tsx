@@ -129,7 +129,9 @@ const SettingRightClanEdit = ({
 							onChange={handleDisplayName}
 							type="text"
 							className="rounded-[3px] w-full dark:text-white text-black border dark:border-white border-slate-200 px-4 py-2 mt-2 outline-none  dark:bg-black bg-[#f0f0f0] font-normal text-sm tracking-wide"
-							placeholder={displayName}
+							placeholder={userProfile?.user?.username}
+							defaultValue={displayName === userProfile?.user?.username ? '' : displayName}
+							maxLength={32}
 						/>
 					</div>
 					<div className="mt-[20px]">
