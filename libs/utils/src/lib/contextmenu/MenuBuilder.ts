@@ -6,15 +6,26 @@ type ConditionValue = boolean | (() => boolean) | undefined | null | number | st
 export type ContextMenuItem = {
 	id?: string;
 	label: string;
-	handleItemClick?: (args: ItemParams<any, any>) => void;
+	handleItemClick?: (args?: ItemParams<any, any> | any) => void;
 	icon?: React.ReactNode;
 	subMenuItems?: ContextMenuItem[] | null;
 	hasSubmenu?: boolean;
 	disabled?: boolean;
+	classNames?: string;
 };
 
+export type MenuBuilderPluginSetup = (builder: MenuBuilder) => void;
+
+export type MenuBuilderPlugin = {
+	setup: MenuBuilderPluginSetup;
+}
 export class MenuBuilder {
+	private plugins: MenuBuilderPlugin[] = [];
 	private items: ContextMenuItem[] = [];
+
+	constructor(plugins?: MenuBuilderPlugin[]) {
+		this.plugins = plugins || [];
+	}
 
 	addMenuItem(
 		id: string,
@@ -24,8 +35,9 @@ export class MenuBuilder {
 		subMenuItems = null,
 		hasSubmenu = false,
 		disabled = false,
+		classNames?: string,
 	): MenuBuilder {
-		this.items.push(this.craftMenuItem(id, label, handleItemClick, icon, subMenuItems, hasSubmenu, disabled));
+		this.items.push(this.craftMenuItem(id, label, handleItemClick, icon, subMenuItems, hasSubmenu, disabled, classNames));
 		return this;
 	}
 
@@ -47,7 +59,12 @@ export class MenuBuilder {
 	}
 
 	build(): ContextMenuItem[] {
+		this.runPlugins();
 		return this.items;
+	}
+
+	private runPlugins() {
+		this.plugins.forEach((plugin) => plugin.setup(this));
 	}
 
 	private craftMenuItem(
@@ -58,6 +75,7 @@ export class MenuBuilder {
 		subMenuItems = null,
 		hasSubmenu = false,
 		disabled = false,
+		classNames?: string,
 	): ContextMenuItem {
 		const clickHandler = handleItemClick || (() => console.log('No handler for this item'));
 		return {
@@ -68,6 +86,7 @@ export class MenuBuilder {
 			subMenuItems,
 			hasSubmenu,
 			disabled,
+			classNames,
 		};
 	}
 }
