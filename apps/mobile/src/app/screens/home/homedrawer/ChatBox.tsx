@@ -14,12 +14,10 @@ import {
 import { Colors, size } from '@mezon/mobile-ui';
 import {
 	RootState,
-	selectAllUsers,
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiImage,
 	selectHiddenBottomTabMobile,
-	selectMemberByUserId,
   selectMembersByChannelId,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -121,8 +119,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
 	const [isFocus, setIsFocus] = useState<boolean>(false);
-	const [senderId, setSenderId] = useState<string>('');
-	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 	const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 	const navigation = useNavigation<any>();
@@ -140,6 +136,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [heightInput, setHeightInput] = useState(size.s_40);
 	const [allMessages, setAllMessages] = useState<{ [key: string]: string }>({});
 	const rawMembers = useSelector(selectMembersByChannelId(props?.channelId));
+	const [replyDisplayName, setReplyDisplayName] = useState('');
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -236,7 +233,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		(actionType: EMessageActionType) => {
 			switch (actionType) {
 				case EMessageActionType.Reply:
-					setSenderId('');
+					setReplyDisplayName('');
 					removeMessageActionByType(EMessageActionType.Reply);
 					setCurrentSelectedReplyMessage(null);
 					break;
@@ -336,18 +333,20 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	useEffect(() => {
 		messageActionListNeedToResolve.forEach((item) => {
-			const { targetMessage, type } = item;
+			const { targetMessage, type, replyTo } = item;
 			switch (type) {
 				case EMessageActionType.Reply:
 					setCurrentSelectedReplyMessage(targetMessage);
-					setSenderId(targetMessage.sender_id);
+					if (replyTo) {
+						setReplyDisplayName(replyTo);
+					}
 					break;
 				case EMessageActionType.EditMessage:
 					setCurrentSelectedEditMessage(targetMessage);
 					setText(targetMessage.content.t);
 					break;
 				default:
-					setSenderId('');
+					setReplyDisplayName('');
 					break;
 			}
 		});
@@ -387,8 +386,11 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	useEffect(() => {
 		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
 		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_KEYBOARD, (value) => {
-			//NOTE: trigger from message action 'MessageItemBS component'
-			resetInput();
+			//NOTE: trigger from message action 'MessageItemBS and MessageItem component'
+			const { isStillShowKeyboard } = value;
+			if (!isStillShowKeyboard) {
+				resetInput();
+			}
 			handleMessageAction(value);
 			openKeyBoard();
 		});
@@ -649,13 +651,13 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	return (
 		<View style={[styles.wrapperChatBox, isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
 			<View style={styles.aboveTextBoxWrapper}>
-				{senderMessage?.user?.username ? (
+				{replyDisplayName ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.Reply)}>
 							<Feather size={25} name="x" style={styles.closeIcon} />
 						</Pressable>
 						<Text style={styles.aboveTextBoxText}>
-							{t('chatBox.replyingTo')} {senderMessage?.user?.username}
+							{t('chatBox.replyingTo')} {replyDisplayName}
 						</Text>
 					</View>
 				) : null}
