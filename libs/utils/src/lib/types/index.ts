@@ -26,7 +26,6 @@ import {
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
 
-export * from './enumListRight';
 export * from './permissions';
 export * from './thumbnailPos';
 

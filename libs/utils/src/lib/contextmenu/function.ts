@@ -1,4 +1,4 @@
-const convertImageToBlobFile = async (urlData: string): Promise<Blob | null> => {
+export const convertImageToBlobFile = async (urlData: string): Promise<Blob | null> => {
 	try {
 		const response = await fetch(urlData);
 		const blob = await response.blob();
@@ -9,7 +9,7 @@ const convertImageToBlobFile = async (urlData: string): Promise<Blob | null> => 
 	}
 };
 
-const handleCopyImage = async (urlData: string) => {
+export const handleCopyImage = async (urlData: string) => {
 	try {
 		const blob = await convertImageToBlobFile(urlData);
 		if (!blob) {
@@ -33,8 +33,8 @@ const handleCopyImage = async (urlData: string) => {
 	}
 };
 
-const handleSaveImage = (urlData: string) => {
-	fetch(urlData)  
+export const handleSaveImage = (urlData: string) => {
+	fetch(urlData)
 		.then((response) => response.blob())
 		.then((blob) => {
 			const url = window.URL.createObjectURL(new Blob([blob]));
@@ -49,7 +49,7 @@ const handleSaveImage = (urlData: string) => {
 		.catch((error) => console.error('Error downloading image:', error));
 };
 
-const handleCopyLink = (urlData: string) => {
+export const handleCopyLink = (urlData: string) => {
 	if (navigator.clipboard) {
 		navigator.clipboard.writeText(urlData).catch((error) => {
 			console.error('Failed to copy link:', error);
@@ -59,8 +59,6 @@ const handleCopyLink = (urlData: string) => {
 	}
 };
 
-const handleOpenLink = (urlData: string) => {
+export const handleOpenLink = (urlData: string) => {
 	window.open(urlData, '_blank');
 };
-
-export { convertImageToBlobFile, handleCopyImage, handleCopyLink, handleOpenLink, handleSaveImage };
