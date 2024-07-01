@@ -2,7 +2,7 @@ import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Session } from 'mezon-js';
 import { toast } from 'react-toastify';
-import { getMezonCtx } from '../helpers';
+import { ensureClientAsync, getMezonCtx } from '../helpers';
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
@@ -63,7 +63,7 @@ export const authenticateEmail = createAsyncThunk('auth/authenticateEmail', asyn
 });
 
 export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, thunkAPI) => {
-	const mezon = getMezonCtx(thunkAPI);
+	const mezon = await ensureClientAsync(getMezonCtx(thunkAPI));
 	const sessionState = selectSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
 
 	if (!sessionState) {
