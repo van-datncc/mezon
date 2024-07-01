@@ -3,11 +3,12 @@ import { useAuth, useGifsStickersEmoji, useReference, useThreads } from '@mezon/
 import { gifsStickerEmojiActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser, SubPanelName } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { findParentByClass } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
-	handleContextMenu: (event: React.MouseEvent<HTMLElement>) => void;
+	handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
 };
 
 const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
@@ -69,7 +70,20 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 	};
 
 	const handleClickOption = (event: React.MouseEvent<HTMLButtonElement>) => {
-		handleContextMenu(event);
+		const target = event.target as HTMLElement;
+		const btn = findParentByClass(target, 'context-menu-trigger');
+		const btnX = btn?.getBoundingClientRect()?.left ?? 0;
+		const btnY = btn?.getBoundingClientRect()?.top ?? 0;
+		const y = btnY;
+		// temporary fix for the position of the context menu
+		// hard code the menu width
+		const x = btnX - 220;
+		const position = { x, y };
+		const props = {
+			position
+		}
+
+		handleContextMenu(event, props);
 	};
 
 	const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -114,7 +128,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 							<Icons.ThreadIcon isWhite={thread} />
 						</button>
 					)}
-					<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
+					<button onClick={handleClickOption} className="h-full p-1 cursor-pointer context-menu-trigger">
 						<Icons.ThreeDot />
 					</button>
 				</div>

@@ -10,7 +10,7 @@ import {
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useMessageContextMenu } from './MessageContextMenuContext';
+import { MessageContextMenuProps, useMessageContextMenu } from './MessageContextMenuContext';
 import MessageInput from './MessageInput';
 import ModalDeleteMess from './ModalDeleteMess';
 import { useDeleteMessageHook } from './useDeleteMessage';
@@ -38,8 +38,8 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
 
 	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLElement>) => {
-			showMessageContextMenu(event, messageId, mode);
+		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
+			showMessageContextMenu(event, messageId, mode, props);
 		},
 		[showMessageContextMenu, messageId, mode],
 	);
