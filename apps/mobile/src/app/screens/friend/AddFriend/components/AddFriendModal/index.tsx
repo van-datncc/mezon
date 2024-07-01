@@ -6,10 +6,10 @@ import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import { useAuth, useFriends } from '@mezon/core';
 import { useTranslation } from 'react-i18next';
 import { Colors, size } from '@mezon/mobile-ui';
-import { requestAddFriendParam, selectAddFriendError } from '@mezon/store-mobile';
+import { friendsActions, requestAddFriendParam, selectStatusSentMobile } from '@mezon/store-mobile';
 import Toast from 'react-native-toast-message';
-import { CloseIcon } from '@mezon/mobile-components';
-import { useSelector } from 'react-redux';
+import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface IAddFriendModal {
     type: EAddFriendWays;
@@ -20,7 +20,8 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
     const { type, onClose } = props;
     const { userProfile } = useAuth();
     const { addFriend } = useFriends();
-    const addFriendError = useSelector(selectAddFriendError);
+    const statusSentMobile = useSelector(selectStatusSentMobile);
+    const dispatch = useDispatch();
     const [visibleModal, setVisibleModal] = useState<boolean>(false);
     const [requestAddFriend, setRequestAddFriend] = useState<requestAddFriendParam>({
 		usernames: [],
@@ -31,16 +32,27 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
     const inputRef = useRef(null);
 
     useEffect(() => {
-        if (addFriendError) {
-            Toast.show({
-                type: 'success',
-                props: {
-                    text2: addFriendError,
-                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
-                }
-            });
+        if (statusSentMobile !== null) {
+            if (statusSentMobile?.isSuccess) {
+                Toast.show({
+                    type: 'success',
+                    props: {
+                        text2: t('toast.sendAddFriendSuccess'),
+                        leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                    }
+                });
+            } else {
+                Toast.show({
+                    type: 'success',
+                    props: {
+                        text2: t('toast.sendAddFriendFail'),
+                        leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                    }
+                });
+            }
+            dispatch(friendsActions.setSentStatusMobile(null));
         }
-    }, [addFriendError])
+    }, [statusSentMobile])
 
     useEffect(() => {
         let timeoutId: NodeJS.Timeout;
