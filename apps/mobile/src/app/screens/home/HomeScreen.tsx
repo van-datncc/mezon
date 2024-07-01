@@ -19,6 +19,7 @@ import BarsLogo from '../../../assets/svg/bars.svg';
 import SearchLogo from '../../../assets/svg/discoverySearch.svg';
 import HashSignIcon from '../../../assets/svg/loading.svg';
 import UsersLogo from '../../../assets/svg/users.svg';
+import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 import { styles } from './styles';
@@ -90,6 +91,7 @@ const HomeScreen = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
 	const session = useSelector(selectSession);
 	const { reconnect } = useMezon();
+	useCheckUpdatedVersion();
 
 	useEffect(() => {
 		if (clans?.length && !currentClan) {
