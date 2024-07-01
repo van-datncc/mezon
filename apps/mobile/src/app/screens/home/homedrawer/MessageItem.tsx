@@ -1,5 +1,6 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import {
+  ActionEmitEvent,
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
@@ -30,7 +31,7 @@ import {
 import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
@@ -101,6 +102,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.message));
 	const { deleteSendMessage } = useDeleteMessage({ channelId: props.channelId, mode: props.mode });
+  const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const hasIncludeMention = useMemo(() => {
@@ -324,6 +326,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setOpenBottomSheet(type);
 	};
 
+  useEffect(()=>{
+    DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({isHiddenBottomSheet}) => {
+      isHiddenBottomSheet && setOpenBottomSheet(null);
+    })
+  },[])
+
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
 			const updateDate = new Date(message?.update_time);
@@ -422,7 +430,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							}}
 							style={styles.messageBoxTop}
 						>
-							<Text style={styles.userNameMessageBox}>{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || 'Anonymous'}</Text>
+							<Text style={styles.userNameMessageBox}>{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}</Text>
 							<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
 						</TouchableOpacity>
 					) : null}
@@ -452,6 +460,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					setOpenBottomSheet(null);
 				}}
 				user={foundUser}
+        checkAnonymous={checkAnonymous}
 			/>
 		</View>
 	);
