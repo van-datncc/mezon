@@ -3,16 +3,15 @@ import { useAccount, useAuth } from '@mezon/core';
 import { HashSignIcon } from '@mezon/mobile-components';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useCallback, useEffect, useState } from 'react';
+import { KeyboardAvoidingView, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { EProfileTab, IUserProfileValue } from '..';
 import BannerAvatar, { IFile } from './components/Banner';
 import DetailInfo from './components/Info';
 import styles from './styles';
-import { useCallback } from 'react';
-import { EProfileTab, IUserProfileValue } from '..';
-import { useNavigation } from '@react-navigation/native';
 
 interface IUserProfile {
 	triggerToSave: EProfileTab;
@@ -29,13 +28,13 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 	const navigation = useNavigation();
 
 	const handleAvatarChange = (data: IFile) => {
-		setCurrentUserProfileValue((prevValue) => ({...prevValue, imgUrl: data?.uri}))
+		setCurrentUserProfileValue((prevValue) => ({ ...prevValue, imgUrl: data?.uri }));
 		setFile(data);
-	}
+	};
 
 	const handleDetailChange = (newValue: Partial<IUserProfileValue>) => {
-		setCurrentUserProfileValue((prevValue) => ({...prevValue, ...newValue}))
-	}
+		setCurrentUserProfileValue((prevValue) => ({ ...prevValue, ...newValue }));
+	};
 
 	function handleHashtagPress() {
 		Toast.show({
@@ -59,7 +58,7 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 		const res = await handleUploadFileMobile(client, session, fullFilename, file);
 
 		return res.url;
-	}, [clientRef, sessionRef, currentChannel, file, userProfileValue])
+	}, [clientRef, sessionRef, currentChannel, file, userProfileValue]);
 
 	const updateUserProfile = async () => {
 		const imgUrl = await getImageUrlToSave();
@@ -74,7 +73,7 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 			setFile(null);
 			navigation.goBack();
 		}
-	}
+	};
 
 	useEffect(() => {
 		if (triggerToSave === EProfileTab.UserProfile) {
@@ -83,7 +82,7 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 	}, [triggerToSave]);
 
 	return (
-		<View style={styles.container}>
+		<KeyboardAvoidingView behavior="position" style={styles.container}>
 			<BannerAvatar avatar={userProfileValue?.imgUrl} onChange={handleAvatarChange} />
 
 			<View style={styles.btnGroup}>
@@ -97,10 +96,10 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 					displayName: userProfileValue.displayName,
 					username: userProfileValue.username,
 					aboutMe: userProfileValue.aboutMe,
-					imgUrl: userProfileValue.imgUrl
+					imgUrl: userProfileValue.imgUrl,
 				}}
 				onChange={handleDetailChange}
 			/>
-		</View>
+		</KeyboardAvoidingView>
 	);
 }
