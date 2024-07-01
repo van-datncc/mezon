@@ -99,6 +99,9 @@ const HomeDefault = React.memo((props: any) => {
 	);
 
 	const fetchMemberChannel = async () => {
+		if (!currentChannel) {
+			return;
+		}
 		await dispatch(
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',

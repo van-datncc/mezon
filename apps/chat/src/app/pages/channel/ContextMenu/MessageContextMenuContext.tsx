@@ -18,7 +18,7 @@ type MessageContextMenuContextValue = {
 
 export type MessageContextMenuProps = {
 	messageId: string;
-	position?: ShowContextMenuParams['position'];
+    position?: ShowContextMenuParams['position']
 };
 
 export const MessageContextMenuContext = createContext<MessageContextMenuContextValue>({
@@ -50,11 +50,11 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 
 	const showContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props: MessageContextMenuProps) => {
-			const position = props.position || null;
+            const position = props.position || null;
 			show({
 				event,
 				props,
-				position,
+                position,
 			});
 		},
 		[show],

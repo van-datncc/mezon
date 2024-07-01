@@ -35,7 +35,7 @@ export default function MemberProfile({
                 <View style={style.avatarContainer}>
                     <Image
                         style={style.avatar}
-                        source={{ uri: user.user.avatar_url }}
+                        source={{ uri: user?.user?.avatar_url }}
                     />
 
                     {!isHideIconStatus &&

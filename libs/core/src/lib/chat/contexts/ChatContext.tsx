@@ -10,6 +10,7 @@ import {
 	messagesActions,
 	notificationActions,
 	reactionActions,
+	selectCurrentChannel,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -29,6 +30,7 @@ import {
 	VoiceLeavedEvent,
 } from 'mezon-js';
 import React, { useCallback, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
@@ -51,6 +53,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 
@@ -109,17 +112,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		(notification: Notification) => {
-			dispatch(notificationActions.add(mapNotificationToEntity(notification)));
-			dispatch(notificationActions.setIsMessageRead(true));
+			if (currentChannel?.channel_id !== (notification as any).channel_id) {
+				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+			}
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[dispatch],
+		[currentChannel?.channel_id, dispatch],
 	);
 	const ondisconnect = useCallback(() => {
-		console.log('Socket disconnected');
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
 	}, [reconnect, dispatch]);

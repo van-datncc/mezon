@@ -111,8 +111,8 @@ export default function CreateThreadForm() {
 	useEffect(() => {
 		const sendMessage = DeviceEventEmitter.addListener(ActionEmitEvent.SEND_MESSAGE, ({ content }) => {
 			const { isPrivate, nameValueThread } = formikRef.current.values;
-			const valueForm = { isPrivate: isPrivate ? 1 : 0, nameValueThread: nameValueThread ?? valueThread?.content.t };
-			const contentMessage = openThreadMessageState ? { t: valueThread.content.t, contentThread: content.t } : { t: content.t };
+			const valueForm = { isPrivate: isPrivate ? 1 : 0, nameValueThread: nameValueThread ?? valueThread?.content?.t };
+			const contentMessage = openThreadMessageState ? { t: valueThread?.content?.t, contentThread: content?.t } : { t: content?.t };
 
 			if (validInput(nameValueThread)) {
 				handleSendMessageThread(contentMessage, [], [], [], valueForm);
@@ -186,6 +186,7 @@ export default function CreateThreadForm() {
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}
 										channelLabel={currentChannel?.channel_label}
+                    isNumberOfLine={true}
 									/>
 								</View>
 							)}
