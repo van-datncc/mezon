@@ -3,7 +3,6 @@ import { selectDefaultChannelIdByClanId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
 import { useEffect } from 'react';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function ClanIndex() {
 	const { clanId } = useAppParams();

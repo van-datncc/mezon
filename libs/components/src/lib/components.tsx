@@ -59,5 +59,6 @@ export { default as UserListVoiceChannel } from './components/UserListVoiceChann
 export { default as UserMentionList } from './components/UserMentionList';
 export { default as ModalUserProfile } from './components/ModalUserProfile';
 export { ModalOverData, ModalErrorTypeUpload } from './components/ModalError';
+export * from './components/AvatarImage/AvatarImage';
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/Firebase/firebase';
