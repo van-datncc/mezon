@@ -1,7 +1,7 @@
 import { ChannelStreamMode } from 'mezon-js';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { useContextMenu } from 'react-contexify';
-import MessageContextMenu from '../ContextMenu/MessageContextMenu';
+import { ShowContextMenuParams, useContextMenu } from 'react-contexify';
+import MessageContextMenu from './MessageContextMenu';
 
 const MESSAGE_CONTEXT_MENU_ID = 'message-context-menu';
 
@@ -11,13 +11,14 @@ type MessageContextMenuContextValue = {
 		event: React.MouseEvent<HTMLElement>,
 		messageId: string,
 		mode: ChannelStreamMode,
-		props?: MessageContextMenuProps,
+		props?: Partial<MessageContextMenuProps>,
 	) => void;
 	preloadMessageContextMenu: (messageId: string) => void;
 };
 
-type MessageContextMenuProps = {
+export type MessageContextMenuProps = {
 	messageId: string;
+	position?: ShowContextMenuParams['position'];
 };
 
 export const MessageContextMenuContext = createContext<MessageContextMenuContextValue>({
@@ -41,7 +42,7 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 		if (!messageId) return null;
 
 		return <MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageId} elementTarget={elementTarget} activeMode={activeMode} />;
-	}, [messageId, elementTarget]);
+	}, [messageId, elementTarget, activeMode]);
 
 	const preloadMessageContextMenu = useCallback((messageId: string) => {
 		setMessageId(messageId);
@@ -49,24 +50,23 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 
 	const showContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props: MessageContextMenuProps) => {
+			const position = props.position || null;
 			show({
 				event,
-				props: {
-					key: 'value',
-				},
+				props,
+				position,
 			});
 		},
 		[show],
 	);
 
 	const showMessageContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLElement>, messageId: string, mode: ChannelStreamMode, props?: MessageContextMenuProps) => {
+		(event: React.MouseEvent<HTMLElement>, messageId: string, mode: ChannelStreamMode, props?: Partial<MessageContextMenuProps>) => {
 			setMessageId(messageId);
 			setElementTarget(event.target as HTMLElement);
 			setActiveMode(mode);
 			const niceProps = {
 				messageId,
-
 				...props,
 			};
 			showContextMenu(event, niceProps);
