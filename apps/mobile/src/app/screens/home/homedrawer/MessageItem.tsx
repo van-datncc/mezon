@@ -301,8 +301,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-				const urlSupported = await Linking.canOpenURL(urlVoice);
-				if (urlSupported) Linking.openURL(urlVoice);
+				await Linking.openURL(urlVoice);
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);

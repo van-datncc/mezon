@@ -71,7 +71,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 
     useEffect(() => {
         if (user?.userId) {
-            const { display_name, avatar_url, username, about_me } = user.userProfile.user;
+            const { display_name, avatar_url, username, about_me } = user?.userProfile?.user || {};
             const initialValue = {
                 username,
                 imgUrl: avatar_url,
