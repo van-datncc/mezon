@@ -16,18 +16,18 @@ import useDataEmojiSvg from './useDataEmojiSvg';
 const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 const filterEmojiData = (emojis: IEmoji[]) => {
-	return emojis.map(({ emoji, shortname, category, name }) => ({
-		name,
-		emoji,
-		shortname,
+	return emojis.map(({ src, shortname, category, }) => ({
+		src,
 		category,
+		shortname,
 	}));
 };
 
 export function useEmojiSuggestion() {
 	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
 	const { emojiListPNG } = useDataEmojiSvg();
-
+	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
+	console.log(emojiMetadata);
 	const emojis = useMemo(() => filterEmojiData(emojisMetaData ?? []), [emojisMetaData]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);

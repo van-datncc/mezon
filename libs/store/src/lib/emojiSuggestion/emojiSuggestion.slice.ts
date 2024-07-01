@@ -1,6 +1,7 @@
 import { IEmoji, IEmojiImage } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -26,28 +27,25 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
-	selectId: (emo: EmojiSuggestionEntity) => emo.id || emo.name || '',
+	selectId: (emo: EmojiSuggestionEntity) => emo.id || '',
 });
+
 let emojiCache: IEmoji[] = [];
 let emojiImageCache: IEmojiImage[] = [];
 
-export const fetchEmoji = createAsyncThunk<any>('emoji/fetchStatus', async (_, thunkAPI) => {
+export const fetchEmoji = createAsyncThunk<any>('emoji/fetchEmoji', async (_, thunkAPI) => {
 	try {
-		const cachedData = sessionStorage.getItem('emojiCache');
-		if (cachedData) {
-			const cachedEmojis = JSON.parse(cachedData) as IEmoji[];
-			return cachedEmojis;
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listClanEmoji(mezon.session);
+
+		if (!response.emoji_list) {
+			throw new Error('Emoji list is undefined or null');
 		}
-		const response = await fetch(`${process.env.NX_CHAT_APP_CDN_META_DATA_EMOJI}`);
-		if (!response.ok) {
-			throw new Error('Failed to fetch emoji data');
-		}
-		const data = await response.json();
-		emojiCache = data.emojis;
-		sessionStorage.setItem('emojiCache', JSON.stringify(emojiCache));
-		return emojiCache;
+
+		return response.emoji_list;
 	} catch (error) {
-		return thunkAPI.rejectWithValue(error);
+		console.error('Error fetching emoji:', error);
+		return thunkAPI.rejectWithValue([]);
 	}
 });
 
@@ -116,9 +114,9 @@ export const emojiSuggestionSlice = createSlice({
 			.addCase(fetchEmoji.pending, (state: EmojiSuggestionState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchEmoji.fulfilled, (state: EmojiSuggestionState, action: PayloadAction<EmojiSuggestionEntity[]>) => {
-				emojiSuggestionAdapter.setAll(state, action.payload);
+			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any[]>) => {
 				state.loadingStatus = 'loaded';
+				emojiSuggestionAdapter.setAll(state, action.payload);
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
 				state.loadingStatus = 'error';
