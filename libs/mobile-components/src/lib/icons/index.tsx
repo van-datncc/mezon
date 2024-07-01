@@ -1031,6 +1031,62 @@ export function SortIcon({ width = 24, height = 24, color = 'white', ...props }:
 			/>
 		</Svg>
 	);
+
+}
+
+export function HammerIcon({ width = 24, height = 24, color = '#d1323f', ...props }: SvgProps) {
+	return (
+		<Svg
+      width={width}
+      height={height}
+      viewBox="0 0 72 72"
+      {...props}
+    >
+      <Path
+        d="M3.69 63.39a3 3 0 010-4.23l22.44-22.41c.6-.6 1.53-.6 2.1 0l6.39 6.36c.6.6.6 1.5 0 2.1L12.18 67.65a3 3 0 01-4.23 0l-4.26-4.26zm19.59-40.11l25.44 25.47a6 6 0 008.49 0l10.62-10.62a6 6 0 000-8.49l-8.82-8.82 1.95-1.98a3 3 0 000-4.2l-4.23-4.26a3 3 0 00-4.23 0l-1.98 1.95-8.16-8.13a6 6 0 00-8.49 0L23.28 14.79a6.001 6.001 0 000 8.49z"
+        fill={color}
+      />
+    </Svg>
+	)
+}
+
+export function UserMinus({ width = 24, height = 24, color = '#d1323f', ...props }: SvgProps) {
+	return (
+		<Svg
+      width={width}
+      height={height}
+      viewBox="0 0 72 72"
+      {...props}
+    >
+      <Path
+        d="M34.59 33A28.59 28.59 0 006 61.59C6 64.02 7.98 66 10.41 66h.66c.72 0 1.32-.51 1.5-1.2.87-3.36 2.52-6.51 3.96-8.73.42-.63 1.29-.3 1.2.45l-.75 7.83c-.09.9.6 1.65 1.5 1.65h22.89c.36 0 .51-.93.18-1.08C38.46 63.42 36 60.66 36 57a9 9 0 019-9h15.06c1.14 0 1.83-1.2 1.2-2.16A28.56 28.56 0 0037.41 33h-2.82zM36 30a12 12 0 100-24 12 12 0 000 24z"
+        fill={color}
+      />
+      <Path d="M45 54a3 3 0 000 6h24a3 3 0 000-6H45z" fill={color} />
+    </Svg>
+	)
+}
+
+export function ClockWarning({ width = 24, height = 24, color = '#d1323f', ...props }: SvgProps) {
+	return (
+    <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 72 72"
+    {...props}
+  >
+    <Path
+      d="M36 69c.24 0 .42-.24.33-.48a8.64 8.64 0 01.87-6.93l6.6-11.55c.54-.9-.18-2.19-.9-2.91l-9-9A3 3 0 0133 36V15a3 3 0 016 0v19.14c0 .39.15.78.45 1.05l7.68 7.68c.24.24.66.24.84-.06l1.08-1.92a9.18 9.18 0 0115.9 0l.9 1.62c.66 1.14 2.34.93 2.58-.36A33 33 0 1036 69z"
+      fill={color}
+    />
+    <Path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M54.27 43.89c1.2-2.1 4.29-2.1 5.46 0l11.88 20.7c1.14 1.98-.36 4.41-2.73 4.41H45.12c-2.37 0-3.9-2.43-2.73-4.44l11.88-20.7v.03zm1.38 5.61h2.7c.9 0 1.56.78 1.5 1.65l-.66 6.06c-.03.48-.51.78-.99.69a5.79 5.79 0 00-2.4 0c-.48.09-.96-.21-.99-.69l-.63-6.06a1.5 1.5 0 011.5-1.65h-.03zM57 66a3 3 0 100-6 3 3 0 000 6z"
+      fill={color}
+    />
+  </Svg>
+	)
 }
 
 export function MenuHorizontalIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {

@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
 		height: '100%',
 	},
 	textAvatarMessageBoxDefault: {
-		fontSize: size.s_22,
+		fontSize: size.s_30,
 		color: Colors.white,
 	},
 	statusCircle: {
@@ -41,4 +41,12 @@ export const styles = StyleSheet.create({
 	offline: {
 		backgroundColor: Colors.bgGrayDark,
 	},
+  avatarMessageBoxDefault: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: Colors.titleReset,
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center'
+  }
 });
