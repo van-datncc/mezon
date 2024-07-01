@@ -47,6 +47,11 @@ export const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	contentMessage: {
+		flexDirection: 'row',
+		justifyContent: 'flex-start',
+		textAlign: 'left',
+		alignItems: 'flex-start',
+		alignSelf: 'flex-start',
 		marginBottom: 10,
 		borderLeftColor: Colors.borderNeutralDisable,
 		borderLeftWidth: 2,

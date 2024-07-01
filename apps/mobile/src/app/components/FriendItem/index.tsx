@@ -62,7 +62,7 @@ export const FriendItem = React.memo(({
             onLongPress={() => onLongPress()}
         >
             <View>
-                {friend.user.avatar_url ? (
+                {friend?.user?.avatar_url ? (
                     <Image source={{ uri: friend?.user?.avatar_url }} style={[styles.friendAvatar, disabled && styles.avatarDisabled]} />
                 ): (
                     <Text style={[styles.textAvatar, disabled && styles.avatarDisabled]}>{friend?.user?.username?.charAt?.(0)}</Text>
@@ -75,7 +75,7 @@ export const FriendItem = React.memo(({
                 <View style={styles.friendItemContent}>
                     <View>
                         {(isPendingFriendRequest || !showAction) && friend?.user?.display_name ? (
-                            <Text style={[styles.defaultText, (isPendingFriendRequest || !showAction) && styles.whiteText]}>{friend.user.display_name}</Text>
+                            <Text style={[styles.defaultText, (isPendingFriendRequest || !showAction) && styles.whiteText]}>{friend?.user?.display_name}</Text>
                         ): null}
                         <Text style={[styles.defaultText, disabled && styles.disabled]}>{friend?.user?.display_name || friend?.user?.username}</Text>
                     </View>

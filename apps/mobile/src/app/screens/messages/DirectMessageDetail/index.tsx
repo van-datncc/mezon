@@ -140,7 +140,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						</View>
 					) : (
 						<View>
-							<Image source={{ uri: currentDmGroup?.channel_avatar[0] || '' }} style={styles.friendAvatar} />
+							<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
 							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 						</View>
 					)}
