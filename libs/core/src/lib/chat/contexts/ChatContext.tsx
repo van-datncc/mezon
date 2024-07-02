@@ -153,6 +153,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
+			console.log('checkDuplice-event', e);
 			if (e) {
 				dispatch(reactionActions.updateReactionMessage(mapReactionToEntity(e)));
 			}
