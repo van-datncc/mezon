@@ -11,12 +11,11 @@ import {
 import { IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import useDataEmojiSvg from './useDataEmojiSvg';
 
 const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 const filterEmojiData = (emojis: IEmoji[]) => {
-	return emojis.map(({ src, shortname, category, }) => ({
+	return emojis.map(({ src, shortname, category }) => ({
 		src,
 		category,
 		shortname,
@@ -24,11 +23,8 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 };
 
 export function useEmojiSuggestion() {
-	const emojisMetaData = useSelector(selectAllEmojiSuggestion);
-	const { emojiListPNG } = useDataEmojiSvg();
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	console.log(emojiMetadata);
-	const emojis = useMemo(() => filterEmojiData(emojisMetaData ?? []), [emojisMetaData]);
+	const emojis = useMemo(() => filterEmojiData(emojiMetadata ?? []), [emojiMetadata]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
@@ -81,7 +77,6 @@ export function useEmojiSuggestion() {
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
-			emojiListPNG,
 			setAddEmojiActionChatbox,
 			addEmojiState,
 			setShiftPressed,
@@ -95,7 +90,6 @@ export function useEmojiSuggestion() {
 			isEmojiListShowed,
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
-			emojiListPNG,
 			setAddEmojiActionChatbox,
 			addEmojiState,
 			setShiftPressed,

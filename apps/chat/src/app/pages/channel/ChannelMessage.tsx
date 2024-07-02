@@ -81,15 +81,6 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 					editor={editor}
 					onContextMenu={handleContextMenu}
 				/>
-				{isEditing ? (
-					<MessageInput
-						messageId={messageId}
-						channelId={channelId}
-						mode={mode}
-						channelLabel={channelLabel}
-						message={mess as IMessageWithUser}
-					/>
-				) : null}
 			</div>
 			{lastSeen && <UnreadMessageBreak />}
 			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}

@@ -1,8 +1,9 @@
 import { IEmoji, IEmojiImage } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
-
+import memoizee from 'memoizee';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
 export interface EmojiSuggestionEntity extends IEmoji {
@@ -27,26 +28,33 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
-	selectId: (emo: EmojiSuggestionEntity) => emo.id || '',
+	selectId: (emo: EmojiSuggestionEntity) => emo.shortname || '',
 });
 
-let emojiCache: IEmoji[] = [];
 let emojiImageCache: IEmojiImage[] = [];
 
-export const fetchEmoji = createAsyncThunk<any>('emoji/fetchEmoji', async (_, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listClanEmoji(mezon.session);
+type FetchEmojiArgs = {
+	noCache?: boolean;
+};
 
-		if (!response.emoji_list) {
-			throw new Error('Emoji list is undefined or null');
-		}
+const fetchEmojiCached = memoizee((mezon: MezonValueContext) => mezon.client.listClanEmoji(mezon.session), {
+	promise: true,
+	maxAge: LIST_EMOJI_CACHED_TIME,
+	normalizer: (args) => {
+		return args[0]!.session!.username!;
+	},
+});
 
-		return response.emoji_list;
-	} catch (error) {
-		console.error('Error fetching emoji:', error);
-		return thunkAPI.rejectWithValue([]);
+export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache }: FetchEmojiArgs, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchEmojiCached.clear(mezon);
 	}
+	const response = await fetchEmojiCached(mezon);
+	if (!response.emoji_list) {
+		throw new Error('Emoji list is undefined or null');
+	}
+	return response.emoji_list;
 });
 
 export const fetchEmojiMobile = createAsyncThunk<any>('emoji/fetchStatusMobile', async (_, thunkAPI) => {
@@ -115,8 +123,8 @@ export const emojiSuggestionSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any[]>) => {
-				state.loadingStatus = 'loaded';
 				emojiSuggestionAdapter.setAll(state, action.payload);
+				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
 				state.loadingStatus = 'error';

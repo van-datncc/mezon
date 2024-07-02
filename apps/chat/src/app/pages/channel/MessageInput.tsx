@@ -7,10 +7,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
+import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import { useEditMessage } from './useEditMessage';
-import ModalDeleteMess from './ModalDeleteMess';
 
 type MessageInputProps = {
 	messageId: string;
@@ -58,7 +58,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		mode,
 		message,
 	);
-	const { emojiListPNG } = useEmojiSuggestion();
+	const { emojis } = useEmojiSuggestion();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionList = UserMentionList(channelId);
@@ -104,7 +104,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const neverMatchingRegex = /($a)/;
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
-		const matches = emojiListPNG
+		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
 			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
@@ -118,7 +118,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			e.preventDefault();
 			e.stopPropagation();
 			if (editMessage?.trim() === '') {
-				if(editMessage.length !==0){
+				if (editMessage.length !== 0) {
 					handleCancelEdit();
 				} else {
 					setOpenModalDelMess(true);
@@ -150,9 +150,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	return (
-		<div className="inputEdit w-full flex">
-			<div className="w-16"></div>
-			<div className='w-full'>
+		<div className="inputEdit w-full flex ">
+			<div className="w-full">
 				<MentionsInput
 					onFocus={handleFocus}
 					inputRef={textareaRef}
@@ -217,7 +216,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					</p>
 				</div>
 			</div>
-			{openModalDelMess && <ModalDeleteMess mess={message} closeModal={() => setOpenModalDelMess(false)} mode={mode}/>}
+			{openModalDelMess && <ModalDeleteMess mess={message} closeModal={() => setOpenModalDelMess(false)} mode={mode} />}
 		</div>
 	);
 };

@@ -5,10 +5,9 @@ import { CustomLoaderFunction } from './appLoader';
 export const mainLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(clansActions.fetchClans());
 	dispatch(notificationActions.fetchListNotification());
-	dispatch(emojiSuggestionActions.fetchEmoji());
+	dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true }));
 	dispatch(gifsActions.fetchGifCategories());
 	dispatch(gifsActions.fetchGifCategoryFeatured());
-
 	return null;
 };
 
