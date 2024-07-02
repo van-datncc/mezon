@@ -1,10 +1,11 @@
 import { useAuth } from '@mezon/core';
-import { Colors, size } from '@mezon/mobile-ui';
+import { Block, Colors, size } from '@mezon/mobile-ui';
 import { RootState } from '@mezon/store-mobile';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
-import React from 'react';
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -24,28 +25,66 @@ type LoginFormPayload = {
 	email: string;
 	password: string;
 };
+const WEB_CLIENT_ID = '285548761692-l9bdt00br2jg1fgh4c23dlb9rvkvqqs0.apps.googleusercontent.com';
+const IOS_CLIENT_ID = '285548761692-3k9ubkdhl8bbvbal78j9v2905kjhg3tj.apps.googleusercontent.com';
 
 const LoginScreen = () => {
 	const navigation = useNavigation();
 	const isLoading = useSelector((state: RootState) => state.auth.loadingStatus);
-	const { loginEmail } = useAuth();
+	const { loginByGoogle, loginEmail } = useAuth();
+
+	useEffect(() => {
+		const config = {
+			webClientId: (process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string) || WEB_CLIENT_ID,
+			iosClientId: (process.env.NX_IOS_APP_GOOGLE_CLIENT_ID as string) || IOS_CLIENT_ID,
+			offlineAccess: true,
+			forceCodeForRefreshToken: true,
+		};
+		GoogleSignin.configure(config);
+	}, []);
 
 	const handleSubmit = React.useCallback(
 		async (values: LoginFormPayload) => {
 			try {
 				const res = await loginEmail(values.email, values.password, true);
 				if (res === 'Invalid session') {
-					Toast.show({
-						type: 'error',
-						text1: 'User account not found',
-					});
+					if (Platform.OS === 'android') {
+						Toast.show({
+							type: 'error',
+							text1: 'Login Failed',
+							text2: 'Invalid email or password',
+						});
+					} else {
+						await onGoogleButtonPress();
+					}
 				}
 			} catch (error) {
 				/* empty */
+				await onGoogleButtonPress();
 			}
 		},
 		[loginEmail],
 	);
+
+	async function onGoogleButtonPress() {
+		try {
+			// Cheat fake request
+			// fetch('https://5f831a256b97440016f4e334.mockapi.io/api/post');
+
+			await GoogleSignin.hasPlayServices();
+			const { idToken } = await GoogleSignin.signIn();
+			await loginByGoogle(idToken);
+		} catch (error) {
+			if (error.message !== 'Sign in action cancelled' && error.code != -5) {
+				Toast.show({
+					type: 'error',
+					text1: 'Login Failed',
+					text2: error.message,
+				});
+			}
+		}
+	}
+
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
 			<KeyboardAvoidingView style={styles.container}>
@@ -54,11 +93,15 @@ const LoginScreen = () => {
 					<Text style={styles.headerTitle}>WELCOME BACK</Text>
 					<Text style={styles.headerContent}>So glad to meet you again!</Text>
 				</View>
-				<View style={styles.googleButton}>
-					<GoogleLogin />
-				</View>
-				<Text style={styles.orText}>Or</Text>
 				{/* body */}
+				<View style={styles.googleButton}>
+					{Platform.OS === 'android' && (
+						<Block>
+							<GoogleLogin onGoogleButtonPress={onGoogleButtonPress} />
+							<Text style={styles.orText}>Or</Text>
+						</Block>
+					)}
+				</View>
 				<ScrollView style={{ flex: 1 }}>
 					<Formik
 						initialValues={{
@@ -149,6 +192,6 @@ const styles = StyleSheet.create({
 		paddingTop: 10,
 	},
 	googleButton: {
-		marginVertical: size.s_20,
+		marginVertical: size.s_30,
 	},
 });

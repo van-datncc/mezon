@@ -128,6 +128,7 @@ export const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: 'bold',
 		color: Colors.tertiary,
+    flexBasis: '75%'
 	},
 	channelListItem: {
 		paddingHorizontal: 10,
@@ -333,10 +334,14 @@ export const styles = StyleSheet.create({
 		gap: 15,
 	},
 	iconReply: {
-		width: 35,
+		width: size.s_34,
 		height: '100%',
 		alignItems: 'center',
-		paddingLeft: 30,
+		paddingLeft: size.s_30,
+		marginTop: size.s_4,
+	},
+	deletedMessageReplyIcon: {
+		top: size.s_4
 	},
 	replyAvatar: {
 		width: size.s_20,
@@ -345,6 +350,32 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.gray48,
 		overflow: 'hidden',
 	},
+
+	newMessageLine: {
+		height: 1,
+		width: "100%",
+		backgroundColor: Colors.red,
+		marginVertical: Metrics.size.xl,
+		position: "relative"
+	},
+
+	newMessageContainer: {
+		position: "absolute",
+		top: -15,
+		left: 0,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		width: "100%"
+	},
+
+	newMessageText: {
+		color: Colors.red,
+		backgroundColor: Colors.secondary,
+		paddingHorizontal: Metrics.size.s,
+		fontWeight: "bold"
+	},
+
 	messageWrapper: {
 		flexDirection: 'column',
 		marginTop: size.s_10,
@@ -355,20 +386,21 @@ export const styles = StyleSheet.create({
 		borderLeftWidth: 2,
 		paddingTop: size.s_2,
 	},
+	highlightMessageReply: {
+		backgroundColor: Colors.bgReply,
+		borderLeftColor: Colors.borderMessageReply,
+		borderLeftWidth: 2,
+		paddingTop: size.s_2,
+	},
 	repliedTextAvatar: {
 		fontSize: size.s_16,
 		color: Colors.white,
-	},
-	repliedContentText: {
-		fontSize: size.small,
-		color: Colors.tertiary,
-		overflow: 'hidden',
-		width: '80%',
 	},
 	repliedMessageWrapper: {
 		flexDirection: 'row',
 		gap: 8,
 		marginRight: 0,
+		marginTop: size.s_4
 	},
 	wrapperMessageBoxCombine: {
 		// marginBottom: size.s_10,
@@ -386,10 +418,21 @@ export const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		marginBottom: size.s_6,
 	},
+	replyDisplayName: {
+		color: Colors.caribbeanGreen,
+		fontSize: size.small
+	},
+	replyContentWrapper: {
+		width: '85%',
+		flexDirection: 'row',
+		alignItems: 'center',
+		top: -size.s_8,
+		gap: 4
+	},
 	userNameMessageBox: {
 		fontSize: size.medium,
 		marginRight: size.s_10,
-		fontWeight: '600',
+		fontWeight: '700',
 		color: Colors.caribbeanGreen,
 	},
 	dateMessageBox: {
@@ -599,6 +642,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
 		gap: 5,
+		alignItems: 'center'
 	},
 	iconMessageDeleteReply: {
 		backgroundColor: Colors.bgCharcoal,
@@ -616,8 +660,8 @@ export const styles = StyleSheet.create({
 		color: Colors.tertiary,
 		overflow: 'hidden',
 		width: '80%',
-    	fontStyle: 'italic'
-  	},
+		fontStyle: 'italic'
+	},
 	badge: {
 		backgroundColor: Colors.red,
 		position: 'absolute',
@@ -641,7 +685,10 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		borderRadius: 50,
 		backgroundColor: Colors.tertiaryWeight,
-		width: 30,
-		height: 30,
-	}
+		width: 40,
+		height: 40,
+	},
+  sortButton: {
+    paddingHorizontal: size.s_14, paddingVertical: size.s_6
+  }
 });

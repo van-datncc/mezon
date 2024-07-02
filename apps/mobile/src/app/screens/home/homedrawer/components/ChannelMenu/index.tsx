@@ -18,7 +18,7 @@ interface IChannelMenuProps {
     channel: IChannel;
 }
 
-type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
+type StackMenuClanScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
 export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
@@ -77,8 +77,16 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
     const organizationMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.organizationMenu.edit'),
-            onPress: () => reserve(),
-            icon: <Icons.SettingsIcon />
+            onPress: () => {
+                dismiss();
+                navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+                    screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
+                    params: {
+                        channelId: channel?.channel_id
+                    }
+                });
+            },
+            icon: <SettingsIcon />
         },
         {
             title: t('menu.organizationMenu.duplicateChannel'),

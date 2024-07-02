@@ -2,22 +2,24 @@ import {
 	appActions,
 	clansActions,
 	directActions,
-	eventManagementActions,
 	friendsActions,
 	getStoreAsync,
 	notificationActions,
 	selectAllClans,
 	selectCurrentClan,
+	selectSession,
 } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import React, { useEffect } from 'react';
-import { SafeAreaView, Text, View } from 'react-native';
+import { AppState, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import BarsLogo from '../../../assets/svg/bars.svg';
 import SearchLogo from '../../../assets/svg/discoverySearch.svg';
 import HashSignIcon from '../../../assets/svg/loading.svg';
 import UsersLogo from '../../../assets/svg/users.svg';
+import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 import { styles } from './styles';
@@ -87,6 +89,9 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const clans = useSelector(selectAllClans);
+	const session = useSelector(selectSession);
+	const { reconnect } = useMezon();
+	useCheckUpdatedVersion();
 
 	useEffect(() => {
 		if (clans?.length && !currentClan) {
@@ -95,8 +100,27 @@ const HomeScreen = React.memo((props: any) => {
 	}, [clans, currentClan]);
 
 	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+
+		return () => {
+			appStateSubscription.remove();
+		};
+	}, [currentClan]);
+
+	useEffect(() => {
 		mainLoader();
-	}, []);
+	}, [session?.token]);
+
+	const handleAppStateChange = async (state: string) => {
+		if (state === 'active') {
+			const store = await getStoreAsync();
+
+			store.dispatch(appActions.setLoadingMainMobile(true));
+			await reconnect();
+			await mainLoader();
+			store.dispatch(appActions.setLoadingMainMobile(false));
+		}
+	};
 
 	const mainLoader = async () => {
 		const store = await getStoreAsync();
@@ -107,8 +131,8 @@ const HomeScreen = React.memo((props: any) => {
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		if (currentClan) {
-		store.dispatch(clansActions.joinClan({clanId: "0"}),);
-      	store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+			store.dispatch(clansActions.joinClan({ clanId: '0' }));
+			store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
 		}
 		return null;
@@ -118,15 +142,13 @@ const HomeScreen = React.memo((props: any) => {
 		const lastClanId = clans?.[clans?.length - 1]?.clan_id;
 		const store = await getStoreAsync();
 		if (lastClanId) {
-      store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
+			store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: lastClanId }));
 		}
 		return null;
 	};
 
-	return (
-		<DrawerScreen navigation={props.navigation} />
-	);
+	return <DrawerScreen navigation={props.navigation} />;
 });
 
 export default HomeScreen;

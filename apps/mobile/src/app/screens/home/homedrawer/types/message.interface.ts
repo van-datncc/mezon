@@ -10,6 +10,7 @@ export interface IReplyBottomSheet {
 	mode?: number;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
+  checkAnonymous?: boolean;
 }
 
 export interface IMessageAction {

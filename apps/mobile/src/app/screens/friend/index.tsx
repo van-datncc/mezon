@@ -32,7 +32,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
     }
 
     const filteredFriendList = useMemo(() => {
-        return friendList.filter(friend => normalizeString(friend.user.username).includes(normalizeString(searchText)));
+        return friendList.filter(friend => normalizeString(friend?.user?.username).includes(normalizeString(searchText)));
     }, [friendList, searchText]);
 
     const friendRequestCount = useMemo(() => {
@@ -63,7 +63,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
                 directMessageWithUser(friend?.user?.id)
                 break;
             case EFriendItemAction.ShowInformation:
-                setSelectedUser(friend.user);
+                setSelectedUser(friend?.user);
                 break;
             default:
                 break;

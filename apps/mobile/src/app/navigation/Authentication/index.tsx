@@ -30,6 +30,7 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import { MenuChannelStacks } from './stacks/MenuChannelStack';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
@@ -44,7 +45,7 @@ export const Authentication = () => {
 	const [fileShared, setFileShared] = useState<any>();
 	const { setAttachmentData } = useReference();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
-  	const currentChannelRef = useRef(currentClan);
+	const currentChannelRef = useRef(currentClan);
 
 	useEffect(() => {
 		if (userProfile?.email) loadFRMConfig();
@@ -57,7 +58,7 @@ export const Authentication = () => {
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
 	}, [currentDmGroupId]);
-	
+
 	useEffect(() => {
 		currentChannelRef.current = currentChannel;
 	}, [currentChannel]);
@@ -67,13 +68,13 @@ export const Authentication = () => {
 		checkNotificationPermission();
 
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			if	(
-					isShowNotification(
-						currentChannelRef.current?.id,
-						currentDmGroupIdRef.current,
-						remoteMessage
-					)
-				) {
+			if (
+				isShowNotification(
+					currentChannelRef.current?.id,
+					currentDmGroupIdRef.current,
+					remoteMessage
+				)
+			) {
 				Toast.show({
 					type: 'info',
 					text1: remoteMessage.notification?.title,
@@ -138,66 +139,54 @@ export const Authentication = () => {
 
 	return (
 		<BottomSheetModalProvider>
-			<RootStack.Navigator initialRouteName={getInitialRouteName} screenOptions={{ headerShown: false, gestureEnabled: true }}>
-				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigator} options={{ gestureEnabled: false }} />
+			<RootStack.Navigator
+				initialRouteName={getInitialRouteName}
+				screenOptions={{
+					headerShown: false,
+					gestureEnabled: true,
+					gestureDirection: 'horizontal'
+				}}>
+
+				<RootStack.Screen
+					name={APP_SCREEN.BOTTOM_BAR}
+					component={BottomNavigator}
+					options={{ gestureEnabled: false }}
+				/>
 				<RootStack.Screen
 					name={APP_SCREEN.SERVERS.STACK}
 					children={(props) => <ServersStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
 				<RootStack.Screen
 					name={APP_SCREEN.MESSAGES.STACK}
 					children={(props) => <MessagesStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
 				<RootStack.Screen
 					name={APP_SCREEN.NOTIFICATION.STACK}
 					children={(props) => <NotificationStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
+				<RootStack.Screen
+					name={APP_SCREEN.MENU_CHANNEL.STACK}
+					children={(props) => <MenuChannelStacks {...props} />}
+				/>
+
 				<RootStack.Screen
 					name={APP_SCREEN.MENU_THREAD.STACK}
 					children={(props) => <MenuThreadDetailStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
 
 				<RootStack.Screen
 					name={APP_SCREEN.MENU_CLAN.STACK}
 					children={(props) => <MenuClanStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
 
 				<RootStack.Screen
 					name={APP_SCREEN.SETTINGS.STACK}
 					children={(props) => <SettingStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
 
 				<RootStack.Screen
 					name={APP_SCREEN.FRIENDS.STACK}
 					children={(props) => <FriendStacks {...props} />}
-					options={{
-						gestureEnabled: true,
-						gestureDirection: 'horizontal',
-					}}
 				/>
 			</RootStack.Navigator>
 			<LoadingModal isVisible={isLoadingMain} />

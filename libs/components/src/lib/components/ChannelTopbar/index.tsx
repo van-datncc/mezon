@@ -119,15 +119,15 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
-	const [isMuteBell, setIsMuteBell] = useState<boolean>()
+	const [isMuteBell, setIsMuteBell] = useState<boolean>(false)
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(()=>{
-		if (getNotificationChannelSelected?.active !== 1 || getNotificationChannelSelected?.notification_setting_type === 'NOTHING' || getNotificationChannelSelected?.active === undefined) {
+		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
 			setIsMuteBell(true)
 		}
-		else if (getNotificationChannelSelected?.notification_setting_type === '' || getNotificationChannelSelected?.notification_setting_type === undefined) {
+		else if (getNotificationChannelSelected?.id === "0") {
 			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === 'NOTHING') {
 				setIsMuteBell(true)
 			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === 'NOTHING') {

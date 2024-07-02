@@ -73,7 +73,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers?.length === 1) {
-			return `${typingUsers[0].user?.username} is typing...`;
+			return `${typingUsers?.[0]?.user?.username} is typing...`;
 		}
 		if (typingUsers?.length > 1) {
 			return 'Several people are typing...';
@@ -115,17 +115,34 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		setVisibleImageModal(true);
 	}, [setIdxSelectedImageModal, setVisibleImageModal]);
 
-	const renderItem = useCallback(
-		({ item }) => {
-			return <MessageItem clansProfile={clansProfile} channelMember={channelMember} messageId={item} mode={mode} channelId={channelId} channelLabel={channelLabel} onOpenImage={onOpenImage} currentClan={currentClan} />;
-		},
-		[mode, channelId, channelLabel, onOpenImage],
-	);
-
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
 		return data.reverse();
 	}, [messages]);
+
+	const jumpToRepliedMessage = useCallback((messageId: string) => {
+		const indexToJump = dataReverse.findIndex(message => message === messageId);
+		if (indexToJump !== -1 && flatListRef.current) {
+			flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
+		}
+	}, [dataReverse])
+
+	const renderItem = useCallback(
+		({ item }) => {
+			return <MessageItem
+				jumpToRepliedMessage={jumpToRepliedMessage}
+				clansProfile={clansProfile}
+				channelMember={channelMember}
+				messageId={item}
+				mode={mode}
+				channelId={channelId}
+				channelLabel={channelLabel}
+				onOpenImage={onOpenImage}
+				currentClan={currentClan}
+			/>;
+		},
+		[mode, channelId, channelLabel, onOpenImage, jumpToRepliedMessage],
+	);
 
 	const onImageModalChange = useCallback(
 		(idx: number) => {

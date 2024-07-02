@@ -67,7 +67,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 							{user?.user?.display_name?.charAt(0).toUpperCase()}
 						</div>
 					) : (
-						<img src={user?.user?.avatar_url} alt="" className="w-[40px] h-[40px] rounded-full" />
+						<img src={user?.user?.avatar_url} alt="" className="w-[40px] h-[40px] rounded-full object-cover" />
 					)}
 					<p style={{ marginRight: 'auto' }} className="pl-[10px]">
 						{user?.user?.display_name}

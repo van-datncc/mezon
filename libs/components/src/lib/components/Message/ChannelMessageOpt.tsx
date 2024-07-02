@@ -1,141 +1,162 @@
-import { ContextMenu, Icons } from '@mezon/components';
-import { useAuth, useGifsStickersEmoji, useReference, useRightClick, useThreads } from '@mezon/core';
-import { gifsStickerEmojiActions, reactionActions, referencesActions, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
-import { IMessageWithUser, RightClickPos, SubPanelName } from '@mezon/utils';
-import { rightClickAction, selectMessageIdRightClicked, selectPosClickingActive } from 'libs/store/src/lib/rightClick/rightClick.slice';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
+import { useAppDispatch } from '@mezon/store';
+import { referencesActions, gifsStickerEmojiActions, reactionActions, threadsActions } from '@mezon/store';
+import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
+import { Icons } from '@mezon/components';
+import { useAuth, useThreads } from '@mezon/core';
+import { memo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { selectCurrentChannel } from '@mezon/store';
+import clx from 'classnames';
+
 
 type ChannelMessageOptProps = {
-	message: IMessageWithUser;
+    message: IMessageWithUser;
+    handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
 };
 
-const ChannelMessageOpt = ({ message }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
+    const currentChannel = useSelector(selectCurrentChannel);
+    const refOpt = useRef<HTMLDivElement>(null);
+
+	const isThread = currentChannel?.parrent_id !== undefined && Number(currentChannel?.parrent_id) !== 0;
+
+	const replyMenu = useMenuReplyMenuBuilder(message);
+	const editMenu = useEditMenuBuilder(message);
+	const reactMenu = useReactMenuBuilder(message);
+	const threadMenu = useThreadMenuBuilder(message, isThread);
+	const optionMenu = useOptionMenuBuilder(handleContextMenu);
+
+	const items = useMenuBuilder([
+		reactMenu,
+		replyMenu,
+		editMenu,
+		threadMenu,
+		optionMenu,
+	]);
+
+    return (
+        <div
+            className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-6 ${isThread ? 'w-32' : 'w-24'}`}
+        >
+            <div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
+                <div className="w-full h-full flex justify-between" ref={refOpt}>
+					{items.map((item, index) => (
+						<button
+							key={index}
+							onClick={(e) => item?.handleItemClick ? item?.handleItemClick(e) : undefined}
+							className={clx('h-full p-1 cursor-pointer popup-btn', item.classNames)}>
+							{item.icon}
+						</button>
+					))}
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default memo(ChannelMessageOpt);
+
+// Menu items plugins
+// maybe should be moved to separate files
+function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 	const dispatch = useAppDispatch();
-	const getMessageIdRightClicked = useSelector(selectMessageIdRightClicked);
-	const { userId } = useAuth();
-	const { setOpenThreadMessageState } = useReference();
-	const { setIsShowCreateThread, setValueThread } = useThreads();
-	const [thread, setThread] = useState(false);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const { setSubPanelActive } = useGifsStickersEmoji();
-	const { setMessageRightClick } = useRightClick();
-	const { setRightClickXy } = useRightClick();
-	const refOpt = useRef<HTMLDivElement>(null);
-	const handleClickReply = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const { userId } = useAuth()
+	const messageId = message.id;
+
+	const handleItemClick = useCallback(() => {
+		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
 		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	}, [dispatch, messageId]);
 
-		event.stopPropagation();
-	};
-	const posClickActive = useSelector(selectPosClickingActive);
+	return useMenuBuilderPlugin((builder) => {
+		builder.when(userId !== message.sender_id, (builder) => {
+			builder.addMenuItem('reply', 'reply', handleItemClick, <Icons.Reply />, null, false, false, 'rotate-180');
+		})
+	});
+}
 
-	const handleClickEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
+function useEditMenuBuilder(message: IMessageWithUser) {
+	const dispatch = useAppDispatch();
+	const { userId } = useAuth()
+	const messageId = message.id;
+
+	const handleItemClick = useCallback(() => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
-		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
+		dispatch(referencesActions.setIdReferenceMessageEdit(messageId));
 		dispatch(referencesActions.setIdMessageToJump(''));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
+	}, [dispatch, messageId]);
 
-		event.stopPropagation();
-	};
+	return useMenuBuilderPlugin((builder) => {
+		builder.when(userId === message.sender_id, (builder) => {
+			builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit />);
+		})
+	});
+}
 
-	const handleOnEnterSmileIcon = () => {
+function useReactMenuBuilder(message: IMessageWithUser) {
+	const dispatch = useAppDispatch();
+
+	const handleItemClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
 		dispatch(referencesActions.setIdReferenceMessageReaction(message.id));
-	};
-	const handleOnEnterReplyIcon = () => {
-		dispatch(referencesActions.setOpenReplyMessageState(true));
-	};
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT));
+		event.stopPropagation();
+		const rect = (event.target as HTMLElement).getBoundingClientRect();
+		const distanceToBottom = window.innerHeight - rect.bottom;
+		
+		if (distanceToBottom > 550) {
+			dispatch(reactionActions.setReactionTopState(true));
+		} else {
+			dispatch(reactionActions.setReactionTopState(false));
+		}
 
-	const handleClickReact = useCallback(
-		(event: React.MouseEvent<HTMLDivElement>) => {
-			setSubPanelActive(SubPanelName.EMOJI_REACTION_RIGHT);
-			event.stopPropagation();
-			const rect = (event.target as HTMLElement).getBoundingClientRect();
-			const distanceToBottom = window.innerHeight - rect.bottom;
-			if (distanceToBottom > 550) {
-				dispatch(reactionActions.setReactionTopState(true));
-			} else {
-				dispatch(reactionActions.setReactionTopState(false));
-			}
-			dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-		},
-		[setSubPanelActive],
-	);
+	}, [dispatch]);
 
-	const handleThread = () => {
+	return useMenuBuilderPlugin((builder) => {
+		builder.addMenuItem('react', 'react', handleItemClick, <Icons.Smile defaultSize="w-5 h-5" />);
+	});
+}
+
+function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
+	const [thread, setThread] = useState(false)
+	const dispatch = useAppDispatch();
+	const { setIsShowCreateThread, setOpenThreadMessageState, setValueThread } = useThreads();
+
+	const handleItemClick = useCallback(() => {
 		setThread(!thread);
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(threadsActions.setOpenThreadMessageState(true));
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
-
 		setValueThread(message);
-	};
+	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setThread, thread, setValueThread]);
 
-	const handleClickOption = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		event.stopPropagation();
-		dispatch(rightClickAction.setPosClickActive(RightClickPos.MORE));
-		setMessageRightClick(message.id);
-		setRightClickXy({ x: position.left, y: position.top });
-		dispatch(rightClickAction.setVisibleOpt(true));
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	};
-	const [position, setPosition] = useState({ top: 0, left: 0 });
+	return useMenuBuilderPlugin((builder) => {
+		builder.when(!isThread, (builder) => {
+			builder.addMenuItem('thread', 'thread', handleItemClick, <Icons.ThreadIcon isWhite={thread} />);
+		})
+	});
+}
 
-	useEffect(() => {
-		const timerId = setTimeout(() => {
-			if (refOpt.current) {
-				const rect = refOpt.current.getBoundingClientRect();
-				setPosition({
-					top: rect.top + window.scrollY,
-					left: rect.left + window.scrollX - 200,
-				});
-			}
-		}, 100);
+function useOptionMenuBuilder(handleContextMenu: Function) {
 
-		return () => clearTimeout(timerId);
-	}, [refOpt]);
+	const useHandleClickOption = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+		const target = event.target as HTMLElement;
+		const btn = findParentByClass(target, 'popup-btn');
+		const btnX = btn?.getBoundingClientRect()?.left ?? 0;
+		const btnY = btn?.getBoundingClientRect()?.top ?? 0;
+		const y = btnY;
+		const x = btnX - 220;
+		const position = { x, y };
+		const props = { position };
+		handleContextMenu(event, props);
+	}, [handleContextMenu]);
 
-	return (
-		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-6 ${Number(currentChannel?.parrent_id) === 0 ? 'w-32' : 'w-24'}
-	`}
-		>
-			{' '}
-			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
-				<div className="w-full h-full flex justify-between" ref={refOpt}>
-					<div onClick={handleClickReact} className="h-full p-1 cursor-pointer" onMouseEnter={handleOnEnterSmileIcon}>
-						<Icons.Smile defaultSize="w-5 h-5" />
-					</div>
-
-					{userId === message.sender_id ? (
-						<button onClick={handleClickEdit} className="h-full p-1 cursor-pointer">
-							<Icons.PenEdit />
-						</button>
-					) : (
-						<button onClick={handleClickReply} className="h-full px-1 pb-[2px] rotate-180" onMouseEnter={handleOnEnterReplyIcon}>
-							<Icons.Reply />
-						</button>
-					)}
-					{Number(currentChannel?.parrent_id) === 0 && (
-						<button className="h-full p-1 cursor-pointer" onClick={handleThread}>
-							<Icons.ThreadIcon isWhite={thread} />
-						</button>
-					)}
-					<button onClick={handleClickOption} className="h-full p-1 cursor-pointer">
-						<Icons.ThreeDot />
-					</button>
-				</div>
-
-				{posClickActive === RightClickPos.MORE && message.id === getMessageIdRightClicked && <ContextMenu urlData={''} />}
-			</div>
-		</div>
-	);
-};
-
-export default memo(ChannelMessageOpt);
+	return useMenuBuilderPlugin((builder) => {
+		builder.addMenuItem('option', 'option', useHandleClickOption, <Icons.ThreeDot />);
+	});
+}

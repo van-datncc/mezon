@@ -39,20 +39,19 @@ export const handleTimeISO = (fullDateStr: Date, timeStr: string)=>{
 
 export const getCurrentTimeRounded = (addMinute?: boolean) => {
     const now = new Date();
-    if(addMinute){
-        now.setMinutes(now.getMinutes() + 30);
-    }
     const minuteNow = now.getMinutes();
-    const roundedMinutes = Math.floor(minuteNow / 30);
-    if (roundedMinutes >= 1) {
+    if (minuteNow < 30) {
         now.setHours(now.getHours() + 1);
-        now.setMinutes(0);
     } else {
-        now.setMinutes(30);
+        now.setHours(now.getHours() + 2);
     }
+    now.setMinutes(0);
+    if(addMinute){
+        now.setHours(now.getHours() + 1);
+    }
+
     const hour = now.getHours();
-    const minute = now.getMinutes();
-    return `${hour}:${minute === 0 ? '00' : minute }`;
+    return `${hour}:00`;
 };
 
 export const compareDate = (start: Date | string, end: Date | string) => {

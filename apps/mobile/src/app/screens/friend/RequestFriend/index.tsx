@@ -16,7 +16,7 @@ enum EFriendRequest {
 
 export const RequestFriendScreen = () => {
     const [selectedTab, setSelectedTab] = useState(EFriendRequest.Received);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null); 
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const { friends, acceptFriend, deleteFriend } = useFriends();
     const { t } = useTranslation('friends');
     const friendRequestTabs = [
@@ -33,13 +33,13 @@ export const RequestFriendScreen = () => {
     const handleFriendAction = useCallback((friend: FriendsEntity, action: EFriendItemAction) => {
         switch (action) {
             case EFriendItemAction.Delete:
-                deleteFriend(friend.user.username, friend.user.id);
+                deleteFriend(friend?.user?.username, friend?.user?.id);
                 break;
             case EFriendItemAction.Approve:
-                acceptFriend(friend.user.username, friend.user.id);
+                acceptFriend(friend?.user?.username, friend?.user?.id);
                 break;
             case EFriendItemAction.ShowInformation:
-                setSelectedUser(friend.user)
+                setSelectedUser(friend?.user)
                 break;
             default:
                 break;

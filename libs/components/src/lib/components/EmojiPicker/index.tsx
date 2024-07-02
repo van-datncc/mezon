@@ -70,6 +70,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setChannelID(currentChannel?.id || '');
 		}
 	}, [currentChannel, direct, directId]);
+	
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(

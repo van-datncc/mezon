@@ -1,13 +1,19 @@
 {
   "userAction": {
-    "sendMessage": "Gửi Tin Nhắn",
-    "voiceCall": "Gọi Thoại",
-    "videoCall": "Cuộc Gọi Video"
+    "sendMessage": "Gửi tin nhắn",
+    "voiceCall": "Gọi thoại",
+    "videoCall": "Gọi video"
   },
   "aboutMe": {
     "headerTitle": "VỀ TÔI",
     "roles": {
       "headerTitle": "VAI TRÒ"
     }
+  },
+  "kickUserClanModal": {
+    "kickFromServer": "Đuổi {{userName}} khỏi máy chủ",
+    "description": "Bạn có chắc chắn muốn đuổi {{userName}} khỏi bang hội không? Họ sẽ có thể tham gia lại với một lời mời mới.",
+    "reasonKick": "LÝ DO ĐUỔI",
+    "buttonName": "Đuổi"
   }
 }

@@ -1,6 +1,4 @@
 import { messagesActions, reactionActions, referencesActions } from '@mezon/store';
-import { RightClickPos } from '@mezon/utils';
-import { rightClickAction } from 'libs/store/src/lib/rightClick/rightClick.slice';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -15,7 +13,6 @@ export const useEscapeKey = (handler: () => void) => {
 				dispatch(messagesActions.setOpenOptionMessageState(false));
 				dispatch(referencesActions.setDataReferences(null));
 				dispatch(reactionActions.setMessageMatchWithRef(false));
-				dispatch(rightClickAction.setPosClickActive(RightClickPos.NONE));
 				handler();
 			}
 		};

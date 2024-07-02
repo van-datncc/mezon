@@ -54,8 +54,8 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const filteredFriendList = useMemo(() => {
 		return friendList.filter(
 			(friend) =>
-				normalizeString(friend.user.username).includes(normalizeString(searchText)) ||
-				normalizeString(friend.user.display_name).includes(normalizeString(searchText)),
+				normalizeString(friend?.user?.username).includes(normalizeString(searchText)) ||
+				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText)),
 		);
 	}, [friendList, searchText]);
 
@@ -90,7 +90,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					directMessageWithUser(friend?.user?.id);
 					break;
 				case EFriendItemAction.ShowInformation:
-					setSelectedUser(friend.user)
+					setSelectedUser(friend?.user)
 					break;
 				default:
 					break;

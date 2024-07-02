@@ -11,7 +11,7 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size } from '@mezon/mobile-ui';
 import {
 	RootState,
 	selectAllUsers,
@@ -117,7 +117,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	});
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
-	const [isShowAttachControl, setIsShowAttachControl] = useAnimatedState<boolean>(false);
+	const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 	const [currentSelectedReplyMessage, setCurrentSelectedReplyMessage] = useState<IMessageWithUser | null>(null);
 	const [currentSelectedEditMessage, setCurrentSelectedEditMessage] = useState<IMessageWithUser | null>(null);
 	const [isFocus, setIsFocus] = useState<boolean>(false);
@@ -148,7 +148,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	async function loadMessageCache() {
 		const messages = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
 		setAllMessages(messages);
-		return messages[props?.channelId] || "";
+		return messages?.[props?.channelId] || "";
 	}
 
 	function setMessageCache(text: string) {
@@ -159,7 +159,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	}
 
 	useEffect(() => {
-		loadMessageCache().then((message) => {
+		loadMessageCache()?.then((message) => {
 			setText(message);
 		});
 	}, [props?.channelId])
@@ -286,7 +286,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						message_id: '',
 						message_ref_id: currentSelectedReplyMessage.id,
 						ref_type: 0,
-						message_sender_id: currentSelectedReplyMessage.user.id,
+						message_sender_id: currentSelectedReplyMessage?.user?.id,
 						content: JSON.stringify(currentSelectedReplyMessage.content),
 						has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
 					},

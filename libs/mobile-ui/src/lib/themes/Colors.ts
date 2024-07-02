@@ -128,6 +128,7 @@ const colors = {
 	borderNeutralDisable: '#9091931a',
 	borderPrimary: '#363940',
 	borderMessageHighlight: '#F0B132',
+	borderMessageReply: '#2882f0',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',
@@ -136,6 +137,7 @@ const colors = {
 	textViolet: '#5a62f4',
 	azureBlue: '#4173c3',
 	caribbeanGreen: '#1FA07C',
+  vividScarlet: '#d1323f',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',
@@ -151,6 +153,7 @@ const colors = {
 	bgMessageHighlight: '#c99d072b',
 	bgDarkMidnightBlue: '#141c2a',
   midnightIndigoBg: '#3b426e',
+	bgReply: '#383B47',
 	// background button
 	pink: '#e148c7',
 	bgButton: '#5865f2',

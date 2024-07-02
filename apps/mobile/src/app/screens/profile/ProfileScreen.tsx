@@ -11,7 +11,7 @@ import { ChevronIcon, MessageIcon, PenIcon } from '@mezon/mobile-components'
 import { FriendsEntity } from '@mezon/store-mobile'
 import moment from 'moment'
 import { MezonButton } from '../../temp-ui'
-import { size } from '@mezon/mobile-ui'
+import { Block, size } from '@mezon/mobile-ui'
 import { useTranslation } from 'react-i18next'
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
@@ -36,7 +36,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     }
 
     const firstFriendImageList = useMemo(() => {
-        return friendList.slice(0, 5).map(friend => friend.user.avatar_url)
+        return friendList?.slice?.(0, 5)?.map(friend => friend?.user?.avatar_url)
     }, [friendList])
 
     const memberSince = useMemo(() => {
@@ -55,7 +55,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
                 <View style={styles.viewImageProfile}>
                     {user?.userProfile?.user?.avatar_url ? (
                         <Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
-                    ) : <Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>}
+                    ) : <Block overflow={'hidden'} width={'100%'} height={'100%'} borderRadius={50}>
+                        <Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>
+                    </Block>}
                     <View style={styles.dotOnline} />
                 </View>
             </View>

@@ -2,33 +2,43 @@ import { EMaxUserCanInvite } from "../enums";
 import { IExpireLinkOption } from "../types";
 
 //TODO: update later when BE is ready
+export enum ExpireLinkValue {
+  Never = 'Never',
+  SevenDays = '7 days',
+  OneDay = '1 day',
+  TwelveHours = '12 hours',
+  SixHours = '6 hours',
+  OneHour = '1 hour',
+  ThirtyMinutes = '30 minutes'
+}
+
 export const LINK_EXPIRE_OPTION: IExpireLinkOption[] = [
 	{
-		value: 1,
+		value: ExpireLinkValue.Never,
 		label: 'NEVER'
 	},
 	{
-		value: 2,
+		value: ExpireLinkValue.SevenDays,
 		label: '7 DAYS'
 	},
 	{
-		value: 3,
+		value: ExpireLinkValue.OneDay,
 		label: '1 DAY'
 	},
 	{
-		value: 4,
+		value: ExpireLinkValue.TwelveHours,
 		label: '12 HOURS'
 	},
 	{
-		value: 5,
+		value: ExpireLinkValue.SixHours,
 		label: '6 HOURS'
 	},
 	{
-		value: 6,
+		value: ExpireLinkValue.OneHour,
 		label: '1 HOURS'
 	},
 	{
-		value: 7,
+		value: ExpireLinkValue.ThirtyMinutes,
 		label: '30 MINS'
 	}
 ];
