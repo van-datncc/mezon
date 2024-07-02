@@ -1,7 +1,6 @@
-import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
+import { useAppParams, useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import { selectCurrentChannel, selectDirectById } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
-import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,9 +13,10 @@ interface IReactionItem {
 
 const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, messageId }) => {
 	const { directId } = useAppParams();
-	const { emojiListPNG } = useDataEmojiSvg();
+	const { emojis } = useEmojiSuggestion();
+
 	const { reactionMessageDispatch } = useChatReaction();
-	const getUrl = getSrcEmoji(emojiShortCode, emojiListPNG ?? []);
+	const getUrl = getSrcEmoji(emojiShortCode, emojis ?? []);
 	const userId = useAuth();
 
 	const [channelID, setChannelID] = useState('');

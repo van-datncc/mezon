@@ -1,5 +1,6 @@
 import { useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
+import { clansActions, selectAllAccount, selectFriendStatus, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -8,7 +9,6 @@ import AvatarProfile from './AvatarProfile';
 import NoteUserProfile from './NoteUserProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
-import { IMessageWithUser } from '@mezon/utils';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
 import PendingFriend from './pendingFriend';
 type ModalUserProfileProps = {
@@ -27,7 +27,17 @@ export type OpenModalProps = {
 	openOption: boolean,
 }
 
-const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, hiddenRole, showNote, message, showPopupLeft }: ModalUserProfileProps) => {
+const ModalUserProfile = ({
+	userID,
+	isFooterProfile,
+	classWrapper,
+	classBanner,
+	hiddenRole,
+	showNote,
+	message,
+	showPopupLeft,
+}: ModalUserProfileProps) => {
+	const dispatch = useAppDispatch();
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -45,6 +55,7 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
+			await dispatch(clansActions.joinClan({ clanId: response.clan_id as string }));
 			sendInviteMessage(content, response.channel_id);
 			setContent('');
 		}
@@ -75,19 +86,30 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	}, [userID, []]);
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
-	const checkUser = useMemo(() => userProfile?.user?.id === userID,[userID, userProfile?.user?.id]);
-	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
+	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999', [message?.sender_id]);
 
-	const {setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab} = useSettingFooter();
+	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const openSetting = () => {
 		setIsShowSettingFooterStatus(true);
 		setIsShowSettingFooterInitTab('Profiles');
-	}
-	
+	};
+
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
-			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
-				{(!checkUser && !checkAnonymous) && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal} user={userById} showPopupLeft={showPopupLeft}/>}
+			<div
+				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`}
+				style={{ backgroundColor: color }}
+			>
+				{(!checkUser && !checkAnonymous) && (
+					<GroupIconBanner
+						checkAddFriend={checkAddFriend}
+						openModal={openModal}
+						setOpenModal={setOpenModal}
+						user={userById}
+						showPopupLeft={showPopupLeft}
+					/>
+				)}
 			</div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
@@ -98,17 +120,29 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{isFooterProfile ? userProfile?.user?.display_name : userById ? userById.user?.display_name : (checkAnonymous ? 'Anonymous' : message?.username)}
+							{isFooterProfile
+								? userProfile?.user?.display_name
+								: userById
+									? userById.user?.display_name
+									: checkAnonymous
+										? 'Anonymous'
+										: message?.username}
 						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
-							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : (checkAnonymous ? 'Anonymous' : message?.username)}
+							{isFooterProfile
+								? userProfile?.user?.username
+								: userById
+									? userById?.user?.username
+									: checkAnonymous
+										? 'Anonymous'
+										: message?.username}
 						</p>
 					</div>
 
 					{(checkAddFriend.myPendingFriend && !showPopupLeft) && <PendingFriend user={userById}/>}
 
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile userById={userById} /> : (!hiddenRole && userById) && <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? <StatusProfile userById={userById} /> : !hiddenRole && userById && <RoleUserProfile userID={userID} />}
 
 					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole ? (
 						<div className="w-full items-center mt-2">
@@ -132,7 +166,11 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 							<NoteUserProfile />
 						</>
 					)}
-					{(!isFooterProfile && checkUser) && <button className='rounded dark:bg-slate-800 bg-bgLightModeButton py-2 hover:bg-opacity-50 mt-2' onClick={openSetting}>Edit Profile</button>}
+					{!isFooterProfile && checkUser && (
+						<button className="rounded dark:bg-slate-800 bg-bgLightModeButton py-2 hover:bg-opacity-50 mt-2" onClick={openSetting}>
+							Edit Profile
+						</button>
+					)}
 				</div>
 			</div>
 		</div>

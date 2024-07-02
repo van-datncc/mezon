@@ -1,4 +1,4 @@
-import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { Colors } from '@mezon/mobile-ui';
 import React from 'react';
@@ -9,11 +9,6 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
 import MezonMenuItem from '../../temp-ui/MezonMenuItem';
-import {
-	AccessibilityIcon, BoostTier2Icon, BrandDiscordIcon, ClipIcon, FriendIcon, GiftIcon, GlobeEarthIcon, GroupIcon, ImageTextIcon, KeyIcon, LanguageIcon, LaptopPhoneIcon, MicrophoneIcon, NitroWheelIcon, PaintPaletteIcon, PuzzlePieceIcon, QRCodeCameraIcon, SettingsIcon, ShieldIcon, UserCircleIcon, BellIcon, CircleQuestionIcon, CircleInformationIcon, DoorExitIcon
-}
-	// @ts-ignore
-	from 'libs/mobile-components/src/lib/icons2';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['setting']);
@@ -51,61 +46,61 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.getNitro'),
-			icon: <NitroWheelIcon />,
+			icon: <Icons.NitroWheelIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <UserCircleIcon />,
+			icon: <Icons.UserCircleIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.privacySafety'),
-			icon: <ShieldIcon />,
+			icon: <Icons.ShieldIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.familyCenter'),
-			icon: <GroupIcon />,
+			icon: <Icons.GroupIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.authorizedApp'),
-			icon: <KeyIcon />,
+			icon: <Icons.KeyIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.device'),
-			icon: <LaptopPhoneIcon />,
+			icon: <Icons.LaptopPhoneIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.connection'),
-			icon: <PuzzlePieceIcon />,
+			icon: <Icons.PuzzlePieceIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.clip'),
-			icon: <ClipIcon />,
+			icon: <Icons.ClipIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.friendRequests'),
-			icon: <FriendIcon />,
+			icon: <Icons.FriendIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
-			icon: <QRCodeCameraIcon />,
+			icon: <Icons.QRCodeCameraIcon />,
 		},
 	]
 
@@ -114,19 +109,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.serverBoost'),
-			icon: <BoostTier2Icon />,
+			icon: <Icons.BoostTier2Icon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.nitroGift'),
-			icon: <GiftIcon />,
+			icon: <Icons.GiftIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.restoreSubscription'),
-			icon: <NitroWheelIcon />,
+			icon: <Icons.NitroWheelIcon />,
 		},
 	]
 
@@ -135,54 +130,58 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.voice'),
-			icon: <MicrophoneIcon />,
+			icon: <Icons.MicrophoneIcon />,
 		},
 		{
-			onPress: () => reserve(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+					screen: APP_SCREEN.SETTINGS.APPEARANCE
+				});
+			},
 			expandable: true,
 			title: t('appSettings.appearance'),
-			icon: <PaintPaletteIcon />,
+			icon: <Icons.PaintPaletteIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.accessibility'),
-			icon: <AccessibilityIcon />,
+			icon: <Icons.AccessibilityIcon />,
 		},
 		{
 			onPress: () => navigateToLanguageSetting(),
 			title: t('appSettings.language'),
-			icon: <LanguageIcon />,
+			icon: <Icons.LanguageIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.chat'),
-			icon: <ImageTextIcon />,
+			icon: <Icons.ImageTextIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.webBrowser'),
-			icon: <GlobeEarthIcon />,
+			icon: <Icons.GlobeEarthIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.notifications'),
-			icon: <BellIcon />,
+			icon: <Icons.BellIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.appIcon'),
-			icon: <BrandDiscordIcon />,
+			icon: <Icons.BrandDiscordIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.advanced'),
-			icon: <SettingsIcon />,
+			icon: <Icons.SettingsIcon />,
 		},
 	]
 
@@ -191,19 +190,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.support'),
-			icon: <CircleQuestionIcon />,
+			icon: <Icons.CircleQuestionIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.uploadLog'),
-			icon: <CircleInformationIcon />,
+			icon: <Icons.CircleInformationIcon />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.acknowledgement'),
-			icon: <CircleInformationIcon />,
+			icon: <Icons.CircleInformationIcon />,
 		},
 	]
 
@@ -212,7 +211,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
-			icon: <CircleInformationIcon width={20} height={20} />,
+			icon: <Icons.CircleInformationIcon width={20} height={20} />,
 		},
 	]
 
@@ -249,7 +248,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				isLast
 				onPress={() => confirmLogout()}
 				title={t('logOut')}
-				icon={<DoorExitIcon color={Colors.textRed} />}
+				icon={<Icons.DoorExitIcon color={Colors.textRed} />}
 			/>
 		</ScrollView>
 	);

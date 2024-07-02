@@ -35,6 +35,16 @@ export function useAuth() {
 		},
 		[dispatch],
 	);
+	
+	const loginByApple = useCallback(
+		async (token: string) => {
+			const action = await dispatch(authActions.authenticateApple(token));
+			const session = action.payload;
+			dispatch(accountActions.setAccount(session));
+			return session;
+		},
+		[dispatch],
+	);
 
 	return useMemo(
 		() => ({
@@ -42,8 +52,9 @@ export function useAuth() {
 			userId,
 			loginEmail,
 			loginByGoogle,
+			loginByApple,
 			fetchUserProfile,
 		}),
-		[userProfile, userId, loginEmail, loginByGoogle, fetchUserProfile],
+		[userProfile, userId, loginEmail, loginByGoogle, loginByApple, fetchUserProfile],
 	);
 }

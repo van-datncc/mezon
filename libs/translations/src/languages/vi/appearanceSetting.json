@@ -1,0 +1,27 @@
+{
+    "fields": {
+        "DMMessagePreview": {
+            "title": "Xem trước tin nhắn DM",
+            "AllMessages": "Tất cả tin nhắn",
+            "UnreadDMOnly": "Chỉ tin nhắn DM chưa đọc",
+            "None": "Không"
+        }
+    },
+    "menu": {
+        "theme": {
+            "title": "Giao diện",
+            "theme": "Giao diện",
+            "syncAcrossClients": {
+                "title": "Đồng bộ trên tất cả các thiết bị",
+                "description": "Bật tính năng này sẽ ghi đè lên các cài đặt giao diện ở trên trên tất cả các thiết bị khác bao gồm cả máy tính để bàn và trình duyệt."
+            }
+        },
+        "search": {
+            "title": "Tìm kiếm",
+            "showResultCount": {
+                "title": "Hiển thị số lượng kết quả tìm kiếm chính xác",
+                "description": "Khi bật, có thể làm tăng thời gian hiển thị kết quả tìm kiếm."
+            }
+        }
+    }
+}
