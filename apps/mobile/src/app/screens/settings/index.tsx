@@ -133,7 +133,11 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			icon: <Icons.MicrophoneIcon />,
 		},
 		{
-			onPress: () => reserve(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+					screen: APP_SCREEN.SETTINGS.APPEARANCE
+				});
+			},
 			expandable: true,
 			title: t('appSettings.appearance'),
 			icon: <Icons.PaintPaletteIcon />,

@@ -8,7 +8,8 @@
         "language": "Ngôn ngữ",
         "profile": "Hồ sơ",
         "newMessage": "Tin Nhắn Mới",
-        "newGroup": "Nhóm Mới"
+        "newGroup": "Nhóm Mới",
+        "appearance": "Giao diện"
     },
     "headerRight": {
         "addFriends": "Thêm bạn bè"

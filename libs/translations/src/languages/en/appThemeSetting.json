@@ -1,0 +1,9 @@
+{
+    "fields": {
+        "dark": "Dark",
+        "darker": "Darker",
+        "light": "Light",
+        "midnight": "Midnight",
+        "auto": "Auto"
+    }
+}
