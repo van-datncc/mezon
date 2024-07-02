@@ -1,5 +1,6 @@
 package com.mobile.mezon
 import expo.modules.ReactActivityDelegateWrapper
+import android.os.Bundle;
 
 import android.content.Intent;
 import com.facebook.react.ReactActivity
@@ -14,6 +15,10 @@ class MainActivity : ReactActivity() {
    * rendering of the component.
    */
   override fun getMainComponentName(): String = "Mobile"
+
+ override fun onCreate(savedInstanceState: Bundle?) {
+     super.onCreate(null);
+ }
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent);
