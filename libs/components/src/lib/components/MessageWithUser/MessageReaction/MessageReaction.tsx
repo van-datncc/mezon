@@ -1,6 +1,7 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
 import {
 	reactionActions,
+	selectCurrentChannelId,
 	selectDataSocketUpdate,
 	selectIdMessageRefReaction,
 	selectReactionBottomState,
@@ -23,9 +24,9 @@ type MessageReactionProps = {
 	mode: number;
 };
 
-const useFilteredReactions = (messageId: string, dataSocketConvert: EmojiDataOptionals[]) => {
+const useFilteredReactions = (messageId: string, dataSocketConvert: EmojiDataOptionals[], channeId: string) => {
 	return useMemo(() => {
-		return dataSocketConvert.filter((item) => item.message_id === messageId);
+		return dataSocketConvert.filter((item) => item.message_id === messageId && item.channel_id === channeId);
 	}, [messageId, dataSocketConvert]);
 };
 
@@ -35,11 +36,15 @@ const useConvertedReactions = (message: IMessageWithUser) => {
 	}, [message]);
 };
 
-const useCombinedReactions = (reactionMessage: EmojiDataOptionals[], reactionSocketByMessageId: EmojiDataOptionals[]) => {
+const useCombinedReactions = (reactionMessage: EmojiDataOptionals[], reactionSocketByMessageId: EmojiDataOptionals[], currentChannelId: string) => {
 	return useMemo(() => {
 		const combined = [...reactionMessage, ...reactionSocketByMessageId];
+		console.log('combined', combined);
+		console.log('reactionMessage', reactionMessage);
+		console.log('reactionSocketByMessageId', reactionSocketByMessageId);
+
 		return updateEmojiReactionData(combined);
-	}, [reactionSocketByMessageId, reactionMessage]);
+	}, [reactionSocketByMessageId, reactionMessage, currentChannelId]);
 };
 
 const useCheckHasEmoji = (dataReactionCombine: EmojiDataOptionals[]) => {
@@ -61,9 +66,10 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const dataSocketConvert = useSelector(selectDataSocketUpdate);
-	const reactionSocketByMessageId = useFilteredReactions(message.id, dataSocketConvert);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const reactionSocketByMessageId = useFilteredReactions(message.id, dataSocketConvert, message.channel_id);
 	const reactionMessage = useConvertedReactions(message);
-	const dataReactionCombine = useCombinedReactions(reactionMessage, reactionSocketByMessageId);
+	const dataReactionCombine = useCombinedReactions(reactionMessage, reactionSocketByMessageId, currentChannelId ?? '');
 	const checkHasEmoji = useCheckHasEmoji(dataReactionCombine);
 	const isMessageMatched = message.id === idMessageRefReaction;
 
