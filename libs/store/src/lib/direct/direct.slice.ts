@@ -2,14 +2,14 @@ import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessageEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
+import { attachmentActions } from '../attachment/attachments.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { fetchChannelsCached } from '../channels/channels.slice';
+import { clansActions } from '../clans/clans.slice';
 import { friendsActions } from '../friends/friend.slice';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
-import { attachmentActions } from '../attachment/attachments.slice';
-import { clansActions } from '../clans/clans.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -56,9 +56,9 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
-			thunkAPI.dispatch(clansActions.joinClan({clanId: '0'}));
+			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -73,7 +73,7 @@ export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', 
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.closeDirectMess(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -88,7 +88,7 @@ export const openDirectMessage = createAsyncThunk('direct/openDirectMessage', as
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.openDirectMess(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({noCache:true}));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
@@ -110,7 +110,7 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
-		fetchChannelsCached.clear(mezon,100,1, '', channelType);
+		fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
 	}
 	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
 
@@ -128,7 +128,7 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 		) {
 			return 0;
 		}
-		if (a.last_sent_message.id && b.last_sent_message.id && (a.last_sent_message.id < b.last_sent_message.id)) {
+		if (a.last_sent_message.id && b.last_sent_message.id && a.last_sent_message.id < b.last_sent_message.id) {
 			return 1;
 		}
 
@@ -155,8 +155,9 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
 			);
-			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({channelId: directMessageId}))
+			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
+			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);
@@ -185,12 +186,14 @@ export const directSlice = createSlice({
 			const timestamp = (Date.now() / 1000).toString();
 			directAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: { last_sent_message: {
-					content: payload.content,
-					id: payload.id,
-					sender_id: payload.sender_id,
-					timestamp: timestamp,
-				} },
+				changes: {
+					last_sent_message: {
+						content: payload.content,
+						id: payload.id,
+						sender_id: payload.sender_id,
+						timestamp: timestamp,
+					},
+				},
 			});
 		},
 		updateLastSeenTime: (state, action: PayloadAction<MessagesEntity>) => {
@@ -198,12 +201,14 @@ export const directSlice = createSlice({
 			const timestamp = (Date.now() / 1000).toString();
 			directAdapter.updateOne(state, {
 				id: payload.channel_id,
-				changes: { last_seen_message: {
-					content: payload.content,
-					id: payload.id,
-					sender_id: payload.sender_id,
-					timestamp: timestamp,
-				} },
+				changes: {
+					last_seen_message: {
+						content: payload.content,
+						id: payload.id,
+						sender_id: payload.sender_id,
+						timestamp: timestamp,
+					},
+				},
 			});
 		},
 		updateBulkDirectMetadata: (state, action: PayloadAction<DMMeta[]>) => {
@@ -219,29 +224,28 @@ export const directSlice = createSlice({
 			const { channelId } = action.payload;
 			const entity = state.entities[channelId];
 			if (entity) {
-			  directAdapter.updateOne(state, {
-				id: channelId,
-				changes: {
-				  count_mess_unread: (entity.count_mess_unread || 0) + 1,
-				},
-			  });
+				directAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: (entity.count_mess_unread || 0) + 1,
+					},
+				});
 			}
-		  },
+		},
 		setDirectLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
 			const channel = state.dmMetadata.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenTimestamp = action.payload.timestamp;
-				channel.notifiCount = 0
+				channel.notifiCount = 0;
 				directAdapter.updateOne(state, {
 					id: action.payload.channelId,
 					changes: {
-						count_mess_unread: 0
+						count_mess_unread: 0,
 					},
 				});
-
 			}
 		},
-		setNotifiDirectCount: (state, action: PayloadAction<{ channelId: string, notifiCount: number }>) => {
+		setNotifiDirectCount: (state, action: PayloadAction<{ channelId: string; notifiCount: number }>) => {
 			const { channelId, notifiCount } = action.payload;
 			const channel = state.dmMetadata.entities[channelId];
 			if (channel) {
@@ -273,7 +277,7 @@ export const directActions = {
 	createNewDirectMessage,
 	joinDirectMessage,
 	closeDirectMessage,
-	openDirectMessage
+	openDirectMessage,
 };
 
 const { selectAll, selectEntities } = directAdapter.getSelectors();
@@ -300,23 +304,15 @@ export const selectLastDMTimestamp = (channelId: string) =>
 		return channel?.lastSeenTimestamp || 0;
 	});
 
-export const selectDirectsUnreadlist = createSelector(
-	selectAllDirectMessages,
-	getDirectState,
-	(directMessages, state) => {
-		return directMessages.filter((dm) => {
-			const channel = state.dmMetadata.entities[dm.id];
-			return channel ? channel.lastSeenTimestamp < channel.lastSentTimestamp : false;
-		});
-	}
-);
+export const selectDirectsUnreadlist = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
+	return directMessages.filter((dm) => {
+		const channel = state.dmMetadata.entities[dm.id];
+		return channel ? channel.lastSeenTimestamp < channel.lastSentTimestamp : false;
+	});
+});
 
-export const selectDirectsOpenlist = createSelector(
-	selectAllDirectMessages,
-	(directMessages) => {
-		return directMessages.filter((dm) => dm.active === 1);
-	}
-);
+export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, (directMessages) => {
+	return directMessages.filter((dm) => dm.active === 1);
+});
 
-export const selectDirectById = (id: string) =>
-createSelector(selectDirectMessageEntities, (clansEntities) => clansEntities[id]);
+export const selectDirectById = (id: string) => createSelector(selectDirectMessageEntities, (clansEntities) => clansEntities[id]);

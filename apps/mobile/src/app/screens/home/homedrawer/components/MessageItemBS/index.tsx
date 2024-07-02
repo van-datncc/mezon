@@ -35,7 +35,7 @@ import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
-	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user, checkAnonymous } = props;
+	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const dispatch = useDispatch<AppDispatch>();
 	const ref = useRef(null);
 	const timeoutRef = useRef(null);
@@ -61,6 +61,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		const payload: IMessageActionNeedToResolve = {
 			type: EMessageActionType.Reply,
 			targetMessage: message,
+			replyTo: senderDisplayName
 		};
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);

@@ -135,7 +135,7 @@ type EmojiMarkdownOpt = {
 };
 
 export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmoji, posReply }) => {
-	const { emojiListPNG } = useEmojiSuggestion();
+	const { emojis } = useEmojiSuggestion();
 	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`);
 
 	useEffect(() => {
@@ -147,8 +147,8 @@ export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmo
 	return (
 		<span style={{ userSelect: 'none' }}>
 			<img
-				src={getSrcEmoji(emojiSyntax.trim(), emojiListPNG)}
-				alt={getSrcEmoji(emojiSyntax.trim(), emojiListPNG)}
+				src={getSrcEmoji(emojiSyntax.trim(), emojis)}
+				alt={getSrcEmoji(emojiSyntax.trim(), emojis)}
 				className={className}
 				onDragStart={(e) => e.preventDefault()}
 			/>{' '}
