@@ -32,7 +32,7 @@ const PanelGroupDM = () => {
                     <ItemPanelMember children="Until I turn it back on" />
 				</Dropdown>
 			</div>
-			<ItemPanelMember children="Leave Group" />
+			<ItemPanelMember children="Leave Group" danger/>
 		</>
 	);
 };
