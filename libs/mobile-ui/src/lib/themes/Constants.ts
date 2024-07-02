@@ -10,6 +10,7 @@ export type Attributes = {
     borderRadio: HexColor,
     text: HexColor,
     textStrong: HexColor,
+    textDisabled: HexColor,
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -31,6 +32,7 @@ export const themeColors: ThemeColor = {
         borderRadio: "#cacad2",
         text: "#93939b",
         textStrong: "#dfe0e4",
+        textDisabled: "#7b7b83"
     },
     light: {
         primary: "#f2f3f5",
@@ -40,5 +42,6 @@ export const themeColors: ThemeColor = {
         borderRadio: "#4d4d54",
         text: "#5d5c64",
         textStrong: "#070709",
+        textDisabled: "#a0a1a6"
     }
 }

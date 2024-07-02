@@ -1,7 +1,7 @@
 import { Attributes, Fonts, Metrics, baseColor } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const style = ({ textStrong, }: Attributes) => StyleSheet.create({
+export const style = ({ textStrong }: Attributes) => StyleSheet.create({
     avatarWrapper: {
         width: 60,
         height: 60,
