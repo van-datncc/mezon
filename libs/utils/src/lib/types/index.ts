@@ -323,13 +323,9 @@ export enum MemberProfileType {
 }
 
 export type IEmoji = {
+	src: string;
 	category: string;
-	emoji: string;
-	html?: string;
-	name?: string;
-	order?: number;
 	shortname: string;
-	unicode?: string;
 };
 
 export type IEmojiImage = {

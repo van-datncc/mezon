@@ -1,6 +1,6 @@
+import { useEmojiSuggestion } from '@mezon/core';
 import { selectCurrentChannelId } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
-import useDataEmojiSvg from 'libs/core/src/lib/chat/hooks/useDataEmojiSvg';
 import { useSelector } from 'react-redux';
 
 type SuggestItemProps = {
@@ -12,8 +12,8 @@ type SuggestItemProps = {
 };
 
 const SuggestItem = ({ avatarUrl, symbol, name, subText, valueHightLight }: SuggestItemProps) => {
-	const { emojiListPNG } = useDataEmojiSvg();
-	const urlEmoji = getSrcEmoji(name, emojiListPNG);
+	const { emojis } = useEmojiSuggestion();
+	const urlEmoji = getSrcEmoji(name, emojis);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
 

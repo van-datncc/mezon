@@ -15,7 +15,7 @@ type UserReactionPanelProps = {
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const dispatch = useDispatch();
 	const { reactionMessageDispatch } = useChatReaction();
-	const { emojiListPNG } = useEmojiSuggestion();
+	const { emojis } = useEmojiSuggestion();
 	const userId = useAuth();
 	const [channelLabel, setChannelLabel] = useState('');
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -58,7 +58,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] shadow-md
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
-						<PanelHeader emoji={emojiShowPanel.emoji} emojiListPNG={emojiListPNG} count={count} />
+						<PanelHeader emoji={emojiShowPanel.emoji} emojiListPNG={emojis} count={count} />
 						{senderList.map((sender: SenderInfoOptionals, index: number) => {
 							if (sender.count && sender.count > 0) {
 								return (
