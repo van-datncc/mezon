@@ -1,25 +1,25 @@
-import { Attributes, Colors } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics} from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const style = ({ secondary, textStrong, borderDim }: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     iconWrapper: {
         display: "flex",
         justifyContent: "center",
         alignContent: "center",
-        padding: 10,
-        backgroundColor: secondary,
+        padding: Metrics.size.m,
+        backgroundColor: colors.secondary,
         borderWidth: 1,
-        borderColor: borderDim,
+        borderColor: colors.borderDim,
         borderRadius: 999
     },
 
     container: {
-        gap: 10,
+        gap: Metrics.size.m,
         alignItems: 'center',
     },
 
     title: {
-        color: textStrong,
-        fontSize: 9,
+        color: colors.textStrong,
+        fontSize: Fonts.size.h9,
     }
 })

@@ -1,7 +1,7 @@
 import { Attributes, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const style = ({ text }: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     info: {
         flexDirection: "row",
         alignItems: "center",
@@ -17,6 +17,6 @@ export const style = ({ text }: Attributes) => StyleSheet.create({
 
     inlineText: {
         fontSize: Fonts.size.h8,
-        color: text
+        color: colors.text
     },
 })

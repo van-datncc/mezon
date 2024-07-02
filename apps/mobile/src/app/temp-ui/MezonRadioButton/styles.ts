@@ -1,14 +1,14 @@
 import { Attributes, Colors, Metrics, baseColor } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const style = ({borderRadio}: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     outer: {
         borderRadius: 999,
         borderWidth: 2,
         padding: 5,
         height: 24,
         width: 24,
-        borderColor: borderRadio
+        borderColor: colors.borderRadio
     },
 
     inner: {

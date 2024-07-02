@@ -86,7 +86,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                     }
                 });
             },
-            icon: <SettingsIcon />
+            icon: <Icons.SettingsIcon />
         },
         {
             title: t('menu.organizationMenu.duplicateChannel'),
