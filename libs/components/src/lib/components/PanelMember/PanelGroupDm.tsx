@@ -1,10 +1,14 @@
+import GroupPanelMember from "./GroupPanelMember";
 import ItemPanelMember from "./ItemPanelMember";
 
 const PanelGroupDM = () => {
     return(
         <>
-            <ItemPanelMember children="Change Icon" />
-            <ItemPanelMember children="Leave Group" />
+            <GroupPanelMember>
+                <ItemPanelMember children="Change Icon" />
+                <ItemPanelMember children="Mute Conversation" />
+            </GroupPanelMember>
+            <ItemPanelMember children="Leave Group" danger/>
         </>
     );
 }

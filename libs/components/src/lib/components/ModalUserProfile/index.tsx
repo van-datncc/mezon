@@ -1,5 +1,5 @@
 import { useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAddFriends, selectAllAccount, selectMemberByUserId } from '@mezon/store';
+import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -10,6 +10,7 @@ import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
 import { IMessageWithUser } from '@mezon/utils';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
+import PendingFriend from './pendingFriend';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -23,7 +24,6 @@ type ModalUserProfileProps = {
 
 export type OpenModalProps = {
 	openFriend: boolean,
-	openAddFriend: boolean,
 	openOption: boolean,
 }
 
@@ -38,7 +38,6 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 
 	const initOpenModal = {
 		openFriend: false,
-		openAddFriend: false,
 		openOption: false,
 	};
 	const [openModal, setOpenModal] = useState<OpenModalProps>(initOpenModal);
@@ -75,7 +74,7 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 		getColor();
 	}, [userID, []]);
 
-	const checkAddFriend = useSelector(selectAddFriends(userById?.user?.id || ''));
+	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID,[userID, userProfile?.user?.id]);
 	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
 
@@ -88,7 +87,7 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`} style={{ backgroundColor: color }}>
-				{!checkUser && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal} user={userById} showPopupLeft={showPopupLeft}/>}
+				{(!checkUser && !checkAnonymous) && <GroupIconBanner checkAddFriend={checkAddFriend} openModal={openModal} setOpenModal={setOpenModal} user={userById} showPopupLeft={showPopupLeft}/>}
 			</div>
 			<AvatarProfile
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
@@ -105,6 +104,9 @@ const ModalUserProfile = ({ userID, isFooterProfile, classWrapper, classBanner, 
 							{isFooterProfile ? userProfile?.user?.username : userById ? userById?.user?.username : (checkAnonymous ? 'Anonymous' : message?.username)}
 						</p>
 					</div>
+
+					{(checkAddFriend.myPendingFriend && !showPopupLeft) && <PendingFriend user={userById}/>}
+
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
 					{isFooterProfile ? <StatusProfile userById={userById} /> : (!hiddenRole && userById) && <RoleUserProfile userID={userID} />}
 
