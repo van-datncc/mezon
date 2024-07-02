@@ -8,7 +8,8 @@ import { useTranslation } from "react-i18next";
 
 type AppearanceSettingScreen = typeof APP_SCREEN.SETTINGS.APPEARANCE;
 export default function AppearanceSetting({ navigation }: SettingScreenProps<AppearanceSettingScreen>) {
-    const styles = style(useTheme().themeValue);
+    const {theme, themeValue} = useTheme();
+    const styles = style(themeValue);
     const { t } = useTranslation(['appearanceSetting']);
 
     const menuTheme = useMemo(() => ([
@@ -18,6 +19,7 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
                 {
                     title: t('menu.theme.theme'),
                     expandable: true,
+                    previewValue: theme,
                     onPress: ()=>{
                         navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
                             screen: APP_SCREEN.SETTINGS.APP_THEME
@@ -62,7 +64,7 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
     return (
         <View style={styles.container}>
             <MezonMenu menu={menuTheme} />
-            <MezonOption data={DMMessagePreviewOptions} title={t('fields.DMMessagePreview.showResultCount.title')} />
+            <MezonOption data={DMMessagePreviewOptions} title={t('fields.DMMessagePreview.title')} />
             <MezonMenu menu={menuSearch} />
         </View>
     )

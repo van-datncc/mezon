@@ -1,10 +1,10 @@
 import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
 import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView } from 'react-native';
-import { styles } from './styles';
+import { style } from './styles';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
@@ -16,7 +16,9 @@ import {
 	from 'libs/mobile-components/src/lib/icons2';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
-	const { t } = useTranslation(['setting']);
+	const { t, i18n } = useTranslation(['setting']);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 
 	const dispatch = useAppDispatch();
 	const logout = () => {
@@ -42,70 +44,66 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		);
 	};
 
-	const navigateToLanguageSetting = () => {
-		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.LANGUAGE });
-	}
-
 	const AccountMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.getNitro'),
-			icon: <NitroWheelIcon />,
+			icon: <NitroWheelIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <UserCircleIcon />,
+			icon: <UserCircleIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.privacySafety'),
-			icon: <ShieldIcon />,
+			icon: <ShieldIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.familyCenter'),
-			icon: <GroupIcon />,
+			icon: <GroupIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.authorizedApp'),
-			icon: <KeyIcon />,
+			icon: <KeyIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.device'),
-			icon: <LaptopPhoneIcon />,
+			icon: <LaptopPhoneIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.connection'),
-			icon: <PuzzlePieceIcon />,
+			icon: <PuzzlePieceIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.clip'),
-			icon: <ClipIcon />,
+			icon: <ClipIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.friendRequests'),
-			icon: <FriendIcon />,
+			icon: <FriendIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
-			icon: <QRCodeCameraIcon />,
+			icon: <QRCodeCameraIcon color={themeValue.textStrong} />,
 		},
 	]
 
@@ -114,19 +112,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.serverBoost'),
-			icon: <BoostTier2Icon />,
+			icon: <BoostTier2Icon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.nitroGift'),
-			icon: <GiftIcon />,
+			icon: <GiftIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.restoreSubscription'),
-			icon: <NitroWheelIcon />,
+			icon: <NitroWheelIcon color={themeValue.textStrong} />,
 		},
 	]
 
@@ -135,7 +133,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.voice'),
-			icon: <MicrophoneIcon />,
+			icon: <MicrophoneIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => {
@@ -145,48 +143,54 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			},
 			expandable: true,
 			title: t('appSettings.appearance'),
-			icon: <PaintPaletteIcon />,
+			icon: <PaintPaletteIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.accessibility'),
-			icon: <AccessibilityIcon />,
+			icon: <AccessibilityIcon color={themeValue.textStrong} />,
 		},
 		{
-			onPress: () => navigateToLanguageSetting(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+					screen: APP_SCREEN.SETTINGS.LANGUAGE
+				});
+			},
 			title: t('appSettings.language'),
-			icon: <LanguageIcon />,
+			expandable: true,
+			previewValue: i18n.language,
+			icon: <LanguageIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.chat'),
-			icon: <ImageTextIcon />,
+			icon: <ImageTextIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.webBrowser'),
-			icon: <GlobeEarthIcon />,
+			icon: <GlobeEarthIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.notifications'),
-			icon: <BellIcon />,
+			icon: <BellIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.appIcon'),
-			icon: <BrandDiscordIcon />,
+			icon: <BrandDiscordIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.advanced'),
-			icon: <SettingsIcon />,
+			icon: <SettingsIcon color={themeValue.textStrong} />,
 		},
 	]
 
@@ -195,19 +199,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.support'),
-			icon: <CircleQuestionIcon />,
+			icon: <CircleQuestionIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.uploadLog'),
-			icon: <CircleInformationIcon />,
+			icon: <CircleInformationIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.acknowledgement'),
-			icon: <CircleInformationIcon />,
+			icon: <CircleInformationIcon color={themeValue.textStrong} />,
 		},
 	]
 
@@ -216,7 +220,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
-			icon: <CircleInformationIcon width={20} height={20} />,
+			icon: <CircleInformationIcon color={themeValue.textStrong} />,
 		},
 	]
 
@@ -253,7 +257,8 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				isLast
 				onPress={() => confirmLogout()}
 				title={t('logOut')}
-				icon={<DoorExitIcon color={Colors.textRed} />}
+				textStyle={{ color: baseColor.red }}
+				icon={<DoorExitIcon color={baseColor.red} />}
 			/>
 		</ScrollView>
 	);

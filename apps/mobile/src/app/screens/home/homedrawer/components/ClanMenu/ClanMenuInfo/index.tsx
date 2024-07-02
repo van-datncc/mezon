@@ -1,15 +1,18 @@
 import { CircleIcon } from "@mezon/mobile-components";
 import { MezonBadge } from "apps/mobile/src/app/temp-ui";
 import { View, Text } from "react-native";
-import styles from "./styles";
 import { useTranslation } from "react-i18next";
 import { ClansEntity } from "@mezon/store-mobile";
+import { style } from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface ClanMenuInfoProps {
     clan: ClansEntity;
 }
 export default function ClanMenuInfo({ clan }: ClanMenuInfoProps) {
     const { t } = useTranslation(['clanMenu']);
+    const styles = style(useTheme().themeValue);
+    
     // TODO: check this
     const [onlineMembers, offlineMembers] = [333, 398];
 
