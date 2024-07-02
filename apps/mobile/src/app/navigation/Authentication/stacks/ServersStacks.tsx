@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/stack';
 
 import {APP_SCREEN} from "../../ScreenTypes";
-import ServersScreen from "../../../screens/main/ClanScreen";
+import UpdateGateScreen from "../../../screens/updateGate/UpdateGateScreen";
 
 // eslint-disable-next-line no-empty-pattern
 export const ServersStacks = ({} : any) => {
@@ -28,11 +28,9 @@ export const ServersStacks = ({} : any) => {
 			}}
 			initialRouteName={APP_SCREEN.SERVERS.HOME}
 		>
-			{/*Example*/}
 			<Stack.Screen
-				name={APP_SCREEN.SERVERS.HOME}
-				component={ServersScreen}
-				// component={ListIconScreens}
+				name={APP_SCREEN.SERVERS.UPDATE_GATE}
+				component={UpdateGateScreen}
 				options={{
 					cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 					headerShown: false,

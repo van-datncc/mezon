@@ -16,9 +16,9 @@ const renderAvatar = (id: string, index: number) => {
             key={index.toString()}
             height={40}
             width={40}
-            avatarUrl={user.user?.avatar_url}
-            userName={user.user?.username}
-            userStatus={user.user?.online}
+            avatarUrl={user?.user?.avatar_url}
+            userName={user?.user?.username}
+            userStatus={user?.user?.online}
         />
     )
 }

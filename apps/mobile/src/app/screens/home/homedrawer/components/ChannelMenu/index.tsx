@@ -11,10 +11,7 @@ import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { BellSlashIcon, ChannelNotificationIcon, CopyIcon, EyeIcon, GroupPlusIcon, IDIcon, LinkIcon, PlusLargeIcon, SettingsIcon, StarIcon }
-    // @ts-ignore
-    from "libs/mobile-components/src/lib/icons2";
-
+import { Icons } from "@mezon/mobile-components";
 
 interface IChannelMenuProps {
     inviteRef: MutableRefObject<any>;
@@ -33,7 +30,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.watchMenu.markAsRead'),
             onPress: () => reserve(),
-            icon: <EyeIcon />
+            icon: <Icons.EyeIcon />
         }
     ]
 
@@ -44,7 +41,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <GroupPlusIcon />
+            icon: <Icons.GroupPlusIcon />
         },
         {
             title: t('menu.inviteMenu.favorite'),
@@ -52,7 +49,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <StarIcon />
+            icon: <Icons.StarIcon />
         },
         {
             title: t('menu.inviteMenu.copyLink'),
@@ -60,7 +57,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <LinkIcon />
+            icon: <Icons.LinkIcon />
         }
     ]
 
@@ -68,12 +65,12 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.notification.muteCategory'),
             onPress: () => reserve(),
-            icon: <BellSlashIcon />
+            icon: <Icons.BellSlashIcon />
         },
         {
             title: t('menu.notification.notification'),
             onPress: () => reserve(),
-            icon: <ChannelNotificationIcon />
+            icon: <Icons.ChannelNotificationIcon />
         }
     ]
 
@@ -94,14 +91,14 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.organizationMenu.duplicateChannel'),
             onPress: () => reserve(),
-            icon: <CopyIcon />
+            icon: <Icons.CopyIcon />
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.devMode.copyChannelID'),
-            icon: <IDIcon />,
+            icon: <Icons.IDIcon />,
             onPress: () => {
                 Clipboard.setString(channel?.channel_id);
                 Toast.show({

@@ -26,9 +26,9 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
     const onSelectChange = useCallback((friend: FriendsEntity, value: boolean) => {
         let newValue: string[] = [];
         if (value) {
-            newValue = [...friendIdSelectedList, friend.user.id];
+            newValue = [...friendIdSelectedList, friend?.user?.id];
         } else {
-            newValue = friendIdSelectedList.filter(friendId => friend.user.id !== friendId);
+            newValue = friendIdSelectedList.filter(friendId => friend?.user?.id !== friendId);
         }
         setFriendIdSelectedList(newValue)
         onSelectedChange(newValue)
@@ -52,7 +52,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 
     const allFriendGroupByAlphabet = useMemo(() => {
         const groupedByCharacter = friendList.reduce((acc, friend) => {
-            const name = showAction ?  friend.user.username : friend.user.display_name;
+            const name = showAction ?  friend?.user?.username : friend?.user?.display_name;
             const firstNameCharacter = name?.charAt(0)?.toUpperCase();
             if (!acc[firstNameCharacter]) {
                 acc[firstNameCharacter] = [];

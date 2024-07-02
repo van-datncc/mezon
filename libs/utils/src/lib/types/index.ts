@@ -26,7 +26,6 @@ import {
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
 
-export * from './enumListRight';
 export * from './permissions';
 export * from './thumbnailPos';
 
@@ -324,13 +323,9 @@ export enum MemberProfileType {
 }
 
 export type IEmoji = {
+	src: string;
 	category: string;
-	emoji: string;
-	html?: string;
-	name?: string;
-	order?: number;
 	shortname: string;
-	unicode?: string;
 };
 
 export type IEmojiImage = {

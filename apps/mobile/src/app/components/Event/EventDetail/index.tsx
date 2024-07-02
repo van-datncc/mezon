@@ -49,8 +49,8 @@ export default function EventDetail({ event }: IEventDetailProps) {
 
                     {/* TODO: Fix this */}
                     <MezonAvatar
-                        avatarUrl={userCreate.user.avatar_url}
-                        userName={userCreate.user.username}
+                        avatarUrl={userCreate?.user?.avatar_url}
+                        userName={userCreate?.user?.username}
                         height={20}
                         width={20}
                     />

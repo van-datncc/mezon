@@ -19,8 +19,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const { reactionMessageDispatch } = useChatReaction();
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const emojiHover = useSelector(selectEmojiHover);
-	const { emojiListPNG } = useEmojiSuggestion();
-	const getUrlItem = getSrcEmoji(emoji.emoji ?? '', emojiListPNG);
+	const { emojis } = useEmojiSuggestion();
+	const getUrlItem = getSrcEmoji(emoji.emoji ?? '', emojis);
 	const count = calculateTotalCount(emoji.senders);
 	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);

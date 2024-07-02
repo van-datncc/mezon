@@ -47,8 +47,7 @@ export const ChannelListItem = React.memo(
 			const store = await getStoreAsync();
 			if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === 1 && props?.data?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
-				const urlSupported = await Linking.canOpenURL(urlVoice);
-				if (urlSupported) Linking.openURL(urlVoice);
+				await Linking.openURL(urlVoice);
 				return;
 			}
 			useChannelListContentIn.navigation.closeDrawer();
