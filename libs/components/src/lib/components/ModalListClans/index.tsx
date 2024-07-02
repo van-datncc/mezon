@@ -65,7 +65,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 						>
 							<div className="flex items-center gap-4 w-10/12">
 								{option.logo ? (
-									<img src={option.logo} alt={option.logo} className="rounded-full size-10 object-cover" />
+									<img src={option.logo} alt={option.logo} className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10" />
 								) : (
 									<div>
 										{option?.clan_name && (

@@ -41,7 +41,7 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 								alt={'logoMezon'}
 								width={48}
 								height={48}
-								className="clan w-full aspect-square"
+								className="clan w-full aspect-square object-cover"
 							/>
 							{countMessUnread !== undefined && countMessUnread !== 0 && (
 								<div className="absolute border-[4px] dark:border-bgPrimary border-white w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
