@@ -36,7 +36,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     }
 
     const firstFriendImageList = useMemo(() => {
-        return friendList.slice(0, 5).map(friend => friend.user.avatar_url)
+        return friendList?.slice?.(0, 5)?.map(friend => friend?.user?.avatar_url)
     }, [friendList])
 
     const memberSince = useMemo(() => {

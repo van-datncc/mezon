@@ -18,7 +18,6 @@ import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
 
-// TODO: move this to core
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const isMessageRead = useSelector(selectIsMessageRead);
@@ -26,11 +25,9 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
+		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		if (isMessageRead && channelId === currentChannel?.channel_id) {
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(notificationActions.setIsMessageRead(false));
-		} else {
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, currentChannel?.channel_id, dispatch, isMessageRead]);
 }

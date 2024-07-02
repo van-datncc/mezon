@@ -25,15 +25,15 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	return (
 		<div className={`overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-white dark:text-white text-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow  ${(stateClose && !stateMenu) ? 'hidden' : 'flex'}`}>
 			<div className="w-170px">
-				<div className="flex justify-start">
+				<div className="flex justify-start max-w-[170px]">
 					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.SpeakerLocked defaultSize="w-5 h-5" />
+						<Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />
 					)}
 					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.HashtagLocked defaultSize="w-5 h-5 -mt-1" />
+						<Icons.HashtagLocked defaultSize="w-5 h-5 -mt-1 min-w-5" />
 					)}
-					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
-					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5 -mt-1" />}
+					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5 min-w-5" />}
+					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5 -mt-1 min-w-5" />}
 					<p className="text-[#84ADFF] font-bold text-sm tracking-wider max-w-[160px] overflow-x-hidden text-ellipsis uppercase one-line">
 						{channel.channel_label}
 					</p>

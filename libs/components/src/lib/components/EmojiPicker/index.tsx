@@ -16,7 +16,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
 
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
-	const { categoriesEmoji, emojiListPNG, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
+	const { categoriesEmoji, emojis, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
@@ -33,7 +33,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			reactionPlaceActive === EmojiPlaces.EMOJI_REACTION_BOTTOM ||
 			reactionPlaceActive === EmojiPlaces.EMOJI_REACTION
 		) {
-			const result = searchEmojis(emojiListPNG, valueInputToCheckHandleSearch ?? '');
+			const result = searchEmojis(emojis, valueInputToCheckHandleSearch ?? '');
 			setEmojiSearch(result);
 		}
 	}, [valueInputToCheckHandleSearch]);
@@ -70,6 +70,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setChannelID(currentChannel?.id || '');
 		}
 	}, [currentChannel, direct, directId]);
+	
 	const handleEmojiSelect = async (emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
@@ -219,7 +220,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 							return (
 								<div className="w-full" key={item.name} ref={(el) => (categoryRefs.current[item.name] = el)}>
 									<DisplayByCategories
-										emojisData={emojiListPNG}
+										emojisData={emojis}
 										onEmojiSelect={handleEmojiSelect}
 										onEmojiHover={handleOnHover}
 										categoryName={item.name}

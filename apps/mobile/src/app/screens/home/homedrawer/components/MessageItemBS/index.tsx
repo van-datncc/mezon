@@ -35,7 +35,7 @@ import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
-	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user } = props;
+	const { type, onClose, message, onConfirmDeleteMessage, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const dispatch = useDispatch<AppDispatch>();
 	const ref = useRef(null);
 	const timeoutRef = useRef(null);
@@ -61,6 +61,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		const payload: IMessageActionNeedToResolve = {
 			type: EMessageActionType.Reply,
 			targetMessage: message,
+			replyTo: senderDisplayName
 		};
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
@@ -246,7 +247,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id}></UserProfile>;
+		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
 	};
 
 	const handleReact = async (mode, messageId, emoji: IEmojiImage, senderId) => {
@@ -367,7 +368,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				setIsShowEmojiPicker(false);
 			}}
 			draggable
-			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type)) && Platform.OS !== 'ios'}
+			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker) || [EMessageBSToShow.UserInformation].includes(type)}
 			customStyles={{
 				container: {
 					backgroundColor: 'transparent',

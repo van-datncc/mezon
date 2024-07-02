@@ -11,9 +11,7 @@ import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { BellSlashIcon, ChannelNotificationIcon, EyeIcon, GroupPlusIcon, IDIcon, PlusLargeIcon, SettingsIcon }
-    // @ts-ignore
-    from "libs/mobile-components/src/lib/icons2";
+import { Icons } from "@mezon/mobile-components";
 
 
 interface ICategoryMenuProps {
@@ -33,7 +31,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.watchMenu.markAsRead'),
             onPress: () => reserve(),
-            icon: <EyeIcon />
+            icon: <Icons.EyeIcon />
         }
     ]
 
@@ -44,7 +42,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <GroupPlusIcon />
+            icon: <Icons.GroupPlusIcon />
         }
     ]
 
@@ -52,12 +50,12 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.notification.muteCategory'),
             onPress: () => reserve(),
-            icon: <BellSlashIcon />
+            icon: <Icons.BellSlashIcon />
         },
         {
             title: t('menu.notification.notification'),
             onPress: () => reserve(),
-            icon: <ChannelNotificationIcon />
+            icon: <Icons.ChannelNotificationIcon />
         }
     ]
 
@@ -65,7 +63,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.organizationMenu.edit'),
             onPress: () => reserve(),
-            icon: <SettingsIcon />
+            icon: <Icons.SettingsIcon />
         },
         {
             title: t('menu.organizationMenu.createChannel'),
@@ -78,14 +76,14 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
                     }
                 });
             },
-            icon: <PlusLargeIcon />
+            icon: <Icons.PlusLargeIcon />
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.devMode.copyServerID'),
-            icon: <IDIcon />,
+            icon: <Icons.IDIcon />,
             onPress: () => {
                 Clipboard.setString(category?.category_id);
                 Toast.show({

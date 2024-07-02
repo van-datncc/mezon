@@ -137,6 +137,7 @@ const colors = {
 	textViolet: '#5a62f4',
 	azureBlue: '#4173c3',
 	caribbeanGreen: '#1FA07C',
+  vividScarlet: '#d1323f',
 	/* background color */
 	bgPrimary: isDarkTheme ? '#3e4247' : '#FFFFFF',
 	bgViolet: isDarkTheme ? '#5a62f4' : '#5a62f4',

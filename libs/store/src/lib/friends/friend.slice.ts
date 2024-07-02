@@ -17,6 +17,10 @@ export interface IFriend extends Friend {
 	id: string;
 }
 
+interface IStatusSentMobile {
+	isSuccess: boolean;
+}
+
 export const mapFriendToEntity = (FriendRes: Friend) => {
 	return { ...FriendRes, id: FriendRes.user?.id || '' };
 };
@@ -25,6 +29,7 @@ export interface FriendsState extends EntityState<FriendsEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	currentTabStatus: string;
+	statusSentMobile: IStatusSentMobile | null
 }
 
 export const friendsAdapter = createEntityAdapter<FriendsEntity>();
@@ -72,11 +77,17 @@ export const sendRequestAddFriend = createAsyncThunk('friends/requestFriends', a
 		.addFriends(mezon.session, ids, usernames)
 		.catch(function (err) {
 			err.json().then((data: any) => {
+				thunkAPI.dispatch(friendsActions.setSentStatusMobile({
+					isSuccess: false,
+				}));
 				toast.error(data.message);
 			});
 		})
 		.then((data) => {
 			if (data) {
+				thunkAPI.dispatch(friendsActions.setSentStatusMobile({
+					isSuccess: true,
+				}));
 				thunkAPI.dispatch(friendsActions.fetchListFriends({noCache: true}));
 			}
 		})
@@ -113,6 +124,7 @@ export const initialFriendsState: FriendsState = friendsAdapter.getInitialState(
 	friends: [],
 	error: null,
 	currentTabStatus: 'all',
+	statusSentMobile: null
 });
 
 export const friendsSlice = createSlice({
@@ -123,6 +135,9 @@ export const friendsSlice = createSlice({
 		remove: friendsAdapter.removeOne,
 		changeCurrentStatusTab: (state, action: PayloadAction<string>) => {
 			state.currentTabStatus = action.payload;
+		},
+		setSentStatusMobile: (state, action: PayloadAction<IStatusSentMobile | null>) => {
+			state.statusSentMobile = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -159,5 +174,6 @@ const { selectAll } = friendsAdapter.getSelectors();
 
 export const getFriendsState = (rootState: { [FRIEND_FEATURE_KEY]: FriendsState }): FriendsState => rootState[FRIEND_FEATURE_KEY];
 export const selectAllFriends = createSelector(getFriendsState, selectAll);
+export const selectStatusSentMobile = createSelector(getFriendsState, state => state.statusSentMobile);
 
 export const selectAddFriends = (userID: string) => createSelector(selectAllFriends, (friends) => friends.some(friend => friend.state === 0 && friend.id === userID));

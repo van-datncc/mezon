@@ -50,17 +50,17 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Give Mezon permission to select photos</string>
+	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Give Mezon permission to select photos</string>
+	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Give Mezon permission to select photos</string>
+	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Give Mezon permission to select photos</string>
+	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
-	<string>Give Mezon permission to select photos</string>
+	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
