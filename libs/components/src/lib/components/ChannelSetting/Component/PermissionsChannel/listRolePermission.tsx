@@ -1,11 +1,11 @@
 import { Icons } from "@mezon/components";
-import { channelUsersActions, selectCurrentClanId, selectRolesByChannelId, useAppDispatch } from "@mezon/store";
+import { channelUsersActions, selectAllRolesClan, selectCurrentClanId, selectRolesByChannelId, useAppDispatch } from "@mezon/store";
 import { IChannel } from "@mezon/utils";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
-
+import { useMemo } from 'react';
 type ListRolePermissionProps = {
     channel: IChannel;
+    selectedRoleIds: string[];
 }
 
 const ListRolePermission = (props: ListRolePermissionProps) => {
@@ -13,11 +13,19 @@ const ListRolePermission = (props: ListRolePermissionProps) => {
 	const dispatch = useAppDispatch();
 	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
 	const currentClanId = useSelector(selectCurrentClanId);
+    const RolesClan = useSelector(selectAllRolesClan);
+    const RolesAddChannel = RolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
+	const RolesNotAddChannel = RolesClan.filter((role) => !RolesAddChannel.map((RoleAddChannel) => RoleAddChannel.id).includes(role.id));
 
     const listRolesInChannel = useMemo(() => {
-		if (!RolesChannel) return [];
+		if (channel.channel_private === 0 || channel.channel_private === undefined) {
+			const filteredRoles = RolesNotAddChannel.filter((role) => 
+            props.selectedRoleIds.includes(role.id)
+        );
+            return filteredRoles
+        }
 		return RolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
-	}, [RolesChannel]);
+	}, [RolesChannel,  props.selectedRoleIds]);
 
     const deleteRole = async (roleId: string) => {
 		const body = {
