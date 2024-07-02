@@ -1,5 +1,6 @@
 import React from 'react';
 import { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { ModalProvider } from 'react-modal-hook';
 
 type Props = {
@@ -23,9 +24,7 @@ export function MezonUiProvider({ children, themeName }: Props) {
 	return (
 		<MezonUiContext.Provider value={value}>
 			<SkeletonTheme baseColor="#202020" highlightColor="#444">
-				<ModalProvider>
-					{children}
-				</ModalProvider>
+				<ModalProvider>{children}</ModalProvider>
 			</SkeletonTheme>
 		</MezonUiContext.Provider>
 	);
