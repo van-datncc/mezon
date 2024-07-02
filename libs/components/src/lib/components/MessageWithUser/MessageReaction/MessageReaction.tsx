@@ -39,12 +39,9 @@ const useConvertedReactions = (message: IMessageWithUser) => {
 const useCombinedReactions = (reactionMessage: EmojiDataOptionals[], reactionSocketByMessageId: EmojiDataOptionals[], currentChannelId: string) => {
 	return useMemo(() => {
 		const combined = [...reactionMessage, ...reactionSocketByMessageId];
-		console.log('combined', combined);
-		console.log('reactionMessage', reactionMessage);
-		console.log('reactionSocketByMessageId', reactionSocketByMessageId);
-
+		console.log('combine', combined);
 		return updateEmojiReactionData(combined);
-	}, [reactionSocketByMessageId, reactionMessage, currentChannelId]);
+	}, [reactionSocketByMessageId, currentChannelId]);
 };
 
 const useCheckHasEmoji = (dataReactionCombine: EmojiDataOptionals[]) => {
@@ -52,6 +49,22 @@ const useCheckHasEmoji = (dataReactionCombine: EmojiDataOptionals[]) => {
 		if (dataReactionCombine.length === 0) return false;
 		return calculateTotalCount(dataReactionCombine[0]!.senders) > 0;
 	}, [dataReactionCombine]);
+};
+
+const useRemoveDuplicate = (objects: EmojiDataOptionals[]): EmojiDataOptionals[] => {
+	const seen: { [key: string]: EmojiDataOptionals } = {};
+	objects?.forEach((obj) => {
+		const key = JSON.stringify({
+			senders: obj.senders,
+			emoji: obj.emoji,
+			channel_id: obj.channel_id,
+			message_id: obj.message_id,
+		});
+		if (!seen[key] || obj.id === '0') {
+			seen[key] = obj;
+		}
+	});
+	return Object.values(seen);
 };
 
 const extractMessageIds = (data: EmojiDataOptionals[]) => {
@@ -110,3 +123,57 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 };
 
 export default MessageReaction;
+
+const x = [
+	{
+		id: '1808158578675027968',
+		emoji: ':verify:',
+		senders: [
+			{
+				sender_id: '1775731111020728320',
+				count: 1,
+			},
+		],
+		channel_id: '1808067006121906176',
+		message_id: '1808067290831261696',
+	},
+];
+
+const ip = [
+	{
+		id: '1808158578675027968',
+		emoji: ':verify:',
+		senders: [
+			{
+				sender_id: '1775731111020728320',
+				count: 1,
+			},
+		],
+		channel_id: '1808067006121906176',
+		message_id: '1808067290831261696',
+	},
+	{
+		id: '0',
+		emoji: ':verify:',
+		senders: [
+			{
+				sender_id: '1775731111020728320',
+				count: 1,
+			},
+		],
+		channel_id: '1808067006121906176',
+		message_id: '1808067290831261696',
+	},
+	{
+		id: '0',
+		emoji: ':verify:',
+		senders: [
+			{
+				sender_id: '1784059393956909056',
+				count: 1,
+			},
+		],
+		channel_id: '1808067006121906176',
+		message_id: '1808067290831261696',
+	},
+];

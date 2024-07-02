@@ -79,6 +79,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessageEvent) => {
+			console.log("clog")
 			const senderId = message.sender_id;
 
 			const timestamp = Date.now() / 1000;
@@ -153,7 +154,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
-			console.log('check duplice event reaction');
 			if (e.count > 0) {
 				dispatch(reactionActions.updateReactionMessage(mapReactionToEntity(e)));
 			}
