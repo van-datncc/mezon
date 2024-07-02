@@ -43,7 +43,7 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 }
 
 export const reactionAdapter = createEntityAdapter({
-	selectId: (emo: ReactionEntity) => emo.id || emo.name || '',
+	selectId: (emo: ReactionEntity) => emo.id || emo.shortname || '',
 });
 
 export const updateReactionMessage = createAsyncThunk(

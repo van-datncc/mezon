@@ -118,7 +118,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { mentions } = useMessageLine(content);
 	const usersClan = useSelector(selectAllUsesClan);
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
-	const { emojiListPNG } = useEmojiSuggestion();
+	const { emojis } = useEmojiSuggestion();
 	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const reactionRightState = useSelector(selectReactionRightState);
@@ -130,7 +130,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
-		const matches = emojiListPNG
+		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
 			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
