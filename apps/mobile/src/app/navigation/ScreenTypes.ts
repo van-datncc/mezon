@@ -75,7 +75,9 @@ export const APP_SCREEN = {
     HOME: 'ROUTES.SETTINGS.HOME',
     LANGUAGE: 'ROUTES.SETTINGS.LANGUAGE',
     PROFILE: 'ROUTES.SETTINGS.PROFILE',
-    SHARING: 'ROUTES.SETTINGS.SHARING'
+    SHARING: 'ROUTES.SETTINGS.SHARING',
+    APPEARANCE: 'ROUTES.SETTINGS.APPEARANCE',
+    APP_THEME: 'ROUTES.SETTINGS.APP_THEME'
   }
 } as const;
 
@@ -148,6 +150,8 @@ type SettingStackParamList = {
   [APP_SCREEN.SETTINGS.HOME]: undefined;
   [APP_SCREEN.SETTINGS.LANGUAGE]: undefined;
   [APP_SCREEN.SETTINGS.PROFILE]: undefined;
+  [APP_SCREEN.SETTINGS.APPEARANCE]: undefined;
+  [APP_SCREEN.SETTINGS.APP_THEME]: undefined
 }
 
 type AppStackParamList = {
@@ -180,5 +184,11 @@ export type MenuClanScreenProps<T extends keyof MenuClanStackParamList> =
 export type MenuChannelScreenProps<T extends keyof MenuChannelStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<MenuChannelStackParamList, T>,
+    AppStackScreenProps<keyof AppStackParamList>
+  >;
+
+export type SettingScreenProps<T extends keyof SettingStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<SettingStackParamList, T>,
     AppStackScreenProps<keyof AppStackParamList>
   >;
