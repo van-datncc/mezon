@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export default function MemberItem({ user, isOffline, onPress }: IProps) {
-	const userStatus = useMemberStatus(user.user?.id || '');
+	const userStatus = useMemberStatus(user?.user?.id || '');
   const currentClan = useSelector(selectCurrentClan);
   const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	return (

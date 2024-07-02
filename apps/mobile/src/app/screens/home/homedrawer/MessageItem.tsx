@@ -1,5 +1,6 @@
 import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
 import {
+  ActionEmitEvent,
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
@@ -30,7 +31,7 @@ import {
 import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
@@ -74,6 +75,8 @@ const arePropsEqual = (prevProps, nextProps) => {
 	return prevProps.message === nextProps.message;
 };
 
+const idUserAnonymous = "1767478432163172999";
+
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
@@ -101,6 +104,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.message));
 	const { deleteSendMessage } = useDeleteMessage({ channelId: props.channelId, mode: props.mode });
+  const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous,[message?.sender_id]);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const hasIncludeMention = useMemo(() => {
@@ -108,7 +112,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message, userLogin]);
 	const isCombine = !message.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
-  const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const videoRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const checkMessageTargetToMoved = useMemo(() => {
@@ -299,8 +304,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 			if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-				const urlSupported = await Linking.canOpenURL(urlVoice);
-				if (urlSupported) Linking.openURL(urlVoice);
+				await Linking.openURL(urlVoice);
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
@@ -323,6 +327,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const setMessageSelected = (type: EMessageBSToShow) => {
 		setOpenBottomSheet(type);
 	};
+
+  useEffect(()=>{
+    DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({isHiddenBottomSheet}) => {
+      isHiddenBottomSheet && setOpenBottomSheet(null);
+    })
+  },[])
 
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
@@ -365,16 +375,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								</View>
 							</View>
 						)}
-						<Text style={styles.repliedContentText} numberOfLines={1}>
-							{messageRefFetchFromServe?.content?.t?.trim()}
-						</Text>
+						<View style={styles.replyContentWrapper}>
+							<Text style={styles.replyDisplayName}>
+								{clanProfileSender?.nick_name || messageRefFetchFromServe?.user?.name || messageRefFetchFromServe?.user?.username || 'Anonymous'}
+							</Text>
+							{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, channelMember, true)}
+						</View>
 					</Pressable>
 				</View>
 			) : null}
 			{isMessageReplyDeleted ? (
 				<View style={styles.aboveMessageDeleteReply}>
 					<View style={styles.iconReply}>
-						<ReplyIcon width={34} height={30} />
+						<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
 					</View>
 					<View style={styles.iconMessageDeleteReply}>
 						<ReplyMessageDeleted width={18} height={9} />
@@ -422,7 +435,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							}}
 							style={styles.messageBoxTop}
 						>
-							<Text style={styles.userNameMessageBox}>{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || 'Anonymous'}</Text>
+							<Text style={styles.userNameMessageBox}>{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}</Text>
 							<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
 						</TouchableOpacity>
 					) : null}
@@ -452,6 +465,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					setOpenBottomSheet(null);
 				}}
 				user={foundUser}
+        checkAnonymous={checkAnonymous}
 			/>
 		</View>
 	);
