@@ -9,7 +9,8 @@
         "profile": "Profile",
         "newMessage": "New Message",
         "newGroup": "New Group",
-        "share": "Share"
+        "share": "Share",
+        "appearance": "Appearance"
     },
     "headerRight": {
         "addFriends": "Add Friends"

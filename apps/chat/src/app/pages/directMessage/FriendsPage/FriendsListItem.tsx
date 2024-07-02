@@ -40,10 +40,10 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	return (
 		<div className="border-t-[1px] dark:border-borderDefault border-gray-300">
 			<div
-				key={friend.user?.id}
+				key={friend.user?.id} onClick={() => directMessageWithUser(friend.user?.id ?? '')}
 				className=" py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-gray-800 hover:bg-white rounded-lg"
 			>
-				<div key={friend.user?.id}>
+				<div key={friend.user?.id} >
 					<MemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={friend?.user?.username ?? ''}
@@ -57,7 +57,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						positionType={MemberProfileType.LIST_FRIENDS}
 					/>
 				</div>
-				<div>
+				<div onClick={(e) => e.stopPropagation()}>
 					{friend.state === 0 && (
 						<div className="flex gap-3 items-center">
 							<button

@@ -7,5 +7,12 @@
     },
     "menuChannelStack": {
         "channelSetting": "Cài đặt Channel"
+    },
+    "settingStack": {
+        "settings": "Cài đặt",
+        "appearance": "Giao diện",
+        "appTheme": "Giao diện ứng dụng",
+        "language": "Ngôn ngữ",
+        "profile": "Hồ sơ"
     }
 }
