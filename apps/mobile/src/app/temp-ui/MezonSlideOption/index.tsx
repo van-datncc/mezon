@@ -1,0 +1,88 @@
+import { ScrollView, Text, View } from "react-native";
+import { style } from "./styles";
+import { useState } from "react";
+import { ReactNode } from "react";
+import { useTheme } from "@mezon/mobile-ui";
+import { useEffect } from "react";
+import { useRef } from "react";
+
+export interface IMezonSlideOptionsData {
+    element: ReactNode,
+    value: string | number;
+    title: string
+}
+
+interface IMezonSlideOption {
+    data: IMezonSlideOptionsData[]
+    onChange?: (value: number | string) => void;
+    height?: number,
+    width?: number
+    initialIndex: number
+}
+
+export default function MezonSlideOption({ data, onChange, height = 90, width = 65, initialIndex }: IMezonSlideOption) {
+    const [padding, setPadding] = useState(0);
+    const [index, setIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
+    const [title, setTitle] = useState<string>(data?.[initialIndex >= 0 ? initialIndex : 0].title);
+    const styles = style(useTheme().themeValue);
+    const ref = useRef<ScrollView>(null);
+
+    const handleLayout = (event) => {
+        const { x } = event.nativeEvent.layout;
+        setPadding(x);
+    };
+
+    const handleScroll = (event) => {
+        const { x } = event.nativeEvent.contentOffset;
+        const _index = Math.floor(x / 60);
+
+        if (index != _index) {
+            const finalIndex = _index >= 0 ? _index : 0;
+            setIndex(finalIndex);
+            setTitle(data[finalIndex].title);
+            onChange && onChange(data[finalIndex].value)
+        }
+    }
+
+    useEffect(() => {
+        const finalIndex = initialIndex >= 0 ? initialIndex : 0
+        ref?.current?.scrollTo({
+            x: finalIndex * width,
+            animated: false
+        })
+    }, [padding])
+
+    return (
+        <View>
+            <Text style={styles.title}>{title}</Text>
+            <View style={{ position: "relative" }}>
+                <View style={[styles.boxSelect]}>
+                    <View style={[styles.boxBorder, { height, width }]} onLayout={handleLayout}></View>
+                </View>
+
+                <ScrollView
+                    ref={ref}
+                    decelerationRate={"fast"}
+                    snapToAlignment={"start"}
+                    snapToInterval={width}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.selectListWrapper}
+                    scrollEventThrottle={50}
+                    onScroll={handleScroll}
+                    contentContainerStyle={[{
+                        paddingLeft: padding + 5,
+                        paddingRight: padding + 5
+                    }, styles.selectList]}
+                >
+                    {data.map((item, index) => (
+                        <View key={index.toString()}>
+                            {item.element}
+                        </View>
+                    ))}
+
+                </ScrollView>
+            </View>
+        </View>
+    )
+}

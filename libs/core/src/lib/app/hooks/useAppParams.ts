@@ -13,6 +13,6 @@ export function useAppParams() {
 			type,
 			currentURL: "",
 		}),
-		[clanId, channelId, directId, type, currentURL],
+		[clanId, channelId, directId, type],
 	);
 }

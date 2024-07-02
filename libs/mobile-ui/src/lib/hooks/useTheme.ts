@@ -1,34 +1,54 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Appearance } from "react-native"
 import { useSelector } from 'react-redux';
-import { selectTheme } from '@mezon/store';
+import { selectAllApp, selectTheme } from '@mezon/store';
 import { themeColors } from "../themes/Constants";
+import { appActions, useAppDispatch } from "@mezon/store-mobile";
 export enum ThemeModeBase {
     LIGHT = "light",
     DARK = "dark",
-    DARKER = "darker",
-    MIDNIGHT = "midnight",
+    // DARKER = "darker",
+    // MIDNIGHT = "midnight",
 }
 
 export enum ThemeModeAuto {
-    AUTO = "auto",
+    AUTO = "system",
 }
 
 export type ThemeMode = ThemeModeBase | ThemeModeAuto
 
 export function useTheme(themeMode?: ThemeMode) {
     const systemTheme = Appearance.getColorScheme() == "dark" ? ThemeModeBase.DARK : ThemeModeBase.LIGHT;
+    const dispatch = useAppDispatch();
     const appearanceTheme = useSelector(selectTheme);
 
-    const [theme, setTheme] = useState<ThemeModeBase>(
-        themeMode
-            ? themeMode == ThemeModeAuto.AUTO ? systemTheme : themeMode
-            : appearanceTheme == "system" ? systemTheme : ThemeModeBase.LIGHT
+    const setAppearanceTheme = useCallback(
+        (value: ThemeMode) => {
+            dispatch(appActions.setTheme(value));
+        },
+        [dispatch],
     );
 
-    useEffect(()=>{
-        !themeMode && setTheme(appearanceTheme == "system" ? systemTheme : ThemeModeBase.LIGHT)
-    },[appearanceTheme]);
+    // @ts-ignore
+    const [theme, setTheme] = useState<ThemeMode>(themeMode ? themeMode : appearanceTheme);
 
-    return themeColors[theme];
+    useEffect(() => {
+        // @ts-ignore
+        setTheme(themeMode ? themeMode : appearanceTheme)
+    }, [appearanceTheme, themeMode]);
+
+    return useMemo(
+        () => {
+            const themeBasicMode = themeMode
+                ? themeMode == ThemeModeAuto.AUTO ? systemTheme : themeMode
+                : appearanceTheme == "system" ? systemTheme : appearanceTheme;
+
+            return ({
+                themeValue: themeColors[themeBasicMode],
+                theme: theme,
+                setTheme: setAppearanceTheme
+            })
+        },
+        [setAppearanceTheme, theme]
+    );
 }

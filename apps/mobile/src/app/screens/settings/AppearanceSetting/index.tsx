@@ -4,23 +4,29 @@ import { style } from "./styles";
 import { useTheme } from "@mezon/mobile-ui";
 import { useMemo } from "react";
 import { IMezonMenuSectionProps, IMzoneOptionData, MezonMenu, MezonOption } from "../../../temp-ui";
+import { useTranslation } from "react-i18next";
 
 type AppearanceSettingScreen = typeof APP_SCREEN.SETTINGS.APPEARANCE;
 export default function AppearanceSetting({ navigation }: SettingScreenProps<AppearanceSettingScreen>) {
-    const styles = style(useTheme());
+    const styles = style(useTheme().themeValue);
+    const { t } = useTranslation(['appearanceSetting']);
 
     const menuTheme = useMemo(() => ([
         {
-
-            title: "a",
+            title: t('menu.theme.title'),
             items: [
                 {
-                    title: "a",
+                    title: t('menu.theme.theme'),
                     expandable: true,
+                    onPress: ()=>{
+                        navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+                            screen: APP_SCREEN.SETTINGS.APP_THEME
+                        })
+                    }
                 },
                 {
-                    title: "b",
-                    description: "b",
+                    title: t('menu.theme.syncAcrossClients.title'),
+                    description: t('menu.theme.syncAcrossClients.description'),
                 }
             ]
         }
@@ -28,10 +34,11 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 
     const menuSearch = useMemo(() => ([
         {
-            title: "",
+            title: t('menu.search.title'),
             items: [
                 {
-                    title: "",
+                    title: t('menu.search.showResultCount.title'),
+                    description: t('menu.search.showResultCount.description')
                 }
             ]
         }
@@ -39,15 +46,23 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
 
     const DMMessagePreviewOptions = useMemo(() => ([
         {
-            title: "",
+            title: t('fields.DMMessagePreview.AllMessages'),
             value: 0
-        }
+        },
+        {
+            title: t('fields.DMMessagePreview.UnreadDMOnly'),
+            value: 1
+        },
+        {
+            title: t('fields.DMMessagePreview.None'),
+            value: 2
+        },
     ]) as IMzoneOptionData, [])
 
     return (
         <View style={styles.container}>
             <MezonMenu menu={menuTheme} />
-            <MezonOption data={DMMessagePreviewOptions} title=""/>
+            <MezonOption data={DMMessagePreviewOptions} title={t('fields.DMMessagePreview.showResultCount.title')} />
             <MezonMenu menu={menuSearch} />
         </View>
     )

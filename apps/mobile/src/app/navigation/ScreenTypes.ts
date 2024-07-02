@@ -76,6 +76,7 @@ export const APP_SCREEN = {
     PROFILE: 'ROUTES.SETTINGS.PROFILE',
     SHARING: 'ROUTES.SETTINGS.SHARING',
     APPEARANCE: 'ROUTES.SETTINGS.APPEARANCE',
+    APP_THEME: 'ROUTES.SETTINGS.APP_THEME'
   }
 } as const;
 
@@ -149,6 +150,7 @@ type SettingStackParamList = {
   [APP_SCREEN.SETTINGS.LANGUAGE]: undefined;
   [APP_SCREEN.SETTINGS.PROFILE]: undefined;
   [APP_SCREEN.SETTINGS.APPEARANCE]: undefined;
+  [APP_SCREEN.SETTINGS.APP_THEME]: undefined
 }
 
 type AppStackParamList = {
