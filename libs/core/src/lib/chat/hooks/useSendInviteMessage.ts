@@ -1,18 +1,14 @@
-import {
-} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { ChannelStreamMode } from 'mezon-js';
 
 
 export function useSendInviteMessage() {
 	const { clientRef, sessionRef, socketRef } = useMezon();
-
 	const client = clientRef.current;
 
 	const sendInviteMessage = React.useCallback(
-		async (url: string, channel_id: string) => {
+		async (url: string, channel_id: string, channelMode: number) => {
             const content: IMessageSendPayload = {
                 t: url
               };
@@ -25,7 +21,7 @@ export function useSendInviteMessage() {
 				throw new Error('Client is not initialized');
 			}
 			
-			await socket.writeChatMessage('DM', channel_id, ChannelStreamMode.STREAM_MODE_DM, content, [], [], []);
+			await socket.writeChatMessage('DM', channel_id, channelMode, content, [], [], []);
 		},
 		[sessionRef, clientRef, socketRef],
 	);
