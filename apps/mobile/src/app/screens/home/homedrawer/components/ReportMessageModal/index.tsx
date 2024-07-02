@@ -1,22 +1,29 @@
 import { IMessageWithUser } from "@mezon/utils";
-import { MezonModal } from "apps/mobile/src/app/temp-ui";
+import { MezonModal } from "../../../../../../app/temp-ui";
 import { memo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 import MessageItem from "../../MessageItem";
+import { ChannelStreamMode } from "mezon-js";
 
 interface IReportMessageModalProps {
     isVisible: boolean;
-    onVisibleChange: (value: boolean) => void;
+    onClose: () => void;
 	message: IMessageWithUser;
 }
-
+//TODO: update later, call api
 export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
-    const { isVisible, onVisibleChange, message } = props;
+    const { isVisible, onClose, message } = props;
     const [visibleBackButton, setVisibleBackButton] = useState(true);
 
     const onBack = () => {
         console.log('back!', message);
+    }
+
+    const onVisibleChange = (value: boolean) => {
+        if (!value) {
+            onClose();
+        }
     }
 
     return (
@@ -28,20 +35,21 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
             visibleChange={onVisibleChange}
         >
             <View style={styles.reportMessageModalContainer}>
-                <View>
-                    <Text>Report message</Text>
-                    <Text>sub description</Text>
-                </View>
+                <View style={styles.contentWrapper}>
+                    <View>
+                        <Text>Report message</Text>
+                        <Text>sub description</Text>
+                    </View>
 
-                <View>
-                    <Text>Selected message</Text>
-                    {/* <MessageItem
-                        messageId={valueThread?.id}
-                        mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-                        channelId={currentChannel.channel_id}
-                        channelLabel={currentChannel?.channel_label}
-                        isNumberOfLine={true}
-                    /> */}
+                    <Text style={styles.selectedMessageText}>Selected message</Text>
+                    <View style={styles.messageBox}>
+                        <MessageItem
+                            messageId={message.id}
+                            channelId={message.channel_id}
+                            mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+                            showUserInformation
+                        />
+                    </View>
                 </View>
 
                 <TouchableOpacity style={styles.cancelButtonWrapper} onPress={() => onVisibleChange(false)}>

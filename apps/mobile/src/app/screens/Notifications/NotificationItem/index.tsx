@@ -83,7 +83,6 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 										message={data}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={data?.channel_id}
-										channelLabel={data?.channel_label}
 									/>
 						</View>
 					</View>
