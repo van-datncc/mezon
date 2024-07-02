@@ -15,7 +15,7 @@ import { MutableRefObject } from "react";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useAuth, useClans } from "@mezon/core";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { BellIcon, BoostTier2Icon, GroupPlusIcon, SettingsIcon } from "libs/mobile-components/src/lib/icons2";
+import { Icons } from "@mezon/mobile-components";
 import { baseColor, useTheme } from "@mezon/mobile-ui";
 
 interface IServerMenuProps {
@@ -163,22 +163,22 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                     horizontal>
                     <MezonButtonIcon
                         title={`18 ${t("actions.boot")}`}
-                        icon={<BoostTier2Icon color={baseColor.purple} />}
+                        icon={<Icons.BoostTier2Icon color={baseColor.purple} />}
                         onPress={() => reserve()}
                     />
                     <MezonButtonIcon
                         title={t("actions.invite")}
-                        icon={<GroupPlusIcon color={themeValue.textStrong} />}
+                        icon={<Icons.GroupPlusIcon color={themeValue.textStrong} />}
                         onPress={handleOpenInvite} />
                     <MezonButtonIcon
                         title={t("actions.notifications")}
-                        icon={<BellIcon color={themeValue.textStrong} />}
+                        icon={<Icons.BellIcon color={themeValue.textStrong} />}
                         onPress={() => reserve()} />
 
                     {user.userId === clan.creator_id &&
                         <MezonButtonIcon
                             title={t("actions.settings")}
-                            icon={<SettingsIcon color={themeValue.textStrong} />}
+                            icon={<Icons.SettingsIcon color={themeValue.textStrong} />}
                             onPress={handleOpenSettings}
                         />
                     }

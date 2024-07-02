@@ -157,6 +157,7 @@ function MessageWithUser({
 												isError={message.isError}
 											/>
 										)}
+										{isEditing && editor}
 									</div>
 								</div>
 							</div>

@@ -1,4 +1,4 @@
-import { LogoutIcon, NittroIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
@@ -9,11 +9,6 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
 import MezonMenuItem from '../../temp-ui/MezonMenuItem';
-import {
-	AccessibilityIcon, BoostTier2Icon, BrandDiscordIcon, ClipIcon, FriendIcon, GiftIcon, GlobeEarthIcon, GroupIcon, ImageTextIcon, KeyIcon, LanguageIcon, LaptopPhoneIcon, MicrophoneIcon, NitroWheelIcon, PaintPaletteIcon, PuzzlePieceIcon, QRCodeCameraIcon, SettingsIcon, ShieldIcon, UserCircleIcon, BellIcon, CircleQuestionIcon, CircleInformationIcon, DoorExitIcon
-}
-	// @ts-ignore
-	from 'libs/mobile-components/src/lib/icons2';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t, i18n } = useTranslation(['setting']);
@@ -49,61 +44,61 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.getNitro'),
-			icon: <NitroWheelIcon color={themeValue.textStrong} />,
+			icon: <Icons.NitroWheelIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <UserCircleIcon color={themeValue.textStrong} />,
+			icon: <Icons.UserCircleIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.privacySafety'),
-			icon: <ShieldIcon color={themeValue.textStrong} />,
+			icon: <Icons.ShieldIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.familyCenter'),
-			icon: <GroupIcon color={themeValue.textStrong} />,
+			icon: <Icons.GroupIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.authorizedApp'),
-			icon: <KeyIcon color={themeValue.textStrong} />,
+			icon: <Icons.KeyIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.device'),
-			icon: <LaptopPhoneIcon color={themeValue.textStrong} />,
+			icon: <Icons.LaptopPhoneIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.connection'),
-			icon: <PuzzlePieceIcon color={themeValue.textStrong} />,
+			icon: <Icons.PuzzlePieceIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.clip'),
-			icon: <ClipIcon color={themeValue.textStrong} />,
+			icon: <Icons.ClipIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.friendRequests'),
-			icon: <FriendIcon color={themeValue.textStrong} />,
+			icon: <Icons.FriendIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
-			icon: <QRCodeCameraIcon color={themeValue.textStrong} />,
+			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong}/>,
 		},
 	]
 
@@ -112,19 +107,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.serverBoost'),
-			icon: <BoostTier2Icon color={themeValue.textStrong} />,
+			icon: <Icons.BoostTier2Icon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.nitroGift'),
-			icon: <GiftIcon color={themeValue.textStrong} />,
+			icon: <Icons.GiftIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.restoreSubscription'),
-			icon: <NitroWheelIcon color={themeValue.textStrong} />,
+			icon: <Icons.NitroWheelIcon color={themeValue.textStrong}/>,
 		},
 	]
 
@@ -133,7 +128,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.voice'),
-			icon: <MicrophoneIcon color={themeValue.textStrong} />,
+			icon: <Icons.MicrophoneIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => {
@@ -143,13 +138,13 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			},
 			expandable: true,
 			title: t('appSettings.appearance'),
-			icon: <PaintPaletteIcon color={themeValue.textStrong} />,
+			icon: <Icons.PaintPaletteIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.accessibility'),
-			icon: <AccessibilityIcon color={themeValue.textStrong} />,
+			icon: <Icons.AccessibilityIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => {
@@ -160,37 +155,37 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('appSettings.language'),
 			expandable: true,
 			previewValue: i18n.language,
-			icon: <LanguageIcon color={themeValue.textStrong} />,
+			icon: <Icons.LanguageIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.chat'),
-			icon: <ImageTextIcon color={themeValue.textStrong} />,
+			icon: <Icons.ImageTextIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.webBrowser'),
-			icon: <GlobeEarthIcon color={themeValue.textStrong} />,
+			icon: <Icons.GlobeEarthIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.notifications'),
-			icon: <BellIcon color={themeValue.textStrong} />,
+			icon: <Icons.BellIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.appIcon'),
-			icon: <BrandDiscordIcon color={themeValue.textStrong} />,
+			icon: <Icons.BrandDiscordIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.advanced'),
-			icon: <SettingsIcon color={themeValue.textStrong} />,
+			icon: <Icons.SettingsIcon color={themeValue.textStrong}/>,
 		},
 	]
 
@@ -199,19 +194,19 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.support'),
-			icon: <CircleQuestionIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleQuestionIcon color={themeValue.textStrong}/>,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.uploadLog'),
-			icon: <CircleInformationIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.acknowledgement'),
-			icon: <CircleInformationIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong}/>,
 		},
 	]
 
@@ -220,7 +215,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
-			icon: <CircleInformationIcon color={themeValue.textStrong} />,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong}/>,
 		},
 	]
 
@@ -258,7 +253,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				onPress={() => confirmLogout()}
 				title={t('logOut')}
 				textStyle={{ color: baseColor.red }}
-				icon={<DoorExitIcon color={baseColor.red} />}
+				icon={<Icons.DoorExitIcon color={baseColor.red} />}
 			/>
 		</ScrollView>
 	);
