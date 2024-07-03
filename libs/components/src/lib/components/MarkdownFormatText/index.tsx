@@ -126,7 +126,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 							) : isEmojiSyntax ? (
 								<>
 									{' '}
-									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />{' '}
+									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />
 								</>
 							) : (
 								tagName
