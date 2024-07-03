@@ -1,9 +1,12 @@
 import { AppleIcon, GoogleIcon } from '@mezon/mobile-components';
-import { Block, size } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { style } from './styles';
 
 const LoginSocial = ({ onGoogleButtonPress, onAppleButtonPress }: any) => {
+	const styles = style(useTheme().themeValue);
+
 	return (
 		<Block gap={size.s_20}>
 			{Platform.OS === 'ios' && (
@@ -26,44 +29,3 @@ const LoginSocial = ({ onGoogleButtonPress, onAppleButtonPress }: any) => {
 
 export default LoginSocial;
 
-const styles = StyleSheet.create({
-	googleButton: {
-		backgroundColor: '#f3f6fc',
-		paddingVertical: 15,
-		marginHorizontal: 20,
-		borderRadius: 4,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	appleButton: {
-		backgroundColor: 'black',
-		paddingVertical: 15,
-		marginHorizontal: 20,
-		borderRadius: 4,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	socialButtonsContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		width: '100%',
-		gap: 10,
-	},
-	signinButtonLogoContainer: {
-		backgroundColor: '#155EEF',
-		padding: 2,
-		borderRadius: 3,
-		position: 'absolute',
-		left: 25,
-	},
-	signinButtonLogo: {
-		height: 18,
-		width: 18,
-	},
-	socialSigninButtonText: {
-		color: '#155EEF',
-		fontSize: 16,
-		lineHeight: 13 * 1.4,
-	},
-});

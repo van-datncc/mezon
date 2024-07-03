@@ -15,13 +15,17 @@ export type Attributes = {
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
 
-export const baseColor = {
+export const baseColor: Colors = {
     blurple: "#5e65de",
     white: "#ffffff",
     black: "#000000",
     red: "#e67b7c",
-    purple: "#fc74fc"
+    purple: "#fc74fc",
 } satisfies Colors;
+
+export const brandColors: Colors = {
+    google: '#155EEF'
+}
 
 export const themeColors: ThemeColor = {
     dark: {

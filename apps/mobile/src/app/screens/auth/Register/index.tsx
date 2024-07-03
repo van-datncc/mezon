@@ -1,14 +1,15 @@
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React from 'react';
 import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
-import Button from '../../components/auth/Button';
-import FooterAuth from '../../components/auth/FooterAuth';
-import TextInputUser from '../../components/auth/TextInput';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import Button from '../../../components/auth/Button';
+import FooterAuth from '../../../components/auth/FooterAuth';
+import TextInputUser from '../../../components/auth/TextInput';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { style } from './styles';
 
 const RegisterSchema = Yup.object().shape({
 	FullName: Yup.string().min(2, 'Too Short!').required('Required'),
@@ -25,7 +26,9 @@ const RegisterSchema = Yup.object().shape({
 		.required('Please enter your mobile number'),
 });
 const RegisterScreen = () => {
+	const styles = style(useTheme().themeValue)
 	const navigation = useNavigation();
+
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
 			<KeyboardAvoidingView style={styles.container}>
@@ -120,90 +123,3 @@ const RegisterScreen = () => {
 };
 
 export default RegisterScreen;
-
-const styles = StyleSheet.create({
-	InputText: {
-		fontSize: 18,
-		textAlignVertical: 'center',
-		padding: 0,
-		color: '#FFFFFF',
-		flex: 1,
-	},
-	container: {
-		flex: 1,
-		backgroundColor: Colors.secondary,
-		justifyContent: 'center',
-	},
-	headerContainer: {
-		alignItems: 'center',
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-	},
-	headerTitle: {
-		fontSize: 38,
-		textAlign: 'center',
-		color: '#FFFFFF',
-	},
-	headerContent: {
-		fontSize: 16,
-		lineHeight: 20 * 1.4,
-		textAlign: 'center',
-		color: '#CCCCCC',
-	},
-	googleButton: {
-		backgroundColor: '#D1E0FF',
-		paddingVertical: 15,
-		marginHorizontal: 20,
-		borderRadius: 8,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	socialButtonsContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		width: '100%',
-	},
-	signinButtonLogoContainer: {
-		backgroundColor: '#155EEF',
-		padding: 2,
-		borderRadius: 3,
-		position: 'absolute',
-		left: 25,
-	},
-	signinButtonLogo: {
-		height: 18,
-		width: 18,
-	},
-	socialSigninButtonText: {
-		color: '#155EEF',
-		fontSize: 16,
-		lineHeight: 13 * 1.4,
-	},
-	orText: {
-		fontSize: 15,
-		lineHeight: 15 * 1.4,
-		color: '#AEAEAE',
-		marginLeft: 5,
-		alignSelf: 'center',
-	},
-
-	signupContainer: {
-		marginHorizontal: 20,
-		justifyContent: 'center',
-		paddingVertical: 20,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	accountText: {
-		fontSize: 15,
-		lineHeight: 13 * 1.4,
-		color: '#CCCCCC',
-	},
-	signupText: {
-		fontSize: 15,
-		lineHeight: 13 * 1.4,
-		color: '#84ADFF',
-		marginLeft: 5,
-	},
-});
