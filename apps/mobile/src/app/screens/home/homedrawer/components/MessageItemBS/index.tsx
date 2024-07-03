@@ -55,6 +55,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message?.channel_id));
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isDM = useMemo(() => {
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
+	}, [mode])
 
 	const handleActionReply = () => {
 		onClose();
@@ -232,18 +235,20 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		const listOfActionOnlyMyMessage = [
 			EMessageActionType.EditMessage,
 			EMessageActionType.DeleteMessage,
-			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 		];
 		const listOfActionOnlyOtherMessage = [
 			EMessageActionType.Report,
+		];
+		const listOfActionShouldHide = [
 			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
+			isDM && EMessageActionType.CreateThread
 		];
 		if (isMyMessage) {
-			return getMessageActions(t).filter((action) => !listOfActionOnlyOtherMessage.includes(action.type));
+			return getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage,...listOfActionShouldHide].includes(action.type));
 		}
 
-		return getMessageActions(t).filter((action) => !listOfActionOnlyMyMessage.includes(action.type));
-	}, [t, userProfile, message, listPinMessages]);
+		return getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage,...listOfActionShouldHide].includes(action.type));
+	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
 		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
