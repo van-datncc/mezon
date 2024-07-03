@@ -1,12 +1,12 @@
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, size, verticalScale } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	clansBox: {
 		width: 250,
 		maxHeight: 300,
 		borderRadius: 10,
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.primary,
 	},
 	serverItem: {
 		flexDirection: 'row',
@@ -15,6 +15,8 @@ export const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: size.s_6,
 		marginBottom: size.s_4,
+		borderWidth: 1,
+		borderColor: colors.border,
 	},
 	serverName: {
 		flexDirection: 'row',
@@ -28,7 +30,7 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: colors.secondary,
 	},
 	createClan: {
 		width: '100%',
@@ -37,13 +39,16 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: size.s_10,
-		borderRadius: 8,
+		borderRadius: 8
 	},
 	clanName: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: size.label,
 		fontWeight: '600',
 		maxWidth: 150,
 	},
-  clanIcon: {width: verticalScale(45), height: verticalScale(45)}
+	clanIcon: {
+		width: verticalScale(45),
+		height: verticalScale(45)
+	}
 });

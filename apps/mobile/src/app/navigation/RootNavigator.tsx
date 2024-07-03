@@ -28,7 +28,6 @@ import SplashScreen from '../components/SplashScreen';
 const RootStack = createStackNavigator();
 
 const NavigationMain = () => {
-	const { themeBasic, themeValue } = useTheme();
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const [isLoadingSplashScreen, setIsLoadingSplashScreen] = useAnimatedState(true);

@@ -7,7 +7,7 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	categoriesActions,
@@ -18,7 +18,7 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
 	selectIsFromFCMMobile,
-  useAppDispatch,
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -26,20 +26,22 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
-import EventViewer from '../../../components/Event';
-import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonBottomSheet } from '../../../temp-ui';
-import { ChannelListContext, ChannelListSection } from './Reusables';
-import { InviteToChannel } from './components';
-import CategoryMenu from './components/CategoryMenu';
-import ChannelListHeader from './components/ChannelList/ChannelListHeader';
-import ClanMenu from './components/ClanMenu/ClanMenu';
-import { styles } from './styles';
-import { darkColor } from '../../../constants/Colors';
-import ChannelMenu from './components/ChannelMenu';
+import EventViewer from '../../../../components/Event';
+import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
+import { MezonBottomSheet } from '../../../../temp-ui';
+import { ChannelListContext, ChannelListSection } from '../Reusables';
+import { InviteToChannel } from '../components';
+import CategoryMenu from '../components/CategoryMenu';
+import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
+import ClanMenu from '../components/ClanMenu/ClanMenu';
+import ChannelMenu from '../components/ChannelMenu';
 import { Icons } from "@mezon/mobile-components"
+import { style } from './styles';
+import MezonSearch from 'apps/mobile/src/app/temp-ui/MezonSearch';
 
 const ChannelList = React.memo((props: any) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue)
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
@@ -115,8 +117,8 @@ const ChannelList = React.memo((props: any) => {
 		setIsUnKnownChannel(!channel?.channel_id)
 	}
 
-  function handleOnPressSortChannel(channel: IChannel) {
-		dispatch(categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id], categoryId : channel?.category_id}));
+	function handleOnPressSortChannel(channel: IChannel) {
+		dispatch(categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id], categoryId: channel?.category_id }));
 	}
 
 	function handlePressEventCreate() {
@@ -126,13 +128,11 @@ const ChannelList = React.memo((props: any) => {
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
-			<View style={[styles.mainList, { backgroundColor: Colors.secondary }]}>
+			<View style={styles.mainList}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
+
 				<View style={styles.channelListSearch}>
-					<View style={styles.channelListSearchWrapperInput}>
-						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
-						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
-					</View>
+					<MezonSearch hasBackground />
 					<Pressable
 						style={styles.inviteIconWrapper}
 						onPress={
@@ -142,19 +142,21 @@ const ChannelList = React.memo((props: any) => {
 							}
 						}
 					>
-						<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
+						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
 					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
+
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
 						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
-						<Icons.CalendarIcon height={20} width={20} />
-						<Text style={{ color: 'white' }}>{`${allEventManagement?.length} Events`}</Text>
+						<Icons.CalendarIcon height={20} width={20} color={themeValue.text} />
+						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
+				
 				<FlatList
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}
@@ -165,7 +167,7 @@ const ChannelList = React.memo((props: any) => {
 							onPressHeader={toggleCollapseChannel}
 							onLongPressCategory={(category) => handleLongPressCategory(category)}
 							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
-              onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
+							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
 							collapseItems={collapseChannelItems}
 						/>
 					)}

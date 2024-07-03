@@ -218,7 +218,7 @@ export const styles = StyleSheet.create({
 	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
-		fontSize: size.s_24,
+		fontSize: size.s_22,
 		fontWeight: '600',
 	},
 	homeDefaultHeader: {
