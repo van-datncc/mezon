@@ -1,70 +1,34 @@
-import { Colors, Metrics } from '@mezon/mobile-ui';
+import { Colors, size, verticalScale } from '@mezon/mobile-ui';
 import React from 'react';
-import { Animated, Easing, Keyboard, StyleSheet, View } from 'react-native';
-import LogoMezon from '../../../assets/svg/logoMezon.svg';
+import { StyleSheet, View } from 'react-native';
+import { Flow } from 'react-native-animated-spinkit';
 
 const SplashScreen = () => {
-	const rotation = React.useRef(new Animated.Value(0)).current;
-	const bounceValue = React.useRef(new Animated.Value(1)).current;
-
-	React.useEffect(() => {
-		Keyboard.dismiss();
-		const rotationAnimation = Animated.loop(
-			Animated.timing(rotation, {
-				toValue: 1,
-				duration: 2000,
-				easing: Easing.linear,
-				useNativeDriver: true,
-			}),
-		);
-
-		const bounceAnimation = Animated.loop(
-			Animated.sequence([
-				Animated.timing(bounceValue, {
-					toValue: 1.2,
-					duration: 1500,
-					easing: Easing.bounce,
-					useNativeDriver: true,
-				}),
-				Animated.timing(bounceValue, {
-					toValue: 1,
-					duration: 1500,
-					easing: Easing.bounce,
-					useNativeDriver: true,
-				}),
-			]),
-		);
-
-		rotationAnimation.start();
-		bounceAnimation.start();
-
-		return () => {
-			rotationAnimation.stop();
-			bounceAnimation.stop();
-		};
-	}, []);
-	const spin = rotation.interpolate({
-		inputRange: [0, 1],
-		outputRange: ['0deg', '360deg'],
-	});
-
 	return (
-		<View style={styles.container}>
-			<Animated.View style={{ transform: [{ rotate: spin }, { scale: bounceValue }] }}>
-				<LogoMezon width={90} height={90} />
-			</Animated.View>
+		<View style={styles.centeredView}>
+			<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		width: Metrics.screenWidth,
-		height: Metrics.screenHeight,
+	centeredView: {
+		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: Colors.secondary,
-		zIndex: 1000,
+		backgroundColor: 'rgba(0,0,0,0.7)',
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		width: '100%',
+		height: '100%',
+	},
+	modalView: {
+		backgroundColor: Colors.black,
+		borderRadius: verticalScale(20),
+		padding: verticalScale(20),
+		alignItems: 'center',
+		elevation: 5,
 	},
 });
 

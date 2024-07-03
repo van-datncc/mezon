@@ -98,7 +98,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
-	const [isMessageReplyDeleted, setIsMessageReplyDeleted] = useState<boolean>(false);
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
 	const emojiListPNG = useSelector(selectEmojiImage);
@@ -141,8 +140,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return { videos, images, documents };
 	};
 
-	useEffect(() => {
-		setIsMessageReplyDeleted(!messageRefFetchFromServe && message?.references && message?.references?.length);
+	const isMessageReplyDeleted = useMemo(() => {
+		return !messageRefFetchFromServe && message?.references && message?.references?.length;
 	}, [messageRefFetchFromServe, message.references]);
 
 	useEffect(() => {
