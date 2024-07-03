@@ -1,4 +1,4 @@
-import { useAuth, useClans, useDeleteMessage } from '@mezon/core';
+import { useAuth, useClans } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	FileIcon,
@@ -28,15 +28,15 @@ import {
 	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { EmojiDataOptionals, IChannelMember, IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
-import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
+import { IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { isImage, isVideo, linkGoogleMeet } from '../../../utils/helpers';
-import { MessageAction, MessageItemBS } from './components';
+import { MessageAction } from './components';
 import { renderTextContent } from './constants';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { styles } from './styles';
@@ -44,33 +44,31 @@ import { styles } from './styles';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { isEmpty } from 'lodash';
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { Swipeable } from 'react-native-gesture-handler';
-import { IMessageActionNeedToResolve } from './types';
+import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
 const widthMedia = Metrics.screenWidth - 150;
+
 export type MessageItemProps = {
 	message?: IMessageWithUser;
 	messageId?: string;
-	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
-	newMessage?: string;
-	child?: JSX.Element;
-	isMention?: boolean;
-	channelLabel?: string;
 	channelId?: string;
-	dataReactionCombine?: EmojiDataOptionals[];
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClan?: ClansEntity;
 	clansProfile?:  UserClanProfileEntity[];
 	channelMember?: ChannelMembersEntity[];
+	onMessageAction?: (payload: IMessageActionPayload) => void;
+	setIsOnlyEmojiPicker?: (value: boolean) => void;
+	showUserInformation?: boolean;
+	preventAction?: boolean
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -80,22 +78,19 @@ const arePropsEqual = (prevProps, nextProps) => {
 const idUserAnonymous = "1767478432163172999";
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage } = props;
+	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false, preventAction = false } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message = useMemo(() => {
 		return props?.message ? props?.message : selectedMessage;
 	}, [props?.message, selectedMessage]);
 	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
-	const [foundUser, setFoundUser] = useState<ApiUser | null>(null);
 	const { attachments, lines } = useMessageParser(message);
 	const user = useSelector(selectMemberByUserId(message?.sender_id));
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
-	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
-	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
@@ -104,7 +99,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.messageId));
-	const { deleteSendMessage } = useDeleteMessage({ channelId: props.channelId, mode: props.mode });
   const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous,[message?.sender_id]);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
@@ -275,14 +269,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
 				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username );
-				clanUser && setFoundUser(clanUser?.user);
 				if (!mentionedUser) return;
-				setMessageSelected(EMessageBSToShow.UserInformation);
+				onMessageAction({
+					type: EMessageBSToShow.UserInformation,
+					user: clanUser?.user
+				})
 			} catch (error) {
 				console.log('error', error);
 			}
 		},
-		[usersClan, setFoundUser],
+		[usersClan, onMessageAction],
 	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
@@ -317,24 +313,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	}, []);
 
-	const onConfirmDeleteMessage = () => {
-		deleteSendMessage(message.id);
-	};
-
 	const handleJumpToMessage = (messageId: string) => {
 		dispatch(referencesActions.setIdMessageToJump(messageId));
 		jumpToRepliedMessage(messageRefFetchFromServe?.id);
 	}
-
-	const setMessageSelected = (type: EMessageBSToShow) => {
-		setOpenBottomSheet(type);
-	};
-
-  useEffect(()=>{
-    DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({isHiddenBottomSheet}) => {
-      isHiddenBottomSheet && setOpenBottomSheet(null);
-    })
-  },[])
 
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
@@ -363,6 +345,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const handleSwipeableOpen = (direction: "left" | "right") => {
+		if (preventAction && swipeableRef.current) {
+			swipeableRef.current.close();
+		}
 		if (direction === 'right') {
 			swipeableRef.current?.close();
 			const payload: IMessageActionNeedToResolve = {
@@ -402,7 +387,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							<View style={styles.iconReply}>
 								<ReplyIcon width={34} height={30} />
 							</View>
-							<Pressable onPress={() => handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
+							<Pressable onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
 								{repliedSender?.user?.avatar_url ? (
 									<View style={styles.replyAvatar}>
 										<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
@@ -435,12 +420,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						</View>
 					) : null}
 					<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-						{isShowInfoUser ? (
+						{isShowInfoUser || showUserInformation ? (
 							<Pressable
 								onPress={() => {
+									if (preventAction) return;
 									setIsOnlyEmojiPicker(false);
-									setMessageSelected(EMessageBSToShow.UserInformation);
-									setFoundUser(user?.user);
+									onMessageAction({
+										type: EMessageBSToShow.UserInformation,
+										user: user?.user
+									})
 								}}
 								style={styles.wrapperAvatar}
 							>
@@ -459,18 +447,26 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						<Pressable
 							style={[styles.rowMessageBox]}
 							onLongPress={() => {
+								if (preventAction) return;
 								setIsOnlyEmojiPicker(false);
-								setMessageSelected(EMessageBSToShow.MessageAction);
+								onMessageAction({
+									type: EMessageBSToShow.MessageAction,
+									senderDisplayName,
+									message
+								})
 								dispatch(setSelectedMessage(message));
 							}}
 						>
-							{isShowInfoUser ? (
+							{isShowInfoUser || showUserInformation ? (
 								<TouchableOpacity
 									activeOpacity={0.8}
 									onPress={() => {
+										if (preventAction) return;
 										setIsOnlyEmojiPicker(false);
-										setMessageSelected(EMessageBSToShow.UserInformation);
-										setFoundUser(user?.user);
+										onMessageAction({
+											type: EMessageBSToShow.UserInformation,
+											user: user?.user
+										})
 									}}
 									style={styles.messageBoxTop}
 								>
@@ -487,26 +483,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								message={message}
 								mode={mode}
 								emojiListPNG={emojiListPNG}
+								preventAction={preventAction}
 								openEmojiPicker={() => {
 									setIsOnlyEmojiPicker(true);
-									setMessageSelected(EMessageBSToShow.MessageAction);
+									onMessageAction({
+										type: EMessageBSToShow.MessageAction,
+										senderDisplayName,
+										message
+									})
 								}}
 							/>
 						</Pressable>
 					</View>
-					<MessageItemBS
-						mode={mode}
-						message={message}
-						onConfirmDeleteMessage={onConfirmDeleteMessage}
-						type={openBottomSheet}
-						isOnlyEmojiPicker={isOnlyEmojiPicker}
-						onClose={() => {
-							setOpenBottomSheet(null);
-						}}
-						user={foundUser}
-						checkAnonymous={checkAnonymous}
-						senderDisplayName={senderDisplayName}
-					/>
 			</View>
 		</Swipeable>
 	);
