@@ -33,22 +33,30 @@ type EmojiData = {
 };
 
 const convertToPlainTextHashtag = (text: string) => {
-	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
-	const result = text.replace(regex, (match, symbol, p1, p2) => {
-		return symbol === '#' ? `<#${p2}>` : `@${p1}`;
-	});
-	return result;
+    const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
+    const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
+        if (atSymbol) {
+            return `@${atUsername}`;
+        } else {
+            return `<#${hashId}>`;
+        }
+    });
+    return result;
 };
 
 const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
-	const regex = /<#[0-9]{19}\b>/g;
-	const replacedText = text.replace(regex, (match) => {
+	const channelRegex = /<#[0-9]{19}\b>/g;
+	const replacedText = text.replace(channelRegex, (match) => {
 		const channelId = match.substring(2, match.length - 1);
 		const channel = listInput.find((item) => item.id === channelId);
 		return channel ? `#[${channel.display}](${channelId})` : match;
 	});
 
-	return replacedText;
+	const usernameRegex = /@([\w.]+)/g;
+	const finalText = replacedText.replace(usernameRegex, (match, p1) => {
+		return `@[${p1}]`;
+	});
+	return finalText;
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
@@ -164,6 +172,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 				>
 					<Mention
+						markup="@[__display__]"
 						appendSpaceOnAdd={true}
 						data={mentionList ?? []}
 						trigger="@"
