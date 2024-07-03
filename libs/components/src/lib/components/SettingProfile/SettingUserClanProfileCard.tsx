@@ -49,9 +49,6 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 						<p className="font-bold tracking-wider text-xl one-line">{profiles.displayName}</p>
 						<p className="font-medium tracking-wide text-sm">{userProfile?.user?.username}</p>
 					</div>
-					<div className="w-full items-center">
-						<button className="w-full h-[32px] dark:bg-buttonProfile bg-[#a9a9a9] rounded font-medium tracking-wide">Example button</button>
-					</div>
 				</div>
 			</div>
 		</div>

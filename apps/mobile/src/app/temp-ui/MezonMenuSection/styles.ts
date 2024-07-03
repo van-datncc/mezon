@@ -1,13 +1,13 @@
 import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const style = ({ secondary, text }: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     sectionWrapper: {
         marginBottom: Metrics.size.xl,
     },
 
     sectionTitle: {
-        color: text,
+        color: colors.text,
         fontSize: Fonts.size.h8,
         fontWeight: '600',
         marginBottom: Fonts.size.s_10
@@ -20,7 +20,7 @@ export const style = ({ secondary, text }: Attributes) => StyleSheet.create({
 
     section: {
         marginBottom: Metrics.size.m,
-        backgroundColor: secondary,
+        backgroundColor: colors.secondary,
         borderRadius: 10,
         overflow: 'hidden',
     },

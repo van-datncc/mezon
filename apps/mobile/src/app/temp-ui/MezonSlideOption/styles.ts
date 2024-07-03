@@ -1,7 +1,7 @@
 import { Attributes, baseColor } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const style = ({ text }: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     boxBorder: {
         borderRadius: 15,
         backgroundColor: "transparent",
@@ -30,6 +30,6 @@ export const style = ({ text }: Attributes) => StyleSheet.create({
     },
 
     title: {
-        color: text
+        color: colors.text
     }
 });

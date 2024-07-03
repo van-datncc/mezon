@@ -2,7 +2,7 @@ import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { DirectEntity, UsersClanEntity } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 
 type ItemPorp = {
 	url: string;
@@ -20,7 +20,14 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			sendInviteMessage(url, response.channel_id);
+			var channelMode = 0
+			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
+				channelMode = ChannelStreamMode.STREAM_MODE_DM
+			}
+			if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
+				channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+			}
+			sendInviteMessage(url, response.channel_id, channelMode);
 		}
 	};
 
@@ -30,7 +37,14 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			directMessageWithUser(userId);
 		}
 		if (directParamId && dmGroup) {
-			sendInviteMessage(url, directParamId);
+			var channelMode = 0
+			if (type === ChannelType.CHANNEL_TYPE_DM) {
+				channelMode = ChannelStreamMode.STREAM_MODE_DM
+			}
+			if (type === ChannelType.CHANNEL_TYPE_GROUP) {
+				channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+			}
+			sendInviteMessage(url, directParamId, channelMode);
 			onSend(dmGroup);
 		}
 	};

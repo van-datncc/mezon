@@ -1,13 +1,14 @@
 import { useAuth, useFriends } from '@mezon/core';
-import { selectAddFriends, selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
+import { directMessageValueProps } from '../DmList/DMListItem';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
-import { string } from 'yup';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { ChannelType } from 'mezon-js';
 import PanelGroupDM from './PanelGroupDm';
@@ -19,9 +20,10 @@ type PanelMemberProps = {
 	onRemoveMember: () => void;
 	directMessageValue?: directMessageValueProps;
 	name?: string;
+	isMemberDMGroup: boolean;
 };
 
-const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember }: PanelMemberProps) => {
+const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -38,10 +40,12 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 		onRemoveMember();
 	};
 
-	const checkAddFriend = useSelector(selectAddFriends(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
-	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id,[currentChannel?.creator_id, userProfile?.user?.id]);
-	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id,[member?.user?.id, userProfile?.user?.id]);
-	const {deleteFriend, addFriend} = useFriends();
+	const checkAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
+	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
+	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id, [member?.user?.id, userProfile?.user?.id]);
+	const checkDm = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM, [directMessageValue?.type]);
+	const checkDmGroup = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP, [directMessageValue?.type]);
+	const { deleteFriend, addFriend } = useFriends();
 
 	return (
 		<div
@@ -54,56 +58,111 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 				top: positionTop ? 'auto' : coords.mouseY,
 			}}
 			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary shadow z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-slate-700 rounded"
-			onClick={(e) => {e.stopPropagation(); onClose()}}
+			onClick={(e) => {
+				e.stopPropagation();
+				onClose();
+			}}
 		>
-			{(directMessageValue && Number(directMessageValue.type) === ChannelType.CHANNEL_TYPE_GROUP) ? 
+			{directMessageValue && <GroupPanelMember><ItemPanelMember children="Mask As Read" /></GroupPanelMember>}
+			{(directMessageValue && checkDmGroup) ? 
 				<PanelGroupDM /> :	
 			<>
-			<GroupPanelMember>
-				<ItemPanelMember children="Profile" />
-				<ItemPanelMember children="Mention" />
-				{!checkUser &&
-					<>
-						<ItemPanelMember children="Message" />
+				<GroupPanelMember>
+					<ItemPanelMember children="Profile" />
+					{directMessageValue ? (
+						checkDm &&
 						<ItemPanelMember children="Call" />
-						<ItemPanelMember children="Add Note" />
-						<ItemPanelMember children="Add Friend Nickname" />
-					</>
-				}
-			</GroupPanelMember>
-			<GroupPanelMember>
-				<ItemPanelMember children="Mute" type="checkbox" />
-				{checkUser && 
-				<>
-					<ItemPanelMember children="Deafen" type="checkbox" />
-					<ItemPanelMember children="Edit Serve Profile" />
-					<ItemPanelMember children="Apps" />
-				</>
-				}
-				{!checkUser &&
+					):
+						<ItemPanelMember children="Mention" />
+					}
+
+					{!checkUser &&
+						<>
+							{!checkDm && <>
+								<ItemPanelMember children="Message" />
+								<ItemPanelMember children="Call" /> 
+							</>}
+							<ItemPanelMember children="Add Note" />
+							<ItemPanelMember children="Add Friend Nickname" />
+						</>
+					}
+					{directMessageValue && <ItemPanelMember children="Close DM" /> }
+				</GroupPanelMember>
+			{(isMemberDMGroup && !checkUser) &&
+				<GroupPanelMember>
+					<ItemPanelMember children="Remove From Group" danger/>
+					<ItemPanelMember children="Make Group Owner" danger/>
+				</GroupPanelMember>
+			}
+
+			{!isMemberDMGroup &&
+				<GroupPanelMember>
+					{!directMessageValue  && <ItemPanelMember children="Mute" type="checkbox" />}
+					{checkUser && 
 					<>
-						<Dropdown
-							trigger="hover"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div>
-									<ItemPanelMember children="Invite to Clan" dropdown />
-								</div>
-							)}
-							label=""
-							placement="left-start"
-							className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
-						>
-							<ItemPanelMember children="Komu" />
-							<ItemPanelMember children="Clan 1" />
-							<ItemPanelMember children="Clan 2" />
-							<ItemPanelMember children="Clan 3" />
-						</Dropdown>
-						{checkAddFriend ? <ItemPanelMember children="Remove Friend" onClick={() => deleteFriend(name || '', directMessageValue?.userId[0] || '')}/> : <ItemPanelMember children="Add Friend" onClick={() => addFriend({usernames:[name || ''], ids:[]})}/>}
-						<ItemPanelMember children="Block" />
+						<ItemPanelMember children="Deafen" type="checkbox" />
+						<ItemPanelMember children="Edit Serve Profile" />
+						<ItemPanelMember children="Apps" />
 					</>
-				}
-			</GroupPanelMember>
+					}
+					{!checkUser &&
+						<>
+							{directMessageValue && <ItemPanelMember children="Apps" />}
+							<Dropdown
+								trigger="hover"
+								dismissOnClick={false}
+								renderTrigger={() => (
+									<div>
+										<ItemPanelMember children="Invite to Clan" dropdown />
+									</div>
+								)}
+								label=""
+								placement="left-start"
+								className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
+							>
+								<ItemPanelMember children="Komu" />
+								<ItemPanelMember children="Clan 1" />
+								<ItemPanelMember children="Clan 2" />
+								<ItemPanelMember children="Clan 3" />
+							</Dropdown>
+							{checkAddFriend.friend ? 
+								<ItemPanelMember children="Remove Friend" onClick={() => {deleteFriend(directMessageValue? name || '' : member?.user?.username || '', directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '');}}/> : 
+								<ItemPanelMember children="Add Friend" onClick={() => addFriend({ usernames: [directMessageValue ? name || '' : member?.user?.username || ''], ids:[]})}/>
+							}
+							<ItemPanelMember children="Block" />
+						</>
+					}
+				</GroupPanelMember>
+			}
+			{isMemberDMGroup && 
+				<>
+					<ItemPanelMember children="Apps" />
+					{!checkUser && 
+						<>
+							<Dropdown
+								trigger="hover"
+								dismissOnClick={false}
+								renderTrigger={() => (
+									<div>
+										<ItemPanelMember children="Invite to Clan" dropdown />
+									</div>
+								)}
+								label=""
+								placement="left-start"
+								className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
+							>
+								<ItemPanelMember children="Komu" />
+								<ItemPanelMember children="Clan 1" />
+								<ItemPanelMember children="Clan 2" />
+								<ItemPanelMember children="Clan 3" />
+							</Dropdown>
+							{checkAddFriend.friend ? <ItemPanelMember children="Remove Friend" onClick={() => deleteFriend(directMessageValue? name || '' :member?.user?.username || '', directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '')}/> : <ItemPanelMember children="Add Friend" onClick={() => addFriend({ usernames: [directMessageValue ? name || '' : member?.user?.username || ''], ids:[]})}/>}
+							<ItemPanelMember children="Block" />
+						</>
+					}
+				</>
+			}
+			{directMessageValue && <GroupPanelMember><ItemPanelMember children={`Mute @${name}`} /></GroupPanelMember>}
 			{checkCreateUser && !checkUser && (
 				<GroupPanelMember>
 					<ItemPanelMember children="Move View" />
@@ -112,7 +171,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 					<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
 				</GroupPanelMember>
 			)}
-			{checkUser && 
+			{(checkUser && !isMemberDMGroup) && 
 				<GroupPanelMember>
 					<ItemPanelMember children="Roles" />
 				</GroupPanelMember>

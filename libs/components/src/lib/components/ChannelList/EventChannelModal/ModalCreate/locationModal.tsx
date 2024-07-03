@@ -3,6 +3,8 @@ import { ContenSubmitEventProps, OptionEvent } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import * as Icons from '../../../Icons';
 import { useSelector } from 'react-redux';
+import Select from 'react-select';
+import { customStyles, lightCustomStyles } from '../../../notificationSetting';
 
 export type LocationModalProps = {
 	contentSubmit: ContenSubmitEventProps;
@@ -17,14 +19,27 @@ const LocationModal = (props: LocationModalProps) => {
 	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker } = props;
 	const [errorVoice, setErrorVoice] = useState(false);
 
-	const handleChangeVoice = (e: any) => {
-		setContentSubmit((prev) => ({ ...prev, voiceChannel: e.target.value }));
+	const handleChangeVoice = (selectedOption: any) => {
+		setContentSubmit({
+			...contentSubmit,
+			voiceChannel: selectedOption.value, 
+		});
 	};
 
 	const onChangeTitle = (e: any) => {
 		setContentSubmit((prev) => ({ ...prev, titleEvent: e.target.value }));
 	};
 	const appearanceTheme = useSelector(selectTheme);
+
+	const options = voicesChannel.map((voice) => ({
+		value: voice.id,
+		label: (
+		  <div className='flex items-center gap-x-2 dark:text-white text-black'>
+			{voice.channel_private ? <Icons.SpeakerLocked /> : <Icons.Speaker />}
+			{voice.channel_label}
+		  </div>
+		),
+	  }));
 
 	useEffect(() => {
 		if (voicesChannel.length <= 0) {
@@ -83,22 +98,15 @@ const LocationModal = (props: LocationModalProps) => {
 				</label>
 			</div>
 			{choiceSpeaker && (
-				<div>
-					<h3 className="uppercase text-[11px] font-semibold dark:text-white text-black ">Select a channel</h3>
-					<select
-						name="voice"
-						value={contentSubmit.voiceChannel}
-						onChange={handleChangeVoice}
-						className="block w-full mt-1 dark:bg-black bg-bgModifierHoverLight border dark:order-black dark:text-white text-black rounded px-4 py-3 font-normal text-sm tracking-wide"
-					>
-						{voicesChannel.map((voice) => (
-							<option key={voice.id} className="dark:text-white text-black" value={voice.id}>
-								{voice.channel_label}
-							</option>
-						))}
-					</select>
-				</div>
+				<Select
+					options={options}
+					value={options.find(option => option.value === contentSubmit.voiceChannel)}
+					onChange={handleChangeVoice}
+					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+				/>
 			)}
+
+			
 
 			{choiceLocation && (
 				<div>
