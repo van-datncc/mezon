@@ -250,7 +250,14 @@ export const ListMemberInvite = React.memo(({ channelID, urlInvite, searchTerm =
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response?.channel_id) {
-			sendInviteMessage(linkInvite, response.channel_id);
+			var channelMode = 0
+			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
+				channelMode = ChannelStreamMode.STREAM_MODE_DM
+			}
+			if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
+				channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+			}
+			sendInviteMessage(linkInvite, response.channel_id, channelMode);
 		}
 	};
 

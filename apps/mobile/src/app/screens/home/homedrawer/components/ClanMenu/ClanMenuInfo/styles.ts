@@ -1,24 +1,22 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     info: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 15,
+        gap: Metrics.size.l,
         justifyContent: "flex-start"
     },
 
     inlineInfo: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 5,
+        gap: Metrics.size.s,
     },
 
     inlineText: {
-        fontSize: 10,
-        color: Colors.white
+        fontSize: Fonts.size.h8,
+        color: colors.text
     },
 })
-
-export default styles;
