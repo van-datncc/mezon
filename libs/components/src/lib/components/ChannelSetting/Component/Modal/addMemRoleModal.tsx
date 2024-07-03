@@ -13,28 +13,37 @@ import { ChannelType } from 'mezon-js';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../Icons';
+import { useAuth } from '@mezon/core';
 interface AddMemRoleProps {
 	onClose: () => void;
 	channel: IChannel;
+	onSelectedUsersChange: (selectedUserIds: string[]) => void;
+	onSelectedRolesChange: (selectedUserIds: string[]) => void;
+	selectRoleIds: string[];
+	selectUserIds: string[];
 }
 
-export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
+export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSelectedUsersChange, onSelectedRolesChange, selectUserIds, selectRoleIds }) => {
 	const isPrivate = channel.channel_private;
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
+	const [selectedUserIds, setSelectedUserIds] = useState<string[]>(selectUserIds);
+	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(selectRoleIds);
+	const { userProfile } = useAuth();
 	const RolesAddChannel = RolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1);
 	const RolesNotAddChannel = RolesClan.filter((role) => !RolesAddChannel.map((RoleAddChannel) => RoleAddChannel.id).includes(role.id));
 
 	const usersClan = useSelector(selectAllUsesClan);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
 	const listUserInvite = useMemo(() => {
-		const memberIds = rawMembers.filter((member) => member.userChannelId !== '0').map((member) => member.user?.id);
+		if (channel.channel_private !== 1) {
+			return usersClan.filter(user => user.id !== userProfile?.user?.id);
+		}
+		const memberIds = rawMembers.filter((member) => member.userChannelId !== '0').map((member) => member.user?.id || '');
 		return usersClan.filter((user) => !memberIds.some((userId) => userId === user.id));
-	}, [usersClan, rawMembers]);
+	}, [usersClan, rawMembers, channel.channel_private, userProfile?.user?.id]);
 	const listMembersNotInChannel = listUserInvite ? listUserInvite.map((member) => member.user) : [];
-	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
 	const dispatch = useAppDispatch();
 	const handleCheckboxUserChange = (event: React.ChangeEvent<HTMLInputElement>, userId: string) => {
 		const isChecked = event.target.checked;
@@ -55,22 +64,31 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 
 	const handleAddMember = async () => {
 		onClose();
-		if (selectedUserIds.length > 0) {
-			const body = {
-				channelId: channel.id,
-				channelType: channel.type,
-				userIds: selectedUserIds,
-			};
-			await dispatch(channelUsersActions.addChannelUsers(body));
-		}
-		if (selectedRoleIds.length > 0) {
-			const body = {
-				clanId: currentClanId || '',
-				channelId: channel.id,
-				roleIds: selectedRoleIds,
-				channelType: channel.type,
-			};
-			await dispatch(channelUsersActions.addChannelRoles(body));
+		if(channel.channel_private === 1){
+			if (selectedUserIds.length > 0) {
+				const body = {
+					channelId: channel.id,
+					channelType: channel.type,
+					userIds: selectedUserIds,
+				};
+				await dispatch(channelUsersActions.addChannelUsers(body));
+			}
+			if (selectedRoleIds.length > 0) {
+				const body = {
+					clanId: currentClanId || '',
+					channelId: channel.id,
+					roleIds: selectedRoleIds,
+					channelType: channel.type,
+				};
+				await dispatch(channelUsersActions.addChannelRoles(body));
+			}
+		} else {
+			if (selectedUserIds.length > 0) {
+				onSelectedUsersChange(selectedUserIds);
+			}
+			if (selectedRoleIds.length > 0) {
+				onSelectedRolesChange(selectedRoleIds);
+			}
 		}
 	};
 
@@ -115,6 +133,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 												id={`checkbox-item-${index}`}
 												type="checkbox"
 												value={role.title}
+												checked={selectedRoleIds.includes(role.id)}
 												onChange={(event) => handleCheckboxRoleChange(event, role?.id || '')}
 												className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
 											/>
@@ -140,6 +159,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel }) => {
 											<input
 												type="checkbox"
 												value={user?.display_name}
+												checked={selectedUserIds.includes(user?.id || '')}
 												onChange={(event) => handleCheckboxUserChange(event, user?.id || '')}
 												className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
 											/>

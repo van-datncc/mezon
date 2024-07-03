@@ -2,7 +2,7 @@ import { IChannel } from "@mezon/utils";
 import React, { MutableRefObject } from "react";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
-import styles from "./styles";
+import { style } from "./styles";
 import { useClans } from "@mezon/core";
 import { reserve, IMezonMenuSectionProps, MezonMenu, IMezonMenuItemProps } from "../../../../../../app/temp-ui";
 import { useTranslation } from "react-i18next";
@@ -11,10 +11,8 @@ import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { BellSlashIcon, ChannelNotificationIcon, CopyIcon, EyeIcon, GroupPlusIcon, IDIcon, LinkIcon, PlusLargeIcon, SettingsIcon, StarIcon }
-    // @ts-ignore
-    from "libs/mobile-components/src/lib/icons2";
-
+import { Icons } from "@mezon/mobile-components";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IChannelMenuProps {
     inviteRef: MutableRefObject<any>;
@@ -23,17 +21,20 @@ interface IChannelMenuProps {
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
 export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
+    const { t } = useTranslation(['channelMenu']);
+    const { themeValue } = useTheme()
+    const styles = style(themeValue);
+
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
 
-    const { t } = useTranslation(['channelMenu']);
     const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>()
 
     const watchMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.watchMenu.markAsRead'),
             onPress: () => reserve(),
-            icon: <EyeIcon />
+            icon: <Icons.EyeIcon color={themeValue.textStrong} />
         }
     ]
 
@@ -44,7 +45,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <GroupPlusIcon />
+            icon: <Icons.GroupPlusIcon color={themeValue.textStrong}/>
         },
         {
             title: t('menu.inviteMenu.favorite'),
@@ -52,7 +53,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <StarIcon />
+            icon: <Icons.StarIcon color={themeValue.textStrong}/>
         },
         {
             title: t('menu.inviteMenu.copyLink'),
@@ -60,7 +61,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <LinkIcon />
+            icon: <Icons.LinkIcon color={themeValue.textStrong}/>
         }
     ]
 
@@ -68,12 +69,12 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         {
             title: t('menu.notification.muteCategory'),
             onPress: () => reserve(),
-            icon: <BellSlashIcon />
+            icon: <Icons.BellSlashIcon color={themeValue.textStrong}/>
         },
         {
             title: t('menu.notification.notification'),
             onPress: () => reserve(),
-            icon: <ChannelNotificationIcon />
+            icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong}/>
         }
     ]
 
@@ -89,19 +90,19 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
                     }
                 });
             },
-            icon: <SettingsIcon />
+            icon: <Icons.SettingsIcon color={themeValue.textStrong}/>
         },
         {
             title: t('menu.organizationMenu.duplicateChannel'),
             onPress: () => reserve(),
-            icon: <CopyIcon />
+            icon: <Icons.CopyIcon color={themeValue.textStrong}/>
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.devMode.copyChannelID'),
-            icon: <IDIcon />,
+            icon: <Icons.IDIcon color={themeValue.textStrong}/>,
             onPress: () => {
                 Clipboard.setString(channel?.channel_id);
                 Toast.show({

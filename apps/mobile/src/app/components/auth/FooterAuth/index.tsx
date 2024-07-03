@@ -1,6 +1,8 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Text } from 'react-native';
 import React from 'react'
+import { useTheme } from '@mezon/mobile-ui';
+import { style } from './styles';
 interface FooterAuthProps {
     content: string;
     title: string;
@@ -8,6 +10,7 @@ interface FooterAuthProps {
 
 }
 const FooterAuth: React.FC<FooterAuthProps> = ({ onPress, content, title }) => {
+    const styles = style(useTheme().themeValue)
     return (
         <View style={styles.signupContainer}>
             <Text style={styles.accountText}>{content}   </Text>
@@ -22,24 +25,3 @@ const FooterAuth: React.FC<FooterAuthProps> = ({ onPress, content, title }) => {
 }
 
 export default FooterAuth
-
-const styles = StyleSheet.create({
-    signupContainer: {
-        marginHorizontal: 20,
-        justifyContent: 'center',
-        paddingVertical: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    accountText: {
-        fontSize: 15,
-        lineHeight: 13 * 1.4,
-        color: "#CCCCCC"
-    },
-    signupText: {
-        fontSize: 15,
-        lineHeight: 13 * 1.4,
-        color: "#84ADFF",
-        marginLeft: 5,
-    },
-})

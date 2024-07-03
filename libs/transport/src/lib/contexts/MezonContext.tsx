@@ -24,6 +24,7 @@ export type MezonContextValue = {
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 	authenticateDevice: (username: string) => Promise<Session>;
 	authenticateGoogle: (token: string) => Promise<Session>;
+	authenticateApple: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
@@ -57,7 +58,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
-			const session = await clientRef.current.authenticateEmail(email, password, false);
+			const session = await clientRef.current.authenticateEmail(email, password);
 			sessionRef.current = session;
 
 			const socket = await createSocket(); // Create socket after authentication
@@ -81,6 +82,29 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				throw new Error('Mezon client not initialized');
 			}
 			const session = await clientRef.current.authenticateGoogle(token);
+			sessionRef.current = session;
+
+			const socket = await createSocket(); // Create socket after authentication
+			socketRef.current = socket;
+
+			if (!socketRef.current) {
+				return session;
+			}
+
+			const session2 = await socketRef.current.connect(session, true);
+			sessionRef.current = session2;
+
+			return session;
+		},
+		[createSocket],
+	);
+	
+	const authenticateApple = useCallback(
+		async (token: string) => {
+			if (!clientRef.current) {
+				throw new Error('Mezon client not initialized');
+			}
+			const session = await clientRef.current.authenticateApple(token);
 			sessionRef.current = session;
 
 			const socket = await createSocket(); // Create socket after authentication
@@ -183,6 +207,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			authenticateDevice,
 			authenticateEmail,
 			authenticateGoogle,
+			authenticateApple,
 			refreshSession,
 			createSocket,
 			addStatusFollow,
@@ -197,6 +222,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			authenticateDevice,
 			authenticateEmail,
 			authenticateGoogle,
+			authenticateApple,
 			refreshSession,
 			createSocket,
 			addStatusFollow,

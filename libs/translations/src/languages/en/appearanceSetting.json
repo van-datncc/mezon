@@ -1,0 +1,27 @@
+{
+    "fields": {
+        "DMMessagePreview": {
+            "title": "DM Message Preview",
+            "AllMessages": "All Messages",
+            "UnreadDMOnly": "Unread DMs only",
+            "None": "None"
+        }
+    },
+    "menu": {
+        "theme": {
+            "title": "Theme",
+            "theme": "Theme",
+            "syncAcrossClients": {
+                "title": "Sync across clients",
+                "description": "Turning this on will overwrite the above appearance settings on all other clients including desktop anf browser"
+            }
+        },
+        "search": {
+                "title": "Search",
+                "showResultCount": {
+                    "title": "Show exact search result counts",
+                    "description": "When enabled, may increase the time it takes to show search results"
+                }
+            }
+    }
+}

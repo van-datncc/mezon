@@ -1,21 +1,23 @@
+import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { useAuth } from '@mezon/core';
-import { Block, Colors, size } from '@mezon/mobile-ui';
+import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { RootState } from '@mezon/store-mobile';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React, { useEffect } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import LoadingModal from '../../components/LoadingModal';
-import Button from '../../components/auth/Button';
-import FooterAuth from '../../components/auth/FooterAuth';
-import GoogleLogin from '../../components/auth/GoogleLogin';
-import TextInputUser from '../../components/auth/TextInput';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import LoadingModal from '../../../components/LoadingModal';
+import Button from '../../../components/auth/Button';
+import FooterAuth from '../../../components/auth/FooterAuth';
+import LoginSocial from '../../../components/auth/LoginSocial';
+import TextInputUser from '../../../components/auth/TextInput';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { style } from './styles';
 const LoginSchema = Yup.object().shape({
 	email: Yup.string().email('Invalid email').required('Please enter your email'),
 	password: Yup.string().min(8, 'Confirm password must be 8 characters long.').required('Please enter your password'),
@@ -29,9 +31,10 @@ const WEB_CLIENT_ID = '285548761692-l9bdt00br2jg1fgh4c23dlb9rvkvqqs0.apps.google
 const IOS_CLIENT_ID = '285548761692-3k9ubkdhl8bbvbal78j9v2905kjhg3tj.apps.googleusercontent.com';
 
 const LoginScreen = () => {
+	const styles = style(useTheme().themeValue);
 	const navigation = useNavigation();
 	const isLoading = useSelector((state: RootState) => state.auth.loadingStatus);
-	const { loginByGoogle, loginEmail } = useAuth();
+	const { loginByGoogle, loginByApple, loginEmail } = useAuth();
 
 	useEffect(() => {
 		const config = {
@@ -54,13 +57,10 @@ const LoginScreen = () => {
 							text1: 'Login Failed',
 							text2: 'Invalid email or password',
 						});
-					} else {
-						await onGoogleButtonPress();
 					}
 				}
 			} catch (error) {
 				/* empty */
-				await onGoogleButtonPress();
 			}
 		},
 		[loginEmail],
@@ -85,8 +85,28 @@ const LoginScreen = () => {
 		}
 	}
 
+	async function onAppleButtonPress() {
+		try {
+			const appleAuthRequestResponse = await appleAuth.performRequest({
+				requestedOperation: appleAuth.Operation.LOGIN,
+				requestedScopes: [appleAuth.Scope.EMAIL],
+			});
+			const identityToken = appleAuthRequestResponse?.identityToken;
+			await loginByApple(identityToken);
+		} catch (error) {
+			if (error.code === appleAuth.Error.CANCELED) {
+				return;
+			}
+			Toast.show({
+				type: 'error',
+				text1: 'Login Failed',
+				text2: error.message,
+			});
+		}
+	}
+
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+		<SafeAreaView style={styles.supperContainer}>
 			<KeyboardAvoidingView style={styles.container}>
 				{/* header */}
 				<View style={styles.headerContainer}>
@@ -95,12 +115,12 @@ const LoginScreen = () => {
 				</View>
 				{/* body */}
 				<View style={styles.googleButton}>
-					{Platform.OS === 'android' && (
-						<Block>
-							<GoogleLogin onGoogleButtonPress={onGoogleButtonPress} />
-							<Text style={styles.orText}>Or</Text>
-						</Block>
-					)}
+					<LoginSocial onGoogleButtonPress={onGoogleButtonPress} onAppleButtonPress={onAppleButtonPress} />
+					<Block marginTop={size.s_30} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} alignSelf={'center'}>
+						<Block width={'35%'} height={1} backgroundColor={Colors.gray48} />
+						<Text style={styles.orText}>Or</Text>
+						<Block width={'35%'} height={1} backgroundColor={Colors.gray48} />
+					</Block>
 				</View>
 				<ScrollView style={{ flex: 1 }}>
 					<Formik
@@ -151,47 +171,3 @@ const LoginScreen = () => {
 };
 
 export default LoginScreen;
-
-const styles = StyleSheet.create({
-	InputText: {
-		fontSize: 18,
-		textAlignVertical: 'center',
-		padding: 0,
-		color: '#FFFFFF',
-		flex: 1,
-	},
-	container: {
-		flex: 1,
-		backgroundColor: Colors.secondary,
-		justifyContent: 'center',
-	},
-	headerContainer: {
-		alignItems: 'center',
-		marginTop: size.s_30,
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-	},
-	headerTitle: {
-		fontSize: size.s_34,
-		textAlign: 'center',
-		fontWeight: 'bold',
-		color: '#FFFFFF',
-	},
-	headerContent: {
-		fontSize: size.s_14,
-		lineHeight: 20 * 1.4,
-		textAlign: 'center',
-		color: '#CCCCCC',
-	},
-	orText: {
-		fontSize: size.s_12,
-		lineHeight: 15 * 1.4,
-		color: '#AEAEAE',
-		marginLeft: 5,
-		alignSelf: 'center',
-		paddingTop: 10,
-	},
-	googleButton: {
-		marginVertical: size.s_30,
-	},
-});

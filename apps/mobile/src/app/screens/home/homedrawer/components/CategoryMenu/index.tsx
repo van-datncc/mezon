@@ -2,7 +2,6 @@ import { ICategoryChannel, IChannel } from "@mezon/utils";
 import React, { MutableRefObject } from "react";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
-import styles from "./styles";
 import { useClans } from "@mezon/core";
 import { reserve, IMezonMenuSectionProps, MezonMenu, IMezonMenuItemProps } from "../../../../../../app/temp-ui";
 import { useTranslation } from "react-i18next";
@@ -11,9 +10,9 @@ import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { APP_SCREEN, AppStackScreenProps } from "../../../../../../app/navigation/ScreenTypes";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { BellSlashIcon, ChannelNotificationIcon, EyeIcon, GroupPlusIcon, IDIcon, PlusLargeIcon, SettingsIcon }
-    // @ts-ignore
-    from "libs/mobile-components/src/lib/icons2";
+import { Icons } from "@mezon/mobile-components";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./styles";
 
 
 interface ICategoryMenuProps {
@@ -23,17 +22,19 @@ interface ICategoryMenuProps {
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
 export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps) {
+    const { t } = useTranslation(['categoryMenu']);
+    const {themeValue} = useTheme()
+    const styles = style(themeValue) 
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
 
-    const { t } = useTranslation(['categoryMenu']);
     const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>()
 
     const watchMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.watchMenu.markAsRead'),
             onPress: () => reserve(),
-            icon: <EyeIcon />
+            icon: <Icons.EyeIcon color={themeValue.textStrong}/>
         }
     ]
 
@@ -44,7 +45,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
                 inviteRef.current.open()
                 dismiss();
             },
-            icon: <GroupPlusIcon />
+            icon: <Icons.GroupPlusIcon color={themeValue.textStrong}/>
         }
     ]
 
@@ -52,12 +53,12 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.notification.muteCategory'),
             onPress: () => reserve(),
-            icon: <BellSlashIcon />
+            icon: <Icons.BellSlashIcon color={themeValue.textStrong}/>
         },
         {
             title: t('menu.notification.notification'),
             onPress: () => reserve(),
-            icon: <ChannelNotificationIcon />
+            icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong}/>
         }
     ]
 
@@ -65,7 +66,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.organizationMenu.edit'),
             onPress: () => reserve(),
-            icon: <SettingsIcon />
+            icon: <Icons.SettingsIcon color={themeValue.textStrong}/>
         },
         {
             title: t('menu.organizationMenu.createChannel'),
@@ -78,14 +79,14 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
                     }
                 });
             },
-            icon: <PlusLargeIcon />
+            icon: <Icons.PlusLargeIcon color={themeValue.textStrong}/>
         }
     ];
 
     const devMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.devMode.copyServerID'),
-            icon: <IDIcon />,
+            icon: <Icons.IDIcon color={themeValue.textStrong}/>,
             onPress: () => {
                 Clipboard.setString(category?.category_id);
                 Toast.show({
