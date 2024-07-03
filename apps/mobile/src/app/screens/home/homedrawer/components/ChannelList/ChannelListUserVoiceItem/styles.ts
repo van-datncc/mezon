@@ -12,7 +12,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     
     userVoiceName: {
         color: colors.text,
-        fontSize: size.medium,
+        fontSize: size.h85,
         fontWeight: '400'
     }
 });
