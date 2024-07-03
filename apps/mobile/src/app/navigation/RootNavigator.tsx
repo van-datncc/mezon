@@ -9,7 +9,7 @@ import {
 	selectIsLogin,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import {  NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,16 +20,16 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { Colors, darkThemeColor, lightThemeColor, useAnimatedState } from '@mezon/mobile-ui';
-import { AppState, StatusBar } from 'react-native';
+import { Colors, ThemeModeBase, darkThemeColor, lightThemeColor, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { AppState, StatusBar, View } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 
 const RootStack = createStackNavigator();
 
 const NavigationMain = () => {
+	const { themeBasic, themeValue } = useTheme();
 	const isLoggedIn = useSelector(selectIsLogin);
-	const [isDarkMode] = useState(true); //TODO: move to custom hook\
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const [isLoadingSplashScreen, setIsLoadingSplashScreen] = useAnimatedState(true);
 	const { reconnect } = useMezon();
@@ -77,26 +77,9 @@ const NavigationMain = () => {
 		}
 	};
 
-	//TODO: update later
-	const lightTheme = {
-		...DefaultTheme,
-		colors: {
-			...DefaultTheme.colors,
-			...lightThemeColor,
-		},
-	};
-
-	//TODO: update later
-	const darkTheme = {
-		...DarkTheme,
-		colors: {
-			...DarkTheme.colors,
-			...darkThemeColor,
-		},
-	};
 
 	return (
-		<NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
+		<NavigationContainer>
 			<NetInfoComp />
 			<RootStack.Navigator screenOptions={{ headerShown: false }}>
 				{isLoggedIn ? (
@@ -122,6 +105,16 @@ const NavigationMain = () => {
 		</NavigationContainer>
 	);
 };
+
+const CustomStatusBar = () => {
+	const { themeValue, themeBasic } = useTheme();
+	return <StatusBar
+		animated
+		backgroundColor={themeValue.primary}
+		barStyle={themeBasic == ThemeModeBase.DARK ? "light-content" : "dark-content"}
+	/>
+}
+
 const RootNavigation = () => {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
@@ -130,7 +123,7 @@ const RootNavigation = () => {
 
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<StatusBar backgroundColor={Colors.secondary} barStyle="light-content" />
+			<CustomStatusBar />
 			<ChatContextProvider>
 				<NavigationMain />
 			</ChatContextProvider>

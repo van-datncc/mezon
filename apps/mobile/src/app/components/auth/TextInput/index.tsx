@@ -1,7 +1,9 @@
-import { Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
+import { style } from './styles';
+import { Icons } from '@mezon/mobile-components';
 
 interface UserTextInputProps {
 	placeholder: string;
@@ -14,12 +16,15 @@ interface UserTextInputProps {
 	touched: boolean;
 }
 const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, placeholder, isPass, value, onChangeText, onBlur }) => {
+	const { themeValue } = useTheme()
+	const styles = style(themeValue);
 	const [showPass, setShowPass] = useState<boolean>(true);
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.label}>
 				{label}
-				<Text style={{ color: 'red' }}> *</Text>
+				<Text style={styles.require}> *</Text>
 			</Text>
 			<View style={styles.inputTexts}>
 				<TextInput
@@ -34,7 +39,10 @@ const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, pl
 				/>
 				{isPass && (
 					<Pressable onPress={() => setShowPass(!showPass)}>
-						<Entypo name={`${showPass ? 'eye' : 'eye-with-line'}`} size={24} color={'#6c6d83'} />
+						{showPass
+							? <Icons.EyeIcon color={themeValue.text} />
+							: <Icons.EyeSlashIcon color={themeValue.text} />
+						}
 					</Pressable>
 				)}
 			</View>
@@ -46,40 +54,3 @@ const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, pl
 
 export default TextInputUser;
 
-const styles = StyleSheet.create({
-	container: {
-		marginBottom: verticalScale(15),
-	},
-	label: {
-		fontSize: size.s_16,
-		marginTop: verticalScale(10),
-		marginBottom: verticalScale(10),
-		marginHorizontal: verticalScale(20),
-		color: '#FFFFFF',
-	},
-	inputTexts: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		height: 50,
-		borderColor: Colors.gray48,
-		borderWidth: 1,
-		borderRadius: 5,
-		paddingHorizontal: 10,
-		paddingLeft: 10,
-		marginRight: 20,
-		marginLeft: 20,
-	},
-
-	inputText: {
-		fontSize: size.s_16,
-		color: '#FFFFFF',
-		width: '90%',
-	},
-	errorText: {
-		fontSize: 15,
-		marginTop: 10,
-		marginHorizontal: 20,
-		color: 'red',
-	},
-});
