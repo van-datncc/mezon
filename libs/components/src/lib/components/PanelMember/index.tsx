@@ -2,9 +2,11 @@ import { useAuth, useFriends } from '@mezon/core';
 import { selectCurrentChannel, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
+import { directMessageValueProps } from '../DmList/DMListItem';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
 import { directMessageValueProps } from '../DmList/DMListItem';
@@ -39,11 +41,11 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	};
 
 	const checkAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
-	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id,[currentChannel?.creator_id, userProfile?.user?.id]);
-	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id,[member?.user?.id, userProfile?.user?.id]);
+	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
+	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id, [member?.user?.id, userProfile?.user?.id]);
 	const checkDm = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM, [directMessageValue?.type]);
 	const checkDmGroup = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP, [directMessageValue?.type]);
-	const {deleteFriend, addFriend} = useFriends();
+	const { deleteFriend, addFriend } = useFriends();
 
 	return (
 		<div
@@ -56,7 +58,10 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 				top: positionTop ? 'auto' : coords.mouseY,
 			}}
 			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary shadow z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-slate-700 rounded"
-			onClick={(e) => {e.stopPropagation(); onClose()}}
+			onClick={(e) => {
+				e.stopPropagation();
+				onClose();
+			}}
 		>
 			{directMessageValue && <GroupPanelMember><ItemPanelMember children="Mask As Read" /></GroupPanelMember>}
 			{(directMessageValue && checkDmGroup) ? 

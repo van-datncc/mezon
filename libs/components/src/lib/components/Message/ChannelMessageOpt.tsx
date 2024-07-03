@@ -37,10 +37,10 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 
     return (
         <div
-            className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-6 ${isThread ? 'w-32' : 'w-24'}`}
+            className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-6 w-fit`}
         >
             <div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
-                <div className="w-full h-full flex justify-between" ref={refOpt}>
+                <div className="w-fit h-full flex justify-between" ref={refOpt}>
 					{items.map((item, index) => (
 						<button
 							key={index}

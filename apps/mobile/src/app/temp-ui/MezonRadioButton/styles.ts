@@ -1,32 +1,33 @@
-import { Colors, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Colors, Metrics, baseColor } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     outer: {
         borderRadius: 999,
         borderWidth: 2,
-        padding: 3,
-        borderColor: Colors.gray72,
+        padding: 5,
+        height: 24,
+        width: 24,
+        borderColor: colors.borderRadio
     },
 
     inner: {
-        height: 12,
-        width: 12,
         borderRadius: 10,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        height: "100%",
+        width: "100%"
     },
 
     innerChecked: {
-        backgroundColor: Colors.green
+        backgroundColor: baseColor.white
     },
 
     outerChecked: {
-        borderColor: Colors.white,
+        borderColor: baseColor.blurple,
+        backgroundColor: baseColor.blurple
     },
 
     container: {
         padding: Metrics.size.s
     }
 })
-
-export default styles;

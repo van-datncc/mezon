@@ -1,38 +1,36 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, Colors, Fonts, Metrics, baseColor } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     avatarWrapper: {
         width: 60,
         height: 60,
-        backgroundColor: Colors.azureBlue,
+        backgroundColor: baseColor.blurple,
         borderRadius: 10,
         overflow: "hidden"
     },
 
     container: {
-        padding: 20,
+        padding: Metrics.size.xl,
         paddingTop: 0
     },
 
     serverName: {
-        color: Colors.white,
-        fontSize: 18,
+        color: colors.textStrong,
+        fontSize: Fonts.size.h6,
         fontWeight: "700",
-        marginBottom: 10
+        marginBottom: Metrics.size.m
     },
 
     header: {
-        gap: 15
+        gap: Metrics.size.l
     },
 
     actionWrapper: {
         flexDirection: "row",
-        gap: 10,
-        padding:10,
+        gap: Metrics.size.m,
+        padding: Metrics.size.m,
         justifyContent: "space-between",
         minWidth: "100%",
     }
 })
-
-export default styles;

@@ -1,11 +1,14 @@
 import {
 	appActions,
+	channelsActions,
 	clansActions,
 	directActions,
 	friendsActions,
 	getStoreAsync,
+	messagesActions,
 	notificationActions,
 	selectAllClans,
+	selectCurrentChannelId,
 	selectCurrentClan,
 	selectSession,
 } from '@mezon/store-mobile';
@@ -89,6 +92,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const clans = useSelector(selectAllClans);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const session = useSelector(selectSession);
 	const { reconnect } = useMezon();
 	useCheckUpdatedVersion();
@@ -117,7 +121,7 @@ const HomeScreen = React.memo((props: any) => {
 
 			store.dispatch(appActions.setLoadingMainMobile(true));
 			await reconnect();
-			await mainLoader();
+			await messageLoader();
 			store.dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
@@ -135,6 +139,18 @@ const HomeScreen = React.memo((props: any) => {
 			store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
 		}
+		return null;
+	};
+	
+	const messageLoader = async () => {
+		const store = await getStoreAsync();
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId }));
+		store.dispatch(
+			channelsActions.joinChannel({
+				clanId: currentClan?.clan_id,
+				channelId: currentChannelId,
+				noFetchMembers: false,
+		}));
 		return null;
 	};
 

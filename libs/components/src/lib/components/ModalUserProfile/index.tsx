@@ -11,6 +11,7 @@ import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
 import PendingFriend from './pendingFriend';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -56,7 +57,14 @@ const ModalUserProfile = ({
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
 			await dispatch(clansActions.joinClan({ clanId: response.clan_id as string }));
-			sendInviteMessage(content, response.channel_id);
+			var channelMode = 0
+			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
+				channelMode = ChannelStreamMode.STREAM_MODE_DM
+			}
+			if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
+				channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+			}
+			sendInviteMessage(content, response.channel_id, channelMode);
 			setContent('');
 		}
 	};
