@@ -1,7 +1,7 @@
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import React from 'react';
-import ThreadListItem from '../../../ThreadListItem';
+import ChannelListThreadItem from '../ChannelListThreadItem';
 import { View } from 'react-native';
 import { useTheme } from '@mezon/mobile-ui';
 import { style } from './styles';
@@ -22,7 +22,7 @@ const ListChannelThread = React.memo(({ threads, currentChanel, onPress }: IList
 				const isActive = currentChanel?.channel_id === thread.channel_id;
 
 				return (
-					<ThreadListItem
+					<ChannelListThreadItem
 						thread={thread}
 						isActive={isActive}
 						isFirstThread={isFirstThread}

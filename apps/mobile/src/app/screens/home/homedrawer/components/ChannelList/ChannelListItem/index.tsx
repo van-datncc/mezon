@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import { ChannelListContext } from '../../../Reusables';
 import ListChannelThread from '../ChannelListThread';
-import UserListVoiceChannel from '../../../UserListVoiceChannel';
+import UserListVoiceChannel from '../ChannelListUserVoice';
 import { style } from './styles';
 
 function useChannelBadgeCount(channelId: string) {
