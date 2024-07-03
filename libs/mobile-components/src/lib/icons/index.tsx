@@ -1110,7 +1110,23 @@ export function DownloadNewVersionIcon({ width = 24, height = 24, color = 'white
 				<Path d="M38.939 32.637l-8.238 8.24a2.18 2.18 0 000 3.088 2.18 2.18 0 003.089 0l8.24-8.237c.849-.855.849-2.236 0-3.091a2.194 2.194 0 00-3.091 0z" />
 			</G>
 		</Svg>
-	);
+	);}
+
+export function OwnerIcon({ width = 24 , height = 24, color="#F0B132", ...props}: SvgProps) {
+  return (
+    <Svg
+      width={width}
+      height={height}
+      fill="none"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <Path
+        fill={color}
+        d="M5 18a1 1 0 00-1 1 3 3 0 003 3h10a3 3 0 003-3 1 1 0 00-1-1H5zM3.04 7.76a1 1 0 00-1.52 1.15l2.25 6.42a1 1 0 00.94.67h14.55a1 1 0 00.95-.71l1.94-6.45a1 1 0 00-1.55-1.1l-4.11 3-3.55-5.33.82-.82a.83.83 0 000-1.18l-1.17-1.17a.83.83 0 00-1.18 0l-1.17 1.17a.83.83 0 000 1.18l.82.82-3.61 5.42-4.41-3.07z"
+      />
+    </Svg>
+  )
 }
 
 export function GoogleIcon({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
@@ -1143,3 +1159,20 @@ export function AppleIcon({ width = 24, height = 24, color = 'white', ...props }
 		</Svg>
 	);
 }
+
+export function DotIcon({ width = 10, height = 10, color = 'white', ...props }: SvgProps) {
+	return (
+		<Svg
+			width={width}
+			height={height}
+			viewBox="0 0 32 32"
+			fill="none"
+			{...props}
+		>
+				<Path
+				d="M16 32c8.837 0 16-7.163 16-16S24.837 0 16 0 0 7.163 0 16s7.163 16 16 16z"
+				fill={color}
+				/>
+		</Svg>
+	)
+  }

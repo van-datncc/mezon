@@ -739,6 +739,16 @@ export const createCachedSelector = createSelectorCreator({
 	argsMemoize: weakMapMemoize,
 });
 
+export const selectMessageEntitiesByChannelId = createCachedSelector(
+	(state, channelId) => {
+		const messagesState = getMessagesState(state);
+		return messagesState.channelMessages[channelId]?.entities || null;
+	},
+	(channelMessageEntities) => {
+		return channelMessageEntities || {};
+	},
+);
+
 export const selectMessageIdsByChannelId = createCachedSelector(
 	(state, channelId: string) => {
 		const messagesState = getMessagesState(state);
@@ -756,6 +766,14 @@ export const selectMessageEntityById = createCachedSelector(
 	},
 	(messagesState) => {
 		return messagesState || {};
+	},
+);
+
+export const selectLassSendMessageEntityBySenderId = createCachedSelector(
+	[selectMessageEntitiesByChannelId, selectMessageIdsByChannelId, (_, __, senderId) => senderId],
+	(entities, ids, senderId) => {
+		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId);
+		return matchedId ? entities[matchedId] : null;
 	},
 );
 

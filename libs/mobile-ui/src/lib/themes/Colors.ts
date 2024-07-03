@@ -154,6 +154,9 @@ const colors = {
 	bgDarkMidnightBlue: '#141c2a',
   midnightIndigoBg: '#3b426e',
 	bgReply: '#383B47',
+  midnightBlue: '#3b426e',
+  jetBlack: '#29292b',
+  darkCharcoalGray: '#2b2b2e',
 	// background button
 	pink: '#e148c7',
 	bgButton: '#5865f2',

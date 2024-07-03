@@ -15,8 +15,7 @@ const MarkUpOnReply = ({ mention, onClickToMove }: IMarkUpOnReply) => {
 		}
 
 		if (markUpId) {
-			acc.push(<span key={`nonMatchText-${index}`}>{item.nonMatchText}</span>, 
-			<HashTagMentionById key={`markUpId-${index}`} id={markUpId} />);
+			acc.push(<span key={`nonMatchText-${index}`}>{item.nonMatchText}</span>, <HashTagMentionById key={`markUpId-${index}`} id={markUpId} />);
 		} else {
 			acc.push(<span key={`nonMatchText-${index}`}>{item.nonMatchText}</span>);
 		}

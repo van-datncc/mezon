@@ -1,7 +1,6 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import {
 	ActionEmitEvent,
-	AngleRight,
 	HashSignLockIcon,
 	MuteIcon,
 	ThreadIcon,
@@ -9,7 +8,7 @@ import {
 	getChannelById,
 	ArrowLeftIcon
 } from '@mezon/mobile-components';
-import { Block, Colors, size } from '@mezon/mobile-ui';
+import { Block, Colors } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -17,13 +16,12 @@ import {
 	selectCurrentChannel,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, IMessageWithUser } from '@mezon/utils';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import BarsLogo from '../../../../assets/svg/bars-white.svg';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
@@ -33,7 +31,6 @@ import ChatBox from './ChatBox';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
-import ForwardMessageModal from './components/ForwardMessage';
 import { styles } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
@@ -41,9 +38,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
-	const [showForwardModal, setShowForwardModal] = useState(false);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
-	const [messageForward, setMessageForward] = useState<IMessageWithUser>(null);
 	const dispatch = useAppDispatch();
 
 	const prevChannelIdRef = useRef<string>();
@@ -57,16 +52,6 @@ const HomeDefault = React.memo((props: any) => {
 			setTypeKeyboardBottomSheet('text');
 			bottomPickerRef.current?.close();
 		}
-	}, []);
-
-	useEffect(() => {
-		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_FORWARD_MODAL, (payload) => {
-			setMessageForward(payload.targetMessage);
-			setShowForwardModal(true);
-		});
-		return () => {
-			showKeyboard.remove();
-		};
 	}, []);
 
 	const bottomSheetRef = useRef<BottomSheet>(null);
@@ -184,11 +169,6 @@ const HomeDefault = React.memo((props: any) => {
 			>
 				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
 			</BottomSheet>
-			{showForwardModal && (
-				<View style={{flex: 1}}>
-					<ForwardMessageModal show={showForwardModal} onClose={() => setShowForwardModal(false)} message={messageForward} />
-				</View>
-			)}
 		</View>
 	);
 });

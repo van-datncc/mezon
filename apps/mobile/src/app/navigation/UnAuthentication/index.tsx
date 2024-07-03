@@ -1,26 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { APP_SCREEN } from '../ScreenTypes';
-import LoginScreen from "../../screens/auth/LoginScreen";
-import RegisterScreen from "../../screens/auth/RegisterScreen";
+import LoginScreen from "../../screens/auth/Login";
+import RegisterScreen from "../../screens/auth/Register";
 
 const Stack = createNativeStackNavigator();
 
 export const UnAuthentication = () => {
 	const getInitialRouteName = APP_SCREEN.LOGIN;
-	
-	useEffect(() => {
-		// TODO: handle dark mode light mode
-		// const isDarkTheme = Appearance.getColorScheme() === 'dark';
-		
-		// dispatch(appActions.onSetAppTheme('dark'));
-		// return () => {
-		// 	dispatch(appActions.onSetAppTheme('default'));
-		// };
-	}, []);
-	
-	
+
 	return (
 		<Stack.Navigator
 			initialRouteName={getInitialRouteName}
