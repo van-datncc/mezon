@@ -25,6 +25,8 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 
 	const appearanceTheme = useSelector(selectTheme);
 
+	const { emojis } = useEmojiSuggestion();
+
 	// TODO: move the invitation logic to upper level
 	const getLinkinvites = useCallback(
 		(children: any) => {
@@ -50,11 +52,14 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 		const isMention = syntax.startsWith('@');
 		const isHashtag = syntax.startsWith('<#') && syntax.endsWith('>');
 		const isEmojiSyntax = syntax.match(/:\b[^:]*\b:/g);
+
+		const srcEmoji = getSrcEmoji(syntax.trim(), emojis);
+
 		if (isMention && !isHashtag && !isEmojiSyntax) {
 			return MentionTypeEnum.MENTION;
 		} else if (!isMention && isHashtag && !isEmojiSyntax) {
 			return MentionTypeEnum.HASHTAG;
-		} else {
+		} else if (isEmojiSyntax && srcEmoji !== undefined) {
 			return MentionTypeEnum.EMOJI_SYNTAX;
 		}
 	};
@@ -78,12 +83,12 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 
 			const isMention = checkMention(tagName) === MentionTypeEnum.MENTION;
 			const isHashtag = checkMention(tagName) === MentionTypeEnum.HASHTAG;
-
+			const isEmojiSyntax = checkMention(tagName) === MentionTypeEnum.EMOJI_SYNTAX;
 			const result = convertMarkdown(markdown);
 
 			return (
-				<div key={index} className="lineText contents">
-					{mentions[index - 1]?.matchedText && ' '}
+				<div key={index} className="lineText contents ">
+					{mentions[index - 1]?.matchedText && ''}
 					{(startsWithTripleBackticks && endsWithNoTripleBackticks && !isBetween) || onlyBackticks ? (
 						<span>{markdown}</span>
 					) : (
@@ -106,15 +111,25 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 							}}
 						/>
 					)}
-					{tagName && ' '}
 					{tagName && (
 						<span className="">
 							{isMention ? (
-								<MentionUser tagName={tagName} />
+								<>
+									{' '}
+									<MentionUser tagName={tagName} />{' '}
+								</>
 							) : isHashtag ? (
-								<ChannelHashtag channelHastagId={tagName} />
+								<>
+									{' '}
+									<ChannelHashtag channelHastagId={tagName} />{' '}
+								</>
+							) : isEmojiSyntax ? (
+								<>
+									{' '}
+									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />{' '}
+								</>
 							) : (
-								<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />
+								tagName
 							)}
 						</span>
 					)}

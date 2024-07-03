@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 export function useMessageLine(line: string): IMessageLine {
 	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:[a-zA-Z0-9_]*:)(?!`)/g;
-	const emojiRegex = /^:\b[a-zA-Z0-9]*\b:$/;
+	const emojiRegex = /^:\w+:$/;
 	const extensionsRegex = /https?:[^,\s;]+?\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?(?:![^.\s]+)?(?:,|;|$)/gi;
 
 	const isOnlyEmoji = useMemo(() => {
