@@ -1,5 +1,6 @@
 import { colors as Colors, lightThemeColor, darkThemeColor } from "./Colors";
 import Fonts, { size } from "./Fonts";
+
 import {
 	Metrics,
 	horizontalScale,
@@ -16,5 +17,7 @@ export {
 	horizontalScale,
 	moderateScale,
 	verticalScale,
-	size,
+	size
 };
+
+export * from "./Constants";

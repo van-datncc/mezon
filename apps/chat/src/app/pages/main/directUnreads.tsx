@@ -1,29 +1,34 @@
-import { NavLink } from 'react-router-dom';
 import { NavLinkComponent } from '@mezon/components';
+import { clansActions, directActions, selectDirectById, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
-import { useSelector } from 'react-redux';
-import { directActions, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useLayoutEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 
 export type DirectMessUnreadProp = {
 	readonly directMessage: Readonly<any>;
 };
 
 function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
-	const [countMessUnread, setCountMessUnread] = useState<number>()
-	const currentDirect = useSelector(selectDirectById(directMessage.id))
+	const [countMessUnread, setCountMessUnread] = useState<number>();
+	const currentDirect = useSelector(selectDirectById(directMessage.id));
 	const dispatch = useAppDispatch();
 	const openDirectMessage = (direct: any) => {
-		dispatch(directActions.openDirectMessage({channel_id: direct.channel_id|| ""}))
+		dispatch(directActions.openDirectMessage({ channel_id: direct.channel_id || '' }));
 		dispatch(
 			directActions.joinDirectMessage({
-			  directMessageId: direct.channel_id,
-			  channelName: '',
-			  type: Number(directMessage.type),
+				directMessageId: direct.channel_id,
+				channelName: '',
+				type: Number(directMessage.type),
 			}),
-		  );
-	}
+		);
+	};
+
+	const handleDirectMessage = async () => {
+		await dispatch(clansActions.joinClan({ clanId: '0' }));
+	};
+
 	useLayoutEffect(() => {
 		if (currentDirect?.count_mess_unread) {
 			setCountMessUnread(currentDirect?.count_mess_unread);
@@ -32,9 +37,9 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 	return (
 		<div>
 			<div className="py-0 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '8px' }}></div>
-			<div onClick={()=>openDirectMessage(directMessage)}>
-				<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`} >
-					<NavLinkComponent clanName={directMessage.channel_label || ""}>
+			<div onClick={() => openDirectMessage(directMessage)}>
+				<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`} onClick={handleDirectMessage}>
+					<NavLinkComponent clanName={directMessage.channel_label || ''}>
 						<div>
 							<Image
 								src={`${directMessage.type === ChannelType.CHANNEL_TYPE_DM ? directMessage.channel_avatar : 'assets/images/avatar-group.png'}`}

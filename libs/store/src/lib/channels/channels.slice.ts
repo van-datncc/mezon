@@ -15,6 +15,7 @@ import { notifiReactMessageActions } from '../notificationSetting/notificationRe
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { threadsActions } from '../threads/threads.slice';
+import { rolesClanActions } from '../roleclan/roleclan.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -152,6 +153,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
+			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({clanId: clanID, channelId: body.channel_id}))
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: clanID,

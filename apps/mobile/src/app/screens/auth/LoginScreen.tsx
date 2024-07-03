@@ -1,3 +1,4 @@
+import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { useAuth } from '@mezon/core';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import { RootState } from '@mezon/store-mobile';
@@ -13,7 +14,7 @@ import * as Yup from 'yup';
 import LoadingModal from '../../components/LoadingModal';
 import Button from '../../components/auth/Button';
 import FooterAuth from '../../components/auth/FooterAuth';
-import GoogleLogin from '../../components/auth/GoogleLogin';
+import LoginSocial from '../../components/auth/LoginSocial';
 import TextInputUser from '../../components/auth/TextInput';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 const LoginSchema = Yup.object().shape({
@@ -31,7 +32,7 @@ const IOS_CLIENT_ID = '285548761692-3k9ubkdhl8bbvbal78j9v2905kjhg3tj.apps.google
 const LoginScreen = () => {
 	const navigation = useNavigation();
 	const isLoading = useSelector((state: RootState) => state.auth.loadingStatus);
-	const { loginByGoogle, loginEmail } = useAuth();
+	const { loginByGoogle, loginByApple, loginEmail } = useAuth();
 
 	useEffect(() => {
 		const config = {
@@ -54,13 +55,10 @@ const LoginScreen = () => {
 							text1: 'Login Failed',
 							text2: 'Invalid email or password',
 						});
-					} else {
-						await onGoogleButtonPress();
 					}
 				}
 			} catch (error) {
 				/* empty */
-				await onGoogleButtonPress();
 			}
 		},
 		[loginEmail],
@@ -85,6 +83,26 @@ const LoginScreen = () => {
 		}
 	}
 
+	async function onAppleButtonPress() {
+		try {
+			const appleAuthRequestResponse = await appleAuth.performRequest({
+				requestedOperation: appleAuth.Operation.LOGIN,
+				requestedScopes: [appleAuth.Scope.EMAIL],
+			});
+			const identityToken = appleAuthRequestResponse?.identityToken;
+			await loginByApple(identityToken);
+		} catch (error) {
+			if (error.code === appleAuth.Error.CANCELED) {
+				return;
+			}
+			Toast.show({
+				type: 'error',
+				text1: 'Login Failed',
+				text2: error.message,
+			});
+		}
+	}
+
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
 			<KeyboardAvoidingView style={styles.container}>
@@ -95,12 +113,12 @@ const LoginScreen = () => {
 				</View>
 				{/* body */}
 				<View style={styles.googleButton}>
-					{Platform.OS === 'android' && (
-						<Block>
-							<GoogleLogin onGoogleButtonPress={onGoogleButtonPress} />
-							<Text style={styles.orText}>Or</Text>
-						</Block>
-					)}
+					<LoginSocial onGoogleButtonPress={onGoogleButtonPress} onAppleButtonPress={onAppleButtonPress} />
+					<Block marginTop={size.s_30} flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} alignSelf={'center'}>
+						<Block width={'35%'} height={1} backgroundColor={Colors.gray48} />
+						<Text style={styles.orText}>Or</Text>
+						<Block width={'35%'} height={1} backgroundColor={Colors.gray48} />
+					</Block>
 				</View>
 				<ScrollView style={{ flex: 1 }}>
 					<Formik
@@ -168,6 +186,7 @@ const styles = StyleSheet.create({
 	headerContainer: {
 		alignItems: 'center',
 		marginTop: size.s_30,
+		marginBottom: size.s_30,
 		paddingVertical: 10,
 		paddingHorizontal: 20,
 	},
@@ -184,14 +203,12 @@ const styles = StyleSheet.create({
 		color: '#CCCCCC',
 	},
 	orText: {
+		paddingHorizontal: size.s_20,
 		fontSize: size.s_12,
-		lineHeight: 15 * 1.4,
 		color: '#AEAEAE',
-		marginLeft: 5,
 		alignSelf: 'center',
-		paddingTop: 10,
 	},
 	googleButton: {
-		marginVertical: size.s_30,
+		marginVertical: size.s_20,
 	},
 });

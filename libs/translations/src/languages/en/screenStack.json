@@ -8,5 +8,12 @@
     },
     "menuChannelStack": {
         "channelSetting": "Channel Settings"
+    },
+    "settingStack": {
+        "settings": "Settings",
+        "appearance": "Appearance Settings",
+        "appTheme": "App Theme",
+        "language": "Language Settings",
+        "profile": "Profile Settings"
     }
 }

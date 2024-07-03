@@ -10,7 +10,8 @@ export interface IReplyBottomSheet {
 	mode?: number;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
-  checkAnonymous?: boolean;
+  	checkAnonymous?: boolean;
+	senderDisplayName?: string;
 }
 
 export interface IMessageAction {
@@ -22,6 +23,8 @@ export interface IMessageAction {
 export interface IMessageActionNeedToResolve {
 	type: EMessageActionType;
 	targetMessage: IMessageWithUser;
+	isStillShowKeyboard?: boolean;
+	replyTo?: string;
 }
 
 export interface IMessageReactionProps {
