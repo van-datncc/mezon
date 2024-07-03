@@ -61,7 +61,9 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 						</>
 					) : (
 						<RenderTextMarkdownContent
-							content={messageReferences?.content ? JSON.parse(messageReferences?.content) : {}}
+							content={{
+								...(typeof messageReferences.content === 'object' ? JSON.parse(messageReferences?.content) : {}),
+							}}
 							isEdited={false}
 							translate={t}
 							isMessageReply

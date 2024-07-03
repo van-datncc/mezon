@@ -121,12 +121,11 @@ export const InviteToChannel = React.memo(
 					t: dataSend.text,
 					links: [
 						{
-							endIndex: dataSend.text.length,
-							link: dataSend.text,
-							startIndex: 0,
+							e: dataSend.text.length,
+							lk: dataSend.text,
+							s: 0,
 						},
 					],
-					plainText: dataSend.text,
 				},
 				[],
 				[],

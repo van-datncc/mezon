@@ -175,7 +175,6 @@ export const Sharing = ({ data, onClose }) => {
 			{
 				t: dataSend.text,
 				links: dataSend.links || [],
-				plainText: dataSend.text,
 			},
 			[],
 			getAttachmentUnique(attachmentDataRef) || [],
@@ -201,7 +200,6 @@ export const Sharing = ({ data, onClose }) => {
 			{
 				t: dataSend.text,
 				links: dataSend.links || [],
-				plainText: dataSend.text,
 			},
 			[], //mentions
 			getAttachmentUnique(attachmentDataRef) || [], //attachments
@@ -228,9 +226,9 @@ export const Sharing = ({ data, onClose }) => {
 				}
 				const endIndex = i;
 				links.push({
-					link: inputString.substring(startIndex, endIndex),
-					startindex: startIndex,
-					endindex: endIndex,
+					lk: inputString.substring(startIndex, endIndex),
+					s: startIndex,
+					e: endIndex,
 				});
 			} else {
 				i++;
