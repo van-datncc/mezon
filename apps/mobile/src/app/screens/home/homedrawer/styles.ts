@@ -87,6 +87,7 @@ export const styles = StyleSheet.create({
 	containerDrawerContent: {
 		flex: 1,
 		flexDirection: 'row',
+		backgroundColor: Colors.secondary,
 	},
 	homeDefault: {
 		backgroundColor: Colors.secondary,

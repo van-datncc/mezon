@@ -139,17 +139,21 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const handleActionReportMessage = () => {
 		onClose();
-		onConfirmAction({
-			type: EMessageActionType.Report
-		})
+		timeoutRef.current = setTimeout(() => {
+			onConfirmAction({
+				type: EMessageActionType.Report
+			})
+		}, Platform.OS === 'ios' ? 500 : 0)
 	};
 
 	const handleForwardMessage = () => {
 		onClose();
-		onConfirmAction({
-			type: EMessageActionType.ForwardMessage,
-			message
-		})
+		timeoutRef.current = setTimeout(() => {
+			onConfirmAction({
+				type: EMessageActionType.ForwardMessage,
+				message
+			})
+		}, Platform.OS === 'ios' ? 500 : 0)
 	};
 
 	const implementAction = (type: EMessageActionType) => {
