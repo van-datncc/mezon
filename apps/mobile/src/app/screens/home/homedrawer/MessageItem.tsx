@@ -68,6 +68,7 @@ export type MessageItemProps = {
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 	showUserInformation?: boolean;
+	preventAction?: boolean
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -77,7 +78,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 const idUserAnonymous = "1767478432163172999";
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false } = props;
+	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false, preventAction = false } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message = useMemo(() => {
 		return props?.message ? props?.message : selectedMessage;
@@ -345,6 +346,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	const handleSwipeableOpen = (direction: "left" | "right") => {
+		if (preventAction && swipeableRef.current) {
+			swipeableRef.current.close();
+		}
 		if (direction === 'right') {
 			swipeableRef.current?.close();
 			const payload: IMessageActionNeedToResolve = {
@@ -384,7 +388,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							<View style={styles.iconReply}>
 								<ReplyIcon width={34} height={30} />
 							</View>
-							<Pressable onPress={() => handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
+							<Pressable onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
 								{repliedSender?.user?.avatar_url ? (
 									<View style={styles.replyAvatar}>
 										<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
@@ -420,6 +424,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						{isShowInfoUser || showUserInformation ? (
 							<Pressable
 								onPress={() => {
+									if (preventAction) return;
 									setIsOnlyEmojiPicker(false);
 									onMessageAction({
 										type: EMessageBSToShow.UserInformation,
@@ -443,6 +448,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						<Pressable
 							style={[styles.rowMessageBox]}
 							onLongPress={() => {
+								if (preventAction) return;
 								setIsOnlyEmojiPicker(false);
 								onMessageAction({
 									type: EMessageBSToShow.MessageAction,
@@ -456,6 +462,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								<TouchableOpacity
 									activeOpacity={0.8}
 									onPress={() => {
+										if (preventAction) return;
 										setIsOnlyEmojiPicker(false);
 										onMessageAction({
 											type: EMessageBSToShow.UserInformation,
@@ -477,6 +484,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								message={message}
 								mode={mode}
 								emojiListPNG={emojiListPNG}
+								preventAction={preventAction}
 								openEmojiPicker={() => {
 									setIsOnlyEmojiPicker(true);
 									onMessageAction({

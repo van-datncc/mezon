@@ -46,6 +46,7 @@ export interface IMessageReactionProps {
 	mode: number;
 	emojiListPNG?: IEmojiImage[];
 	openEmojiPicker?: () => void;
+	preventAction?: boolean;
 }
 
 export interface IDetailReactionBottomSheet {

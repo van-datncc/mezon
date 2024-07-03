@@ -228,7 +228,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
-		const messageExists = listPinMessages.some((pinMessage) => pinMessage.message_id === message.id);
+		const messageExists = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
 		const listOfActionOnlyMyMessage = [
 			EMessageActionType.EditMessage,
 			EMessageActionType.DeleteMessage,
