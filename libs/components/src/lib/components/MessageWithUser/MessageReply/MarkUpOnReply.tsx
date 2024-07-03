@@ -4,12 +4,14 @@ import HashTagMentionById from './HashTagMentionById';
 interface IMarkUpOnReply {
 	mention: any[];
 	onClickToMove: (e: React.MouseEvent<HTMLSpanElement>) => void;
+	posMention?: boolean;
 }
 
-const MarkUpOnReply = ({ mention, onClickToMove }: IMarkUpOnReply) => {
+const MarkUpOnReply = ({ mention, onClickToMove, posMention }: IMarkUpOnReply) => {
+
 	const processedMessage = mention.reduce((acc: any, item, index) => {
 		let markUpId = '';
-
+		
 		if (item.matchedText.startsWith('<#') || item.matchedText.startsWith('@') || item.matchedText.startsWith(':')) {
 			markUpId = item.matchedText;
 		}
@@ -21,10 +23,11 @@ const MarkUpOnReply = ({ mention, onClickToMove }: IMarkUpOnReply) => {
 		}
 		return acc;
 	}, []);
+
 	return (
 		<span
 			onClick={onClickToMove}
-			className="one-line dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer noselect"
+			className={`${posMention ? '' : 'one-line'} dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer noselect`}
 		>
 			{processedMessage}
 		</span>

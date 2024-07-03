@@ -5,12 +5,14 @@ import {
 	selectChannelById,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectMemberByUserId,
 	selectMemberClanByUserId,
+	selectMessageByMessageId,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import MessageAvatar from '../MessageWithUser/MessageAvatar';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageHead from '../MessageWithUser/MessageHead';
 import MarkUpOnReply from '../MessageWithUser/MessageReply/MarkUpOnReply';
 import { useMessageLine } from '../MessageWithUser/useMessageLine';
@@ -60,10 +62,12 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
+	const messageId = notify.content.message_id;
 	const { toChannelPage, navigate } = useAppNavigation();
 	const { jumpToMessage } = useJumpToMessage();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-
+	const message = useSelector(selectMessageByMessageId(messageId));
+	console.log(message);
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
 	const dispatchMessageMention = async () => {
@@ -123,8 +127,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				>
 					Jump
 				</button>
-
-				<MentionTabContent message={data} />
+				{message !== undefined && <MentionTabContent message={message} />}
 			</div>
 		</div>
 	);
@@ -138,7 +141,7 @@ interface IMentionTabContent {
 
 function MentionTabContent({ message }: IMentionTabContent) {
 	const dispatch = useDispatch();
-	const { mentions } = useMessageLine(message.content.t ?? '');
+	const { mentions } = useMessageLine(message?.content?.t ?? '');
 	const getIdMessageToJump = useCallback(
 		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
@@ -149,17 +152,26 @@ function MentionTabContent({ message }: IMentionTabContent) {
 		},
 		[dispatch],
 	);
+	const senderMessage = useSelector(selectMemberByUserId(message?.sender_id));
+
 	return (
 		<>
-			<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
-				<MessageAvatar user={user} message={message} isCombine={false} isEditing={isEditing} isShowFull={isShowFull} />
-				<div className="w-full relative h-full">
-					<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} />
-					<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
-						<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
-							<MarkUpOnReply onClickToMove={(e) => getIdMessageToJump(message.id, e)} mention={mentions} />
+			<div className="flex flex-row p-5 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
+				
+				<div className="w-14 h-14">
+					<AvatarImage
+						alt="user avatar"
+						className="w-full h-full min-w-14"
+						userName={senderMessage?.user?.username}
+						src={senderMessage?.user?.avatar_url}
+					/>
+				</div>
+
+				<div className="h-full">
+					<MessageHead message={message} user={senderMessage} isCombine={true} isShowFull={true} />
+						<div className={'w-[20rem] border'} style={{ wordBreak: 'break-word' }}>
+							<MarkUpOnReply posMention={true} onClickToMove={(e) => getIdMessageToJump(message?.id, e)} mention={mentions} />
 						</div>
-					</div>
 				</div>
 			</div>
 		</>

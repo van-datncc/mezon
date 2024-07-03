@@ -38,7 +38,7 @@ const HashTagReply = ({ hashtagId }: IHashtag) => {
 	const channel = getChannelById(hashtagId.slice(2, -1));
 
 	return getChannelById(hashtagId.slice(2, -1)) ? (
-		<span className="font-medium  rounded-sm  !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ">
+		<span className="font-medium border rounded-sm  !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ">
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<Icons.Speaker defaultSize="inline mt-[-0.2rem] w-4 h-4 ml-[-0.5rem]" defaultFill="#3297FF" />
 			) : (
