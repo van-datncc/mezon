@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { View } from "react-native";
-import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useEffect } from "react";
+import { style } from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IMezonRadioButton {
     onChange?: (isCheck: boolean) => void;
@@ -11,8 +12,9 @@ interface IMezonRadioButton {
 }
 
 export default function MezonRadioButton({ onChange, checked, noSwitchFalse }: IMezonRadioButton) {
+    const styles = style(useTheme().themeValue);
     const [isChecked, setChecked] = useState<boolean>(checked);
-
+    
     useEffect(() => {
         if (checked != isChecked) setChecked(checked);
     }, [checked])

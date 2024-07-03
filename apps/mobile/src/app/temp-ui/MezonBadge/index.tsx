@@ -4,7 +4,7 @@ import styles from "./styles";
 
 interface MezonBadgeProps {
     title: string,
-    type: "success" | "warning" | "danger",
+    type?: "success" | "warning" | "danger",
 }
 
 export default function MezonBadge({ title, type }: MezonBadgeProps) {

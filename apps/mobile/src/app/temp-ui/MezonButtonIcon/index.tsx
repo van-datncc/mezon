@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
-import styles from "./styles";
+import { style } from "./styles";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IMezonButtonIconProps {
     onPress?: () => void;
@@ -9,6 +10,7 @@ interface IMezonButtonIconProps {
 }
 
 export default function MezonButtonIcon({ title, icon, onPress }: IMezonButtonIconProps) {
+    const styles = style(useTheme().themeValue);
     return (
         <TouchableOpacity
             onPress={onPress}

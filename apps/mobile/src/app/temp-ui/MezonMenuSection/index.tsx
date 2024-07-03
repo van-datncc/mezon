@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
-import styles from "./styles";
 import MezonMenuItem, { IMezonMenuItemProps } from "../MezonMenuItem";
+import { style } from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
 
 export interface IMezonMenuSectionProps {
     title?: string;
@@ -9,6 +10,8 @@ export interface IMezonMenuSectionProps {
 }
 
 export default function MezonMenuSection({ title, items, bottomDescription }: IMezonMenuSectionProps) {
+    const styles = style(useTheme().themeValue);
+
     return (
         <View style={styles.sectionWrapper}>
             {title && <Text style={styles.sectionTitle}>{title}</Text>}
