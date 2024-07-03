@@ -45,6 +45,7 @@ export function useTheme(themeMode?: ThemeMode) {
 
             return ({
                 themeValue: themeColors[themeBasicMode],
+                themeBasic: themeBasicMode,
                 theme: theme,
                 setTheme: setAppearanceTheme
             })

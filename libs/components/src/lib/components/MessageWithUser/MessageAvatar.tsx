@@ -36,9 +36,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMes
 	};
 
 	if (message.references?.length === 0 && isCombine && !isShowFull) {
-		return isEditing ? (
-			''
-		) : (
+		return (
 			<div className="w-10 flex items-center justify-center min-w-10">
 				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>
 			</div>

@@ -20,6 +20,7 @@ export const size = {
   h5: 20,
   h6: 19,
   h7: 14,
+  h85: 12,
   h8: 11,
   h9: 9,
   input: 18,

@@ -28,7 +28,7 @@ export const LanguageSetting = () => {
 
     const changeLanguage = (lang: string) => {
         setCurrentLanguage(lang);
-        i18n.changeLanguage(lang)
+        i18n.changeLanguage(lang);        
     }
 
     return (
