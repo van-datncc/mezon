@@ -23,7 +23,7 @@ const AppLayout = () => {
 			toast(
 				<div>
 					<div className="flex items-center">
-						{image && <img src={image} alt="Notification" className="w-10 h-10 rounded-full object-cover" />}
+						{image && <img src={image} alt="Notification" className="min-w-10 min-h-10 size-10 rounded-full object-cover" />}
 						<div className="ml-3">
 							<span className="block font-semibold">{title}</span>
 						</div>
