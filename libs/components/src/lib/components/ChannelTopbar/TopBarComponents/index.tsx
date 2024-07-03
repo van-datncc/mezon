@@ -66,7 +66,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				<div className="flex flex-row items-center gap-2">
 					<Icons.ArrowRight />
 					{channelParent && channel.channel_private === ChannelStatusEnum.isPrivate ? (
-						<Icons.ThreadIconLocker />
+						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode" />
 					) : (
 						<Icons.ThreadIcon defaultSize="w-6 h-6" />
 					)}
