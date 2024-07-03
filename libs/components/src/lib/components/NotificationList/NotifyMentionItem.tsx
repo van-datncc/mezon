@@ -7,10 +7,13 @@ import {
 	selectCurrentClan,
 	selectMemberClanByUserId,
 } from '@mezon/store';
-import { IChannelMember } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { IMessageWithUser } from '@mezon/utils';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import MessageWithUser from '../MessageWithUser';
+import MessageAvatar from '../MessageWithUser/MessageAvatar';
+import MessageHead from '../MessageWithUser/MessageHead';
+import MarkUpOnReply from '../MessageWithUser/MessageReply/MarkUpOnReply';
+import { useMessageLine } from '../MessageWithUser/useMessageLine';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
 };
@@ -78,7 +81,11 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				<div className="flex flex-row items-center gap-2">
 					<div>
 						{currentClan?.logo ? (
-							<img src={currentClan.logo} className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10" alt={currentClan.logo} />
+							<img
+								src={currentClan.logo}
+								className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
+								alt={currentClan.logo}
+							/>
 						) : (
 							<div>
 								{currentClan?.clan_name && (
@@ -116,16 +123,45 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 				>
 					Jump
 				</button>
-				<MessageWithUser
-					message={data}
-					user={user as IChannelMember}
-					isMessNotifyMention={true}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isMention={true}
-				/>
+
+				<MentionTabContent message={data} />
 			</div>
 		</div>
 	);
 }
 
 export default NotifyMentionItem;
+
+interface IMentionTabContent {
+	message: IMessageWithUser;
+}
+
+function MentionTabContent({ message }: IMentionTabContent) {
+	const dispatch = useDispatch();
+	const { mentions } = useMessageLine(message.content.t ?? '');
+	const getIdMessageToJump = useCallback(
+		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
+			e.stopPropagation();
+			if (idRefMessage) {
+				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+				dispatch(referencesActions.setIdReferenceMessageReply(''));
+			}
+		},
+		[dispatch],
+	);
+	return (
+		<>
+			<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
+				<MessageAvatar user={user} message={message} isCombine={false} isEditing={isEditing} isShowFull={isShowFull} />
+				<div className="w-full relative h-full">
+					<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} />
+					<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+						<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+							<MarkUpOnReply onClickToMove={(e) => getIdMessageToJump(message.id, e)} mention={mentions} />
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
+	);
+}
