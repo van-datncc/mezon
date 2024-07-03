@@ -9,8 +9,6 @@ import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
-import { directMessageValueProps } from '../DmList/DMListItem';
-import { ChannelType } from 'mezon-js';
 import PanelGroupDM from './PanelGroupDm';
 
 type PanelMemberProps = {
@@ -63,7 +61,6 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 				onClose();
 			}}
 		>
-			{directMessageValue && <GroupPanelMember><ItemPanelMember children="Mask As Read" /></GroupPanelMember>}
 			{(directMessageValue && checkDmGroup) ? 
 				<PanelGroupDM /> :	
 			<>
