@@ -1,14 +1,9 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import {
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
-	getInfoChannelByClanId,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save,
-} from '@mezon/mobile-components';
+import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
+	RootState,
 	appActions,
 	categoriesActions,
 	channelsActions,
@@ -18,7 +13,7 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
 	selectIsFromFCMMobile,
-  useAppDispatch,
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -27,22 +22,23 @@ import { FlatList, Pressable, Text, TextInput, TouchableOpacity, View } from 're
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../components/Event';
+import ChannelListSkeleton from '../../../components/Skeletons/ChannelListSkeleton';
+import { darkColor } from '../../../constants/Colors';
 import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../../temp-ui';
 import { ChannelListContext, ChannelListSection } from './Reusables';
 import { InviteToChannel } from './components';
 import CategoryMenu from './components/CategoryMenu';
 import ChannelListHeader from './components/ChannelList/ChannelListHeader';
+import ChannelMenu from './components/ChannelMenu';
 import ClanMenu from './components/ClanMenu/ClanMenu';
 import { styles } from './styles';
-import { darkColor } from '../../../constants/Colors';
-import ChannelMenu from './components/ChannelMenu';
-import { Icons } from "@mezon/mobile-components"
 
 const ChannelList = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
+	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
@@ -112,11 +108,16 @@ const ChannelList = React.memo((props: any) => {
 	function handleLongPressChannel(channel: IChannel) {
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
-		setIsUnKnownChannel(!channel?.channel_id)
+		setIsUnKnownChannel(!channel?.channel_id);
 	}
 
-  function handleOnPressSortChannel(channel: IChannel) {
-		dispatch(categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id], categoryId : channel?.category_id}));
+	function handleOnPressSortChannel(channel: IChannel) {
+		dispatch(
+			categoriesActions.setCategoryIdSortChannel({
+				isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id],
+				categoryId: channel?.category_id,
+			}),
+		);
 	}
 
 	function handlePressEventCreate() {
@@ -135,12 +136,10 @@ const ChannelList = React.memo((props: any) => {
 					</View>
 					<Pressable
 						style={styles.inviteIconWrapper}
-						onPress={
-							() => {
-								setIsUnKnownChannel(false);
-								bottomSheetInviteRef.current.open()
-							}
-						}
+						onPress={() => {
+							setIsUnKnownChannel(false);
+							bottomSheetInviteRef.current.open();
+						}}
 					>
 						<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
 					</Pressable>
@@ -155,21 +154,25 @@ const ChannelList = React.memo((props: any) => {
 						<Text style={{ color: 'white' }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
-				<FlatList
-					data={categorizedChannels || []}
-					keyExtractor={(_, index) => index.toString()}
-					renderItem={({ item, index }) => (
-						<ChannelListSection
-							data={item}
-							index={index}
-							onPressHeader={toggleCollapseChannel}
-							onLongPressCategory={(category) => handleLongPressCategory(category)}
-							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
-              onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-							collapseItems={collapseChannelItems}
-						/>
-					)}
-				/>
+				{isLoading === 'loading' ? (
+					<ChannelListSkeleton numberSkeleton={6} />
+				) : (
+					<FlatList
+						data={categorizedChannels || []}
+						keyExtractor={(_, index) => index.toString()}
+						renderItem={({ item, index }) => (
+							<ChannelListSection
+								data={item}
+								index={index}
+								onPressHeader={toggleCollapseChannel}
+								onLongPressCategory={(category) => handleLongPressCategory(category)}
+								onLongPressChannel={(channel) => handleLongPressChannel(channel)}
+								onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
+								collapseItems={collapseChannelItems}
+							/>
+						)}
+					/>
+				)}
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

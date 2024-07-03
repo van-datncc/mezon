@@ -21,7 +21,7 @@ import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
-import MessageItemSkeleton from './components/MessageItemSkeleton';
+import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import { styles } from './styles';
 
 type ChannelMessagesProps = {
