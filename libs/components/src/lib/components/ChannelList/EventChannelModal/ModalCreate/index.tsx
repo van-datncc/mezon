@@ -118,7 +118,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, []);
 
 	return (
-		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg overflow-hidden text-sm p-4">
+		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg text-sm p-4">
 			<div className="flex gap-x-4 mb-4">
 				<HeaderEventCreate tabs={tabs} currentModal={currentModal} onHandleTab={(num: number) => handleCurrentModal(num)} />
 			</div>

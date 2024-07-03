@@ -40,15 +40,21 @@ export const Sharing = ({ data, onClose }) => {
 		return data.filter((data: { contentUri: any }) => !!data?.contentUri);
 	}, [data]);
 	const { attachmentDataRef, setAttachmentData } = useReference();
+	const { reconnect } = useMezon();
 
 	useEffect(() => {
+		reConnectSocket();
 		if (data) {
 			if (data?.length === 1 && data?.[0]?.weblink) {
 				setDataText(data?.[0]?.weblink);
 			}
 		}
 	}, [data]);
-
+	
+	const reConnectSocket = async () => {
+		await reconnect();
+	};
+	
 	useEffect(() => {
 		if (searchText) {
 			handleSearchShareTo();

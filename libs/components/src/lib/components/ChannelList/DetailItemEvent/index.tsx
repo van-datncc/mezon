@@ -19,7 +19,7 @@ const DetailItemEvent = (props: DetailItemEventProps) => {
 	const chooseEvent = useSelector(selectChooseEvent);
 
 	return (
-		<div className="relative w-full max-w-[600px]">
+		<div className="relative w-full max-w-[600px] rounded-lg">
 			<div className="rounded-lg overflow-hidden text-sm dark:bg-[#313339] bg-white dark:text-white text-black">
 				{chooseEvent?.logo && <img src={chooseEvent?.logo} alt={chooseEvent?.title} className="w-full h-44 object-cover" />}
 				<div className="flex justify-between items-center pt-4 border-b border-zinc-600">

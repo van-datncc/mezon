@@ -4,7 +4,7 @@ import { IChannelMember } from '@mezon/utils';
 import classNames from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
 import * as Icons from '../Icons/index';
 import MessageAttachment from './MessageAttachment';
@@ -147,6 +147,7 @@ function MessageWithUser({
 								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} />
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
+										{isEditing && editor}
 										<MessageAttachment message={message} onContextMenu={onContextMenu} />
 										{!isEditing && (
 											<MessageContent
@@ -157,7 +158,6 @@ function MessageWithUser({
 												isError={message.isError}
 											/>
 										)}
-										{isEditing && editor}
 									</div>
 								</div>
 							</div>

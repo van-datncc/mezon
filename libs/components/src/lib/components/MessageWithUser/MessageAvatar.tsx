@@ -1,19 +1,17 @@
-import { ShortUserProfile } from '@mezon/components';
+import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
-import { useMessageSender } from './useMessageSender';
 type IMessageAvatarProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
 	isEditing?: boolean;
-	isShowFull?: boolean; 
+	isShowFull?: boolean;
 };
 
 const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMessageAvatarProps) => {
-	const { hasAvatar, avatarChar, avatarImg, username } = useMessageSender(user);
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -37,31 +35,17 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMes
 		e.stopPropagation();
 	};
 
-	if ((message.references?.length === 0 && isCombine && !isShowFull)) {
+	if (message.references?.length === 0 && isCombine && !isShowFull) {
 		return (
-			isEditing ? "" : (<div className="w-10 flex items-center justify-center min-w-10">
+			<div className="w-10 flex items-center justify-center min-w-10">
 				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>
-			</div>)
+			</div>
 		);
 	}
 	return (
 		<div className="relative group">
 			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
-				{user ? (
-					hasAvatar ? (
-						<img className="size-10 rounded-full object-cover min-w-10 min-h-[38px] cursor-pointer" src={avatarImg} alt={avatarImg} />
-					) : (
-						<div className="size-10 bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{avatarChar}
-						</div>
-					)
-				) : (
-					<img
-						className="size-10 rounded-full object-cover min-w-10 min-h-[38px] cursor-pointer"
-						src="./assets/images/anonymous-avatar.jpg"
-						alt={"anonymous-avatar"}
-					/>
-				)}
+				<AvatarImage alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} />
 			</div>
 			{isShowPanelChannel ? (
 				<div
@@ -69,7 +53,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMes
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message}/>
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} />
 				</div>
 			) : null}
 		</div>

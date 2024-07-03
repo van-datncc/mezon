@@ -6,6 +6,7 @@ import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import ListRolePermission from './listRolePermission';
 import ListMemberPermission from './listMemberPermission';
 import { channelsActions, useAppDispatch } from '@mezon/store';
+import { useAuth } from '@mezon/core';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
@@ -15,18 +16,24 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
 	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
+	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const handleToggle = () => {
 		setValueToggle(!valueToggle);
 	};
 
 	const handleReset = () => {
+		setSelectedRoleIds([])
+		setSelectedUserIds([])
 		setValueToggle(valueToggleInit);
 	};
 
 	const handleSave = async () => {
 		setValueToggleInit(valueToggle);
-		await dispatch(channelsActions.updateChannelPrivate({channel_id: channel.id,channel_private: channel.channel_private || 0}));
+		const updatedUserIds = userProfile?.user?.id ? [...selectedUserIds, userProfile.user.id] : selectedUserIds;
+		await dispatch(channelsActions.updateChannelPrivate({channel_id: channel.id,channel_private: channel.channel_private || 0, user_ids: updatedUserIds, role_ids: selectedRoleIds }));
 	};
 
 	const openAddMemRoleModal = () => {
@@ -37,6 +44,13 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		setShowAddMemRole(false);
 	};
 
+	const handleSelectedUsersChange = (newSelectedUserIds: string[]) => {
+		setSelectedUserIds(newSelectedUserIds);
+	};
+	const handleSelectedRolesChange = (newSelectedRoleIds: string[]) => {
+		setSelectedRoleIds(newSelectedRoleIds);
+	};
+	
 	return (
 		<>
 			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
@@ -84,14 +98,14 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Roles</p>
 									<div>
-										<ListRolePermission channel={channel}/>
+										<ListRolePermission channel={channel} selectedRoleIds={selectedRoleIds}/>
 									</div>
 								</div>
 								<hr className="border-t border-solid border-borderDefault" />
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Members</p>
 									<div>
-										<ListMemberPermission channel={channel}/>
+										<ListMemberPermission channel={channel} selectedUserIds={selectedUserIds}/>
 									</div>
 								</div>
 							</div>
@@ -102,7 +116,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 				)}
 			</div>
-			{showAddMemRole && <AddMemRole onClose={closeAddMemRoleModal} channel={channel} />}
+			{showAddMemRole && <AddMemRole onClose={closeAddMemRoleModal} channel={channel} onSelectedUsersChange={handleSelectedUsersChange} onSelectedRolesChange={handleSelectedRolesChange} selectRoleIds={selectedRoleIds} selectUserIds={selectedUserIds}/>}
 		</>
 	);
 };
