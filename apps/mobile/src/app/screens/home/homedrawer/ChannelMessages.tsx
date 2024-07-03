@@ -1,7 +1,16 @@
 import { useChatMessages, useChatTypings } from '@mezon/core';
 import { ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { selectAllUserClanProfile, selectAttachmentPhoto, selectCurrentClan, selectHasMoreMessageByChannelId, selectMembersByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import {
+	RootState,
+	selectAllUserClanProfile,
+	selectAttachmentPhoto,
+	selectCurrentClan,
+	selectHasMoreMessageByChannelId,
+	selectMembersByChannelId,
+	selectMessageIdsByChannelId,
+	useAppDispatch,
+} from '@mezon/store-mobile';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -12,6 +21,7 @@ import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
+import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import { styles } from './styles';
 
 type ChannelMessagesProps = {
@@ -25,6 +35,7 @@ type ChannelMessagesProps = {
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
 	const { loadMoreMessage } = useChatMessages({ channelId });
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const { typingUsers } = useChatTypings({ channelId, mode });
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
 	const flatListRef = useRef(null);
@@ -33,9 +44,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const dispatch = useAppDispatch();
-  const currentClan = useSelector(selectCurrentClan);
-  const channelMember = useSelector(selectMembersByChannelId(channelId));
-  const clansProfile = useSelector(selectAllUserClanProfile);
+	const currentClan = useSelector(selectCurrentClan);
+	const channelMember = useSelector(selectMembersByChannelId(channelId));
+	const clansProfile = useSelector(selectAllUserClanProfile);
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -109,37 +120,45 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 			</View>
 		);
 	};
-	const onOpenImage = useCallback((image: ApiMessageAttachment) => {
-		setImageSelected(image);
-		setIdxSelectedImageModal(0);
-		setVisibleImageModal(true);
-	}, [setIdxSelectedImageModal, setVisibleImageModal]);
+	const onOpenImage = useCallback(
+		(image: ApiMessageAttachment) => {
+			setImageSelected(image);
+			setIdxSelectedImageModal(0);
+			setVisibleImageModal(true);
+		},
+		[setIdxSelectedImageModal, setVisibleImageModal],
+	);
 
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
 		return data.reverse();
 	}, [messages]);
 
-	const jumpToRepliedMessage = useCallback((messageId: string) => {
-		const indexToJump = dataReverse.findIndex(message => message === messageId);
-		if (indexToJump !== -1 && flatListRef.current) {
-			flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
-		}
-	}, [dataReverse])
+	const jumpToRepliedMessage = useCallback(
+		(messageId: string) => {
+			const indexToJump = dataReverse.findIndex((message) => message === messageId);
+			if (indexToJump !== -1 && flatListRef.current) {
+				flatListRef.current.scrollToIndex({ animated: true, index: indexToJump - 1 });
+			}
+		},
+		[dataReverse],
+	);
 
 	const renderItem = useCallback(
 		({ item }) => {
-			return <MessageItem
-				jumpToRepliedMessage={jumpToRepliedMessage}
-				clansProfile={clansProfile}
-				channelMember={channelMember}
-				messageId={item}
-				mode={mode}
-				channelId={channelId}
-				channelLabel={channelLabel}
-				onOpenImage={onOpenImage}
-				currentClan={currentClan}
-			/>;
+			return (
+				<MessageItem
+					jumpToRepliedMessage={jumpToRepliedMessage}
+					clansProfile={clansProfile}
+					channelMember={channelMember}
+					messageId={item}
+					mode={mode}
+					channelId={channelId}
+					channelLabel={channelLabel}
+					onOpenImage={onOpenImage}
+					currentClan={currentClan}
+				/>
+			);
 		},
 		[mode, channelId, channelLabel, onOpenImage, jumpToRepliedMessage],
 	);
@@ -168,7 +187,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
-			{!messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
+			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
+			{isLoading === 'loading' && !isLoadMore && <MessageItemSkeleton skeletonNumber={15} />}
 			<FlatList
 				ref={flatListRef}
 				inverted
