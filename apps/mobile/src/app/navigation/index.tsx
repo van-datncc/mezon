@@ -5,11 +5,13 @@ import RootNavigation from "./RootNavigator";
 // @ts-expect-error
 import { NX_CHAT_APP_API_HOST } from '@env';
 import { I18nextProvider } from 'react-i18next';
+// @ts-ignore
 import i18n from '@mezon/translations';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Sentry from '@sentry/react-native';
+import 'react-native-svg'
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
@@ -25,8 +27,10 @@ Sentry.init({
 });
 
 const mezon: CreateMezonClientOptions = {
-	host: process.env.NX_CHAT_APP_API_HOST as string,
-	key: process.env.NX_CHAT_APP_API_KEY as string,
+	// host: process.env.NX_CHAT_APP_API_HOST as string,
+	// key: process.env.NX_CHAT_APP_API_KEY as string,
+	host: "mezon.vn",
+	key: "m3zonPr0dkey",
 	port: process.env.NX_CHAT_APP_API_PORT as string,
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 };

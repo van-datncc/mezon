@@ -2,7 +2,7 @@ import { MenuHorizontalIcon, VerifyIcon } from '@mezon/mobile-components';
 import { ClansEntity } from '@mezon/store-mobile';
 import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { style } from './style';
+import { style } from './styles';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 interface IProps {
 	onPress: () => void;
