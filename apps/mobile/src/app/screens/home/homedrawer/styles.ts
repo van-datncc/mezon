@@ -330,6 +330,7 @@ export const styles = StyleSheet.create({
 	},
 	aboveMessage: {
 		flexDirection: 'row',
+		marginTop: size.s_6,
 		paddingLeft: size.s_10,
 		gap: 15,
 	},
@@ -373,7 +374,6 @@ export const styles = StyleSheet.create({
 		color: Colors.red,
 		backgroundColor: Colors.secondary,
 		paddingHorizontal: Metrics.size.s,
-		fontWeight: "bold"
 	},
 
 	messageWrapper: {
@@ -642,6 +642,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingLeft: size.s_10,
 		gap: 5,
+		marginTop: size.s_6,
 		alignItems: 'center'
 	},
 	iconMessageDeleteReply: {

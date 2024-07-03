@@ -224,7 +224,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
 	valueTextInput: {},
-	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	// idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	idChannelSelected: {},
 	mode: 'dm',
 });
 
