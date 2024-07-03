@@ -18,21 +18,24 @@ const EventModal = (props: EventModalProps) => {
 	}, []);
 
 	return (
-		<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
+		<div className="justify-center items-center flex overflow-x-hidden rounded-lg overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
 			{!openModalDetail ? (
-				<div className={`relative w-full sm:h-auto ${openModal ? 'max-w-[472px]' : 'max-w-[600px]'}`}>
-					<div className="rounded-lg overflow-hidden text-sm">
-						{!openModal ? (
+				<div className={`relative w-full sm:h-auto rounded-lg ${openModal ? 'max-w-[472px]' : 'max-w-[600px]'}`}>
+					{!openModal ? (
+						<div className="rounded-lg text-sm overflow-hidden">
 							<StartEventModal
 								onClose={onClose}
 								onOpenCreate={() => setOpenModal(true)}
 								onOpenDetailItem={handleModalDetail}
 								numberEventManagement={numberEventManagement}
 							/>
-						) : (
+						</div>
+					) : (
+						<div className="rounded-lg text-sm">
 							<ModalCreate onClose={() => setOpenModal(false)} onCloseEventModal={onClose} />
-						)}
-					</div>
+						</div>
+					)}
+					
 				</div>
 			) : (
 				<DetailItemEvent setOpenModalDetail={handleModalDetail} />

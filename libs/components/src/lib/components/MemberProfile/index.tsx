@@ -139,7 +139,7 @@ function MemberProfile({
 						<img src={avatar} className="w-[32px] h-[32px] min-w-[32px] rounded-full object-cover" />
 					) : (
 						<div className="w-[32px] h-[32px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{name.charAt(0).toUpperCase()}
+							{(userProfile?.user?.username || name).charAt(0).toUpperCase()}
 						</div>
 					)}
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
