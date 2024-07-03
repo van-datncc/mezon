@@ -17,6 +17,7 @@ export * from './MezonSelect';
 export * from './MezonDateTimePicker';
 export * from './MezonConfirm';
 export * from './MezonSlideOption';
+export * from './MezonSearch';
 
 export { default as MezonMenu } from './MezonMenu';
 export { default as MezonOption } from './MezonOption';
@@ -30,3 +31,4 @@ export { default as MezonSelect } from './MezonSelect';
 export { default as MezonDateTimePicker } from "./MezonDateTimePicker"
 export { default as MezonConfirm } from "./MezonConfirm";
 export { default as MezonSlideOption } from "./MezonSlideOption";
+export { default as MezonSearch } from "./MezonSearch";

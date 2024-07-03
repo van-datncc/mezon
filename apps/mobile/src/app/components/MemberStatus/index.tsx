@@ -88,6 +88,8 @@ export const MemberListStatus = React.memo(() => {
 									}}
 									user={user}
 									key={user?.user?.id}
+                  currentChannel={currentChannel}
+                  isDMThread={isDMThread}
 								/>
 							))}
 						</View>
@@ -105,6 +107,8 @@ export const MemberListStatus = React.memo(() => {
 									onPress={(user) => {
 										setSelectedUser(user);
 									}}
+                  currentChannel={currentChannel}
+                  isDMThread={isDMThread}
 								/>
 							))}
 						</View>
