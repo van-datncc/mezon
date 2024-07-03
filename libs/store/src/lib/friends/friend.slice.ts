@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
@@ -19,6 +20,14 @@ export interface IFriend extends Friend {
 
 interface IStatusSentMobile {
 	isSuccess: boolean;
+}
+
+export type StateFriendProps = {
+	noFriend: boolean,
+	myPendingFriend: boolean,
+	otherPendingFriend: boolean,
+	blockFriend: boolean,
+	friend: boolean
 }
 
 export const mapFriendToEntity = (FriendRes: Friend) => {
@@ -176,4 +185,41 @@ export const getFriendsState = (rootState: { [FRIEND_FEATURE_KEY]: FriendsState 
 export const selectAllFriends = createSelector(getFriendsState, selectAll);
 export const selectStatusSentMobile = createSelector(getFriendsState, state => state.statusSentMobile);
 
-export const selectAddFriends = (userID: string) => createSelector(selectAllFriends, (friends) => friends.some(friend => friend.state === 0 && friend.id === userID));
+export const selectFriendStatus = (userID: string) => createSelector(
+	selectAllFriends,
+	(friends) => {
+		let status: StateFriendProps = {
+			noFriend: false,
+			otherPendingFriend: false,
+			myPendingFriend: false,
+			blockFriend: false,
+			friend: false
+		};
+  
+	  	const friend = friends.find(friend => friend.id === userID);
+  
+		if (friend) {
+			switch (friend.state) {
+			case 0:
+				status.friend = true;
+				break;
+			case 1:
+				status.otherPendingFriend = true;
+				break;
+			case 2:
+				status.myPendingFriend = true;
+				break;
+			case 3:
+				status.blockFriend = true;
+				break;
+			default:
+				status.noFriend = true;
+				break;
+			}
+		} else {
+			status.noFriend = true;
+		}
+  
+	  	return status;
+	}
+  );
