@@ -1,3 +1,4 @@
+import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelsActions,
@@ -36,6 +37,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 			screenOptions={{
 				drawerPosition: 'left',
 				drawerType: 'back',
+				swipeEdgeWidth: Metrics.screenWidth,
 				drawerStyle: {
 					width: '85%',
 				},
@@ -109,7 +111,7 @@ const HomeScreen = React.memo((props: any) => {
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [currentClan]);
+	}, [currentClan, currentChannelId]);
 
 	useEffect(() => {
 		mainLoader();
@@ -117,12 +119,8 @@ const HomeScreen = React.memo((props: any) => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			const store = await getStoreAsync();
-
-			store.dispatch(appActions.setLoadingMainMobile(true));
 			await reconnect();
 			await messageLoader();
-			store.dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
@@ -141,7 +139,7 @@ const HomeScreen = React.memo((props: any) => {
 		}
 		return null;
 	};
-	
+
 	const messageLoader = async () => {
 		const store = await getStoreAsync();
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId }));
@@ -150,7 +148,8 @@ const HomeScreen = React.memo((props: any) => {
 				clanId: currentClan?.clan_id,
 				channelId: currentChannelId,
 				noFetchMembers: false,
-		}));
+			}),
+		);
 		return null;
 	};
 

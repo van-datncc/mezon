@@ -37,7 +37,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const { typingUsers } = useChatTypings({ channelId, mode });
-	const [showScrollToBottomButton, setShowScrollToBottomButton] = useAnimatedState(false);
+	const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const attachments = useSelector(selectAttachmentPhoto());
@@ -68,8 +68,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		return [imageSelectedUrl, ...attachmentObjects];
 	}, [attachments, imageSelected]);
 
-	const [visibleImageModal, setVisibleImageModal] = useAnimatedState<boolean>(false);
-	const [visibleImageModalOverlay, setVisibleImageModalOverlay] = useAnimatedState<boolean>(false);
+	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
+	const [visibleImageModalOverlay, setVisibleImageModalOverlay] = useState<boolean>(false);
 	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
 
 	useEffect(() => {
