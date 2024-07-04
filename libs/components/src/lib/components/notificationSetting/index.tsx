@@ -22,7 +22,7 @@ export type ModalParam = {
 	channelID: string;
 };
 
-const customStyles = {
+export const customStyles = {
 	control: (provided: any) => ({
 		...provided,
 		backgroundColor: 'black',
@@ -54,7 +54,7 @@ const customStyles = {
 	}),
 };
 
-const lightCustomStyles = {
+export const lightCustomStyles = {
 	control: (provided: any) => ({
 		...provided,
 		backgroundColor: 'white',

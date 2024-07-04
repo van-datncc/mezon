@@ -1,4 +1,4 @@
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../screens/settings';
@@ -12,21 +12,24 @@ import AppThemeSetting from '../../../screens/settings/AppearanceSetting/AppThem
 export const SettingStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
+	const {themeValue} = useTheme();
+
 	return (
 		<Stack.Navigator
 			screenOptions={{
 				headerShown: true,
+				headerBackTitleVisible: false,
 				headerShadowVisible: false,
 				gestureEnabled: true,
 				gestureDirection: 'horizontal',
 				headerTitleAlign: 'center',
-				headerTintColor: Colors.white,
-				headerBackTitleVisible: false,
+				headerTintColor: themeValue.textStrong,
 				headerStyle: {
-					backgroundColor: Colors.secondary,
+					backgroundColor: themeValue.primary,
 				},
 				headerTitleStyle: {
-					fontWeight: "bold"
+					fontWeight: "bold",
+					fontSize: Fonts.size.h7
 				}
 			}}
 		>

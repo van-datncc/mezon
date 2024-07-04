@@ -5,14 +5,14 @@ import {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import { Colors } from "@mezon/mobile-ui";
+import { Colors, baseColor } from "@mezon/mobile-ui";
 
 const Backdrop = (props: BottomSheetBackdropProps) => {
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       props.animatedIndex.value,
       [-1, 0],
-      [0, 0.7],
+      [0, 0.9],
       Extrapolation.CLAMP
     ),
   }));
@@ -21,7 +21,7 @@ const Backdrop = (props: BottomSheetBackdropProps) => {
     () => [
       props.style,
       {
-        backgroundColor: Colors.primary,
+        backgroundColor: baseColor.black,
       },
       containerAnimatedStyle,
     ],

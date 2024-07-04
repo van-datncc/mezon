@@ -93,7 +93,7 @@ export const markdownStyles = {
 	mention: {
 		fontSize: size.medium,
 		color: Colors.textGray,
-		backgroundColor: '#3b426e',
+		backgroundColor: Colors.midnightBlue,
 		lineHeight: size.s_20,
 	},
 	blockquote: {
@@ -434,7 +434,6 @@ const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsE
             }
             if(userMention)
 						return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
-            return `[${part}](${part})`;
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];

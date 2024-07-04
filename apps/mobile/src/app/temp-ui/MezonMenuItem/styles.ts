@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
-import { Colors, Fonts, Metrics, size } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics, size } from "@mezon/mobile-ui";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     btn: {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         gap: size.s_10,
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.secondary,
         paddingLeft: Metrics.size.xl,
     },
 
@@ -17,13 +17,14 @@ const styles = StyleSheet.create({
     },
 
     btnTitle: {
-        color: Colors.tertiary,
-        fontSize: Fonts.size.h7,
+        color: colors.textStrong,
+        fontSize: Fonts.size.h85,
+        fontWeight: "600"
     },
 
     btnDescription: {
-        color: Colors.gray48,
-        fontSize: Fonts.size.h8,
+        color: colors.text,
+        fontSize: Fonts.size.h9,
     },
 
     btnTitleWrapper: {
@@ -35,16 +36,19 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         gap: Metrics.size.s,
-        flexBasis:10
+        flexBasis: 10
     },
     borderBottom: {
-        borderBottomColor: Colors.borderDim,
+        borderBottomColor: colors.borderDim,
         borderBottomWidth: 1,
     },
 
     disable: {
         opacity: 0.8
+    },
+
+    previewValue: {
+        color: colors.text,
+        fontSize: Fonts.size.h8
     }
 })
-
-export default styles;

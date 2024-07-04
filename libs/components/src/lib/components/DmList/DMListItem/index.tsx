@@ -12,6 +12,7 @@ export type DirectMessProp = {
 export type directMessageValueProps = {
 	type: string;
 	userId: string[];
+	dmID: string;
 };
 
 function DMListItem({ directMessage }: DirectMessProp) {
@@ -63,6 +64,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 	const directMessageValue: directMessageValueProps = {
 		type: directMessage.type,
 		userId: directMessage.user_id,
+		dmID: directMessage.id,
 	};
 
 	return (

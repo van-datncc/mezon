@@ -128,7 +128,7 @@ function MemberProfile({
 	useOnClickOutside(panelRef, handleClickOutSide);
 
 	return (
-		<div className="relative group" onClick={() => console.log('1', dataMemberCreate?.createId, user?.user?.id)}>
+		<div className="relative group" >
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
@@ -139,7 +139,7 @@ function MemberProfile({
 						<img src={avatar} className="w-[32px] h-[32px] min-w-[32px] rounded-full object-cover" />
 					) : (
 						<div className="w-[32px] h-[32px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{name.charAt(0).toUpperCase()}
+							{(userProfile?.user?.username || name).charAt(0).toUpperCase()}
 						</div>
 					)}
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
@@ -195,7 +195,7 @@ function MemberProfile({
 				</div>
 			</div>
 			{isShowPanelMember && (
-				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name}/>
+				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false}/>
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div

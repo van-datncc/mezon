@@ -1,11 +1,15 @@
+import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
+	channelsActions,
 	clansActions,
 	directActions,
 	friendsActions,
 	getStoreAsync,
+	messagesActions,
 	notificationActions,
 	selectAllClans,
+	selectCurrentChannelId,
 	selectCurrentClan,
 	selectSession,
 } from '@mezon/store-mobile';
@@ -33,6 +37,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 			screenOptions={{
 				drawerPosition: 'left',
 				drawerType: 'back',
+				swipeEdgeWidth: Metrics.screenWidth,
 				drawerStyle: {
 					width: '85%',
 				},
@@ -89,6 +94,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const clans = useSelector(selectAllClans);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const session = useSelector(selectSession);
 	const { reconnect } = useMezon();
 	useCheckUpdatedVersion();
@@ -105,7 +111,7 @@ const HomeScreen = React.memo((props: any) => {
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [currentClan]);
+	}, [currentClan, currentChannelId]);
 
 	useEffect(() => {
 		mainLoader();
@@ -113,12 +119,8 @@ const HomeScreen = React.memo((props: any) => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			const store = await getStoreAsync();
-
-			store.dispatch(appActions.setLoadingMainMobile(true));
 			await reconnect();
-			await mainLoader();
-			store.dispatch(appActions.setLoadingMainMobile(false));
+			await messageLoader();
 		}
 	};
 
@@ -135,6 +137,19 @@ const HomeScreen = React.memo((props: any) => {
 			store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
 		}
+		return null;
+	};
+
+	const messageLoader = async () => {
+		const store = await getStoreAsync();
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId }));
+		store.dispatch(
+			channelsActions.joinChannel({
+				clanId: currentClan?.clan_id,
+				channelId: currentChannelId,
+				noFetchMembers: false,
+			}),
+		);
 		return null;
 	};
 

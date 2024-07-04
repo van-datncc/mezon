@@ -739,6 +739,16 @@ export const createCachedSelector = createSelectorCreator({
 	argsMemoize: weakMapMemoize,
 });
 
+export const selectMessageEntitiesByChannelId = createCachedSelector(
+	(state, channelId) => {
+		const messagesState = getMessagesState(state);
+		return messagesState.channelMessages[channelId]?.entities || null;
+	},
+	(channelMessageEntities) => {
+		return channelMessageEntities || {};
+	},
+);
+
 export const selectMessageIdsByChannelId = createCachedSelector(
 	(state, channelId: string) => {
 		const messagesState = getMessagesState(state);
@@ -756,6 +766,14 @@ export const selectMessageEntityById = createCachedSelector(
 	},
 	(messagesState) => {
 		return messagesState || {};
+	},
+);
+
+export const selectLassSendMessageEntityBySenderId = createCachedSelector(
+	[selectMessageEntitiesByChannelId, selectMessageIdsByChannelId, (_, __, senderId) => senderId],
+	(entities, ids, senderId) => {
+		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId);
+		return matchedId ? entities[matchedId] : null;
 	},
 );
 
@@ -856,5 +874,7 @@ const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: Mess
 
 	const startIndex = Math.max(index - 1, 0);
 
-	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), false);
+	const itemCount = channelEntity.ids.length;
+
+	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), itemCount > 2 ? false : true);
 };

@@ -23,9 +23,9 @@ type MessageReactionProps = {
 	mode: number;
 };
 
-const useFilteredReactions = (messageId: string, dataSocketConvert: EmojiDataOptionals[]) => {
+const useFilteredReactions = (messageId: string, dataSocketConvert: EmojiDataOptionals[], channeId: string) => {
 	return useMemo(() => {
-		return dataSocketConvert.filter((item) => item.message_id === messageId);
+		return dataSocketConvert.filter((item) => item.message_id === messageId && item.channel_id === channeId);
 	}, [messageId, dataSocketConvert]);
 };
 
@@ -37,10 +37,9 @@ const useConvertedReactions = (message: IMessageWithUser) => {
 
 const useCombinedReactions = (reactionMessage: EmojiDataOptionals[], reactionSocketByMessageId: EmojiDataOptionals[]) => {
 	return useMemo(() => {
-		const sortedReactionMessage = [...reactionMessage].sort((a, b) => (a?.emoji || '').localeCompare(b?.emoji || ''));
-		const combined = [...sortedReactionMessage, ...reactionSocketByMessageId];
+		const combined = [...reactionMessage, ...reactionSocketByMessageId];
 		return updateEmojiReactionData(combined);
-	}, [reactionMessage, reactionSocketByMessageId]);
+	}, [reactionSocketByMessageId, reactionMessage]);
 };
 
 const useCheckHasEmoji = (dataReactionCombine: EmojiDataOptionals[]) => {
@@ -58,13 +57,11 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const dispatch = useDispatch();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
-
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const dataSocketConvert = useSelector(selectDataSocketUpdate);
-
-	const reactionSocketByMessageId = useFilteredReactions(message.id, dataSocketConvert);
+	const reactionSocketByMessageId = useFilteredReactions(message.id, dataSocketConvert, message.channel_id);
 	const reactionMessage = useConvertedReactions(message);
 	const dataReactionCombine = useCombinedReactions(reactionMessage, reactionSocketByMessageId);
 	const checkHasEmoji = useCheckHasEmoji(dataReactionCombine);

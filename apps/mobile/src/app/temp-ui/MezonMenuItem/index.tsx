@@ -1,9 +1,10 @@
 import { StyleProp, Text, TextStyle, TouchableOpacity, View } from "react-native";
-import styles from "./styles";
 import { ReactNode } from "react";
 import { ChevronSmallRightIcon }
     // @ts-ignore
     from "libs/mobile-components/src/lib/icons2";
+import { style } from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
 
 export interface IMezonMenuItemProps {
     isShow?: boolean;
@@ -16,8 +17,12 @@ export interface IMezonMenuItemProps {
     textStyle?: StyleProp<TextStyle>,
     disabled?: boolean,
     description?: string,
+    previewValue?: string,
 }
-export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled, description, isShow = true }: IMezonMenuItemProps) {
+export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled, description, isShow = true, previewValue }: IMezonMenuItemProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
+
     return (
         isShow &&
         <TouchableOpacity
@@ -31,7 +36,8 @@ export default function MezonMenuItem({ isLast, title, expandable, icon, onPress
                     {description && <Text style={[styles.btnDescription]}>{description}</Text>}
                 </View>
                 {component}
-                {expandable && <ChevronSmallRightIcon height={18} width={18} />}
+                {previewValue && <Text style={styles.previewValue}>{previewValue}</Text>}
+                {expandable && <ChevronSmallRightIcon height={18} width={18} color={themeValue.text} />}
             </View>
         </TouchableOpacity>
     )

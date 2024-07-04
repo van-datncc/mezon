@@ -1,7 +1,6 @@
 import {
 	useChannelMembers,
 	useChannels,
-	useChatMessages,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -15,6 +14,7 @@ import {
 	messagesActions,
 	reactionActions,
 	referencesActions,
+	selectAllAccount,
 	selectAllUsesClan,
 	selectAttachmentData,
 	selectCloseMenu,
@@ -23,6 +23,7 @@ import {
 	selectDataReferences,
 	selectIdMessageRefReply,
 	selectIsFocused,
+	selectLassSendMessageEntityBySenderId,
 	selectMessageByMessageId,
 	selectOpenEditMessageState,
 	selectOpenReplyMessageState,
@@ -119,10 +120,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const usersClan = useSelector(selectAllUsesClan);
 	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojis } = useEmojiSuggestion();
-	const { lastMessageByUserId } = useChatMessages({ channelId: currentChannel?.channel_id as string });
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
+
+	const userProfile = useSelector(selectAllAccount);
+	const lastMessageByUserId = useSelector((state) =>
+		selectLassSendMessageEntityBySenderId(state, currentChannel?.channel_id, userProfile?.user?.id),
+	);
 
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),

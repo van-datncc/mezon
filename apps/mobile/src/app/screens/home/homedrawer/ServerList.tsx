@@ -26,7 +26,6 @@ const ServerList = React.memo((props: any) => {
 			setIsVisible(false);
 		}, 200);
 		const store = await getStoreAsync();
-		store.dispatch(appActions.setLoadingMainMobile(true));
     store.dispatch(clansActions.joinClan({ clanId: clanId }));
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
