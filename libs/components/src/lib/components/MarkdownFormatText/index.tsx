@@ -115,11 +115,17 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 					{tagName && (
 						<span className="">
 							{isMention ? (
-								<MentionUser tagName={tagName} mode={mode} />
+								<>
+								<MentionUser tagName={tagName} mode={mode}/>{' '}
+							</>
 							) : isHashtag ? (
-								<ChannelHashtag channelHastagId={tagName} />
+								<>
+									<ChannelHashtag channelHastagId={tagName} />{' '}
+								</>
 							) : isEmojiSyntax ? (
-								<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />
+								<>
+									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />{' '}
+								</>
 							) : (
 								tagName
 							)}

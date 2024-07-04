@@ -33,15 +33,15 @@ type EmojiData = {
 };
 
 const convertToPlainTextHashtag = (text: string) => {
-    const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
-    const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
-        if (atSymbol) {
-            return `@${atUsername}`;
-        } else {
-            return `<#${hashId}>`;
-        }
-    });
-    return result;
+	const regex = /(@)\[(.*?)\](?:\(.*?\))?|(#)\[(.*?)\]\((.*?)\)/g;
+	const result = text.replace(regex, (match, atSymbol, atUsername, hashSymbol, hashText, hashId) => {
+		if (atSymbol) {
+			return `@${atUsername}`;
+		} else {
+			return `<#${hashId}>`;
+		}
+	});
+	return result;
 };
 
 const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionProps[]) => {
@@ -69,23 +69,25 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const { emojis } = useEmojiSuggestion();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
-	const mentionList = UserMentionList({channelID: channelId, channelMode: mode});
+	const mentionList = UserMentionList({ channelID: channelId, channelMode: mode });
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
 
-	const listChannelsMention = useMemo(
-		() =>
-			listChannels.map((item) => {
+	const listChannelsMention = useMemo(() => {
+		if (mode !== 3 && mode !== 4) {
+			return listChannels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
 					subText: item?.category_name ?? '',
 				};
-			}),
-		[listChannels],
-	);
+			});
+		} else {
+			return [];
+		}
+	}, [mode, listChannels]);
 
 	useEffect(() => {
 		if (editMessage) {
