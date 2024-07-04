@@ -92,6 +92,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 			dispatch(messagesActions.newMessage(mess));
 			dispatch(notificationActions.setIsMessageRead(true));
+			dispatch(channelsActions.updateChannelThreadSocket({...message, timestamp}));
 		},
 		[dispatch, userId],
 	);

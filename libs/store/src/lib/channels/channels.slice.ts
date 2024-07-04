@@ -2,8 +2,8 @@ import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelMessageEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiChannelMessageHeader, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -287,6 +287,15 @@ export const channelsSlice = createSlice({
 				},
 			});
 		},
+		updateChannelThreadSocket: (state, action) => {
+			const payload  = action.payload;
+			channelsAdapter.updateOne(state, {
+				id: payload.channel_id,
+				changes: {
+					last_sent_message: payload,
+				},
+			});
+		},
 		updateChannelPrivateSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
 			const payload = action.payload;
 			const entity = state.entities[payload.channel_id];
@@ -458,7 +467,6 @@ export const selectChannelsByClanId = (clainId: string) =>
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
     createSelector(selectChannelsByClanId(clanId), (channels) => {
 		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
-		console.log(idsSelectedChannel);
         if (idsSelectedChannel && idsSelectedChannel[clanId]) {
             const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
             if (selectedChannel) {
