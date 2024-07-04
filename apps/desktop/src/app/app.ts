@@ -1,4 +1,4 @@
-import { BrowserWindow, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, screen, shell } from 'electron';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
@@ -7,6 +7,7 @@ import { rendererAppName, rendererAppPort } from './constants';
 import { setup } from 'electron-push-receiver';
 
 let deeplinkingUrl;
+let isQuitting = false;
 
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
@@ -28,28 +29,25 @@ export default class App {
 		}
 	}
 
-	private static onClose() {
-		// Dereference the window object, usually you would store windows
-		// in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
-		App.mainWindow = null;
+	private static onClose(event) {
+		if (!isQuitting) {
+			event.preventDefault();
+			App.mainWindow.hide();
+		}
+		return false;
 	}
 
 	private static onReady() {
-		// This method will be called when Electron has finished
-		// initialization and is ready to create browser windows.
-		// Some APIs can only be used after this event occurs.
 		if (rendererAppName) {
 			App.initMainWindow();
 			App.loadMainWindow();
+			App.handleTray();
 		}
 
 		setup(App.mainWindow.webContents);
 	}
 
 	private static onActivate() {
-		// On macOS it's common to re-create a window in the app when the
-		// dock icon is clicked and there are no other windows open.
 		if (App.mainWindow === null) {
 			App.onReady();
 		}
@@ -128,12 +126,7 @@ export default class App {
 		});
 
 		// Emitted when the window is closed.
-		App.mainWindow.on('closed', () => {
-			// Dereference the window object, usually you would store windows
-			// in an array if your app supports multi windows, this is the time
-			// when you should delete the corresponding element.
-			App.mainWindow = null;
-		});
+		App.mainWindow.on('close', (event) => this.onClose(event));
 	}
 
 	private static loadMainWindow() {
@@ -156,18 +149,53 @@ export default class App {
 			App.application.setAppUserModelId('Mezon');
 		}
 	}
+	private static handleTray() {
+		let mezonTray = null;
+		App.application.whenReady().then(() => {
+			mezonTray = new Tray('apps/chat/src/assets/icon-desktop.ico');
+
+			const template: (MenuItem | MenuItemConstructorOptions)[] = [
+				{
+					label: 'Check for updates',
+					type: 'normal',
+					click: () => autoUpdater.checkForUpdates(),
+				},
+				{
+					label: 'Show Mezon',
+					type: 'normal',
+					click: function () {
+						if (App.mainWindow) {
+							App.mainWindow.show();
+						}
+					},
+				},
+				{
+					label: 'Quit Mezon',
+					type: 'normal',
+					click: function () {
+						isQuitting = true;
+						App.application.quit();
+					},
+				},
+			];
+			const contextMenu = Menu.buildFromTemplate(template);
+
+			mezonTray.setContextMenu(contextMenu);
+			mezonTray.setToolTip('Mezon');
+			mezonTray.on('click', () => {
+				if (App.mainWindow) {
+					App.mainWindow.show();
+				}
+			});
+		});
+	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
-		// we pass the Electron.App object and the
-		// Electron.BrowserWindow into this function
-		// so this class has no dependencies. This
-		// makes the code easier to write tests for
-
 		App.BrowserWindow = browserWindow;
 		App.application = app;
 
-		App.application.on('window-all-closed', App.onWindowAllClosed); // Quit when all windows are closed.
-		App.application.on('ready', App.onReady); // App is ready to load data
-		App.application.on('activate', App.onActivate); // App is activated
+		App.application.on('window-all-closed', App.onWindowAllClosed);
+		App.application.on('ready', App.onReady);
+		App.application.on('activate', App.onActivate);
 	}
 }
