@@ -40,8 +40,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		}
 	}, [coords.distanceToBottom]);
 
-	console.log(channel);
-
 	return (
 		<div
 			ref={panelRef}
