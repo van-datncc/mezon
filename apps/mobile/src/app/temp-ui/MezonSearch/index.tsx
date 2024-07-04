@@ -1,19 +1,28 @@
 import { TextInput, View } from "react-native";
-import styles from "./styles";
-import { SearchIcon } from "@mezon/mobile-components";
+import { style } from "./styles";
+import { Icons } from "@mezon/mobile-components";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface MezonInputProps {
-    onChangeText?: (text: string) => void
+    onChangeText?: (text: string) => void,
+    hasBackground?: boolean,
+    size?: "small" | "medium" | "large"
 }
 
-export default function MezonSearch({ onChangeText }: MezonInputProps) {
+export default function MezonSearch({ onChangeText, hasBackground, size = "medium" }: MezonInputProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     return (
-        <View style={styles.inputWrapper}>
-            <SearchIcon height={24} width={24}/>
+        <View style={[
+            styles.inputWrapper,
+            { backgroundColor: hasBackground ? themeValue.primary : themeValue.secondary }
+        ]}
+        >
+            <Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />
             <TextInput
                 style={styles.input}
                 onChangeText={onChangeText}
-                placeholderTextColor={"white"}
+                placeholderTextColor={themeValue.text}
                 placeholder="Search"
             />
         </View>

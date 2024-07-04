@@ -1,20 +1,22 @@
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, TouchableOpacity, View, Text } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
-import LogoMezon from '../../../../assets/svg/logoMezon.svg';
-import { ClanIcon } from './Reusables';
-import ListClanPopupProps from './components/ListClanPopup';
-import { styles } from './styles';
-import { UnreadDMBadgeList } from './components/UnreadDMBadgeList';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { SeparatorWithLine } from '../../../components/Common';
+import LogoMezon from '../../../../../assets/svg/logoMezon.svg';
+import ListClanPopupProps from '../components/ListClanPopup';
+import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
+import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
+import { SeparatorWithLine } from '../../../../components/Common';
 import { useFriends } from '@mezon/core';
-import { PlusGreenIcon } from '@mezon/mobile-components';
+import { Icons, PlusGreenIcon } from '@mezon/mobile-components';
+import { style } from './styles';
+import { ClanIcon } from '../components/ClanIcon';
 
 const ServerList = React.memo((props: any) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
@@ -48,10 +50,10 @@ const ServerList = React.memo((props: any) => {
 					<View style={styles.badge}>
 						<Text style={styles.badgeText}>{quantityPendingRequest}</Text>
 					</View>
-				): null}
+				) : null}
 			</TouchableOpacity>
 
-			<SeparatorWithLine style={{width: '60%'}} />
+			<SeparatorWithLine style={{ width: '60%' }} />
 
 			<UnreadDMBadgeList />
 
@@ -63,7 +65,7 @@ const ServerList = React.memo((props: any) => {
 				disableShadow={true}
 				closeOnContentInteraction={true}
 				content={<ListClanPopupProps handleChangeClan={handleChangeClan} clans={clans} />}
-				contentStyle={{ backgroundColor: Colors.secondary }}
+				contentStyle={{ backgroundColor: themeValue.primary }}
 				placement="bottom"
 				onClose={() => setIsVisible(false)}
 			>
@@ -73,9 +75,13 @@ const ServerList = React.memo((props: any) => {
 						setIsVisible(!isVisible);
 					}}
 				>
-					<PlusGreenIcon width={30} height={30} color={Colors.caribbeanGreen} />
+					<Icons.PlusLargeIcon color={baseColor.green} />
 				</Pressable>
 			</Tooltip>
+
+			<Pressable style={styles.wrapperPlusClan}>
+				<Icons.HubIcon color={baseColor.green} />
+			</Pressable>
 		</View>
 	);
 });
