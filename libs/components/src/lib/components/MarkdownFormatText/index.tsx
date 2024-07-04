@@ -159,14 +159,11 @@ export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmo
 		}
 	}, [posReply]);
 
+	const srcEmoji = getSrcEmoji(emojiSyntax.trim(), emojis);
+
 	return (
 		<span style={{ userSelect: 'none' }}>
-			<img
-				src={getSrcEmoji(emojiSyntax.trim(), emojis)}
-				alt={getSrcEmoji(emojiSyntax.trim(), emojis)}
-				className={className}
-				onDragStart={(e) => e.preventDefault()}
-			/>{' '}
+			<img src={srcEmoji} alt={srcEmoji} className={className} onDragStart={(e) => e.preventDefault()} />
 		</span>
 	);
 };
