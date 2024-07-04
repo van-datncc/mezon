@@ -1,7 +1,14 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import {
+	Icons,
+	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	getInfoChannelByClanId,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save,
+} from '@mezon/mobile-components';
+import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	appActions,
@@ -18,23 +25,23 @@ import {
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
+import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import EventViewer from '../../../components/Event';
-import ChannelListSkeleton from '../../../components/Skeletons/ChannelListSkeleton';
-import { darkColor } from '../../../constants/Colors';
-import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonBottomSheet } from '../../../temp-ui';
-import { ChannelListContext, ChannelListSection } from './Reusables';
-import { InviteToChannel } from './components';
-import CategoryMenu from './components/CategoryMenu';
-import ChannelListHeader from './components/ChannelList/ChannelListHeader';
-import ChannelMenu from './components/ChannelMenu';
-import ClanMenu from './components/ClanMenu/ClanMenu';
-import { styles } from './styles';
+import EventViewer from '../../../../components/Event';
+import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
+import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
+import { MezonBottomSheet, MezonSearch } from '../../../../temp-ui';
+import { ChannelListContext, ChannelListSection } from '../Reusables';
+import { InviteToChannel } from '../components';
+import CategoryMenu from '../components/CategoryMenu';
+import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
+import ChannelMenu from '../components/ChannelMenu';
+import ClanMenu from '../components/ClanMenu/ClanMenu';
+import { style } from './styles';
 
 const ChannelList = React.memo((props: any) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue)
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
@@ -127,13 +134,11 @@ const ChannelList = React.memo((props: any) => {
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
-			<View style={[styles.mainList, { backgroundColor: Colors.secondary }]}>
+			<View style={styles.mainList}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
+
 				<View style={styles.channelListSearch}>
-					<View style={styles.channelListSearchWrapperInput}>
-						<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
-						<TextInput placeholder={'Search'} placeholderTextColor={Colors.tertiary} style={styles.channelListSearchInput} />
-					</View>
+					<MezonSearch hasBackground />
 					<Pressable
 						style={styles.inviteIconWrapper}
 						onPress={() => {
@@ -141,17 +146,18 @@ const ChannelList = React.memo((props: any) => {
 							bottomSheetInviteRef.current.open();
 						}}
 					>
-						<Feather size={16} name="user-plus" style={{ color: darkColor.Backgound_Subtle }} />
+						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
 					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
+
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
 					<TouchableOpacity
 						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
-						<Icons.CalendarIcon height={20} width={20} />
-						<Text style={{ color: 'white' }}>{`${allEventManagement?.length} Events`}</Text>
+						<Icons.CalendarIcon height={20} width={20} color={themeValue.text} />
+						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' ? (
