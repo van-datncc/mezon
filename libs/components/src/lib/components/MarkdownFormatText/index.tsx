@@ -117,7 +117,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 							{isMention ? (
 								<>
 									{' '}
-									<MentionUser tagName={tagName} />{' '}
+									<MentionUser tagName={tagName} mode={mode}/>{' '}
 								</>
 							) : isHashtag ? (
 								<>

@@ -11,9 +11,10 @@ type IMessageHeadProps = {
 	message: IMessageWithUser;
 	isCombine: boolean;
 	isShowFull?: boolean;
+	mode?: number;
 };
 
-const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps) => {
+const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
 	const { username } = useMessageSender(user);
 	const { messageTime } = useMessageParser(message);
 
@@ -103,7 +104,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull }: IMessageHeadProps
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} />
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode}/>
 				</div>
 			)}
 		</div>

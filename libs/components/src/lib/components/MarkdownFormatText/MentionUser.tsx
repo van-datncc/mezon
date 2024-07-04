@@ -25,7 +25,6 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 
 	const [userRemoveChar, setUserRemoveChar] = useState('');
 	const username = tagName.slice(1);
-
 	useEffect(() => {
 		if (checkLastChar(username)) {
 			setUserRemoveChar(username.slice(0, -1));
@@ -91,7 +90,7 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 					}}
 					onMouseDown={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={foundUser.user.id} />
+					<ShortUserProfile userID={foundUser.user.id} mode={mode}/>
 				</div>
 			)}
 			{foundUser !== null || tagName === '@here' ? (
