@@ -367,8 +367,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setTitleModalMention('Members');
 		} else if (newPlainTextValue.endsWith('#')) {
 			setTitleModalMention('Text channels');
-		} else if (newPlainTextValue.endsWith(':gr')) {
-			setTitleModalMention('Emoji matching :gr');
+		} else if (newPlainTextValue.endsWith(':')) {
+			setTitleModalMention('Emoji matching');
 		}
 	};
 
