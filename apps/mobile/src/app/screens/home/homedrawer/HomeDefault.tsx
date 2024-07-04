@@ -1,11 +1,22 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, ArrowLeftIcon, HashSignLockIcon, MuteIcon, ThreadIcon, UnMuteIcon, getChannelById } from '@mezon/mobile-components';
 import { Block, Colors } from '@mezon/mobile-ui';
-import { ChannelsEntity, channelMembersActions, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	ClansEntity,
+	UsersClanEntity,
+	channelMembersActions,
+	selectAllAccount,
+	selectAllUsesClan,
+	selectChannelsEntities,
+	selectCurrentChannel,
+	selectCurrentClan,
+	useAppDispatch,
+} from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, PanResponder, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
@@ -18,6 +29,9 @@ import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import { styles } from './styles';
+import { transformListUserMention } from '../../../utils/transformDataHelpers';
+import { ApiAccount } from 'mezon-js/api.gen';
+export const channelDetailContext = createContext<{currentClan: ClansEntity, usersClanMention: UsersClanEntity[], userProfile: ApiAccount | null | undefined}>(null);
 
 const HomeDefault = React.memo((props: any) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -25,6 +39,10 @@ const HomeDefault = React.memo((props: any) => {
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
+	const usersClan = useSelector(selectAllUsesClan);
+	const currentClan = useSelector(selectCurrentClan);
+  const userProfile = useSelector(selectAllAccount);
+
 	const dispatch = useAppDispatch();
 
 	const prevChannelIdRef = useRef<string>();
@@ -69,6 +87,7 @@ const HomeDefault = React.memo((props: any) => {
 		}, [currentChannel?.channel_id]),
 	);
 
+  const usersClanMention = useMemo(()=> transformListUserMention(usersClan), [usersClan])
 	const fetchMemberChannel = async () => {
 		if (!currentChannel) {
 			return;
@@ -113,11 +132,17 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
-					<ChannelMessages
+				<channelDetailContext.Provider value={{
+          usersClanMention,
+          currentClan,
+          userProfile
+        }}>
+        <ChannelMessages
 						channelId={currentChannel.channel_id}
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
+        </channelDetailContext.Provider>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
 							<TouchableOpacity style={{ flex: 1 }} onPress={() => onShowKeyboardBottomSheet(false, 0, 'text')}></TouchableOpacity>
