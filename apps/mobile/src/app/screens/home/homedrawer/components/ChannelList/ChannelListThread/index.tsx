@@ -1,17 +1,20 @@
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import React from 'react';
-import { styles } from './styles';
-import ThreadListItem from './ThreadListItem';
+import ChannelListThreadItem from '../ChannelListThreadItem';
 import { View } from 'react-native';
+import { useTheme } from '@mezon/mobile-ui';
+import { style } from './styles';
 
-type ThreadListChannelProps = {
+type IListChannelThreadProps = {
 	threads: IChannel[];
 	currentChanel: ChannelsEntity;
 	onPress: (thread: IChannel) => void;
 };
 
-const ThreadListChannel = React.memo(({ threads, currentChanel, onPress }: ThreadListChannelProps) => {
+const ListChannelThread = React.memo(({ threads, currentChanel, onPress }: IListChannelThreadProps) => {
+	const styles = style(useTheme().themeValue);
+
 	return (
 		<View style={styles.containerThreadList}>
 			{threads.map((thread) => {
@@ -19,7 +22,7 @@ const ThreadListChannel = React.memo(({ threads, currentChanel, onPress }: Threa
 				const isActive = currentChanel?.channel_id === thread.channel_id;
 
 				return (
-					<ThreadListItem
+					<ChannelListThreadItem
 						thread={thread}
 						isActive={isActive}
 						isFirstThread={isFirstThread}
@@ -31,4 +34,4 @@ const ThreadListChannel = React.memo(({ threads, currentChanel, onPress }: Threa
 	);
 });
 
-export default ThreadListChannel;
+export default ListChannelThread;

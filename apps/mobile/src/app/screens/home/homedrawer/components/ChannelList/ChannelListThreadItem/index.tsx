@@ -1,11 +1,12 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import { styles } from './styles';
-import LongCornerIcon from '../../../../assets/svg/long-corner.svg';
-import ShortCornerIcon from '../../../../assets/svg/short-corner.svg';
+import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
+import ShortCornerIcon from '../../../../../../../assets/svg/short-corner.svg';
 import { useSelector } from "react-redux";
 import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from "@mezon/store-mobile";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./styles";
 
-interface IThreadListItem {
+interface IChannelListThreadItemProps {
     onPress?: (thread: any) => void;
     thread: any;
     isActive?: boolean;
@@ -20,7 +21,10 @@ function useChannelBadgeCount(channelId: string) {
 }
 
 
-export default function ThreadListItem({ onPress, thread, isActive, isFirstThread }: IThreadListItem) {
+export default function ChannelListThreadItem({ onPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
+
     const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
     const numberNotification = useChannelBadgeCount(thread.id);
 
@@ -35,8 +39,14 @@ export default function ThreadListItem({ onPress, thread, isActive, isFirstThrea
         >
             <View style={[styles.threadItem]}>
                 {isActive && <View style={[styles.threadItemActive, isFirstThread && styles.threadFirstItemActive]} />}
-                {isFirstThread ? <ShortCornerIcon /> : <LongCornerIcon />}
-                <Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]} numberOfLines={1}>{thread?.channel_label}</Text>
+                {isFirstThread
+                    ? <ShortCornerIcon />
+                    : <LongCornerIcon />
+                }
+                <Text
+                    style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]}
+                    numberOfLines={1}>{thread?.channel_label}
+                </Text>
             </View>
 
             {numberNotification > 0 &&

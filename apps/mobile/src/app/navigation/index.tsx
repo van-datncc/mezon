@@ -5,6 +5,7 @@ import RootNavigation from "./RootNavigator";
 // @ts-expect-error
 import { NX_CHAT_APP_API_HOST } from '@env';
 import { I18nextProvider } from 'react-i18next';
+// @ts-ignore
 import i18n from '@mezon/translations';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';

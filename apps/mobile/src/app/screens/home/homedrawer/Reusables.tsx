@@ -13,7 +13,7 @@ import Images from '../../../../assets/Images';
 import AngleDownIcon from '../../../../assets/svg/guildDropdownMenu.svg';
 import { MezonButton } from '../../../temp-ui';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
-import { ChannelListItem } from './ChannelListItem';
+import { ChannelListItem } from './components/ChannelList/ChannelListItem';
 import { styles } from './styles';
 import { SortIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
@@ -32,42 +32,6 @@ export interface IListMemberInviteProps {
 	channelID?: string;
 }
 
-interface IChannelListSectionProps {
-	data: ICategoryChannel;
-	index: number;
-	onPressHeader: any;
-	collapseItems: any
-	onLongPressCategory: (channel: ICategoryChannel) => void;
-	onPressSortChannel: (channel: ICategoryChannel) => void;
-	onLongPressChannel: (channel: IChannel) => void;
-}
-
-export const ClanIcon = React.memo((props: { icon?: any; data: any; onPress?: any; isActive?: boolean, clanIconStyle?: ViewStyle }) => {
-	return (
-		<TouchableOpacity
-			activeOpacity={props?.onPress ? 0.7 : 1}
-			key={Math.floor(Math.random() * 9999999).toString() + props?.data?.clan_id}
-			style={[styles.wrapperClanIcon]}
-			onPress={() => {
-				if (props?.onPress && props?.data?.clan_id) {
-					props?.onPress(props?.data?.clan_id);
-				}
-			}}
-		>
-			<View style={[styles.clanIcon, props?.isActive && styles.clanIconActive, props?.clanIconStyle]}>
-				{props.icon ? (
-					props.icon
-				) : props?.data?.logo ? (
-					<Image source={{ uri: props.data.logo }} style={styles.logoClan} />
-				) : (
-					<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name.charAt(0).toUpperCase()}</Text>
-				)}
-			</View>
-			{props?.isActive && <View style={styles.lineActiveClan} />}
-		</TouchableOpacity>
-	);
-});
-
 export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string; isCirle?: boolean }) => {
 	return (
 		<FastImage
@@ -82,57 +46,6 @@ export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string;
 	);
 });
 
-export const ChannelListHeader = React.memo((props: { title: string; onPress: any; onLongPress: () => void; isCollapsed: boolean, onPressSortChannel: () => void }) => {
-	return (
-		<TouchableOpacity
-			activeOpacity={0.8}
-			onPress={props?.onPress}
-			onLongPress={props?.onLongPress}
-			key={Math.floor(Math.random() * 9999999).toString()}
-			style={styles.channelListHeader}
-		>
-			<View style={styles.channelListHeaderItem}>
-				<AngleDownIcon width={20} height={20} style={[props?.isCollapsed && { transform: [{ rotate: '-90deg' }] }]} />
-				<Text style={styles.channelListHeaderItemTitle}>{props.title}</Text>
-				<TouchableOpacity onPress={props?.onPressSortChannel} style={styles.sortButton}>
-        <SortIcon width={20} height={20} color={Colors.textGray} />
-        </TouchableOpacity>
-			</View>
-		</TouchableOpacity>
-	);
-});
-
-export const ChannelListSection = React.memo((props: IChannelListSectionProps) => {
-	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
-	const currentChanel = useSelector(selectCurrentChannel);
-
-	return (
-		<View key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListSection}>
-			<ChannelListHeader
-				title={props.data.category_name}
-				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
-				onLongPress={() => props?.onLongPressCategory(props.data)}
-        onPressSortChannel={()=> props?.onPressSortChannel(props?.data)}
-				isCollapsed={isCollapsed}
-			/>
-			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
-				{props.data.channels?.map((item: any, index: number) => {
-					const isActive = currentChanel?.id === item.id;
-
-					return (
-						<ChannelListItem
-							data={item}
-							key={Math.floor(Math.random() * 9999999).toString() + index}
-							isActive={isActive}
-							currentChanel={currentChanel}
-							onLongPress={() => { props?.onLongPressChannel(item) }}
-						/>
-					);
-				})}
-			</View>
-		</View>
-	);
-});
 
 export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 	const { dmGroup, user, isSent, onPress } = props;
