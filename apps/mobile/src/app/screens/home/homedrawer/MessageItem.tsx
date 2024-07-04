@@ -1,6 +1,7 @@
 import { useAuth, useClans } from '@mezon/core';
 import {
 	ActionEmitEvent,
+	AttachmentImageIcon,
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
@@ -206,6 +207,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						create_time: message.create_time,
 					});
 				}}
+				onLongPress={() => {
+					if (preventAction) return;
+					setIsOnlyEmojiPicker(false);
+					onMessageAction({
+						type: EMessageBSToShow.MessageAction,
+						senderDisplayName,
+						message
+					})
+					dispatch(setSelectedMessage(message));
+				}}
 			>
 				<FastImage
 					style={[
@@ -252,7 +263,21 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			}
 
 			return (
-				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => openUrl(document.url)}>
+				<TouchableOpacity
+					activeOpacity={0.8}
+					key={index}
+					onPress={() => openUrl(document.url)}
+					onLongPress={() => {
+						if (preventAction) return;
+						setIsOnlyEmojiPicker(false);
+						onMessageAction({
+							type: EMessageBSToShow.MessageAction,
+							senderDisplayName,
+							message
+						})
+						dispatch(setSelectedMessage(message));
+					}}
+				>
 					<View style={styles.fileViewer}>
 						<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
 						<View style={{ maxWidth: '75%' }}>
@@ -405,7 +430,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									<Text style={styles.replyDisplayName}>
 										{clanProfileSender?.nick_name || repliedSender?.user?.display_name || repliedSender?.user?.username || 'Anonymous'}
 									</Text>
-									{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, usersClanMention, true)}
+									{messageRefFetchFromServe?.attachments?.length ? (
+										<>
+											<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
+											<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
+										</>
+									): (
+										<>
+											{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, usersClanMention, true)}
+										</>
+									)}
 								</View>
 							</Pressable>
 						</View>

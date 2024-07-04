@@ -5,6 +5,7 @@ import { Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import SuggestItem from './SuggestItem';
+import { memo } from 'react';
 
 export interface MentionSuggestionsProps {
 	suggestions: MentionDataProps[];
@@ -70,7 +71,7 @@ const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestio
 			keyboardShouldPersistTaps="handled"
 		/>
 	);
-};
+});
 
 export type ChannelsMention = {
 	id: string;
