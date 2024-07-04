@@ -142,7 +142,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [checkSenderMessage]);
 
 	const pinMessageStatus = useMemo(() => {
-		console.log(checkMessageInPinneList);
 		if (!checkMessageInPinneList) {
 			if (pinMessage || isClanCreator || checkAdmintrator) {
 				return true;
