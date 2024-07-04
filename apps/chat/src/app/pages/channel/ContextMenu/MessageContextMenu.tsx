@@ -1,7 +1,7 @@
-import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAppParams, useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
+import { useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
 	directActions,
 	gifsStickerEmojiActions,
@@ -10,7 +10,6 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
-	selectDirectById,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
 	selectReactionOnMessageList,
@@ -81,23 +80,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
 	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
 	const [isAllowCreateThread] = useClanRestriction([EPermission.manageThread]);
-	//
-	const [enableDelMessageItem, setEnableDelMessageItem] = useState<boolean>(false);
-	const [enableEditMessageItem, setEnableEditMessageItem] = useState<boolean>(false);
-	const [enableSpeakMessageItem, setEnableSpeakMessageItem] = useState<boolean>(false);
-	const [enableCreateThreadItem, setEnableCreateThreadItem] = useState<boolean>(false);
-	const [enableViewReactionItem, setEnableViewReactionItem] = useState<boolean>(false);
-	const [enableRemoveOneReactionItem, setEnableRemoveOneReactionItem] = useState<boolean>(false);
-	const [enableRemoveAllReactionItem, setEnableRemoveAllReactionsItem] = useState<boolean>(false);
-	const [enableReportMessageItem, setEnableReportMessageItem] = useState<boolean>(false);
 	const [enableCopyLinkItem, setEnableCopyLinkItem] = useState<boolean>(false);
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
 
-	const [urlImage, setUrlImage] = useState<string>('');
-	const { directId } = useAppParams();
-	const direct = useSelector(selectDirectById(directId || ''));
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: currentChannel?.id || '',
@@ -144,19 +131,18 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		setValueThread(message);
 	};
 
-	// 1. allow view reaction
-	useLayoutEffect(() => {
-		setEnableViewReactionItem(checkMessageHasReaction());
+	const enableViewReactionItem = useMemo(() => {
+		return checkMessageHasReaction();
 	}, [checkMessageHasReaction()]);
 
-	// 2. allow edit/report message
-	useLayoutEffect(() => {
-		setEnableEditMessageItem(checkSenderMessage);
-		setEnableReportMessageItem(!checkSenderMessage);
+	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
+		const enableEdit = checkSenderMessage;
+		const enableReport = !checkSenderMessage;
+		return [enableEdit, enableReport];
 	}, [checkSenderMessage]);
 
-	// 3. allow pin/unpin message
 	const pinMessageStatus = useMemo(() => {
+		console.log(checkMessageInPinneList);
 		if (!checkMessageInPinneList) {
 			if (pinMessage || isClanCreator || checkAdmintrator) {
 				return true;
@@ -170,51 +156,43 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		}
 	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList, message]);
 
-	// 5. allow speak message
-	useLayoutEffect(() => {
-		setEnableSpeakMessageItem(checkMessageHasText);
+	const enableSpeakMessageItem = useMemo(() => {
+		return checkMessageHasText;
 	}, [checkMessageHasText]);
 
-	// 6. allow remove one/all reaction
-	useLayoutEffect(() => {
-		if (
-			(isClanCreator && checkMessageHasReaction()) ||
-			(checkAdmintrator && checkMessageHasReaction()) ||
-			(removeReaction && checkMessageHasReaction())
-		) {
-			setEnableRemoveOneReactionItem(true);
-			setEnableRemoveAllReactionsItem(true);
-		} else {
-			setEnableRemoveOneReactionItem(false);
-			setEnableRemoveAllReactionsItem(false);
-		}
+	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
+		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
+		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
+		return [enableOne, enableAll];
 	}, [isClanCreator, checkAdmintrator, checkMessageHasReaction(), removeReaction]);
 
-	// 8. allow thread item
-	useLayoutEffect(() => {
-		if (createThread || isAllowCreateThread || !isClanCreator || checkAdmintrator) {
-			setEnableCreateThreadItem(true);
+	const enableCreateThreadItem = useMemo(() => {
+		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			return false;
 		} else {
-			setEnableCreateThreadItem(false);
+			return createThread || isAllowCreateThread || isClanCreator || checkAdmintrator;
 		}
-	}, [createThread, isAllowCreateThread, isClanCreator, checkAdmintrator]);
+	}, [createThread, isAllowCreateThread, isClanCreator, checkAdmintrator, activeMode]);
 
-	// 10. allow delete message
-	useLayoutEffect(() => {
-		if (delMessage || isAllowDelMessage || checkSenderMessage || isClanCreator || checkAdmintrator) {
-			setEnableDelMessageItem(true);
+	const enableDelMessageItem = useMemo(() => {
+		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			return delMessage || isAllowDelMessage || checkSenderMessage || isClanCreator || checkAdmintrator;
 		} else {
-			setEnableDelMessageItem(false);
+			return checkSenderMessage;
 		}
 	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanCreator, checkAdmintrator]);
 
-	// 11. allow image
+	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
-	useLayoutEffect(() => {
-		const checkImageHTML = elementTarget instanceof HTMLImageElement;
-		if (checkImageHTML) {
-			const imgSrc = elementTarget.src;
-			setUrlImage(imgSrc);
+	const urlImage = useMemo(() => {
+		if (checkElementIsImage) {
+			return elementTarget.src;
+		}
+		return '';
+	}, [checkElementIsImage, elementTarget]);
+
+	useMemo(() => {
+		if (checkElementIsImage) {
 			setEnableCopyLinkItem(true);
 			setEnableOpenLinkItem(true);
 			setEnableCopyImageItem(true);
@@ -250,7 +228,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem(
 				'editMessage',
 				'Edit Message',
-
 				async () => {
 					try {
 						await handleEditMessage();
@@ -263,10 +240,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			);
 		});
 
-		builder.when(pinMessageStatus, (builder) => {
+		builder.when(pinMessageStatus === true, (builder) => {
 			builder.addMenuItem('pinMessage', 'Pin Message', () => handlePinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
-		builder.when(!pinMessageStatus, (builder) => {
+		builder.when(pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
@@ -325,7 +302,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				<Icons.RightArrowRightClick defaultSize="w-4 h-4" />,
 			);
 		});
-		builder.when(enableRemoveAllReactionItem, (builder) => {
+		builder.when(enableRemoveAllReactionsItem, (builder) => {
 			builder.addMenuItem('removeAllReactions', 'Remove All Reactions', () => {
 				console.log('remove all reaction');
 			});
@@ -360,7 +337,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(enableCopyLinkItem, (builder) => {
 			builder.addMenuItem('copyLink', 'Copy Link', async () => {
 				try {
-					await handleCopyLink(urlImage ?? '');
+					await handleCopyLink(urlImage);
 				} catch (error) {
 					console.error('Failed to copy link:', error);
 				}
@@ -370,7 +347,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(enableOpenLinkItem, (builder) => {
 			builder.addMenuItem('openLink', 'Open Link', async () => {
 				try {
-					await handleOpenLink(urlImage ?? '');
+					await handleOpenLink(urlImage);
 				} catch (error) {
 					console.error('Failed to copy image:', error);
 				}
@@ -380,7 +357,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(enableCopyImageItem, (builder) => {
 			builder.addMenuItem('copyImage', 'Copy Image', async () => {
 				try {
-					await handleCopyImage(urlImage ?? '');
+					await handleCopyImage(urlImage);
 				} catch (error) {
 					console.error('Failed to copy image:', error);
 				}
@@ -390,7 +367,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(enableSaveImageItem, (builder) => {
 			builder.addMenuItem('saveImage', 'Save Image', async () => {
 				try {
-					await handleSaveImage(urlImage ?? '');
+					await handleSaveImage(urlImage);
 				} catch (error) {
 					console.error('Failed to save image:', error);
 				}
@@ -406,7 +383,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		enableCreateThreadItem,
 		enableSpeakMessageItem,
 		enableRemoveOneReactionItem,
-		enableRemoveAllReactionItem,
+		enableRemoveAllReactionsItem,
 		enableDelMessageItem,
 		enableReportMessageItem,
 		enableCopyLinkItem,

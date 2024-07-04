@@ -458,7 +458,6 @@ export const selectChannelsByClanId = (clainId: string) =>
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
     createSelector(selectChannelsByClanId(clanId), (channels) => {
 		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
-		console.log(idsSelectedChannel);
         if (idsSelectedChannel && idsSelectedChannel[clanId]) {
             const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
             if (selectedChannel) {
