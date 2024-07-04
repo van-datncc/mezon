@@ -106,20 +106,21 @@ const HomeDefault = React.memo((props: any) => {
 		props.navigation.openDrawer();
 		Keyboard.dismiss();
 	};
-
+	
 	const panResponder = useRef(
 		PanResponder.create({
 			onStartShouldSetPanResponder: () => true,
-			onMoveShouldSetPanResponder: () => true,
-
+			onMoveShouldSetPanResponder: (evt, gestureState) => {
+				const {dx, dy} = gestureState;
+				return Math.abs(dx) > Math.abs(dy);
+			},
 			onPanResponderRelease: (evt, gestureState) => {
 				const { dx } = gestureState;
-
 				if (dx > 50) {
 					onOpenDrawer();
 				}
 			},
-		}),
+		})
 	).current;
 
 	return (
