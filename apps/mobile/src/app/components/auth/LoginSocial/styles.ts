@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
 	googleButton: {
-		backgroundColor: colors.secondary,
+		backgroundColor: 'white',
 		paddingVertical: Metrics.size.l,
 		marginHorizontal: Metrics.size.xl,
 		borderRadius: 4,

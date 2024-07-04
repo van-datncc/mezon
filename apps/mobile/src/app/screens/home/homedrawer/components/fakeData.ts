@@ -1,4 +1,4 @@
-import { IEmojiImage, IUser } from "@mezon/utils";
+import { IEmoji, IUser } from "@mezon/utils";
 
 //TODO: delete later
 export const friendList: IUser[] = [
@@ -154,7 +154,7 @@ export const friendList: IUser[] = [
       },
 ]
 
-export const emojiFakeData: IEmojiImage[] = [
+export const emojiFakeData: IEmoji[] = [
   {
     "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/100_pbdkjg.png",
     "shortname": ":100:",

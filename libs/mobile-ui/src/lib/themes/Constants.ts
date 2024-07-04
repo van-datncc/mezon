@@ -5,6 +5,8 @@ type Colors = { [key: string]: HexColor }
 export type Attributes = {
     primary: HexColor,
     secondary: HexColor,
+    secondaryWeight: HexColor,
+    secondaryLight: HexColor,
     tertiary: HexColor,
     border: HexColor,
     borderDim: HexColor,
@@ -12,6 +14,8 @@ export type Attributes = {
     text: HexColor,
     textStrong: HexColor,
     textDisabled: HexColor,
+    white: HexColor,
+    black: HexColor,
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -37,9 +41,13 @@ export const themeColors: ThemeColor = {
         border: "#2e2f34",
         borderDim: "#2f2f37",
         borderRadio: "#cacad2",
-        text: "#93939b",
+        text: "#CCCCCC",
         textStrong: "#dfe0e4",
-        textDisabled: "#7b7b83"
+        textDisabled: "#7b7b83",
+        secondaryWeight: '#212122',
+        secondaryLight:  '#2A2D31',
+        white: '#FFFFFF',
+        black: '#000000'
     },
     light: {
         primary: "#f2f3f5",
@@ -50,6 +58,10 @@ export const themeColors: ThemeColor = {
         borderRadio: "#4d4d54",
         text: "#5d5c64",
         textStrong: "#070709",
-        textDisabled: "#a0a1a6"
+        textDisabled: "#a0a1a6",
+        secondaryWeight:  '#F0F0F0',
+        secondaryLight:  '#2A2D31',
+        white: '#000000',
+        black: '#FFFFFF'
     }
 }

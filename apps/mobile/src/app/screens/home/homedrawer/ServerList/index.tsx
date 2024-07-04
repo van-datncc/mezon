@@ -78,10 +78,6 @@ const ServerList = React.memo((props: any) => {
 					<Icons.PlusLargeIcon color={baseColor.green} />
 				</Pressable>
 			</Tooltip>
-
-			<Pressable style={styles.wrapperPlusClan}>
-				<Icons.HubIcon color={baseColor.green} />
-			</Pressable>
 		</View>
 	);
 });
