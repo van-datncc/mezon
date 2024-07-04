@@ -13,7 +13,7 @@ export interface MentionSuggestionsProps {
 	onSelect: (user: MentionDataProps) => void;
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestions = [] }) => {
+const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, suggestions = [] }) => {
 	const formattedMentionList = useMemo(() => {
 		if (keyword === null || !suggestions.length) {
 			return [];
