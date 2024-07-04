@@ -47,7 +47,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const dispatch = useAppDispatch();
 	useChannelSeen(directMessageId || '');
 	const currentChannel = useSelector(selectCurrentChannel);
-	
+
 	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
 		if (isShow) {
@@ -89,7 +89,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		);
 		return null;
 	}, [currentDmGroup]);
-	
+
 	useEffect(() => {
 		return () => {
 			fetchMemberChannel();
@@ -100,7 +100,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		if (currentDmGroup?.id) {
 			directMessageLoader();
 		}
-	}, [currentDmGroup, directMessageLoader]);
+	}, [currentDmGroup?.id]);
 
 	useEffect(() => {
 		if (from && from === APP_SCREEN.HOME) {

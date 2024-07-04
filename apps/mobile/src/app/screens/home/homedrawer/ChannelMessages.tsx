@@ -28,6 +28,8 @@ import { EMessageActionType, EMessageBSToShow } from './enums';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
+import { useContext } from 'react';
+import { channelDetailContext } from './HomeDefault';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -50,8 +52,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const currentClan = useSelector(selectCurrentClan);
-	const channelMember = useSelector(selectMembersByChannelId(channelId));
+  const { usersClanMention, currentClan } = useContext(channelDetailContext) || {};
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -205,7 +206,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				<MessageItem
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					clansProfile={clansProfile}
-					channelMember={channelMember}
+					usersClanMention={usersClanMention}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
