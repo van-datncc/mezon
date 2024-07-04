@@ -156,6 +156,7 @@ function MessageWithUser({
 												isCombine={isCombine}
 												isSending={message.isSending}
 												isError={message.isError}
+												mode={mode}
 											/>
 										)}
 									</div>

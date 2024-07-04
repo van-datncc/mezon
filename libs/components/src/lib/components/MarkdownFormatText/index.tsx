@@ -15,9 +15,10 @@ import PreClass from './PreClass';
 type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
+	mode?: number;
 };
 
-const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji }) => {
+const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji, mode }) => {
 	// TODO: move the invitation logic to upper level
 	const { getLinkInvite } = useInvite();
 
@@ -110,7 +111,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 					{tagName && (
 						<span className="">
 							{isMention ? (
-								<MentionUser tagName={tagName} />
+								<MentionUser tagName={tagName} mode={mode}/>
 							) : isHashtag ? (
 								<ChannelHashtag channelHastagId={tagName} />
 							) : (

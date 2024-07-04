@@ -69,7 +69,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const { emojis } = useEmojiSuggestion();
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
-	const mentionList = UserMentionList(channelId);
+	const mentionList = UserMentionList({channelID: channelId, channelMode: mode});
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 

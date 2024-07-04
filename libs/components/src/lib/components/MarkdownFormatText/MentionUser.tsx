@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
+import { selectAllChannelMembers, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
 import { checkLastChar } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -9,11 +9,13 @@ import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
 type ChannelHashtagProps = {
 	tagName: string;
+	mode?: number;
 };
 
-const MentionUser = ({ tagName }: ChannelHashtagProps) => {
+const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
+	const usersInChannel = useSelector(selectAllChannelMembers);
 	const [foundUser, setFoundUser] = useState<any>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -30,13 +32,19 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 		} else {
 			setUserRemoveChar(username);
 		}
-		const user = usersClan.find((userClan) => userClan.user?.username === userRemoveChar);
+		let user;
+		if (mode === 4 || mode === 3) {
+			user = usersInChannel.find((channelUsers) => channelUsers.user?.username === userRemoveChar);
+		} else {
+			user = usersClan.find((userClan) => userClan.user?.username === userRemoveChar);
+		}
+
 		if (user) {
 			setFoundUser(user);
 		} else {
 			setFoundUser(null);
 		}
-	}, [tagName, userRemoveChar]);
+	}, [tagName, userRemoveChar, mode, usersInChannel, usersClan]);
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -71,7 +79,6 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
 	return (
 		<>
 			{showProfileUser && (
@@ -87,8 +94,7 @@ const MentionUser = ({ tagName }: ChannelHashtagProps) => {
 					<ShortUserProfile userID={foundUser.user.id} />
 				</div>
 			)}
-			{(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && foundUser !== null) ||
-			(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && tagName === '@here') ? (
+			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
 						onMouseDown={(event) => handleMouseClick(event)}

@@ -43,7 +43,7 @@ const ModalUserProfile = ({
 	const { sendInviteMessage } = useSendInviteMessage();
 
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-
+	// console.log("userById: ", userById);
 	const [content, setContent] = useState<string>('');
 
 	const initOpenModal = {
