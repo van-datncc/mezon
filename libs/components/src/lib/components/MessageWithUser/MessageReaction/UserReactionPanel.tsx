@@ -94,7 +94,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({ emoji, emojiListPNG, count })
 	return (
 		<div>
 			<div className="flex flex-row items-center m-2 dark:text-white text-black">
-				<img src={getSrcEmoji(emoji ?? '', emojiListPNG)} className="w-5 h-5" />
+				<img src={getSrcEmoji(emoji ?? '', emojiListPNG)} className="w-5 h-5 min-h-5 min-w-5" />
 				<p className="text-sm ml-2">{count}</p>
 			</div>
 			<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none" />

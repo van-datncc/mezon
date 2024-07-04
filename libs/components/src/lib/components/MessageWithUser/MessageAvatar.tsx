@@ -45,7 +45,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull }: IMes
 	return (
 		<div className="relative group">
 			<div className="pt-1" ref={panelRef} onMouseDown={(event) => handleMouseClick(event)}>
-				<AvatarImage alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} />
+				<AvatarImage alt="user avatar" userName={user?.user?.username} src={user?.user?.avatar_url} className="min-w-10 min-h-10" />
 			</div>
 			{isShowPanelChannel ? (
 				<div
