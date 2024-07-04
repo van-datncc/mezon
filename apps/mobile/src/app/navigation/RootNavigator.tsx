@@ -36,7 +36,7 @@ const NavigationMain = () => {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setIsLoadingSplashScreen(false);
-		}, 2500);
+		}, 1500);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {

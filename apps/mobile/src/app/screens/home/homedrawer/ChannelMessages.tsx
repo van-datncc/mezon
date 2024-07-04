@@ -53,7 +53,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const channelMember = useSelector(selectMembersByChannelId(channelId));
-	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
   const { usersClanMention, currentClan } = useContext(channelDetailContext) || {};
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });

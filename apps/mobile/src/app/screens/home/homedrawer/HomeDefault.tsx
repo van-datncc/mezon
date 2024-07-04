@@ -123,7 +123,7 @@ const HomeDefault = React.memo((props: any) => {
 	).current;
 
 	return (
-		<View style={[styles.homeDefault]} {...panResponder.panHandlers}>
+		<View style={[styles.homeDefault]}>
 			<HomeDefaultHeader
 				openBottomSheet={openBottomSheet}
 				navigation={props.navigation}
@@ -137,11 +137,13 @@ const HomeDefault = React.memo((props: any) => {
           currentClan,
           userProfile
         }}>
-        <ChannelMessages
-						channelId={currentChannel.channel_id}
-						channelLabel={currentChannel?.channel_label}
-						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					/>
+					<View style={[styles.homeDefault]} {...panResponder.panHandlers}>
+						<ChannelMessages
+							channelId={currentChannel.channel_id}
+							channelLabel={currentChannel?.channel_label}
+							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						/>
+					</View>
         </channelDetailContext.Provider>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
