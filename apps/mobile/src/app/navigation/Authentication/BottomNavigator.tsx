@@ -20,7 +20,7 @@ const BottomNavigator = () => {
 	const {themeValue} = useTheme();
 
 	return (
-		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
+		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
 			<TabStack.Navigator
 				screenOptions={{
 					tabBarHideOnKeyboard: true,
@@ -29,7 +29,7 @@ const BottomNavigator = () => {
 						paddingBottom: hiddenBottomTab ? 10 : 20,
 						borderTopWidth: 1,
 						elevation: 0,
-						backgroundColor: themeValue.tertiary,
+						backgroundColor: themeValue.secondary,
 						borderTopColor: themeValue.border,
 					},
 					tabBarActiveTintColor: themeValue.textStrong,
