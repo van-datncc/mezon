@@ -54,7 +54,7 @@ import {
 	uniqueUsers,
 } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { KeyboardEvent, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
@@ -98,6 +98,7 @@ export type MentionReactInputProps = {
 	readonly handleConvertToFile?: (valueContent: string) => void | undefined;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
+	readonly mode?: number;
 };
 
 const neverMatchingRegex = /($a)/;
@@ -300,13 +301,18 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 
-	const listChannelsMention = listChannels.map((item) => {
-		return {
-			id: item?.channel_id ?? '',
-			display: item?.channel_label ?? '',
-			subText: item?.category_name ?? '',
-		};
-	}) as ChannelsMentionProps[];
+const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
+	if (props.mode !== 3 && props.mode !== 4) {
+		return listChannels.map((item) => {
+			return {
+				id: item?.channel_id ?? '',
+				display: item?.channel_label ?? '',
+				subText: item?.category_name ?? '',
+			};
+		}) as ChannelsMentionProps[];
+	}
+	return [];
+}, [props.mode, listChannels]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const mentionList =
