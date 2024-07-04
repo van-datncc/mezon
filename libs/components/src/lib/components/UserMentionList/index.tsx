@@ -22,6 +22,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 				id: item?.user?.id ?? '',
 				display: item?.user?.username ?? '',
 				avatarUrl: item?.user?.avatar_url ?? '',
+				displayName: item?.user?.display_name ?? '',
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
 			id: '1775731111020111321',
