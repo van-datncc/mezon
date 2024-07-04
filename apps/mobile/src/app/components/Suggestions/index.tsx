@@ -1,4 +1,4 @@
-import { selectEmojiImage } from '@mezon/store';
+import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
 import { FC, useMemo } from 'react';
 import { Pressable } from 'react-native';
@@ -128,7 +128,7 @@ export type IEmoji = {
 };
 
 const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 	let emojiData = [];
 	if (!keyword) {

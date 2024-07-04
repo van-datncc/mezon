@@ -17,7 +17,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 
 	threadItemActive: {
-		backgroundColor: colors.primary,
+		backgroundColor: colors.secondaryLight,
 		borderRadius: size.s_10,
 		// borderWidth: 0.4,
 		// borderColor: Colors.gray48,
@@ -25,7 +25,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		width: '95%',
 		height: '90%',
 		right: 0,
-		top: size.s_16,
+		top: size.s_18,
 	},
 
 	titleThread: {
@@ -45,7 +45,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		height: '160%',
 		right: 0,
 		top: size.s_2,
-		backgroundColor: colors.text,
+		backgroundColor: colors.secondaryLight,
 		borderRadius: size.s_10,
 		// borderWidth: 0.4,
 		// borderColor: Colors.gray48

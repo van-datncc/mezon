@@ -1,6 +1,6 @@
 import { Colors, size } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity, ClansEntity, UserClanProfileEntity } from '@mezon/store-mobile';
-import { IEmojiImage, getSrcEmoji } from '@mezon/utils';
+import { IEmoji, getSrcEmoji } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
@@ -145,7 +145,7 @@ export type IMarkdownProps = {
 	isEdited?: boolean;
 	t?: TFunction;
 	channelsEntities?: Record<string, ChannelsEntity>;
-	emojiListPNG?: IEmojiImage[];
+	emojiListPNG?: IEmoji[];
 	onMention?: (url: string) => void;
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
@@ -274,7 +274,7 @@ export const formatUrls = (text: string) => {
 		.join('');
 };
 
-export const formatEmoji = (text: string, emojiImages: IEmojiImage[] = []) => {
+export const formatEmoji = (text: string, emojiImages: IEmoji[] = []) => {
 	const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
 	const parts = modifiedString.split('\0').filter(Boolean);
 	return parts
@@ -466,7 +466,7 @@ export const renderTextContent = (
 	isEdited?: boolean,
 	t?: TFunction,
 	channelsEntities?: Record<string, ChannelsEntity>,
-	emojiListPNG?: IEmojiImage[],
+	emojiListPNG?: IEmoji[],
 	onMention?: (url: string) => void,
 	onChannelMention?: (channel: ChannelsEntity) => void,
 	isNumberOfLine?: boolean,

@@ -328,12 +328,6 @@ export type IEmoji = {
 	shortname: string;
 };
 
-export type IEmojiImage = {
-	src?: string;
-	shortname: string;
-	category?: string;
-};
-
 export type IEmoticons = {
 	[key: string]: string;
 };

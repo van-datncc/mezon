@@ -16,7 +16,7 @@ import {
 	RootState,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	selectEmojiImage,
+	selectAllEmojiSuggestion,
 	selectHiddenBottomTabMobile,
   selectMembersByChannelId,
 } from '@mezon/store-mobile';
@@ -130,7 +130,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const currentTextInput = useRef('');
 	const mentions = useRef([]);
 	const { emojiPicked } = useEmojiSuggestion();
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);

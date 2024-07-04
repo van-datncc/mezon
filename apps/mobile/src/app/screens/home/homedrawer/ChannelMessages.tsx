@@ -1,15 +1,20 @@
-import { useChatMessages, useChatTypings, useDeleteMessage } from '@mezon/core';
+import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, ArrowDownIcon } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	RootState,
+	messagesActions,
 	selectAllUserClanProfile,
 	selectAttachmentPhoto,
+	selectChannelMemberByUserIds,
 	selectCurrentClan,
 	selectHasMoreMessageByChannelId,
 	selectMembersByChannelId,
 	selectMessageIdsByChannelId,
+	selectTypingUserIdsByChannelId,
+	useAppDispatch,
 } from '@mezon/store-mobile';
+import { IMessageWithUser } from '@mezon/utils';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
@@ -18,49 +23,53 @@ import { ActivityIndicator, DeviceEventEmitter, FlatList, Text, TouchableOpacity
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
+import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
-import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import { styles } from './styles';
 import { MessageItemBS } from './components';
-import { IMessageWithUser } from '@mezon/utils';
-import { EMessageActionType, EMessageBSToShow } from './enums';
-import { IConfirmActionPayload, IMessageActionPayload } from './types';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
+import { EMessageActionType, EMessageBSToShow } from './enums';
+import { styles } from './styles';
+import { IConfirmActionPayload, IMessageActionPayload } from './types';
 
 type ChannelMessagesProps = {
 	channelId: string;
-	type: string;
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
 };
 
-const idUserAnonymous = "1767478432163172999";
+const idUserAnonymous = '1767478432163172999';
 
-const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
-	const { loadMoreMessage } = useChatMessages({ channelId });
+const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMessagesProps) => {
+	const dispatch = useAppDispatch();
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
-	const { typingUsers } = useChatTypings({ channelId, mode });
-	const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
-	const flatListRef = useRef(null);
-	const timeOutRef = useRef(null);
+	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
+	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const currentClan = useSelector(selectCurrentClan);
 	const channelMember = useSelector(selectMembersByChannelId(channelId));
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
+	const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
+	const flatListRef = useRef(null);
+	const timeOutRef = useRef(null);
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
 	const [userSelected, setUserSelected] = useState<ApiUser | null>(null);
 	const [messageSelected, setMessageSelected] = useState<IMessageWithUser | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
-	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous,[messageSelected?.sender_id]);
+	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+
+	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
+
+	const loadMoreMessage = React.useCallback(async () => {
+		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
+	}, [dispatch, channelId]);
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -97,29 +106,32 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		};
 	}, []);
 
-	useEffect(()=>{
-		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({isHiddenBottomSheet}) => {
-		  isHiddenBottomSheet && setOpenBottomSheet(null);
-		})
+	useEffect(() => {
+		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
+			isHiddenBottomSheet && setOpenBottomSheet(null);
+		});
 		return () => {
 			messageItemBSListener.remove();
-		}
-	}, [])
+		};
+	}, []);
 
-	const onConfirmAction = useCallback((payload: IConfirmActionPayload) => {
-		const { type, message, senderDisplayName, user } = payload;
-		switch (type) {
-			case EMessageActionType.DeleteMessage:
-				deleteSendMessage(message?.id);
-				break;
-			case EMessageActionType.ForwardMessage:
-			case EMessageActionType.Report:
-				setCurrentMessageActionType(type);
-				break;
-			default:
-				break;
-		}
-	}, [deleteSendMessage])
+	const onConfirmAction = useCallback(
+		(payload: IConfirmActionPayload) => {
+			const { type, message, senderDisplayName, user } = payload;
+			switch (type) {
+				case EMessageActionType.DeleteMessage:
+					deleteSendMessage(message?.id);
+					break;
+				case EMessageActionType.ForwardMessage:
+				case EMessageActionType.Report:
+					setCurrentMessageActionType(type);
+					break;
+				default:
+					break;
+			}
+		},
+		[deleteSendMessage],
+	);
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers?.length === 1) {
@@ -132,21 +144,23 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	}, [typingUsers]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
-	const onLoadMore = () => {
+	const onLoadMore = useCallback(() => {
 		setIsLoadMore(true);
-		if (!isLoadMore) loadMoreMessage().finally(() => setIsLoadMore(false));
-	};
-
-	const handleScroll = (event: { nativeEvent: { contentOffset: { y: any } } }) => {
+		if (!isLoadMore) {
+			loadMoreMessage().finally(() => setIsLoadMore(false));
+		}
+	}, [isLoadMore, loadMoreMessage]);
+	
+	const handleScroll = useCallback((event: { nativeEvent: { contentOffset: { y: any } } }) => {
 		const offsetY = event.nativeEvent.contentOffset.y;
 		const threshold = 300; // Adjust this value to determine when to show the button
-
+		
 		if (offsetY > threshold && !showScrollToBottomButton) {
 			setShowScrollToBottomButton(true);
 		} else if (offsetY <= threshold && showScrollToBottomButton) {
 			setShowScrollToBottomButton(false);
 		}
-	};
+	}, [showScrollToBottomButton]);
 
 	const scrollToBottom = () => {
 		flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
@@ -188,7 +202,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		switch (type) {
 			case EMessageBSToShow.MessageAction:
 				setMessageSelected(message);
-				setSenderDisplayName(senderDisplayName)
+				setSenderDisplayName(senderDisplayName);
 				break;
 			case EMessageBSToShow.UserInformation:
 				setUserSelected(user);
@@ -197,10 +211,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				break;
 		}
 		setOpenBottomSheet(type);
-	}, [])
+	}, []);
 
 	const renderItem = useCallback(
-		({ item }) => {
+		({ item, index }) => {
 			return (
 				<MessageItem
 					jumpToRepliedMessage={jumpToRepliedMessage}
@@ -216,7 +230,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				/>
 			);
 		},
-		[mode, channelId, onOpenImage, jumpToRepliedMessage, onMessageAction],
+		[jumpToRepliedMessage, clansProfile, channelMember, mode, channelId, onOpenImage, currentClan, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(
@@ -285,7 +299,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 					onClose={() => setVisibleImageModal(false)}
 					onImageChangeFooter={onImageFooterChange}
 				/>
-			): null}
+			) : null}
 
 			<MessageItemBS
 				mode={mode}
@@ -301,19 +315,19 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				senderDisplayName={senderDisplayName}
 			/>
 
-			{currentMessageActionType ===  EMessageActionType.ForwardMessage && (
-				<View style={{flex: 1}}>
+			{currentMessageActionType === EMessageActionType.ForwardMessage && (
+				<View style={{ flex: 1 }}>
 					<ForwardMessageModal
-						show={currentMessageActionType ===  EMessageActionType.ForwardMessage}
+						show={currentMessageActionType === EMessageActionType.ForwardMessage}
 						onClose={() => setCurrentMessageActionType(null)}
 						message={messageSelected}
 					/>
 				</View>
 			)}
 
-			{currentMessageActionType ===  EMessageActionType.Report && (
+			{currentMessageActionType === EMessageActionType.Report && (
 				<ReportMessageModal
-					isVisible={currentMessageActionType ===  EMessageActionType.Report}
+					isVisible={currentMessageActionType === EMessageActionType.Report}
 					onClose={() => setCurrentMessageActionType(null)}
 					message={messageSelected}
 				/>

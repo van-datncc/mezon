@@ -1,12 +1,12 @@
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
-import { IEmojiImage } from '@mezon/utils';
+import { IEmoji } from '@mezon/utils';
 import React from 'react';
 import { Text } from 'react-native';
 import { channelIdRegex, highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
 
-export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], channelsEntities?: Record<string, ChannelsEntity>, rawMembers: ChannelMembersEntity[]) => {
+export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channelsEntities?: Record<string, ChannelsEntity>, rawMembers: ChannelMembersEntity[]) => {
 	const getChannelById = (channelHashtagId: string) => {
 		const channel = channelsEntities?.[channelHashtagId];
 		if (channel) {
@@ -63,7 +63,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmojiImage[], ch
 		));
 	};
 
-	const renderTextWithEmoji = (text: string, emojiListPNG?: IEmojiImage[]) => {
+	const renderTextWithEmoji = (text: string, emojiListPNG?: IEmoji[]) => {
 		const parts = text?.split?.(highlightEmojiRegex);
 		return parts?.map?.((part, index) => {
 			const isHighlighted = highlightEmojiRegex.test(part);

@@ -18,7 +18,7 @@ import {
 	getStoreAsync,
 	messagesActions,
 	selectChannelsEntities,
-	selectEmojiImage,
+	selectAllEmojiSuggestion,
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	selectMessageEntityById,
@@ -51,7 +51,7 @@ import { RenderVideoChat } from './components/RenderVideoChat';
 import { Swipeable } from 'react-native-gesture-handler';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
-const widthMedia = Metrics.screenWidth - 150;
+const widthMedia = Metrics.screenWidth - 140;
 
 export type MessageItemProps = {
 	message?: IMessageWithUser;
@@ -95,7 +95,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [senderId, setSenderId] = useState<string>('');
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.messageId));
@@ -198,7 +198,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				activeOpacity={0.8}
 				key={index}
 				onPress={() => {
-					onOpenImage({
+					onOpenImage?.({
 						...image,
 						uploader: message.sender_id,
 						create_time: message.create_time,
@@ -376,12 +376,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					checkMessageTargetToMoved && styles.highlightMessageReply
 				]}
 				>
-					{lastSeen &&
-						<View style={styles.newMessageLine}>
-							<View style={styles.newMessageContainer}>
-								<Text style={styles.newMessageText}>NEW MESSAGE</Text>
-							</View>
-						</View>}
+					{/*{lastSeen &&*/}
+					{/*	<View style={styles.newMessageLine}>*/}
+					{/*		<View style={styles.newMessageContainer}>*/}
+					{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
+					{/*		</View>*/}
+					{/*	</View>}*/}
 					{messageRefFetchFromServe ? (
 						<View style={styles.aboveMessage}>
 							<View style={styles.iconReply}>

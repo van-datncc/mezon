@@ -57,7 +57,7 @@ const NavigationMain = () => {
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmojiMobile());
+		store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {

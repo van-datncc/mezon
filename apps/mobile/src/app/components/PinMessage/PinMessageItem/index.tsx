@@ -1,7 +1,7 @@
 import { CloseIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelsEntity, PinMessageEntity } from '@mezon/store-mobile';
-import { IEmojiImage } from '@mezon/utils';
+import { IEmoji } from '@mezon/utils';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { renderTextContent } from '../../../screens/home/homedrawer/constants/markdown';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
@@ -12,7 +12,7 @@ interface IPinMessageItemProps {
 	handleUnpinMessage: (pinMessageItem: PinMessageEntity) => void;
 	contentMessage: string;
 	channelsEntities: Record<string, ChannelsEntity>;
-	emojiListPNG: IEmojiImage[];
+	emojiListPNG: IEmoji[];
 }
 
 const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage, channelsEntities, emojiListPNG }: IPinMessageItemProps) => {
