@@ -34,7 +34,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 
 	useEffect(() => {
 		if (messageRefFetchFromServe !== undefined && messageRefFetchFromServe?.content.t !== '') {
-			console.log(messageRefFetchFromServe.content.t);
 			setMessageLine(messageRefFetchFromServe.content.t ?? '');
 		}
 	}, [messageRefFetchFromServe?.content.t]);
