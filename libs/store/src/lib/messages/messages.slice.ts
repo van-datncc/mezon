@@ -112,8 +112,10 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 export const TYPING_TIMEOUT = 3000;
 
 export const fetchMessagesCached = memoize(
-	(mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>
-		mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE),
+	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>{
+	const respont =	await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE)
+	return {...respont, time: Date.now()}
+	},
 	{
 		promise: true,
 		maxAge: FETCH_MESSAGES_CACHED_TIME,
@@ -135,11 +137,12 @@ type fetchMessageChannelPayload = {
 	noCache?: boolean;
 	messageId?: string;
 	direction?: number;
+	lastSeenMess?: string;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
-	async ({ channelId, noCache, messageId, direction }: fetchMessageChannelPayload, thunkAPI) => {
+	async ({ channelId, noCache, messageId, direction, lastSeenMess }: fetchMessageChannelPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
@@ -149,6 +152,21 @@ export const fetchMessages = createAsyncThunk(
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 		if (!response.messages) {
 			return [];
+		}
+		
+		if(Date.now() - response.time > 1000){
+			const state = getMessagesState(getMessagesRootState(thunkAPI))
+			const lastSeenMessageId = selectMessageIdsByChannelId(state, channelId)?.at(-1);
+			
+			if (lastSeenMessageId) {
+				thunkAPI.dispatch(
+					messagesActions.setChannelLastMessage({
+						channelId,
+						messageId: lastSeenMessageId,
+					}),
+				);
+			}
+			return []
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -423,7 +441,7 @@ export const messagesSlice = createSlice({
 			state.quantitiesMessageRemain = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
 			if (!channelId || !messageId) return state;
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -480,11 +498,12 @@ export const messagesSlice = createSlice({
 					break;
 			}
 
-			// TODO: check duplicates with setChannelLastMessage
-			state.unreadMessagesEntries = {
-				...state.unreadMessagesEntries,
-				[action.payload.channel_id]: action.payload.id,
-			};
+			if (isCurrentChannel || isMe) {
+				state.unreadMessagesEntries = {
+					...state.unreadMessagesEntries,
+					[action.payload.channel_id]: action.payload.id,
+				};		
+			}
 			const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
 
 			if (state?.typingUsers?.[typingUserKey]) {
@@ -532,6 +551,13 @@ export const messagesSlice = createSlice({
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
 				[action.payload.channelId]: action.payload.messageId,
+			};
+		},
+		UpdateChannelLastMessage: (state, action: PayloadAction<{channelId:string}>) => {
+			const lastMess = state.channelMessages[action.payload.channelId]?.ids.at(-1)
+			state.unreadMessagesEntries = {
+				...state.unreadMessagesEntries,
+				[action.payload.channelId]: lastMess || "",
 			};
 		},
 		setUserTyping: (state, action: PayloadAction<SetUserTypingArgs>) => {
@@ -752,7 +778,7 @@ export const selectMessageEntitiesByChannelId = createCachedSelector(
 export const selectMessageIdsByChannelId = createCachedSelector(
 	(state, channelId: string) => {
 		const messagesState = getMessagesState(state);
-		return messagesState.channelMessages[channelId]?.ids || null;
+		return messagesState?.channelMessages[channelId]?.ids || null;
 	},
 	(messagesState: string[] | null) => {
 		return messagesState || [];
