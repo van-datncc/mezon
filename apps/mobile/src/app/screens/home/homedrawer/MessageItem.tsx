@@ -8,7 +8,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Metrics, Text, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import {
   ChannelMembersEntity,
 	ChannelsEntity,
@@ -39,7 +39,7 @@ import { isImage, isVideo, linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction } from './components';
 import { renderTextContent } from './constants';
 import { EMessageActionType, EMessageBSToShow } from './enums';
-import { styles } from './styles';
+import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -78,6 +78,8 @@ const arePropsEqual = (prevProps, nextProps) => {
 const idUserAnonymous = "1767478432163172999";
 
 const MessageItem = React.memo((props: MessageItemProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false, preventAction = false } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message = useMemo(() => {

@@ -1,8 +1,8 @@
-import { Colors, Fonts, Metrics, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, Colors, Fonts, Metrics, baseColor, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 const width = Dimensions.get('window').width;
 const inputWidth = width * 0.6;
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	mainList: {
 		height: '100%',
 		width: '78%',
@@ -12,18 +12,26 @@ export const styles = StyleSheet.create({
 	},
 
 	wrapperChatBox: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 		borderTopWidth: 0.5,
-		borderTopColor: Colors.gray48,
+		borderTopColor: colors.border,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 	},
 	aboveTextBoxWrapper: {
 		flexDirection: 'column',
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.primary,
+	},
+	btnIcon: {
+		width: size.s_40,
+		height: size.s_40,
+		borderRadius: size.s_40,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: colors.tertiary
 	},
 	aboveTextBoxText: {
-		color: Colors.white,
+		color: colors.text,
 		fontSize: size.s_12,
 	},
 	aboveTextBoxItem: {
@@ -33,7 +41,7 @@ export const styles = StyleSheet.create({
 		padding: size.tiny,
 		gap: 10,
 		borderBottomWidth: 1,
-		borderBottomColor: Colors.bgDarkSlate,
+		borderBottomColor: colors.border,
 	},
 	closeIcon: {
 		color: Colors.bgDarkSlate,
@@ -57,8 +65,8 @@ export const styles = StyleSheet.create({
 	wrapperInput: {
 		position: 'relative',
 		justifyContent: 'center',
-		backgroundColor: Colors.secondaryLight,
-		paddingVertical: size.s_4,
+		// backgroundColor: Colors.secondaryLight,
+		// paddingVertical: size.s_4,
 		borderRadius: size.s_22,
 	},
 	inputStyle: {
@@ -71,8 +79,8 @@ export const styles = StyleSheet.create({
 		paddingRight: size.s_40,
 		fontSize: size.medium,
 		paddingTop: size.s_8,
-		backgroundColor: Colors.secondaryLight,
-		color: Colors.tertiary,
+		backgroundColor: colors.tertiary,
+		color: colors.textStrong,
 		textAlignVertical: 'center',
 	},
 	iconEmoji: {
@@ -80,9 +88,7 @@ export const styles = StyleSheet.create({
 		right: 10,
 	},
 	iconSend: {
-		backgroundColor: '#5865F2',
-		alignItems: 'center',
-		justifyContent: 'center',
+		backgroundColor: baseColor.blurple,
 	},
 	containerDrawerContent: {
 		flex: 1,
@@ -90,17 +96,17 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.secondary,
 	},
 	homeDefault: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 		flex: 1,
 	},
 	wrapperChannelMessage: {
 		flex: 1,
 		justifyContent: 'space-between',
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 	},
 	listChannels: {
 		paddingTop: size.s_14,
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 	},
 	channelListLink: {
 		display: "flex",
@@ -129,7 +135,7 @@ export const styles = StyleSheet.create({
 		fontSize: 15,
 		fontWeight: 'bold',
 		color: Colors.tertiary,
-    flexBasis: '75%'
+		flexBasis: '75%'
 	},
 	channelListItem: {
 		paddingHorizontal: 10,
@@ -227,8 +233,8 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		borderBottomWidth: 1,
-		borderBottomColor: Colors.gray48,
-		backgroundColor: Colors.secondary,
+		borderBottomColor: colors.border,
+		backgroundColor: colors.primary,
 	},
 	lineActiveClan: {
 		backgroundColor: Colors.azureBlue,
@@ -482,7 +488,7 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_14,
 		paddingVertical: size.s_6,
 		fontSize: size.s_14,
-		color: Colors.textGray,
+		color: colors.text
 	},
 	iconUserClan: {
 		alignItems: 'center',
@@ -497,8 +503,12 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: size.s_10,
 		marginVertical: size.s_30,
 	},
+	channelView: {
+		flex: 1, 
+		backgroundColor: colors.secondary
+	},
 	iconWelcomeMessage: {
-		backgroundColor: 'rgb(80,80,80)',
+		backgroundColor: colors.primary,
 		marginBottom: size.s_10,
 		width: 70,
 		height: 70,
@@ -509,12 +519,12 @@ export const styles = StyleSheet.create({
 	titleWelcomeMessage: {
 		fontSize: size.s_22,
 		marginBottom: size.s_10,
-		color: Colors.white,
+		color: colors.textStrong,
 		fontWeight: '600',
 	},
 	subTitleWelcomeMessage: {
 		fontSize: size.s_14,
-		color: Colors.tertiary,
+		color: colors.text,
 		marginBottom: size.s_10,
 	},
 	wrapperAttachmentPreview: {
@@ -559,7 +569,7 @@ export const styles = StyleSheet.create({
 		position: 'absolute',
 		right: size.s_10,
 		bottom: size.s_20,
-		backgroundColor: Colors.borderPrimary,
+		backgroundColor: colors.primary,
 		width: size.s_50,
 		height: size.s_50,
 		borderRadius: size.s_50,
@@ -634,8 +644,19 @@ export const styles = StyleSheet.create({
 	},
 	channelContainer: { flexDirection: 'row', alignItems: 'center' },
 	threadHeaderBox: { flexDirection: 'row', alignItems: 'center' },
-	threadHeaderLabel: { color: Colors.white, fontWeight:"700", marginLeft: size.s_10, fontSize: size.label , width: '85%'},
-	channelHeaderLabel: { color: Colors.textGray, marginLeft: size.s_10, fontSize: size.medium, maxWidth: '85%' },
+	threadHeaderLabel: {
+		color: colors.textStrong,
+		fontWeight: "700",
+		marginLeft: size.s_10,
+		fontSize: size.label,
+		width: '85%'
+	},
+	channelHeaderLabel: {
+		color: colors.textStrong,
+		marginLeft: size.s_10,
+		fontSize: size.medium,
+		maxWidth: '85%'
+	},
 	mb_10: {
 		marginBottom: verticalScale(10),
 	},
@@ -690,7 +711,7 @@ export const styles = StyleSheet.create({
 		width: 40,
 		height: 40,
 	},
-  sortButton: {
-    paddingHorizontal: size.s_14, paddingVertical: size.s_6
-  }
+	sortButton: {
+		paddingHorizontal: size.s_14, paddingVertical: size.s_6
+	}
 });

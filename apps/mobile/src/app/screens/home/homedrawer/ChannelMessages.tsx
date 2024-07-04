@@ -1,6 +1,6 @@
 import { useChatMessages, useChatTypings, useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, ArrowDownIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Icons, ActionEmitEvent } from '@mezon/mobile-components';
+import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	selectAllUserClanProfile,
@@ -21,7 +21,7 @@ import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import { styles } from './styles';
+import { style } from './styles';
 import { MessageItemBS } from './components';
 import { IMessageWithUser } from '@mezon/utils';
 import { EMessageActionType, EMessageBSToShow } from './enums';
@@ -40,6 +40,8 @@ type ChannelMessagesProps = {
 const idUserAnonymous = "1767478432163172999";
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: ChannelMessagesProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { loadMoreMessage } = useChatMessages({ channelId });
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
@@ -60,7 +62,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 	const [messageSelected, setMessageSelected] = useState<IMessageWithUser | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
-	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous,[messageSelected?.sender_id]);
+	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
 
 	const createAttachmentObject = (attachment: any) => ({
 		source: {
@@ -97,9 +99,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 		};
 	}, []);
 
-	useEffect(()=>{
-		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({isHiddenBottomSheet}) => {
-		  isHiddenBottomSheet && setOpenBottomSheet(null);
+	useEffect(() => {
+		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
+			isHiddenBottomSheet && setOpenBottomSheet(null);
 		})
 		return () => {
 			messageItemBSListener.remove();
@@ -264,7 +266,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 
 			{showScrollToBottomButton && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>
-					<ArrowDownIcon color={Colors.tertiary} />
+					<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />
 				</TouchableOpacity>
 			)}
 
@@ -285,7 +287,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 					onClose={() => setVisibleImageModal(false)}
 					onImageChangeFooter={onImageFooterChange}
 				/>
-			): null}
+			) : null}
 
 			<MessageItemBS
 				mode={mode}
@@ -301,19 +303,19 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, type, mode }: Cha
 				senderDisplayName={senderDisplayName}
 			/>
 
-			{currentMessageActionType ===  EMessageActionType.ForwardMessage && (
-				<View style={{flex: 1}}>
+			{currentMessageActionType === EMessageActionType.ForwardMessage && (
+				<View style={{ flex: 1 }}>
 					<ForwardMessageModal
-						show={currentMessageActionType ===  EMessageActionType.ForwardMessage}
+						show={currentMessageActionType === EMessageActionType.ForwardMessage}
 						onClose={() => setCurrentMessageActionType(null)}
 						message={messageSelected}
 					/>
 				</View>
 			)}
 
-			{currentMessageActionType ===  EMessageActionType.Report && (
+			{currentMessageActionType === EMessageActionType.Report && (
 				<ReportMessageModal
-					isVisible={currentMessageActionType ===  EMessageActionType.Report}
+					isVisible={currentMessageActionType === EMessageActionType.Report}
 					onClose={() => setCurrentMessageActionType(null)}
 					message={messageSelected}
 				/>

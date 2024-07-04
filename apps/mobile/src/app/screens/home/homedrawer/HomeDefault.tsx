@@ -1,14 +1,10 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import {
 	ActionEmitEvent,
-	HashSignLockIcon,
-	MuteIcon,
-	ThreadIcon,
-	UnMuteIcon,
 	getChannelById,
-	ArrowLeftIcon
+	Icons
 } from '@mezon/mobile-components';
-import { Block, Colors } from '@mezon/mobile-ui';
+import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -22,7 +18,6 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import HashSignIcon from '../../../../assets/svg/channelText-white.svg';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -31,9 +26,11 @@ import ChatBox from './ChatBox';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
-import { styles } from './styles';
+import { style } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -111,7 +108,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 			/>
 			{currentChannel && isFocusChannelView && (
-				<View style={{ flex: 1, backgroundColor: Colors.tertiaryWeight }}>
+				<View style={styles.channelView}>
 					<ChannelMessages
 						channelId={currentChannel.channel_id}
 						type="CHANNEL"
@@ -133,11 +130,11 @@ const HomeDefault = React.memo((props: any) => {
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
-					
+
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: Colors.secondary,
+							backgroundColor: themeValue.secondary,
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
@@ -165,7 +162,7 @@ const HomeDefault = React.memo((props: any) => {
 				backdropComponent={renderBackdrop}
 				index={-1}
 				snapPoints={snapPoints}
-				backgroundStyle={{ backgroundColor: Colors.secondary }}
+				backgroundStyle={{ backgroundColor: themeValue.secondary }}
 			>
 				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
 			</BottomSheet>
@@ -185,6 +182,8 @@ const HomeDefaultHeader = React.memo(
 		openBottomSheet: () => void;
 		onOpenDrawer: () => void;
 	}) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
 		const navigateMenuThreadDetail = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
@@ -200,17 +199,17 @@ const HomeDefaultHeader = React.memo(
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<TouchableOpacity activeOpacity={0.8} style={styles.iconBar} onPress={onOpenDrawer}>
-							<ArrowLeftIcon width={20} height={20}  />
+							<Icons.ArrowLargeLeftIcon width={20} height={20} color={themeValue.textStrong} />
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<ThreadIcon width={20} height={20}></ThreadIcon>
+									<Icons.ThreadPlusIcon width={20} height={20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
-									<HashSignLockIcon width={20} height={20} color={Colors.white} />
+									currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+									<Icons.TextLockIcon width={20} height={20} color={themeValue.textStrong} />
 								) : (
-									<HashSignIcon width={18} height={18} />
+									<Icons.TextIcon width={20} height={20} color={themeValue.textStrong} />
 								)}
 								<View>
 									<View style={styles.threadHeaderBox}>
@@ -228,9 +227,9 @@ const HomeDefaultHeader = React.memo(
 					<TouchableOpacity onPress={() => openBottomSheet()}>
 						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
 						{statusMute === EActionMute.Mute ? (
-							<MuteIcon width={22} height={22} style={{ marginRight: 20 }} />
+							<Icons.BellSlashIcon width={20} height={20} color={themeValue.textStrong} />
 						) : (
-							<UnMuteIcon width={22} height={22} style={{ marginRight: 20 }} />
+							<Icons.BellIcon width={20} height={20} color={themeValue.textStrong} />
 						)}
 					</TouchableOpacity>
 				)}
