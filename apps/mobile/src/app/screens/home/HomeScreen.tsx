@@ -97,7 +97,7 @@ const HomeScreen = React.memo((props: any) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const session = useSelector(selectSession);
 	const { reconnect } = useMezon();
-	// useCheckUpdatedVersion();
+	useCheckUpdatedVersion();
 
 	useEffect(() => {
 		if (clans?.length && !currentClan) {
