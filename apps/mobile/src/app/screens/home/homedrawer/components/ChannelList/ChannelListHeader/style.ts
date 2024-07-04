@@ -1,7 +1,7 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     listHeader: {
         width: '100%',
         flexDirection: 'row',
@@ -10,27 +10,25 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 2,
         left: 0,
-        padding: 5,
-        gap: 5,
-        paddingHorizontal: 10,
-        paddingVertical: 10
+        padding: Metrics.size.m,
+        gap: Metrics.size.s,
     },
 
     titleNameWrapper: {
         maxWidth: '85%',
         display: "flex",
-        backgroundColor: Colors.gray4850,
+        backgroundColor: colors.primary,
         paddingHorizontal: 10,
         paddingVertical: 3,
         borderRadius: 20,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: 5,
+        gap: Metrics.size.s,
         alignItems: "center",
     },
 
     titleServer: {
-        color: Colors.white,
+        color: colors.text,
         fontWeight: 'bold',
         fontSize: 16
     },
@@ -45,12 +43,11 @@ const styles = StyleSheet.create({
 
     textInfo: {
         color: Colors.gray72,
-        fontSize: 9,
+        fontSize: Fonts.size.h9,
     },
 
     actions: {
         padding: 4,
-        backgroundColor: Colors.gray4850,
         borderRadius: 999
     },
 
@@ -58,8 +55,6 @@ const styles = StyleSheet.create({
         height: 150,
         width: "100%",
         position: "relative",
-        marginBottom: 20
+        marginBottom: Metrics.size.xl
     }
 });
-
-export default styles;

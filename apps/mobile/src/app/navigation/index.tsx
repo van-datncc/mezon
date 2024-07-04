@@ -10,6 +10,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Sentry from '@sentry/react-native';
+import 'react-native-svg'
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
