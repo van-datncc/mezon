@@ -40,6 +40,16 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const remain = useSelector(selectQuantitiesMessageRemain);
 	
 	const dispatch = useAppDispatch();
+	
+	useEffect(()=>{
+		return ()=>{
+			dispatch(
+				messagesActions.UpdateChannelLastMessage({
+					channelId
+				}),
+			);
+		}
+	},[channelId])	
 
 	const loadMoreMessage = useCallback(async () => {
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
