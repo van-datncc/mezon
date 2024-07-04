@@ -164,7 +164,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					onFocus={handleFocus}
 					inputRef={textareaRef}
 					value={editMessage}
-					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
+					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
 					rows={editMessage?.split('\n').length}
