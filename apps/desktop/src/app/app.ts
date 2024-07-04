@@ -70,6 +70,7 @@ export default class App {
 			},
 			icon: join(__dirname, 'assets', 'favicon.ico'),
 		});
+		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
 
