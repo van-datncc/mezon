@@ -31,13 +31,14 @@ import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
 import { MezonBottomSheet, MezonSearch } from '../../../../temp-ui';
-import { ChannelListContext, ChannelListSection } from '../Reusables';
+import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
+import { ChannelListSection } from '../components/ChannelList/ChannelListSection';
 
 const ChannelList = React.memo((props: any) => {
 	const { themeValue } = useTheme();

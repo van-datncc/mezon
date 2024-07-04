@@ -34,6 +34,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
+import { useAppParams } from '@mezon/core';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -54,6 +55,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const { directId , channelId } = useAppParams();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 
@@ -85,7 +87,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const mess = mapMessageChannelToEntity(message);
 
 			mess.isMe = senderId === userId;
-
+			mess.isCurrentChannel = message.channel_id === directId
+			if(directId === undefined){
+				mess.isCurrentChannel = message.channel_id === channelId
+			}
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -94,7 +99,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({...message, timestamp}));
 		},
-		[dispatch, userId],
+		[dispatch, userId, channelId, directId],
 	);
 
 	const onchannelpresence = useCallback(
