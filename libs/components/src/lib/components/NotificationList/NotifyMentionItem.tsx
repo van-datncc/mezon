@@ -10,11 +10,12 @@ import {
 	selectMessageByMessageId,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageHead from '../MessageWithUser/MessageHead';
 import MarkUpOnReply from '../MessageWithUser/MessageReply/MarkUpOnReply';
+import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 import { useMessageLine } from '../MessageWithUser/useMessageLine';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
@@ -67,7 +68,6 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const { jumpToMessage } = useJumpToMessage();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const message = useSelector(selectMessageByMessageId(messageId));
-	console.log(message);
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
 	const dispatchMessageMention = async () => {
@@ -154,26 +154,25 @@ function MentionTabContent({ message }: IMentionTabContent) {
 	);
 	const senderMessage = useSelector(selectMemberByUserId(message?.sender_id));
 
+	const checkMessageHasReply = useMemo(() => {
+		return message.references && message.references?.length > 0;
+	}, [message.references]);
 	return (
-		<>
-			<div className="flex flex-row p-5 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
-				
-				<div className="w-14 h-14">
-					<AvatarImage
-						alt="user avatar"
-						className="w-full h-full min-w-14"
-						userName={senderMessage?.user?.username}
-						src={senderMessage?.user?.avatar_url}
-					/>
+		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
+			{checkMessageHasReply && (
+				<div className="max-w-full overflow-hidden">
+					<MessageReply message={message} />
 				</div>
+			)}
 
-				<div className="h-full">
+			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
+				<AvatarImage alt="user avatar" className="w-15 h-15" userName={senderMessage?.user?.username} src={senderMessage?.user?.avatar_url} />
+
+				<div className="h-full ">
 					<MessageHead message={message} user={senderMessage} isCombine={true} isShowFull={true} />
-						<div className={'w-[20rem] border'} style={{ wordBreak: 'break-word' }}>
-							<MarkUpOnReply posMention={true} onClickToMove={(e) => getIdMessageToJump(message?.id, e)} mention={mentions} />
-						</div>
+					<MarkUpOnReply posMention={true} onClickToMove={(e) => getIdMessageToJump(message?.id, e)} mention={mentions} />
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
