@@ -74,6 +74,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 							fontSize: '14px',
 							fontWeight: 500,
 						}}
+						className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-[#ADB3B9] hover:text-[#FFF]'} `}
 					>
 						<span>{item.label}</span>
 						<span> {item.icon}</span>
