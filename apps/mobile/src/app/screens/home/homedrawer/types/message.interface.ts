@@ -1,4 +1,4 @@
-import { EmojiDataOptionals, IEmojiImage, IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
+import { EmojiDataOptionals, IEmoji, IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiUser } from 'mezon-js/api.gen';
 import { EMessageActionType, EMessageBSToShow } from '../enums';
 
@@ -44,7 +44,7 @@ export interface IMessageActionNeedToResolve {
 export interface IMessageReactionProps {
 	message: IMessageWithUser;
 	mode: number;
-	emojiListPNG?: IEmojiImage[];
+	emojiListPNG?: IEmoji[];
 	openEmojiPicker?: () => void;
 	preventAction?: boolean;
 }
@@ -54,7 +54,7 @@ export interface IDetailReactionBottomSheet {
 	emojiSelectedId: string | null;
 	userId: string | null;
 	onClose: () => void;
-	emojiListPNG?: IEmojiImage[];
+	emojiListPNG?: IEmoji[];
 	removeEmoji?: (emoji: EmojiDataOptionals) => void;
 }
 export interface IPayloadThreadSendMessage {

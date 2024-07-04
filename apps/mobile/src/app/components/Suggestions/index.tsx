@@ -1,10 +1,11 @@
-import { useEmojiSuggestion } from '@mezon/core';
+import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
 import SuggestItem from './SuggestItem';
-import { useMemo } from 'react';
+import { memo } from 'react';
 
 export interface MentionSuggestionsProps {
 	suggestions: MentionDataProps[];
@@ -12,8 +13,7 @@ export interface MentionSuggestionsProps {
 	onSelect: (user: MentionDataProps) => void;
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestions = [] }) => {
-	
+const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, suggestions = [] }) => {
 	const formattedMentionList = useMemo(() => {
 		if (keyword === null || !suggestions.length) {
 			return [];
@@ -22,20 +22,20 @@ const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestio
 		const mentionSearchText = keyword?.toLocaleLowerCase();
 
 		const filterMatchedMentions = (mentionData: MentionDataProps) => {
-			return mentionData?.display.toLocaleLowerCase().includes(mentionSearchText)
-		}
-		
+			return mentionData?.display.toLocaleLowerCase().includes(mentionSearchText);
+		};
+
 		const sortDisplayNameFunction = (a, b) => {
 			const indexA = a.display.indexOf(mentionSearchText);
 			const indexB = b.display.indexOf(mentionSearchText);
-		  
+
 			if (indexA === -1 && indexB === -1) {
-			  return a.display.localeCompare(b.display);
+				return a.display.localeCompare(b.display);
 			}
 			if (indexA === -1) return 1;
 			if (indexB === -1) return -1;
 			if (indexA === indexB) {
-			  return a.display.localeCompare(b.display);
+				return a.display.localeCompare(b.display);
 			}
 
 			return indexA - indexB;
@@ -43,12 +43,12 @@ const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestio
 
 		return suggestions
 			.filter(filterMatchedMentions)
-		  	.sort(sortDisplayNameFunction)
+			.sort(sortDisplayNameFunction)
 			.map((item) => ({
 				...item,
 				name: item.display,
-			}))
-	}, [keyword, suggestions])
+			}));
+	}, [keyword, suggestions]);
 
 	if (keyword == null) {
 		return null;
@@ -71,7 +71,7 @@ const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestio
 			keyboardShouldPersistTaps="handled"
 		/>
 	);
-};
+});
 
 export type ChannelsMention = {
 	id: string;
@@ -129,12 +129,13 @@ export type IEmoji = {
 };
 
 const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
-	const { emojiListPNG } = useEmojiSuggestion();
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
+
 	let emojiData = [];
 	if (!keyword) {
 		return;
 	}
-	emojiData = emojiListPNG.map((emoji) => ({
+	emojiData = emojiListPNG?.map?.((emoji) => ({
 		...emoji,
 		name: emoji?.shortname,
 		id: emoji?.shortname,

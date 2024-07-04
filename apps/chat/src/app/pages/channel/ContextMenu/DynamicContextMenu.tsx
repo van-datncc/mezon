@@ -18,11 +18,13 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 	const emojiList = [':anhan:', , ':100:', ':rofl:', ':verify:'];
 	const [warningStatus, setWarningStatus] = useState<string>('');
 
-	//red: #E83247
-	//gray: #ADB3B9
+	const isLightMode = useMemo(() => {
+		return appearanceTheme === 'light';
+	}, [appearanceTheme]);
+
 	const className: CSSProperties = {
-		'--contexify-menu-bgColor': '#111214',
-		'--contexify-item-color': '#ADB3B9',
+		'--contexify-menu-bgColor': isLightMode ? '#FFFFFF' : '#111214',
+		'--contexify-item-color': isLightMode ? '#4E5057' : '#ADB3B9',
 		'--contexify-activeItem-color': '#FFFFFF',
 		'--contexify-activeItem-bgColor': warningStatus,
 		'--contexify-rightSlot-color': '#6f6e77',
@@ -33,14 +35,19 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 		'--contexify-menu-radius': '2px',
 		'--contexify-activeItem-radius': '2px',
 		'--contexify-menu-minWidth': '188px',
+		'--contexify-separator-color': '#ADB3B9',
 	} as CSSProperties;
 
 	const children = useMemo(() => {
 		const elements: React.ReactNode[] = [];
 		for (let index = 0; index < items.length; index++) {
 			const item = items[index];
-			const lableItemWarning = item.label === 'Delete Message' || item.label === 'Report Message';
-			if (items[index].label === 'Copy Link') elements.push(<Separator key={`separator-${index}`} />);
+			const lableItemWarning =
+				item.label === 'Delete Message' ||
+				item.label === 'Report Message' ||
+				item.label === 'Remove Reactions' ||
+				item.label === 'Remove All Reactions';
+			if (item.label === 'Copy Link' || item.label === 'Copy Image') elements.push(<Separator key={`separator-${index}`} />);
 			elements.push(
 				<Item
 					key={item.label}
@@ -67,6 +74,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 							fontSize: '14px',
 							fontWeight: 500,
 						}}
+						className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-[#ADB3B9] hover:text-[#FFF]'} `}
 					>
 						<span>{item.label}</span>
 						<span> {item.icon}</span>
@@ -89,7 +97,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 	}, [items]);
 
 	return (
-		<Menu id={menuId} style={appearanceTheme === 'light' ? className : className}>
+		<Menu id={menuId} style={className}>
 			<ReactionPart emojiList={emojiList} activeMode={mode} messageId={messageId} />
 			{children}
 		</Menu>

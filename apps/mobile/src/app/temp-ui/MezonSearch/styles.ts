@@ -1,26 +1,23 @@
-import { Colors, Fonts, size } from '@mezon/mobile-ui';
+import { Attributes, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	inputWrapper: {
-		backgroundColor: Colors.secondary,
 		borderRadius: 10,
-		paddingHorizontal: 15,
-		marginVertical: 20,
+		paddingHorizontal: Metrics.size.l,
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: 10,
+		gap: Metrics.size.m,
+		flexBasis: 50,
+		flexGrow: 1,
 	},
 
 	input: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: Fonts.size.small,
 		flexBasis: 10,
 		flexGrow: 1,
-		paddingVertical: 0,
-		height: size.s_40,
+		paddingVertical: 0
 	},
 });
-
-export default styles;

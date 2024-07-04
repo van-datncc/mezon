@@ -11,7 +11,7 @@ import { useMemberStatus } from '@mezon/core';
 import { emojiRegex, normalizeString } from '../../utils/helpers';
 import { useThrottledCallback } from 'use-debounce';
 import { useSelector } from 'react-redux';
-import { DirectEntity, selectDirectsOpenlist, selectEmojiImage } from '@mezon/store-mobile';
+import { DirectEntity, selectDirectsOpenlist, selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { removeBlockCode } from '../home/homedrawer/constants';
 import FastImage from 'react-native-fast-image';
 import { getSrcEmoji } from '@mezon/utils';
@@ -25,7 +25,7 @@ const SeparatorListFriend = () => {
 const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation: any}) => {
 	const { directMessage, navigation } = props;
 	const { t } = useTranslation('message');
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: directMessage?.id } })

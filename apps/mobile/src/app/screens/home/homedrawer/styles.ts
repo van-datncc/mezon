@@ -219,7 +219,7 @@ export const styles = StyleSheet.create({
 	},
 	textLogoClanIcon: {
 		color: Colors.titleReset,
-		fontSize: size.s_24,
+		fontSize: size.s_22,
 		fontWeight: '600',
 	},
 	homeDefaultHeader: {
@@ -363,7 +363,7 @@ export const styles = StyleSheet.create({
 
 	newMessageContainer: {
 		position: "absolute",
-		top: -15,
+		top: -size.s_10,
 		left: 0,
 		display: "flex",
 		justifyContent: "center",
@@ -429,6 +429,10 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		top: -size.s_8,
 		gap: 4
+	},
+	tapToSeeAttachmentText: {
+		color: Colors.tertiary,
+		fontSize: size.small
 	},
 	userNameMessageBox: {
 		fontSize: size.medium,

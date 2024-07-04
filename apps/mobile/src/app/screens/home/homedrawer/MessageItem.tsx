@@ -1,6 +1,7 @@
 import { useAuth, useClans } from '@mezon/core';
 import {
 	ActionEmitEvent,
+	AttachmentImageIcon,
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
@@ -18,7 +19,7 @@ import {
 	getStoreAsync,
 	messagesActions,
 	selectChannelsEntities,
-	selectEmojiImage,
+	selectAllEmojiSuggestion,
 	selectMemberByUserId,
 	selectMessageByMessageId,
 	selectMessageEntityById,
@@ -27,10 +28,11 @@ import {
   selectLastSeenMessage,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
+  UsersClanEntity,
 } from '@mezon/store-mobile';
 import { IMessageWithUser, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
@@ -50,8 +52,9 @@ import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { Swipeable } from 'react-native-gesture-handler';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
+import { channelDetailContext } from './HomeDefault';
 
-const widthMedia = Metrics.screenWidth - 150;
+const widthMedia = Metrics.screenWidth - 140;
 
 export type MessageItemProps = {
 	message?: IMessageWithUser;
@@ -64,7 +67,7 @@ export type MessageItemProps = {
 	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClan?: ClansEntity;
 	clansProfile?:  UserClanProfileEntity[];
-	channelMember?: ChannelMembersEntity[];
+	usersClanMention?: UsersClanEntity[];
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 	showUserInformation?: boolean;
@@ -78,12 +81,11 @@ const arePropsEqual = (prevProps, nextProps) => {
 const idUserAnonymous = "1767478432163172999";
 
 const MessageItem = React.memo((props: MessageItemProps) => {
-	const { mode, onOpenImage, isNumberOfLine , currentClan, channelMember, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false, preventAction = false } = props;
+	const { mode, onOpenImage, isNumberOfLine , currentClan, usersClanMention, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false, preventAction = false } = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message = useMemo(() => {
 		return props?.message ? props?.message : selectedMessage;
 	}, [props?.message, selectedMessage]);
-	const userLogin = useAuth();
 	const dispatch = useAppDispatch();
 	const { attachments, lines } = useMessageParser(message);
 	const user = useSelector(selectMemberByUserId(message?.sender_id));
@@ -95,16 +97,17 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [senderId, setSenderId] = useState<string>('');
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
 	const repliedSender = useSelector(selectMemberByUserId(senderId));
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.messageId));
   const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous,[message?.sender_id]);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
+  const { userProfile } = useContext(channelDetailContext) || {};
 	const hasIncludeMention = useMemo(() => {
-		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userLogin.userProfile?.user?.username}`);
-	}, [message, userLogin]);
+		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
+	}, [message, userProfile]);
 	const isCombine = !message.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
@@ -198,11 +201,21 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				activeOpacity={0.8}
 				key={index}
 				onPress={() => {
-					onOpenImage({
+					onOpenImage?.({
 						...image,
 						uploader: message.sender_id,
 						create_time: message.create_time,
 					});
+				}}
+				onLongPress={() => {
+					if (preventAction) return;
+					setIsOnlyEmojiPicker(false);
+					onMessageAction({
+						type: EMessageBSToShow.MessageAction,
+						senderDisplayName,
+						message
+					})
+					dispatch(setSelectedMessage(message));
 				}}
 			>
 				<FastImage
@@ -250,7 +263,21 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			}
 
 			return (
-				<TouchableOpacity activeOpacity={0.8} key={index} onPress={() => openUrl(document.url)}>
+				<TouchableOpacity
+					activeOpacity={0.8}
+					key={index}
+					onPress={() => openUrl(document.url)}
+					onLongPress={() => {
+						if (preventAction) return;
+						setIsOnlyEmojiPicker(false);
+						onMessageAction({
+							type: EMessageBSToShow.MessageAction,
+							senderDisplayName,
+							message
+						})
+						dispatch(setSelectedMessage(message));
+					}}
+				>
 					<View style={styles.fileViewer}>
 						<FileIcon width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
 						<View style={{ maxWidth: '75%' }}>
@@ -330,7 +357,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const senderDisplayName = useMemo(() => {
 		return clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)
 	}, [checkAnonymous, clanProfile?.nick_name, message?.username, user?.user?.display_name, user?.user?.username])
-	
+
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
 		  inputRange: [-50, 0],
@@ -376,12 +403,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					checkMessageTargetToMoved && styles.highlightMessageReply
 				]}
 				>
-					{lastSeen &&
-						<View style={styles.newMessageLine}>
-							<View style={styles.newMessageContainer}>
-								<Text style={styles.newMessageText}>NEW MESSAGE</Text>
-							</View>
-						</View>}
+					{/*{lastSeen &&*/}
+					{/*	<View style={styles.newMessageLine}>*/}
+					{/*		<View style={styles.newMessageContainer}>*/}
+					{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
+					{/*		</View>*/}
+					{/*	</View>}*/}
 					{messageRefFetchFromServe ? (
 						<View style={styles.aboveMessage}>
 							<View style={styles.iconReply}>
@@ -403,7 +430,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									<Text style={styles.replyDisplayName}>
 										{clanProfileSender?.nick_name || repliedSender?.user?.display_name || repliedSender?.user?.username || 'Anonymous'}
 									</Text>
-									{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, channelMember, true)}
+									{messageRefFetchFromServe?.attachments?.length ? (
+										<>
+											<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
+											<AttachmentImageIcon width={13} height={13} color={Colors.textGray} />
+										</>
+									): (
+										<>
+											{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, usersClanMention, true)}
+										</>
+									)}
 								</View>
 							</Pressable>
 						</View>
@@ -478,7 +514,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							{images?.length > 0 && renderImages()}
 
 							{documents?.length > 0 && renderDocuments()}
-							{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, channelMember)}
+							{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, usersClanMention)}
 							<MessageAction
 								message={message}
 								mode={mode}

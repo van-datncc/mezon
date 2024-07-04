@@ -168,6 +168,7 @@ export type IMessage = ChannelMessage & {
 	isError?: boolean;
 	isMe?: boolean;
 	isAnonymous?: boolean;
+	isCurrentChannel?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -328,12 +329,6 @@ export type IEmoji = {
 	shortname: string;
 };
 
-export type IEmojiImage = {
-	src?: string;
-	shortname: string;
-	category?: string;
-};
-
 export type IEmoticons = {
 	[key: string]: string;
 };
@@ -402,7 +397,7 @@ export type MentionDataProps = {
 	id: string | number;
 	display?: string;
 	avatarUrl?: string;
-	name?: string;
+	displayName?: string;
 };
 
 export type UserSearchDataProps = {
