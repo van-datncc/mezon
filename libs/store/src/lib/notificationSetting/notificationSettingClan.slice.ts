@@ -1,8 +1,8 @@
 import {IDefaultNotification, IDefaultNotificationClan, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
-
+import memoize from 'memoizee';
 export const DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY = 'defaultnotificationclan';
 
 export interface DefaultNotificationClanState {
@@ -16,9 +16,31 @@ export const initialDefaultNotificationClanState: DefaultNotificationClanState =
 	defaultNotificationClan: null,
 };
 
-export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationclan/getDefaultNotificationClan', async (clanId: string, thunkAPI) => {
+const LIST_NOTIFI_CLAN_CACHED_TIME = 1000 * 60 * 3;
+export const fetchNotificationClanSetting = memoize(
+	(mezon: MezonValueContext, clanId: string) =>
+		mezon.client.getNotificationClanSetting(mezon.session, clanId),
+	{
+		promise: true,
+		maxAge: LIST_NOTIFI_CLAN_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1];
+		},
+	},
+);
+
+type fetchNotificationClanSettingsArgs = {
+	clanId: string;
+	noCache?: boolean;
+};
+
+export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationclan/getDefaultNotificationClan', 
+	async ({clanId, noCache}:fetchNotificationClanSettingsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.getNotificationClanSetting(mezon.session, clanId);
+	if (noCache) {
+		fetchNotificationClanSetting.clear(mezon, clanId);
+	}
+	const response = await fetchNotificationClanSetting(mezon, clanId);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
@@ -43,7 +65,7 @@ export const setDefaultNotificationClan = createAsyncThunk(
 			
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getDefaultNotificationClan(clan_id || ""));
+		thunkAPI.dispatch(getDefaultNotificationClan({clanId: clan_id || "", noCache: true}));
 		return response;
 	},
 );

@@ -1,8 +1,8 @@
 import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { ApiNotificationChannelCategoySetting, ApiNotificationSetting } from 'mezon-js/api.gen';
-
+import memoize from 'memoizee';
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
 
 export interface DefaultNotificationCategoryState {
@@ -16,9 +16,18 @@ export const initialDefaultNotificationCategoryState: DefaultNotificationCategor
 	defaultNotificationCategory: null,
 };
 
-export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificationcategory/getDefaultNotificationCategory', async (categoryId: string, thunkAPI) => {
+type fetchNotificationCategorySettingsArgs = {
+	categoryId: string;
+	noCache?: boolean;
+};
+
+export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificationcategory/getDefaultNotificationCategory', 
+	async ({categoryId, noCache}:fetchNotificationCategorySettingsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.getNotificationCategory(mezon.session, categoryId);
+	if (noCache) {
+		fetchNotificationCategorySetting.clear(mezon, categoryId);
+	}
+	const response = await fetchNotificationCategorySetting(mezon, categoryId);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
@@ -30,6 +39,18 @@ type SetDefaultNotificationPayload = {
     notification_type?: string;
 	clan_id:string;
 };
+const LIST_NOTIFI_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
+export const fetchNotificationCategorySetting = memoize(
+	(mezon: MezonValueContext, categoryId: string) =>
+		mezon.client.getNotificationCategory(mezon.session, categoryId),
+	{
+		promise: true,
+		maxAge: LIST_NOTIFI_CATEGORY_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1];
+		},
+	},
+);
 
 export const setDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/setDefaultNotificationCategory',
@@ -44,8 +65,8 @@ export const setDefaultNotificationCategory = createAsyncThunk(
 			
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({clanId: clan_id ||""}))
-		thunkAPI.dispatch(getDefaultNotificationCategory(category_id || ""));
+		thunkAPI.dispatch(fetchChannelCategorySetting({clanId: clan_id ||"", noCache: true}))
+		thunkAPI.dispatch(getDefaultNotificationCategory({categoryId: category_id || "", noCache: true}));
 		return response;
 	},
 );
@@ -64,8 +85,8 @@ export const deleteDefaultNotificationCategory = createAsyncThunk(
 			
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({clanId: clan_id ||""}))
-		thunkAPI.dispatch(getDefaultNotificationCategory(category_id || ""));
+		thunkAPI.dispatch(fetchChannelCategorySetting({clanId: clan_id ||"", noCache: true}))
+		thunkAPI.dispatch(getDefaultNotificationCategory({categoryId: category_id || "", noCache: true}));
 		return response;
 	},
 );
@@ -111,16 +132,33 @@ export const channelCategorySettingAdapter = createEntityAdapter<NotiChannelCate
 
 type fetchChannelCategorySettingPayload = {
 	clanId: string;
+	noCache?: boolean
 };
-export const fetchChannelCategorySetting = createAsyncThunk('channelCategorySetting/fetchChannelCategorySetting', async ({ clanId }: fetchChannelCategorySettingPayload, thunkAPI) => {
+export const fetchChannelCategorySetting = createAsyncThunk('channelCategorySetting/fetchChannelCategorySetting', 
+	async ({ clanId, noCache }: fetchChannelCategorySettingPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.getChannelCategoryNotiSettingsList(mezon.session, clanId);
+	if (noCache) {
+		fetchChannelCategorySettingCache.clear(mezon, clanId);
+	}
+	const response = await fetchChannelCategorySettingCache(mezon, clanId);
 	if (!response.noti_channel_categoy_setting) {
 		return [];
 	}
 	return response.noti_channel_categoy_setting.map(mapChannelCategorySettingToEntity);
 });
 
+const LIST_NOTIFI_CHANEL_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
+export const fetchChannelCategorySettingCache = memoize(
+	(mezon: MezonValueContext, channelID: string) =>
+		mezon.client.getChannelCategoryNotiSettingsList(mezon.session, channelID),
+	{
+		promise: true,
+		maxAge: LIST_NOTIFI_CHANEL_CATEGORY_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1];
+		},
+	},
+);
 
 export const initialChannelCategorySettingState: ChannelCategorySettingState = channelCategorySettingAdapter.getInitialState({
 	loadingStatus: 'not loaded',

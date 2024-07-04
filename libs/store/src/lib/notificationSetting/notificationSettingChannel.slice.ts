@@ -36,7 +36,8 @@ type fetchNotificationSettingsArgs = {
 	noCache?: boolean;
 };
 
-export const getNotificationSetting = createAsyncThunk('notificationsetting/getNotificationSetting', async ({channelId, noCache}:fetchNotificationSettingsArgs, thunkAPI) => {
+export const getNotificationSetting = createAsyncThunk('notificationsetting/getNotificationSetting', 
+	async ({channelId, noCache}:fetchNotificationSettingsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
 		fetchNotificationSetting.clear(mezon, channelId);
@@ -68,7 +69,7 @@ export const setNotificationSetting = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache:true }));
 		thunkAPI.dispatch(getNotificationSetting({channelId: channel_id||"", noCache: true}));
 		return response;
 	},
@@ -94,7 +95,7 @@ export const setMuteNotificationSetting = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache:true }));
 		thunkAPI.dispatch(getNotificationSetting({channelId: channel_id || '', noCache: true}));
 		return response;
 	},
@@ -113,7 +114,7 @@ export const deleteNotiChannelSetting = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 		thunkAPI.dispatch(getNotificationSetting({channelId: channel_id || '', noCache: true}));
 		return response;
 	},
