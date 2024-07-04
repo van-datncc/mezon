@@ -100,7 +100,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		if (currentDmGroup?.id) {
 			directMessageLoader();
 		}
-	}, [currentDmGroup, directMessageLoader]);
+	}, [currentDmGroup?.id]);
 
 	useEffect(() => {
 		if (from && from === APP_SCREEN.HOME) {

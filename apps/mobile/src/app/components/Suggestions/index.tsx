@@ -5,6 +5,7 @@ import { Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import SuggestItem from './SuggestItem';
 import { useMemo } from 'react';
+import { memo } from 'react';
 
 export interface MentionSuggestionsProps {
 	suggestions: MentionDataProps[];
@@ -12,7 +13,7 @@ export interface MentionSuggestionsProps {
 	onSelect: (user: MentionDataProps) => void;
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestions = [] }) => {
+const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, suggestions = [] }) => {
 	
 	const formattedMentionList = useMemo(() => {
 		if (keyword === null || !suggestions.length) {
@@ -71,7 +72,7 @@ const Suggestions: FC<MentionSuggestionsProps> = ({ keyword, onSelect, suggestio
 			keyboardShouldPersistTaps="handled"
 		/>
 	);
-};
+});
 
 export type ChannelsMention = {
 	id: string;

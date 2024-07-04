@@ -85,7 +85,8 @@ interface IChatBoxProps {
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 	hiddenIcon?: {
 		threadIcon: boolean
-	}
+	},
+	directMessageId?: string;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const inputRef = useRef<TextInput>();
@@ -97,7 +98,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { members } = useChannelMembers({ channelId: props.channelId });
 	const currentChannel = useSelector(selectCurrentChannel);
 	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
-	const listMentions = UseMentionList(currentChannel?.id);
+	const listMentions = UseMentionList(props?.channelId || '');
 	const { listChannels } = useChannels();
 	const { textInputProps, triggers } = useMentions({
 		value: mentionTextValue,
@@ -112,6 +113,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		channelId: props.channelId,
 		channelLabel: props.channelLabel,
 		mode: props.mode,
+		directMessageId: props?.channelId
 	});
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
@@ -216,7 +218,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const editMessage = useCallback(
 		(editMessage: string, messageId: string) => {
-			EditSendMessage(editMessage, messageId);
+			EditSendMessage(editMessage?.trim(), messageId);
 		},
 		[EditSendMessage],
 	);
