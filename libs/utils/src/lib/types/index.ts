@@ -509,3 +509,9 @@ export type ContenSubmitEventProps = {
 	logo: string;
 	description: string;
 };
+
+export enum SHOW_POSITION {
+	IN_VIEWER = 'IN_VIEWER',
+	IN_LINK = 'IN_LINK',
+	NONE = 'NONE',
+}

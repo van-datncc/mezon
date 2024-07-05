@@ -1,7 +1,9 @@
 import { Icons } from '@mezon/components';
 import { useAttachments } from '@mezon/core';
-import { selectAttachment, selectAttachmentPhoto, selectOpenModalAttachment } from '@mezon/store';
-import { useEffect, useState } from 'react';
+import { selectAttachment, selectAttachmentPhoto, selectMessageIdAttachment, selectModeAttachment, selectOpenModalAttachment } from '@mezon/store';
+import { SHOW_POSITION } from '@mezon/utils';
+import { MessageContextMenuProps, useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ListAttachment from './listAttachment';
 
@@ -16,6 +18,10 @@ const MessageModalImage = () => {
 	const [currentIndexAtt, setCurrentIndexAtt] = useState(attachments.findIndex((img) => img.url === urlImg));
 	const attLength = attachments.length;
 	const checkNumberAtt = attLength > 1;
+	const { showMessageContextMenu, setPositionShow } = useMessageContextMenu();
+
+	const mode = useSelector(selectModeAttachment);
+	const messageId = useSelector(selectMessageIdAttachment);
 
 	const handleShowList = () => {
 		setShowList(!showList);
@@ -48,7 +54,16 @@ const MessageModalImage = () => {
 
 	const closeModal = () => {
 		setOpenModalAttachment(false);
+		setPositionShow(SHOW_POSITION.NONE);
 	};
+
+	const handleContextMenu = useCallback(
+		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
+			showMessageContextMenu(event, messageId, mode ?? 2, props);
+			setPositionShow(SHOW_POSITION.IN_VIEWER);
+		},
+		[showMessageContextMenu, messageId, mode, setPositionShow],
+	);
 
 	const handleKeyDown = (event: any) => {
 		if (event.key === 'Escape') {
@@ -57,11 +72,11 @@ const MessageModalImage = () => {
 		}
 		if (event.key === 'ArrowUp') {
 			const newIndex = currentIndexAtt > 0 ? currentIndexAtt - 1 : attLength - 1;
-      		setUrlImg(attachments[newIndex]?.url || '');
+			setUrlImg(attachments[newIndex]?.url || '');
 		}
-		if(event.key === "ArrowDown"){
+		if (event.key === 'ArrowDown') {
 			const newIndex = currentIndexAtt < attLength - 1 ? currentIndexAtt + 1 : 0;
-      		setUrlImg(attachments[newIndex]?.url || '');
+			setUrlImg(attachments[newIndex]?.url || '');
 		}
 	};
 
@@ -100,7 +115,7 @@ const MessageModalImage = () => {
 	};
 
 	return (
-		<div className="justify-center items-center flex flex-col md:flex-row fixed inset-0 z-50 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
+		<div className="justify-center items-center flex flex-col md:flex-row fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
 			<div className="flex-1 flex justify-center items-center p-5 overflow-hidden h-full w-full">
 				<img
 					src={urlImg}
@@ -116,6 +131,7 @@ const MessageModalImage = () => {
 						transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
 						transition: `${dragging ? '' : 'transform 0.2s ease'}`,
 					}}
+					onContextMenu={handleContextMenu}
 				/>
 			</div>
 			<button
@@ -133,7 +149,14 @@ const MessageModalImage = () => {
 				</button>
 			)}
 			{showList && checkNumberAtt && (
-				<ListAttachment attachments={attachments} urlImg={urlImg} setUrlImg={setUrlImg} handleDrag={handleDrag} setScale={setScale} setPosition={setPosition}/>
+				<ListAttachment
+					attachments={attachments}
+					urlImg={urlImg}
+					setUrlImg={setUrlImg}
+					handleDrag={handleDrag}
+					setScale={setScale}
+					setPosition={setPosition}
+				/>
 			)}
 		</div>
 	);

@@ -1,4 +1,4 @@
-import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { ChannelMessageOpt, MessageModalImage, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectIdMessageRefEdit,
@@ -6,6 +6,7 @@ import {
 	selectMemberByUserId,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
+	selectOpenModalAttachment,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';

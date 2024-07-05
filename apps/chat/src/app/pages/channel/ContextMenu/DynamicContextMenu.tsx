@@ -1,9 +1,10 @@
 import { selectTheme } from '@mezon/store';
-import { ContextMenuItem } from '@mezon/utils';
+import { ContextMenuItem, SHOW_POSITION } from '@mezon/utils';
 import { CSSProperties, useMemo, useState } from 'react';
 import { Item, Menu, Separator, Submenu } from 'react-contexify';
 // import 'react-contexify/dist/ReactContexify.css';
 import { useSelector } from 'react-redux';
+import { useMessageContextMenu } from './MessageContextMenuContext';
 import ReactionPart from './ReactionPart';
 
 type Props = {
@@ -38,6 +39,11 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 		'--contexify-separator-color': '#ADB3B9',
 	} as CSSProperties;
 
+	const { posShowMenu } = useMessageContextMenu();
+	const checkPos = useMemo(() => {
+		return posShowMenu === SHOW_POSITION.NONE;
+	}, [posShowMenu]);
+
 	const children = useMemo(() => {
 		const elements: React.ReactNode[] = [];
 		for (let index = 0; index < items.length; index++) {
@@ -47,7 +53,9 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 				item.label === 'Report Message' ||
 				item.label === 'Remove Reactions' ||
 				item.label === 'Remove All Reactions';
-			if (item.label === 'Copy Link' || item.label === 'Copy Image') elements.push(<Separator key={`separator-${index}`} />);
+			if (item.label === 'Copy Link' && checkPos) elements.push(<Separator key={`separator-${index}`} />);
+			if (item.label === 'Copy Image') elements.push(<Separator key={`separator-${index}`} />);
+
 			elements.push(
 				<Item
 					key={item.label}
@@ -97,8 +105,8 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 	}, [items]);
 
 	return (
-		<Menu id={menuId} style={className}>
-			<ReactionPart emojiList={emojiList} activeMode={mode} messageId={messageId} />
+		<Menu id={menuId} style={className} className="z-50">
+			{checkPos && <ReactionPart emojiList={emojiList} activeMode={mode} messageId={messageId} />}
 			{children}
 		</Menu>
 	);

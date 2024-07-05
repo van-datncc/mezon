@@ -48,11 +48,11 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	}, [message]);
 
 	return (
-		<div>
+		<div className="overflow-hidden">
 			{messageRefFetchFromServe && senderMessage && message.references && message?.references.length > 0 && (
 				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 					<Icons.ReplyCorner />
-					<div className="flex flex-row gap-1 mb-2 pr-12 items-center">
+					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
 						<div className="w-5 h-5">
 							<AvatarImage
 								className="w-5 h-5"
@@ -81,7 +81,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 							) : (
 								<span
 									onClick={(e) => getIdMessageToJump(messageRefId, e)}
-									className="text-[14px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer one-line break-all pt-0"
+									className="text-[14px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer one-line break-all pt-0 "
 								>
 									{messageRefFetchFromServe?.content?.t}
 								</span>
