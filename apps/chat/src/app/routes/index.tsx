@@ -32,6 +32,7 @@ import ProtectedRoutes from './ProtectedRoutes';
 import ThreadsRoutes from './ThreadsRoutes';
 
 const Login = loadable(() => import('../pages/login'));
+const Homepage = loadable(() => import('../pages/homepage'));
 const LoginDesktop = loadable(() => import('../pages/loginDesktop'));
 const Main = loadable(() => import('../pages/main'));
 const DirectMain = loadable(() => import('../pages/directMessage'));
@@ -77,6 +78,10 @@ export const Routes = () => {
 						{
 							path: '',
 							element: <InitialRoutes />,
+						},
+						{
+							path: '/homepage',
+							element: <Homepage />,
 						},
 						{
 							path: 'guess',
