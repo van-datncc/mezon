@@ -9,7 +9,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, Metrics, Text, size, verticalScale } from '@mezon/mobile-ui';
+import { Colors, Metrics, Text, size, verticalScale, useAnimatedState } from '@mezon/mobile-ui';
 import {
   ChannelMembersEntity,
 	ChannelsEntity,
@@ -92,7 +92,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
-	const [calcImgHeight, setCalcImgHeight] = useState<number>(180);
+	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
 	const [messageRefId, setMessageRefId] = useState<string>('');
 	const [senderId, setSenderId] = useState<string>('');
 	const messageRefFetchFromServe = useSelector(selectMessageByMessageId(messageRefId));
@@ -194,7 +194,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
-	const imageItem = ({ image, index, checkImage }) => {
+	const imageItem = useCallback(({ image, index, checkImage }) => {
 		return (
 			<TouchableOpacity
 				disabled={checkImage}
@@ -234,19 +234,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				/>
 			</TouchableOpacity>
 		);
-	};
+	}, [images, calcImgHeight]);
 
-	const renderImages = () => {
+	const renderImages = useCallback(() => {
 		return (
 			<View>
 				{images.map((image, index) => {
 					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
-
+					
 					return imageItem({ image, index, checkImage });
 				})}
 			</View>
 		);
-	};
+	}, [images, calcImgHeight]);
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {

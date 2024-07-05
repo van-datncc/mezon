@@ -1,4 +1,4 @@
-import { ChatWelcome } from '@mezon/components';
+import { ChatWelcome, MessageModalImage } from '@mezon/components';
 import { getJumpToMessageId, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
 	messagesActions,
@@ -7,6 +7,7 @@ import {
 	selectIdMessageToJump,
 	selectMessageIdsByChannelId,
 	selectMessageMetionId,
+	selectOpenModalAttachment,
 	selectQuantitiesMessageRemain,
 	selectTheme,
 	useAppDispatch,
@@ -38,18 +39,19 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
-	
+
 	const dispatch = useAppDispatch();
-	
-	useEffect(()=>{
-		return ()=>{
+	const openModalAttachment = useSelector(selectOpenModalAttachment);
+
+	useEffect(() => {
+		return () => {
 			dispatch(
 				messagesActions.UpdateChannelLastMessage({
-					channelId
+					channelId,
 				}),
 			);
-		}
-	},[channelId])	
+		};
+	}, [channelId]);
 
 	const loadMoreMessage = useCallback(async () => {
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
@@ -86,13 +88,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
 			return (
-				<MemorizedChannelMessage
-					key={messageId}
-					messageId={messageId}
-					channelId={channelId}
-					mode={mode}
-					channelLabel={channelLabel ?? ''}
-				/>
+				<MemorizedChannelMessage key={messageId} messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel ?? ''} />
 			);
 		});
 	}, [messages, channelId, mode, channelLabel]);
@@ -113,6 +109,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			)}
 			<MessageContextMenuProvider>
 				{messagesView}
+				{openModalAttachment && <MessageModalImage />}
 			</MessageContextMenuProvider>
 		</div>
 	);

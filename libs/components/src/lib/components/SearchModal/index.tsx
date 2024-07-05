@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 import { ChannelType } from 'mezon-js';
+import ListMemberSearch from './listMemberSearch';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -60,6 +61,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						id: itemFriend?.id ?? '',
 						name: itemFriend?.user.username ?? '',
 						avatarUser: itemFriend?.user.avatar_url ?? '',
+						displayName: itemFriend?.user.display_name ?? '',
 						idDM: '',
 					};
 				})
@@ -70,6 +72,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						displayName: itemUserClan?.user.display_name ?? '',
 						idDM: '',
 					};
 				})
@@ -255,25 +258,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				>
 					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
 						<>
-							{listMemSearch.length
-								? listMemSearch
-										.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
-										.slice(0, 7)
-										.map((item: any, index: number) => {
-											return (
-												<div
-													ref={itemRef}
-													key={item.id}
-													onClick={() => handleSelectMem(item)}
-													onMouseEnter={() => setIdActive(item.id)}
-													onMouseLeave={() => setIdActive(item.id)}
-													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
-												>
-													<SuggestItem name={item?.name} avatarUrl={item.avatarUser} />
-												</div>
-											);
-										})
-								: null}
+							<ListMemberSearch listMemSearch={listMemSearch} itemRef={itemRef} handleSelectMem={handleSelectMem} searchText={searchText} idActive={idActive} setIdActive={setIdActive}/>
 							{listChannelSearch.length
 								? listChannelSearch
 										.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
