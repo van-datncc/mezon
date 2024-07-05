@@ -62,8 +62,8 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 						key={clan.id}
 						style={[styles.serverItem, {
 							backgroundColor: currentClan?.clan_id === clan?.clan_id
-								? themeValue.secondary
-								: themeValue.tertiary,
+								? themeValue.secondaryLight
+								: themeValue.secondaryWeight,
 						}]}
 					>
 						<View style={styles.serverName}>

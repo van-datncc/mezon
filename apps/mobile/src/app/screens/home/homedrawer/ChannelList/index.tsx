@@ -69,7 +69,7 @@ const ChannelList = React.memo((props: any) => {
 		}
 	}, [categorizedChannels]);
 
-	const [collapseChannelItems, setCollapseChannelItems] = useAnimatedState([]);
+	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
 	const toggleCollapseChannel = (index: string) => {
 		if (collapseChannelItems.includes(index)) {
