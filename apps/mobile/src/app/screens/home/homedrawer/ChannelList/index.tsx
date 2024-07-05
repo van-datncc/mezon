@@ -67,7 +67,7 @@ const ChannelList = React.memo((props: any) => {
 		if (categorizedChannels?.length && !isFromFCMMobile) {
 			setDefaultChannelLoader();
 		}
-	}, [categorizedChannels]);
+	}, [categorizedChannels?.length, categorizedChannels?.[0]?.channels?.[0]?.channel_id]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
