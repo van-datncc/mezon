@@ -9,9 +9,9 @@ import {
 	selectIsLogin,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import {  NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -20,22 +20,26 @@ import { UnAuthentication } from './UnAuthentication';
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { Colors, ThemeModeBase, darkThemeColor, lightThemeColor, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { AppState, StatusBar, View } from 'react-native';
+import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { AppState, StatusBar } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
-import SplashScreen from '../components/SplashScreen';
+// import SplashScreen from '../components/SplashScreen';
+import notifee from '@notifee/react-native';
+import * as SplashScreen from 'expo-splash-screen';
 
 const RootStack = createStackNavigator();
 
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
-	const [isLoadingSplashScreen, setIsLoadingSplashScreen] = useAnimatedState(true);
 	const { reconnect } = useMezon();
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			setIsLoadingSplashScreen(false);
+		const timer = setTimeout(async () => {
+			await SplashScreen.hideAsync();
+			await notifee.cancelAllNotifications();
 		}, 1500);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
@@ -53,6 +57,7 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		reconnect().catch((e) => 'trying to reconnect');
+		await notifee.cancelAllNotifications();
 	};
 
 	const authLoader = async () => {
@@ -75,7 +80,6 @@ const NavigationMain = () => {
 			console.log('Tom log  => error authLoader', error);
 		}
 	};
-
 
 	return (
 		<NavigationContainer>
@@ -100,19 +104,15 @@ const NavigationMain = () => {
 					</RootStack.Group>
 				)}
 			</RootStack.Navigator>
-			{isLoadingSplashScreen && <SplashScreen />}
+			{/*{isLoadingSplashScreen && <SplashScreen />}*/}
 		</NavigationContainer>
 	);
 };
 
 const CustomStatusBar = () => {
 	const { themeValue, themeBasic } = useTheme();
-	return <StatusBar
-		animated
-		backgroundColor={themeValue.primary}
-		barStyle={themeBasic == ThemeModeBase.DARK ? "light-content" : "dark-content"}
-	/>
-}
+	return <StatusBar animated backgroundColor={themeValue.primary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
+};
 
 const RootNavigation = () => {
 	const mezon = useMezon();
