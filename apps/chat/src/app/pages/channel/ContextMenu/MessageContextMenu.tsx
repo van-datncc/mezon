@@ -209,7 +209,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [checkElementIsImage, elementTarget]);
 
 	useMemo(() => {
-		console.log(elementTarget);
 		if (checkElementIsImage) {
 			setEnableCopyLinkItem(true);
 			setEnableOpenLinkItem(true);
@@ -221,7 +220,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			setEnableCopyImageItem(false);
 			setEnableSaveImageItem(false);
 		}
-	}, [elementTarget]);
+	}, [checkElementIsImage, elementTarget]);
 
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
