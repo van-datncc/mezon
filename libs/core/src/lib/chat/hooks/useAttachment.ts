@@ -1,31 +1,28 @@
-import { attachmentActions, useAppDispatch } from "@mezon/store";
-import { useCallback, useMemo } from "react";
+import { attachmentActions, useAppDispatch } from '@mezon/store';
+import { useCallback, useMemo } from 'react';
 
 export function useAttachments() {
-    const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-    const setAttachment = useCallback(
+	const setAttachment = useCallback(
 		(status: string) => {
 			dispatch(attachmentActions.setAttachment(status));
 		},
 		[dispatch],
 	);
 
-    const setOpenModalAttachment = useCallback(
+	const setOpenModalAttachment = useCallback(
 		(status: boolean) => {
 			dispatch(attachmentActions.setOpenModalAttachment(status));
 		},
 		[dispatch],
 	);
 
-    return useMemo(
+	return useMemo(
 		() => ({
-            setAttachment,
-            setOpenModalAttachment,
+			setAttachment,
+			setOpenModalAttachment,
 		}),
-		[
-            setAttachment,
-            setOpenModalAttachment,
-		],
+		[setAttachment, setOpenModalAttachment],
 	);
 }
