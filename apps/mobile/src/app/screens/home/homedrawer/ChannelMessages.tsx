@@ -34,6 +34,7 @@ import { styles } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 import { useContext } from 'react';
 import { channelDetailContext } from './HomeDefault';
+import { FlashList } from '@shopify/flash-list';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -216,9 +217,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	}, []);
 
 	const renderItem = useCallback(
-		({ item, index }) => {
+		({ item }) => {
 			return (
 				<MessageItem
+					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					clansProfile={clansProfile}
 					usersClanMention={usersClanMention}
@@ -261,7 +263,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		<View style={styles.wrapperChannelMessage}>
 			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 			{isLoading === 'loading' && !isLoadMore && <MessageItemSkeleton skeletonNumber={15} />}
-			<FlatList
+			<FlashList
 				ref={flatListRef}
 				inverted
 				data={dataReverse || []}
@@ -270,11 +272,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
 				keyExtractor={(item) => `${item}`}
-				maxToRenderPerBatch={5}
-				initialNumToRender={5}
-				windowSize={10}
-				onEndReached={!!messages?.length && onLoadMore}
+				estimatedItemSize={200}
+				onEndReached={!!messages?.length ? onLoadMore : () => {}}
 				onEndReachedThreshold={0.5}
+				showsVerticalScrollIndicator={false}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 			/>
 
