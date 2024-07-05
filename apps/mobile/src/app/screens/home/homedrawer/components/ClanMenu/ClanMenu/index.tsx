@@ -105,13 +105,13 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         },
         {
             onPress: () => reserve(),
-            isShow: user.userId !== clan.creator_id,
+            isShow: user.userId !== clan?.creator_id,
             title: t('menu.optionsMenu.leaveServer'),
             textStyle: { color: "red" }
         },
         {
             onPress: () => reserve(),
-            isShow: user.userId === clan.creator_id,
+            isShow: user.userId === clan?.creator_id,
             title: t('menu.optionsMenu.deleteClan'),
             textStyle: { color: "red" }
         },
@@ -175,7 +175,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                         icon={<Icons.BellIcon color={themeValue.textStrong} />}
                         onPress={() => reserve()} />
 
-                    {user.userId === clan.creator_id &&
+                    {user.userId === clan?.creator_id &&
                         <MezonButtonIcon
                             title={t("actions.settings")}
                             icon={<Icons.SettingsIcon color={themeValue.textStrong} />}
