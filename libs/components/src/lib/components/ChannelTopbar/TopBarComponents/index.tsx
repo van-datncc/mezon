@@ -66,12 +66,12 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				<div className="flex flex-row items-center gap-2">
 					<Icons.ArrowRight />
 					{channelParent && channel.channel_private === ChannelStatusEnum.isPrivate ? (
-						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode" />
+						<Icons.ThreadIconLocker className="dark:text-[#B5BAC1] text-colorTextLightMode min-w-6" />
 					) : (
-						<Icons.ThreadIcon defaultSize="w-6 h-6" />
+						<Icons.ThreadIcon defaultSize="w-6 h-6 min-w-6" />
 					)}
 					<p
-						className={`mt-[2px] text-base font-semibold cursor-default ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
+						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
 					>
 						{channel.channel_label}
 					</p>
