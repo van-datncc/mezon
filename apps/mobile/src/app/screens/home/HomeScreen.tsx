@@ -39,7 +39,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 				drawerType: 'back',
 				swipeEdgeWidth: Metrics.screenWidth,
 				drawerStyle: {
-					width: '85%',
+					width: '100%',
 				},
 			}}
 			screenListeners={{

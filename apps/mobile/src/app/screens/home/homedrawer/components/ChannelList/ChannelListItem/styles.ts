@@ -11,7 +11,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     channelListItemActive: {
-        backgroundColor: colors.tertiary,
+        backgroundColor: colors.secondaryLight,
         borderRadius: size.s_10,
         // borderWidth: 1,
         // borderColor: colors.border
@@ -42,7 +42,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     channelListItemTitleActive: {
-        color: colors.textStrong,
+        color: colors.white,
     },
 
     channelDotWrapper: {

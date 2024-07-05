@@ -36,7 +36,7 @@ const NavigationMain = () => {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setIsLoadingSplashScreen(false);
-		}, 2500);
+		}, 1500);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
@@ -57,7 +57,7 @@ const NavigationMain = () => {
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmojiMobile());
+		store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {

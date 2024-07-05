@@ -1,10 +1,9 @@
-import { useAuth, useChatReaction, useDeleteMessage } from '@mezon/core';
+import { useAuth, useChatReaction } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	CopyIcon,
 	FaceIcon,
 	FlagIcon,
-	HashtagIcon,
 	LinkIcon,
 	MarkUnreadIcon,
 	MentionIcon,
@@ -15,8 +14,8 @@ import {
 	TrashIcon,
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { AppDispatch, pinMessageActions, selectCurrentChannel, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store-mobile';
-import { IEmojiImage, IMessageWithUser } from '@mezon/utils';
+import { AppDispatch, pinMessageActions, selectCurrentChannel, selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { IEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -56,15 +55,15 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message?.channel_id));
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isDM = useMemo(() => {
-		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
-	}, [mode])
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+	}, [mode]);
 
 	const handleActionReply = () => {
 		onClose();
 		const payload: IMessageActionNeedToResolve = {
 			type: EMessageActionType.Reply,
 			targetMessage: message,
-			replyTo: senderDisplayName
+			replyTo: senderDisplayName,
 		};
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
@@ -102,24 +101,26 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 					onPress: () => console.log('Cancel Pressed'),
 					style: 'cancel',
 				},
-				{ text: 'Yes', onPress: () => onConfirmAction({
-					type: EMessageActionType.DeleteMessage,
-					message
-				})},
+				{
+					text: 'Yes',
+					onPress: () =>
+						onConfirmAction({
+							type: EMessageActionType.DeleteMessage,
+							message,
+						}),
+				},
 			],
 			{ cancelable: false },
 		);
 	};
 
 	const handleActionPinMessage = () => {
-    if(message)
-		onClose();
+		if (message) onClose();
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message.channel_id, message_id: message.id }));
 	};
 
 	const handleActionUnPinMessage = () => {
-    if(message)
-		onClose();
+		if (message) onClose();
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannel.id || '', message_id: message.id }));
 	};
 
@@ -142,21 +143,27 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const handleActionReportMessage = () => {
 		onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.Report
-			})
-		}, Platform.OS === 'ios' ? 500 : 0)
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.Report,
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0,
+		);
 	};
 
 	const handleForwardMessage = () => {
 		onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.ForwardMessage,
-				message
-			})
-		}, Platform.OS === 'ios' ? 500 : 0)
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.ForwardMessage,
+					message,
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0,
+		);
 	};
 
 	const implementAction = (type: EMessageActionType) => {
@@ -236,39 +243,25 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
 		const messageExists = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const listOfActionOnlyMyMessage = [
-			EMessageActionType.EditMessage,
-			EMessageActionType.DeleteMessage,
-		];
-		const listOfActionOnlyOtherMessage = [
-			EMessageActionType.Report,
-		];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
+		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 		const listOfActionShouldHide = [
 			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isDM && EMessageActionType.CreateThread
+			isDM && EMessageActionType.CreateThread,
 		];
 		if (isMyMessage) {
-			return getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage,...listOfActionShouldHide].includes(action.type));
+			return getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage, ...listOfActionShouldHide].includes(action.type));
 		}
 
-		return getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage,...listOfActionShouldHide].includes(action.type));
+		return getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
 	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
 		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
 	};
 
-	const handleReact = async (mode, messageId, emoji: IEmojiImage, senderId) => {
-		await reactionMessageDispatch(
-			'',
-			mode,
-			message.channel_id ?? '',
-			messageId ?? '',
-			emoji?.shortname?.trim(),
-			1,
-			senderId ?? '',
-			false,
-		);
+	const handleReact = async (mode, messageId, emoji: IEmoji, senderId) => {
+		await reactionMessageDispatch('', mode, message.channel_id ?? '', messageId ?? '', emoji?.shortname?.trim(), 1, senderId ?? '', false);
 		onClose();
 	};
 

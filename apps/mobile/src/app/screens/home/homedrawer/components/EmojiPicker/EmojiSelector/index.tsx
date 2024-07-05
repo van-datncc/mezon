@@ -12,7 +12,7 @@ import {
 	SmilingFaceIcon,
 } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { selectEmojiImage } from '@mezon/store-mobile';
+import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import { debounce } from 'lodash';
 import React, { useCallback, useRef, useState } from 'react';
@@ -83,10 +83,16 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 	);
 };
 
-export default function EmojiSelector({ onScroll, onSelected, isReactMessage = false, handleBottomSheetExpand, handleBottomSheetCollapse }: EmojiSelectorProps) {
+export default function EmojiSelector({
+	onScroll,
+	onSelected,
+	isReactMessage = false,
+	handleBottomSheetExpand,
+	handleBottomSheetCollapse,
+}: EmojiSelectorProps) {
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
 	const { categoriesEmoji, setEmojiSuggestion } = useEmojiSuggestion();
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);

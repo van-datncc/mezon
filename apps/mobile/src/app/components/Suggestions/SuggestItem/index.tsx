@@ -1,4 +1,4 @@
-import { selectEmojiImage } from '@mezon/store-mobile';
+import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
 import { Image, View } from 'react-native';
 import { Text } from 'react-native';
@@ -14,7 +14,7 @@ type SuggestItemProps = {
 };
 
 const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar }: SuggestItemProps) => {
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const urlEmoji = getSrcEmoji(name, emojiListPNG);
 	return (
 		<View style={s.wrapperItem}>

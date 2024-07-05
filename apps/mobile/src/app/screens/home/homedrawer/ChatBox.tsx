@@ -17,7 +17,7 @@ import {
 	RootState,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	selectEmojiImage,
+	selectAllEmojiSuggestion,
 	selectHiddenBottomTabMobile,
 	selectMembersByChannelId,
 } from '@mezon/store-mobile';
@@ -86,7 +86,8 @@ interface IChatBoxProps {
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 	hiddenIcon?: {
 		threadIcon: boolean
-	}
+	},
+	directMessageId?: string;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
 	const { themeValue } = useTheme();
@@ -100,7 +101,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { members } = useChannelMembers({ channelId: props.channelId });
 	const currentChannel = useSelector(selectCurrentChannel);
 	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
-	const listMentions = UseMentionList(currentChannel?.id);
+	const listMentions = UseMentionList(props?.channelId || '');
 	const { listChannels } = useChannels();
 	const { textInputProps, triggers } = useMentions({
 		value: mentionTextValue,
@@ -115,6 +116,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		channelId: props.channelId,
 		channelLabel: props.channelLabel,
 		mode: props.mode,
+		directMessageId: props?.channelId
 	});
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
@@ -133,7 +135,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const currentTextInput = useRef('');
 	const mentions = useRef([]);
 	const { emojiPicked } = useEmojiSuggestion();
-	const emojiListPNG = useSelector(selectEmojiImage);
+	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
@@ -219,7 +221,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const editMessage = useCallback(
 		(editMessage: string, messageId: string) => {
-			EditSendMessage(editMessage, messageId);
+			EditSendMessage(editMessage?.trim(), messageId);
 		},
 		[EditSendMessage],
 	);

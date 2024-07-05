@@ -15,7 +15,7 @@ const ChannelListSkeleton = ({ numberSkeleton }: { numberSkeleton: number }) => 
 				/>
 			</Block>
 			{Array.from({ length: numberSkeleton }).map((_, index) => (
-				<Block>
+				<Block key={`ChannelListSkeleton_${index}`}>
 					<ShimmerPlaceHolder
 						shimmerColors={[Colors.secondaryLight, Colors.darkCharcoalGray, Colors.jetBlack]}
 						shimmerStyle={styles.normalText}

@@ -5,7 +5,7 @@ export const style = (colors: Attributes)=> StyleSheet.create({
     wrapperServerList: {
 		height: '100%',
 		paddingTop: size.s_20,
-		width: '22%',
+		width: '18%',
 		justifyContent: 'flex-start',
 		backgroundColor: colors.primary,
 		alignItems: 'center',
@@ -40,6 +40,6 @@ export const style = (colors: Attributes)=> StyleSheet.create({
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: colors.tertiary,
+		backgroundColor: colors.secondary,
 	},
 })

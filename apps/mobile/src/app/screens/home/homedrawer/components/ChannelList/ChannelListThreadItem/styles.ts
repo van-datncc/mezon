@@ -1,5 +1,5 @@
 import { Attributes, Fonts, Metrics, baseColor, size } from "@mezon/mobile-ui";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
     channelListLink: {
@@ -17,15 +17,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 
 	threadItemActive: {
-		backgroundColor: colors.primary,
+		backgroundColor: colors.secondaryLight,
 		borderRadius: size.s_10,
 		// borderWidth: 0.4,
 		// borderColor: Colors.gray48,
 		position: 'absolute',
 		width: '95%',
-		height: '90%',
+		height: Platform.OS === 'android' ? '90%' : '95%',
 		right: 0,
-		top: size.s_16,
+		top: Platform.OS === 'android' ? size.s_18 : size.s_14,
 	},
 
 	titleThread: {
@@ -45,7 +45,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		height: '160%',
 		right: 0,
 		top: size.s_2,
-		backgroundColor: colors.text,
+		backgroundColor: colors.secondaryLight,
 		borderRadius: size.s_10,
 		// borderWidth: 0.4,
 		// borderColor: Colors.gray48

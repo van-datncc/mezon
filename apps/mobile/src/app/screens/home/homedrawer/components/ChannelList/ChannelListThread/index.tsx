@@ -17,12 +17,13 @@ const ListChannelThread = React.memo(({ threads, currentChanel, onPress }: IList
 
 	return (
 		<View style={styles.containerThreadList}>
-			{threads.map((thread) => {
+			{threads.map((thread, index) => {
 				const isFirstThread = threads.indexOf(thread) === 0;
 				const isActive = currentChanel?.channel_id === thread.channel_id;
 
 				return (
 					<ChannelListThreadItem
+						key={`${thread?.id}_channel_thread_item${index}`}
 						thread={thread}
 						isActive={isActive}
 						isFirstThread={isFirstThread}
