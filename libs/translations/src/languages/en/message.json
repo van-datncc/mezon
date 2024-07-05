@@ -21,7 +21,8 @@
     },
     "toast": {
         "copyText": "Copied Message Text",
-        "attachmentIsLoading": "Attachment is loading, please wait a moment"
+        "attachmentIsLoading": "Attachment is loading, please wait a moment",
+        "pinMessage": "Message has been pinned"
     },
     "directMessage": {
         "you": "You"
