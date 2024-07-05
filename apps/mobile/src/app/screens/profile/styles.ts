@@ -1,24 +1,27 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.secondary,
         flex: 1,
         alignItems: 'center'
     },
+
     containerBackground: {
         width: '100%',
         height: "20%",
     },
+
     backgroundListIcon: {
         flexDirection: 'row',
         gap: 10, paddingTop: 15,
         justifyContent: 'flex-end',
         paddingRight: 15
     },
+
     backgroundSetting: {
-        backgroundColor: Colors.gray48,
+        backgroundColor: colors.secondary,
         height: size.s_30,
         width: size.s_30,
         borderRadius: 50,
@@ -27,19 +30,21 @@ export const styles = StyleSheet.create({
         gap: 5,
         flexDirection: 'row'
     },
-    iconColor: {
-        color: Colors.textGray
-    },
+
     text: {
-        color: Colors.textGray
+        color: colors.text
     },
-    textBold: {
-        color: Colors.textGray,
+
+    whiteText: {
+        color: Colors.white,
+        marginLeft: 10
+    },
+
+    textTitle: {
+        color: colors.textStrong,
         fontWeight: 'bold'
     },
-    whiteText: {
-        color: Colors.white
-    },
+
     button: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -51,53 +56,63 @@ export const styles = StyleSheet.create({
         
         flexDirection: 'row',
     },
+
     viewImageProfile: {
         position: 'absolute',
         width: size.s_100,
         height: size.s_100,
         borderRadius: 50,
-        backgroundColor: 'gray',
+        backgroundColor: colors.secondary,
         left: size.s_18,
         bottom: -size.s_50,
         borderWidth: 5,
-        borderColor: Colors.secondary,
+        borderColor: colors.secondary,
     },
+
     textAvatar: {
-        backgroundColor: Colors.bgGrayDark,
+        backgroundColor: colors.primary,
         width: '100%',
         height: '100%',
         textAlign: 'center',
         textAlignVertical: 'center',
         borderRadius: 50,
         fontSize: size.h5,
-        color: Colors.white
+        color: colors.text
     },
+
     dotOnline: {
         position: 'absolute',
         width: 20,
         height: 20,
         borderRadius: 10,
-        backgroundColor: Colors.green,
+        backgroundColor: baseColor.green,
         bottom: size.s_2,
         right: size.s_2,
-        borderWidth: 2,
-        borderColor: Colors.secondary
+        borderWidth: 3,
+        borderColor: colors.secondary
     },
+
     contentContainer: {
-        backgroundColor: Colors.tertiaryWeight,
+        backgroundColor: colors.primary,
         borderRadius: 20,
         padding: size.s_18,
         marginTop: size.s_20,
+        borderWidth: 1,
+        borderColor: colors.border
     },
+
     viewInfo: {
         flexDirection: 'row',
         alignItems: 'center'
     },
+
     textName: {
         fontSize: size.h5,
         fontWeight: 'bold',
-        color: Colors.textGray
+        color: colors.textStrong,
+        marginRight: 10
     },
+
     buttonList: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -136,6 +151,6 @@ export const styles = StyleSheet.create({
         height: size.s_30,
         borderRadius: 50,
         borderWidth: 3,
-        borderColor: Colors.tertiaryWeight
+        borderColor: colors.secondary
     },
 });
