@@ -76,11 +76,11 @@ export const Routes = () => {
 					children: [
 						// initial route to redirect to /chat
 						{
-							path: '',
+							path: '/mezon',
 							element: <InitialRoutes />,
 						},
 						{
-							path: '/homepage',
+							path: '/',
 							element: <Homepage />,
 						},
 						{
