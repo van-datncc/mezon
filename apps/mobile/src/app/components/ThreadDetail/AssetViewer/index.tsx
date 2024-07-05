@@ -1,61 +1,70 @@
-import React from 'react';
-import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from "react-native";
-import { Text } from 'react-native';
-import styles from "./style"
-import { MemberListStatus } from "../../MemberStatus";
-import AssetsHeader from "../AssetsHeader";
-import { useState, useRef } from "react";
-import PinMessage from "../../PinMessage";
+import { selectCurrentChannelId } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
+import React, { useContext, useRef, useState } from 'react';
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { MemberListStatus } from '../../MemberStatus';
+import PinMessage from '../../PinMessage';
+import AssetsHeader from '../AssetsHeader';
+import { threadDetailContext } from '../MenuThreadDetail';
+import styles from './style';
 
 const TabList = [
-    "Members",
-    // "Media",
-    "Pins",
-    // "Links",
-    // "Files"
-]
+	'Members',
+	// "Media",
+	'Pins',
+	// "Links",
+	// "Files"
+];
 
 export const AssetsViewer = React.memo(() => {
-    const [pageID, setPageID] = useState<number>(0);
-    const ref = useRef<ScrollView>();
+	const [pageID, setPageID] = useState<number>(0);
+	const ref = useRef<ScrollView>();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentChannel = useContext(threadDetailContext);
 
-    function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
-        const currentOffsetX = event.nativeEvent.contentOffset.x;
-        const windowWidth = Dimensions.get('window').width;
+	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
+		const currentOffsetX = event.nativeEvent.contentOffset.x;
+		const windowWidth = Dimensions.get('window').width;
 
-        const pageID_ = Math.round(currentOffsetX / windowWidth);
-        if (pageID !== pageID_) {
-            setPageID(pageID_);
-        }
-    }
+		const pageID_ = Math.round(currentOffsetX / windowWidth);
+		if (pageID !== pageID_) {
+			setPageID(pageID_);
+		}
+	}
 
-    function handelHeaderTabChange(index: number) {
-        const windowWidth = Dimensions.get('window').width;
-        ref && ref.current && ref.current.scrollTo({ x: index * windowWidth, animated: true })
-    }
+	function handelHeaderTabChange(index: number) {
+		const windowWidth = Dimensions.get('window').width;
+		ref && ref.current && ref.current.scrollTo({ x: index * windowWidth, animated: true });
+	}
 
-    return (
-        <>
-            <AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} titles={TabList} />
-            <View style={styles.container}>
-                <ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
-                    <MemberListStatus />
-                    {/*<Page2 />*/}
-                    <PinMessage />
-                    <Page2 />
-                    <Page2 />
-                </ScrollView>
-            </View >
-        </>
-
-    )
-})
+	return (
+		<>
+			<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} titles={TabList} />
+			<View style={styles.container}>
+				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+					<MemberListStatus />
+					{/*<Page2 />*/}
+					<PinMessage
+						currentChannelId={
+							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+								? currentChannel?.channel_id
+								: currentChannelId
+						}
+					/>
+					<Page2 />
+					<Page2 />
+				</ScrollView>
+			</View>
+		</>
+	);
+});
 
 // Just for testing purposes
 function Page2() {
-    return (
-        <View style={{ width: Dimensions.get("screen").width }}>
-            <Text style={{ color: "white" }}>tab content</Text>
-        </View>
-    )
+	return (
+		<View style={{ width: Dimensions.get('screen').width }}>
+			<Text style={{ color: 'white' }}>tab content</Text>
+		</View>
+	);
 }
