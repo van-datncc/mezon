@@ -53,5 +53,14 @@
         "cancel": "Cancel",
         "reportSubmitted": "Report submitted"
     },
-    "tapToSeeAttachment": "Tap to see attachment"
+    "tapToSeeAttachment": "Tap to see attachment",
+    "findThePerfectReaction": "Find the perfect reaction",
+    "pinMessage": "Pin Message",
+    "unpinMessage": "Unpin Message",
+    "confirmPinMessage": "Are you sure you want to pin this message?",
+    "confirmUnPinMessage": "Are you sure you want to remove this pined message?",
+    "pinSuccess": "Pin Message Success",
+    "unpinSuccess": "Unpin Message Success",
+    "Yes": "Yes",
+    "No": "No"
 }

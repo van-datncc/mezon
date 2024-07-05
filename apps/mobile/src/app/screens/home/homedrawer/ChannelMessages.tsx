@@ -34,6 +34,7 @@ import { styles } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 import { useContext } from 'react';
 import { channelDetailContext } from './HomeDefault';
+import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -126,6 +127,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					break;
 				case EMessageActionType.ForwardMessage:
 				case EMessageActionType.Report:
+				case EMessageActionType.PinMessage:
+				case EMessageActionType.UnPinMessage:
 					setCurrentMessageActionType(type);
 					break;
 				default:
@@ -332,6 +335,15 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					isVisible={currentMessageActionType === EMessageActionType.Report}
 					onClose={() => setCurrentMessageActionType(null)}
 					message={messageSelected}
+				/>
+			)}
+
+			{[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType) && (
+				<ConfirmPinMessageModal
+					isVisible={[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType)}
+					onClose={() => setCurrentMessageActionType(null)}
+					message={messageSelected}
+					type={currentMessageActionType}
 				/>
 			)}
 		</View>
