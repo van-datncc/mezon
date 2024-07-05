@@ -10,9 +10,10 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectIsMessageHasReaction,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
-	selectReactionOnMessageList,
+	setSelectedMessage,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -26,11 +27,11 @@ import {
 	handleOpenLink,
 	handleSaveImage,
 } from '@mezon/utils';
-import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
 import DynamicContextMenu from './DynamicContextMenu';
+import { toggleIsShowPopupForwardTrue } from '@mezon/store';
 
 type MessageContextMenuProps = {
 	id: string;
@@ -43,7 +44,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const reactionRealtimeList = useSelector(selectReactionOnMessageList);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const dispatch = useAppDispatch();
@@ -62,15 +62,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';
 	}, [message?.content.t]);
-
-	const checkMessageHasReaction = useCallback(() => {
-		const checkRealtime = checkMessageInRealtimeList(reactionRealtimeList, message?.id);
-		if (!messageHasReaction && !checkRealtime) {
-			return false;
-		} else {
-			return true;
-		}
-	}, [messageHasReaction, reactionRealtimeList, checkMessageInRealtimeList]);
 
 	const checkMessageInPinneList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
@@ -131,9 +122,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		setValueThread(message);
 	};
 
-	const enableViewReactionItem = useMemo(() => {
-		return checkMessageHasReaction();
-	}, [checkMessageHasReaction()]);
+	const enableViewReactionItem = useSelector(selectIsMessageHasReaction(messageId));
 
 	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
 		const enableEdit = checkSenderMessage;
@@ -153,17 +142,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		} else {
 			return undefined;
 		}
-	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList, message]);
+	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList]);
 
 	const enableSpeakMessageItem = useMemo(() => {
 		return checkMessageHasText;
 	}, [checkMessageHasText]);
 
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
-		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
-		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
+		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
 		return [enableOne, enableAll];
-	}, [isClanCreator, checkAdmintrator, checkMessageHasReaction(), removeReaction]);
+	}, [isClanCreator, checkAdmintrator, enableViewReactionItem, removeReaction]);
 
 	const enableCreateThreadItem = useMemo(() => {
 		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {

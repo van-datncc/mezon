@@ -90,12 +90,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 					key={messageId}
 					messageId={messageId}
 					channelId={channelId}
+					isHighlight={messageId === idMessageNotifed}
 					mode={mode}
 					channelLabel={channelLabel ?? ''}
 				/>
 			);
 		});
-	}, [messages, channelId, mode, channelLabel]);
+	}, [messages, channelId, mode, channelLabel, idMessageNotifed]);
 
 	return (
 		<div
