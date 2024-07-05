@@ -540,7 +540,7 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.displayName ?? ''}
+								name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 								avatarUrl={suggestion.avatarUrl ?? ''}
 								subText={suggestion.display === 'here' ? 'Notify everyone who has permission to see this channel' : suggestion.display  ?? ''}
 								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + 'text-xs'}
