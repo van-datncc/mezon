@@ -46,7 +46,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, subText, subTextSty
 				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
 				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, valueHightLight ?? '')}</span>
 			</div>
-			<span className={`text-[10px] font-semibold text-[#A1A1AA] uppercase ${subTextStyle}`}>{subText}</span>
+			<span className={`text-[10px] font-semibold text-[#A1A1AA] ${subTextStyle}`}>{subText}</span>
 		</div>
 	);
 };
