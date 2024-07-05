@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, nativeImage, screen, shell } from 'electron';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
@@ -153,7 +153,8 @@ export default class App {
 	private static handleTray() {
 		let mezonTray = null;
 		App.application.whenReady().then(() => {
-			mezonTray = new Tray('apps/chat/src/assets/icon-desktop.ico');
+			const trayIcon = nativeImage.createFromPath(join(__dirname, 'assets', 'icon-desktop.ico'));
+			mezonTray = new Tray(trayIcon);
 
 			const template: (MenuItem | MenuItemConstructorOptions)[] = [
 				{
