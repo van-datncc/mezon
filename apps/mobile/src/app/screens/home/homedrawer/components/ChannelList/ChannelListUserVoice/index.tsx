@@ -13,7 +13,7 @@ export default memo(function ChannelListUserVoice({ userListVoice }: IUserListVo
 		<View>
 			{
 				userListVoice?.length
-					? userListVoice?.map((userVoice) => <UserVoiceItem userVoice={userVoice} />)
+					? userListVoice?.map((userVoice, index) => <UserVoiceItem key={`${index}_voice_item_${userVoice?.participant}`} userVoice={userVoice} />)
 					: null
 			}
 		</View>

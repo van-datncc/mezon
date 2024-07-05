@@ -52,5 +52,6 @@
         "submitReport": "Submit Report",
         "cancel": "Cancel",
         "reportSubmitted": "Report submitted"
-    }
+    },
+    "tapToSeeAttachment": "Tap to see attachment"
 }

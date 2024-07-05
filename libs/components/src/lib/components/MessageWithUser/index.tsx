@@ -148,7 +148,6 @@ function MessageWithUser({
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}
-										<MessageAttachment message={message} onContextMenu={onContextMenu} />
 										{!isEditing && (
 											<MessageContent
 												message={message}
@@ -159,6 +158,7 @@ function MessageWithUser({
 												mode={mode}
 											/>
 										)}
+										<MessageAttachment message={message} onContextMenu={onContextMenu} />
 									</div>
 								</div>
 							</div>

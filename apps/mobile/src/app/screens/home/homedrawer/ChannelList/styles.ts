@@ -4,9 +4,8 @@ import { StyleSheet } from "react-native";
 export const style = (colors: Attributes) => StyleSheet.create({
     mainList: {
         height: '100%',
-        width: '78%',
+        width: '82%',
         borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
         overflow: 'hidden',
         backgroundColor: colors.secondary
     },

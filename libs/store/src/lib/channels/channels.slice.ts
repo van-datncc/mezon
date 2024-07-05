@@ -2,8 +2,8 @@ import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelMessageEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiChannelMessageHeader, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -284,6 +284,15 @@ export const channelsSlice = createSlice({
 				changes: {
 					channel_label: payload.channel_label,
 					status: payload.status,
+				},
+			});
+		},
+		updateChannelThreadSocket: (state, action) => {
+			const payload  = action.payload;
+			channelsAdapter.updateOne(state, {
+				id: payload.channel_id,
+				changes: {
+					last_sent_message: payload,
 				},
 			});
 		},

@@ -11,10 +11,11 @@ export type UseChatSendingOptions = {
 	channelId: string;
 	channelLabel: string;
 	mode: number;
+	directMessageId?: string;
 };
 
 // TODO: separate this hook into 2 hooks for send and edit message
-export function useChatSending({ channelId, channelLabel, mode }: UseChatSendingOptions) {
+export function useChatSending({ channelId, channelLabel, mode, directMessageId }: UseChatSendingOptions) {
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
@@ -22,7 +23,7 @@ export function useChatSending({ channelId, channelLabel, mode }: UseChatSending
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
 	// If not, using 2 hooks for direct and channel
-	const direct = useSelector(selectDirectById(directId || ""));
+	const direct = useSelector(selectDirectById(directMessageId || directId || ""));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
 	var channelID = channelId
