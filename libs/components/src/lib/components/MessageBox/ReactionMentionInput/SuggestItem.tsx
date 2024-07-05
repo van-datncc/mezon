@@ -40,12 +40,12 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, subText, subTextSty
 	return (
 		<div className="flex flex-row items-center justify-between h-[24px]">
 			<div className="flex flex-row items-center gap-2 py-[3px]">
-				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-8" />}
+				{showAvatar ? <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-8" /> : '@here'}
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
 				{symbol && <span className="text-[17px] dark:text-textDarkTheme text-textLightTheme">{symbol}</span>}
 				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, valueHightLight ?? '')}</span>
 			</div>
-			<span className={`text-[10px] font-semibold text-[#A1A1AA] uppercase ${subTextStyle}`}>{subText}</span>
+			<span className={`text-[10px] font-semibold text-[#A1A1AA] ${subTextStyle}`}>{subText}</span>
 		</div>
 	);
 };
