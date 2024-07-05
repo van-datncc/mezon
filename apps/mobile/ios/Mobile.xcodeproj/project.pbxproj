@@ -16,6 +16,7 @@
 		8062E008C4D06D4A0E6F7C92 /* libPods-Mobile-MobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68857255654E07272F9D78F5 /* libPods-Mobile-MobileTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		CE049B18D263E78C0E28DB71 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF63FBD8F416D85DC93F4BD /* ExpoModulesProvider.swift */; };
+		E9BFF0C32C37AC0F003C310E /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9BFF0C22C37AC0F003C310E /* SplashScreen.storyboard */; };
 		E9DEDF952BF7326A003F6572 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */; };
 		EB8EF22644D89E2389CBE23D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
@@ -69,6 +70,7 @@
 		E9B83E6D2C18346C00AE249D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		E9B83E6F2C18346C00AE249D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E9B83E772C18349600AE249D /* MezonRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonRelease.entitlements; sourceTree = "<group>"; };
+		E9BFF0C22C37AC0F003C310E /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
 		E9C22F3A2BF59D4200BCBA90 /* MobileRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = MobileRelease.entitlements; path = Mobile/MobileRelease.entitlements; sourceTree = "<group>"; };
 		E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -126,6 +128,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				CC2EF50EB870283F95A556F6 /* PrivacyInfo.xcprivacy */,
+				E9BFF0C22C37AC0F003C310E /* SplashScreen.storyboard */,
 			);
 			name = Mobile;
 			sourceTree = "<group>";
@@ -323,6 +326,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				E9DEDF952BF7326A003F6572 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				E9BFF0C32C37AC0F003C310E /* SplashScreen.storyboard in Resources */,
 				72F27102A63F9EE6833F91E0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -641,7 +645,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.12;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -678,7 +682,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.12;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
