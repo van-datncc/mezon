@@ -33,14 +33,14 @@ type filterItemProps = {
 
 export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSelectedUsersChange, onSelectedRolesChange, selectUserIds, selectRoleIds }) => {
 	const isPrivate = channel.channel_private;
-	const RolesClan = useSelector(selectAllRolesClan);
+	const rolesClan = useSelector(selectAllRolesClan);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const RolesChannel = useSelector(selectRolesByChannelId(channel.id));
+	const rolesChannel = useSelector(selectRolesByChannelId(channel.id));
 	const [selectedUserIds, setSelectedUserIds] = useState<string[]>(selectUserIds);
 	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(selectRoleIds);
 	const { userProfile } = useAuth();
-	const RolesAddChannel = useMemo(() => RolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1),[RolesChannel]);
-	const RolesNotAddChannel = useMemo(() => RolesClan.filter((role) => !RolesAddChannel.map((RoleAddChannel) => RoleAddChannel.id).includes(role.id)),[RolesAddChannel, RolesClan]);
+	const rolesAddChannel = useMemo(() => rolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1),[rolesChannel]);
+	const listRolesNotAddChannel = useMemo(() => rolesClan.filter((role) => !rolesAddChannel.map((roleAddChannel) => roleAddChannel.id).includes(role.id)),[rolesClan, rolesAddChannel]);
 
 	const usersClan = useSelector(selectAllUsesClan);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
@@ -55,8 +55,8 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 
 	const initFilter: filterItemProps = useMemo(() => ({
 		listMembersNotInChannel: listMembersNotInChannel,
-		listRolesNotAddChannel: RolesNotAddChannel,
-	}),[RolesNotAddChannel, listMembersNotInChannel]);
+		listRolesNotAddChannel: listRolesNotAddChannel,
+	}),[listRolesNotAddChannel, listMembersNotInChannel]);
 	const [filterItem, setFilterItem] = useState<filterItemProps>(initFilter);
 
 	const dispatch = useAppDispatch();
@@ -108,7 +108,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 	};
 
 	const [valueSearch, setValueSearch] = useState('');
-	const handleValueSearch = (e: any) => {
+	const handleValueSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValueSearch(e.target.value);
 	}
 
@@ -124,12 +124,12 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 			return;
 		}
 		const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.includes(inputData));
-		const filteredRoles = RolesNotAddChannel.filter(item => item?.title?.includes(inputData));
+		const filteredRoles = listRolesNotAddChannel.filter(item => item?.title?.includes(inputData));
 		setFilterItem({
 			listMembersNotInChannel: filteredMembers,
 			listRolesNotAddChannel: filteredRoles,
 		})
-	},[RolesNotAddChannel, listMembersNotInChannel]);
+	},[listRolesNotAddChannel, listMembersNotInChannel]);
 
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
