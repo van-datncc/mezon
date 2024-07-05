@@ -16,9 +16,10 @@ type MarkdownFormatTextProps = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
 	mode?: number;
+	lengthLine?: number;
 };
 
-const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji, mode }) => {
+const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji, mode, lengthLine }) => {
 	// TODO: move the invitation logic to upper level
 	const { getLinkInvite } = useInvite();
 
@@ -88,7 +89,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 			const result = convertMarkdown(markdown);
 
 			return (
-				<div key={index} className="lineText contents ">
+				<div key={index} className="lineText contents">
 					{mentions[index - 1]?.matchedText && ''}
 					{(startsWithTripleBackticks && endsWithNoTripleBackticks && !isBetween) || onlyBackticks ? (
 						<span>{markdown}</span>
@@ -113,18 +114,24 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 						/>
 					)}
 					{tagName && (
-						<span className="">
+						<span>
 							{isMention ? (
 								<>
-								<MentionUser tagName={tagName} mode={mode}/>{' '}
-							</>
+									{part.startIndex === 0 ? '' : ' '}
+									<MentionUser tagName={tagName} mode={mode} />
+									{part.endIndex === lengthLine ? '' : ' '}
+								</>
 							) : isHashtag ? (
 								<>
-									<ChannelHashtag channelHastagId={tagName} />{' '}
+									{part.startIndex === 0 ? '' : ' '}
+									<ChannelHashtag channelHastagId={tagName} />
+									{part.endIndex === lengthLine ? '' : ' '}
 								</>
 							) : isEmojiSyntax ? (
 								<>
-									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />{' '}
+									{part.startIndex === 0 ? '' : ' '}
+									<EmojiMarkdown emojiSyntax={tagName} onlyEmoji={isOnlyEmoji} />
+									{part.endIndex === lengthLine ? '' : ' '}
 								</>
 							) : (
 								tagName

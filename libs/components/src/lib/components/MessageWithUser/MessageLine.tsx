@@ -14,10 +14,10 @@ const MessageLine = ({ line, messageId, mode }: MessageLineProps) => {
 
 	return (
 		<div className="pt-[0.2rem] pl-0">
-			<MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} mode={mode}/>
+			<MarkdownFormatText mentions={mentions} isOnlyEmoji={isOnlyEmoji} mode={mode} lengthLine={line.length} />
 			{imageLinks.length > 0 &&
 				imageLinks?.map((item, index) => {
-					return <MessageImage key={index}  attachmentData={{ url: item.matchedText }} />;
+					return <MessageImage key={index} attachmentData={{ url: item.matchedText }} />;
 				})}
 		</div>
 	);
