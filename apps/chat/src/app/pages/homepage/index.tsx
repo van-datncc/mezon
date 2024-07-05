@@ -25,7 +25,7 @@ function Homepage() {
 							<div className="uppercase font-bold tracking-wide text-[20px]">Mezon</div>
 						</Link>
 
-						<div className="mid flex gap-[40px] items-center font-semibold">
+						<div className="mid flex gap-[40px] items-center font-semibold max-lg:hidden">
 							<div className="hover:underline cursor-pointer">Download</div>
 							<div className="hover:underline cursor-pointer">Nitro</div>
 							<div className="hover:underline cursor-pointer">Discover</div>
@@ -39,27 +39,28 @@ function Homepage() {
 						</Link>
 					</div>
 					<div className="main-content">
-						<div className="block1 flex items-center justify-center">
-							<div className="b1-left">
+						<div className="block1 flex items-center justify-center max-lg:flex-col">
+							<img src={BannerImg} alt="" className="object-cover w-6/12 max-md:w-8/12 hidden max-lg:block" />
+							<div className="b1-left mt-10 max-lg:text-center">
 								<div className="top-text text-[50px] font-black leading-[60px]">GROUP CHAT THAT’S ALL FUN & GAMES</div>
 								<div className="bottom-text text-[24px]">
 									Mezon is great for playing games and chilling with friends, or even building a worldwide community. Customize your
 									own space to talk, play, and hang out.
 								</div>
 							</div>
-							<img src={BannerImg} alt="" className="object-cover w-6/12" />
+							<img src={BannerImg} alt="" className="object-cover w-6/12 block max-lg:hidden" />
 						</div>
-						<div className="block2 flex justify-center gap-[24px] mt-10">
+						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col">
 							<div
 								style={{ borderRadius: '28px' }}
-								className="flex items-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer"
+								className="max-md:w-7/12 max-sm:w-11/12 flex items-center justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer"
 							>
 								<Icons.HomepageDownload className="text-black" />
 								<div>Download for Windows</div>
 							</div>
 							<Link
 								to={"/mezon"}
-								className="text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px]"
+								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center"
 								target="_blank"
 								rel="noreferrer"
 								style={{ borderRadius: '28px' }}
