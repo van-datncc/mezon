@@ -1,12 +1,16 @@
-import { EmojiDataOptionals, EmojiPlaces, IEmoji } from '@mezon/utils';
+import { EmojiDataOptionals, EmojiPlaces, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiMessageReaction } from 'mezon-js/api.gen';
 
 export const REACTION_FEATURE_KEY = 'reaction';
+
 export const mapReactionToEntity = (reaction: UpdateReactionMessageArgs) => {
-	return reaction;
+	return {
+		...reaction,
+	} as ReactionEntity;
 };
 
-export interface ReactionEntity extends IEmoji {
+export interface ReactionEntity extends IReaction {
 	id: string;
 }
 
@@ -20,6 +24,13 @@ export type UpdateReactionMessageArgs = {
 	action?: boolean;
 };
 
+export type UpdateBulkMessageReactionsArgs = {
+	messages: {
+		id: string;
+		reactions?: ApiMessageReaction[] | undefined;
+	}[];
+};
+
 export interface ReactionState extends EntityState<ReactionEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
@@ -27,8 +38,6 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 	reactionTopState: boolean;
 	reactionBottomState: boolean;
 	reactionRightState: boolean;
-	reactionDataSocket: EmojiDataOptionals;
-	dataReactionSocketUpdate: EmojiDataOptionals[];
 	userReactionPanelState: boolean;
 	reactionBottomStateResponsive: boolean;
 	messageMatchWithRef: boolean;
@@ -39,11 +48,11 @@ export interface ReactionState extends EntityState<ReactionEntity, string> {
 		bottom: number;
 	};
 	emojiHover: EmojiDataOptionals | null;
-	reactionOnMessageList: string[];
+	computedMessageReactions: Record<string, EmojiDataOptionals[]>;
 }
 
 export const reactionAdapter = createEntityAdapter({
-	selectId: (emo: ReactionEntity) => emo.id || emo.shortname || '',
+	selectId: (emo: ReactionEntity) => emo.id || '',
 });
 
 export const updateReactionMessage = createAsyncThunk(
@@ -66,15 +75,6 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 	reactionTopState: false,
 	reactionBottomState: false,
 	reactionRightState: false,
-	reactionDataSocket: {
-		action: undefined,
-		id: '',
-		emoji: '',
-		senders: [{ sender_id: '', count: 0, emojiIdList: [], sender_name: '', avatar: '' }],
-		channel_id: '',
-		message_id: '',
-	},
-	dataReactionSocketUpdate: [],
 	userReactionPanelState: false,
 	reactionBottomStateResponsive: false,
 	messageMatchWithRef: false,
@@ -85,7 +85,7 @@ export const initialReactionState: ReactionState = reactionAdapter.getInitialSta
 		bottom: 0,
 	},
 	emojiHover: null,
-	reactionOnMessageList: [],
+	computedMessageReactions: {},
 });
 
 export const reactionSlice = createSlice({
@@ -116,34 +116,51 @@ export const reactionSlice = createSlice({
 		},
 
 		setReactionDataSocket: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
-			state.reactionDataSocket = {
-				action: action.payload.action,
-				id: action.payload.id ?? '',
-				emoji: action.payload.emoji ?? '',
-				senders: [
-					{
-						sender_id: action.payload.sender_id || '',
-						count: action.payload.action ? action.payload.count : 1,
-					},
-				],
-				channel_id: action.payload.channel_id ?? '',
-				message_id: action.payload.message_id ?? '',
+			console.log('setReactionDataSocket', action.payload);
+			
+			const reactionDataSocket = {
+				...action.payload,
+				count: action.payload.count || 1,
 			};
-			if (!action.payload.action) {
-				const { action, ...newStateReaction } = state.reactionDataSocket;
-				state.dataReactionSocketUpdate.push(newStateReaction);
-			} else if (action.payload.action) {
-				const { action, ...newStateReaction } = state.reactionDataSocket;
-				const dataSocketRemove = {
-					...newStateReaction,
-					senders: [
-						{
-							...newStateReaction.senders[0],
-							count: newStateReaction?.senders[0]?.count && newStateReaction?.senders[0]?.count * -1,
-						},
-					],
-				};
-				state.dataReactionSocketUpdate.push(dataSocketRemove);
+			
+			const isAdd = !action.payload.action;
+
+			// Server not send id
+			// We have to find the id of the reaction by message_id and emoji and sender_id
+			if (reactionDataSocket.id === '0') {
+				const reactionEntities = reactionAdapter.getSelectors().selectAll(state);
+				const reaction = reactionEntities.find(
+					(reaction) =>
+						reaction.message_id === reactionDataSocket.message_id &&
+						reaction.emoji === reactionDataSocket.emoji &&
+						reaction.sender_id === reactionDataSocket.sender_id,
+				);
+
+				if (reaction) {
+					reactionDataSocket.id = reaction.id;
+				}
+			}
+
+			const existing = reactionAdapter.getSelectors().selectById(state, reactionDataSocket.id);
+
+			if (isAdd && !existing) {
+				reactionAdapter.addOne(state, mapReactionToEntity(reactionDataSocket));
+			} else if(isAdd && existing) {
+				reactionAdapter.updateOne(state, {
+					id: reactionDataSocket.id,
+					changes: {
+						count: existing.count + reactionDataSocket.count,
+					},
+				});
+			} else if (!isAdd && existing) {
+				reactionAdapter.removeOne(state, reactionDataSocket.id);
+			} else {
+				// Do nothing when remove reaction and not found
+			}
+
+		
+			if (action.payload.message_id) {
+				state.computedMessageReactions[action.payload.message_id] = combineMessageReactions(state, action.payload.message_id);
 			}
 		},
 
@@ -156,11 +173,69 @@ export const reactionSlice = createSlice({
 		setPositionOfSmileButton(state, action) {
 			state.positionOfSmileButton = action.payload;
 		},
-		setReactionMessageList: (state, action) => {
-			state.reactionOnMessageList = action.payload;
+		updateBulkMessageReactions: (state, action: PayloadAction<UpdateBulkMessageReactionsArgs>) => {
+			const { messages } = action.payload;
+
+			for (const message of messages) {
+				const reactionsRaw = message.reactions;
+				const reactions = (reactionsRaw || []).map((reaction) => {
+					const id = reaction.id || '';
+					const message_id = message.id;
+					return mapReactionToEntity({ ...reaction, id, message_id });
+				});
+				reactionAdapter.upsertMany(state, reactions);
+
+				state.computedMessageReactions[message.id] = combineMessageReactions(state, message.id);
+			}
 		},
 	},
 });
+
+function combineMessageReactions(state: ReactionState, messageId: string): EmojiDataOptionals[] {
+	const reactionEntities = reactionAdapter.getSelectors().selectAll(state);
+	const reactions = reactionEntities.filter((reaction) => reaction.message_id === messageId);
+
+	const dataCombined: Record<string, EmojiDataOptionals> = {};
+
+	for (const reaction of reactions) {
+		const emoji = reaction.emoji || '' as string;
+		
+		if(reaction.count < 1) {
+			continue;
+		}
+
+		if (!dataCombined[emoji]) {
+			dataCombined[emoji] = {
+				emoji,
+				senders: [],
+				action: false,
+				message_id: messageId,
+				// TODO: TBD
+				id: '',
+				channel_id: '',
+			};
+		}
+
+		const newSender = {
+			sender_id: reaction.sender_id,
+			count: reaction.count,
+		};
+
+		const reactionData = dataCombined[emoji];
+		const senderIndex = reactionData.senders.findIndex((sender) => sender.sender_id === newSender.sender_id);
+
+		if (senderIndex === -1) {
+			reactionData.senders.push(newSender);
+		} else if (reactionData?.senders[senderIndex]) {
+			reactionData.senders[senderIndex].count = newSender.count;
+		}
+
+	}
+
+	const dataCombinedArray = Object.values(dataCombined);
+
+	return dataCombinedArray;
+}
 
 export const reactionReducer = reactionSlice.reducer;
 
@@ -187,10 +262,6 @@ export const selectReactionBottomStateResponsive = createSelector(getReactionSta
 
 export const selectReactionRightState = createSelector(getReactionState, (state: ReactionState) => state.reactionRightState);
 
-export const selectMessageReacted = createSelector(getReactionState, (state: ReactionState) => state.reactionDataSocket);
-
-export const selectDataSocketUpdate = createSelector(getReactionState, (state: ReactionState) => state.dataReactionSocketUpdate);
-
 export const selectUserReactionPanelState = createSelector(getReactionState, (state: ReactionState) => state.userReactionPanelState);
 
 export const selectMessageMatchWithRef = createSelector(getReactionState, (state: ReactionState) => state.messageMatchWithRef);
@@ -199,4 +270,14 @@ export const selectPositionEmojiButtonSmile = createSelector(getReactionState, (
 
 export const selectEmojiHover = createSelector(getReactionState, (state: ReactionState) => state.emojiHover);
 
-export const selectReactionOnMessageList = createSelector(getReactionState, (state: ReactionState) => state.reactionOnMessageList);
+export const selectComputedMessageReactions = createSelector(getReactionState, (state: ReactionState) => state.computedMessageReactions);
+
+export const selectIsMessageHasReaction = (messageId: string) =>
+	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
+		return computedMessageReactions[messageId] && computedMessageReactions[messageId].length > 0;
+	});
+
+export const selectComputedReactionsByMessageId = (messageId: string) =>
+	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
+		return computedMessageReactions[messageId] || [];
+	});
