@@ -1,24 +1,15 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
 import {
-	reactionActions,
 	selectComputedReactionsByMessageId,
 	selectIdMessageRefReaction,
 	selectIsMessageHasReaction,
 	selectReactionBottomState,
 	selectReactionBottomStateResponsive,
 } from '@mezon/store';
-import {
-	EmojiDataOptionals,
-	IMessageWithUser,
-	SenderInfoOptionals,
-	calculateTotalCount,
-	convertReactionDataFromMessage,
-	updateEmojiReactionData,
-} from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { IMessageWithUser } from '@mezon/utils';
+import React, { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
-import React from 'react';
 
 type MessageReactionProps = {
 	message: IMessageWithUser;
@@ -38,12 +29,11 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 
-	const messageReactions = useMessageReaction(message.id)
-	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.id))
+	const messageReactions = useMessageReaction(message.id);
+	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.id));
+
 
 	const isMessageMatched = message.id === idMessageRefReaction;
-
-	console.log('messageReactions', messageReactions);
 
 	return (
 		<div className="relative pl-3">

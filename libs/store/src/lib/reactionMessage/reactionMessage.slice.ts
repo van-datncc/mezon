@@ -116,18 +116,15 @@ export const reactionSlice = createSlice({
 		},
 
 		setReactionDataSocket: (state, action: PayloadAction<UpdateReactionMessageArgs>) => {
-			console.log('setReactionDataSocket', action.payload);
-			
 			const reactionDataSocket = {
 				...action.payload,
 				count: action.payload.count || 1,
 			};
-			
-			const isAdd = !action.payload.action;
 
+			const isAdd = !action.payload.action;
 			// Server not send id
 			// We have to find the id of the reaction by message_id and emoji and sender_id
-			if (reactionDataSocket.id === '0') {
+			if (reactionDataSocket.id !== '') {
 				const reactionEntities = reactionAdapter.getSelectors().selectAll(state);
 				const reaction = reactionEntities.find(
 					(reaction) =>
@@ -142,10 +139,9 @@ export const reactionSlice = createSlice({
 			}
 
 			const existing = reactionAdapter.getSelectors().selectById(state, reactionDataSocket.id);
-
 			if (isAdd && !existing) {
 				reactionAdapter.addOne(state, mapReactionToEntity(reactionDataSocket));
-			} else if(isAdd && existing) {
+			} else if (isAdd && existing) {
 				reactionAdapter.updateOne(state, {
 					id: reactionDataSocket.id,
 					changes: {
@@ -158,7 +154,6 @@ export const reactionSlice = createSlice({
 				// Do nothing when remove reaction and not found
 			}
 
-		
 			if (action.payload.message_id) {
 				state.computedMessageReactions[action.payload.message_id] = combineMessageReactions(state, action.payload.message_id);
 			}
@@ -175,7 +170,6 @@ export const reactionSlice = createSlice({
 		},
 		updateBulkMessageReactions: (state, action: PayloadAction<UpdateBulkMessageReactionsArgs>) => {
 			const { messages } = action.payload;
-
 			for (const message of messages) {
 				const reactionsRaw = message.reactions;
 				const reactions = (reactionsRaw || []).map((reaction) => {
@@ -184,7 +178,6 @@ export const reactionSlice = createSlice({
 					return mapReactionToEntity({ ...reaction, id, message_id });
 				});
 				reactionAdapter.upsertMany(state, reactions);
-
 				state.computedMessageReactions[message.id] = combineMessageReactions(state, message.id);
 			}
 		},
@@ -198,9 +191,9 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 	const dataCombined: Record<string, EmojiDataOptionals> = {};
 
 	for (const reaction of reactions) {
-		const emoji = reaction.emoji || '' as string;
-		
-		if(reaction.count < 1) {
+		const emoji = reaction.emoji || ('' as string);
+
+		if (reaction.count < 1) {
 			continue;
 		}
 
@@ -229,7 +222,6 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 		} else if (reactionData?.senders[senderIndex]) {
 			reactionData.senders[senderIndex].count = newSender.count;
 		}
-
 	}
 
 	const dataCombinedArray = Object.values(dataCombined);
