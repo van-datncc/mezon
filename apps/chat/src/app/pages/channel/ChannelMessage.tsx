@@ -20,10 +20,11 @@ type MessageProps = {
 	channelId: string;
 	messageId: string;
 	mode: number;
+	isHighlight?: boolean;
 	channelLabel: string;
 };
 
-export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Readonly<MessageProps>) {
+export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight }: Readonly<MessageProps>) {
 	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const user = useSelector(selectMemberByUserId(message.sender_id));
@@ -31,7 +32,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu, preloadMessageContextMenu } = useMessageContextMenu();
-
+	
 	const isEditing = useMemo(() => {
 		return openEditMessageState && idMessageRefEdit === messageId;
 	}, [openEditMessageState, idMessageRefEdit, messageId]);
@@ -78,6 +79,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel }: Rea
 					user={user}
 					mode={mode}
 					isEditing={isEditing}
+					isHighlight={isHighlight}
 					popup={popup}
 					editor={editor}
 					onContextMenu={handleContextMenu}

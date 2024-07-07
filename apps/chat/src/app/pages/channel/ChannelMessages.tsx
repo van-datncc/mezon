@@ -88,10 +88,17 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
 			return (
-				<MemorizedChannelMessage key={messageId} messageId={messageId} channelId={channelId} mode={mode} channelLabel={channelLabel ?? ''} />
+				<MemorizedChannelMessage
+					key={messageId}
+					messageId={messageId}
+					channelId={channelId}
+					isHighlight={messageId === idMessageNotifed}
+					mode={mode}
+					channelLabel={channelLabel ?? ''}
+				/>
 			);
 		});
-	}, [messages, channelId, mode, channelLabel]);
+	}, [messages, channelId, mode, channelLabel, idMessageNotifed]);
 
 	return (
 		<div

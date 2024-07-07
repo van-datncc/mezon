@@ -1,21 +1,14 @@
 import { GifStickerEmojiPopup, ReactionBottom } from '@mezon/components';
 import {
-	reactionActions,
-	selectDataSocketUpdate,
+	selectComputedReactionsByMessageId,
 	selectIdMessageRefReaction,
+	selectIsMessageHasReaction,
 	selectReactionBottomState,
 	selectReactionBottomStateResponsive,
 } from '@mezon/store';
-import {
-	EmojiDataOptionals,
-	IMessageWithUser,
-	SenderInfoOptionals,
-	calculateTotalCount,
-	convertReactionDataFromMessage,
-	updateEmojiReactionData,
-} from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { IMessageWithUser } from '@mezon/utils';
+import React, { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ItemEmoji from './ItemEmoji';
 
 type MessageReactionProps = {
@@ -23,55 +16,24 @@ type MessageReactionProps = {
 	mode: number;
 };
 
-const useFilteredReactions = (messageId: string, dataSocketConvert: EmojiDataOptionals[], channeId: string) => {
-	return useMemo(() => {
-		return dataSocketConvert.filter((item) => item.message_id === messageId && item.channel_id === channeId);
-	}, [messageId, dataSocketConvert]);
-};
+function useMessageReaction(messageId: string) {
+	const computedReactions = useSelector(selectComputedReactionsByMessageId(messageId));
 
-const useConvertedReactions = (message: IMessageWithUser) => {
-	return useMemo(() => {
-		return message.reactions && message.reactions.length > 0 ? convertReactionDataFromMessage(message) : [];
-	}, [message]);
-};
-
-const useCombinedReactions = (reactionMessage: EmojiDataOptionals[], reactionSocketByMessageId: EmojiDataOptionals[]) => {
-	return useMemo(() => {
-		const combined = [...reactionMessage, ...reactionSocketByMessageId];
-		return updateEmojiReactionData(combined);
-	}, [reactionSocketByMessageId, reactionMessage]);
-};
-
-const useCheckHasEmoji = (dataReactionCombine: EmojiDataOptionals[]) => {
-	return useMemo(() => {
-		if (dataReactionCombine.length === 0) return false;
-		return calculateTotalCount(dataReactionCombine[0]!.senders) > 0;
-	}, [dataReactionCombine]);
-};
-
-const extractMessageIds = (data: EmojiDataOptionals[]) => {
-	return data.filter((item) => item.senders.some((sender: SenderInfoOptionals) => sender.count && sender.count > 0)).map((item) => item.message_id);
-};
+	return computedReactions;
+}
 
 const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
-	const dispatch = useDispatch();
 	const smileButtonRef = useRef<HTMLDivElement | null>(null);
 	const [showIconSmile, setShowIconSmile] = useState<boolean>(false);
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
-	const dataSocketConvert = useSelector(selectDataSocketUpdate);
-	const reactionSocketByMessageId = useFilteredReactions(message.id, dataSocketConvert, message.channel_id);
-	const reactionMessage = useConvertedReactions(message);
-	const dataReactionCombine = useCombinedReactions(reactionMessage, reactionSocketByMessageId);
-	const checkHasEmoji = useCheckHasEmoji(dataReactionCombine);
-	const isMessageMatched = message.id === idMessageRefReaction;
 
-	useEffect(() => {
-		const handleDataReaction = updateEmojiReactionData(dataSocketConvert);
-		const filter = extractMessageIds(handleDataReaction);
-		dispatch(reactionActions.setReactionMessageList(filter));
-	}, [dataSocketConvert]);
+	const messageReactions = useMessageReaction(message.id);
+	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.id));
+
+
+	const isMessageMatched = message.id === idMessageRefReaction;
 
 	return (
 		<div className="relative pl-3">
@@ -89,7 +51,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 					onMouseEnter={() => setShowIconSmile(true)}
 					onMouseLeave={() => setShowIconSmile(false)}
 				>
-					{dataReactionCombine.map((emoji, index) => (
+					{messageReactions.map((emoji, index) => (
 						<ItemEmoji key={`${index}-${message.id}`} message={message} mode={mode} emoji={emoji} />
 					))}
 					{checkHasEmoji && (
@@ -103,4 +65,4 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	);
 };
 
-export default MessageReaction;
+export default React.memo(MessageReaction);

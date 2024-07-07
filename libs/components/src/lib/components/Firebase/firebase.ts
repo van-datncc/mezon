@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
 import type { Messaging } from 'firebase/messaging';
 
 const firebaseConfig = {
@@ -15,15 +15,15 @@ const firebaseConfig = {
 let messaging: Messaging| null = null;
 
 function isPlatformSupported() {
-  return 'serviceWorker' in navigator;
+  return isSupported();
 }
 
 function isMessagingAvailable(messaging: Messaging | null): messaging is Messaging {
-  return isPlatformSupported() && messaging !== null;
+  return messaging !== null;
 }
 
-function initializeFirebase() {
-  if (isPlatformSupported()) {
+async function initializeFirebase() {
+  if (await isPlatformSupported()) {
     initializeApp(firebaseConfig);
     messaging = getMessaging();
   }

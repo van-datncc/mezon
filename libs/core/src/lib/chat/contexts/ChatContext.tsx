@@ -159,8 +159,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: MessageReactionEvent) => {
+			console.log('event', e.id);
 			if (e.count > 0) {
-				dispatch(reactionActions.updateReactionMessage(mapReactionToEntity(e)));
+				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
 			}
 		},
 		[dispatch],

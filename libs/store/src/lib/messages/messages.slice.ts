@@ -24,6 +24,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { seenMessagePool } from './SeenMessagePool';
+import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -150,6 +151,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
+
 		if (!response.messages) {
 			return [];
 		}
@@ -171,6 +173,8 @@ export const fetchMessages = createAsyncThunk(
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
+
+		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 		thunkAPI.dispatch(messagesActions.setQuatitiesMessageRemain(messages.length));
 
 		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
