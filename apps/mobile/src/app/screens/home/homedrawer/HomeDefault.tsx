@@ -123,6 +123,8 @@ const HomeDefault = React.memo((props: any) => {
 				const { dx } = gestureState;
 				if (dx > 50) {
 					onOpenDrawer();
+				} else {
+					return false;
 				}
 			},
 		})
@@ -226,7 +228,7 @@ const HomeDefaultHeader = React.memo(
 
 		useEffect(() => {
 			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
-		}, [currentChannel, channelsEntities]);
+		}, [currentChannel?.parrent_id, channelsEntities]);
 		return (
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
