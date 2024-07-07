@@ -1,9 +1,10 @@
 import { useAttachments } from '@mezon/core';
 import { attachmentActions } from '@mezon/store';
 import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export type MessageImage = {
@@ -18,6 +19,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
+	const { setImageURL } = useMessageContextMenu();
 
 	const handleClick = (url: string) => {
 		if (!isDimensionsValid && !checkImage) {
@@ -38,6 +40,11 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 		setImageError(true);
 	};
 
+	const handleContextMenu = useCallback(() => {
+		setImageURL(attachmentData?.url ?? '');
+		onContextMenu;
+	}, [attachmentData?.url]);
+
 	if (imageError || !attachmentData.url) {
 		return null;
 	}
@@ -46,7 +53,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 			{attachmentData.url ? (
 				<div className="break-all">
 					<img
-						onContextMenu={onContextMenu}
+						onContextMenu={handleContextMenu}
 						className={
 							'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' +
 							(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')

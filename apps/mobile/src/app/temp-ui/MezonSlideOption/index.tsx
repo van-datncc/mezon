@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { style } from "./styles";
 import { useState } from "react";
 import { ReactNode } from "react";
@@ -52,6 +52,13 @@ export default function MezonSlideOption({ data, onChange, height = 90, width = 
         })
     }, [padding])
 
+    function handlePressItem(index: number) {
+        ref?.current?.scrollTo({
+            x: index * width,
+            animated: false
+        })
+    }
+
     return (
         <View>
             <Text style={styles.title}>{title}</Text>
@@ -77,7 +84,9 @@ export default function MezonSlideOption({ data, onChange, height = 90, width = 
                 >
                     {data.map((item, index) => (
                         <View key={index.toString()}>
-                            {item.element}
+                            <Pressable onPress={() => handlePressItem(index)}>
+                                {item.element}
+                            </Pressable>
                         </View>
                     ))}
 

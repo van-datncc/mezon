@@ -10,10 +10,12 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectIsMessageHasReaction,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
-	selectReactionOnMessageList,
+	setSelectedMessage,
 	threadsActions,
+	toggleIsShowPopupForwardTrue,
 	useAppDispatch,
 } from '@mezon/store';
 import {
@@ -27,7 +29,6 @@ import {
 	handleOpenLink,
 	handleSaveImage,
 } from '@mezon/utils';
-import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
@@ -45,12 +46,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const reactionRealtimeList = useSelector(selectReactionOnMessageList);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
-	const { posShowMenu } = useMessageContextMenu();
+	const { posShowMenu, imageSrc } = useMessageContextMenu();
 
 	const checkMessageInRealtimeList = useCallback((arrayMessageIdReaction: string[], messageId: string) => {
 		return arrayMessageIdReaction.includes(messageId);
@@ -66,15 +66,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';
 	}, [message?.content.t]);
-
-	const checkMessageHasReaction = useCallback(() => {
-		const checkRealtime = checkMessageInRealtimeList(reactionRealtimeList, message?.id);
-		if (!messageHasReaction && !checkRealtime) {
-			return false;
-		} else {
-			return true;
-		}
-	}, [messageHasReaction, reactionRealtimeList, checkMessageInRealtimeList]);
 
 	const checkMessageInPinneList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
@@ -139,10 +130,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		return posShowMenu === SHOW_POSITION.NONE;
 	}, [posShowMenu]);
 
+	const reactionStatus = useSelector(selectIsMessageHasReaction(messageId));
 	const enableViewReactionItem = useMemo(() => {
 		if (!checkPos) return false;
-		return checkMessageHasReaction();
-	}, [checkMessageHasReaction(), checkPos]);
+		return reactionStatus;
+	}, [reactionStatus, checkPos]);
 
 	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
@@ -176,10 +168,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
 
-		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
-		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
+		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
 		return [enableOne, enableAll];
-	}, [isClanCreator, checkAdmintrator, checkMessageHasReaction(), removeReaction, checkPos]);
+	}, [isClanCreator, checkAdmintrator, enableViewReactionItem, removeReaction]);
 
 	const enableCreateThreadItem = useMemo(() => {
 		if (!checkPos) return false;
@@ -202,11 +194,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
 	const urlImage = useMemo(() => {
-		if (checkElementIsImage) {
-			return elementTarget.src;
-		}
-		return '';
-	}, [checkElementIsImage, elementTarget]);
+		if (imageSrc) {
+			return imageSrc;
+		} else return '';
+	}, [checkElementIsImage, elementTarget, imageSrc]);
 
 	useMemo(() => {
 		if (checkElementIsImage) {
@@ -427,6 +418,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		enableSaveImageItem,
 		pinMessageStatus,
 		checkPos,
+		urlImage,
 	]);
 
 	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;

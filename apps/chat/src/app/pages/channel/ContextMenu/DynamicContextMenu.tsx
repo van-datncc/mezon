@@ -25,14 +25,12 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 
 	const className: CSSProperties = {
 		'--contexify-menu-bgColor': isLightMode ? '#FFFFFF' : '#111214',
-		'--contexify-item-color': isLightMode ? '#4E5057' : '#ADB3B9',
-		'--contexify-activeItem-color': '#FFFFFF',
 		'--contexify-activeItem-bgColor': warningStatus,
 		'--contexify-rightSlot-color': '#6f6e77',
 		'--contexify-activeRightSlot-color': '#fff',
 		'--contexify-arrow-color': '#6f6e77',
 		'--contexify-activeArrow-color': '#fff',
-		'--contexify-itemContent-padding': '3px',
+		'--contexify-itemContent-padding': '-3px',
 		'--contexify-menu-radius': '2px',
 		'--contexify-activeItem-radius': '2px',
 		'--contexify-menu-minWidth': '188px',
@@ -82,7 +80,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 							fontSize: '14px',
 							fontWeight: 500,
 						}}
-						className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-[#ADB3B9] hover:text-[#FFF]'} `}
+						className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
 					>
 						<span>{item.label}</span>
 						<span> {item.icon}</span>

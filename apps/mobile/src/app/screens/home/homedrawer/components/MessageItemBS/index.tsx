@@ -32,9 +32,12 @@ import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
+import { useRoute } from '@react-navigation/native';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
+  const route = useRoute();
+  const { params } = route;
 	const dispatch = useDispatch<AppDispatch>();
 	const ref = useRef(null);
 	const timeoutRef = useRef(null);
@@ -117,11 +120,19 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const handleActionPinMessage = () => {
 		if (message) onClose();
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message.channel_id, message_id: message.id }));
+    Toast.show({
+			type: 'success',
+			props: {
+				text2: t('toast.pinMessage'),
+				leadingIcon: <PinMessageIcon color={Colors.bgGrayLight} />,
+			},
+		});
 	};
 
 	const handleActionUnPinMessage = () => {
-		if (message) onClose();
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannel.id || '', message_id: message.id }));
+    if(message)
+		onClose();
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: params?.['directMessageId'] ? params?.['directMessageId'] : currentChannel.id || '', message_id: message.id }));
 	};
 
 	const handleActionMarkUnRead = () => {

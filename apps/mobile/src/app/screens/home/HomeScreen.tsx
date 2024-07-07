@@ -57,34 +57,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 				name="HomeDefault"
 				component={HomeDefault}
 				options={{
-					headerTitleAlign: 'left',
-					headerStyle: {
-						backgroundColor: 'grey',
-					},
-					headerShown: false,
-					headerLeft(vals) {
-						return (
-							<View style={styles.drawerHeaderLeft} {...vals} onTouchEnd={() => navigation.openDrawer()}>
-								<BarsLogo width={20} height={20} />
-							</View>
-						);
-					},
-					headerTitle(props) {
-						return (
-							<View style={styles.drawerHeaderTitle}>
-								<HashSignIcon width={18} height={18} />
-								<Text style={styles.drawerHeaderTitleTxt}>welcome-and-rules</Text>
-							</View>
-						);
-					},
-					headerRight(props) {
-						return (
-							<View style={styles.drawerHeaderRight}>
-								<SearchLogo width={22} height={22} />
-								<UsersLogo width={22} height={22} />
-							</View>
-						);
-					},
+					headerShown: false
 				}}
 			/>
 		</Drawer.Navigator>

@@ -49,7 +49,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 
 	return (
 		<div className="overflow-hidden">
-			{messageRefFetchFromServe && senderMessage && message.references && message?.references.length > 0 && (
+			{messageRefFetchFromServe && message.references && message?.references.length > 0 && (
 				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
@@ -64,7 +64,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 
 						<div className="gap-1 flex flex-row items-center">
 							<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">
-								@{senderMessage.user?.username}{' '}
+								{senderMessage ? '@' + senderMessage.user?.username : 'Anonymous'}
 							</span>
 							{message.references[0].has_attachment ? (
 								<div className=" flex flex-row items-center">
