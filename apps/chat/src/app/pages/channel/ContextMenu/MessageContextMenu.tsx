@@ -50,7 +50,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
-	const { posShowMenu } = useMessageContextMenu();
+	const { posShowMenu, imageSrc } = useMessageContextMenu();
 
 	const checkMessageInRealtimeList = useCallback((arrayMessageIdReaction: string[], messageId: string) => {
 		return arrayMessageIdReaction.includes(messageId);
@@ -202,11 +202,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
 	const urlImage = useMemo(() => {
-		if (checkElementIsImage) {
-			return elementTarget.src;
-		}
-		return '';
-	}, [checkElementIsImage, elementTarget]);
+		if (imageSrc) {
+			return imageSrc;
+		} else return '';
+	}, [checkElementIsImage, elementTarget, imageSrc]);
 
 	useMemo(() => {
 		if (checkElementIsImage) {
@@ -427,6 +426,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		enableSaveImageItem,
 		pinMessageStatus,
 		checkPos,
+		urlImage,
 	]);
 
 	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;

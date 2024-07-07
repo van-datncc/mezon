@@ -17,6 +17,8 @@ type MessageContextMenuContextValue = {
 	preloadMessageContextMenu: (messageId: string) => void;
 	setPositionShow: (showPostion: SHOW_POSITION) => void;
 	posShowMenu: string;
+	setImageURL: (url: string) => void;
+	imageSrc: string;
 };
 
 export type MessageContextMenuProps = {
@@ -32,6 +34,8 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	preloadMessageContextMenu: () => {},
 	setPositionShow: () => {},
 	posShowMenu: SHOW_POSITION.NONE,
+	setImageURL: () => {},
+	imageSrc: '',
 });
 
 export const MessageContextMenuProvider = ({ children }: { children: React.ReactNode }) => {
@@ -39,6 +43,7 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
 	const [activeMode, setActiveMode] = useState<ChannelStreamMode>(ChannelStreamMode.STREAM_MODE_CHANNEL);
 	const [posShowMenu, setPosShowMenu] = useState<string>(SHOW_POSITION.NONE);
+	const [imageSrc, setImageSrc] = useState<string>(SHOW_POSITION.NONE);
 
 	const { show } = useContextMenu({
 		id: MESSAGE_CONTEXT_MENU_ID,
@@ -56,6 +61,10 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 
 	const setPositionShow = useCallback((pos: string) => {
 		setPosShowMenu(pos);
+	}, []);
+
+	const setImageURL = useCallback((src: string) => {
+		setImageSrc(src);
 	}, []);
 
 	const showContextMenu = useCallback(
@@ -91,8 +100,10 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 			preloadMessageContextMenu,
 			setPositionShow,
 			posShowMenu,
+			setImageURL,
+			imageSrc,
 		}),
-		[showMessageContextMenu, preloadMessageContextMenu, messageId, setPositionShow, posShowMenu],
+		[showMessageContextMenu, preloadMessageContextMenu, messageId, setPositionShow, posShowMenu, setImageURL, imageSrc],
 	);
 
 	return (

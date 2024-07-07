@@ -18,7 +18,7 @@ const MessageModalImage = () => {
 	const [currentIndexAtt, setCurrentIndexAtt] = useState(attachments.findIndex((img) => img.url === urlImg));
 	const attLength = attachments.length;
 	const checkNumberAtt = attLength > 1;
-	const { showMessageContextMenu, setPositionShow } = useMessageContextMenu();
+	const { showMessageContextMenu, setPositionShow, setImageURL, imageSrc } = useMessageContextMenu();
 
 	const mode = useSelector(selectModeAttachment);
 	const messageId = useSelector(selectMessageIdAttachment);
@@ -55,14 +55,16 @@ const MessageModalImage = () => {
 	const closeModal = () => {
 		setOpenModalAttachment(false);
 		setPositionShow(SHOW_POSITION.NONE);
+		setImageURL('');
 	};
 
 	const handleContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
 			showMessageContextMenu(event, messageId, mode ?? 2, props);
 			setPositionShow(SHOW_POSITION.IN_VIEWER);
+			setImageURL(urlImg);
 		},
-		[showMessageContextMenu, messageId, mode, setPositionShow],
+		[showMessageContextMenu, messageId, mode, setPositionShow, setImageURL, urlImg],
 	);
 
 	const handleKeyDown = (event: any) => {
