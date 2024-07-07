@@ -1127,7 +1127,9 @@ export const ArrowAngleRightDownIcon = ({ width, height, color = "white", ...pro
     <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
         <Path d="M65.1 50.1a3 3 0 000-4.2l-15-15a3 3 0 00-4.2 4.2l9.87 9.9H39a21 21 0 01-21-21V12a3 3 0 00-6 0v12a27 27 0 0027 27h16.77l-9.9 9.9a3 3 0 004.26 4.2l15-15h-.03z" />
     </Svg>
-)export const ChatThinkingIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+)
+
+export const ChatThinkingIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
     <Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
         <Path
             fillRule="evenodd"
