@@ -1,52 +1,62 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.secondary,
         flex: 1,
         paddingHorizontal: size.s_18
     },
+
     headerWrapper: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: size.s_20
     },
+
     headerTitle: {
         fontSize: size.h6,
-        color: Colors.white
+        color: colors.textStrong
     },
+
     addFriendWrapper: {
         flexDirection: 'row',
         gap: size.s_8,
         alignItems: 'center',
-        backgroundColor: Colors.bgDarkSlate,
+        backgroundColor: colors.primary,
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: colors.border,
         paddingHorizontal: size.s_10,
         paddingVertical: size.s_6
     },
+
     addFriendText: {
         fontSize: size.label,
-        color: Colors.white
+        color: colors.textStrong
     },
+
     dmMessageListContainer: {
         marginTop: size.s_18
     },
+
     searchMessage: {
-		backgroundColor: Colors.primary,
-		borderRadius: 40,
-		alignItems: 'center',
-		paddingHorizontal: size.s_12,
-		flexDirection: 'row',
-	},
-	searchInput: {
-		width: '93%',
-		borderRadius: 20,
-		height: size.s_50,
-		color: Colors.white,
+        backgroundColor: colors.primary,
+        borderRadius: 40,
+        alignItems: 'center',
+        paddingHorizontal: size.s_12,
+        flexDirection: 'row',
+    },
+
+    searchInput: {
+        width: '93%',
+        borderRadius: 20,
+        height: size.s_50,
+        color: colors.textStrong,
         paddingVertical: size.s_6
-	},
+    },
+
     statusCircle: {
         position: 'absolute',
         width: 14,
@@ -55,8 +65,9 @@ export const styles = StyleSheet.create({
         bottom: 0,
         right: 0,
         borderWidth: 2,
-        borderColor: Colors.secondary,
+        borderColor: colors.secondary,
     },
+    
     messageItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -68,32 +79,37 @@ export const styles = StyleSheet.create({
         height: size.s_40,
         borderRadius: 50
     },
+
     messageContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: size.s_2
     },
+
     online: {
-        backgroundColor: Colors.green,
+        backgroundColor: baseColor.green,
     },
     offline: {
         backgroundColor: Colors.bgGrayDark,
     },
+
     defaultText: {
-        color: Colors.textGray
+        color: colors.text
     },
+
     addMessage: {
         position: 'absolute',
         bottom: 10,
         right: 10,
         width: size.s_50,
         height: size.s_50,
-        backgroundColor: Colors.bgButton,
+        backgroundColor: baseColor.blurple,
         borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
     },
+
     groupAvatar: {
         backgroundColor: Colors.orange,
         width: size.s_40,
@@ -102,14 +118,17 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+
     lastMessage: {
         fontSize: size.s_12,
-        color: Colors.gray72,
+        color: colors.textStrong,
         lineHeight: size.s_18
     },
+
     dateTime: {
         fontSize: size.s_12,
     },
+    
     channelLabel: {
         fontSize: size.s_14,
         flex: 1

@@ -1,6 +1,7 @@
 import { IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelAttachment } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
@@ -18,6 +19,8 @@ export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 	error?: string | null;
 	attachment: string;
 	openModalAttachment: boolean;
+	mode: ChannelStreamMode | undefined;
+	messageId: string;
 }
 
 export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
@@ -63,6 +66,8 @@ export const initialAttachmentState: AttachmentState = attachmentAdapter.getInit
 	error: null,
 	attachment: '',
 	openModalAttachment: false,
+	mode: undefined,
+	messageId: '',
 });
 
 export const attachmentSlice = createSlice({
@@ -77,6 +82,12 @@ export const attachmentSlice = createSlice({
 		},
 		setOpenModalAttachment: (state, action) => {
 			state.openModalAttachment = action.payload;
+		},
+		setMode: (state, action) => {
+			state.mode = action.payload;
+		},
+		setMessageId: (state, action) => {
+			state.messageId = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -148,6 +159,10 @@ export const selectAttachmentEntities = createSelector(getAttachmentState, selec
 export const selectAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.attachment);
 
 export const selectOpenModalAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.openModalAttachment);
+
+export const selectModeAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.mode);
+
+export const selectMessageIdAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.messageId);
 
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => attachments.filter((att) => att.filetype == 'image/png' || att.filetype == 'image/jpeg'));

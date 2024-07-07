@@ -323,6 +323,11 @@ export enum MemberProfileType {
 	LIST_FRIENDS = 'list_friends',
 }
 
+export type IReaction = ApiMessageReaction & {
+	id: string;
+	message_id: string;
+}
+
 export type IEmoji = {
 	src: string;
 	category: string;
@@ -509,3 +514,9 @@ export type ContenSubmitEventProps = {
 	logo: string;
 	description: string;
 };
+
+export enum SHOW_POSITION {
+	IN_VIEWER = 'IN_VIEWER',
+	IN_LINK = 'IN_LINK',
+	NONE = 'NONE',
+}
