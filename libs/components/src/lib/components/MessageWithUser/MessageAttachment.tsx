@@ -1,15 +1,17 @@
-import { ApiMessageAttachment } from "mezon-js/api.gen";
-import { useMemo } from "react";
-import MessageVideo from "./MessageVideo";
-import MessageImage from "./MessageImage";
-import MessageLinkFile from "./MessageLinkFile";
-import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from "@mezon/utils";
-import { useMessageParser } from "./useMessageParser";
+import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useMemo } from 'react';
+import MessageImage from './MessageImage';
+import MessageLinkFile from './MessageLinkFile';
+import MessageVideo from './MessageVideo';
+import { useMessageParser } from './useMessageParser';
 
 type MessageAttachmentProps = {
 	message: IMessageWithUser;
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
-}
+	mode: ChannelStreamMode;
+};
 
 const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	const videos: ApiMessageAttachment[] = [];
@@ -28,7 +30,12 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	return { videos, images, documents };
 };
 
-const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: string, onContextMenu: any }> = ({ attachments, messageId, onContextMenu }) => {
+const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: string; onContextMenu: any; mode: ChannelStreamMode }> = ({
+	attachments,
+	messageId,
+	onContextMenu,
+	mode,
+}) => {
 	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
 
 	return (
@@ -49,8 +56,8 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
 							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
-								<MessageImage attachmentData={image} onContextMenu={onContextMenu}/>
-								</div>
+								<MessageImage messageId={messageId} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
+							</div>
 						);
 					})}
 				</div>
@@ -62,14 +69,12 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 	);
 };
 
-
 // TODO: refactor component for message lines
-const MessageAttachment = ({ message, onContextMenu }: MessageAttachmentProps) => {
+const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentProps) => {
 	const { attachments, hasAttachments } = useMessageParser(message);
 	if (!hasAttachments) return null;
 
-	return   <Attachments messageId={message.id} attachments={attachments ?? []} onContextMenu={onContextMenu} />
-
+	return <Attachments mode={mode} messageId={message.id} attachments={attachments ?? []} onContextMenu={onContextMenu} />;
 };
 
 export default MessageAttachment;

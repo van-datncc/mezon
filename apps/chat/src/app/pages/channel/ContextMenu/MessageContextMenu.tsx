@@ -10,27 +10,30 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
+	selectIsMessageHasReaction,
 	selectMessageByMessageId,
 	selectPinMessageByChannelId,
-	selectReactionOnMessageList,
+	setSelectedMessage,
 	threadsActions,
+	toggleIsShowPopupForwardTrue,
 	useAppDispatch,
 } from '@mezon/store';
 import {
 	ContextMenuItem,
 	EPermission,
 	MenuBuilder,
+	SHOW_POSITION,
 	SubPanelName,
 	handleCopyImage,
 	handleCopyLink,
 	handleOpenLink,
 	handleSaveImage,
 } from '@mezon/utils';
-import { setSelectedMessage, toggleIsShowPopupForwardTrue } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
 import DynamicContextMenu from './DynamicContextMenu';
+import { useMessageContextMenu } from './MessageContextMenuContext';
 
 type MessageContextMenuProps = {
 	id: string;
@@ -43,11 +46,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const reactionRealtimeList = useSelector(selectReactionOnMessageList);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
+	const { posShowMenu, imageSrc } = useMessageContextMenu();
+
 	const checkMessageInRealtimeList = useCallback((arrayMessageIdReaction: string[], messageId: string) => {
 		return arrayMessageIdReaction.includes(messageId);
 	}, []);
@@ -62,15 +66,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';
 	}, [message?.content.t]);
-
-	const checkMessageHasReaction = useCallback(() => {
-		const checkRealtime = checkMessageInRealtimeList(reactionRealtimeList, message?.id);
-		if (!messageHasReaction && !checkRealtime) {
-			return false;
-		} else {
-			return true;
-		}
-	}, [messageHasReaction, reactionRealtimeList, checkMessageInRealtimeList]);
 
 	const checkMessageInPinneList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
@@ -131,17 +126,27 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		setValueThread(message);
 	};
 
+	const checkPos = useMemo(() => {
+		return posShowMenu === SHOW_POSITION.NONE;
+	}, [posShowMenu]);
+
+	const reactionStatus = useSelector(selectIsMessageHasReaction(messageId));
 	const enableViewReactionItem = useMemo(() => {
-		return checkMessageHasReaction();
-	}, [checkMessageHasReaction()]);
+		if (!checkPos) return false;
+		return reactionStatus;
+	}, [reactionStatus, checkPos]);
 
 	const [enableEditMessageItem, enableReportMessageItem] = useMemo(() => {
+		if (!checkPos) return [false, false];
 		const enableEdit = checkSenderMessage;
 		const enableReport = !checkSenderMessage;
+
 		return [enableEdit, enableReport];
-	}, [checkSenderMessage]);
+	}, [checkSenderMessage, checkPos]);
 
 	const pinMessageStatus = useMemo(() => {
+		if (!checkPos) return undefined;
+
 		if (!checkMessageInPinneList) {
 			if (pinMessage || isClanCreator || checkAdmintrator) {
 				return true;
@@ -153,42 +158,46 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		} else {
 			return undefined;
 		}
-	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList, message]);
+	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList, message, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {
+		if (!checkPos) return false;
 		return checkMessageHasText;
-	}, [checkMessageHasText]);
+	}, [checkMessageHasText, checkPos]);
 
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
-		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
-		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && checkMessageHasReaction();
+		if (!checkPos) return [false, false];
+
+		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
 		return [enableOne, enableAll];
-	}, [isClanCreator, checkAdmintrator, checkMessageHasReaction(), removeReaction]);
+	}, [isClanCreator, checkAdmintrator, enableViewReactionItem, removeReaction]);
 
 	const enableCreateThreadItem = useMemo(() => {
+		if (!checkPos) return false;
 		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			return false;
 		} else {
 			return createThread || isAllowCreateThread || isClanCreator || checkAdmintrator;
 		}
-	}, [createThread, isAllowCreateThread, isClanCreator, checkAdmintrator, activeMode]);
+	}, [createThread, isAllowCreateThread, isClanCreator, checkAdmintrator, activeMode, checkPos]);
 
 	const enableDelMessageItem = useMemo(() => {
+		if (!checkPos) return false;
 		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			return delMessage || isAllowDelMessage || checkSenderMessage || isClanCreator || checkAdmintrator;
 		} else {
 			return checkSenderMessage;
 		}
-	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanCreator, checkAdmintrator]);
+	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanCreator, checkAdmintrator, checkPos]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
 	const urlImage = useMemo(() => {
-		if (checkElementIsImage) {
-			return elementTarget.src;
-		}
-		return '';
-	}, [checkElementIsImage, elementTarget]);
+		if (imageSrc) {
+			return imageSrc;
+		} else return '';
+	}, [checkElementIsImage, elementTarget, imageSrc]);
 
 	useMemo(() => {
 		if (checkElementIsImage) {
@@ -202,17 +211,19 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			setEnableCopyImageItem(false);
 			setEnableSaveImageItem(false);
 		}
-	}, [elementTarget]);
+	}, [checkElementIsImage, elementTarget]);
 
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
 
-		builder.addMenuItem(
-			'addReaction', // id
-			'Add Reaction', // lable
-			() => console.log('add reaction'),
-			<Icons.RightArrowRightClick />,
-		);
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'addReaction', // id
+				'Add Reaction', // lable
+				() => console.log('add reaction'),
+				<Icons.RightArrowRightClick />,
+			);
+		});
 
 		builder.when(enableViewReactionItem, (builder) => {
 			builder.addMenuItem(
@@ -246,39 +257,55 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.addMenuItem(
-			'reply',
-			'Reply',
-			() => handleReplyMessage(),
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'reply',
+				'Reply',
+				() => handleReplyMessage(),
 
-			<Icons.ReplyRightClick defaultSize="w-4 h-4" />,
-		);
+				<Icons.ReplyRightClick defaultSize="w-4 h-4" />,
+			);
+		});
 
 		builder.when(enableCreateThreadItem, (builder) => {
 			builder.addMenuItem('createThread', 'Create Thread', () => handleCreateThread(), <Icons.ThreadIconRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.addMenuItem(
-			'copyText',
-			'Copy Text',
-			async () => {
-				try {
-					await handleCopyLink(message?.content?.t ?? '');
-				} catch (error) {
-					console.error('Failed to copy text', error);
-				}
-			},
-			<Icons.CopyTextRightClick />,
-		);
-		builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
-		builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('apps'), <Icons.UnreadRightClick defaultSize="w-4 h-4" />);
-		builder.addMenuItem(
-			'copyMessageLink',
-			'Copy Message Link',
-			() => console.log('apps'),
-			<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />,
-		);
-		builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'copyText',
+				'Copy Text',
+				async () => {
+					try {
+						await handleCopyLink(message?.content?.t ?? '');
+					} catch (error) {
+						console.error('Failed to copy text', error);
+					}
+				},
+				<Icons.CopyTextRightClick />,
+			);
+		});
+
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
+		});
+
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('markUnread'), <Icons.UnreadRightClick defaultSize="w-4 h-4" />);
+		});
+
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'copyMessageLink',
+				'Copy Message Link',
+				() => console.log('copyMessageLink'),
+				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />,
+			);
+		});
+
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
+		});
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(
@@ -390,6 +417,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		enableCopyImageItem,
 		enableSaveImageItem,
 		pinMessageStatus,
+		checkPos,
+		urlImage,
 	]);
 
 	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
