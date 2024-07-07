@@ -57,12 +57,12 @@ const AppLayout = () => {
 			});
 
 		if (fcmTokenObject?.token) {
-			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmTokenObject.token ?? '', deviceId: fcmTokenObject.deviceId ?? '' }));
+			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmTokenObject.token ?? '', deviceId: fcmTokenObject.deviceId ?? '', platform: "website" }));
 		} else {
 			requestForToken()
 				.then((token) => {
 					if (token) {
-						dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '' }));
+						dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '', platform: "website" }));
 					}
 				})
 				.catch((error: Error) => {
