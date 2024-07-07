@@ -3,6 +3,7 @@ import {
 	ActionEmitEvent,
 	AddThread,
 	AngleRightIcon,
+	Icons,
 	MicrophoneIcon,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	SendIcon,
@@ -11,14 +12,14 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectAllEmojiSuggestion,
 	selectHiddenBottomTabMobile,
-  selectMembersByChannelId,
+	selectMembersByChannelId,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
@@ -52,7 +53,7 @@ import AttachmentPreview from './components/AttachmentPreview';
 import EmojiSwitcher from './components/EmojiPicker/EmojiSwitcher';
 import { renderTextContent } from './components/RenderTextContent';
 import { EMessageActionType } from './enums';
-import { styles } from './styles';
+import { style } from './styles';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from './types';
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
@@ -89,6 +90,8 @@ interface IChatBoxProps {
 	directMessageId?: string;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const inputRef = useRef<TextInput>();
 	const { sessionRef, clientRef } = useMezon();
 	const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -656,7 +659,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				{replyDisplayName ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.Reply)}>
-							<Feather size={25} name="x" style={styles.closeIcon} />
+							<Icons.CircleXIcon height={20} width={20} color={themeValue.text} />
 						</Pressable>
 						<Text style={styles.aboveTextBoxText}>
 							{t('chatBox.replyingTo')} {replyDisplayName}
@@ -666,7 +669,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				{currentSelectedEditMessage ? (
 					<View style={styles.aboveTextBoxItem}>
 						<Pressable onPress={() => removeAction(EMessageActionType.EditMessage)}>
-							<Feather size={25} name="x" style={styles.closeIcon} />
+							<Icons.CircleXIcon height={20} width={20} color={themeValue.text} />
 						</Pressable>
 						<Text style={styles.aboveTextBoxText}>{t('chatBox.editingMessage')}</Text>
 					</View>
@@ -681,22 +684,22 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			<View style={styles.containerInput}>
 				{text.length > 0 && !isShowAttachControl ? (
 					<TouchableOpacity
-						style={[styles.iconContainer, { backgroundColor: Colors.secondaryLight }]}
+						style={[styles.btnIcon]}
 						onPress={() => setIsShowAttachControl(!isShowAttachControl)}
 					>
-						<AngleRightIcon width={18} height={18} />
+						<Icons.ChevronSmallLeftIcon width={22} height={22} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				) : (
 					<>
-						<View style={[styles.iconContainer, { backgroundColor: Colors.secondaryLight }]}>
+						<View style={styles.btnIcon}>
 							<AttachmentSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />
 						</View>
 						{!props?.hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id) && (
 							<TouchableOpacity
-								style={[styles.iconContainer, { backgroundColor: Colors.secondaryLight, marginRight: isShowAttachControl ? size.s_10 : 0 }]}
+								style={[styles.btnIcon]}
 								onPress={() => navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD })}
 							>
-								<AddThread width={22} height={22} />
+								<Icons.ThreadPlusIcon width={22} height={22} color={themeValue.textStrong} />
 							</TouchableOpacity>
 						)}
 					</>
@@ -707,7 +710,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						ref={inputRef}
 						autoFocus={isFocus}
 						placeholder={'Write message here...'}
-						placeholderTextColor={Colors.textGray}
+						placeholderTextColor={themeValue.text}
 						blurOnSubmit={false}
 						onSubmitEditing={handleSendMessage}
 						onFocus={handleInputFocus}
@@ -730,14 +733,16 @@ const ChatBox = memo((props: IChatBoxProps) => {
 					</View>
 				</View>
 
-				<View style={[styles.iconContainer, { backgroundColor: '#2b2d31' }]}>
+				<View>
 					{text.length > 0 || !!attachmentDataRef?.length ? (
-						<View onTouchEnd={handleSendMessage} style={[styles.iconContainer, styles.iconSend]}>
-							<SendIcon width={18} height={18} />
+						<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
+							<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />
 						</View>
 					) : (
-						<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
-							<MicrophoneIcon width={22} height={22} />
+						<TouchableOpacity
+							onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}
+							style={styles.btnIcon}>
+							<Icons.MicrophoneIcon width={22} height={22} color={themeValue.textStrong} />
 						</TouchableOpacity>
 					)}
 				</View>

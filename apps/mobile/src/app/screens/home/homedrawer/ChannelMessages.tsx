@@ -1,6 +1,6 @@
 import { useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, ArrowDownIcon } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Icons, ActionEmitEvent } from '@mezon/mobile-components';
+import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	messagesActions,
@@ -30,7 +30,7 @@ import { MessageItemBS } from './components';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
-import { styles } from './styles';
+import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 import { useContext } from 'react';
 import { channelDetailContext } from './HomeDefault';
@@ -46,6 +46,8 @@ const idUserAnonymous = '1767478432163172999';
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
@@ -53,7 +55,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const channelMember = useSelector(selectMembersByChannelId(channelId));
-  const { usersClanMention, currentClan } = useContext(channelDetailContext) || {};
+	const { usersClanMention, currentClan } = useContext(channelDetailContext) || {};
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -152,11 +154,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			loadMoreMessage().finally(() => setIsLoadMore(false));
 		}
 	}, [isLoadMore, loadMoreMessage]);
-	
+
 	const handleScroll = useCallback((event: { nativeEvent: { contentOffset: { y: any } } }) => {
 		const offsetY = event.nativeEvent.contentOffset.y;
 		const threshold = 300; // Adjust this value to determine when to show the button
-		
+
 		if (offsetY > threshold && !showScrollToBottomButton) {
 			setShowScrollToBottomButton(true);
 		} else if (offsetY <= threshold && showScrollToBottomButton) {
@@ -280,7 +282,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 
 			{showScrollToBottomButton && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>
-					<ArrowDownIcon color={Colors.tertiary} />
+					<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />
 				</TouchableOpacity>
 			)}
 
