@@ -1,6 +1,7 @@
 import { EmojiDataOptionals, EmojiPlaces, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 export const REACTION_FEATURE_KEY = 'reaction';
 
@@ -64,6 +65,37 @@ export const updateReactionMessage = createAsyncThunk(
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
+
+export type WriteMessageReactionArgs = {
+	id: string;
+	channelId: string;
+	mode: number;
+	messageId: string;
+	emoji: string;
+	count: number;
+	messageSenderId: string;
+	actionDelete: boolean;
+};
+
+export const writeMessageReaction = createAsyncThunk(
+	"messages/writeMessageReaction",
+	async ({ id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const session = mezon.sessionRef.current;
+			const client = mezon.clientRef.current;
+			const socket = mezon.socketRef.current;
+
+			if (!client || !session || !socket) {
+				throw new Error('Client is not initialized');
+			}
+
+			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete);
+		} catch (e) {
+			return thunkAPI.rejectWithValue("Error while writing message reaction");
 		}
 	},
 );
@@ -234,6 +266,7 @@ export const reactionReducer = reactionSlice.reducer;
 export const reactionActions = {
 	...reactionSlice.actions,
 	updateReactionMessage,
+	writeMessageReaction,
 };
 
 const { selectAll, selectEntities } = reactionAdapter.getSelectors();
