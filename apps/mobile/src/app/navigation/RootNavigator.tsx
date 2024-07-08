@@ -37,14 +37,11 @@ const NavigationMain = () => {
 	const { reconnect } = useMezon();
 
 	useEffect(() => {
-		const timer = setTimeout(async () => {
-			await SplashScreen.hideAsync();
-			await notifee.cancelAllNotifications();
-		}, 1500);
+		SplashScreen.hideAsync();
+		notifee.cancelAllNotifications();
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
-			clearTimeout(timer);
 			appStateSubscription.remove();
 		};
 	}, []);
