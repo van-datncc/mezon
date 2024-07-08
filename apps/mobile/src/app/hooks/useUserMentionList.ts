@@ -12,16 +12,22 @@ function UseMentionList(channelID: string): MentionDataProps[] {
 
 		const userMentionRaw = members[0].users;
 		const mentionList = userMentionRaw?.map((item: ChannelMembersEntity) => ({
+            ...item,
             id: item?.user?.id ?? '',
             display: item?.user?.username ?? '',
             avatarUrl: item?.user?.avatar_url ?? '',
         })) ?? [];
-        const hardcodedUser: MentionDataProps = {
-            id: "1775731111020111321",
-            display: 'here',
+        const hardcodedUser = {
+          id: "1775731111020111321",
+          display: 'here',
+          avatarUrl: '',
+          user: {
+            id: '1775731111020111321',
+            display_name: 'here',
+            username: 'here',
             avatarUrl: '',
+          },
         };
-
         return [...mentionList, hardcodedUser];
 	}, [members]);
 
