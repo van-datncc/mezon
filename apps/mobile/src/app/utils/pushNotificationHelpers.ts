@@ -1,10 +1,11 @@
 import { STORAGE_KEY_CLAN_CURRENT_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
+import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { Alert, Linking, Platform } from 'react-native';
-import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
+import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const IS_ANDROID = Platform.OS === 'android';
 
 export const checkNotificationPermission = async () => {
@@ -74,6 +75,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			body: body,
 			data: data,
 			android: {
+				visibility: AndroidVisibility.PUBLIC,
 				channelId: 'mezon-mobile',
 				smallIcon: 'ic_notification',
 				color: '#000000',
@@ -132,15 +134,12 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 		return true;
 	}
 
-	if (
-		channelMessageId && areOnChannel ||
-		directMessageId && areOnDirectMessage
-	) {
+	if ((channelMessageId && areOnChannel) || (directMessageId && areOnDirectMessage)) {
 		return false;
 	}
 
 	return true;
-}
+};
 
 export const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
 	const link = notification?.data?.link;
@@ -158,9 +157,9 @@ export const navigateToNotification = async (notification: any, navigation: any,
 			const isDifferentClan = currentClan?.clan_id !== clanId;
 			const channelId = linkMatch[2];
 			if (isDifferentClan) {
-        store.dispatch(clansActions.joinClan({ clanId: clanId }));
-        store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
-      }
+				store.dispatch(clansActions.joinClan({ clanId: clanId }));
+				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+			}
 			setTimeout(
 				() => {
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -183,10 +182,12 @@ export const navigateToNotification = async (notification: any, navigation: any,
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				if (navigation) {
-					navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: messageId } })
+					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+						params: { directMessageId: messageId },
+					});
 				}
-			}
-			else {
+			} else {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 			}
 		}
@@ -240,7 +241,7 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 		});
 	});
 
-	messaging().setBackgroundMessageHandler(async remoteMessage => {
+	messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 		console.log('Message handled in the background!', remoteMessage);
 	});
 
