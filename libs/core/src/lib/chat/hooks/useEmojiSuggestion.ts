@@ -3,6 +3,7 @@ import {
 	selectAddEmojiState,
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
+	selectEmojisRecent,
 	selectEmojiSuggestion,
 	selectShiftPressedStatus,
 	selectTextToSearchEmojiSuggestion,
@@ -12,9 +13,10 @@ import { IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-const categoriesEmoji = ['Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 const filterEmojiData = (emojis: IEmoji[]) => {
+	console.log(emojis);
 	return emojis.map(({ src, shortname, category }) => ({
 		src,
 		category,
@@ -24,7 +26,16 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 
 export function useEmojiSuggestion() {
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	const emojis = useMemo(() => filterEmojiData(emojiMetadata ?? []), [emojiMetadata]);
+	// const emojiRecentData = localStorage.getItem('recentEmojis');
+	// const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
+	// console.log(emojisRecentDataParse);
+
+	const emojisRecent = useSelector(selectEmojisRecent);
+	console.log(emojisRecent);
+
+	const emojiCombine = [...emojiMetadata, ...emojisRecent];
+
+	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
 	const emojiPicked = useSelector(selectEmojiSuggestion);
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
@@ -81,6 +92,7 @@ export function useEmojiSuggestion() {
 			addEmojiState,
 			setShiftPressed,
 			shiftPressedState,
+			emojiMetadata,
 		}),
 		[
 			emojis,
@@ -94,6 +106,7 @@ export function useEmojiSuggestion() {
 			addEmojiState,
 			setShiftPressed,
 			shiftPressedState,
+			emojiMetadata,
 		],
 	);
 }

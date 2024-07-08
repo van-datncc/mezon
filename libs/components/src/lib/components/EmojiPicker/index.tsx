@@ -1,6 +1,13 @@
 import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectDirectById, selectMessageByMessageId, selectReactionPlaceActive } from '@mezon/store';
-import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
+import {
+	emojiSuggestionActions,
+	reactionActions,
+	selectCurrentChannel,
+	selectDirectById,
+	selectMessageByMessageId,
+	selectReactionPlaceActive,
+} from '@mezon/store';
+import { EmojiPlaces, IEmoji, SubPanelName, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,6 +46,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	}, [valueInputToCheckHandleSearch]);
 
 	const categoryIcons = [
+		<Icons.ClockHistory defaultSize="w-7 h-7" />,
 		<Icons.PenEdit defaultSize="w-7 h-7" />,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
@@ -70,9 +78,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setChannelID(currentChannel?.id || '');
 		}
 	}, [currentChannel, direct, directId]);
-	
+
 	const handleEmojiSelect = async (emojiPicked: string) => {
-		
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
@@ -84,11 +91,13 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				messageEmoji?.sender_id ?? '',
 				false,
 			);
-
+			dispatch(emojiSuggestionActions.setEmojisRecent());
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
 			setEmojiSuggestion(emojiPicked);
+			dispatch(emojiSuggestionActions.setEmojisRecent());
+
 			if (!shiftPressedState) {
 				dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 				setSubPanelActive(SubPanelName.NONE);
@@ -187,9 +196,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				<div className="w-9 h-9 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
 					<Icons.Star defaultSize="w-7 h-7" />
 				</div>
-				<div className="w-9 h-9 max-sm:hidden  flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
-					<Icons.ClockHistory defaultSize="w-7 h-7" />
-				</div>
 				<hr className=" bg-gray-200 border w-full max-sm:h-full max-sm:w-[1px] max-sm:hidden" />
 				{categoriesWithIcons.map((item, index) => {
 					return (
@@ -278,7 +284,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
-	const { shiftPressedState } = useEmojiSuggestion();
+	const { shiftPressedState, emojiMetadata } = useEmojiSuggestion();
 
 	return (
 		<div
@@ -292,7 +298,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img draggable="false" src={item.src}></img>
+					<img draggable="false" src={item.src || getSrcEmoji(item.shortname, emojiMetadata)}></img>
 				</button>
 			))}
 		</div>

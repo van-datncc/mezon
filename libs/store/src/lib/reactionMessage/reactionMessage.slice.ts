@@ -121,6 +121,14 @@ export const reactionSlice = createSlice({
 				count: action.payload.count || 1,
 			};
 
+			const emojiLastest = {
+				emoji: reactionDataSocket.emoji,
+				messageId: reactionDataSocket.message_id,
+				senderId: reactionDataSocket.sender_id,
+				action: reactionDataSocket.action,
+			};
+			saveRecentEmoji(emojiLastest);
+
 			const isAdd = !action.payload.action;
 			// Server not send id
 			// We have to find the id of the reaction by message_id and emoji and sender_id
@@ -183,6 +191,24 @@ export const reactionSlice = createSlice({
 		},
 	},
 });
+function saveRecentEmoji(emojiLastest: any) {
+	const storedEmojis = localStorage.getItem('recentEmojis');
+	const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
+
+	const duplicateIndex = emojisRecentParse.findIndex((item: any) => {
+		return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
+	});
+
+	if (duplicateIndex !== -1) {
+		if (emojiLastest.action === true) {
+			emojisRecentParse.splice(duplicateIndex, 1);
+		}
+	} else {
+		emojisRecentParse.push(emojiLastest);
+	}
+
+	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
+}
 
 function combineMessageReactions(state: ReactionState, messageId: string): EmojiDataOptionals[] {
 	const reactionEntities = reactionAdapter.getSelectors().selectAll(state);

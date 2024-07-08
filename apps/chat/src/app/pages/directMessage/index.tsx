@@ -14,6 +14,8 @@ export default function Direct() {
 
 	useEscapeKey(() => setOpenSetting(false));
 
+	localStorage.setItem('recentEmojis', JSON.stringify([]));
+
 	return (
 		<>
 			<div

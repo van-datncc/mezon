@@ -1,7 +1,7 @@
 import { IEmoji } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -18,6 +18,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	textToSearchEmojiSuggestion: string;
 	addEmojiAction: boolean;
 	shiftPressed: boolean;
+	emojisRecent: IEmoji[];
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
@@ -57,6 +58,7 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	textToSearchEmojiSuggestion: '',
 	addEmojiAction: false,
 	shiftPressed: false,
+	emojisRecent: [],
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -82,6 +84,11 @@ export const emojiSuggestionSlice = createSlice({
 		setShiftPressed: (state, action: PayloadAction<boolean>) => {
 			state.shiftPressed = action.payload;
 		},
+		setEmojisRecent: (state) => {
+			const emojiRecentData = localStorage.getItem('recentEmojis');
+			const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
+			state.emojisRecent = convertedEmojiRecent(emojisRecentDataParse, emojiSuggestionAdapter.getSelectors().selectAll);
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -98,6 +105,20 @@ export const emojiSuggestionSlice = createSlice({
 			});
 	},
 });
+
+function convertedEmojiRecent(emojiArr: any, emojiSource: any) {
+	return emojiArr.map((item: any) => {
+		console.log(item.emoji);
+		// const src = getSrcEmoji(item.emoji, Array.isArray(emojiSource) && emojiSource);
+		const emojiFound = Array.isArray(emojiSource) && emojiSource.find((emoji: any) => emoji.shortname === item.emoji);
+
+		return {
+			src: emojiFound.src,
+			category: 'Recent',
+			shortName: item.emoji,
+		};
+	});
+}
 
 export const emojiSuggestionReducer = emojiSuggestionSlice.reducer;
 
@@ -124,3 +145,5 @@ export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggesti
 export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.addEmojiAction);
 
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
+
+export const selectEmojisRecent = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojisRecent);
