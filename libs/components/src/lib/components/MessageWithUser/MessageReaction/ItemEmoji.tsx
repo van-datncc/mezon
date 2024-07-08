@@ -36,6 +36,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			setChannelLabel(currentChannel?.channel_label || '');
 		}
 	}, [message]);
+	
 	async function reactOnExistEmoji(
 		id: string,
 		mode: number,
