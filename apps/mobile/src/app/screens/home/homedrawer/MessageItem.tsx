@@ -9,7 +9,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, Metrics, Text, size, useTheme, verticalScale, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, Metrics, Text, size, useTheme, verticalScale, useAnimatedState, Block } from '@mezon/mobile-ui';
 import {
 	ChannelMembersEntity,
 	ChannelsEntity,
@@ -516,7 +516,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						{images?.length > 0 && renderImages()}
 
 						{documents?.length > 0 && renderDocuments()}
-						{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, usersClanMention)}
+						<Block opacity={(message?.isSending || message.isError) ? 0.6 : 1}>
+							{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, usersClanMention)}
+						</Block>
+						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 						<MessageAction
 							message={message}
 							mode={mode}
