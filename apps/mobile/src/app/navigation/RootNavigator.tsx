@@ -37,14 +37,11 @@ const NavigationMain = () => {
 	const { reconnect } = useMezon();
 
 	useEffect(() => {
-		const timer = setTimeout(async () => {
-			await SplashScreen.hideAsync();
-			await notifee.cancelAllNotifications();
-		}, 1500);
+		SplashScreen.hideAsync();
+		notifee.cancelAllNotifications();
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
-			clearTimeout(timer);
 			appStateSubscription.remove();
 		};
 	}, []);
@@ -54,10 +51,31 @@ const NavigationMain = () => {
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
-
+	
+	const withTimeout = async (promise: Promise<any>, duration: number) => {
+		let timeoutId: NodeJS.Timeout;
+		const timeoutPromise = new Promise((_, reject) => {
+			timeoutId = setTimeout(() => {
+				reject(new Error('Operation timed out'));
+			}, duration);
+		});
+		
+		const result = await Promise.race([promise, timeoutPromise]);
+		clearTimeout(timeoutId);
+		return result;
+	};
+	
 	const handleAppStateChange = async (state: string) => {
-		reconnect().catch((e) => 'trying to reconnect');
-		await notifee.cancelAllNotifications();
+		if (state === 'active') {
+			withTimeout(reconnect(), 1500)
+				.then(() => {
+					console.log('Reconnected successfully');
+				})
+				.catch((e) => {
+					console.log('Failed to reconnect or operation timed out', e);
+				});
+			await notifee.cancelAllNotifications();
+		}
 	};
 
 	const authLoader = async () => {

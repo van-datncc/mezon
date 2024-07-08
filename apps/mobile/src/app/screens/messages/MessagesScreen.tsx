@@ -1,10 +1,9 @@
 import moment from 'moment';
 import React, { useState, useMemo } from 'react';
 import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
-import { MessageIcon, PaperclipIcon, UserGroupIcon, UserPlusIcon } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
-import { styles } from './styles';
+import { Icons, MessageIcon, PaperclipIcon, } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { style } from './styles';
 import { useTranslation } from 'react-i18next';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { useMemberStatus } from '@mezon/core';
@@ -22,7 +21,9 @@ const SeparatorListFriend = () => {
 	)
 }
 
-const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation: any}) => {
+const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { directMessage, navigation } = props;
 	const { t } = useTranslation('message');
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
@@ -58,13 +59,13 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 
 		const parts = removeBlockCode?.(text?.trim())?.split(/(:[^:]+:)/);
 		return (
-			<View style={{flex: 1, maxHeight: size.s_18, flexDirection: 'row', flexWrap: 'nowrap', overflow: 'hidden'}}>
+			<View style={{ flex: 1, maxHeight: size.s_18, flexDirection: 'row', flexWrap: 'nowrap', overflow: 'hidden' }}>
 				<Text style={[styles.defaultText, styles.lastMessage]}>{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}</Text>
 				{parts?.map?.((part, index) => {
 					if (!part) return null
 					if (part.match(emojiRegex)) {
 						const srcEmoji = getSrcEmoji(part, emojiListPNG);
-						return <FastImage key={index} source={{uri: srcEmoji}} style={{width: 18, height: 18}} />
+						return <FastImage key={index} source={{ uri: srcEmoji }} style={{ width: 18, height: 18 }} />
 					}
 					return <Text style={[styles.defaultText, styles.lastMessage]} key={index}>{part} </Text>
 				})}
@@ -84,7 +85,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()}>
 			{directMessage?.channel_avatar?.length > 1 ? (
 				<View style={styles.groupAvatar}>
-					<UserGroupIcon />
+					<Icons.GroupIcon />
 				</View>
 			) : (
 				<View>
@@ -103,18 +104,20 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 					</Text>
 					{lastMessageTime ? (
 						<Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text>
-					): null}
+					) : null}
 				</View>
 
 				{lastMessageTime ? (
 					getLastMessageContent(directMessage?.last_sent_message?.content)
-				): null}
+				) : null}
 			</View>
 		</TouchableOpacity>
 	)
 })
 
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const { t } = useTranslation(['dmMessage', 'common']);
@@ -153,16 +156,16 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.headerWrapper}>
 				<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
 				<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-					<UserPlusIcon height={15} width={30} />
+					<Icons.UserPlusIcon height={20} width={20} color={themeValue.textStrong} />
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
 
 			<View style={styles.searchMessage}>
-				<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
+				<Icons.MagnifyingIcon height={20} width={20} color={themeValue.text} />
 				<TextInput
 					placeholder={t('common:searchPlaceHolder')}
-					placeholderTextColor={Colors.tertiary}
+					placeholderTextColor={themeValue.text}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
@@ -178,7 +181,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			/>
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-				<MessageIcon width={32} height={25} style={{marginLeft: -5}} />
+				<Icons.ChatIcon width={32} height={25} style={{ marginLeft: -5 }} />
 			</Pressable>
 		</View>
 	);

@@ -70,8 +70,6 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 	const classes = clx(
 		'prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
 
-		// 'prose-code:text-sm prose prose-blue prose-hr-0 prose-headings-0 prose-contents prose-lg prose-h1-2xl whitespace-pre-wrap prose-base prose-blockquote-leading-[6px] prose-blockquote-0 leading-[0] border',
-
 		{
 			lightMode: appearanceTheme === 'light',
 		},
@@ -92,8 +90,6 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 			const isEmojiSyntax = checkMention(tagName) === MentionTypeEnum.EMOJI_SYNTAX;
 			const result = convertMarkdown(markdown);
 
-			console.log(startsWithTripleBackticks);
-			console.log(!endsWithNoTripleBackticks);
 
 			return (
 				<div key={index} className="lineText contents">

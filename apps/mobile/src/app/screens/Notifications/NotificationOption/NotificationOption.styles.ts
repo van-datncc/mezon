@@ -1,12 +1,10 @@
-import { Colors, horizontalScale, size, verticalScale } from "@mezon/mobile-ui"
+import { Attributes, Colors, horizontalScale, size, verticalScale } from "@mezon/mobile-ui"
 import { StyleSheet } from "react-native"
-import { HEIGHT, WIDTH } from "../../../constants/config"
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	wrapperOption: {
-		width: WIDTH,
-		height: HEIGHT,
 		paddingHorizontal: horizontalScale(10),
+		paddingVertical: verticalScale(10)
 	},
 	optionContainer: {
 		backgroundColor: Colors.bgPrimary,
