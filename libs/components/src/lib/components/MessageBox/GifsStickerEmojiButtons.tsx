@@ -55,16 +55,16 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 	);
 
 	return (
-		<div className="flex flex-row h-full items-center gap-1 w-18 mr-3  absolute right-0">
-			<div onClick={handleOpenGifs} className="cursor-pointer block max-sm:hidden">
+		<div className="flex flex-row h-full items-center gap-1 mr-3  ">
+			<div onClick={handleOpenGifs} className="cursor-pointer block max-sm:hidden w-6 h-6">
 				<Icons.Gif defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.GIFS} />
 			</div>
 
-			<div onClick={handleOpenStickers} className="cursor-pointer block max-sm:hidden">
+			<div onClick={handleOpenStickers} className="cursor-pointer block max-sm:hidden w-6 h-6">
 				<Icons.Sticker defaultSize="w-6 h-6" isWhite={subPanelActive === SubPanelName.STICKERS} />
 			</div>
 
-			<div onClick={handleOpenEmoji} className="cursor-pointer">
+			<div onClick={handleOpenEmoji} className="cursor-pointer w-6 h-6">
 				<Icons.Smile defaultSize="w-6 h-6" defaultFill={`${subPanelActive === SubPanelName.EMOJI ? '#FFFFFF' : '#AEAEAE'}`} />
 			</div>
 		</div>
