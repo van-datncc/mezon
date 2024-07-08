@@ -90,8 +90,8 @@ const HomeScreen = React.memo((props: any) => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await reconnect();
 			await messageLoader();
+			await reconnect();
 		}
 	};
 
@@ -115,8 +115,8 @@ const HomeScreen = React.memo((props: any) => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-		store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId }));
+		store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
 		store.dispatch(
 			channelsActions.joinChannel({
 				clanId: currentClan?.clan_id,

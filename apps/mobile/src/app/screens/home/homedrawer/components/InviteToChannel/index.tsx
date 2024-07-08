@@ -115,9 +115,9 @@ export const InviteToChannel = React.memo(
 				}
 				setCurrentInviteLink(`https://mezon.vn/invite/${response.invite_link}`);
 			};
-
-			fetchInviteLink();
-		}, [categorizedChannels, currentClanId, createLinkInviteUser]);
+			
+			categorizedChannels?.[0]?.['channels']?.[0]?.channel_id && fetchInviteLink();
+		}, [categorizedChannels?.[0]?.['channels']?.[0]?.channel_id, currentClanId]);
 
 		return (
 			<View>

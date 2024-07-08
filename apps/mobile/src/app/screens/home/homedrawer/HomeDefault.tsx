@@ -12,7 +12,16 @@ import { ChannelStatusEnum } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, PanResponder, Platform, Text, TouchableOpacity, View } from 'react-native';
+import {
+	AppState,
+	DeviceEventEmitter,
+	Keyboard,
+	PanResponder,
+	Platform,
+	Text,
+	TouchableOpacity,
+	View
+} from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
@@ -76,6 +85,21 @@ const HomeDefault = React.memo((props: any) => {
 			};
 		}, [currentChannel?.channel_id]),
 	);
+
+	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+		
+		return () => {
+			appStateSubscription.remove();
+		};
+	}, []);
+	
+	const handleAppStateChange = async (state: string) => {
+		if (state === 'background') {
+			Keyboard.dismiss();
+			setHeightKeyboardShow(0);
+		}
+	};
 
 	const fetchMemberChannel = async () => {
 		if (!currentChannel) {

@@ -26,7 +26,7 @@ const BottomNavigator = () => {
 					tabBarHideOnKeyboard: true,
 					tabBarStyle: {
 						height: hiddenBottomTab ? 0 : 80,
-						paddingBottom: hiddenBottomTab ? 10 : 20,
+						paddingBottom: hiddenBottomTab ? 0 : 20,
 						borderTopWidth: 1,
 						elevation: 0,
 						backgroundColor: themeValue.secondary,
