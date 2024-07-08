@@ -14,7 +14,9 @@ const SettingEmoji = () => {
           <li>Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores</li>
         </ul>
       </div>
-      <SettingEmojiList />
+      <SettingEmojiList title={"Emoji"}/>
+      <SettingEmojiList title={"Emoji Animated"}/>
+
     </>
 
   )

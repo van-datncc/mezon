@@ -8,7 +8,7 @@ const SettingEmojiItem = () => {
     setNameEmoji(e.target.value);
   }
   return (
-    <div className={'flex flex-row w-full max-w-[700px] h-[70px] items-center border-b border-borderClan'} onMouseEnter={()=>setShowEdit(true)} onMouseLeave={()=>setShowEdit(false)}>
+    <div className={'flex flex-row w-full max-w-[700px] relative h-[65px] items-center border-b border-borderClan'} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
       <div className={'w-14 h-8'}>
         <div className={'w-8 h-8 overflow-hidden flex items-center justify-center'}>
           <img className={'w-full h-auto object-cover'} src="https://motgame.vn/stores/news_dataimages/motgamevn/062023/30/05/hina-nu-cosplayer-noi-tieng-han-quoc-khien-bao-nguoi-me-met-nhan-lam-vo-la-ai-50-.6566.jpg" />
@@ -32,6 +32,14 @@ const SettingEmojiItem = () => {
           Thích Du Yên
         </p>
       </div>
+      {
+        showEdit &&
+        <button
+          className=" text-black absolute text-xs font-bold w-6 h-6 top-[-12px] right-[-12px] flex items-center justify-center border border-borderClan rounded-[50%] bg-[#AEAEAE]"
+        >
+          X
+        </button>
+      }
     </div>
   )
 }
