@@ -1,6 +1,6 @@
 {
   "name": "Mezon",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "scripts": {
     "dev:chat": "nx run chat:serve",
