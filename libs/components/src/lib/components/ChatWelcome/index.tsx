@@ -1,5 +1,4 @@
-import { useThreads } from '@mezon/core';
-import { selectMemberByUserId } from '@mezon/store';
+import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import { ETypeMessage } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import { Hashtag, ThreadIcon } from '../Icons';
@@ -11,8 +10,8 @@ export type ChatWelComeProp = {
 };
 
 function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
-	const { threadCurrentChannel } = useThreads();
-	const user = useSelector(selectMemberByUserId(threadCurrentChannel?.creator_id as string));
+	const currentChannel = useSelector(selectCurrentChannel);
+	const user = useSelector(selectMemberByUserId(currentChannel?.creator_id as string));
 	return (
 		<div className="space-y-2 px-4 mb-0 mt-[50px]">
 			{type === ETypeMessage.CHANNEL ? (
@@ -27,27 +26,28 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
 			)}
 
-			{type === ETypeMessage.THREAD && threadCurrentChannel && (
-				<div>
-					<h4 className="text-[32px] font-bold my-2 dark:text-textDarkTheme text-textLightTheme">{threadCurrentChannel?.channel_label}</h4>
+			<div>
+				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+					Welcome to #{name}
+				</p>
+			</div>
+			<div>
+				{(currentChannel?.parrent_id !== "0" && !avatarDM)? 
 					<div className="mb-1 dark:text-textDarkTheme text-textLightTheme">
 						<span className="text-base">Started by &nbsp;</span>
 						<span className="text-base font-semibold">{user?.user?.username}</span>
-					</div>
-				</div>
-			)}
-
-			{type !== ETypeMessage.THREAD && !threadCurrentChannel && (
-				<div>
-					<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
-						{type === 'CHANNEL' ? 'Welcome to #' : ''} {name}
-					</p>
-
+					</div>:
 					<p className="dark:text-zinc-400 text-colorTextLightMode text-sm">
-						{type === 'CHANNEL' ? `This is the start of the #${name} channel.` : `This is the start of your conversation with ${name}`}
+						{avatarDM ? 
+							(type === "DM" ?
+								`This is the beginning of your direct message history with ${name}`:
+								`Welcome to the beginning of the #${name} group`
+							):
+							`This is the start of the #${name} ${currentChannel?.channel_private ? 'private' : ''} channel`
+						}
 					</p>
-				</div>
-			)}
+				}
+			</div>
 		</div>
 	);
 }

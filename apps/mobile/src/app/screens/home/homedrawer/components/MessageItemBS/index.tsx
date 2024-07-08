@@ -30,6 +30,7 @@ import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
+import { useRoute } from '@react-navigation/native';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
@@ -299,7 +300,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 							<Pressable
 								key={index}
 								style={styles.favouriteIconItem}
-								onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item.shortname, userProfile.user.id)}
+								onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item.shortname, userProfile?.user?.id)}
 							>
 								<FastImage
 									source={{
@@ -354,7 +355,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const onSelectEmoji = async (emoij: string) => {
-		await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, emoij, userProfile.user.id);
+		await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, emoij, userProfile?.user?.id);
 	};
 
 	const renderEmojiSelector = () => {

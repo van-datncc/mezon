@@ -1,4 +1,5 @@
-import { Attributes, Colors, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { title } from "process";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -25,6 +26,17 @@ export const style = (colors: Attributes) => StyleSheet.create({
         flexBasis: 10
     },
 
+    titleSM: {
+
+    },
+
+    titleMD: {
+        fontSize: Fonts.size.h6
+    },
+
+    titleLg: {
+
+    },
     sectionRight: {
         display: "flex",
         flexDirection: "row",

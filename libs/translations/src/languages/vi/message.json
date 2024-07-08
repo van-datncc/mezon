@@ -20,7 +20,8 @@
     },
     "toast": {
         "copyText": "Đã sao chép nội dung tin nhắn",
-        "attachmentIsLoading": "Attachment is loading, please wait a moment"
+        "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi trong giây lát",
+        "pinMessage": "Tin nhắn đã được ghim"
     },
     "directMessage": {
         "you": "Bạn"

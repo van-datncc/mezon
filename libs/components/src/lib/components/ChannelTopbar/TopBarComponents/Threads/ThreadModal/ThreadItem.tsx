@@ -42,7 +42,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 		>
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">
-					<p className="text-base font-semibold leading-5 dark:text-white text-black">{thread?.channel_label}</p>
+					<p className="text-base font-semibold leading-5 dark:text-white text-black one-line">{thread?.channel_label}</p>
 					{thread?.last_sent_message ? (
 						<div className="flex flex-row items-center h-6">
 							<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />

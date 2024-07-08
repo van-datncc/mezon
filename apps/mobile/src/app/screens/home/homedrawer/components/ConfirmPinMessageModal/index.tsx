@@ -14,6 +14,7 @@ import { Colors } from "@mezon/mobile-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { CheckIcon } from "@mezon/mobile-components";
+import { useRoute } from "@react-navigation/native";
 
 interface IConfirmPinMessageModalProps {
     isVisible: boolean,
@@ -24,13 +25,15 @@ interface IConfirmPinMessageModalProps {
 
 export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps) => {
     const { isVisible, message, onClose, type } = props;
+    const route = useRoute();
+    const { params } = route;
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation('message');
 
     const onConfirm = async () => {
         switch (type) {
             case EMessageActionType.UnPinMessage:
-		        dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message?.channel_id || '', message_id: message?.id }));
+                dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: params?.['directMessageId'] ? params?.['directMessageId'] : message?.channel_id || '', message_id: message.id }));
                 break;
             case EMessageActionType.PinMessage:
                 dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));

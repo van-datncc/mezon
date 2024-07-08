@@ -4,13 +4,14 @@ import { Ref } from "react";
 import { forwardRef } from "react";
 import { ReactNode } from "react";
 import Backdrop from "./backdrop";
-import { Text, View } from "react-native";
+import { StyleProp, Text, View } from "react-native";
 import { style } from "./styles";
 import { useTheme } from "@mezon/mobile-ui";
 
 export interface IMezonBottomSheetProps extends BottomSheetModalProps  {
     children: ReactNode,
     title?: string,
+    titleSize?: "sm" | "md" | "lg",
     headerLeft?: ReactNode,
     headerRight?: ReactNode,
     heightFitContent?: boolean,
@@ -21,7 +22,7 @@ export default forwardRef(function MezonBottomSheet(
     props: IMezonBottomSheetProps,
     ref: Ref<BottomSheetModalMethods>)
 {
-    const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'] } = props;
+    const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = "sm" } = props;
     const styles = style(useTheme().themeValue);
     return (
         <OriginalBottomSheet
@@ -39,7 +40,7 @@ export default forwardRef(function MezonBottomSheet(
                 {(title || headerLeft || headerRight) &&
                     <View style={styles.header}>
                         <View style={[styles.section, styles.sectionLeft]}>{headerLeft}</View>
-                        <Text style={[styles.section, styles.sectionTitle]}>{title}</Text>
+                        <Text style={[styles.section, styles.sectionTitle, titleSize == "md" ? styles.titleMD : {}]}>{title}</Text>
                         <View style={[styles.section, styles.sectionRight]}>{headerRight}</View>
                     </View>
                 }

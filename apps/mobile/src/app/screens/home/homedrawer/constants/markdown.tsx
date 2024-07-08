@@ -183,6 +183,12 @@ export const renderRulesCustom = {
 			);
 		}
 
+    if (content?.startsWith('::')) {
+      return (
+        <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
+      )
+    }
+
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
 				return (
@@ -204,19 +210,10 @@ export const renderRulesCustom = {
 				</Text>
 			);
 		}
-
 		return (
 			<Text key={node.key} style={[styles.link]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 				{children}
 			</Text>
-		);
-	},
-	image: (node, children, parent, styles, allowedImageHandlers, defaultImageHandler) => {
-		const { src } = node.attributes;
-		return (
-			<View key={node.key} style={{ padding: 1 }}>
-				<FastImage source={{ uri: src }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
-			</View>
 		);
 	},
 	fence: (node, children, parent, styles, inheritedStyles = {}) => {
@@ -284,7 +281,7 @@ export const formatEmoji = (text: string, emojiImages: IEmoji[] = []) => {
 			} else {
 				if (part.match(emojiRegex)) {
 					const srcEmoji = getSrcEmoji(part, emojiImages);
-					return srcEmoji ? `![${part}](${srcEmoji})` : part;
+					 return `[:${part}](${srcEmoji})`;
 				}
 				return part;
 			}

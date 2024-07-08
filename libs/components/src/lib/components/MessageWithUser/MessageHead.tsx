@@ -83,10 +83,11 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 		<div className="relative group">
 			<div className="flex-row items-center w-full gap-4 flex">
 				<div
-					className="text-base text-textLightUserName font-medium tracking-wider cursor-pointer break-all username"
+					className="text-base text-textLightUserName font-medium tracking-normal cursor-pointer break-all username"
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
+					style={{letterSpacing: "-0.01rem"}}
 				>
 					{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 				</div>
