@@ -134,11 +134,20 @@ module.exports = {
             transform: 'rotate3d(0, 1, 0, 360deg)',
           },
         },
+        faded_input:{
+          '0%': {
+            opacity: 0,
+          },
+          '100%': {
+            opacity: 1,
+          },
+        }
       },
     },
     animation: {
       rotation: 'rotation 6s linear infinite',
       spin: 'spin 1s linear infinite',
+      faded_input : 'faded_input 0.25s linear forwards'
     },
     screens: {
       ssm: "430px",
