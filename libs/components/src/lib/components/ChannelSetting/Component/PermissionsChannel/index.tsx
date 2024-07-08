@@ -94,14 +94,14 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 										Add members or roles
 									</button>
 								</div>
-								<hr className="border-t border-solid border-borderDefault" />
+								<hr className="border-t border-solid dark:border-borderDefault border-bgModifierHoverLight" />
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Roles</p>
 									<div>
 										<ListRolePermission channel={channel} selectedRoleIds={selectedRoleIds}/>
 									</div>
 								</div>
-								<hr className="border-t border-solid border-borderDefault" />
+								<hr className="border-t border-solid dark:border-borderDefault border-bgModifierHoverLight" />
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Members</p>
 									<div>

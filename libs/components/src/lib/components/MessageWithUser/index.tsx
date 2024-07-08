@@ -29,6 +29,7 @@ export type MessageWithUserProps = {
 	isMention?: boolean;
 	isEditing?: boolean;
 	isShowFull?: boolean;
+	isHighlight?: boolean;
 	editor?: JSX.Element;
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	popup?: JSX.Element;
@@ -43,6 +44,7 @@ function MessageWithUser({
 	isMention,
 	onContextMenu,
 	isEditing,
+	isHighlight,
 	popup,
 	isShowFull,
 }: Readonly<MessageWithUserProps>) {
@@ -51,7 +53,6 @@ function MessageWithUser({
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
-	const { idMessageNotifed, setMessageNotifedId } = useNotification();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
@@ -61,12 +62,6 @@ function MessageWithUser({
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
 	const checkReferences = message.references?.length !== 0;
-	const [checkMessageReply, setCheckMessageReply] = useState(false);
-	const [checkMessageToMove, setCheckMessageToMove] = useState(false);
-	const [checkMessageIncludeMention, setCheckMessageIncludeMention] = useState<boolean | undefined>(false);
-	const [classNameHighlightParentDiv, setClassNameHighlightParentDiv] = useState<string>('');
-	const [classNameHighlightChildDiv, setClassNameHighlightChildDiv] = useState<string>('');
-	const [classNameNotification, setClassNameNotification] = useState<string>('');
 
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay;
@@ -76,61 +71,34 @@ function MessageWithUser({
 		return message.references && message.references?.length > 0;
 	}, [message.references]);
 
+	const checkMessageIncludeMention = useMemo(() => {
+		return hasIncludeMention;
+	}, [hasIncludeMention]);
+
 	const containerClass = classNames('relative', 'message-container', {
 		'mt-3': !isCombine || checkReferences,
 		'is-sending': message.isSending,
 		'is-error': message.isError,
-		[classNameNotification]: classNameNotification,
+		'bg-[#383B47]': isHighlight,
 	});
 
 	const parentDivClass = classNames(
 		'flex h-15 flex-col w-auto px-3',
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
-		{ [classNameHighlightParentDiv]: hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'dark:bg-[#403D38]': checkMessageIncludeMention},
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ [classNameHighlightChildDiv]: hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'dark:bg-[#403D38]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-
-	useEffect(() => {
-		let resetTimeoutId: NodeJS.Timeout | null = null;
-
-		if (idMessageNotifed === message.id) {
-			setClassNameNotification('bg-[#383B47]');
-			resetTimeoutId = setTimeout(() => {
-				setClassNameNotification('');
-				setMessageNotifedId('');
-			}, 2000);
-		}
-		return () => {
-			if (resetTimeoutId) {
-				clearTimeout(resetTimeoutId);
-			}
-		};
-	}, [idMessageNotifed, message.id, setMessageNotifedId]);
-
-	useEffect(() => {
-		if (checkMessageReply || checkMessageToMove) {
-			setClassNameHighlightParentDiv('dark:bg-[#383B47]');
-			setClassNameHighlightChildDiv('dark:bg-blue-500');
-		} else if (checkMessageIncludeMention) {
-			setClassNameHighlightParentDiv('dark:bg-[#403D38]');
-			setClassNameHighlightChildDiv('dark:bg-[#F0B132]');
-		}
-	}, [checkMessageReply, checkMessageToMove, checkMessageIncludeMention]);
-
-	useEffect(() => {
-		setCheckMessageReply(checkReplied);
-		setCheckMessageToMove(checkMessageTargetToMoved);
-		setCheckMessageIncludeMention(hasIncludeMention ?? undefined);
-	}, [checkReplied, checkMessageTargetToMoved, hasIncludeMention, idMessageToJump]);
 
 	return (
 		<>
@@ -141,10 +109,17 @@ function MessageWithUser({
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
-							<MessageAvatar user={user} message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode}/>
+							<MessageAvatar
+								user={user}
+								message={message}
+								isCombine={isCombine}
+								isEditing={isEditing}
+								isShowFull={isShowFull}
+								mode={mode}
+							/>
 
 							<div className="w-full relative h-full">
-								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} mode={mode}/>
+								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
 								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}
@@ -158,7 +133,7 @@ function MessageWithUser({
 												mode={mode}
 											/>
 										)}
-										<MessageAttachment message={message} onContextMenu={onContextMenu} />
+										<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 									</div>
 								</div>
 							</div>

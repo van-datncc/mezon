@@ -34,10 +34,18 @@ window.electron?.on(TOKEN_UPDATED, (_, token) => {
 window.electron?.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
   if (serverNotificationPayload.notification.body) {
 
-    new Notification(serverNotificationPayload.notification.title, {
+    const notifi = new Notification(serverNotificationPayload.notification.title, {
       body: serverNotificationPayload.notification.body,
-      icon: serverNotificationPayload.notification.image
+      icon: serverNotificationPayload.notification.image,
+      data: {
+        link: serverNotificationPayload.data.link 
+      }
     })
+    notifi.onclick = () => {
+      if (notifi.data && notifi.data.link) {
+            window.location.href = notifi.data.link ;
+          }
+    } 
   } else {
     console.log('do something with the key/value pairs in the data', serverNotificationPayload.data);
   }

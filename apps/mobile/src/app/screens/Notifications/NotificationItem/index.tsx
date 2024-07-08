@@ -7,23 +7,24 @@ import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { ENotifyBsToShow, NotifyProps } from '../types';
-import { styles as s } from './NotificationItem.styles';
 import MessageItem from '../../home/homedrawer/MessageItem';
 import { ChannelStreamMode } from 'mezon-js';
+import { useTheme } from '@mezon/mobile-ui';
+import { style } from './NotificationItem.styles';
 
 function parseObject(obj: any) {
 	let attachments;
 	let mentions;
 	let reactions;
 	let references;
-  let content;
+	let content;
 	try {
 		attachments = obj?.attachments && JSON.parse(obj?.attachments);
 	} catch (err) {
 		attachments = {};
 	}
 	try {
-		mentions =  obj?.mentions &&  JSON.parse(obj?.mentions);
+		mentions = obj?.mentions && JSON.parse(obj?.mentions);
 	} catch (err) {
 		mentions = {};
 	}
@@ -38,8 +39,8 @@ function parseObject(obj: any) {
 		reactions = {};
 	}
 
-  try {
-    content = obj?.content && JSON.parse(obj?.content);
+	try {
+		content = obj?.content && JSON.parse(obj?.content);
 	} catch (err) {
 		content = {};
 	}
@@ -49,12 +50,14 @@ function parseObject(obj: any) {
 		mentions,
 		reactions,
 		references,
-    content
+		content
 	};
 	return parsedObj;
 }
 
 const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify }: NotifyProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user as any);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
@@ -69,17 +72,17 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 				onLongPressNotify(ENotifyBsToShow.removeNotification, notify);
 			}}
 		>
-			<View style={s.notifyContainer}>
-				<View style={s.notifyHeader}>
-					<View style={s.boxImage}>
-						<Image source={{ uri: avatarImg || AVATAR_DEFAULT_URL }} style={s.image} />
+			<View style={styles.notifyContainer}>
+				<View style={styles.notifyHeader}>
+					<View style={styles.boxImage}>
+						<Image source={{ uri: avatarImg || AVATAR_DEFAULT_URL }} style={styles.image} />
 					</View>
-					<View style={s.notifyContent}>
-						<Text numberOfLines={2} style={s.notifyHeaderTitle}>
+					<View style={styles.notifyContent}>
+						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
 							{notify?.subject} - {channelInfo?.channel_label}:
 						</Text>
-						<View style={s.contentMessage}>
-            				<MessageItem
+						<View style={styles.contentMessage}>
+							<MessageItem
 								message={data}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								channelId={data?.channel_id}
@@ -87,7 +90,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 							/>
 						</View>
 					</View>
-					<Text style={s.notifyDuration}>{messageTimeDifference}</Text>
+					<Text style={styles.notifyDuration}>{messageTimeDifference}</Text>
 				</View>
 			</View>
 		</TouchableOpacity>

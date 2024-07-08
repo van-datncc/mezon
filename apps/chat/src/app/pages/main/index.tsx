@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
+import { MessageContextMenuProvider } from '../channel/ContextMenu/MessageContextMenuContext';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
 function MyApp() {
@@ -211,7 +212,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
-			{openModalAttachment && <MessageModalImage />}
+			{/* <MessageContextMenuProvider>{openModalAttachment && <MessageModalImage />}</MessageContextMenuProvider> */}
 		</div>
 	);
 }

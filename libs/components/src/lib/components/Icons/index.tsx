@@ -1852,7 +1852,7 @@ export const EyeOpen: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultF
 
 export const ArrowRight: React.FC<IconProps> = () => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 min-w-4">
 			<g id="Live area">
 				<path
 					id="Vector"

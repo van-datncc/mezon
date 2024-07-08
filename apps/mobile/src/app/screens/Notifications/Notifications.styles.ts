@@ -1,42 +1,52 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 import { HEIGHT, WIDTH } from '../../constants/config';
-export const styles = StyleSheet.create({
+
+export const style = (colors: Attributes) => StyleSheet.create({
 	notifications: {
 		width: WIDTH,
 		height: HEIGHT,
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.primary,
 	},
+
 	notificationsHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		padding: 10,
+		padding: Metrics.size.m,
 	},
+
 	notificationHeaderTitle: {
-		fontSize: 18,
+		fontSize: Fonts.size.h6,
 		fontWeight: '600',
-		color: Colors.white,
+		color: colors.textStrong,
 	},
+
 	notificationHeaderIcon: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.black,
+		backgroundColor: colors.secondary,
 		borderRadius: 50,
+		borderWidth: 1,
+		borderColor: colors.borderDim,
 		height: 35,
 		width: 35,
 	},
+
 	notificationsList: {
 		paddingBottom: 200,
 	},
+
 	container: {
 		flex: 1,
 		padding: 24,
 	},
+
 	contentContainer: {
 		flex: 1,
 		alignItems: 'center',
 	},
+
 	removeNotifyText: {
 		color: Colors.white,
 		fontSize: size.label,
