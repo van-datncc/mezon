@@ -102,7 +102,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
-	const lastSeen = useSelector(selectLastSeenMessage(props.channelId, props.messageId));
 	const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous, [message?.sender_id]);
 	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
@@ -114,7 +113,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
-	const videoRef = React.useRef(null);
 	const swipeableRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const checkMessageTargetToMoved = useMemo(() => {
