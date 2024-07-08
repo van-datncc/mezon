@@ -15,6 +15,7 @@ import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { CheckIcon } from "@mezon/mobile-components";
 import { useRoute } from "@react-navigation/native";
+import UseMentionList from "../../../../../../app/hooks/useUserMentionList";
 
 interface IConfirmPinMessageModalProps {
     isVisible: boolean,
@@ -29,6 +30,8 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
     const { params } = route;
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation('message');
+    const listMentions = UseMentionList(params?.['directMessageId'] ? params?.['directMessageId'] : message?.channel_id || '');
+
 
     const onConfirm = async () => {
         switch (type) {
@@ -67,8 +70,8 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
                     </View>
                     <Text style={styles.descriptionText}>{EMessageActionType.PinMessage === type ? t('confirmPinMessage') : t('confirmUnPinMessage')}</Text>
                     <ScrollView>
-						{message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
-					</ScrollView>
+						            {message && <MessageItem listMentions={listMentions} message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
+					          </ScrollView>
                     <View style={styles.buttonsWrapper}>
                         <MezonButton
                             onPress={() => onConfirm()}
