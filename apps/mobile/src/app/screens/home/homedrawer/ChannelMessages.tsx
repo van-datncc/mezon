@@ -12,6 +12,7 @@ import {
 	selectMessageIdsByChannelId,
 	selectTypingUserIdsByChannelId,
 	useAppDispatch,
+	selectCurrentClan,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
@@ -24,7 +25,6 @@ import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import { channelDetailContext } from './HomeDefault';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import { MessageItemBS } from './components';
