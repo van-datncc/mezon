@@ -32,6 +32,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 	// TODO: move the invitation logic to upper level
 	const getLinkinvites = useCallback(
 		(children: any) => {
+			console.log(children);
 			const inviteId = children.split('/invite/')[1];
 			if (inviteId) {
 				getLinkInvite(inviteId).then((res) => {
@@ -91,6 +92,9 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 			const isEmojiSyntax = checkMention(tagName) === MentionTypeEnum.EMOJI_SYNTAX;
 			const result = convertMarkdown(markdown);
 
+			console.log(startsWithTripleBackticks);
+			console.log(!endsWithNoTripleBackticks);
+
 			return (
 				<div key={index} className="lineText contents">
 					{mentions[index - 1]?.matchedText && ''}
@@ -103,16 +107,17 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 							components={{
 								pre: PreClass,
 								p: 'span',
-								a: ({ children }) => (
+								a: (props) => (
 									<span
-										onClick={() => getLinkinvites(children)}
+										onClick={() => getLinkinvites(props.href)}
 										rel="noopener noreferrer"
 										style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 										className="tagLink"
 									>
-										{children}
+										{props.children}
 									</span>
 								),
+
 								th: ({ node, ...props }) => (
 									<th
 										style={{
