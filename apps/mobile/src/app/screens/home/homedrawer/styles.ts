@@ -234,7 +234,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'space-between',
 		borderBottomWidth: 1,
 		borderBottomColor: colors.border,
-		backgroundColor: colors.primary,
+		backgroundColor: colors.secondary,
 	},
 	lineActiveClan: {
 		backgroundColor: Colors.azureBlue,
@@ -508,7 +508,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		marginVertical: size.s_30,
 	},
 	channelView: {
-		flex: 1, 
+		flex: 1,
 		backgroundColor: colors.secondary
 	},
 	iconWelcomeMessage: {

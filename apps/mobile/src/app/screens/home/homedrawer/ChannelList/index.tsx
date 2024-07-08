@@ -1,14 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import {
-	Icons,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
-	getInfoChannelByClanId,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save,
-} from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
+import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	appActions,
@@ -20,11 +13,13 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
 	selectIsFromFCMMobile,
+	selectIsLogin,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
+import { ICategoryChannel, IChannel, IThread } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useRef, useState } from 'react';
+import { isEqual } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
@@ -35,26 +30,45 @@ import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
+import { ChannelListSection } from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
-import { ChannelListSection } from '../components/ChannelList/ChannelListSection';
+
+const filterMessages = (channels: IChannel[]) => {
+	return channels.map((category: ICategoryChannel) => ({
+		...category,
+		channels: category.channels.map((channel: any) => ({
+			...channel,
+			last_sent_message: null,
+			last_seen_message: null,
+			threads: channel.threads.map((thread: IThread) => ({
+				...thread,
+				last_sent_message: null,
+				last_seen_message: null,
+			})),
+		})),
+	}));
+};
 
 const ChannelList = React.memo((props: any) => {
 	const { themeValue } = useTheme();
-	const styles = style(themeValue)
+	const styles = style(themeValue);
 	const currentClan = useSelector(selectCurrentClan);
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
+	const isLogin = useSelector(selectIsLogin);
 
 	const allEventManagement = useSelector(selectAllEventManagement);
+	const prevFilteredChannelsRef = useRef<any>();
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const filteredChannels = useMemo(() => filterMessages(categorizedChannels), [categorizedChannels]);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<IChannel>(null);
@@ -64,10 +78,11 @@ const ChannelList = React.memo((props: any) => {
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
 	useEffect(() => {
-		if (categorizedChannels?.length && !isFromFCMMobile) {
+		if (!isEqual(filteredChannels, prevFilteredChannelsRef.current) && !isFromFCMMobile) {
 			setDefaultChannelLoader();
 		}
-	}, [categorizedChannels?.length, categorizedChannels?.[0]?.channels?.[0]?.channel_id]);
+		prevFilteredChannelsRef.current = isLogin ? filteredChannels : {};
+	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id, isLogin]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
@@ -79,23 +94,22 @@ const ChannelList = React.memo((props: any) => {
 		}
 	};
 
-	const setDefaultChannelLoader = async () => {
-		const firstChannel = categorizedChannels?.[0]?.channels?.[0];
-
-		if (categorizedChannels && !!firstChannel) {
-			const data = load(STORAGE_KEY_CLAN_CURRENT_CACHE);
-			const infoChannelCache = getInfoChannelByClanId(data || [], currentClan?.clan_id);
-			if (infoChannelCache) {
-				await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
-			} else {
+	const setDefaultChannelLoader = useCallback(async () => {
+		const data = load(STORAGE_KEY_CLAN_CURRENT_CACHE);
+		const infoChannelCache = getInfoChannelByClanId(data || [], currentClan?.clan_id);
+		if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
+			await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
+		} else {
+			const firstChannel = filteredChannels?.[0]?.channels?.[0];
+			if (firstChannel) {
 				const channelId = firstChannel?.channel_id;
 				const clanId = currentClan?.clan_id;
-				const dataSave = getUpdateOrAddClanChannelCache(currentClan?.clan_id, firstChannel?.channel_id);
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		}
-	};
+	}, [currentClan?.clan_id, filteredChannels]);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();

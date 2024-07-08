@@ -63,5 +63,6 @@
     "pinSuccess": "Pin Message Success",
     "unpinSuccess": "Unpin Message Success",
     "Yes": "Yes",
-    "No": "No"
+    "No": "No",
+    "unableSendMessage": "Unable to send message. Please try again."
 }
