@@ -13,23 +13,38 @@
 -   using `Git Bash` to run the commands
 -   using `VSCode` as the code editor
 
-## Sync dependencies
+## Prerequisites
 
--   Run `npm run sync` to sync dependencies
+- Node.js 18.17.0
+- yarn 1.22.17
+- git bash
 
-## Start the app
+## Setup
 
-To start the development server run `npm run dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
+- Clone the repository
+
+
+## Install the dependencies
+
+- Run `yarn` to install the dependencies
+
+## Prepare the environment variables
+
+- Create a `.env` file in the `apps/chat` directory
+
+## Start the chat app
+
+To start the development server run `yarn dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
 
 ## Linting
 
--   Run `npm run lint` to lint the codebase
--   Run `npm run lint:fix` to fix the linting issues
+-   Run `yarn lint` to lint the codebase
+-   Run `yarn lint:fix` to fix the linting issues
 
 ## Format
 
--   Run `npm run format` to format the codebase
--   Run `npm run format:fix` to fix the formatting issues
+-   Run `yarn format` to format the codebase
+-   Run `yarn format:fix` to fix the formatting issues
 
 ## Architecture Overview
 

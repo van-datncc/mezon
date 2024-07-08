@@ -129,7 +129,7 @@ const NavigationMain = () => {
 
 const CustomStatusBar = () => {
 	const { themeValue, themeBasic } = useTheme();
-	return <StatusBar animated backgroundColor={themeValue.primary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
+	return <StatusBar animated backgroundColor={themeValue.secondary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
 };
 
 const RootNavigation = () => {
