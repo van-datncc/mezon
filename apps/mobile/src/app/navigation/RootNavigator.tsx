@@ -37,11 +37,14 @@ const NavigationMain = () => {
 	const { reconnect } = useMezon();
 
 	useEffect(() => {
-		SplashScreen.hideAsync();
-		notifee.cancelAllNotifications();
+		const timer = setTimeout(async () => {
+			await SplashScreen.hideAsync();
+			await notifee.cancelAllNotifications();
+		}, 200);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
+			clearTimeout(timer);
 			appStateSubscription.remove();
 		};
 	}, []);
@@ -129,6 +132,7 @@ const NavigationMain = () => {
 
 const CustomStatusBar = () => {
 	const { themeValue, themeBasic } = useTheme();
+	// eslint-disable-next-line eqeqeq
 	return <StatusBar animated backgroundColor={themeValue.secondary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
 };
 

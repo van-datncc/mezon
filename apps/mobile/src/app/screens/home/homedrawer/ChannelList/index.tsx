@@ -13,6 +13,7 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
 	selectIsFromFCMMobile,
+	selectIsLogin,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel, IThread } from '@mezon/utils';
@@ -57,6 +58,7 @@ const ChannelList = React.memo((props: any) => {
 	const isFromFCMMobile = useSelector(selectIsFromFCMMobile);
 	const { categorizedChannels } = useCategory();
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
+	const isLogin = useSelector(selectIsLogin);
 
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const prevFilteredChannelsRef = useRef<any>();
@@ -79,8 +81,8 @@ const ChannelList = React.memo((props: any) => {
 		if (!isEqual(filteredChannels, prevFilteredChannelsRef.current) && !isFromFCMMobile) {
 			setDefaultChannelLoader();
 		}
-		prevFilteredChannelsRef.current = filteredChannels;
-	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id]);
+		prevFilteredChannelsRef.current = isLogin ? filteredChannels : {};
+	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id, isLogin]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
