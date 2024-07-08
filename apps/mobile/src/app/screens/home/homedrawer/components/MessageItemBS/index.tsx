@@ -13,33 +13,29 @@ import {
 	ThreadIcon,
 	TrashIcon,
 } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
-import { AppDispatch, pinMessageActions, selectCurrentChannel, selectPinMessageByChannelId } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
+import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { selectPinMessageByChannelId } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, FlatList, Platform, Pressable, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import BottomSheet from 'react-native-raw-bottom-sheet';
 import Toast from 'react-native-toast-message';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
-import { IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
+import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { styles } from './styles';
 import { useRoute } from '@react-navigation/native';
+import { MezonBottomSheet } from '../../../../../../app/temp-ui';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
-  const route = useRoute();
-  const { params } = route;
-	const dispatch = useDispatch<AppDispatch>();
-	const ref = useRef(null);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
@@ -56,7 +52,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 	};
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message?.channel_id));
-	const currentChannel = useSelector(selectCurrentChannel);
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 	}, [mode]);
@@ -119,20 +115,26 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const handleActionPinMessage = () => {
 		if (message) onClose();
-		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message.channel_id, message_id: message.id }));
-    Toast.show({
-			type: 'success',
-			props: {
-				text2: t('toast.pinMessage'),
-				leadingIcon: <PinMessageIcon color={Colors.bgGrayLight} />,
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.PinMessage,
+				});
 			},
-		});
+			500
+		);
 	};
 
 	const handleActionUnPinMessage = () => {
-    if(message)
-		onClose();
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: params?.['directMessageId'] ? params?.['directMessageId'] : currentChannel.id || '', message_id: message.id }));
+		if (message) onClose();
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.UnPinMessage,
+				});
+			},
+			500
+		);
 	};
 
 	const handleActionMarkUnRead = () => {
@@ -227,13 +229,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.Reply:
 				return <ReplyMessageIcon />;
 			case EMessageActionType.ForwardMessage:
-				return <ReplyMessageIcon />;
+				return <ReplyMessageIcon style={{ transform: [{ scaleX: -1 }] }} />;
 			case EMessageActionType.CreateThread:
 				return <ThreadIcon width={20} height={20} />;
 			case EMessageActionType.CopyText:
 				return <CopyIcon />;
 			case EMessageActionType.DeleteMessage:
-				return <TrashIcon />;
+				return <TrashIcon color={Colors.textRed} width={18} height={18} />;
 			case EMessageActionType.PinMessage:
 				return <PinMessageIcon />;
 			case EMessageActionType.UnPinMessage:
@@ -245,7 +247,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyMessageLink:
 				return <LinkIcon />;
 			case EMessageActionType.Report:
-				return <FlagIcon />;
+				return <FlagIcon color={Colors.textRed} />;
 			default:
 				return <View />;
 		}
@@ -253,26 +255,39 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
-		const messageExists = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
+		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
+
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage,EMessageActionType.DeleteMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
+
 		const listOfActionShouldHide = [
-			messageExists ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isDM && EMessageActionType.CreateThread,
+			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
+			isDM && EMessageActionType.CreateThread
 		];
+
+		let availableMessageActions: IMessageAction[] = [];
 		if (isMyMessage) {
-			return getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage, ...listOfActionShouldHide].includes(action.type));
+			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage,...listOfActionShouldHide].includes(action.type));
+		} else {
+			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage,...listOfActionShouldHide].includes(action.type));
 		}
 
-		return getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
+		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
+		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
+
+		return {
+			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
+			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList].includes(action.type)),
+			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
+		}
 	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
 		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
 	};
 
-	const handleReact = async (mode, messageId, emoji: IEmoji, senderId) => {
-		await reactionMessageDispatch('', mode, message.channel_id ?? '', messageId ?? '', emoji?.shortname?.trim(), 1, senderId ?? '', false);
+	const handleReact = async (mode, messageId, emoji: string, senderId) => {
+		await reactionMessageDispatch('', mode, message.channel_id ?? '', messageId ?? '', emoji?.trim(), 1, senderId ?? '', false);
 		onClose();
 	};
 
@@ -284,7 +299,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 						return (
 							<Pressable
 								key={index}
-								onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item, userProfile.user.id)}
+								style={styles.favouriteIconItem}
+								onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item.shortname, userProfile?.user?.id)}
 							>
 								<FastImage
 									source={{
@@ -300,27 +316,46 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 						);
 					})}
 
-					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ width: size.s_28, height: size.s_28 }}>
+					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{height: size.s_28, width: size.s_28,}}>
 						<FaceIcon color={Colors.white} />
 					</Pressable>
 				</View>
-				<FlatList
-					data={messageActionList}
-					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item }) => (
-						<Pressable style={styles.actionItem} onPress={() => implementAction(item.type)}>
-							<View style={styles.icon}>{getActionMessageIcon(item.type)}</View>
-							<Text style={styles.actionText}>{item.title}</Text>
-						</Pressable>
-					)}
-				/>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.frequent.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.actionText}>{action.title}</Text>
+							</Pressable>
+						)
+					})}
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.normal.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.actionText}>{action.title}</Text>
+							</Pressable>
+						)
+					})}
+				</View>
+				<View style={styles.messageActionGroup}>
+					{messageActionList.warning.map((action) => {
+						return (
+							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
+								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
+								<Text style={styles.warningActionText}>{action.title}</Text>
+							</Pressable>
+						)
+					})}
+				</View>
 			</View>
 		);
 	};
 
 	const onSelectEmoji = async (emoij: string) => {
-		setIsShowEmojiPicker(false);
-		await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, { shortname: emoij }, userProfile.user.id);
+		await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, emoij, userProfile?.user?.id);
 	};
 
 	const renderEmojiSelector = () => {
@@ -332,11 +367,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const setVisibleBottomSheet = (isShow: boolean) => {
-		if (ref) {
+		if (bottomSheetRef) {
 			if (isShow) {
-				ref.current.open();
+				bottomSheetRef.current?.present();
 			} else {
-				ref.current.close();
+				bottomSheetRef.current?.close();
 			}
 		}
 	};
@@ -367,27 +402,35 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
+	const snapPoints = useMemo(() => {
+		if (isShowEmojiPicker || isOnlyEmojiPicker) {
+			return ['90%']
+		}
+		if ([EMessageBSToShow.UserInformation].includes(type)) {
+			return ['60%']
+		}
+		return ['50%']
+	}, [isShowEmojiPicker, isOnlyEmojiPicker, type])
+
 	return (
-		<BottomSheet
-			ref={ref}
-			height={
-				isShowEmojiPicker || isOnlyEmojiPicker || [EMessageBSToShow.UserInformation].includes(type)
-					? Metrics.screenHeight / 1.4
-					: Metrics.screenHeight / 1.7
-			}
-			onClose={() => {
+		<MezonBottomSheet
+			ref={bottomSheetRef}
+			snapPoints={snapPoints}
+			heightFitContent={true}
+			onDismiss={() => {
 				onClose();
 				setIsShowEmojiPicker(false);
 			}}
-			draggable
-			dragOnContent={!(isShowEmojiPicker || isOnlyEmojiPicker) || [EMessageBSToShow.UserInformation].includes(type)}
-			customStyles={{
-				container: {
-					backgroundColor: 'transparent',
-				},
-			}}
+			style={styles.bottomSheet}
+			handleComponent={() => {
+                return (
+					<View style={styles.bottomSheetBarWrapper}>
+						<View style={styles.bottomSheetBar}/>
+					</View>
+                )
+            }}
 		>
 			<View style={styles.bottomSheetWrapper}>{content}</View>
-		</BottomSheet>
+		</MezonBottomSheet>
 	);
 });

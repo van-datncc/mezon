@@ -1,14 +1,12 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { selectAllAccount, selectCurrentChannel, selectDataSocketUpdate, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectAllAccount, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
 import {
 	EmojiDataOptionals,
 	SenderInfoOptionals,
 	calculateTotalCount,
-	convertReactionDataFromMessage,
 	getSrcEmoji,
-	updateEmojiReactionData,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -28,30 +26,9 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { reactionMessageDispatch } = useChatReaction();
 	const userProfile = useSelector(selectAllAccount);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const dataSocketConvert = useSelector(selectDataSocketUpdate);
+	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
 
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile]);
-
-	const filterByMessageId = useCallback((array: EmojiDataOptionals[], messageId: string) => {
-		return array.filter((item) => item.message_id === messageId);
-	}, []);
-
-	const reactionMessage = useMemo(() => {
-		if (message.reactions && message.reactions?.length > 0) {
-			return convertReactionDataFromMessage(message);
-		}
-		return [];
-	}, [message]);
-
-	const reactionSocketByMessageId = useMemo(() => {
-		return filterByMessageId(dataSocketConvert, message.id);
-	}, [dataSocketConvert, message.id]);
-
-	const dataReactionCombine = useMemo(() => {
-		const sortedReactionMessage = [...reactionMessage].sort((a, b) => (a?.emoji || '').localeCompare(b?.emoji || ''));
-		const combine = [...sortedReactionMessage, ...reactionSocketByMessageId];
-		return updateEmojiReactionData(combine);
-	}, [reactionSocketByMessageId, reactionMessage]);
 
 	const reactOnExistEmoji = async (
 		id: string,
@@ -90,7 +67,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	};
 
 	const allReactionDataOnOneMessage = useMemo(() => {
-		return dataReactionCombine
+		return messageReactions
 			?.filter?.((emoji: EmojiDataOptionals) => emoji.message_id === message.id && emoji.senders.some((sender) => sender.count > 0))
 			.map((emoji) => {
 				if (Number(emoji.id) === 0) {
@@ -99,7 +76,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 				}
 				return emoji;
 			});
-	}, [dataReactionCombine, message]);
+	}, [messageReactions, message]);
 
 	return (
 		<View style={styles.reactionWrapper}>
