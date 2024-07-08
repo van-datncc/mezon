@@ -3,7 +3,6 @@ import {
 	selectAddEmojiState,
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
-	selectEmojisRecent,
 	selectEmojiSuggestion,
 	selectShiftPressedStatus,
 	selectTextToSearchEmojiSuggestion,
@@ -16,7 +15,6 @@ import { useSelector } from 'react-redux';
 const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 const filterEmojiData = (emojis: IEmoji[]) => {
-	console.log(emojis);
 	return emojis.map(({ src, shortname, category }) => ({
 		src,
 		category,
@@ -26,14 +24,22 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 
 export function useEmojiSuggestion() {
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	// const emojiRecentData = localStorage.getItem('recentEmojis');
-	// const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
-	// console.log(emojisRecentDataParse);
+	const emojiRecentData = localStorage.getItem('recentEmojis');
+	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
 
-	const emojisRecent = useSelector(selectEmojisRecent);
-	console.log(emojisRecent);
+	function convertedEmojiRecent(emojiArr: any, emojiSource: any) {
+		return emojiArr.map((item: any) => {
+			const emojiFound = Array.isArray(emojiSource) && emojiSource.find((emoji: any) => emoji.shortname === item.emoji);
+			return {
+				src: emojiFound.src,
+				category: 'Recent', 
+				shortName: item.emoji,
+			};
+		});
+	}
 
-	const emojiCombine = [...emojiMetadata, ...emojisRecent];
+	const emojiConverted = convertedEmojiRecent(emojisRecentDataParse, emojiMetadata);
+	const emojiCombine = [...emojiMetadata, ...emojiConverted];
 
 	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
@@ -80,7 +86,6 @@ export function useEmojiSuggestion() {
 
 	return useMemo(
 		() => ({
-			emojis,
 			emojiPicked,
 			setEmojiSuggestion,
 			setIsEmojiListShowed,
@@ -92,10 +97,9 @@ export function useEmojiSuggestion() {
 			addEmojiState,
 			setShiftPressed,
 			shiftPressedState,
-			emojiMetadata,
+			emojis,
 		}),
 		[
-			emojis,
 			emojiPicked,
 			setEmojiSuggestion,
 			setIsEmojiListShowed,
@@ -106,7 +110,7 @@ export function useEmojiSuggestion() {
 			addEmojiState,
 			setShiftPressed,
 			shiftPressedState,
-			emojiMetadata,
+			emojis,
 		],
 	);
 }

@@ -1,13 +1,6 @@
 import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import {
-	emojiSuggestionActions,
-	reactionActions,
-	selectCurrentChannel,
-	selectDirectById,
-	selectMessageByMessageId,
-	selectReactionPlaceActive,
-} from '@mezon/store';
-import { EmojiPlaces, IEmoji, SubPanelName, getSrcEmoji } from '@mezon/utils';
+import { reactionActions, selectCurrentChannel, selectDirectById, selectMessageByMessageId, selectReactionPlaceActive } from '@mezon/store';
+import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -91,12 +84,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				messageEmoji?.sender_id ?? '',
 				false,
 			);
-			dispatch(emojiSuggestionActions.setEmojisRecent());
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
 			setEmojiSuggestion(emojiPicked);
-			dispatch(emojiSuggestionActions.setEmojisRecent());
 
 			if (!shiftPressedState) {
 				dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
@@ -253,6 +244,8 @@ type DisplayByCategoriesProps = {
 };
 
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
+	console.log(emojisData);
+	console.log(categoryName);
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
 			.filter((emoji) => emoji.category.includes(categoryParam))
@@ -282,23 +275,23 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 	);
 }
 
-const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ onEmojiSelect, onEmojiHover }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
-	const { shiftPressedState, emojiMetadata } = useEmojiSuggestion();
+	const { shiftPressedState, emojis } = useEmojiSuggestion();
 
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
-			{emojisData.map((item, index) => (
+			{emojis.map((item, index) => (
 				<button
 					key={index}
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
 					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img draggable="false" src={item.src || getSrcEmoji(item.shortname, emojiMetadata)}></img>
+					<img draggable="false" src={item.src}></img>
 				</button>
 			))}
 		</div>

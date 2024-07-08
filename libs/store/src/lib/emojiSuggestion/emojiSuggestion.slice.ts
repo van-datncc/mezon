@@ -18,7 +18,6 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	textToSearchEmojiSuggestion: string;
 	addEmojiAction: boolean;
 	shiftPressed: boolean;
-	emojisRecent: IEmoji[];
 }
 
 export const emojiSuggestionAdapter = createEntityAdapter({
@@ -58,7 +57,6 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	textToSearchEmojiSuggestion: '',
 	addEmojiAction: false,
 	shiftPressed: false,
-	emojisRecent: [],
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -84,11 +82,6 @@ export const emojiSuggestionSlice = createSlice({
 		setShiftPressed: (state, action: PayloadAction<boolean>) => {
 			state.shiftPressed = action.payload;
 		},
-		setEmojisRecent: (state) => {
-			const emojiRecentData = localStorage.getItem('recentEmojis');
-			const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
-			state.emojisRecent = convertedEmojiRecent(emojisRecentDataParse, emojiSuggestionAdapter.getSelectors().selectAll);
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -97,6 +90,7 @@ export const emojiSuggestionSlice = createSlice({
 			})
 			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any[]>) => {
 				emojiSuggestionAdapter.setAll(state, action.payload);
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
@@ -105,20 +99,6 @@ export const emojiSuggestionSlice = createSlice({
 			});
 	},
 });
-
-function convertedEmojiRecent(emojiArr: any, emojiSource: any) {
-	return emojiArr.map((item: any) => {
-		console.log(item.emoji);
-		// const src = getSrcEmoji(item.emoji, Array.isArray(emojiSource) && emojiSource);
-		const emojiFound = Array.isArray(emojiSource) && emojiSource.find((emoji: any) => emoji.shortname === item.emoji);
-
-		return {
-			src: emojiFound.src,
-			category: 'Recent',
-			shortName: item.emoji,
-		};
-	});
-}
 
 export const emojiSuggestionReducer = emojiSuggestionSlice.reducer;
 
@@ -145,5 +125,3 @@ export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggesti
 export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.addEmojiAction);
 
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
-
-export const selectEmojisRecent = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojisRecent);

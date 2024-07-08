@@ -121,7 +121,6 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 			sender.sender_id ?? '',
 			sender.count ?? 0,
 		);
-		dispatch(emojiSuggestionActions.setEmojisRecent());
 
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};

@@ -1,13 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import {
-	emojiSuggestionActions,
-	reactionActions,
-	selectCurrentChannel,
-	selectDirectById,
-	selectEmojiHover,
-	selectUserReactionPanelState,
-} from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectDirectById, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -62,7 +55,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			message_sender_id ?? '',
 			false,
 		);
-		dispatch(emojiSuggestionActions.setEmojisRecent());
 	}
 
 	const [topUserPanel, setTopUserPanel] = useState<number | string>();
