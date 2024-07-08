@@ -170,7 +170,7 @@ export const navigateToNotification = async (notification: any, navigation: any,
 					store.dispatch(appActions.setLoadingMainMobile(false));
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 				},
-				isDifferentClan ? 2500 : 0,
+				isDifferentClan ? 200 : 0,
 			);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
@@ -224,7 +224,7 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
 						currentClan,
-						time: 2500,
+						time: 200,
 					});
 				}
 			});
