@@ -2,7 +2,7 @@ import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
-import { getSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { getSelectedMessage } from '@mezon/store-mobile';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -15,6 +15,7 @@ import { styles } from './styles';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 import { selectDirectsOpenlist } from '@mezon/store-mobile';
+import UseMentionList from "../../../../../../app/hooks/useUserMentionList";
 
 type OpjectSend = {
 	id: string;
@@ -41,6 +42,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const accountId = userProfile?.user?.id ?? '';
 	const { t } = useTranslation('message');
+  const listMentions = UseMentionList(message?.channel_id || '');
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM?.length
@@ -262,7 +264,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 				</ScrollView>
 				<View style={styles.messageWrapper}>
 					<ScrollView>
-						{message && <MessageItem message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
+						{message && <MessageItem listMentions={listMentions} message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
 					</ScrollView>
 				</View>
 				<TouchableOpacity style={styles.btn} onPress={() => sentToMessage()}>
