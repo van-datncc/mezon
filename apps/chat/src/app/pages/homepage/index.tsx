@@ -1,17 +1,19 @@
 import { Icons } from '@mezon/components';
+import { selectIsLogin } from '@mezon/store';
 import { Image } from '@mezon/ui';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import BannerImg from '../../../assets/homepage-banner.png';
-import Background from '../../../assets/homepage-bg.png';
-import { useSelector } from 'react-redux';
-import { selectIsLogin } from '@mezon/store';
 
 function Homepage() {
 	const isLogin = useSelector(selectIsLogin);
 	return (
 		<div className="relative">
-			<img src={Background} alt="" className="absolute top-0 z-0 w-full" />
-			<div className="layout relative z-10 flex justify-center text-textDarkTheme">
+			{/* <img src={Background} alt="" className="absolute top-0 z-0 w-full" /> */}
+			<div
+				className="layout relative z-10 flex justify-center text-textDarkTheme"
+				style={{ backgroundImage: 'url(../../../assets/homepage-bg.png)' }}
+			>
 				<div className="container w-10/12">
 					<div className="header mt-5 flex items-center justify-between">
 						<Link to={'/mezon'} className="left flex gap-[10px] items-center">
@@ -25,7 +27,7 @@ function Homepage() {
 							<div className="uppercase font-bold tracking-wide text-[20px]">Mezon</div>
 						</Link>
 
-						<div className="mid flex gap-[40px] items-center font-semibold max-lg:hidden">
+						<div className="mid flex gap-[30px] items-center font-semibold max-lg:hidden">
 							<div className="hover:underline cursor-pointer">Download</div>
 							<div className="hover:underline cursor-pointer">Nitro</div>
 							<div className="hover:underline cursor-pointer">Discover</div>
@@ -34,9 +36,24 @@ function Homepage() {
 							<div className="hover:underline cursor-pointer">Blog</div>
 							<div className="hover:underline cursor-pointer">Careers</div>
 						</div>
-						<Link className="right px-[16px] py-[7px] bg-white rounded-3xl text-black font-semibold hover:text-[#5865f2]" to={'/mezon'}>
-							{isLogin ? "Open Mezon" : "Login"}
-						</Link>
+						<div className="flex gap-2 w-fit">
+							{isLogin ? (
+								<Link
+									className="right px-[16px] py-[7px] bg-white rounded-3xl text-black font-semibold hover:text-[#5865f2] w-[120px]"
+									to={'/mezon'}
+								>
+									Open Mezon
+								</Link>
+							) : (
+								<Link
+									className="right px-[16px] py-[7px] bg-white rounded-3xl text-black font-semibold hover:text-[#5865f2]"
+									to={'/mezon'}
+								>
+									Login
+								</Link>
+							)}
+							<Icons.HomepageMenu className="hidden w-[40px] max-lg:block" />
+						</div>
 					</div>
 					<div className="main-content">
 						<div className="block1 flex items-center justify-center max-lg:flex-col">
@@ -50,17 +67,17 @@ function Homepage() {
 							</div>
 							<img src={BannerImg} alt="" className="object-cover w-6/12 block max-lg:hidden" />
 						</div>
-						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col">
+						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col mb-10">
 							<div
 								style={{ borderRadius: '28px' }}
-								className="max-md:w-7/12 max-sm:w-11/12 flex items-center justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer"
+								className="max-md:w-7/12 max-sm:w-11/12 flex items-center justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
 							>
 								<Icons.HomepageDownload className="text-black" />
 								<div>Download for Windows</div>
 							</div>
 							<Link
-								to={"/mezon"}
-								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center"
+								to={'/mezon'}
+								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center hoverBoxShadow"
 								target="_blank"
 								rel="noreferrer"
 								style={{ borderRadius: '28px' }}

@@ -3053,3 +3053,16 @@ export function HomepageDownload(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function HomepageMenu(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				{' '}
+				<path d="M4 6H20M4 12H20M4 18H20" stroke="#fcfcfc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>{' '}
+			</g>
+		</svg>
+	);
+}
