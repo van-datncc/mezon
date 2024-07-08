@@ -1,4 +1,4 @@
-import { BottomSheetScrollView, BottomSheetModal as OriginalBottomSheet } from "@gorhom/bottom-sheet";
+import { BottomSheetModalProps, BottomSheetScrollView, BottomSheetModal as OriginalBottomSheet } from "@gorhom/bottom-sheet";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { Ref } from "react";
 import { forwardRef } from "react";
@@ -8,23 +8,27 @@ import { StyleProp, Text, View } from "react-native";
 import { style } from "./styles";
 import { useTheme } from "@mezon/mobile-ui";
 
-export interface IMezonBottomSheetProps {
+export interface IMezonBottomSheetProps extends BottomSheetModalProps  {
     children: ReactNode,
     title?: string,
     titleSize?: "sm" | "md" | "lg",
     headerLeft?: ReactNode,
     headerRight?: ReactNode,
-    heightFitContent?: boolean
+    heightFitContent?: boolean,
+    snapPoints?: string[]
 }
 
 export default forwardRef(function MezonBottomSheet(
-    { children, title, headerLeft, headerRight, heightFitContent, titleSize = "sm" }: IMezonBottomSheetProps,
-    ref: Ref<BottomSheetModalMethods>) {
+    props: IMezonBottomSheetProps,
+    ref: Ref<BottomSheetModalMethods>)
+{
+    const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = "sm" } = props;
     const styles = style(useTheme().themeValue);
     return (
         <OriginalBottomSheet
+            {...props}
             ref={ref}
-            snapPoints={['90%']}
+            snapPoints={snapPoints}
             index={0}
             animateOnMount
             backgroundStyle={styles.backgroundStyle}

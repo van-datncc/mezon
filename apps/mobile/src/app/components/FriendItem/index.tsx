@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { TouchableOpacity, View, Image, Pressable } from "react-native";
 import { Text } from 'react-native';
 import { styles } from "./styles";
@@ -53,6 +53,10 @@ export const FriendItem = React.memo(({
     const onLongPress = () => {
         handleFriendAction(friend, EFriendItemAction.ShowInformation);
     }
+
+    const isShowDisplayName = useMemo(() => {
+        return (isPendingFriendRequest || !showAction) && friend?.user?.display_name;
+    }, [friend?.user?.display_name, isPendingFriendRequest, showAction])
     
     return (
         <TouchableOpacity
@@ -74,10 +78,12 @@ export const FriendItem = React.memo(({
             <View style={styles.fill}>
                 <View style={styles.friendItemContent}>
                     <View>
-                        {(isPendingFriendRequest || !showAction) && friend?.user?.display_name ? (
+                        { isShowDisplayName? (
                             <Text style={[styles.defaultText, (isPendingFriendRequest || !showAction) && styles.whiteText]}>{friend?.user?.display_name}</Text>
                         ): null}
-                        <Text style={[styles.defaultText, disabled && styles.disabled]}>{friend?.user?.display_name || friend?.user?.username}</Text>
+                        <Text style={[styles.defaultText, disabled && styles.disabled]}>
+                            {isShowDisplayName ? friend?.user?.username : friend?.user?.display_name || friend?.user?.username}
+                        </Text>
                     </View>
                     {isFriend && showAction && !selectMode ? (
                         <View style={styles.friendAction}>
