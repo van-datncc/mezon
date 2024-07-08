@@ -53,5 +53,14 @@
         "cancel": "Hủy",
         "reportSubmitted": "Đã gửi báo cáo"
     },
-    "tapToSeeAttachment": "Nhấn để xem tệp đính kèm"
+    "tapToSeeAttachment": "Nhấn để xem tệp đính kèm",
+    "findThePerfectReaction": "Tìm kiếm biểu cảm phù hợp nhất",
+    "pinMessage": "Ghim tin nhắn",
+    "unpinMessage": "Bỏ ghim tin nhắn",
+    "confirmPinMessage": "Bạn có chắc muốn ghim tin nhắn này không?",
+    "confirmUnPinMessage": "Bạn có chắc muốn xoá tin nhắn được ghim này không?",
+    "pinSuccess": "ghim tin nhắn thành công",
+    "unpinSuccess": "bỏ ghim tin nhắn thành công",
+     "Yes": "Có",
+    "No": "Không"
 }
