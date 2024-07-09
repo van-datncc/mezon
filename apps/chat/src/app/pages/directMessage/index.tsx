@@ -1,7 +1,7 @@
 import { ClanHeader, DirectMessageList, FooterProfile } from '@mezon/components';
 import { useAuth, useEscapeKey } from '@mezon/core';
 import { selectCloseMenu, selectStatusMenu } from '@mezon/store';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Setting from '../setting';
 import { MainContentDirect } from './MainContentDirect';
@@ -14,7 +14,9 @@ export default function Direct() {
 
 	useEscapeKey(() => setOpenSetting(false));
 
-	localStorage.setItem('recentEmojis', JSON.stringify([]));
+	useEffect(() => {
+		localStorage.setItem('recentEmojis', JSON.stringify([]));
+	}, []);
 
 	return (
 		<>

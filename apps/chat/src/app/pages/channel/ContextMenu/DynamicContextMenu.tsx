@@ -18,7 +18,14 @@ type Props = {
 export default function DynamicContextMenu({ menuId, items, mode, messageId }: Props) {
 	const appearanceTheme = useSelector(selectTheme);
 	const { emojiConverted } = useEmojiSuggestion();
-	const firstFourElements = emojiConverted.slice(0, 4);
+
+	const emojiRecentData = useMemo(() => {
+		return localStorage.getItem('recentEmojis');
+	}, [localStorage.getItem('recentEmojis')]);
+
+	const firstFourElements = useMemo(() => {
+		return emojiConverted.slice(0, 4);
+	}, [emojiConverted, emojiRecentData]);
 
 	const [warningStatus, setWarningStatus] = useState<string>('');
 
