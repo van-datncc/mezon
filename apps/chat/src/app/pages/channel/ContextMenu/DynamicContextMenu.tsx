@@ -3,6 +3,7 @@ import { ContextMenuItem, SHOW_POSITION } from '@mezon/utils';
 import { CSSProperties, useMemo, useState } from 'react';
 import { Item, Menu, Separator, Submenu } from 'react-contexify';
 // import 'react-contexify/dist/ReactContexify.css';
+import { useEmojiSuggestion } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from './MessageContextMenuContext';
 import ReactionPart from './ReactionPart';
@@ -16,7 +17,9 @@ type Props = {
 
 export default function DynamicContextMenu({ menuId, items, mode, messageId }: Props) {
 	const appearanceTheme = useSelector(selectTheme);
-	const emojiList = [':anhan:', , ':100:', ':rofl:', ':verify:'];
+	const { emojiConverted } = useEmojiSuggestion();
+	const firstFourElements = emojiConverted.slice(0, 4);
+
 	const [warningStatus, setWarningStatus] = useState<string>('');
 
 	const isLightMode = useMemo(() => {
@@ -104,7 +107,7 @@ export default function DynamicContextMenu({ menuId, items, mode, messageId }: P
 
 	return (
 		<Menu id={menuId} style={className} className="z-50">
-			{checkPos && <ReactionPart emojiList={emojiList} activeMode={mode} messageId={messageId} />}
+			{checkPos && <ReactionPart emojiList={firstFourElements} activeMode={mode} messageId={messageId} />}
 			{children}
 		</Menu>
 	);

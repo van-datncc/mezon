@@ -326,11 +326,11 @@ export enum MemberProfileType {
 export type IReaction = ApiMessageReaction & {
 	id: string;
 	message_id: string;
-}
+};
 
 export type IEmoji = {
 	src: string;
-	category: string;
+	category: string ;
 	shortname: string;
 };
 
@@ -520,3 +520,10 @@ export enum SHOW_POSITION {
 	IN_LINK = 'IN_LINK',
 	NONE = 'NONE',
 }
+
+export type EmojiStorage = {
+	emoji: string;
+	messageId: string;
+	senderId: string;
+	action: boolean;
+};

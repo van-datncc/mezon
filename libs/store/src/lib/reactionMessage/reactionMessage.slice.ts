@@ -1,4 +1,4 @@
-import { EmojiDataOptionals, EmojiPlaces, IReaction } from '@mezon/utils';
+import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 
@@ -121,12 +121,13 @@ export const reactionSlice = createSlice({
 				count: action.payload.count || 1,
 			};
 
-			const emojiLastest = {
-				emoji: reactionDataSocket.emoji,
-				messageId: reactionDataSocket.message_id,
-				senderId: reactionDataSocket.sender_id,
-				action: reactionDataSocket.action,
+			const emojiLastest: EmojiStorage = {
+				emoji: reactionDataSocket.emoji ?? '',
+				messageId: reactionDataSocket.message_id ?? '',
+				senderId: reactionDataSocket.sender_id ?? '',
+				action: reactionDataSocket.action ?? false,
 			};
+
 			saveRecentEmoji(emojiLastest);
 
 			const isAdd = !action.payload.action;
@@ -191,7 +192,7 @@ export const reactionSlice = createSlice({
 		},
 	},
 });
-function saveRecentEmoji(emojiLastest: any) {
+function saveRecentEmoji(emojiLastest: EmojiStorage) {
 	const storedEmojis = localStorage.getItem('recentEmojis');
 	const emojisRecentParse = storedEmojis ? JSON.parse(storedEmojis) : [];
 
@@ -204,9 +205,9 @@ function saveRecentEmoji(emojiLastest: any) {
 			emojisRecentParse.splice(duplicateIndex, 1);
 		}
 	} else {
+		if (emojiLastest.action === true) return;
 		emojisRecentParse.push(emojiLastest);
 	}
-
 	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
 }
 

@@ -24,7 +24,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
-		return emojis.filter((emoji) => emoji.shortname.includes(searchTerm));
+		return emojis.filter((emoji) => emoji?.shortname?.includes(searchTerm));
 	};
 
 	useEffect(() => {
@@ -244,11 +244,9 @@ type DisplayByCategoriesProps = {
 };
 
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
-	console.log(emojisData);
-	console.log(categoryName);
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
-			.filter((emoji) => emoji.category.includes(categoryParam))
+			.filter((emoji) => emoji?.category?.includes(categoryParam))
 			.map((emoji) => ({
 				...emoji,
 				category: emoji.category,
@@ -275,23 +273,23 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 	);
 }
 
-const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ onEmojiSelect, onEmojiHover }) => {
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
-	const { shiftPressedState, emojis } = useEmojiSuggestion();
+	const { shiftPressedState } = useEmojiSuggestion();
 
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
-			{emojis.map((item, index) => (
+			{emojisData.map((item, index) => (
 				<button
 					key={index}
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
 					onClick={() => onEmojiSelect(item.shortname + ' ')}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img draggable="false" src={item.src}></img>
+					<img draggable="false" src={item?.src}></img>
 				</button>
 			))}
 		</div>
