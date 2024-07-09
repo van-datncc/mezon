@@ -1743,7 +1743,6 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 };
 
 export const ArrowDown: React.FC<IconProps> = ({
-	defaultFill = '#AEAEAE',
 	defaultSize = 'w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black',
 }) => {
 	return (
@@ -2259,7 +2258,7 @@ export const LockIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const RoleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const RoleIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5 min-w-5' }) => {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="23" height="20" fill="none" viewBox="0 0 24 24" className={`${defaultSize}`}>
 			<path

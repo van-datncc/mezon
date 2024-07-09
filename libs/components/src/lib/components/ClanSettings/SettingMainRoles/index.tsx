@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ServerSettingRoleManagement from '../SettingRoleManagement';
 import ListActiveRole from './listActiveRole';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
+import { Icons } from '@mezon/components';
 
 export type ModalOpenEdit = {
 	handleOpen?: () => void;
@@ -52,16 +53,29 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<>
+			<p className='text-sm dark:text-zinc-400 text-colorTextLightMode mb-4'>Use roles to group your server members and assign permissions.</p>
+			<div className='rounded dark:bg-bgSecondary bg-bgLightMode p-4 pr-6 flex justify-between cursor-pointer group mb-4 dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton'>
+				<div className='flex gap-x-4 items-center'>
+					<div className='dark:bg-bgPrimary bg-white p-1 rounded-full h-fit'>
+						<Icons.MemberList defaultSize="w-5 h-5" />
+					</div>
+					<div className='dark:text-textThreadPrimary text-gray-500 dark:group-hover:text-white group-hover:text-black'>
+						<h4 className='text-base font-semibold'>Default permissions</h4>
+						<p className='text-xs'>@everyone •&nbsp;applies to all server members</p>
+					</div>
+				</div>
+				<Icons.ArrowDown defaultSize="w-[20px] h-[30px] -rotate-90 dark:text-textThreadPrimary text-gray-500 dark:group-hover:text-white group-hover:text-black" />
+			</div>
 			<div className="flex items-center space-x-4">
 				<div className="w-full flex-grow">
 					<InputField
 						type="text"
-						className="text-[15px] rounded-[3px] w-full dark:text-white text-black border dark:border-black px-4 py-2 focus:outline-none focus:border-white-500 dark:bg-black bg-white"
+						className="rounded w-full dark:text-white text-black border dark:border-black px-2 py-1 focus:outline-none focus:border-white-500 dark:bg-black bg-white text-base"
 						placeholder="Search Roles"
 					/>
 				</div>
 				<button
-					className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[8px] px-[10px] text-nowrap"
+					className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[5px] px-2 text-nowrap font-medium"
 					onClick={() => {
 						dispatch(setSelectedRoleId('New Role'));
 						dispatch(setNameRoleNew('New Role'));
@@ -73,6 +87,10 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					Create Role
 				</button>
 			</div>
+			<p className='dark:text-textThreadPrimary text-gray-500 text-sm mt-2'>
+				Members use the colour of the highest role they have on this list. Drag roles to reorder them.&nbsp;
+				<a href="" className='hover:underline text-[#00A8FC]'>Need help with permissions?</a>
+			</p>
 			<br />
 			<div className={`overflow-y-auto relative w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 				<table className="w-full divide-y divide-gray-200">

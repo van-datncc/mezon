@@ -15,7 +15,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
             <tr key={role.id} className="h-14 dark:text-white text-black">
                 <td className="text-center ">
                     <p
-                        className="text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2"
+                        className="text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 one-line"
                         onClick={() => {
                             setShowModal(false);
                         }}
