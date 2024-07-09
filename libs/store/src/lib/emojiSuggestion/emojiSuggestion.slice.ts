@@ -25,10 +25,11 @@ export const emojiSuggestionAdapter = createEntityAdapter({
 });
 
 type FetchEmojiArgs = {
+	clanId: string;
 	noCache?: boolean;
 };
 
-const fetchEmojiCached = memoizee((mezon: MezonValueContext) => mezon.client.listClanEmoji(mezon.session), {
+const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanEmoji(mezon.session, clanId), {
 	promise: true,
 	maxAge: LIST_EMOJI_CACHED_TIME,
 	normalizer: (args) => {
@@ -36,12 +37,12 @@ const fetchEmojiCached = memoizee((mezon: MezonValueContext) => mezon.client.lis
 	},
 });
 
-export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache }: FetchEmojiArgs, thunkAPI) => {
+export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, noCache }: FetchEmojiArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
-		fetchEmojiCached.clear(mezon);
+		fetchEmojiCached.clear(mezon, clanId);
 	}
-	const response = await fetchEmojiCached(mezon);
+	const response = await fetchEmojiCached(mezon, clanId);
 	if (!response.emoji_list) {
 		throw new Error('Emoji list is undefined or null');
 	}

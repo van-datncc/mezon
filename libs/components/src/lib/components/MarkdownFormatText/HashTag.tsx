@@ -1,5 +1,5 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
-import { selectChannelById, selectCurrentChannel } from '@mezon/store';
+import { ChannelsEntity, selectChannelById, selectDirectChannelVoidById, selectCurrentChannel } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ type ChannelHashtagProps = {
 };
 
 const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
+	const { directId } = useAppParams();
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
 	const { toChannelPage } = useAppNavigation();
@@ -24,7 +25,12 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 		return undefined;
 	};
 	const getChannelById = (channelHastagId: string) => {
-		const channel = useSelector(selectChannelById(channelHastagId));
+		let channel: ChannelsEntity
+		if (directId !== undefined) {
+			channel = useSelector(selectDirectChannelVoidById(directId+channelHastagId))
+		} else{
+			channel = useSelector(selectChannelById(channelHastagId));
+		}
 		return channel;
 	};
 
@@ -41,13 +47,13 @@ const ChannelHashtag = ({ channelHastagId }: ChannelHashtagProps) => {
 	}, [channel, currentChannelId, clanId, channelHastagId]);
 
 	const handleClick = useCallback(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE || (channelHastagId && directId)) {
 			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
 		}
 	}, [channel]);
 
-	return currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && getChannelById(channelHastagId.slice(2, -1)) ? (
+	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT || (channelHastagId && directId)) && getChannelById(channelHastagId.slice(2, -1)) ? (
 		<Link
 			onClick={handleClick}
 			style={{ textDecoration: 'none' }}
