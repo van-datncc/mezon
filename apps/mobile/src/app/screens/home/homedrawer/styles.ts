@@ -294,12 +294,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingTop: 10,
 		paddingLeft: 10,
 		lineHeight: 20,
-		color: Colors.white,
+		color: colors.text,
 		maxWidth: 200
 	},
 	inviteButton: {
 		paddingVertical: 8,
 		paddingHorizontal: 12,
+		borderRadius: 15,
+		minWidth: size.s_60,
+		backgroundColor: Colors.bgDarkSlate
 	},
 	invitedButton: {
 		borderRadius: 15

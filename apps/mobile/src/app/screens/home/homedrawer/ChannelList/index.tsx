@@ -144,7 +144,7 @@ const ChannelList = React.memo((props: any) => {
 						style={styles.inviteIconWrapper}
 						onPress={() => {
 							setIsUnKnownChannel(false);
-							bottomSheetInviteRef.current.open();
+							bottomSheetInviteRef.current.present();
 						}}
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
