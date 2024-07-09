@@ -1,7 +1,7 @@
 import { IEmoji } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -90,6 +90,7 @@ export const emojiSuggestionSlice = createSlice({
 			})
 			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any[]>) => {
 				emojiSuggestionAdapter.setAll(state, action.payload);
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
