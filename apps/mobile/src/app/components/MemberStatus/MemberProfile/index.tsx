@@ -52,7 +52,7 @@ export default function MemberProfile({
 					</Text>
 				)}
 			</View>
-			{(creatorClanId === user?.user?.id && isDMThread) || (creatorDMId === user?.user?.id && <OwnerIcon width={16} height={16} />)}
+			{((isDMThread ? creatorDMId : creatorClanId) === user?.user?.id && <OwnerIcon width={16} height={16} />)}
 		</View>
 	);
 }

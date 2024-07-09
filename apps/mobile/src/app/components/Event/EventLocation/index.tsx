@@ -19,7 +19,7 @@ export default function EventLocation({ event }: IEventLocation) {
             {option === OptionEvent.OPTION_SPEAKER && (
                 <View style={styles.inline}>
                     <SpeakerIcon height={16} width={16} />
-                    <Text style={styles.smallText}>{channelVoice.channel_label}</Text>
+                    <Text style={styles.smallText}>{channelVoice?.channel_label}</Text>
                 </View>
             )}
 

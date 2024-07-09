@@ -1,13 +1,13 @@
 import { Colors, size } from '@mezon/mobile-ui';
-import { ChannelsEntity, ClansEntity, UserClanProfileEntity, UsersClanEntity } from '@mezon/store-mobile';
-import { IEmoji, getSrcEmoji } from '@mezon/utils';
+import { ChannelsEntity, ClansEntity, UserClanProfileEntity } from '@mezon/store-mobile';
+import { IEmoji, MentionDataProps, getSrcEmoji } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
-import FastImage from 'react-native-fast-image';
 import {
 	channelIdRegex,
 	codeBlockRegex,
@@ -85,7 +85,7 @@ export const markdownStyles = {
 	iconEmojiInMessage: {
 		width: size.s_20,
 		height: size.s_20,
-	},
+    	},
 	editedText: {
 		fontSize: size.small,
 		color: Colors.gray72,
@@ -119,7 +119,7 @@ export const markdownStyles = {
 		color: Colors.textGray,
 		lineHeight: size.s_20,
 	},
-  unknownChannel: {fontStyle: 'italic'}
+	unknownChannel: { fontStyle: 'italic' },
 };
 
 const styleMessageReply = {
@@ -151,7 +151,7 @@ export type IMarkdownProps = {
 	isNumberOfLine?: boolean;
 	clanProfile?: UserClanProfileEntity[];
 	currentClan?: ClansEntity;
-	usersClanMention?: UsersClanEntity[];
+	listMentions: MentionDataProps[];
 	isMessageReply?: boolean;
 };
 
@@ -183,11 +183,9 @@ export const renderRulesCustom = {
 			);
 		}
 
-    if (content?.startsWith('::')) {
-      return (
-        <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
-      )
-    }
+		if (content?.startsWith('::')) {
+			return <FastImage source={{ uri: payload }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
+		}
 
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
@@ -214,6 +212,14 @@ export const renderRulesCustom = {
 			<Text key={node.key} style={[styles.link]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 				{children}
 			</Text>
+		);
+	},
+  image: (node, children, parent, styles, allowedImageHandlers, defaultImageHandler) => {
+		const { src } = node.attributes;
+		return (
+			<View key={node.key} style={{ padding: 1 }}>
+				<FastImage source={{ uri: src }} style={styles.iconEmojiInMessage} resizeMode={'contain'} />
+			</View>
 		);
 	},
 	fence: (node, children, parent, styles, inheritedStyles = {}) => {
@@ -271,7 +277,7 @@ export const formatUrls = (text: string) => {
 		.join('');
 };
 
-export const formatEmoji = (text: string, emojiImages: IEmoji[] = []) => {
+export const formatEmoji = (text: string, emojiImages: IEmoji[] = [], isMessageReply: boolean) => {
 	const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
 	const parts = modifiedString.split('\0').filter(Boolean);
 	return parts
@@ -281,7 +287,7 @@ export const formatEmoji = (text: string, emojiImages: IEmoji[] = []) => {
 			} else {
 				if (part.match(emojiRegex)) {
 					const srcEmoji = getSrcEmoji(part, emojiImages);
-					 return `[:${part}](${srcEmoji})`;
+          return isMessageReply ? `![${part}](${srcEmoji})` : `[:${part}](${srcEmoji})`;
 				}
 				return part;
 			}
@@ -308,7 +314,20 @@ export const removeBlockCode = (text: string) => {
 };
 
 const RenderTextContent = React.memo(
-	({ lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine , clanProfile, currentClan , usersClanMention, isMessageReply}: IMarkdownProps) => {
+	({
+		lines,
+		isEdited,
+		t,
+		channelsEntities,
+		emojiListPNG,
+		onMention,
+		onChannelMention,
+		isNumberOfLine,
+		clanProfile,
+		currentClan,
+		listMentions,
+		isMessageReply,
+	}: IMarkdownProps) => {
 		if (!lines) return null;
 
 		const matchesMentions = lines.match(mentionRegex); //note: ["@yLeVan", "@Nguyen.dev"]
@@ -320,7 +339,7 @@ const RenderTextContent = React.memo(
 		let content: string = lines?.trim();
 
 		if (matchesMentions) {
-			content = formatMention(content, matchesMentions, channelsEntities, clanProfile, currentClan, usersClanMention);
+			content = formatMention(content, matchesMentions, channelsEntities, clanProfile, currentClan, listMentions);
 		}
 
 		if (matchesUrls) {
@@ -328,10 +347,10 @@ const RenderTextContent = React.memo(
 		}
 
 		if (isExistEmoji) {
-			content = formatEmoji(content, emojiListPNG);
+			content = formatEmoji(content, emojiListPNG, isMessageReply);
 		}
 
-		if (isExistBlockCode) {
+		if (isExistBlockCode && !isMessageReply) {
 			content = formatBlockCode(content);
 		}
 
@@ -340,7 +359,7 @@ const RenderTextContent = React.memo(
 		}
 
 		if (isMessageReply) {
-			customStyle = {...styleMessageReply};
+			customStyle = { ...styleMessageReply };
 		}
 
 		return isNumberOfLine ? (
@@ -352,18 +371,19 @@ const RenderTextContent = React.memo(
 				}}
 			>
 				{isMessageReply ? (
-					<View style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						zIndex: 1,
-					}}/>
-				): null}
-
+					<View
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							zIndex: 1,
+						}}
+					/>
+				) : null}
 				<Markdown
-					style={{...markdownStyles as StyleSheet.NamedStyles<any>, ...customStyle}}
+					style={{ ...(markdownStyles as StyleSheet.NamedStyles<any>), ...customStyle }}
 					rules={renderRulesCustom}
 					onLinkPress={(url) => {
 						if (url.startsWith('@')) {
@@ -412,7 +432,13 @@ const RenderTextContent = React.memo(
 	},
 );
 
-const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsEntities: Record<string, ChannelsEntity>, clanProfile: UserClanProfileEntity[], currentClan?: ClansEntity,	usersClanMention?: UsersClanEntity[],
+const formatMention = (
+	text: string,
+	matchesMention: RegExpMatchArray,
+	channelsEntities: Record<string, ChannelsEntity>,
+	clanProfile: UserClanProfileEntity[],
+	currentClan?: ClansEntity,
+	listMentions?: MentionDataProps[],
 ) => {
 	const parts = text.split(splitBlockCodeRegex);
 	return parts
@@ -422,15 +448,17 @@ const formatMention = (text: string, matchesMention: RegExpMatchArray, channelsE
 			} else {
 				if (matchesMention.includes(part)) {
 					if (part.startsWith('@')) {
-            const nameMention = part?.slice(1);
-            const userMention = usersClanMention?.find(user => nameMention === user?.user?.username);
-            const { user } = userMention || {};
-            const clanProfileByIdUser = clanProfile?.find(clanProfile => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id);
-            if(clanProfileByIdUser) {
-						  return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
-            }
-            if(userMention)
-						return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
+						const nameMention = part?.slice(1);
+						const userMention = listMentions?.find((user) => nameMention === user?.user?.username);
+						const { user } = userMention || {};
+						const clanProfileByIdUser = clanProfile?.find(
+							(clanProfile) => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
+						);
+						if (clanProfileByIdUser) {
+							return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
+						}
+						if (userMention)
+							return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];
@@ -469,7 +497,7 @@ export const renderTextContent = (
 	isNumberOfLine?: boolean,
 	clanProfile?: UserClanProfileEntity[],
 	currentClan?: ClansEntity,
-  usersClanMention?: UsersClanEntity[],
+	listMentions?: MentionDataProps[],
 	isMessageReply?: boolean,
 ) => {
 	return (
@@ -484,7 +512,7 @@ export const renderTextContent = (
 			isNumberOfLine={isNumberOfLine}
 			clanProfile={clanProfile}
 			currentClan={currentClan}
-			usersClanMention={usersClanMention}
+			listMentions={listMentions}
 			isMessageReply={isMessageReply}
 		/>
 	);
