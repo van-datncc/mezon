@@ -1,5 +1,5 @@
 import { ChatWelcome, MessageModalImage } from '@mezon/components';
-import { getJumpToMessageId, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
+import { getJumpToMessageId, useAppParams, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
 	messagesActions,
 	selectHasMoreMessageByChannelId,
@@ -32,7 +32,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
-	const { jumpToMessage } = useJumpToMessage();
+	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '' });
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const messageMentionId = useSelector(selectMessageMetionId);
@@ -58,10 +58,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [dispatch, channelId]);
 
 	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages });
+	const { messageId } = useAppParams();
 
 	useEffect(() => {
-		if (messageMentionId) setMessageIdToJump(messageMentionId);
-	}, [messageMentionId]);
+		if (messageId) setMessageIdToJump(messageId);
+	}, [messageId]);
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
@@ -99,6 +100,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			);
 		});
 	}, [messages, channelId, mode, channelLabel, idMessageNotifed]);
+
+	console.log(messageId);
 
 	return (
 		<div

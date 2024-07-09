@@ -1,3 +1,4 @@
+import { useJumpToMessage } from '@mezon/core';
 import { referencesActions, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,19 +19,24 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	const senderMessage = useSelector(selectMemberByUserId(senderId));
 	const dispatch = useDispatch();
 
-	const getIdMessageToJump = useCallback(
-		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
-			e.stopPropagation();
-			if (idRefMessage) {
-				dispatch(referencesActions.setIdMessageToJump(idRefMessage));
-				dispatch(referencesActions.setIdReferenceMessageReply(''));
-			}
-		},
-		[dispatch],
-	);
+	// const getIdMessageToJump = useCallback(
+	// 	(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
+	// 		e.stopPropagation();
+	// 		if (idRefMessage) {
+	// 			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+	// 			dispatch(referencesActions.setIdReferenceMessageReply(''));
+	// 		}
+	// 	},
+	// 	[dispatch],
+	// );
 
 	const [messageLine, setMessageLine] = useState<string>('');
 	const { mentions } = useMessageLine(messageLine);
+
+	const channelId = message.channel_id;
+	const messageID = message.id;
+
+	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
 
 	useEffect(() => {
 		if (messageRefFetchFromServe !== undefined && messageRefFetchFromServe?.content.t !== '') {
@@ -69,7 +75,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 							{message.references[0].has_attachment ? (
 								<div className=" flex flex-row items-center">
 									<div
-										onClick={(e) => getIdMessageToJump(messageRefId, e)}
+										onClick={directToMessageById}
 										className="text-[14px] pr-1 mr-[-5px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
 									>
 										Click to see attachment
@@ -77,10 +83,10 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 									<Icons.ImageThumbnail />
 								</div>
 							) : mentions.length > 0 ? (
-								<MarkUpOnReply onClickToMove={(e) => getIdMessageToJump(messageRefId, e)} mention={mentions} />
+								<MarkUpOnReply onClickToMove={()=>{}} mention={mentions} />
 							) : (
 								<span
-									onClick={(e) => getIdMessageToJump(messageRefId, e)}
+									onClick={directToMessageById}
 									className="text-[14px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer one-line break-all pt-0 "
 								>
 									{messageRefFetchFromServe?.content?.t}
