@@ -1,9 +1,8 @@
+import { useEmojiSuggestion } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
 import { ContextMenuItem, SHOW_POSITION } from '@mezon/utils';
 import { CSSProperties, useMemo, useState } from 'react';
 import { Item, Menu, Separator, Submenu } from 'react-contexify';
-// import 'react-contexify/dist/ReactContexify.css';
-import { useEmojiSuggestion } from '@mezon/core';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from './MessageContextMenuContext';
 import ReactionPart from './ReactionPart';
