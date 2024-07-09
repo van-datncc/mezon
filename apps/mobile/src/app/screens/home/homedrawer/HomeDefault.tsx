@@ -7,7 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
@@ -107,7 +107,7 @@ const HomeDefault = React.memo((props: any) => {
 	};
 
 	const handleGesture = (event: { nativeEvent: { translationX: number; state: number } }) => {
-		if (Math.ceil(event.nativeEvent.translationX) >= 5) {
+		if (event.nativeEvent.translationX >= 5 && event.nativeEvent.state === State.CANCELLED) {
 			onOpenDrawer();
 		}
 	};
