@@ -4,6 +4,7 @@ import { Image } from '@mezon/ui';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import DancingRobot from '../../../assets/dancing-robot.gif';
 import BannerImg from '../../../assets/homepage-banner.png';
 import SideBar from './sidebar';
 
@@ -20,7 +21,9 @@ function Homepage() {
 				className="layout relative z-10 flex flex-col items-center text-textDarkTheme"
 				style={{ backgroundImage: 'url(../../../assets/homepage-bg.png)' }}
 			>
-				<div className={`header w-10/12 max-lg:w-full max-lg:px-[35px] mt-5 flex items-center ${sideBarIsOpen ? 'justify-end' : 'justify-between'} `}>
+				<div
+					className={`header w-10/12 max-lg:w-full max-lg:px-[35px] mt-5 flex items-center ${sideBarIsOpen ? 'justify-end' : 'justify-between'} `}
+				>
 					{!sideBarIsOpen && (
 						<Link to={'/mezon'} className="left flex gap-[10px] items-center">
 							<Image
@@ -65,7 +68,10 @@ function Homepage() {
 					<div className="main-content">
 						<div className="block1 flex items-center justify-center max-lg:flex-col">
 							<img src={BannerImg} alt="" className="object-cover w-6/12 max-md:w-8/12 hidden max-lg:block" />
-							<div className="b1-left mt-10 max-lg:text-center">
+							<div className="b1-left mt-10 max-lg:text-center flex flex-col max-md:items-center">
+								<div className='w-[150px] -z-10 relative top-[19px] left-[20px]'>
+									<img src={DancingRobot} alt="" className='w-full' />
+								</div>
 								<div className="top-text text-[50px] font-black leading-[60px]">GROUP CHAT THAT’S ALL FUN & GAMES</div>
 								<div className="bottom-text text-[24px]">
 									Mezon is great for playing games and chilling with friends, or even building a worldwide community. Customize your
