@@ -566,6 +566,7 @@ const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 							name={suggestion.display ?? ''}
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
+							channelId={suggestion.id}
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
