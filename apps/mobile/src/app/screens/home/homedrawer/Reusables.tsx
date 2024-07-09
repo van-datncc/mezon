@@ -36,7 +36,6 @@ export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string;
 	);
 });
 
-
 export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 	const { dmGroup, user, isSent, onPress } = props;
 	const { themeValue } = useTheme();

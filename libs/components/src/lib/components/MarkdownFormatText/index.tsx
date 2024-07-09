@@ -67,7 +67,8 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 	};
 
 	const classes = clx(
-		'prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-headings:contents prose-h1:prose-2xl whitespace-pre-wrap prose prose-base prose-blockquote:leading-[6px] prose-blockquote:my-0 leading-[0]',
+		'prose-code:text-sm prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
+
 		{
 			lightMode: appearanceTheme === 'light',
 		},
@@ -100,15 +101,36 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 							components={{
 								pre: PreClass,
 								p: 'span',
-								a: ({ children }) => (
+								a: (props) => (
 									<span
-										onClick={() => getLinkinvites(children)}
+										onClick={() => getLinkinvites(props.href)}
 										rel="noopener noreferrer"
 										style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 										className="tagLink"
 									>
-										{children}
+										{props.children}
 									</span>
+								),
+
+								th: ({ node, ...props }) => (
+									<th
+										style={{
+											padding: '12px 15px',
+											border: '1px solid #ddd',
+											color: '#fff',
+										}}
+										{...props}
+									/>
+								),
+								td: ({ node, ...props }) => (
+									<td
+										style={{
+											padding: '12px 15px',
+											border: '1px solid #ddd',
+											color: '#ddd',
+										}}
+										{...props}
+									/>
 								),
 							}}
 						/>
@@ -143,7 +165,11 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 		});
 	}, [mentions, getLinkinvites, isOnlyEmoji]);
 
-	return <article style={{letterSpacing: "-0.01rem"}} className={classes}>{memoizedMentions}</article>;
+	return (
+		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
+			{memoizedMentions}
+		</article>
+	);
 };
 
 export default MarkdownFormatText;

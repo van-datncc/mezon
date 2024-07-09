@@ -62,5 +62,6 @@
     "pinSuccess": "ghim tin nhắn thành công",
     "unpinSuccess": "bỏ ghim tin nhắn thành công",
      "Yes": "Có",
-    "No": "Không"
+    "No": "Không",
+    "unableSendMessage": "Không thể gửi tin nhắn. Vui lòng thử lại."
 }

@@ -2,16 +2,17 @@ import { useAuth } from '@mezon/core';
 import { useGoogleLogin } from '@react-oauth/google';
 import isElectron from 'is-electron';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const GoogleButtonLogin: React.FC = () => {
 	const { loginByGoogle } = useAuth();
-
+	const navigate = useNavigate();
 	const googleLogin = useGoogleLogin({
 		flow: 'auth-code',
 		ux_mode: 'popup',
 		onSuccess: async ({ code }) => {
 			await loginByGoogle(code);
+			navigate("/mezon");
 		},
 		onError: (errorResponse) => console.log(errorResponse),
 	});

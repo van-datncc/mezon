@@ -10,6 +10,8 @@ import { SeparatorWithSpace } from "apps/mobile/src/app/components/Common";
 import { Colors, size } from "@mezon/mobile-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
+import UseMentionList from "../../../../../../app/hooks/useUserMentionList";
+
 
 interface IReportMessageModalProps {
     isVisible: boolean;
@@ -53,6 +55,8 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
     const [reportSelected, setReportSelected] = useState<IReportOption | null>(null);
     const slideAnim = useRef(new Animated.Value(1)).current;
     const { t } = useTranslation('message');
+    const listMentions = UseMentionList(message?.channel_id || '');
+
 
     const onVisibleChange = (value: boolean) => {
         if (!value) {
@@ -100,7 +104,7 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
                             </View>
                             <View style={{marginVertical: 10}}>
                                 <Text style={styles.reportCategory}>{t('reportMessage.reportCategory')}</Text>
-                                
+
                                 <View style={styles.reportCategoryWrapper}>
                                     <DotIcon color={Colors.bgViolet} height={5} width={5} />
                                     <Text style={styles.reportCategoryTitle}>{reportSelected?.title}</Text>
@@ -117,6 +121,7 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
                     <Text style={styles.selectedMessageText}>{t('reportMessage.selectedMessage')}</Text>
                     <View style={styles.messageBox}>
                         <MessageItem
+                            listMentions={listMentions}
                             messageId={message.id}
                             channelId={message.channel_id}
                             mode={ChannelStreamMode.STREAM_MODE_CHANNEL}

@@ -403,6 +403,7 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
+  user?: ApiUser;
 };
 
 export type UserSearchDataProps = {
