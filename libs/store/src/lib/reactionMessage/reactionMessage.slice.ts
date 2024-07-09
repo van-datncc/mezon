@@ -81,7 +81,7 @@ export type WriteMessageReactionArgs = {
 };
 
 export const writeMessageReaction = createAsyncThunk(
-	"messages/writeMessageReaction",
+	'messages/writeMessageReaction',
 	async ({ id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -95,7 +95,7 @@ export const writeMessageReaction = createAsyncThunk(
 
 			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete);
 		} catch (e) {
-			return thunkAPI.rejectWithValue("Error while writing message reaction");
+			return thunkAPI.rejectWithValue('Error while writing message reaction');
 		}
 	},
 );
@@ -232,14 +232,16 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 		return item.emoji === emojiLastest.emoji && item.senderId === emojiLastest.senderId;
 	});
 
-	if (duplicateIndex !== -1) {
-		if (emojiLastest.action === true) {
+	if (emojiLastest.action === true) {
+		if (duplicateIndex !== -1) {
 			emojisRecentParse.splice(duplicateIndex, 1);
 		}
 	} else {
-		if (emojiLastest.action === true) return;
-		emojisRecentParse.push(emojiLastest);
+		if (duplicateIndex === -1) {
+			emojisRecentParse.push(emojiLastest);
+		}
 	}
+
 	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
 }
 
