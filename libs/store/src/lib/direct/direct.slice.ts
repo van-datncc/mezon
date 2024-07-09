@@ -145,6 +145,7 @@ interface JoinDirectMessagePayload {
 	directMessageId: string;
 	channelName?: string;
 	type?: number;
+	noCache?: boolean;
 }
 interface members {
     id: string;
@@ -157,10 +158,10 @@ interface members {
 
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>(
 	'direct/joinDirectMessage',
-	async ({ directMessageId, channelName, type }, thunkAPI) => {
+	async ({ directMessageId, channelName, type, noCache = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
-			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
+			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache }));
 			
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),

@@ -113,7 +113,7 @@ const ChannelList = React.memo((props: any) => {
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 		store.dispatch(appActions.setLoadingMainMobile(false));
 	};
