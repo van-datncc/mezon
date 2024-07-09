@@ -32,7 +32,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 		});
 	}, [])
 
-	console.log("specificChannel", specificChannel);
+	// console.log("specificChannel", specificChannel);
 	
 	const highlightMatch = (name: string, getUserName: string) => {
 		const index = name.toLowerCase().indexOf(getUserName.toLowerCase());
