@@ -1,5 +1,5 @@
 import { useDeleteMessage } from '@mezon/core';
-import { Icons, ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -7,19 +7,20 @@ import {
 	selectAllUserClanProfile,
 	selectAttachmentPhoto,
 	selectChannelMemberByUserIds,
-	selectCurrentClan,
 	selectHasMoreMessageByChannelId,
 	selectMembersByChannelId,
 	selectMessageIdsByChannelId,
 	selectTypingUserIdsByChannelId,
 	useAppDispatch,
+	selectCurrentClan,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
+import { FlashList } from '@shopify/flash-list';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
@@ -27,15 +28,13 @@ import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkelet
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import { MessageItemBS } from './components';
+import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import { useContext } from 'react';
-import { channelDetailContext } from './HomeDefault';
-import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
-import { FlashList } from '@shopify/flash-list';
+import UseMentionList from '../../../hooks/useUserMentionList';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -57,7 +56,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const channelMember = useSelector(selectMembersByChannelId(channelId));
-	const { usersClanMention, currentClan } = useContext(channelDetailContext) || {};
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -70,6 +68,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+	const listMentions = UseMentionList(channelId || '');
+	const currentClan = useSelector(selectCurrentClan);
+
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
 
@@ -159,16 +160,19 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		}
 	}, [isLoadMore, loadMoreMessage]);
 
-	const handleScroll = useCallback((event: { nativeEvent: { contentOffset: { y: any } } }) => {
-		const offsetY = event.nativeEvent.contentOffset.y;
-		const threshold = 300; // Adjust this value to determine when to show the button
+	const handleScroll = useCallback(
+		(event: { nativeEvent: { contentOffset: { y: any } } }) => {
+			const offsetY = event.nativeEvent.contentOffset.y;
+			const threshold = 300; // Adjust this value to determine when to show the button
 
-		if (offsetY > threshold && !showScrollToBottomButton) {
-			setShowScrollToBottomButton(true);
-		} else if (offsetY <= threshold && showScrollToBottomButton) {
-			setShowScrollToBottomButton(false);
-		}
-	}, [showScrollToBottomButton]);
+			if (offsetY > threshold && !showScrollToBottomButton) {
+				setShowScrollToBottomButton(true);
+			} else if (offsetY <= threshold && showScrollToBottomButton) {
+				setShowScrollToBottomButton(false);
+			}
+		},
+		[showScrollToBottomButton],
+	);
 
 	const scrollToBottom = () => {
 		flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
@@ -218,6 +222,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			default:
 				break;
 		}
+		Keyboard.dismiss();
 		setOpenBottomSheet(type);
 	}, []);
 
@@ -228,7 +233,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					clansProfile={clansProfile}
-					usersClanMention={usersClanMention}
+					listMentions={listMentions}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
@@ -278,7 +283,13 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				renderItem={renderItem}
 				keyExtractor={(item) => `${item}`}
 				estimatedItemSize={200}
-				onEndReached={!!messages?.length ? onLoadMore : () => {}}
+				onEndReached={
+					messages?.length
+						? onLoadMore
+						: () => {
+								// 	empty
+							}
+				}
 				onEndReachedThreshold={0.5}
 				showsVerticalScrollIndicator={false}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
