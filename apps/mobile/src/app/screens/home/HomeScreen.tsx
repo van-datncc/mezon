@@ -1,3 +1,4 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -11,22 +12,17 @@ import {
 	selectAllClans,
 	selectCurrentChannelId,
 	selectCurrentClan,
-	selectSession,
+	selectIsLogin,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import React, { useEffect } from 'react';
-import { AppState, Text, View } from 'react-native';
+import { AppState, DeviceEventEmitter } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import BarsLogo from '../../../assets/svg/bars.svg';
-import SearchLogo from '../../../assets/svg/discoverySearch.svg';
-import HashSignIcon from '../../../assets/svg/loading.svg';
-import UsersLogo from '../../../assets/svg/users.svg';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
-import { styles } from './styles';
 
 const Drawer = createDrawerNavigator();
 
@@ -57,7 +53,7 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 				name="HomeDefault"
 				component={HomeDefault}
 				options={{
-					headerShown: false
+					headerShown: false,
 				}}
 			/>
 		</Drawer.Navigator>
@@ -68,7 +64,8 @@ const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const clans = useSelector(selectAllClans);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const session = useSelector(selectSession);
+	const isLogin = useSelector(selectIsLogin);
+
 	const { reconnect } = useMezon();
 	useCheckUpdatedVersion();
 
@@ -87,8 +84,10 @@ const HomeScreen = React.memo((props: any) => {
 	}, [currentClan, currentChannelId]);
 
 	useEffect(() => {
-		mainLoader();
-	}, [session?.token]);
+		if (isLogin) {
+			mainLoader();
+		}
+	}, [isLogin]);
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
@@ -114,15 +113,20 @@ const HomeScreen = React.memo((props: any) => {
 	};
 
 	const messageLoader = async () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.DISABLE_SKELETON_MESSAGE, { isDisabled: true });
 		const store = await getStoreAsync();
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId }));
-		store.dispatch(
+		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
+		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+		// await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+		await store.dispatch(
 			channelsActions.joinChannel({
 				clanId: currentClan?.clan_id,
 				channelId: currentChannelId,
 				noFetchMembers: false,
 			}),
 		);
+		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+		DeviceEventEmitter.emit(ActionEmitEvent.DISABLE_SKELETON_MESSAGE, { isDisabled: false });
 		return null;
 	};
 
@@ -130,6 +134,7 @@ const HomeScreen = React.memo((props: any) => {
 		const lastClanId = clans?.[clans?.length - 1]?.clan_id;
 		const store = await getStoreAsync();
 		if (lastClanId) {
+			store.dispatch(clansActions.joinClan({ clanId: '0' }));
 			store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: lastClanId }));
 		}

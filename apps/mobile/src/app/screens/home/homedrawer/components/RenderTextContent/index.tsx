@@ -6,7 +6,7 @@ import { Text } from 'react-native';
 import { channelIdRegex, highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
 
-export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channelsEntities?: Record<string, ChannelsEntity>, rawMembers: ChannelMembersEntity[]) => {
+export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channelsEntities?: Record<string, ChannelsEntity>) => {
 	const getChannelById = (channelHashtagId: string) => {
 		const channel = channelsEntities?.[channelHashtagId];
 		if (channel) {

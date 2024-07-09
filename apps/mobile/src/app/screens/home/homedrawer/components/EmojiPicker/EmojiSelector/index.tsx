@@ -21,6 +21,7 @@ import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import styles from './styles';
+import { useTranslation } from 'react-i18next';
 
 type EmojiSelectorProps = {
 	onSelected: (url: string) => void;
@@ -96,6 +97,7 @@ export default function EmojiSelector({
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
+	const { t } = useTranslation('message')
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
 	const categoryRefs = useRef(
 		categoriesEmoji.reduce((refs, item) => {
@@ -135,10 +137,10 @@ export default function EmojiSelector({
 			style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
 			contentContainerStyle={{ paddingBottom: size.s_50 }}
 		>
-			<View style={{ backgroundColor: isReactMessage ? Colors.bgCharcoal : Colors.secondary }}>
+			<View style={{ backgroundColor: isReactMessage ? Colors.primary : Colors.secondary }}>
 				<View style={styles.textInputWrapper}>
 					<SearchIcon height={18} width={18} />
-					<TextInput onFocus={handleBottomSheetExpand} style={styles.textInput} onChangeText={debouncedSetSearchText} />
+					<TextInput onFocus={handleBottomSheetExpand} placeholder={t('findThePerfectReaction')} style={styles.textInput} placeholderTextColor={Colors.textGray} onChangeText={debouncedSetSearchText} />
 				</View>
 				<ScrollView
 					horizontal

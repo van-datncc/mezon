@@ -176,13 +176,8 @@ export const emojiFakeData: IEmoji[] = [
     "category": "Custom"
   },
   {
-    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056636/emojisSvg/Custom/memes_zdnukg.gif",
-    "shortname": ":memes:",
+    "src": "https://cdn.mezon.vn/emojis/Custom/pikachu.gif",
+    "shortname": ":pikachu:",
     "category": "Custom"
-  },
-  {
-    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/heart_eyes_r0qbvu.png",
-    "shortname": ":heart_eyes:",
-    "category": "People"
   },
 ];
