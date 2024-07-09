@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import { Icons } from '../../../components';
+import { ChannelType } from 'mezon-js';
 
 type SuggestItemProps = {
 	avatarUrl?: string;
@@ -32,8 +33,6 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 		});
 	}, [])
 
-	// console.log("specificChannel", specificChannel);
-	
 	const highlightMatch = (name: string, getUserName: string) => {
 		const index = name.toLowerCase().indexOf(getUserName.toLowerCase());
 		if (index === -1) {
@@ -56,10 +55,10 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-4" />}
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
-				{ !specificChannel?.channel_private && specificChannel?.type === 1 && (<Icons.Hashtag defaultSize="w-5 h-5" />)}
-				{ specificChannel?.channel_private && specificChannel?.type === 1 && (<Icons.HashtagLocked defaultSize="w-5 h-5 " />)}
-				{ !specificChannel?.channel_private && specificChannel?.type === 4 && (<Icons.Speaker defaultSize="w-5 5-5" />)}
-				{ specificChannel?.channel_private && specificChannel?.type === 4 && (<Icons.SpeakerLocked defaultSize="w-5 h-5" />)}
+				{ !specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (<Icons.Hashtag defaultSize="w-5 h-5" />)}
+				{ specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (<Icons.HashtagLocked defaultSize="w-5 h-5 " />)}
+				{ !specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (<Icons.Speaker defaultSize="w-5 5-5" />)}
+				{ specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (<Icons.SpeakerLocked defaultSize="w-5 h-5" />)}
 				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
 				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, valueHightLight ?? '')}</span>
 			</div>
