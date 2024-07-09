@@ -270,6 +270,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	);
 
 	return (
+		<View style={{flex: 1}}>
 		<View style={styles.wrapperChannelMessage}>
 			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 			{isLoading === 'loading' && !isLoadMore && <MessageItemSkeleton skeletonNumber={15} />}
@@ -302,8 +303,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			)}
 
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
+		</View>
 
-			{visibleImageModalOverlay && (
+		<View>
+		{visibleImageModalOverlay && (
 				<View style={styles.overlay}>
 					<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
 				</View>
@@ -335,13 +338,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			/>
 
 			{currentMessageActionType === EMessageActionType.ForwardMessage && (
-				<View style={{ flex: 1 }}>
-					<ForwardMessageModal
-						show={currentMessageActionType === EMessageActionType.ForwardMessage}
-						onClose={() => setCurrentMessageActionType(null)}
-						message={messageSelected}
-					/>
-				</View>
+				<ForwardMessageModal
+					show={currentMessageActionType === EMessageActionType.ForwardMessage}
+					onClose={() => setCurrentMessageActionType(null)}
+					message={messageSelected}
+				/>
 			)}
 
 			{currentMessageActionType === EMessageActionType.Report && (
@@ -360,6 +361,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					type={currentMessageActionType}
 				/>
 			)}
+		</View>
 		</View>
 	);
 });

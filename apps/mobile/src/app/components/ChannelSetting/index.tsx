@@ -1,4 +1,4 @@
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View, Text } from "react-native";
 import { IMezonMenuItemProps, IMezonMenuSectionProps, IMzoneOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from "../../temp-ui";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,7 +8,18 @@ import MezonSlider, { IMezonSliderData } from "../../temp-ui/MezonSlider";
 import { channelsActions, selectChannelById, useAppDispatch } from "@mezon/store-mobile";
 import { APP_SCREEN, MenuChannelScreenProps } from "../../navigation/ScreenTypes";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { isEqual } from 'lodash';
+import { ApiUpdateChannelDescRequest } from "mezon-js";
+import Toast from "react-native-toast-message";
+import { CheckIcon } from "@mezon/mobile-components";
+import { Colors } from "@mezon/mobile-ui";
+
+interface IChannelSettingValue {
+    channelName: string;
+    channelTopic: string;
+    //TODO: update more
+}
 
 type ScreenChannelSetting = typeof APP_SCREEN.MENU_CHANNEL.SETTINGS;
 export default function ChannelSetting({ navigation, route }: MenuChannelScreenProps<ScreenChannelSetting>) {
@@ -16,8 +27,62 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
     const { t } = useTranslation(['channelSetting']);
     const dispatch = useAppDispatch();
     const channel = useSelector(selectChannelById(channelId || ""));
-
     const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
+    const [originSettingValue, setOriginSettingValue] = useState<IChannelSettingValue>({
+        channelName: '',
+        channelTopic: ''
+    });
+    const [currentSettingValue, setCurrentSettingValue] = useState<IChannelSettingValue>({
+        channelName: '',
+        channelTopic: ''
+    });
+    const isNotChanged = useMemo(() => {
+        return isEqual(originSettingValue, currentSettingValue);
+    }, [originSettingValue, currentSettingValue])
+
+    navigation.setOptions({
+        headerRight: () => (
+            <Pressable onPress={() => handleSaveChannelSetting()}>
+                <Text
+                    style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}
+                >
+                    {t('confirm.save')}
+                </Text>
+            </Pressable>
+        ),
+    });
+
+    const handleUpdateValue = (value: Partial<IChannelSettingValue>) => {
+        setCurrentSettingValue({...currentSettingValue, ...value})
+    }
+
+    useEffect(() => {
+        if (channel?.channel_id) {
+            const initialChannelSettingValue: IChannelSettingValue = {
+                channelName: channel?.channel_label,
+                channelTopic: ''
+            }
+            setOriginSettingValue(initialChannelSettingValue);
+            setCurrentSettingValue(initialChannelSettingValue);
+        }
+    }, [channel])
+
+    const handleSaveChannelSetting = async () => {
+        const updateChannel: ApiUpdateChannelDescRequest = {
+			channel_id: channel.channel_id || '',
+			channel_label: currentSettingValue?.channelName,
+			category_id: channel.category_id,
+		};
+		await dispatch(channelsActions.updateChannel(updateChannel));
+        navigation?.goBack();
+        Toast.show({
+			type: 'success',
+			props: {
+				text2: t('toast.updated'),
+				leadingIcon: <CheckIcon color={Colors.green} />,
+			},
+		});
+    }
 
     const categoryMenu = useMemo(() => ([
         {
@@ -191,12 +256,14 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
             <View style={styles.inputWrapper}>
                 <MezonInput
                     label={t('fields.channelName.title')}
-                    value="uuu"
+                    value={currentSettingValue.channelName}
+                    onTextChange={(text) => handleUpdateValue({channelName: text})}
                 />
 
                 <MezonInput
                     label={t('fields.channelDescription.title')}
-                    value="uuu"
+                    value={currentSettingValue.channelTopic}
+                    onTextChange={(text) => handleUpdateValue({channelTopic: text})}
                     textarea
                 />
             </View>
