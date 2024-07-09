@@ -264,7 +264,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	iconBar: {
 		paddingLeft: size.s_14,
-		paddingRight: size.s_18,
+		paddingRight: size.s_14,
 		paddingVertical: size.s_14,
 	},
 	wrapperServerList: {
@@ -651,13 +651,13 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	threadHeaderLabel: {
 		color: colors.textStrong,
 		fontWeight: "700",
-		marginLeft: size.s_10,
+		marginLeft: size.s_8,
 		fontSize: size.label,
 		width: '85%'
 	},
 	channelHeaderLabel: {
 		color: colors.textStrong,
-		marginLeft: size.s_10,
+		marginLeft: size.s_8,
 		fontSize: size.medium,
 		maxWidth: '85%'
 	},
@@ -717,5 +717,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	sortButton: {
 		paddingHorizontal: size.s_14, paddingVertical: size.s_6
+	},
+	iconBell: {
+		paddingRight: size.s_14,
 	}
 });
