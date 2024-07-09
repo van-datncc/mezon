@@ -44,7 +44,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, subText, subTextSty
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
 				{symbol && <span className="text-[17px] dark:text-textDarkTheme text-textLightTheme">{symbol}</span>}
 				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
-				<span className="text-[15px] font-thin dark:text-white text-textLightTheme">{highlightMatch(name, valueHightLight ?? '')}</span>
+				<span className={`text-[15px] font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}>{highlightMatch(name, valueHightLight ?? '')}</span>
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] ${subTextStyle}`}>{subText}</span>
 		</div>
