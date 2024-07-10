@@ -22,7 +22,7 @@ export default function EventLocation({ event }: IEventLocation) {
             {option === OptionEvent.OPTION_SPEAKER && (
                 <View style={styles.inline}>
                     <Icons.VoiceNormalIcon height={16} width={16} color={themeValue.text} />
-                    <Text style={styles.smallText}>{channelVoice.channel_label}</Text>
+                    <Text style={styles.smallText}>{channelVoice?.channel_label}</Text>
                 </View>
             )}
 

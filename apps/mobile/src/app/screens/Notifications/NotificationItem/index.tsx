@@ -11,6 +11,7 @@ import MessageItem from '../../home/homedrawer/MessageItem';
 import { ChannelStreamMode } from 'mezon-js';
 import { useTheme } from '@mezon/mobile-ui';
 import { style } from './NotificationItem.styles';
+import UseMentionList from '../../../hooks/useUserMentionList';
 
 function parseObject(obj: any) {
 	let attachments;
@@ -58,11 +59,13 @@ function parseObject(obj: any) {
 const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify }: NotifyProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
-	const { hasAvatar, avatarChar, avatarImg } = useMessageSender(user as any);
-	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
+	const user = useSelector(selectMemberClanByUserId(notify?.sender_id || ''));
+	const { avatarImg } = useMessageSender(user as any);
+	const channelInfo = useSelector(selectChannelById(notify?.content?.channel_id));
 	const data = parseObject(notify?.content);
 	const { messageTimeDifference } = useMessageParser(data);
+	const listMentions = UseMentionList(notify?.content?.channel_id || '');
+
 	return (
 		<TouchableOpacity
 			onPress={() => {
@@ -83,6 +86,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 						</Text>
 						<View style={styles.contentMessage}>
 							<MessageItem
+                listMentions={listMentions}
 								message={data}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								channelId={data?.channel_id}

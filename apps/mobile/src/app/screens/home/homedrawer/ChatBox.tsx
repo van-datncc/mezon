@@ -1,12 +1,8 @@
 import { useChannelMembers, useChannels, useChatSending, useDirectMessages, useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
-	AddThread,
-	AngleRightIcon,
 	Icons,
-	MicrophoneIcon,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
-	SendIcon,
 	convertMentionsToText,
 	getAttachmentUnique,
 	load,
@@ -18,8 +14,6 @@ import {
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectAllEmojiSuggestion,
-	selectHiddenBottomTabMobile,
-	selectMembersByChannelId,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
@@ -40,7 +34,6 @@ import { DeviceEventEmitter, Dimensions, Keyboard, KeyboardEvent, Platform, Pres
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
-import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { ChannelsMention, EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../components/Suggestions';
@@ -100,7 +93,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const { members } = useChannelMembers({ channelId: props.channelId });
 	const currentChannel = useSelector(selectCurrentChannel);
-	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 	const listMentions = UseMentionList(props?.channelId || '');
 	const { listChannels } = useChannels();
 	const { textInputProps, triggers } = useMentions({
@@ -140,7 +132,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
 	const [allMessages, setAllMessages] = useState<{ [key: string]: string }>({});
-	const rawMembers = useSelector(selectMembersByChannelId(props?.channelId));
 	const [replyDisplayName, setReplyDisplayName] = useState('');
 
 	useEffect(() => {
@@ -716,6 +707,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						onFocus={handleInputFocus}
 						onBlur={handleInputBlur}
 						multiline={true}
+						spellCheck={false}
 						numberOfLines={3}
 						{...textInputProps}
 						style={[
@@ -723,7 +715,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
-						children={renderTextContent(text, emojiListPNG, channelsEntities, rawMembers)}
+						children={renderTextContent(text, emojiListPNG, channelsEntities)}
 						onContentSizeChange={(e) => {
 							if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
 						}}

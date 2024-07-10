@@ -359,7 +359,10 @@ input:-webkit-autofill:active {
 	.prose {
 		max-width: unset;
 		padding-right: 0;
-
+		line-height: 1.375rem;
+		code {
+			border: 1px;
+		}
 		* {
 			color: #ccc;
 		}
@@ -415,7 +418,6 @@ input:-webkit-autofill:active {
 
 			span {
 				line-height: 1.375rem;
-
 				code {
 					border: 1px solid #1e1f22;
 					background-color: #2b2d31;
@@ -460,20 +462,7 @@ input:-webkit-autofill:active {
 			}
 
 			> blockquote {
-				margin: -4px 0;
-
-				span {
-					display: inline-block;
-					line-height: 1.375rem;
-				}
-
-				> ul {
-					display: flex;
-					flex-direction: column;
-					margin: 0 0 -6px 0;
-					padding-left: 14px;
-					line-height: 1.375rem;
-				}
+				line-height: 0;
 			}
 		}
 	}
@@ -673,4 +662,14 @@ input:-webkit-autofill:active {
 
 .hoverIconBlackImportant:hover button svg {
 	color: black;
+}
+
+.hoverBoxShadow:hover {
+	box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+	svg {
+		color: #5865f2;
+	}
+	div {
+		color: #5865f2;
+	}
 }

@@ -153,7 +153,7 @@ export default class App {
 	private static handleTray() {
 		let mezonTray = null;
 		App.application.whenReady().then(() => {
-			const trayIcon = nativeImage.createFromPath(join(__dirname, 'assets', 'icon-desktop.ico'));
+			const trayIcon = nativeImage.createFromPath(join(__dirname, 'assets', 'desktop-tray-64x64.ico'));
 			mezonTray = new Tray(trayIcon);
 
 			const template: (MenuItem | MenuItemConstructorOptions)[] = [

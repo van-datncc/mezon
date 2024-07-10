@@ -59,9 +59,10 @@ export const clansAdapter = createEntityAdapter<ClansEntity>();
 
 export type ChangeCurrentClanArgs = {
 	clanId: string;
+	noCache?: boolean;
 };
 
-export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>('clans/changeCurrentClan', async ({ clanId }: ChangeCurrentClanArgs, thunkAPI) => {
+export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>('clans/changeCurrentClan', async ({ clanId, noCache = false }: ChangeCurrentClanArgs, thunkAPI) => {
 	thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
 	thunkAPI.dispatch(clansActions.setCurrentClanId(clanId));
 	thunkAPI.dispatch(categoriesActions.fetchCategories({ clanId }));
@@ -70,11 +71,11 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>('
 	thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
 	thunkAPI.dispatch(policiesActions.fetchPermission());
-	thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({clanId}));
-	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({clanId: clanId}));
-	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId }));
+	thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId, noCache }));
+	thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId, noCache }));
+	thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
 	thunkAPI.dispatch(userClanProfileActions.fetchUserClanProfile({ clanId }));
-	thunkAPI.dispatch(directActions.fetchDirectMessage({}));
+	thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache }));
 	thunkAPI.dispatch(
 		voiceActions.fetchVoiceChannelMembers({
 			clanId: clanId ?? '',
@@ -158,7 +159,7 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 		}
 		thunkAPI.dispatch(fetchClans())
 		return response;
-	} catch(error : any) {		
+	} catch(error : any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}

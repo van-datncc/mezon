@@ -232,13 +232,14 @@ export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', asyn
 type JumpToMessageArgs = {
 	channelId: string;
 	messageId: string;
+	noCache?: boolean;
 };
-export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId }: JumpToMessageArgs, thunkAPI) => {
+export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId, noCache = false }: JumpToMessageArgs, thunkAPI) => {
 	try {
 		await thunkAPI.dispatch(
 			fetchMessages({
 				channelId: channelId,
-				noCache: false,
+				noCache: noCache,
 				messageId: messageId,
 				direction: 1,
 			}),
@@ -506,7 +507,7 @@ export const messagesSlice = createSlice({
 				state.unreadMessagesEntries = {
 					...state.unreadMessagesEntries,
 					[action.payload.channel_id]: action.payload.id,
-				};		
+				};
 			}
 			const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
 

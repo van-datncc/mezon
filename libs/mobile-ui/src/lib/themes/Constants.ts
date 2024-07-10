@@ -18,6 +18,7 @@ export type Attributes = {
     textNormal: HexColor,
     white: HexColor,
     black: HexColor,
+    bgInputPrimary: HexColor,
     charcoal: HexColor,
     jet: HexColor,
 }
@@ -54,6 +55,7 @@ export const themeColors: ThemeColor = {
         secondaryLight: '#2A2D31',
         white: '#FFFFFF',
         black: '#000000',
+        bgInputPrimary: '#2a2e31',
         charcoal: '#2b2b2e',
         jet: "#29292b"
     },
@@ -73,6 +75,7 @@ export const themeColors: ThemeColor = {
         secondaryLight: '#ffffff',
         white: '#000000',
         black: '#FFFFFF',
+        bgInputPrimary: '#a0a1a6',
         charcoal: "#f2f3f5",
         jet: "#ecedef"
     }

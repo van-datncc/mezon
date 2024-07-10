@@ -22,7 +22,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, sugg
 		const mentionSearchText = keyword?.toLocaleLowerCase();
 
 		const filterMatchedMentions = (mentionData: MentionDataProps) => {
-			return mentionData?.display.toLocaleLowerCase().includes(mentionSearchText);
+			return mentionData?.display?.toLocaleLowerCase()?.includes(mentionSearchText);
 		};
 
 		const sortDisplayNameFunction = (a, b) => {
@@ -92,7 +92,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 	}
 	listChannelsMention = listChannelsMention.map((item) => ({
 		...item,
-		name: item.display,
+		name: item?.display,
 	}));
 
 	const handleSuggestionPress = (channel: ChannelsMention) => {
@@ -102,10 +102,10 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 	return (
 		<FlatList
 			style={{ maxHeight: 200 }}
-			data={listChannelsMention?.filter((item) => item?.name.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
+			data={listChannelsMention?.filter((item) => item?.name?.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText} />
+					<SuggestItem isDisplayDefaultAvatar={false} name={item?.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}

@@ -1,14 +1,12 @@
-import { useMezon } from '@mezon/transport';
 import { useCallback, useMemo } from 'react';
-import { useClans } from './useClans';
+import { reactionActions, useAppDispatch } from '@mezon/store';
 
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
 
 export function useChatReaction() {
-	const { currentClanId } = useClans();
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const dispatch = useAppDispatch();
 
 	const reactionMessageDispatch = useCallback(
 		async (
@@ -21,16 +19,20 @@ export function useChatReaction() {
 			message_sender_id: string,
 			action_delete: boolean,
 		) => {
-			const session = sessionRef.current;
-			const client = clientRef.current;
-			const socket = socketRef.current;
-
-			if (!client || !session || !socket || !currentClanId) {
-				throw new Error('Client is not initialized');
-			}
-			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, message_sender_id, action_delete);
+			return dispatch(
+				reactionActions.writeMessageReaction({
+					id,
+					channelId,
+					mode,
+					messageId,
+					emoji,
+					count,
+					messageSenderId: message_sender_id,
+					actionDelete: action_delete,
+				})
+			);
 		},
-		[sessionRef, clientRef, socketRef, currentClanId],
+		[dispatch],
 	);
 
 	return useMemo(
