@@ -15,7 +15,7 @@ const SettingEmoji = () => {
             <li>Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores</li>
           </ul>
         </div>
-        <div className="h-[38px] rounded bg-[#3297ff] text-[#ffffff] w-28 relative flex flex-row items-center justify-center hover:bg-[#2b80d7]">
+        <div className="h-[38px] font-semibold rounded bg-[#3297ff] text-[#ffffff] w-28 relative flex flex-row items-center justify-center hover:bg-[#2b80d7]">
             Upload emoji
             <input className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer" type="file" title=" " tabIndex={0} multiple accept=".jpg,.jpeg,.png,.gif" ></input>
         </div>

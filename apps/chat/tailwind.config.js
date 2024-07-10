@@ -145,8 +145,8 @@ module.exports = {
         }
       },
       boxShadow: {
-        'emoji_item': '0 1px 0 0 #3e3e3ed4',
-        'emoji_item_dark' : '0 1px 0px 0px #4f5155',
+        'emoji_item': '0 1px 0 0 #ededef',
+        'emoji_item_dark' : '0 1px 0px 0px #3e3e3ed4',
         'emoji_item-delete' : '0px 0px 2.5px 0px #2f2f2f33'
       }
     },

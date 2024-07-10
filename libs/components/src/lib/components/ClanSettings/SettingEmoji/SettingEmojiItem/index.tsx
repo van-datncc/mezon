@@ -18,7 +18,7 @@ const SettingEmojiItem = () => {
         </div>
 
         <div className={'flex-1 relative'}>
-          <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] after:content-[":"] before:left-[-3px] after:right-[-3px]'}>
+          <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'}>
             {nameEmoji}
           </div>
           {
