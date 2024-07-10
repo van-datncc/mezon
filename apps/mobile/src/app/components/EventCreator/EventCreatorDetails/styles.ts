@@ -25,7 +25,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     container: {
-        paddingHorizontal: Metrics.size.xl
+        paddingHorizontal: Metrics.size.xl,
+        backgroundColor: colors.primary,
+        flex: 1
     },
 
     feedSection: {
