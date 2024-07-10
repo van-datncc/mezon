@@ -40,7 +40,7 @@ const NavigationMain = () => {
 		const timer = setTimeout(async () => {
 			await SplashScreen.hideAsync();
 			await notifee.cancelAllNotifications();
-		}, 1500);
+		}, 200);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
@@ -83,7 +83,7 @@ const NavigationMain = () => {
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: false }));
+		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: "0", noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {
@@ -132,7 +132,8 @@ const NavigationMain = () => {
 
 const CustomStatusBar = () => {
 	const { themeValue, themeBasic } = useTheme();
-	return <StatusBar animated backgroundColor={themeValue.primary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
+	// eslint-disable-next-line eqeqeq
+	return <StatusBar animated backgroundColor={themeValue.secondary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
 };
 
 const RootNavigation = () => {

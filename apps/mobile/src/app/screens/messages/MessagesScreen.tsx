@@ -181,9 +181,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			/>
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-				{/* TODO: NghiaDT: change icon */}
-				{/* <Icons.ChatPlusIcon height={20} width={20} color={baseColor.white} /> */}
-				<MessageIcon width={32} height={25} style={{ marginLeft: -5 }} />
+				<Icons.MessagePlusIcon width={22} height={22} />
 			</Pressable>
 		</View>
 	);

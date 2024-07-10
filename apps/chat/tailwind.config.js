@@ -94,6 +94,7 @@ module.exports = {
         '9/10': "90%",
         heightInBox: `calc(100vh - 168px)`,
         messageViewChatDM: `calc(100vh - 60px)`,
+        "50vh" : "50vh"
       },
 
       minHeight: {

@@ -1,28 +1,34 @@
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannels, useNotification } from '@mezon/core';
-import { TrashIcon } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { INotification, NotificationEntity, channelsActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Feather from 'react-native-vector-icons/Feather';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import NotificationIndividualItem from './NotificationIndividualItem';
 import NotificationItem from './NotificationItem';
 import NotificationOption from './NotificationOption';
-import { styles } from './Notifications.styles';
 import { EActionDataNotify, ENotifyBsToShow } from './types';
+import { style } from './Notifications.styles';
+import { MezonBottomSheet } from '../../temp-ui';
+import NotificationItemOption from './NotificationItemOption';
 
 const Notifications = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { notification, deleteNotify } = useNotification();
+	const [notify, setNotify] = useState<INotification>();
+
 	const { t } = useTranslation(['notification']);
 	const { channels } = useChannels();
-	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const navigation = useNavigation();
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
+	const bottomSheetOptionsRef = useRef<BottomSheetModal>(null);
 
 	const [sortedNotifications, setSortedNotifications] = useState<NotificationEntity[]>([]);
 
@@ -52,41 +58,18 @@ const Notifications = () => {
 	useEffect(() => {
 		handleFilterNotify(EActionDataNotify.All);
 	}, [notification, channels]);
-	const bottomSheetRef = useRef<BottomSheet>(null);
 
-	const snapPoints = ['35%', '55%'];
 	const openBottomSheet = (type: ENotifyBsToShow, notify?: INotification) => {
 		switch (type) {
 			case ENotifyBsToShow.notification:
-				bottomSheetRef.current?.snapToIndex(1);
-				setContent(
-					<NotificationOption
-						channels={channels}
-						onChange={(value) => {
-							handleFilterNotify(value);
-						}}
-					/>,
-				);
+				bottomSheetRef.current?.present();
 				break;
 			case ENotifyBsToShow.removeNotification:
-				bottomSheetRef.current?.snapToIndex(0);
-				setContent(
-					<TouchableOpacity onPress={() => handleDeleteNotify(notify)} style={styles.removeNotifyContainer}>
-						<TrashIcon />
-						<Text style={styles.removeNotifyText}>{t('removeNotification')}</Text>
-					</TouchableOpacity>,
-				);
+				bottomSheetOptionsRef.current?.present();
+				setNotify(notify)
 				break;
 			default:
-				setContent(
-					<NotificationOption
-						channels={channels}
-						onChange={(value) => {
-							handleFilterNotify(value);
-						}}
-					/>,
-				);
-				bottomSheetRef.current?.snapToIndex(1);
+				bottomSheetRef.current?.present();
 				break;
 		}
 	};
@@ -112,13 +95,8 @@ const Notifications = () => {
 	};
 
 	const closeBottomSheet = () => {
-		bottomSheetRef.current?.close();
+		bottomSheetRef.current?.dismiss();
 	};
-
-	const renderBackdrop = useCallback(
-		(props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} onPress={closeBottomSheet} />,
-		[],
-	);
 
 	return (
 		<View style={styles.notifications}>
@@ -126,10 +104,11 @@ const Notifications = () => {
 				<Text style={styles.notificationHeaderTitle}>{t('headerTitle')}</Text>
 				<Pressable onPress={() => openBottomSheet(ENotifyBsToShow.notification)}>
 					<View style={styles.notificationHeaderIcon}>
-						<Feather name="more-horizontal" size={20} color={'white'} />
+						<Icons.MoreHorizontalIcon height={20} width={20} color={themeValue.textStrong} />
 					</View>
 				</Pressable>
 			</View>
+
 			<View style={styles.notificationsList}>
 				<FlatList
 					data={sortedNotifications}
@@ -143,17 +122,17 @@ const Notifications = () => {
 					keyExtractor={(item) => item.id}
 				/>
 			</View>
-			<BottomSheet
-				ref={bottomSheetRef}
-				enablePanDownToClose={true}
-				backdropComponent={renderBackdrop}
-				index={-1}
-				snapPoints={snapPoints}
-				backgroundStyle={{ backgroundColor: Colors.secondary }}
-				style={{ padding: size.s_16 }}
-			>
-				<BottomSheetView style={styles.contentContainer}>{content}</BottomSheetView>
-			</BottomSheet>
+
+			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize='md'>
+				<NotificationOption
+					channels={channels}
+					onChange={(value) => { handleFilterNotify(value) }}
+				/>
+			</MezonBottomSheet>
+
+			<MezonBottomSheet ref={bottomSheetOptionsRef} heightFitContent>
+				<NotificationItemOption onDelete={() => handleDeleteNotify(notify)} />
+			</MezonBottomSheet>
 		</View>
 	);
 };

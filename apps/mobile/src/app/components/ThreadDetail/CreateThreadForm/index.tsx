@@ -12,7 +12,6 @@ import {
 	selectCurrentClanId,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
@@ -31,6 +30,7 @@ import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { validInput } from '../../../utils/validate';
 import { ErrorInput } from '../../ErrorInput';
 import { styles } from './CreateThreadForm.style';
+import UseMentionList from '../../../hooks/useUserMentionList';
 
 export default function CreateThreadForm() {
 	const dispatch = useAppDispatch();
@@ -44,6 +44,7 @@ export default function CreateThreadForm() {
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread , threadCurrentChannel} = useThreads();
+  const listMentions = UseMentionList(currentChannelId || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
@@ -182,6 +183,7 @@ export default function CreateThreadForm() {
 							{valueThread && openThreadMessageState && (
 								<View style={styles.messageBox}>
 									<MessageItem
+                    listMentions={listMentions}
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}

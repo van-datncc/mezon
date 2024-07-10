@@ -7,7 +7,7 @@ interface IMezonButtonProps extends TouchableOpacityProps {
     disabled?: boolean;
     onPress?: () => void;
     viewContainerStyle?: ViewStyle | ViewStyle[];
-    textStyle?: TextStyle;
+    textStyle?: ViewStyle | ViewStyle[];
 }
 
 export const MezonButton = (props: IMezonButtonProps) => {

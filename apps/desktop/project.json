@@ -10,7 +10,7 @@
         "{options.outputPath}"
       ],
       "win": {
-        "icon": "apps/chat/src/assets/icon-desktop.ico",
+        "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": "nsis",
         "appId": "Mezon"
       },
@@ -75,7 +75,7 @@
         "outputPath": "dist/packages",
         "prepackageOnly": true,
         "win": {
-          "icon": "apps/chat/src/assets/icon-desktop.ico",
+          "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
           "appId": "Mezon"
         }
@@ -89,7 +89,7 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
         "win": {
-          "icon": "apps/chat/src/assets/icon-desktop.ico",
+          "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
           "appId": "Mezon"
         }

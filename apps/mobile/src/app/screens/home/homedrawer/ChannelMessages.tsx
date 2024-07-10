@@ -1,5 +1,5 @@
 import { useDeleteMessage } from '@mezon/core';
-import { Icons, ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -15,26 +15,26 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
+import { FlashList } from '@shopify/flash-list';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
+import UseMentionList from '../../../hooks/useUserMentionList';
 import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import { MessageItemBS } from './components';
+import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import { useContext } from 'react';
-import { channelDetailContext } from './HomeDefault';
-import { FlashList } from '@shopify/flash-list';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -56,7 +56,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const channelMember = useSelector(selectMembersByChannelId(channelId));
-	const { usersClanMention, currentClan } = useContext(channelDetailContext) || {};
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -67,8 +66,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [userSelected, setUserSelected] = useState<ApiUser | null>(null);
 	const [messageSelected, setMessageSelected] = useState<IMessageWithUser | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
+	const [isDisableSkeletonLoading, setIsDisableSkeletonLoading] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
+	const listMentions = UseMentionList(channelId || '');
+	const currentClan = useSelector(selectCurrentClan);
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
 
@@ -115,8 +117,12 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && setOpenBottomSheet(null);
 		});
+		const disableSkeletonListener = DeviceEventEmitter.addListener(ActionEmitEvent.DISABLE_SKELETON_MESSAGE, ({ isDisabled = false }) => {
+			setIsDisableSkeletonLoading(isDisabled);
+		});
 		return () => {
 			messageItemBSListener.remove();
+			disableSkeletonListener.remove();
 		};
 	}, []);
 
@@ -129,6 +135,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					break;
 				case EMessageActionType.ForwardMessage:
 				case EMessageActionType.Report:
+				case EMessageActionType.PinMessage:
+				case EMessageActionType.UnPinMessage:
 					setCurrentMessageActionType(type);
 					break;
 				default:
@@ -149,23 +157,28 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	}, [typingUsers]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
-	const onLoadMore = useCallback(() => {
+	const onLoadMore = useCallback(async () => {
+		if (isLoadMore || isLoading === 'loading') {
+			return;
+		}
 		setIsLoadMore(true);
-		if (!isLoadMore) {
-			loadMoreMessage().finally(() => setIsLoadMore(false));
-		}
-	}, [isLoadMore, loadMoreMessage]);
+		await loadMoreMessage();
+		setIsLoadMore(false);
+	}, [isLoadMore, loadMoreMessage, isLoading]);
 
-	const handleScroll = useCallback((event: { nativeEvent: { contentOffset: { y: any } } }) => {
-		const offsetY = event.nativeEvent.contentOffset.y;
-		const threshold = 300; // Adjust this value to determine when to show the button
+	const handleScroll = useCallback(
+		(event: { nativeEvent: { contentOffset: { y: any } } }) => {
+			const offsetY = event.nativeEvent.contentOffset.y;
+			const threshold = 300; // Adjust this value to determine when to show the button
 
-		if (offsetY > threshold && !showScrollToBottomButton) {
-			setShowScrollToBottomButton(true);
-		} else if (offsetY <= threshold && showScrollToBottomButton) {
-			setShowScrollToBottomButton(false);
-		}
-	}, [showScrollToBottomButton]);
+			if (offsetY > threshold && !showScrollToBottomButton) {
+				setShowScrollToBottomButton(true);
+			} else if (offsetY <= threshold && showScrollToBottomButton) {
+				setShowScrollToBottomButton(false);
+			}
+		},
+		[showScrollToBottomButton],
+	);
 
 	const scrollToBottom = () => {
 		flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
@@ -215,6 +228,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			default:
 				break;
 		}
+		Keyboard.dismiss();
 		setOpenBottomSheet(type);
 	}, []);
 
@@ -225,7 +239,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					clansProfile={clansProfile}
-					usersClanMention={usersClanMention}
+					listMentions={listMentions}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
@@ -264,7 +278,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	return (
 		<View style={styles.wrapperChannelMessage}>
 			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
-			{isLoading === 'loading' && !isLoadMore && <MessageItemSkeleton skeletonNumber={15} />}
+			{isLoading === 'loading' && !isLoadMore && !isDisableSkeletonLoading && <MessageItemSkeleton skeletonNumber={15} />}
 			<FlashList
 				ref={flatListRef}
 				inverted
@@ -275,8 +289,14 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				renderItem={renderItem}
 				keyExtractor={(item) => `${item}`}
 				estimatedItemSize={200}
-				onEndReached={!!messages?.length ? onLoadMore : () => {}}
-				onEndReachedThreshold={0.5}
+				onEndReached={
+					messages?.length
+						? onLoadMore
+						: () => {
+								// 	empty
+							}
+				}
+				onEndReachedThreshold={0.1}
 				showsVerticalScrollIndicator={false}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 			/>
@@ -335,6 +355,15 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					isVisible={currentMessageActionType === EMessageActionType.Report}
 					onClose={() => setCurrentMessageActionType(null)}
 					message={messageSelected}
+				/>
+			)}
+
+			{[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType) && (
+				<ConfirmPinMessageModal
+					isVisible={[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType)}
+					onClose={() => setCurrentMessageActionType(null)}
+					message={messageSelected}
+					type={currentMessageActionType}
 				/>
 			)}
 		</View>
