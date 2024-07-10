@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddMembersModal } from '../AddMembersModal';
 import { UsersClanEntity } from '@mezon/utils';
+import { InputField } from '@mezon/ui';
 
 const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	const { updateRole } = useRoles();
@@ -45,15 +46,15 @@ const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	return (
 		<>
 			<div className="w-full flex gap-x-3">
-				<input
-					className="flex-grow dark:bg-black bg-white p-[7px] border rounded-lg font-normal"
+				<InputField
+					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"
 					type="text"
 					placeholder="Search Members"
 					value={searchTerm}
 					onChange={(e) => setSearchTerm(e.target.value)}
 				/>
 				<button
-					className="flex-grow bg-blue-500 hover:bg-blue-400 text-white p-[7px] rounded-lg font-normal"
+					className="flex-grow text-[15px] bg-blue-600 hover:bg-blue-500 rounded py-[3px] px-2 text-nowrap font-medium"
 					onClick={() => {
 						handleOpenModal();
 					}}

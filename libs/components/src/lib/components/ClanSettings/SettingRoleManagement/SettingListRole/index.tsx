@@ -36,15 +36,15 @@ const SettingListRole = (props: closeEditRole) => {
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	return (
 		<div className="w-1/3 pr-3 flex flex-col">
-			<div className="font-semibold mb-4 flex">
+			<div className="font-semibold mb-4 flex cursor-pointer"  onClick={() => handleClose()} >
 				<div className="rotate-90 -ml-[10px] dark:text-textDarkTheme text-textLightTheme">
-					<Icons.ArrowDown defaultSize="size-5" />
+					<Icons.ArrowDown />
 				</div>
-				<div className="cursor-pointer tracking-wide text-sm dark:text-white text-black" onClick={() => handleClose()} role="button">
+				<div className="tracking-wide text-base dark:text-textSecondary text-textSecondary800" role="button">
 					BACK
 				</div>
 			</div>
-			<div className={`overflow-y-scroll flex flex-col gap-y-2  ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
+			<div className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
 				{clickedRole === 'New Role' ? (
 					<div>
 						<button className={`block w-full py-2 px-4 rounded text-[15px] bg-gray-500 hover:bg-gray-70 text-white font-bold`}>
@@ -56,11 +56,12 @@ const SettingListRole = (props: closeEditRole) => {
 						<div key={role.id}>
 							<button
 								onClick={() => handleRoleClick(role.id)}
-								className={`w-full py-2 px-4 rounded text-[15px] ${
-									clickedRole === role.id ? 'dark:bg-[#535353] bg-[#b6b6b6] font-bold hover:op' : 'dark:bg-[#1E1E1E] bg-[#cacaca] hover:font-bold'
-								} dark:text-textDarkTheme text-textLightTheme truncate`}
+								className={`w-full py-1.5 px-[10px] rounded text-[15px] text-left font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton inline-flex gap-x-2 items-center ${
+									clickedRole === role.id ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight font-bold' : ''
+								} dark:text-textDarkTheme text-textLightTheme`}
 							>
-								{role.title}
+								<div className='size-3 bg-contentTertiary rounded-full min-w-3'></div>
+								<span className='one-line'>{role.title}</span>
 							</button>
 						</div>
 					))

@@ -17,37 +17,37 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 	const roleUsersCount = activeRole?.role_user_list?.role_users?.length || 0;
 	return (
 		<>
-			<div className="w-full flex justify-between mb-5">
+			<div className="w-full flex justify-between mb-5 border-b border-gray-200 dark:border-gray-500">
 				<button
-					className={`p-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight rounded relative tracking-wider ${selectedButton === 'Display' ? 'shadow-md' : ''}`}
+					className={`py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${selectedButton === 'Display' ? 'shadow-md' : ''}`}
 					onClick={() => {
 						handleButtonClick('Display');
 						dispatch(toggleIsShowFalse());
 					}}
 				>
 					Display
-					{selectedButton === 'Display' && <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-400" />}
+					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Display' ? 'bg-blue-400' : ''}`} />
 				</button>
 
 				<button
-					className={`p-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight rounded relative tracking-wider ${selectedButton === 'Permissions' ? 'shadow-md' : ''}`}
+					className={`py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${selectedButton === 'Permissions' ? 'shadow-md' : ''}`}
 					onClick={() => {
 						handleButtonClick('Permissions');
 						dispatch(toggleIsShowFalse());
 					}}
 				>
 					Permissions
-					{selectedButton === 'Permissions' && <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-400" />}
+					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Permissions' ? 'bg-blue-400' : ''}`} />
 				</button>
 				<button
-					className={`p-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight rounded relative tracking-wider ${selectedButton === 'Manage Members' ? 'shadow-md' : ''}`}
+					className={`py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${selectedButton === 'Manage Members' ? 'shadow-md' : ''}`}
 					onClick={() => {
 						handleButtonClick('Manage Members');
 						dispatch(toggleIsShowFalse());
 					}}
 				>
 					Manage Members ({roleUsersCount > 0 ? roleUsersCount : 0})
-					{selectedButton === 'Manage Members' && <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-400" />}
+					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Manage Members' ? 'bg-blue-400' : ''}`} />
 				</button>
 			</div>
 			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan}/>}

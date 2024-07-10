@@ -58,10 +58,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 
 				<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto hide-scrollbar">
 					<div className="flex flex-row flex-1 justify-start h-full">
-						<div className="w-[740px] sbm:p-10 p-4 sbm:pt-[60px] pt-10">
-							<div className="relative h-full max-h-full">
+						<div className="w-[740px] sbm:px-10">
+							<div className="relative max-h-full sbm:min-h-heightRolesEdit min-h-heightRolesEditMobile">
 								{!(currentSetting.id === ItemSetting.INTEGRATIONS) ? (
-									<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme">{currentSetting.name}</h2>
+									<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">{currentSetting.name}</h2>
 								) : (
 									''
 								)}
