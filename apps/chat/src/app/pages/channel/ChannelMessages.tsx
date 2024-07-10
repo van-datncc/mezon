@@ -6,7 +6,6 @@ import {
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
 	selectMessageIdsByChannelId,
-	selectMessageMetionId,
 	selectOpenModalAttachment,
 	selectQuantitiesMessageRemain,
 	selectTheme,
@@ -35,7 +34,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '' });
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const messageMentionId = useSelector(selectMessageMetionId);
 	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
@@ -64,12 +62,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [dispatch, channelId]);
 
 	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages });
-
-	useEffect(() => {
-		if (messageMentionId) {
-			setMessageIdToJump(messageMentionId);
-		}
-	}, [messageMentionId]);
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
