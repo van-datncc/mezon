@@ -536,5 +536,5 @@ export type EmojiStorage = {
 export enum DIRECTION_MODE {
 	AROUND_TIMESTAMP = 1,
 	AFTER_TIMESTAMP = 2,
-	BEFORE_TIMESTAMP = 2,
+	BEFORE_TIMESTAMP = 3,
 }
