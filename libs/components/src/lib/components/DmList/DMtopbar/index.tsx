@@ -3,7 +3,7 @@ import { appActions, channelsActions, selectCloseMenu, selectDmGroupCurrent, sel
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
-import * as Icons from '../../Icons/index';
+import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
 import { Tooltip } from 'flowbite-react';
@@ -43,7 +43,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 	const [openEditName, setOpenEditName] = useState(false);
 	const [label, setLabel] = useState(currentDmGroup?.channel_label);
 	const handleOpenEditName = () => {
-		if(currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ){
+		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
 			setOpenEditName(true);
 		}
 	}
@@ -61,7 +61,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 	const handleSave = async () => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
-			channel_id: dmGroupId|| '',
+			channel_id: dmGroupId || '',
 			channel_label: label,
 			category_id: '',
 		};
@@ -72,12 +72,12 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		if (openEditName && inputRef.current) {
 			inputRef.current.focus();
 		}
-  	}, [openEditName]);
+	}, [openEditName]);
 
 	useEffect(() => {
 		setOpenEditName(false);
 		setLabel(currentDmGroup?.channel_label);
-	},[currentDmGroup?.channel_label, dmGroupId])
+	}, [currentDmGroup?.channel_label, dmGroupId])
 
 	return (
 		<div
@@ -102,8 +102,8 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						key={currentDmGroup?.channel_id}
 					/>
 					{!openEditName && <h2 className="shrink-1 dark:text-white text-black text-ellipsis" onClick={handleOpenEditName}>{label}</h2>}
-					{openEditName && 
-						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded'/>
+					{openEditName &&
+						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded' />
 					}
 				</div>
 
@@ -111,12 +111,12 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>
-								<Tooltip content='Start voice call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+								<Tooltip content='Start voice call' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 									<Icons.IconPhoneDM />
 								</Tooltip>
 							</button>
 							<button>
-								<Tooltip content='Start Video Call' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+								<Tooltip content='Start Video Call' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 									<Icons.IconMeetDM />
 								</Tooltip>
 							</button>
@@ -124,20 +124,20 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								<PinButton isLightMode={appearanceTheme === 'light'} />
 							</div>
 							<button>
-								<Tooltip content='Add friends to DM' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+								<Tooltip content='Add friends to DM' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 									<Icons.IconAddFriendDM />
 								</Tooltip>
 							</button>
-							{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
+							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
 								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} >
-									<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
-										<Icons.MemberList isWhite={isShowMemberListDM}/>
+									<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+										<Icons.MemberList isWhite={isShowMemberListDM} />
 									</Tooltip>
 								</button>
 							}
-							{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&  
+							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&
 								<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
-									<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+									<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 										<Icons.IconUserProfileDM />
 									</Tooltip>
 								</button>
@@ -153,16 +153,16 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 					</div>
 				</div>
-				{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
+				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
 					<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className='sbm:hidden'>
-						<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
-							<Icons.MemberList isWhite={isShowMemberListDM}/>
+						<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+							<Icons.MemberList isWhite={isShowMemberListDM} />
 						</Tooltip>
 					</button>
 				}
-				{ currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&  
+				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&
 					<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className='sbm:hidden'>
-						<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+						<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 							<Icons.IconUserProfileDM />
 						</Tooltip>
 					</button>

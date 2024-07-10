@@ -5,7 +5,7 @@ import { InputField, Modal } from '@mezon/ui';
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
 
 export type ModalCreateClansProps = {
@@ -57,13 +57,13 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 		}
 		const allowedTypes = ['image/jpeg', 'image/png'];
 		if (!allowedTypes.includes(file.type)) {
-			seOpenModalError((prev) => ({...prev, errorType: true}));
+			seOpenModalError((prev) => ({ ...prev, errorType: true }));
 			e.target.value = null;
 			return;
 		}
 
 		if (sizeImage > 1000000) {
-			seOpenModalError((prev) => ({...prev, errorSize: true}));
+			seOpenModalError((prev) => ({ ...prev, errorSize: true }));
 			e.target.value = null;
 			return;
 		}
@@ -139,8 +139,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					</span>
 				</div>
 			</div>
-			<ModalErrorTypeUpload openModal={openModalError.errorType} handleClose={() => seOpenModalError((prev) => ({...prev, errorType: false}))}/>
-			<ModalOverData openModal={openModalError.errorSize} handleClose={() => seOpenModalError((prev) => ({...prev, errorSize: false}))}/>
+			<ModalErrorTypeUpload openModal={openModalError.errorType} handleClose={() => seOpenModalError((prev) => ({ ...prev, errorType: false }))} />
+			<ModalOverData openModal={openModalError.errorSize} handleClose={() => seOpenModalError((prev) => ({ ...prev, errorSize: false }))} />
 		</Modal>
 	);
 };

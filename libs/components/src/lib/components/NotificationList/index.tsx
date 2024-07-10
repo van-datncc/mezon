@@ -1,7 +1,7 @@
 import { useChannels, useNotification } from '@mezon/core';
 import { INotification, selectTheme } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import NotificationItem from './NotificationItem';
 import NotifyMentionItem from './NotifyMentionItem';
 import { useSelector } from 'react-redux';
@@ -37,7 +37,7 @@ function NotificationList() {
 		if (currentTabNotify === 'individual' && tabIndividualRef.current) {
 			tabIndividualRef.current.scrollTop = -tabIndividualRef.current.scrollHeight;
 		}
-	},[currentTabNotify, notifyMentionItem]);
+	}, [currentTabNotify, notifyMentionItem]);
 
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">

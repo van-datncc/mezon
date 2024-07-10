@@ -1,7 +1,7 @@
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import { ETypeMessage } from '@mezon/utils';
 import { useSelector } from 'react-redux';
-import { Hashtag, ThreadIcon } from '../Icons';
+import { Hashtag, ThreadIcon } from '../../../../../ui/src/lib/Icons';
 
 export type ChatWelComeProp = {
 	readonly type: Readonly<string>;
@@ -32,17 +32,17 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 				</p>
 			</div>
 			<div>
-				{(currentChannel?.parrent_id !== "0" && !avatarDM)? 
+				{(currentChannel?.parrent_id !== "0" && !avatarDM) ?
 					<div className="mb-1 dark:text-textDarkTheme text-textLightTheme">
 						<span className="text-base">Started by &nbsp;</span>
 						<span className="text-base font-semibold">{user?.user?.username}</span>
-					</div>:
+					</div> :
 					<p className="dark:text-zinc-400 text-colorTextLightMode text-sm">
-						{avatarDM ? 
+						{avatarDM ?
 							(type === "DM" ?
-								`This is the beginning of your direct message history with ${name}`:
+								`This is the beginning of your direct message history with ${name}` :
 								`Welcome to the beginning of the #${name} group`
-							):
+							) :
 							`This is the start of the #${name} ${currentChannel?.channel_private ? 'private' : ''} channel`
 						}
 					</p>

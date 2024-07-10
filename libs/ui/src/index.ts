@@ -10,5 +10,6 @@ export { default as Select } from './lib/Select';
 export { default as TextArea } from './lib/TextArea';
 export * from './lib/ThumnailAttachmentRender/index';
 export { default as TimePicker } from './lib/TimePicker';
+export * as Icons from './lib/Icons';
 
 export * from './lib/useMezonUi';
