@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GestureResponderEvent, LayoutAnimation, LayoutChangeEvent, Pressable, View } from "react-native";
+import { GestureResponderEvent, LayoutChangeEvent, Pressable, View } from "react-native";
 import { Text } from 'react-native';
 import styles from "./style";
 import { useEffect } from "react";
@@ -39,7 +39,6 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
     const [selected, setSelected] = useState<number>(pageID);
 
     useEffect(() => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
         setSelected(pageID);
     }, [pageID])
 

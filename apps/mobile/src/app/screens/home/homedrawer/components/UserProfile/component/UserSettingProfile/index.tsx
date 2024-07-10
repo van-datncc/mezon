@@ -53,26 +53,26 @@ const UserSettingProfile = ({
 		{
 			label: EActionSettingUserProfile.Manage,
 			value: EActionSettingUserProfile.Manage,
-			icon: <SettingIcon width={20} height={20} />,
+			icon: <SettingIcon color={Colors.textGray} width={20} height={20} />,
 			action: handleSettingUserProfile,
 			isShow: true,
 		},
 		{
-			label: `${EActionSettingUserProfile.TimeOut} ${user?.user?.username || user?.['username'] || ''}`,
+			label: `${EActionSettingUserProfile.TimeOut}`,
 			value: EActionSettingUserProfile.TimeOut,
 			icon: <ClockWarning width={20} height={20} />,
 			action: handleSettingUserProfile,
 			isShow: checkCreateUser && !checkUser,
 		},
 		{
-			label: `${EActionSettingUserProfile.Kick} ${user?.user?.username || user?.['username'] || ''}`,
+			label: `${EActionSettingUserProfile.Kick}`,
 			value: EActionSettingUserProfile.Kick,
 			icon: <UserMinus width={20} height={20} />,
 			action: handleSettingUserProfile,
 			isShow: checkCreateUser && !checkUser,
 		},
 		{
-			label: `${EActionSettingUserProfile.Ban} ${user?.user?.username || user?.['username'] || ''}`,
+			label: `${EActionSettingUserProfile.Ban}`,
 			value: EActionSettingUserProfile.Ban,
 			icon: <HammerIcon width={20} height={20} />,
 			action: handleSettingUserProfile,
@@ -97,17 +97,7 @@ const UserSettingProfile = ({
 						<Block key={index} style={styles.option}>
 							{item?.icon}
 							<Text
-								style={{
-									color: ![
-										EActionSettingUserProfile.Ban,
-										EActionSettingUserProfile.Kick,
-										EActionSettingUserProfile.TimeOut,
-									].includes(item.value)
-										? Colors.white
-										: Colors.vividScarlet,
-									fontSize: size.label,
-									fontWeight: '600',
-								}}
+								style={styles.textOption}
 							>
 								{item?.label}
 							</Text>

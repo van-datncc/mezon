@@ -207,7 +207,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		if (!emojiPicked) {
 			return;
 		}
-		setText(`${text.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
+		setText(`${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
 	};
 
 	const editMessage = useCallback(
@@ -713,7 +713,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						{...textInputProps}
 						style={[
 							styles.inputStyle,
-							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
+							text?.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
 						children={renderTextContent(text, emojiListPNG, channelsEntities)}
@@ -727,7 +727,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				</View>
 
 				<View>
-					{text.length > 0 || !!attachmentDataRef?.length ? (
+					{text?.length > 0 || !!attachmentDataRef?.length ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
 							<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />
 						</View>
