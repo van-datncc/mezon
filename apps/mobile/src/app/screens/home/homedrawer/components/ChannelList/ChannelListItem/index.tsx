@@ -49,19 +49,19 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
 
 	const handleRouteData = async (thread?: IChannel) => {
-		const store = await getStoreAsync();
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === 1 && props?.data?.meeting_code) {
 			const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
 			await Linking.openURL(urlVoice);
 			return;
 		}
 		useChannelListContentIn.navigation.closeDrawer();
+		const store = await getStoreAsync();
 		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 
 	return (

@@ -9,7 +9,6 @@ import {
 	selectChannelMemberByUserIds,
 	selectCurrentClan,
 	selectHasMoreMessageByChannelId,
-	selectMembersByChannelId,
 	selectMessageIdsByChannelId,
 	selectTypingUserIdsByChannelId,
 	useAppDispatch,
@@ -55,7 +54,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const channelMember = useSelector(selectMembersByChannelId(channelId));
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -69,7 +67,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [isDisableSkeletonLoading, setIsDisableSkeletonLoading] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const listMentions = UseMentionList(channelId || '');
 	const currentClan = useSelector(selectCurrentClan);
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
@@ -239,7 +236,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					clansProfile={clansProfile}
-					listMentions={listMentions}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
@@ -250,7 +246,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				/>
 			);
 		},
-		[jumpToRepliedMessage, clansProfile, channelMember, mode, channelId, onOpenImage, currentClan, onMessageAction],
+		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClan, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(

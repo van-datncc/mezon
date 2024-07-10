@@ -175,25 +175,26 @@ const ChannelList = React.memo((props: any) => {
 						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' ? (
-					<ChannelListSkeleton numberSkeleton={6} />
-				) : (
-					<FlatList
-						data={categorizedChannels || []}
-						keyExtractor={(_, index) => index.toString()}
-						renderItem={({ item, index }) => (
-							<ChannelListSection
-								data={item}
-								index={index}
-								onPressHeader={toggleCollapseChannel}
-								onLongPressCategory={(category) => handleLongPressCategory(category)}
-								onLongPressChannel={(channel) => handleLongPressChannel(channel)}
-								onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-								collapseItems={collapseChannelItems}
-							/>
-						)}
-					/>
-				)}
+				{
+					isLoading === 'loading' && (
+						<ChannelListSkeleton numberSkeleton={6} />
+					)
+				}
+				<FlatList
+					data={categorizedChannels || []}
+					keyExtractor={(_, index) => index.toString()}
+					renderItem={({ item, index }) => (
+						<ChannelListSection
+							data={item}
+							index={index}
+							onPressHeader={toggleCollapseChannel}
+							onLongPressCategory={(category) => handleLongPressCategory(category)}
+							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
+							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
+							collapseItems={collapseChannelItems}
+						/>
+					)}
+				/>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
