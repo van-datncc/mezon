@@ -17,7 +17,7 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
@@ -48,6 +48,13 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
+	const timeoutRef = useRef<any>();
+
+	useEffect(() => {
+		return () => {
+			timeoutRef.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	const handleRouteData = async (thread?: IChannel) => {
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === 1 && props?.data?.meeting_code) {
@@ -59,15 +66,16 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		const store = await getStoreAsync();
 		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
-		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-		await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-
-		if (!channelsCache?.includes(channelId)) {
-			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-		}
+		timeoutRef.current = setTimeout(() => {
+			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+			// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+			if (!channelsCache?.includes(channelId)) {
+				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+			}
+		}, 0);
 	};
 
 	return (
