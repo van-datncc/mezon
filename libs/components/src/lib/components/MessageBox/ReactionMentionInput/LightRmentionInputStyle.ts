@@ -1,4 +1,5 @@
 export default {
+	width: "100%",
 	control: {
 		fontSize: 16,
 	},

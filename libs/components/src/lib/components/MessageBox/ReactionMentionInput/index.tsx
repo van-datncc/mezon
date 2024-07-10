@@ -38,6 +38,8 @@ import {
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
+	selectIsShowMemberListDM,
+	selectIsUseProfileDM,
 } from '@mezon/store';
 import {
 	ChannelMembersEntity,
@@ -66,7 +68,7 @@ import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateTh
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
-import { widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
+import { widthDmGroupMemberList, widthDmUserProfile, widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -133,6 +135,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const { isSearchMessage } = useSearchMessages();
 
 	const userProfile = useSelector(selectAllAccount);
@@ -496,6 +500,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [dispatch, isFocused]);
 
+	const [mentionWidth, setMentionWidth] = useState('');
+	
+	useEffect(()=>{
+		if(props.mode === ChannelStreamMode.STREAM_MODE_DM){
+			setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
+		}else if(props.mode === ChannelStreamMode.STREAM_MODE_GROUP){
+			setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
+		}
+		else{
+			setMentionWidth(isShowMemberList ? widthMessageViewChat : isShowCreateThread ? widthMessageViewChatThread : isSearchMessage ? widthSearchMessage : widthThumbnailAttachment);
+		}
+	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode])
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -540,7 +557,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					...(appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle),
 					suggestions: {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.suggestions : darkMentionsInputStyle.suggestions),
-						width: `${isShowMemberList ? widthMessageViewChat : isShowCreateThread ? widthMessageViewChatThread : isSearchMessage ? widthSearchMessage : widthThumbnailAttachment}`,
+						width: `${mentionWidth}`,
 					},
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
