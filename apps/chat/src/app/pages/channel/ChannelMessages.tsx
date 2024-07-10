@@ -34,6 +34,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '' });
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
+	console.log(idMessageToJump);
 	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
@@ -73,6 +74,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [idMessageNotifed, idMessageRefReply, idMessageToJump]);
 
 	useEffect(() => {
+		console.log(messageid);
 		let timeoutId: NodeJS.Timeout | null = null;
 		if (messageid) {
 			timeoutId = setTimeout(() => {
