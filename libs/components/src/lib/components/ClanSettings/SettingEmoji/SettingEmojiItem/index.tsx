@@ -1,11 +1,12 @@
 import { ChangeEvent, useState } from "react";
 
 type SettingEmojiItemProp = {
+  emojiName : string,
   author: string,
 }
 
-const SettingEmojiItem = ({ author }: SettingEmojiItemProp) => {
-  const [nameEmoji, setNameEmoji] = useState<string>("__");
+const SettingEmojiItem = ({ author,emojiName}: SettingEmojiItemProp) => {
+  const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);

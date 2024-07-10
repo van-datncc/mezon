@@ -22,9 +22,9 @@ const SettingEmojiList = ({ title }: SettingEmojiListProps) => {
         </p>
       </div>
       <div className={'flex flex-col w-full'}>
-        <SettingEmojiItem author="" />
-        <SettingEmojiItem author="" />
-        <SettingEmojiItem author="" />
+        <SettingEmojiItem author="" emojiName=""/>
+        <SettingEmojiItem author="" emojiName=""/>
+        <SettingEmojiItem author="" emojiName=""/>
 
       </div>
     </div>
