@@ -3,10 +3,10 @@ import { directActions, messagesActions, selectAllDirectMessages, selectAllUsesC
 import { InputField } from '@mezon/ui';
 import { removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
-import { ChannelType } from 'mezon-js';
 import ListMemberSearch from './listMemberSearch';
 export type SearchModalProps = {
 	readonly open: boolean;
@@ -40,7 +40,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemDM?.channel_label ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
-						displayName:'',
+						displayName: '',
 						typeChat: 3,
 					};
 				})
@@ -77,14 +77,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					};
 				})
 			: [];
-		const friendsMap = new Map(listFriendsSearch.map(friend => [friend.id, friend]));
-		const listSearch = [ 
-			...listDMSearch.map(itemDM => {
+		const friendsMap = new Map(listFriendsSearch.map((friend) => [friend.id, friend]));
+		const listSearch = [
+			...listDMSearch.map((itemDM) => {
 				const friend = friendsMap.get(itemDM.id);
 				return friend ? { ...itemDM, displayName: friend.displayName || itemDM.displayName } : itemDM;
-		  	}),
+			}),
 			...listGroupSearch,
-			...listUserClanSearch
+			...listUserClanSearch,
 		];
 		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
 	}, [accountId, friends, listDM, listGroup, usersClan]);
@@ -109,14 +109,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				dispatch(directActions.openDirectMessage({ channel_id: user.idDM || '' }));
 				const result = await dispatch(
 					directActions.joinDirectMessage({
-					  directMessageId: user.idDM,
-					  channelName: '',
-					  type: user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM,
+						directMessageId: user.idDM,
+						channelName: '',
+						type: user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM,
 					}),
-				  );
-				  if (result) {
+				);
+				if (result) {
 					navigate(toDmGroupPageFromMainApp(user.idDM, user?.typeChat ?? ChannelType.CHANNEL_TYPE_DM));
-				  }
+				}
 			} else {
 				const response = await createDirectMessageWithUser(user.id);
 				if (response.channel_id) {
@@ -267,7 +267,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				>
 					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
 						<>
-							<ListMemberSearch listMemSearch={listMemSearch} itemRef={itemRef} handleSelectMem={handleSelectMem} searchText={searchText} idActive={idActive} setIdActive={setIdActive}/>
+							<ListMemberSearch
+								listMemSearch={listMemSearch}
+								itemRef={itemRef}
+								handleSelectMem={handleSelectMem}
+								searchText={searchText}
+								idActive={idActive}
+								setIdActive={setIdActive}
+							/>
 							{listChannelSearch.length
 								? listChannelSearch
 										.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
@@ -282,7 +289,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 													onMouseLeave={() => setIdActive(item.id)}
 													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 												>
-													<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} channelId={item.channelId}/>
+													<SuggestItem
+														name={item.name ?? ''}
+														symbol={item.icon}
+														subText={item.subText}
+														channelId={item.channelId}
+													/>
 												</div>
 											);
 										})
@@ -308,7 +320,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} channelId={item.channelId}/>
+														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} channelId={item.channelId} />
 													</div>
 												);
 											})
@@ -334,7 +346,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} channelId={item.channelId}/>
+														<SuggestItem
+															name={item.name ?? ''}
+															symbol={item.icon}
+															subText={item.subText}
+															channelId={item.channelId}
+														/>
 													</div>
 												);
 											})
