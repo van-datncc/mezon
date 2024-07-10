@@ -103,9 +103,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return list;
 	}, [listChannels]);
 
-	console.log("listChannelSearch:", listChannelSearch);
-	
-
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			if (user?.idDM) {
@@ -307,7 +304,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														ref={itemRef}
 														key={item.id}
 														onClick={() => handleSelectMem(item)}
-														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
@@ -333,7 +330,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														ref={itemRef}
 														key={item.id}
 														onClick={() => handleSelectChannel(item)}
-														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
