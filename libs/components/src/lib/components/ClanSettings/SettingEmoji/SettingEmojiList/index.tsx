@@ -6,15 +6,15 @@ type SettingEmojiListProps = {
 
 const SettingEmojiList = ({ title }: SettingEmojiListProps) => {
   return (
-    <div className={'flex flex-col gap-4 dark:text-textDarkTheme text-textLightTheme'}>
+    <div className={'flex flex-col gap-3 dark:text-textDarkTheme text-textLightTheme pb-[60px]'}>
       <h2 className="text-base font-bold">
         {title} - 2 slots available
       </h2>
-      <div className={'flex flex-row w-full dark:text-textSecondary text-textSecondary800'}>
-        <p className={'w-14 h-8 text-xs font-bold '}>
+      <div className={'flex items-center flex-row w-full dark:text-textSecondary text-textSecondary800'}>
+        <p className={'w-14   text-xs font-bold '}>
           IMAGE
         </p>
-        <p className={'flex-1 relative text-xs font-bold'}>
+        <p className={'flex-1 text-xs font-bold'}>
           NAME
         </p>
         <p className={'flex-1 flex text-xs font-bold'}>
@@ -24,13 +24,7 @@ const SettingEmojiList = ({ title }: SettingEmojiListProps) => {
       <div className={'flex flex-col w-full'}>
         <SettingEmojiItem />
         <SettingEmojiItem />
-
         <SettingEmojiItem />
-
-        <SettingEmojiItem />
-
-        <SettingEmojiItem />
-
 
       </div>
     </div>

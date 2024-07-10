@@ -137,18 +137,23 @@ module.exports = {
         },
         faded_input:{
           '0%': {
-            opacity: 0,
+            opacity: 0.80,
           },
           '100%': {
             opacity: 1,
           },
         }
       },
+      boxShadow: {
+        'emoji_item': '0 1px 0 0 #3e3e3ed4',
+        'emoji_item_dark' : '0 1px 0px 0px #4f5155',
+        'emoji_item-delete' : '0px 0px 2.5px 0px #2f2f2f33'
+      }
     },
     animation: {
       rotation: 'rotation 6s linear infinite',
       spin: 'spin 1s linear infinite',
-      faded_input : 'faded_input 0.25s linear forwards'
+      faded_input : 'faded_input 0.05s ease-in-out forwards'
     },
     screens: {
       ssm: "430px",
