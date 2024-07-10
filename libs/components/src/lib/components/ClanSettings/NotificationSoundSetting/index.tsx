@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import SoundItem from "./SoundItem";
-// import * as  from "./../../../../../../assets/src/assets/videos"
 
 type SoundType = {
   id: number;
@@ -90,7 +89,6 @@ const NotificationSoundSetting = () => {
   
   const handlePlaySound = (sound: SoundType) => {
     setPlayingSound(sound);
-    console.log (playingSound)
   };
   
   return (
