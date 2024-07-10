@@ -18,7 +18,7 @@ import {
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
-import { Linking, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import { ChannelListContext } from '../../../Reusables';
@@ -41,6 +41,11 @@ interface IChannelListItemProps {
 	onLongPress: () => void;
 }
 
+enum StatusVoiceChannel {
+	Active = 1,
+	No_Active = 0,
+}
+
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -57,25 +62,28 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	}, []);
 
 	const handleRouteData = async (thread?: IChannel) => {
-		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === 1 && props?.data?.meeting_code) {
-			const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
-			await Linking.openURL(urlVoice);
-			return;
-		}
-		useChannelListContentIn.navigation.closeDrawer();
-		const store = await getStoreAsync();
-		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
-		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-		timeoutRef.current = setTimeout(() => {
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-			save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
-			// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-			if (!channelsCache?.includes(channelId)) {
-				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
+				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
+				await Linking.openURL(urlVoice);
+				return;
 			}
-		}, 0);
+		} else {
+			useChannelListContentIn.navigation.closeDrawer();
+			const store = await getStoreAsync();
+			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
+			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
+			timeoutRef.current = setTimeout(() => {
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+				if (!channelsCache?.includes(channelId)) {
+					save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+				}
+			}, 0);
+		}
 	};
 
 	return (
@@ -106,6 +114,9 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 						{props.data.channel_label}
 					</Text>
 				</View>
+				{props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === StatusVoiceChannel.No_Active && (
+					<ActivityIndicator color={themeValue.white} />
+				)}
 
 				{numberNotification > 0 && (
 					<View style={styles.channelDotWrapper}>
