@@ -47,7 +47,11 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			icon: <Icons.NitroWheelIcon color={themeValue.textStrong}/>,
 		},
 		{
-			onPress: () => reserve(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+					screen: APP_SCREEN.SETTINGS.ACCOUNT
+				});
+			},
 			expandable: true,
 			title: t('accountSettings.account'),
 			icon: <Icons.UserCircleIcon color={themeValue.textStrong}/>,

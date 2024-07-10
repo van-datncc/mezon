@@ -1,4 +1,4 @@
-import { Colors, Fonts, useTheme } from '@mezon/mobile-ui';
+import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../screens/settings';
@@ -8,6 +8,8 @@ import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 import AppearanceSetting from '../../../screens/settings/AppearanceSetting';
 import AppThemeSetting from '../../../screens/settings/AppearanceSetting/AppTheme';
+import { AccountSetting } from '../../../screens/settings/AccountSetting';
+import { BlockedUsers } from '../../../screens/settings/AccountSetting/BlockedUsers';
 
 export const SettingStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
@@ -65,6 +67,21 @@ export const SettingStacks = ({ }: any) => {
 				}}
 			/>
 
+			<Stack.Screen
+				name={APP_SCREEN.SETTINGS.ACCOUNT}
+				component={AccountSetting}
+				options={{
+					headerTitle: t('settingStack.account'),
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.SETTINGS.BLOCKED_USERS}
+				component={BlockedUsers}
+				options={{
+					headerTitle: t('settingStack.blockedUsers'),
+				}}
+			/>
 
 			<Stack.Screen
 				name={APP_SCREEN.SETTINGS.APP_THEME}

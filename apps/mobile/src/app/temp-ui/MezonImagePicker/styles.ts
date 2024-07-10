@@ -31,6 +31,10 @@ const styles = StyleSheet.create({
     textPlaceholder: {
         color: Colors.white,
         fontSize: Fonts.size.h7
+    },
+    image: {
+        height: '100%',
+        width: '100%',
     }
 })
 

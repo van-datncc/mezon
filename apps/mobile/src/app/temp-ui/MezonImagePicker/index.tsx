@@ -9,6 +9,7 @@ import { handleUploadFileMobile, useMezon } from "@mezon/transport";
 import { useSelector } from "react-redux";
 import { selectCurrentChannel } from "@mezon/store-mobile";
 import { memo } from "react";
+import { openCropper } from 'react-native-image-crop-picker';
 
 export interface IFile {
     uri: string;
@@ -19,15 +20,16 @@ export interface IFile {
 }
 
 interface IMezonImagePickerProps {
-    onChange?: (url: string) => void;
+    onChange?: (file: any) => void;
     onLoad?: (url: string) => void;
     defaultValue: string;
     height?: DimensionValue;
     width?: DimensionValue;
     showHelpText?: boolean;
+    autoUpload?: boolean;
 }
 
-export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60, showHelpText }: IMezonImagePickerProps) {
+export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60, showHelpText, autoUpload=false }: IMezonImagePickerProps) {
     const [image, setImage] = useState<string>(defaultValue);
     const currentChannel = useSelector(selectCurrentChannel);
     const { sessionRef, clientRef } = useMezon();
@@ -70,26 +72,38 @@ export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, 
     async function handleImage() {
         const file = await handleSelectImage();
         if (file) {
-            setImage(file.uri);
-            onChange && onChange(file.uri);
-
-            const url = await handleUploadImage(file);
-            if (url) {
-                setImage(url);
-                onLoad && onLoad(url);
+            const croppedFile = await openCropper({
+                path: file.uri,
+                mediaType: 'photo',
+                includeBase64: true
+            });
+            setImage(croppedFile.path);
+            onChange && onChange(croppedFile);
+            if (autoUpload) {
+                const uploadImagePayload = {
+                    fileData: croppedFile?.data,
+                    name: file.name,
+                    uri: croppedFile.path,
+                    size: croppedFile.size.toString(),
+                    type: croppedFile.mime
+                } as IFile;
+                const url = await handleUploadImage(uploadImagePayload);
+                if (url) {
+                    onLoad && onLoad(url);
+                }
             }
         }
     }
 
     return (
-        <TouchableOpacity onPress={handleImage}>
+        <TouchableOpacity onPress={() => handleImage()}>
             <View style={styles.bannerContainer}>
                 <View style={[styles.bannerWrapper, { height, width }]}>
                     {image || !showHelpText
                         ? <FastImage
                             source={{ uri: image }}
                             resizeMode="cover"
-                            style={{ height: "100%" }}
+                            style={styles.image}
                         />
                         : <Text style={styles.textPlaceholder}>Choose an image</Text>}
                 </View>
