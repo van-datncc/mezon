@@ -48,16 +48,29 @@ function parseObject(obj: any) {
 }
 
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
+	const dispatch = useDispatch();
 	const { deleteNotify } = useNotification();
 	const currentClan = useSelector(selectCurrentClan);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
-	const messageID = notify.content.message_id;
-	const channelId = notify.content.channel_id;
+
+	const messageID = useMemo(() => {
+		return notify.content.message_id;
+	}, [notify.content.message_id]);
+	const channelId = useMemo(() => {
+		return notify.content.channel_id;
+	}, [notify.content.channel_id]);
+
 	const message = useSelector(selectMessageByMessageId(messageID));
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
 	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
+
+	const handleClickJump = useCallback(() => {
+		dispatch(referencesActions.setIdMessageToJump(messageID));
+		directToMessageById();
+	}, []);
+
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
 			<div className="flex justify-between">
@@ -100,9 +113,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 			<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
 				<button
 					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
-					onClick={() => {
-						directToMessageById();
-					}}
+					onClick={handleClickJump}
 				>
 					Jump
 				</button>

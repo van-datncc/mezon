@@ -334,7 +334,7 @@ export type IReaction = ApiMessageReaction & {
 
 export type IEmoji = {
 	src: string;
-	category: string ;
+	category: string;
 	shortname: string;
 };
 
@@ -407,7 +407,7 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
-  user?: ApiUser;
+	user?: ApiUser;
 };
 
 export type UserSearchDataProps = {
@@ -532,3 +532,9 @@ export type EmojiStorage = {
 	senderId: string;
 	action: boolean;
 };
+
+export enum DIRECTION_MODE {
+	AROUND_TIMESTAMP = 1,
+	AFTER_TIMESTAMP = 2,
+	BEFORE_TIMESTAMP = 2,
+}

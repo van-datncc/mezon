@@ -40,6 +40,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const { idMessageNotifed } = useNotification();
 	const remain = useSelector(selectQuantitiesMessageRemain);
 
+	const { messageId } = useAppParams();
+
+	useEffect(() => {
+		if (messageId) setMessageIdToJump(messageId);
+	}, [messageId]);
+
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -58,16 +64,18 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [dispatch, channelId]);
 
 	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages });
-	const { messageId } = useAppParams();
 
 	useEffect(() => {
-		if (messageId) setMessageIdToJump(messageId);
-	}, [messageId]);
+		if (messageMentionId) {
+			setMessageIdToJump(messageMentionId);
+		}
+	}, [messageMentionId]);
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
 		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
 		if (idMessageToJump !== '') setMessageIdToJump(idMessageToJump);
+
 		setTimeToJump(0);
 		setPositionToJump('center');
 	}, [idMessageNotifed, idMessageRefReply, idMessageToJump]);
@@ -100,8 +108,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			);
 		});
 	}, [messages, channelId, mode, channelLabel, idMessageNotifed]);
-
-	console.log(messageId);
 
 	return (
 		<div

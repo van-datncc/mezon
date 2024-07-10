@@ -121,15 +121,13 @@ export default class App {
 		});
 
 		// handle all external redirects in a new browser window
-		// App.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-		// 	shell.openExternal(url);
-		// 	return { action: 'deny' };
-		// });
+		App.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+			shell.openExternal(url);
+			return { action: 'deny' };
+		});
 
 		// Emitted when the window is closed.
 		App.mainWindow.on('close', (event) => this.onClose(event));
-		App.mainWindow.webContents.openDevTools();
-
 	}
 
 	private static loadMainWindow() {

@@ -14,8 +14,6 @@ export function useJumpToMessage({ channelId, messageID }: useJumpToMessagesOpti
 	const { navigate, toMessageChannel } = useAppNavigation();
 	const currentClanId = useSelector(selectCurrentClanId);
 
-	console.log('jumnes-1');
-
 	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'center') => {
 		if (messageId) {
 			const messageElement = document.getElementById(messageId);

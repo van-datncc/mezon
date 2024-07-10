@@ -1,7 +1,8 @@
-import { useAppNavigation, useJumpToMessage, useNotification } from '@mezon/core';
+import { useJumpToMessage, useNotification } from '@mezon/core';
 import { selectCurrentClanId, selectMemberClanByUserId } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 export type NotifyProps = {
@@ -18,8 +19,16 @@ function NotificationItem({ notify }: NotifyProps) {
 		const userNameLenght = userName.length;
 		notice = notify?.subject?.slice(userNameLenght);
 	}
-	const messageID = notify.content.message_id;
-	const channelId = notify.content.channel_id;
+
+	
+
+	const messageID = useMemo(() => {
+		return notify.content.message_id;
+	}, [notify.content.message_id]);
+	const channelId = useMemo(() => {
+		return notify.content.channel_id;
+	}, [notify.content.channel_id]);
+
 	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
 
 	return (

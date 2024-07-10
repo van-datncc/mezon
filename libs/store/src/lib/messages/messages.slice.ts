@@ -1,4 +1,5 @@
 import {
+	DIRECTION_MODE,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -23,8 +24,8 @@ import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
-import { seenMessagePool } from './SeenMessagePool';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
+import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -113,9 +114,9 @@ function getMessagesRootState(thunkAPI: GetThunkAPI<unknown>): MessagesRootState
 export const TYPING_TIMEOUT = 3000;
 
 export const fetchMessagesCached = memoize(
-	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) =>{
-	const respont =	await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE)
-	return {...respont, time: Date.now()}
+	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) => {
+		const respont = await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE);
+		return { ...respont, time: Date.now() };
 	},
 	{
 		promise: true,
@@ -155,11 +156,11 @@ export const fetchMessages = createAsyncThunk(
 		if (!response.messages) {
 			return [];
 		}
-		
-		if(Date.now() - response.time > 1000){
-			const state = getMessagesState(getMessagesRootState(thunkAPI))
+
+		if (Date.now() - response.time > 1000) {
+			const state = getMessagesState(getMessagesRootState(thunkAPI));
 			const lastSeenMessageId = selectMessageIdsByChannelId(state, channelId)?.at(-1);
-			
+
 			if (lastSeenMessageId) {
 				thunkAPI.dispatch(
 					messagesActions.setChannelLastMessage({
@@ -168,7 +169,7 @@ export const fetchMessages = createAsyncThunk(
 					}),
 				);
 			}
-			return []
+			return [];
 		}
 
 		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -220,7 +221,7 @@ export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', asyn
 				channelId: channelId,
 				noCache: false,
 				messageId: lastScrollMessageId,
-				direction: 3,
+				direction: DIRECTION_MODE.BEFORE_TIMESTAMP,
 			}),
 		);
 	} catch (e) {
@@ -234,21 +235,24 @@ type JumpToMessageArgs = {
 	messageId: string;
 	noCache?: boolean;
 };
-export const jumpToMessage = createAsyncThunk('messages/jumpToMessage', async ({ messageId, channelId, noCache = false }: JumpToMessageArgs, thunkAPI) => {
-	try {
-		await thunkAPI.dispatch(
-			fetchMessages({
-				channelId: channelId,
-				noCache: noCache,
-				messageId: messageId,
-				direction: 1,
-			}),
-		);
-	} catch (e) {
-		console.log(e);
-		return thunkAPI.rejectWithValue([]);
-	}
-});
+export const jumpToMessage = createAsyncThunk(
+	'messages/jumpToMessage',
+	async ({ messageId, channelId, noCache = false }: JumpToMessageArgs, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(
+				fetchMessages({
+					channelId: channelId,
+					noCache: noCache,
+					messageId: messageId,
+					direction: DIRECTION_MODE.BEFORE_TIMESTAMP,
+				}),
+			);
+		} catch (e) {
+			console.log(e);
+			return thunkAPI.rejectWithValue([]);
+		}
+	},
+);
 
 type UpdateMessageArgs = {
 	channelId: string;
@@ -558,11 +562,11 @@ export const messagesSlice = createSlice({
 				[action.payload.channelId]: action.payload.messageId,
 			};
 		},
-		UpdateChannelLastMessage: (state, action: PayloadAction<{channelId:string}>) => {
-			const lastMess = state.channelMessages[action.payload.channelId]?.ids.at(-1)
+		UpdateChannelLastMessage: (state, action: PayloadAction<{ channelId: string }>) => {
+			const lastMess = state.channelMessages[action.payload.channelId]?.ids.at(-1);
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
-				[action.payload.channelId]: lastMess || "",
+				[action.payload.channelId]: lastMess || '',
 			};
 		},
 		setUserTyping: (state, action: PayloadAction<SetUserTypingArgs>) => {
