@@ -61,6 +61,10 @@
             "content": "Are you sure you want to delete #{{channelName}} ?. This cannot be undone",
             "confirmText": "Delete",
             "title": "Delete channel"
-        }
+        },
+        "save": "Save"
+    },
+    "toast": {
+        "updated": "Update successfully"
     }
 }
