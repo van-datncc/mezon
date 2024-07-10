@@ -172,7 +172,6 @@ export const fetchMessages = createAsyncThunk(
 			return [];
 		}
 
-		//const currentHasMore = selectHasMoreMessageByChannelId(channelId)(getMessagesRootState(thunkAPI));
 		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
@@ -244,7 +243,7 @@ export const jumpToMessage = createAsyncThunk(
 					channelId: channelId,
 					noCache: noCache,
 					messageId: messageId,
-					direction: DIRECTION_MODE.BEFORE_TIMESTAMP,
+					direction: DIRECTION_MODE.AROUND_TIMESTAMP,
 				}),
 			);
 		} catch (e) {
@@ -308,7 +307,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
 		const socket = mezon.socketRef.current;
-		// const channel = mezon.channelRef.current;
 
 		if (!client || !session || !socket || !channelId) {
 			throw new Error('Client is not initialized');
