@@ -396,7 +396,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			<View
 				style={[
 					styles.messageWrapper,
-					isCombine && { marginTop: 0 },
+					(isCombine || preventAction) && { marginTop: 0 },
 					hasIncludeMention && styles.highlightMessageMention,
 					checkMessageTargetToMoved && styles.highlightMessageReply
 				]}
@@ -516,20 +516,22 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, listMentions)}
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
-						<MessageAction
-							message={message}
-							mode={mode}
-							emojiListPNG={emojiListPNG}
-							preventAction={preventAction}
-							openEmojiPicker={() => {
-								setIsOnlyEmojiPicker(true);
-								onMessageAction({
-									type: EMessageBSToShow.MessageAction,
-									senderDisplayName,
-									message
-								})
-							}}
-						/>
+						{!preventAction ? (
+							<MessageAction
+								message={message}
+								mode={mode}
+								emojiListPNG={emojiListPNG}
+								preventAction={preventAction}
+								openEmojiPicker={() => {
+									setIsOnlyEmojiPicker(true);
+									onMessageAction({
+										type: EMessageBSToShow.MessageAction,
+										senderDisplayName,
+										message
+									})
+								}}
+							/>
+						): null}
 					</Pressable>
 				</View>
 			</View>
