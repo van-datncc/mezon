@@ -37,7 +37,14 @@ function Homepage() {
 						</Link>
 					)}
 					<div className="mid flex gap-[40px] items-center font-semibold max-lg:hidden">
-						<div className="hover:underline cursor-pointer">Download</div>
+						<a
+							href="https://drive.google.com/file/d/1zfLNnJMlFKEGLbm9ce-8VPqLbIZFvh5O/view"
+							target="_blank"
+							rel="noreferrer"
+							className="hover:underline cursor-pointer"
+						>
+							Download
+						</a>
 						<div className="hover:underline cursor-pointer">Nitro</div>
 						<div className="hover:underline cursor-pointer">Discover</div>
 						<div className="hover:underline cursor-pointer">Safety</div>
@@ -69,10 +76,12 @@ function Homepage() {
 						<div className="block1 flex items-center justify-center max-lg:flex-col">
 							<img src={BannerImg} alt="" className="object-cover w-6/12 max-md:w-8/12 hidden max-lg:block" />
 							<div className="b1-left mt-10 max-lg:text-center flex flex-col max-md:items-center">
-								<div className='w-[150px] -z-10 relative top-[19px] left-[20px]'>
-									<img src={DancingRobot} alt="" className='w-full' />
+								<div className="w-[150px] -z-10 relative top-[19px] left-[20px]">
+									<img src={DancingRobot} alt="" className="w-full" />
 								</div>
-								<div className="top-text text-[50px] max-md:text-[30px] font-black leading-[60px] max-md:leading-[40px]">GROUP CHAT THAT’S ALL FUN & GAMES</div>
+								<div className="top-text text-[50px] max-md:text-[30px] font-black leading-[60px] max-md:leading-[40px]">
+									GROUP CHAT THAT’S ALL FUN & GAMES
+								</div>
 								<div className="bottom-text text-[24px] max-md:text-[17px]">
 									Mezon is great for playing games and chilling with friends, or even building a worldwide community. Customize your
 									own space to talk, play, and hang out.
@@ -81,13 +90,16 @@ function Homepage() {
 							<img src={BannerImg} alt="" className="object-cover w-6/12 block max-lg:hidden" />
 						</div>
 						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col mb-10">
-							<div
+							<a
 								style={{ borderRadius: '28px' }}
 								className="max-md:w-7/12 max-sm:w-11/12 flex items-center justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
+								href="https://drive.google.com/file/d/1zfLNnJMlFKEGLbm9ce-8VPqLbIZFvh5O/view"
+								target="_blank"
+								rel="noreferrer"
 							>
 								<Icons.HomepageDownload className="text-black" />
 								<div>Download for Windows</div>
-							</div>
+							</a>
 							<Link
 								to={'/mezon'}
 								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center hoverBoxShadow"

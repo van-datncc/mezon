@@ -40,13 +40,16 @@ const SideBar = ({ sideBarIsOpen, toggleSideBar }: SideBarProps) => {
 						<div>Careers</div>
 					</div>
 				</div>
-				<div
+				<a
 					className="bottom flex items-center justify-center text-white bg-[#5865f2] px-[20px] py-[7px] font-semibold cursor-pointer mb-[70px]"
 					style={{ borderRadius: '28px' }}
+					href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
+					target="_blank"
+					rel="noreferrer"
 				>
 					<Icons.HomepageDownload className="text-white w-[24px]" />
 					<div className="">Download</div>
-				</div>
+				</a>
 			</div>
 		</div>
 	);
