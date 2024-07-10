@@ -3,14 +3,15 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import MezonBottomSheet from "../MezonBottomSheet";
 import { useRef } from "react";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import styles from "./styles";
 import DatePicker from 'react-native-date-picker'
 import { useState } from "react";
-import { CloseIcon, getNearTime } from "@mezon/mobile-components";
+import { getNearTime, Icons } from "@mezon/mobile-components";
 import MezonFakeInputBox from "../MezonFakeBox";
 import { useEffect } from "react";
 import { memo } from "react";
 import { useCallback } from "react";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./styles";
 
 interface IMezonDateTimePicker {
     mode?: "datetime" | "date" | "time",
@@ -21,6 +22,8 @@ interface IMezonDateTimePicker {
 }
 
 export default memo(function MezonDateTimePicker({ mode = "date", title, onChange, value, keepTime }: IMezonDateTimePicker) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const bottomSheetRef = useRef<BottomSheetModalMethods>();
     const [date, setDate] = useState(value || getNearTime(120))
     const [currentDate, setCurrentDate] = useState(value || getNearTime(120));
@@ -81,7 +84,7 @@ export default memo(function MezonDateTimePicker({ mode = "date", title, onChang
                 title={title}
                 headerLeft={
                     <TouchableOpacity onPress={handleClose}>
-                        <CloseIcon height={16} width={16} />
+                        <Icons.CloseIcon height={16} width={16} color={themeValue.text} />
                     </TouchableOpacity>
                 }
                 headerRight={

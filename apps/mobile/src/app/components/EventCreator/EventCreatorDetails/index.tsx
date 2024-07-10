@@ -1,5 +1,5 @@
 import { ScrollView, Text, View } from "react-native";
-import styles from "./styles";
+import { style } from "./styles";
 import { useTranslation } from "react-i18next";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
 import { MezonDateTimePicker, MezonInput, MezonSelect } from "../../../temp-ui";
@@ -8,9 +8,12 @@ import { useState } from "react";
 import { getNearTime } from "@mezon/mobile-components";
 import { OptionEvent } from "@mezon/utils";
 import Toast from "react-native-toast-message";
+import { useTheme } from "@mezon/mobile-ui";
 
 type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS;
 export default function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<CreateEventScreenDetails>) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const { t } = useTranslation(['eventCreator']);
 
     // @ts-ignore

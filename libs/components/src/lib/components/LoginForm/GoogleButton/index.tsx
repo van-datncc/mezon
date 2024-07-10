@@ -12,7 +12,7 @@ const GoogleButtonLogin: React.FC = () => {
 		ux_mode: 'popup',
 		onSuccess: async ({ code }) => {
 			await loginByGoogle(code);
-			navigate("/mezon");
+			navigate('/mezon');
 		},
 		onError: (errorResponse) => console.log(errorResponse),
 	});

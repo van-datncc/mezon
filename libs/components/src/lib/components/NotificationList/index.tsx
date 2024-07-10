@@ -21,6 +21,7 @@ function NotificationList() {
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
+	
 	const { channels } = useChannels();
 	const notificationItem = notification.filter(
 		(item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),

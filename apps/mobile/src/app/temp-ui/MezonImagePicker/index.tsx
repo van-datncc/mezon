@@ -1,8 +1,8 @@
-import { PenIcon } from "@mezon/mobile-components";
+import { Icons } from "@mezon/mobile-components";
 import { DimensionValue, Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import styles from "./styles";
+import { style } from "./styles";
 import { useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker";
 import { handleUploadFileMobile, useMezon } from "@mezon/transport";
@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentChannel } from "@mezon/store-mobile";
 import { memo } from "react";
 import { openCropper } from 'react-native-image-crop-picker';
+import { useTheme } from "@mezon/mobile-ui";
 
 export interface IFile {
     uri: string;
@@ -30,6 +31,8 @@ interface IMezonImagePickerProps {
 }
 
 export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60, showHelpText, autoUpload=false }: IMezonImagePickerProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const [image, setImage] = useState<string>(defaultValue);
     const currentChannel = useSelector(selectCurrentChannel);
     const { sessionRef, clientRef } = useMezon();
@@ -109,8 +112,7 @@ export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, 
                 </View>
 
                 <View style={styles.btnWrapper}>
-                    {/* TODO: change icon */}
-                    <PenIcon height={12} width={12} color="gray" />
+                    <Icons.PencilIcon height={12} width={12} color={themeValue.text} />
                 </View>
             </View>
         </TouchableOpacity>

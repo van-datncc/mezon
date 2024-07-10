@@ -1,14 +1,5 @@
-import { useAppNavigation, useJumpToMessage, useNotification } from '@mezon/core';
-import {
-	INotification,
-	referencesActions,
-	selectChannelById,
-	selectCurrentChannelId,
-	selectCurrentClan,
-	selectMemberByUserId,
-	selectMemberClanByUserId,
-	selectMessageByMessageId,
-} from '@mezon/store';
+import { useJumpToMessage, useNotification } from '@mezon/core';
+import { INotification, referencesActions, selectChannelById, selectCurrentClan, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -59,25 +50,26 @@ function parseObject(obj: any) {
 function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const dispatch = useDispatch();
 	const { deleteNotify } = useNotification();
-	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const currentClan = useSelector(selectCurrentClan);
 	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
 	const data = parseObject(notify.content);
-	const messageId = notify.content.message_id;
-	const { toChannelPage, navigate } = useAppNavigation();
-	const { jumpToMessage } = useJumpToMessage();
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const message = useSelector(selectMessageByMessageId(messageId));
+
+	const messageID = useMemo(() => {
+		return notify.content.message_id;
+	}, [notify.content.message_id]);
+	const channelId = useMemo(() => {
+		return notify.content.channel_id;
+	}, [notify.content.channel_id]);
+
+	const message = useSelector(selectMessageByMessageId(messageID));
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
-	const dispatchMessageMention = async () => {
-		if (currentChannelId !== data.channel_id) {
-			await navigate(toChannelPage(data.channel_id, currentClan?.id ?? ''));
-			dispatch(referencesActions.setMessageMentionId(data.message_id));
-		} else {
-			jumpToMessage(data.message_id);
-		}
-	};
+	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
+
+	const handleClickJump = useCallback(() => {
+		dispatch(referencesActions.setIdMessageToJump(messageID));
+		directToMessageById();
+	}, []);
 
 	return (
 		<div className="flex flex-col gap-2 py-3 px-3 w-full">
@@ -121,9 +113,7 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 			<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
 				<button
 					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
-					onClick={() => {
-						dispatchMessageMention();
-					}}
+					onClick={handleClickJump}
 				>
 					Jump
 				</button>
