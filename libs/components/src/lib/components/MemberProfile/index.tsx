@@ -7,7 +7,7 @@ import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
-import { OfflineStatus, OnlineStatus } from '../Icons';
+import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
@@ -181,7 +181,7 @@ function MemberProfile({
 							>
 								{name}
 							</p>
-							{((dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id ) && (
+							{((dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id) && (
 								<button className="w-[14px] h-[14px] ml-1">
 									<Icons.OwnerIcon />
 								</button>
@@ -195,7 +195,7 @@ function MemberProfile({
 				</div>
 			</div>
 			{isShowPanelMember && (
-				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false}/>
+				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} />
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div

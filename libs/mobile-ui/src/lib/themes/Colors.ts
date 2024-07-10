@@ -129,6 +129,7 @@ const colors = {
 	borderPrimary: '#363940',
 	borderMessageHighlight: '#F0B132',
 	borderMessageReply: '#2882f0',
+  borderGrayishBrown: '#7f7e7e87',
 	/* text color */
 	header1: '#888c94',
 	header2: '#676b73',

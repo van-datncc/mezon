@@ -172,7 +172,7 @@ const ModalUserProfile = ({
 					) : null}
 					{showNote && (
 						<>
-							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
+							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 p-2"></div>
 							<NoteUserProfile />
 						</>
 					)}

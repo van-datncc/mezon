@@ -1,16 +1,18 @@
 import { useReference, useThreads } from '@mezon/core';
-import { ThreadIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { useNavigation } from '@react-navigation/native';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { styles } from './EmptyThread.style';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mezon/mobile-ui';
 
 const EmptyThread = () => {
 	const { setValueThread } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const navigation = useNavigation<any>();
   const { t } = useTranslation(["createThread"]);
+  const { themeValue } = useTheme();
 
 	const handleNavigateCreateForm = () => {
 		setOpenThreadMessageState(false);
@@ -21,7 +23,7 @@ const EmptyThread = () => {
 		<View style={styles.emptyThreadContainer}>
 			<View style={styles.emptyThreadContent}>
 				<View style={styles.iconContainer}>
-					<ThreadIcon width={22} height={22} />
+        <Icons.ThreadPlusIcon width={22} height={22} color={themeValue.textStrong} />
 				</View>
 				<Text style={styles.textNoThread}>{t("emptyThread.textNoThread")}</Text>
 				<Text style={styles.textNotify}>{t("emptyThread.textNotify")}</Text>

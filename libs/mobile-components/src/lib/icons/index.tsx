@@ -1111,7 +1111,7 @@ export function UserMinus({ width = 24, height = 24, color = '#d1323f', ...props
 	)
 }
 
-export function ClockWarning({ width = 24, height = 24, color = '#d1323f', ...props }: SvgProps) {
+export function ClockWarning({ width = 24, height = 24, color = '#c7c7c7', ...props }: SvgProps) {
 	return (
     <Svg
     width={width}

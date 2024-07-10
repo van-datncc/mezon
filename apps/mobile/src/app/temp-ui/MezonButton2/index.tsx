@@ -1,5 +1,6 @@
 import { Pressable, Text } from "react-native";
-import styles from "./styles";
+import { style } from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IMezonButton {
     icon?: any,
@@ -11,6 +12,9 @@ interface IMezonButton {
 }
 
 export default function MezonButton({ icon, title, fluid, border, type, onPress }: IMezonButton) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
+
     function renderContainerStyle() {
         if (type === "success") return styles.containerSuccess;
         if (type === "warning") return styles.containerWarning;

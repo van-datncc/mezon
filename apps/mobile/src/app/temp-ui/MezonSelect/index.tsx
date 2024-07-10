@@ -3,11 +3,12 @@ import { ReactNode } from "react";
 import { useState } from "react";
 import { useRef } from "react";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
-import { AngleRightIcon } from "@mezon/mobile-components";
+import { Icons } from "@mezon/mobile-components";
 import MezonFakeInputBox from "../MezonFakeBox";
 import { View } from "react-native";
 import MezonBottomSheet from "../MezonBottomSheet";
-import styles from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./styles";
 
 interface IMezonSelectProps {
     title?: string;
@@ -21,6 +22,8 @@ interface IMezonSelectProps {
 }
 
 export default function MezonSelect({ data, onChange, icon, title }: IMezonSelectProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const [currentValue, setCurrentValue] = useState(0);
     const [currentContent, setCurrentContent] = useState(data?.[0]?.title || "unknown");
     const bottomSheetRef = useRef<BottomSheetModalMethods>();
@@ -41,7 +44,7 @@ export default function MezonSelect({ data, onChange, icon, title }: IMezonSelec
             <MezonFakeInputBox
                 title={title}
                 value={currentContent}
-                postfixIcon={<AngleRightIcon height={20} width={20} />}
+                postfixIcon={<Icons.ChevronSmallRightIcon height={20} width={20} color={themeValue.text} />}
                 onPress={handlePress}
             />
 

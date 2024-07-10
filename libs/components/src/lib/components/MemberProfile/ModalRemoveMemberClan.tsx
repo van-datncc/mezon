@@ -46,7 +46,7 @@ const ModalRemoveMemberClan = ({ openModal, username, onClose, onRemoveMember }:
 							rows={2}
 							value={value ?? ''}
 							onChange={handleChange}
-							className="text-[#B5BAC1] outline-none w-full h-16 p-[10px] dark:bg-[#26262B] bg-bgTextarea text-base rounded placeholder:text-sm"
+							className="text-[#B5BAC1] outline-none w-full h-16 p-[10px] dark:bg-bgInputDark bg-bgTextarea text-base rounded placeholder:text-sm"
 						/>
 					</div>
 

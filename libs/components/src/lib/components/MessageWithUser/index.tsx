@@ -6,7 +6,7 @@ import React, { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
-import * as Icons from '../Icons/index';
+import * as Icons from '../../../../../ui/src/lib/Icons/index';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';

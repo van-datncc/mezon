@@ -1,14 +1,15 @@
 import {
 	Icons,
+	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_KEY_CLAN_CURRENT_CACHE,
 	getUpdateOrAddClanChannelCache,
+	load,
 	save,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	getStoreAsync,
-	messagesActions,
 	selectIsUnreadChannelById,
 	selectLastChannelTimestamp,
 	selectNotificationMentionCountByChannelId,
@@ -16,8 +17,8 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React from 'react';
-import { Linking, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import { ChannelListContext } from '../../../Reusables';
@@ -37,7 +38,12 @@ interface IChannelListItemProps {
 	image?: string;
 	isActive: boolean;
 	currentChanel: IChannel;
-	onLongPress: () => void
+	onLongPress: () => void;
+}
+
+enum StatusVoiceChannel {
+	Active = 1,
+	No_Active = 0,
 }
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
@@ -47,21 +53,37 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
+	const timeoutRef = useRef<any>();
+
+	useEffect(() => {
+		return () => {
+			timeoutRef.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	const handleRouteData = async (thread?: IChannel) => {
-		const store = await getStoreAsync();
-		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === 1 && props?.data?.meeting_code) {
-			const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
-			await Linking.openURL(urlVoice);
-			return;
+		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
+				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
+				await Linking.openURL(urlVoice);
+				return;
+			}
+		} else {
+			useChannelListContentIn.navigation.closeDrawer();
+			const store = await getStoreAsync();
+			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
+			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
+			timeoutRef.current = setTimeout(() => {
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+				if (!channelsCache?.includes(channelId)) {
+					save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+				}
+			}, 0);
 		}
-		useChannelListContentIn.navigation.closeDrawer();
-		const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
-		const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
-		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 
 	return (
@@ -76,41 +98,31 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{isUnRead && <View style={styles.dotIsNew} />}
 
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceLockIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
+						<Icons.VoiceLockIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
 					)}
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextLockIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
+						<Icons.TextLockIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
 					)}
 					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceNormalIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
+						<Icons.VoiceNormalIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
 					)}
-					{props?.data?.channel_private === undefined &&
-						props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-						<Icons.TextIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
-					}
+					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+						<Icons.TextIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
+					)}
 
-					<Text
-						style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>{props.data.channel_label}
+					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
+						{props.data.channel_label}
 					</Text>
 				</View>
+				{props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === StatusVoiceChannel.No_Active && (
+					<ActivityIndicator color={themeValue.white} />
+				)}
 
-				{numberNotification > 0 &&
+				{numberNotification > 0 && (
 					<View style={styles.channelDotWrapper}>
 						<Text style={styles.channelDot}>{numberNotification}</Text>
 					</View>
-				}
+				)}
 			</TouchableOpacity>
 
 			{!!props?.data?.threads?.length && (
@@ -119,5 +131,4 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			{!!voiceChannelMember?.length && <UserListVoiceChannel userListVoice={voiceChannelMember} />}
 		</View>
 	);
-},
-);
+});
