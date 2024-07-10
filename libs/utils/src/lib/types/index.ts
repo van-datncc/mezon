@@ -6,6 +6,7 @@ import {
 	ApiChannelDescription,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiDirectChannelVoice,
 	ApiEventManagement,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
@@ -74,6 +75,9 @@ export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
 };
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
+	id: string;
+};
+export type IDirectChannelVoid = ApiDirectChannelVoice & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
