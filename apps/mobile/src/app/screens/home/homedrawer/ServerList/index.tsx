@@ -1,18 +1,18 @@
-import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
-import { appActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
+import { useFriends } from '@mezon/core';
+import { Icons, STORAGE_CHANNEL_CURRENT_CACHE, remove } from '@mezon/mobile-components';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, TouchableOpacity, View, Text } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useSelector } from 'react-redux';
 import LogoMezon from '../../../../../assets/svg/logoMezon.svg';
+import { SeparatorWithLine } from '../../../../components/Common';
+import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
+import { ClanIcon } from '../components/ClanIcon';
 import ListClanPopupProps from '../components/ListClanPopup';
 import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
-import { APP_SCREEN } from '../../../../navigation/ScreenTypes';
-import { SeparatorWithLine } from '../../../../components/Common';
-import { useFriends } from '@mezon/core';
-import { Icons, PlusGreenIcon } from '@mezon/mobile-components';
 import { style } from './styles';
-import { ClanIcon } from '../components/ClanIcon';
 
 const ServerList = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -28,7 +28,8 @@ const ServerList = React.memo((props: any) => {
 			setIsVisible(false);
 		}, 200);
 		const store = await getStoreAsync();
-    store.dispatch(clansActions.joinClan({ clanId: clanId }));
+		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+		store.dispatch(clansActions.joinClan({ clanId: clanId }));
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
 
@@ -40,7 +41,7 @@ const ServerList = React.memo((props: any) => {
 
 	const navigateToDM = () => {
 		props.navigation.navigate(APP_SCREEN.MESSAGES.HOME);
-	}
+	};
 
 	return (
 		<View style={styles.wrapperServerList}>

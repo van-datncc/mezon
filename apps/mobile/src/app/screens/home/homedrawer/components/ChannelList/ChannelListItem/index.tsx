@@ -1,14 +1,15 @@
 import {
 	Icons,
+	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_KEY_CLAN_CURRENT_CACHE,
 	getUpdateOrAddClanChannelCache,
+	load,
 	save,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	getStoreAsync,
-	messagesActions,
 	selectIsUnreadChannelById,
 	selectLastChannelTimestamp,
 	selectNotificationMentionCountByChannelId,
@@ -37,7 +38,7 @@ interface IChannelListItemProps {
 	image?: string;
 	isActive: boolean;
 	currentChanel: IChannel;
-	onLongPress: () => void
+	onLongPress: () => void;
 }
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
@@ -62,6 +63,11 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+
+		if (!channelsCache?.includes(channelId)) {
+			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		}
 	};
 
 	return (
@@ -76,41 +82,28 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{isUnRead && <View style={styles.dotIsNew} />}
 
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceLockIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
+						<Icons.VoiceLockIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
 					)}
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextLockIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
+						<Icons.TextLockIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
 					)}
 					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceNormalIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
+						<Icons.VoiceNormalIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
 					)}
-					{props?.data?.channel_private === undefined &&
-						props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT &&
-						<Icons.TextIcon
-							width={16} height={16}
-							color={isUnRead ? themeValue.textStrong : themeValue.text}
-						/>
-					}
+					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+						<Icons.TextIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
+					)}
 
-					<Text
-						style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>{props.data.channel_label}
+					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
+						{props.data.channel_label}
 					</Text>
 				</View>
 
-				{numberNotification > 0 &&
+				{numberNotification > 0 && (
 					<View style={styles.channelDotWrapper}>
 						<Text style={styles.channelDot}>{numberNotification}</Text>
 					</View>
-				}
+				)}
 			</TouchableOpacity>
 
 			{!!props?.data?.threads?.length && (
@@ -119,5 +112,4 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			{!!voiceChannelMember?.length && <UserListVoiceChannel userListVoice={voiceChannelMember} />}
 		</View>
 	);
-},
-);
+});

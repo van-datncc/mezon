@@ -1,9 +1,9 @@
 import { useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, load, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
-	RootState,
 	messagesActions,
+	RootState,
 	selectAllUserClanProfile,
 	selectAttachmentPhoto,
 	selectChannelMemberByUserIds,
@@ -24,16 +24,15 @@ import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import UseMentionList from '../../../hooks/useUserMentionList';
-import MessageItem from './MessageItem';
-import WelcomeMessage from './WelcomeMessage';
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
+import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
+import WelcomeMessage from './WelcomeMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -64,7 +63,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [userSelected, setUserSelected] = useState<ApiUser | null>(null);
 	const [messageSelected, setMessageSelected] = useState<IMessageWithUser | null>(null);
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
-	const [isDisableSkeletonLoading, setIsDisableSkeletonLoading] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const currentClan = useSelector(selectCurrentClan);
@@ -114,12 +112,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && setOpenBottomSheet(null);
 		});
-		const disableSkeletonListener = DeviceEventEmitter.addListener(ActionEmitEvent.DISABLE_SKELETON_MESSAGE, ({ isDisabled = false }) => {
-			setIsDisableSkeletonLoading(isDisabled);
-		});
 		return () => {
 			messageItemBSListener.remove();
-			disableSkeletonListener.remove();
 		};
 	}, []);
 
@@ -271,10 +265,15 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		[setIdxSelectedImageModal, setVisibleImageModal, setVisibleImageModalOverlay],
 	);
 
+	const checkChannelCacheLoading = useMemo(() => {
+		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+		return channelsCache?.includes(channelId);
+	}, [channelId]);
+
 	return (
 		<View style={styles.wrapperChannelMessage}>
 			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
-			{isLoading === 'loading' && !isLoadMore && !isDisableSkeletonLoading && <MessageItemSkeleton skeletonNumber={15} />}
+			{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && <MessageItemSkeleton skeletonNumber={15} />}
 			<FlashList
 				ref={flatListRef}
 				inverted
