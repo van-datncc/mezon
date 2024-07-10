@@ -1,8 +1,11 @@
 import { ChangeEvent, useState } from "react";
 
+type SettingEmojiItemProp = {
+  author: string,
+}
 
-const SettingEmojiItem = () => {
-  const [nameEmoji, setNameEmoji] = useState<string>("thich.du.yen");
+const SettingEmojiItem = ({ author }: SettingEmojiItemProp) => {
+  const [nameEmoji, setNameEmoji] = useState<string>("__");
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
@@ -32,7 +35,7 @@ const SettingEmojiItem = () => {
             <img className={'w-full h-auto object-cover'} src="https://64.media.tumblr.com/204861b8de03c6826f4b08e898256ee3/a62e949d921cdb7f-8b/s1280x1920/fa655ae1bb2bcfd1b72a4605af853aa6a7ef9c49.jpg" />
           </div>
           <p className={'text-sm h-auto leading-6'}>
-            Thích Du Yên
+            {author}
           </p>
         </div>
 
