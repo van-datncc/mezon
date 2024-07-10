@@ -2,18 +2,9 @@ import { useAuth, useChatReaction } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	CopyIcon,
-	FaceIcon,
-	FlagIcon,
-	LinkIcon,
-	MarkUnreadIcon,
-	MentionIcon,
-	PenIcon,
-	PinMessageIcon,
-	ReplyMessageIcon,
-	ThreadIcon,
-	TrashIcon,
+	Icons,
 } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectPinMessageByChannelId } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -29,12 +20,14 @@ import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
-import { styles } from './styles';
-import { useRoute } from '@react-navigation/native';
+import { style } from './styles';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -154,6 +147,22 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		console.log('CopyMessageLink');
 	};
 
+	const handleActionCopyMediaLink = () => {
+		const media = message.attachments;
+		if (media.length > 0) {
+			const url = media[0].url;
+			Clipboard.setString(url);
+		}
+	}
+
+	const handleActionSaveImage = () => {
+		const media = message.attachments;
+		if (media.length > 0) {
+			const url = media[0].url;
+			CameraRoll.save(url);
+		}
+	}
+
 	const handleActionReportMessage = () => {
 		onClose();
 		timeoutRef.current = setTimeout(
@@ -211,6 +220,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyMessageLink:
 				handleActionCopyMessageLink();
 				break;
+			case EMessageActionType.CopyMediaLink:
+				handleActionCopyMediaLink();
+				break;
+			case EMessageActionType.SaveImage:
+				handleActionSaveImage();
+				break;
 			case EMessageActionType.Report:
 				handleActionReportMessage();
 				break;
@@ -225,29 +240,33 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const getActionMessageIcon = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.EditMessage:
-				return <PenIcon />;
+				return <Icons.PencilIcon color={themeValue.text} />;
 			case EMessageActionType.Reply:
-				return <ReplyMessageIcon />;
+				return <Icons.ArrowAngleLeftUpIcon color={themeValue.text} />;
 			case EMessageActionType.ForwardMessage:
-				return <ReplyMessageIcon style={{ transform: [{ scaleX: -1 }] }} />;
+				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
 			case EMessageActionType.CreateThread:
-				return <ThreadIcon width={20} height={20} />;
+				return <Icons.ThreadIcon color={themeValue.text} />;
 			case EMessageActionType.CopyText:
-				return <CopyIcon />;
+				return <Icons.CopyIcon color={themeValue.text} />;
 			case EMessageActionType.DeleteMessage:
-				return <TrashIcon color={Colors.textRed} width={18} height={18} />;
+				return <Icons.TrashIcon color={themeValue.text} />;
 			case EMessageActionType.PinMessage:
-				return <PinMessageIcon />;
+				return <Icons.PinIcon color={themeValue.text} />;
 			case EMessageActionType.UnPinMessage:
-				return <PinMessageIcon />;
+				return <Icons.PinIcon color={themeValue.text} />;
 			case EMessageActionType.MarkUnRead:
-				return <MarkUnreadIcon />;
+				return <Icons.ChatMarkUnreadIcon color={themeValue.text} />;
 			case EMessageActionType.Mention:
-				return <MentionIcon />;
+				return <Icons.AtIcon color={themeValue.text} />;
+			case EMessageActionType.SaveImage:
+				return <Icons.DownloadIcon color={themeValue.text} />;
+			case EMessageActionType.CopyMediaLink:
+				return <Icons.LinkIcon color={themeValue.text} />;
 			case EMessageActionType.CopyMessageLink:
-				return <LinkIcon />;
+				return <Icons.LinkIcon color={themeValue.text} />;
 			case EMessageActionType.Report:
-				return <FlagIcon color={Colors.textRed} />;
+				return <Icons.FlagIcon color={themeValue.text} />;
 			default:
 				return <View />;
 		}
@@ -257,7 +276,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
 
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage,EMessageActionType.DeleteMessage];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
 		const listOfActionShouldHide = [
@@ -267,12 +286,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 		let availableMessageActions: IMessageAction[] = [];
 		if (isMyMessage) {
-			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage,...listOfActionShouldHide].includes(action.type));
+			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage, ...listOfActionShouldHide].includes(action.type));
 		} else {
-			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage,...listOfActionShouldHide].includes(action.type));
+			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
 		}
 
-		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
+		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread, EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
 		return {
@@ -316,8 +335,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 						);
 					})}
 
-					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{height: size.s_28, width: size.s_28,}}>
-						<FaceIcon color={Colors.white} />
+					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28, }}>
+						<Icons.ReactionIcon color={themeValue.text} />
 					</Pressable>
 				</View>
 				<View style={styles.messageActionGroup}>
@@ -423,12 +442,12 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			}}
 			style={styles.bottomSheet}
 			handleComponent={() => {
-                return (
+				return (
 					<View style={styles.bottomSheetBarWrapper}>
-						<View style={styles.bottomSheetBar}/>
+						<View style={styles.bottomSheetBar} />
 					</View>
-                )
-            }}
+				)
+			}}
 		>
 			<View style={styles.bottomSheetWrapper}>{content}</View>
 		</MezonBottomSheet>
