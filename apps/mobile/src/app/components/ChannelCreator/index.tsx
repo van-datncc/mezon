@@ -3,14 +3,12 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../navigation/ScreenTypes";
 import { useState } from "react";
 import { CrossIcon, NittroIcon } from "@mezon/mobile-components";
 import { useTranslation } from "react-i18next";
-import MezonInput from "../../temp-ui/MezonInput2";
 import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
 import { useSelector } from "react-redux";
 import { createNewChannel, selectCurrentChannel, selectCurrentClanId } from "@mezon/store-mobile";
 import styles from "./styles";
-import MezonToggleButton from "../../temp-ui/MezonToggleButton";
 import { useMemo } from "react";
-import { IMezonMenuSectionProps, MezonMenu, MezonOption } from "../../temp-ui";
+import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from "../../temp-ui";
 import { ChannelType } from "mezon-js";
 import { useAppDispatch } from "@mezon/store";
 import { validInput } from "../../utils/validate";
@@ -69,12 +67,6 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
         navigation.goBack();
     }
 
-    const ToggleBtn = () => <MezonToggleButton
-        onChange={(value: boolean) => setChannelPrivate(value)}
-        height={25}
-        width={45}
-    />
-
     const menuPrivate = useMemo(() => ([
         {
             bottomDescription: channelType === ChannelType.CHANNEL_TYPE_TEXT
@@ -83,7 +75,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
             items: [
                 {
                     title: t('fields.channelPrivate.title'),
-                    component: <ToggleBtn />,
+                    component: <MezonSwitch />,
                     icon: <NittroIcon />
                 }
             ]
@@ -114,7 +106,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
                 label={t('fields.channelName.title')}
                 errorMessage={t('fields.channelName.errorMessage')}
                 placeHolder={t('fields.channelName.placeholder')} />
-            <View style={styles.menu}>
+            <View>
                 <MezonOption
                     title={t('fields.channelType.title')}
                     data={channelTypeList}

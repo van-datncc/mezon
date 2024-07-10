@@ -5,6 +5,9 @@ import { useRef } from "react";
 import { useState } from "react";
 import { size } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
+import { useEffect } from "react";
+import { validInput } from "../../utils/validate";
+import { ErrorInput } from "../../components/ErrorInput";
 
 interface IMezonInputProps {
     placeHolder?: string;
@@ -14,13 +17,19 @@ interface IMezonInputProps {
     onTextChange?: (value: string) => void;
     maxCharacter?: number,
     inputWrapperStyle?: StyleProp<ViewStyle>,
-    showBorderOnFocus?: boolean
+    showBorderOnFocus?: boolean,
+    errorMessage?: string;
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus }: IMezonInputProps) {
-    const ref = useRef<TextInput>(null)
+export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage }: IMezonInputProps) {
+    const ref = useRef<TextInput>(null);
     const [showCount, setShowCount] = useState<boolean>(false);
     const [isFocus, setFocus] = useState<boolean>(false);
+    const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
+
+    useEffect(() => {
+        setIsCheckValid(validInput(value))
+    }, [value])
 
     function handleClearBtn() {
         ref && ref.current && ref.current.clear();
@@ -48,7 +57,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
     return (
         <View style={styles.container}>
             <Text style={styles.label}>{label}</Text>
-            <View style={[styles.fakeInput, textarea && {paddingTop: 10}, renderBorder(), inputWrapperStyle]}>
+            <View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
                 <View style={styles.inputBox}>
                     <TextInput
                         ref={ref}
@@ -73,13 +82,14 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         </TouchableOpacity>
                     }
                 </View>
-                
+
                 {showCount && textarea &&
                     <View style={styles.lineCountWrapper}>
                         <Text style={styles.count}>{`${value?.length || '0'}/${maxCharacter}`}</Text>
                     </View>
                 }
             </View>
+            {!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
         </View>
 
     )

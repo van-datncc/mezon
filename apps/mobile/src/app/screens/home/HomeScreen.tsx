@@ -67,7 +67,7 @@ const HomeScreen = React.memo((props: any) => {
 	const isLogin = useSelector(selectIsLogin);
 
 	const { reconnect } = useMezon();
-	useCheckUpdatedVersion();
+	// useCheckUpdatedVersion();
 
 	useEffect(() => {
 		if (clans?.length && !currentClan) {
