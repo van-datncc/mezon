@@ -55,7 +55,10 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 			{(!openEdit) &&
 				<>
 					<p className='text-sm dark:text-zinc-400 text-colorTextLightMode mb-4'>Use roles to group your server members and assign permissions.</p>
-					<div className='rounded dark:bg-bgSecondary bg-bgLightMode p-4 pr-6 flex justify-between cursor-pointer group mb-4 dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton'>
+					<div 
+						onClick={() => {handleRoleClick(rolesClan[0]?.id); setOpenEdit(true);}}
+						className='rounded dark:bg-bgSecondary bg-bgLightMode p-4 pr-6 flex justify-between cursor-pointer group mb-4 dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton'
+					>
 						<div className='flex gap-x-4 items-center'>
 							<div className='dark:bg-bgPrimary bg-white p-1 rounded-full h-fit'>
 								<Icons.MemberList defaultSize="w-5 h-5" />

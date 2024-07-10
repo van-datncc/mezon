@@ -19,7 +19,7 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 		<>
 			<div className="w-full flex justify-between mb-5 border-b border-gray-200 dark:border-gray-500">
 				<button
-					className={`py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${selectedButton === 'Display' ? 'shadow-md' : ''}`}
+					className="py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group"
 					onClick={() => {
 						handleButtonClick('Display');
 						dispatch(toggleIsShowFalse());
@@ -30,7 +30,7 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 				</button>
 
 				<button
-					className={`py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${selectedButton === 'Permissions' ? 'shadow-md' : ''}`}
+					className="py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group"
 					onClick={() => {
 						handleButtonClick('Permissions');
 						dispatch(toggleIsShowFalse());
@@ -40,7 +40,7 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Permissions' ? 'bg-blue-400' : ''}`} />
 				</button>
 				<button
-					className={`py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${selectedButton === 'Manage Members' ? 'shadow-md' : ''}`}
+					className="py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group"
 					onClick={() => {
 						handleButtonClick('Manage Members');
 						dispatch(toggleIsShowFalse());

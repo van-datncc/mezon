@@ -47,8 +47,9 @@ const SettingListRole = (props: closeEditRole) => {
 			<div className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
 				{clickedRole === 'New Role' ? (
 					<div>
-						<button className={`block w-full py-2 px-4 rounded text-[15px] bg-gray-500 hover:bg-gray-70 text-white font-bold`}>
-							{nameRoleNew}
+						<button className="w-full py-1.5 px-[10px] text-[15px] dark:bg-[#4e5058] bg-bgModifierHoverLight text-white font-bold inline-flex gap-x-2 items-center rounded">
+							<div className='size-3 bg-contentTertiary rounded-full min-w-3'></div>
+							<span className='one-line'>{nameRoleNew}</span>
 						</button>
 					</div>
 				) : (
@@ -57,7 +58,7 @@ const SettingListRole = (props: closeEditRole) => {
 							<button
 								onClick={() => handleRoleClick(role.id)}
 								className={`w-full py-1.5 px-[10px] rounded text-[15px] text-left font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton inline-flex gap-x-2 items-center ${
-									clickedRole === role.id ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight font-bold' : ''
+									clickedRole === role.id ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight' : ''
 								} dark:text-textDarkTheme text-textLightTheme`}
 							>
 								<div className='size-3 bg-contentTertiary rounded-full min-w-3'></div>
