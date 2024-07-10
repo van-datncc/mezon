@@ -129,7 +129,7 @@ export default function CreateThreadForm() {
 		navigation.navigate(APP_SCREEN.HOME as never);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 

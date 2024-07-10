@@ -1,9 +1,9 @@
-import { Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
-        gap:  Metrics.size.s
+        gap: Metrics.size.s
     },
 
     inline: {
@@ -15,14 +15,12 @@ const styles = StyleSheet.create({
     },
 
     tinyText: {
-        color: Colors.white,
+        color: colors.text,
         fontSize: Fonts.size.tiny,
     },
 
     smallText: {
-        color: Colors.white,
+        color: colors.text,
         fontSize: Fonts.size.h8,
     },
 });
-
-export default styles;

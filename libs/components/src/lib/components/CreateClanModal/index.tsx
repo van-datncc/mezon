@@ -126,7 +126,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 						onChange={handleInputChange}
 						type="text"
 						className="dark:bg-bgSurface bg-bgModifierHoverLight mb-2 mt-4 py-2"
-						placeholder={`${userProfile?.user?.username}'s clan`}
+						placeholder={`Enter the clan name`}
 						maxLength={64}
 					/>
 					{checkvalidate && (
