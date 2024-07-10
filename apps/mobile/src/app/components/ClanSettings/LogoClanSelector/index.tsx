@@ -1,7 +1,8 @@
 import { Text, View } from "react-native";
-import styles from "./style";
 import { useClans } from "@mezon/core";
 import { MezonImagePicker } from "../../../temp-ui";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./style";
 
 export interface IFile {
     uri: string;
@@ -14,6 +15,8 @@ export interface IFile {
 interface ILogoClanSelector { }
 
 export default function LogoClanSelector({ }: ILogoClanSelector) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const { currentClan, updateClan } = useClans();
 
     function handleLoad(url?: string) {

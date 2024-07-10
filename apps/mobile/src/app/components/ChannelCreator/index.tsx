@@ -12,6 +12,7 @@ import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch
 import { ChannelType } from "mezon-js";
 import { useAppDispatch } from "@mezon/store";
 import { validInput } from "../../utils/validate";
+import Toast from "react-native-toast-message";
 
 type CreateChannelScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CHANNEL;
 export default function ChannelCreator({ navigation, route }: MenuClanScreenProps<CreateChannelScreen>) {
@@ -57,10 +58,19 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
             category_id: categoryId || currentChannel.category_id,
         };
 
-        console.log(body);
-        await dispatch(createNewChannel(body));
-        setChannelName('');
-        navigation.navigate(APP_SCREEN.HOME);
+        const newChannelCreatedId = await dispatch(createNewChannel(body));
+        // @ts-ignore
+        const error = newChannelCreatedId.error
+
+        if (newChannelCreatedId && error) {
+            Toast.show({
+                type: "info",
+                text1: error.message
+            })
+        } else {
+            setChannelName('');
+            navigation.navigate(APP_SCREEN.HOME);
+        }
     }
 
     function handleClose() {
@@ -98,6 +108,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
     function handleChannelTypeChange(value: number) {
         setChannelType(value);
     }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <MezonInput

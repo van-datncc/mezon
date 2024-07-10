@@ -1,10 +1,10 @@
 import { StyleProp, Text, TextInput, View, ViewStyle } from "react-native";
-import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRef } from "react";
 import { useState } from "react";
-import { size } from "@mezon/mobile-ui";
+import { size, useTheme } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
+import { style } from "./styles";
 import { useEffect } from "react";
 import { validInput } from "../../utils/validate";
 import { ErrorInput } from "../../components/ErrorInput";
@@ -22,6 +22,8 @@ interface IMezonInputProps {
 }
 
 export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage }: IMezonInputProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const ref = useRef<TextInput>(null);
     const [showCount, setShowCount] = useState<boolean>(false);
     const [isFocus, setFocus] = useState<boolean>(false);

@@ -86,8 +86,8 @@ android {
         applicationId "com.mobile.mezon"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 32
-        versionName "1.0.17"
+        versionCode 33
+        versionName "1.0.18"
     }
     signingConfigs {
         debug {

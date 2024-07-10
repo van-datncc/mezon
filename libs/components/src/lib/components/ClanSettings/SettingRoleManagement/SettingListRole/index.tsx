@@ -2,13 +2,13 @@ import { useApp } from '@mezon/core';
 import { RolesClanEntity, getIsShow, getSelectedRoleId, selectTheme, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../Icons';
+import * as Icons from '../../../../../../../ui/src/lib/Icons';
 type closeEditRole = {
 	RolesClan: RolesClanEntity[];
 	handleClose: () => void;
 };
 const SettingListRole = (props: closeEditRole) => {
-	const {RolesClan, handleClose} = props;
+	const { RolesClan, handleClose } = props;
 	const appearanceTheme = useSelector(selectTheme);
 	const isChange = useSelector(getIsShow);
 
@@ -56,9 +56,8 @@ const SettingListRole = (props: closeEditRole) => {
 						<div key={role.id}>
 							<button
 								onClick={() => handleRoleClick(role.id)}
-								className={`w-full py-2 px-4 rounded text-[15px] ${
-									clickedRole === role.id ? 'dark:bg-[#535353] bg-[#b6b6b6] font-bold hover:op' : 'dark:bg-[#1E1E1E] bg-[#cacaca] hover:font-bold'
-								} dark:text-textDarkTheme text-textLightTheme truncate`}
+								className={`w-full py-2 px-4 rounded text-[15px] ${clickedRole === role.id ? 'dark:bg-[#535353] bg-[#b6b6b6] font-bold hover:op' : 'dark:bg-[#1E1E1E] bg-[#cacaca] hover:font-bold'
+									} dark:text-textDarkTheme text-textLightTheme truncate`}
 							>
 								{role.title}
 							</button>

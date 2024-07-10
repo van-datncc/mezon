@@ -2,7 +2,7 @@ import { selectCloseMenu } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import IntegrationsChannel from './Component/IntegrationsChannel';
 import InvitesChannel from './Component/InvitesChannel';
 import OverviewChannel from './Component/OverviewChannel';

@@ -1,6 +1,6 @@
 import { IChannel } from '@mezon/utils';
 import { useState, useEffect } from 'react';
-import * as Icons from '../../../Icons';
+import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import ListRolePermission from './listRolePermission';
@@ -33,7 +33,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const handleSave = async () => {
 		setValueToggleInit(valueToggle);
 		const updatedUserIds = userProfile?.user?.id ? [...selectedUserIds, userProfile.user.id] : selectedUserIds;
-		await dispatch(channelsActions.updateChannelPrivate({channel_id: channel.id,channel_private: channel.channel_private || 0, user_ids: updatedUserIds, role_ids: selectedRoleIds }));
+		await dispatch(channelsActions.updateChannelPrivate({ channel_id: channel.id, channel_private: channel.channel_private || 0, user_ids: updatedUserIds, role_ids: selectedRoleIds }));
 	};
 
 	const openAddMemRoleModal = () => {
@@ -50,7 +50,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const handleSelectedRolesChange = (newSelectedRoleIds: string[]) => {
 		setSelectedRoleIds(newSelectedRoleIds);
 	};
-	
+
 	return (
 		<>
 			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
@@ -98,14 +98,14 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Roles</p>
 									<div>
-										<ListRolePermission channel={channel} selectedRoleIds={selectedRoleIds}/>
+										<ListRolePermission channel={channel} selectedRoleIds={selectedRoleIds} />
 									</div>
 								</div>
 								<hr className="border-t border-solid dark:border-borderDefault border-bgModifierHoverLight" />
 								<div className="py-4">
 									<p className="uppercase font-bold text-xs pb-4">Members</p>
 									<div>
-										<ListMemberPermission channel={channel} selectedUserIds={selectedUserIds}/>
+										<ListMemberPermission channel={channel} selectedUserIds={selectedUserIds} />
 									</div>
 								</div>
 							</div>
@@ -116,7 +116,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 				)}
 			</div>
-			{showAddMemRole && <AddMemRole onClose={closeAddMemRoleModal} channel={channel} onSelectedUsersChange={handleSelectedUsersChange} onSelectedRolesChange={handleSelectedRolesChange} selectRoleIds={selectedRoleIds} selectUserIds={selectedUserIds}/>}
+			{showAddMemRole && <AddMemRole onClose={closeAddMemRoleModal} channel={channel} onSelectedUsersChange={handleSelectedUsersChange} onSelectedRolesChange={handleSelectedRolesChange} selectRoleIds={selectedRoleIds} selectUserIds={selectedUserIds} />}
 		</>
 	);
 };

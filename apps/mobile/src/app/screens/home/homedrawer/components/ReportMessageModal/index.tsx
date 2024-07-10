@@ -1,12 +1,12 @@
 import { IMessageWithUser } from "@mezon/utils";
 import { MezonModal } from "../../../../../../app/temp-ui";
 import { memo, useEffect, useRef, useState } from "react";
-import { Animated, Easing, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 import MessageItem from "../../MessageItem";
 import { ChannelStreamMode } from "mezon-js";
 import { CheckIcon, ChevronIcon, DotIcon } from "@mezon/mobile-components";
-import { SeparatorWithSpace } from "apps/mobile/src/app/components/Common";
+import { SeparatorWithSpace } from "../../../../../components/Common";
 import { Colors, size } from "@mezon/mobile-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";

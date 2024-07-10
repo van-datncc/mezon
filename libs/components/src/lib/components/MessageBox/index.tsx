@@ -14,7 +14,7 @@ import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, SubPanelNam
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
 import GifStickerEmojiButtons from './GifsStickerEmojiButtons';
 
@@ -121,7 +121,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							files.length = 0;
 							navigator.clipboard
 								.writeText('')
-								.then(() => {})
+								.then(() => { })
 								.catch((error) => {
 									console.error('Failed to clear clipboard:', error);
 								});
@@ -132,7 +132,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							files.length = 0;
 							navigator.clipboard
 								.writeText('')
-								.then(() => {})
+								.then(() => { })
 								.catch((error) => {
 									console.error('Failed to clear clipboard:', error);
 								});
