@@ -6,7 +6,7 @@ import { Resolver, useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
-import * as Icons from '../../Icons';
+import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 export type LoginFormPayload = {
 	userEmail: string;
@@ -92,9 +92,8 @@ function LoginForm(props: LoginFormProps) {
 							</span>
 						</div>
 						<div
-							className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] dark:bg-[#000000] bg-white relative dark:border-[1px] dark:border-[#1e1e1e] ${
-								errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
-							}`}
+							className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] dark:bg-[#000000] bg-white relative dark:border-[1px] dark:border-[#1e1e1e] ${errors.userEmail ? 'border-red-500' : 'border-[#1e1e1e]'
+								}`}
 						>
 							<input
 								className={`w-full h-6  dark:bg-transparent bg-white outline-none relative dark:text-white text-colorTextLightMode ${appearanceTheme === "light" ? "lightInputAutoFill" : "darkInputAutoFill"}`}
@@ -118,9 +117,8 @@ function LoginForm(props: LoginFormProps) {
 
 						<div className="flex-col justify-start items-start flex w-full h-fit ">
 							<div
-								className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] dark:bg-[#000000] bg-white dark:border-[1px] ${
-									errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
-								} `}
+								className={`flex-row justify-start items-center flex w-full h-fit pt-3 pr-4 pb-3 pl-4 gap-x-2 rounded-[4px] dark:bg-[#000000] bg-white dark:border-[1px] ${errors.password ? 'border-red-500' : 'border-[#1e1e1e]'
+									} `}
 							>
 								<input
 									type={showPassword ? 'text' : 'password'}

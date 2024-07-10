@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { ChannelMembersEntity, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Dropdown } from 'flowbite-react';
-import { OnlineStatus } from '../../Icons';
+import { OnlineStatus } from '../../../../../../ui/src/lib/Icons';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 

@@ -14,7 +14,7 @@ import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 
 export type VoiceControlPanelProps = {
 	readonly channelCurrent: ChannelsEntity | null | undefined;
