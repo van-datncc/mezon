@@ -6,7 +6,7 @@ import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -123,7 +123,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-	useEffect(()=>{
+	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
 			setIsMuteBell(true)
 		}
@@ -138,7 +138,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 		} else {
 			setIsMuteBell(false)
 		}
-	},[getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
+	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -158,8 +158,8 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{ isMuteBell ? (<Icons.MuteBell />):(
-					<Icons.UnMuteBell />)}
+					{isMuteBell ? (<Icons.MuteBell />) : (
+						<Icons.UnMuteBell />)}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}

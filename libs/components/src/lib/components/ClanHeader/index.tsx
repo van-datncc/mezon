@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ClanSetting from '../ClanSettings';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import SearchModal from '../SearchModal';
 import ModalNotificationSetting from '../notificationSetting';
@@ -124,7 +124,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 									)}
 									{userProfile?.user?.id === currentClan?.creator_id && (
 										<ItemModal
-											onClick={() => {openNotiSettingModal(); setIsShowModalPanelClan(false);}}
+											onClick={() => { openNotiSettingModal(); setIsShowModalPanelClan(false); }}
 											children="Notification Settings"
 											endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 										/>

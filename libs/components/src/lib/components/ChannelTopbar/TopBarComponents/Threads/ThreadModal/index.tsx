@@ -3,7 +3,7 @@ import { searchMessagesActions, selectCurrentChannel, threadsActions, useAppDisp
 import { Button } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../Icons';
+import * as Icons from '../../../../../../../../ui/src/lib/Icons';
 import EmptyThread from './EmptyThread';
 import GroupThreads from './GroupThreads';
 import SearchThread from './SearchThread';
