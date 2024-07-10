@@ -1,10 +1,10 @@
 import { StyleProp, Text, TextInput, View, ViewStyle } from "react-native";
-import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRef } from "react";
 import { useState } from "react";
-import { size } from "@mezon/mobile-ui";
+import { size, useTheme } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
+import { style } from "./styles";
 
 interface IMezonInputProps {
     placeHolder?: string;
@@ -18,6 +18,8 @@ interface IMezonInputProps {
 }
 
 export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus }: IMezonInputProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const ref = useRef<TextInput>(null)
     const [showCount, setShowCount] = useState<boolean>(false);
     const [isFocus, setFocus] = useState<boolean>(false);
@@ -48,7 +50,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
     return (
         <View style={styles.container}>
             <Text style={styles.label}>{label}</Text>
-            <View style={[styles.fakeInput, textarea && {paddingTop: 10}, renderBorder(), inputWrapperStyle]}>
+            <View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
                 <View style={styles.inputBox}>
                     <TextInput
                         ref={ref}
@@ -73,7 +75,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         </TouchableOpacity>
                     }
                 </View>
-                
+
                 {showCount && textarea &&
                     <View style={styles.lineCountWrapper}>
                         <Text style={styles.count}>{`${value?.length || '0'}/${maxCharacter}`}</Text>

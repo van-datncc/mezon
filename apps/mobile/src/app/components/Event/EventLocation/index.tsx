@@ -1,15 +1,18 @@
 import { EventManagementEntity, selectChannelById } from "@mezon/store-mobile";
 import { Text, View } from "react-native";
-import styles from "./styles";
+import { style } from "./styles";
 import { OptionEvent } from "@mezon/utils";
-import { LocationIcon, SpeakerIcon } from "@mezon/mobile-components";
+import { Icons, LocationIcon, SpeakerIcon } from "@mezon/mobile-components";
 import { useSelector } from "react-redux";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IEventLocation {
     event: EventManagementEntity;
 }
 
 export default function EventLocation({ event }: IEventLocation) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
     const channelVoice = useSelector(selectChannelById(event?.channel_id));
     // const channelFirst = useSelector(selectChannelFirst);
@@ -18,14 +21,14 @@ export default function EventLocation({ event }: IEventLocation) {
         <View style={styles.container}>
             {option === OptionEvent.OPTION_SPEAKER && (
                 <View style={styles.inline}>
-                    <SpeakerIcon height={16} width={16} />
+                    <Icons.VoiceNormalIcon height={16} width={16} color={themeValue.text} />
                     <Text style={styles.smallText}>{channelVoice.channel_label}</Text>
                 </View>
             )}
 
             {option === OptionEvent.OPTION_LOCATION && (
                 <View style={styles.inline}>
-                    <LocationIcon height={16} width={16} />
+                    <Icons.LocationIcon height={16} width={16} color={themeValue.text} />
                     <Text style={styles.smallText}>{event.title}</Text>
                 </View>
             )}

@@ -5,16 +5,19 @@ import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import styles from './styles';
-import { CrossIcon, LockIcon } from '@mezon/mobile-components';
+import { style } from './styles';
+import { Icons } from '@mezon/mobile-components';
 import { useTranslation } from 'react-i18next';
 import MezonInput from '../../temp-ui/MezonInput2';
 import { IMezonMenuSectionProps, MezonMenu } from '../../temp-ui';
 import MezonToggleButton from '../../temp-ui/MezonToggleButton';
 import { validInput } from '../../utils/validate';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 
 type CreateCategoryScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CATEGORY;
 export default function CategoryCreator({ navigation }: MenuClanScreenProps<CreateCategoryScreen>) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const [isPrivate, setPrivate] = useState<boolean>(false);
     const [categoryName, setCategoryName] = useState<string>("");
     const dispatch = useAppDispatch();
@@ -25,7 +28,8 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
         headerRight: () => (
             <Pressable onPress={handleCreateCategory}>
                 <Text style={{
-                    color: "white",
+                    color: baseColor.blurple,
+                    fontWeight: "bold",
                     paddingHorizontal: 20,
                     opacity: categoryName?.trim()?.length > 0 ? 1 : 0.5
                 }}>
@@ -36,7 +40,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 
         headerLeft: () => (
             <Pressable style={{ padding: 20 }} onPress={handleClose}>
-                <CrossIcon height={16} width={16} />
+                <Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.text} />
             </Pressable>
         ),
     });
@@ -71,7 +75,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
                 {
                     title: t('fields.catePrivate.title'),
                     component: <ToggleBtn />,
-                    icon: <LockIcon height={18} width={18} />
+                    icon: <Icons.LockIcon height={18} width={18} color={themeValue.text}/>
                 }
             ]
         }
