@@ -1,17 +1,9 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, Colors } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     logoContainer: {
         position: "relative"
-    },
-
-    logoWrapper: {
-        width: 60,
-        height: 60,
-        borderRadius: 20,
-        overflow: "hidden",
-        backgroundColor: Colors.green,
     },
 
     logoSection: {
@@ -20,25 +12,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center"
     },
-
-    btnWrapper: {
-        position: "absolute",
-        top: -7,
-        right: -7,
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        padding: 7,
-        borderRadius: 50,
-        backgroundColor: Colors.white
-    },
-
+    
     clanName: {
-        color: Colors.white,
+        color: colors.textStrong,
         fontSize: 14,
         marginTop: 10
     }
 })
-
-export default styles;

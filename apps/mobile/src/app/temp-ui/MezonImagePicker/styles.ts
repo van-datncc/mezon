@@ -1,11 +1,13 @@
-import { Colors, Fonts } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Colors, Fonts } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     bannerWrapper: {
         borderRadius: 20,
         overflow: "hidden",
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.tertiary,
+        borderWidth: 1,
+        borderColor: colors.border,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -25,13 +27,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 7,
         borderRadius: 50,
-        backgroundColor: Colors.white
+        backgroundColor: baseColor.white
     },
 
     textPlaceholder: {
-        color: Colors.white,
-        fontSize: Fonts.size.h7
+        color: colors.textDisabled,
+        fontSize: Fonts.size.h6
     }
 })
-
-export default styles;
