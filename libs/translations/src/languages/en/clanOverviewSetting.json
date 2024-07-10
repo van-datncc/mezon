@@ -3,7 +3,7 @@
         "save": "Save"
     },
     "toast": {
-        "saveSuccess": "Save Success",
+        "saveSuccess": "Save Successfully",
         "notBlank": "Cannot be left blank"
     },
     "menu": {
