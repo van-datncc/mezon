@@ -113,7 +113,7 @@ const ChannelList = React.memo((props: any) => {
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 		store.dispatch(appActions.setLoadingMainMobile(false));
 	};
@@ -158,7 +158,7 @@ const ChannelList = React.memo((props: any) => {
 						style={styles.inviteIconWrapper}
 						onPress={() => {
 							setIsUnKnownChannel(false);
-							bottomSheetInviteRef.current.open();
+							bottomSheetInviteRef.current.present();
 						}}
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
@@ -175,25 +175,26 @@ const ChannelList = React.memo((props: any) => {
 						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' ? (
-					<ChannelListSkeleton numberSkeleton={6} />
-				) : (
-					<FlatList
-						data={categorizedChannels || []}
-						keyExtractor={(_, index) => index.toString()}
-						renderItem={({ item, index }) => (
-							<ChannelListSection
-								data={item}
-								index={index}
-								onPressHeader={toggleCollapseChannel}
-								onLongPressCategory={(category) => handleLongPressCategory(category)}
-								onLongPressChannel={(channel) => handleLongPressChannel(channel)}
-								onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-								collapseItems={collapseChannelItems}
-							/>
-						)}
-					/>
-				)}
+				{
+					isLoading === 'loading' && (
+						<ChannelListSkeleton numberSkeleton={6} />
+					)
+				}
+				<FlatList
+					data={categorizedChannels || []}
+					keyExtractor={(_, index) => index.toString()}
+					renderItem={({ item, index }) => (
+						<ChannelListSection
+							data={item}
+							index={index}
+							onPressHeader={toggleCollapseChannel}
+							onLongPressCategory={(category) => handleLongPressCategory(category)}
+							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
+							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
+							collapseItems={collapseChannelItems}
+						/>
+					)}
+				/>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

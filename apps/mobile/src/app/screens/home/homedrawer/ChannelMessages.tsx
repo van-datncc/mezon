@@ -1,40 +1,38 @@
 import { useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, load, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
-	RootState,
 	messagesActions,
+	RootState,
 	selectAllUserClanProfile,
 	selectAttachmentPhoto,
 	selectChannelMemberByUserIds,
+	selectCurrentClan,
 	selectHasMoreMessageByChannelId,
-	selectMembersByChannelId,
 	selectMessageIdsByChannelId,
 	selectTypingUserIdsByChannelId,
 	useAppDispatch,
-	selectCurrentClan,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
-import MessageItem from './MessageItem';
-import WelcomeMessage from './WelcomeMessage';
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
+import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import UseMentionList from '../../../hooks/useUserMentionList';
+import WelcomeMessage from './WelcomeMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -55,7 +53,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const channelMember = useSelector(selectMembersByChannelId(channelId));
 	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -68,9 +65,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const listMentions = UseMentionList(channelId || '');
 	const currentClan = useSelector(selectCurrentClan);
-
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
 
@@ -153,12 +148,14 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	}, [typingUsers]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
-	const onLoadMore = useCallback(() => {
-		setIsLoadMore(true);
-		if (!isLoadMore) {
-			loadMoreMessage().finally(() => setIsLoadMore(false));
+	const onLoadMore = useCallback(async () => {
+		if (isLoadMore || isLoading === 'loading') {
+			return;
 		}
-	}, [isLoadMore, loadMoreMessage]);
+		setIsLoadMore(true);
+		await loadMoreMessage();
+		setIsLoadMore(false);
+	}, [isLoadMore, loadMoreMessage, isLoading]);
 
 	const handleScroll = useCallback(
 		(event: { nativeEvent: { contentOffset: { y: any } } }) => {
@@ -233,7 +230,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
 					clansProfile={clansProfile}
-					listMentions={listMentions}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
@@ -244,7 +240,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				/>
 			);
 		},
-		[jumpToRepliedMessage, clansProfile, channelMember, mode, channelId, onOpenImage, currentClan, onMessageAction],
+		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClan, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(
@@ -269,10 +265,16 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		[setIdxSelectedImageModal, setVisibleImageModal, setVisibleImageModalOverlay],
 	);
 
+	const checkChannelCacheLoading = useMemo(() => {
+		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+		return channelsCache?.includes(channelId);
+	}, [channelId]);
+
 	return (
+		<View style={{flex: 1}}>
 		<View style={styles.wrapperChannelMessage}>
 			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
-			{isLoading === 'loading' && !isLoadMore && <MessageItemSkeleton skeletonNumber={15} />}
+			{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && <MessageItemSkeleton skeletonNumber={15} />}
 			<FlashList
 				ref={flatListRef}
 				inverted
@@ -290,7 +292,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 								// 	empty
 							}
 				}
-				onEndReachedThreshold={0.5}
+				onEndReachedThreshold={0.1}
 				showsVerticalScrollIndicator={false}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 			/>
@@ -302,8 +304,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			)}
 
 			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
+		</View>
 
-			{visibleImageModalOverlay && (
+		<View>
+		{visibleImageModalOverlay && (
 				<View style={styles.overlay}>
 					<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
 				</View>
@@ -335,13 +339,11 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			/>
 
 			{currentMessageActionType === EMessageActionType.ForwardMessage && (
-				<View style={{ flex: 1 }}>
-					<ForwardMessageModal
-						show={currentMessageActionType === EMessageActionType.ForwardMessage}
-						onClose={() => setCurrentMessageActionType(null)}
-						message={messageSelected}
-					/>
-				</View>
+				<ForwardMessageModal
+					show={currentMessageActionType === EMessageActionType.ForwardMessage}
+					onClose={() => setCurrentMessageActionType(null)}
+					message={messageSelected}
+				/>
 			)}
 
 			{currentMessageActionType === EMessageActionType.Report && (
@@ -360,6 +362,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					type={currentMessageActionType}
 				/>
 			)}
+		</View>
 		</View>
 	);
 });

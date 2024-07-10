@@ -1,6 +1,6 @@
 import { ThemeModeBase } from "../hooks/useTheme"
 
-type HexColor = `#${string}`
+export type HexColor = `#${string}`
 type Colors = { [key: string]: HexColor }
 export type Attributes = {
     primary: HexColor,
@@ -18,6 +18,9 @@ export type Attributes = {
     textNormal: HexColor,
     white: HexColor,
     black: HexColor,
+    bgInputPrimary: HexColor,
+    charcoal: HexColor,
+    jet: HexColor,
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -51,7 +54,10 @@ export const themeColors: ThemeColor = {
         secondaryWeight: '#212122',
         secondaryLight: '#2A2D31',
         white: '#FFFFFF',
-        black: '#000000'
+        black: '#000000',
+        bgInputPrimary: '#2a2e31',
+        charcoal: '#2b2b2e',
+        jet: "#29292b"
     },
     light: {
         primary: "#f2f3f5",
@@ -66,8 +72,11 @@ export const themeColors: ThemeColor = {
         textDisabled: "#a0a1a6",
         textNormal: "#e0e1e3",
         secondaryWeight: '#F0F0F0',
-        secondaryLight: '#2A2D31',
+        secondaryLight: '#ffffff',
         white: '#000000',
-        black: '#FFFFFF'
+        black: '#FFFFFF',
+        bgInputPrimary: '#a0a1a6',
+        charcoal: "#f2f3f5",
+        jet: "#ecedef"
     }
 }

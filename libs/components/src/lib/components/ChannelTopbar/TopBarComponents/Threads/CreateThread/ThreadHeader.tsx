@@ -1,6 +1,6 @@
 import { useMessageValue, useThreads } from '@mezon/core';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import * as Icons from '../../../../Icons';
+import * as Icons from '../../../../../../../../ui/src/lib/Icons';
 
 type ThreadHeaderProps = {
 	threadCurrentChannel?: ApiChannelDescription | null;

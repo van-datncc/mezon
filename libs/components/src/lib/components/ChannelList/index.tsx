@@ -5,7 +5,7 @@ import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };

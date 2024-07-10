@@ -1,6 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { APP_SCREEN } from "../../ScreenTypes";
-import { Colors, Fonts } from "@mezon/mobile-ui";
+import { Colors, Fonts, useTheme } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 import CategoryCreator from "../../../components/Category";
 import ClanSetting from "../../../components/ClanSettings";
@@ -11,6 +11,7 @@ import EventCreatorDetails from "../../../components/EventCreator/EventCreatorDe
 import EventCreatorPreview from "../../../components/EventCreator/EventCreatorPreview";
 
 export const MenuClanStacks = ({ }: any) => {
+    const { themeValue } = useTheme();
     const Stack = createStackNavigator();
     const { t } = useTranslation(['screenStack']);
 
@@ -22,13 +23,14 @@ export const MenuClanStacks = ({ }: any) => {
                 gestureEnabled: true,
                 gestureDirection: 'horizontal',
                 headerTitleAlign: "center",
-                headerTintColor: Colors.white,
+                headerTintColor: themeValue.white,
                 headerStyle: {
-                    backgroundColor: Colors.primary
+                    backgroundColor: themeValue.secondary
                 },
                 headerTitleStyle: {
                     fontSize: Fonts.size.h6,
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    color: themeValue.textStrong
                 }
             }}>
 

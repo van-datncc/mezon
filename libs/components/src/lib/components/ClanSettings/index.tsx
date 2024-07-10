@@ -2,7 +2,7 @@ import { selectCloseMenu } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { ExitSetting } from '../SettingProfile';
 import ClanSettingOverview from './ClanSettingOverview';
 import Integrations from './Integrations';

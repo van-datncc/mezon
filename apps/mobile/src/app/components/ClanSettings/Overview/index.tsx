@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import MezonToggleButton from "../../../temp-ui/MezonToggleButton";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
+import { baseColor } from "@mezon/mobile-ui";
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
@@ -20,7 +21,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
     navigation.setOptions({
         headerBackTitleVisible: false,
         headerRight: () => <Pressable onPress={handleSave} disabled={loading}>
-            <Text style={{ color: "green", paddingHorizontal: 20, opacity: loading ? 0.5 : 1 }}>
+            <Text style={{ ...styles.headerActionTitle, opacity: loading ? 0.5 : 1 }}>
                 {t("header.save")}
             </Text>
         </Pressable>
@@ -65,13 +66,13 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
         {
             title: t("menu.inactive.inactiveChannel"),
             expandable: true,
-            component: <Text style={{ color: "white", fontSize: 11 }}>No Active channel</Text>,
+            previewValue: "No Active channel",
             onPress: () => reserve()
         },
         {
             title: t("menu.inactive.inactiveTimeout"),
             expandable: true,
-            component: <Text style={{ color: "white", fontSize: 11 }}>5 mins</Text>,
+            previewValue: "5 mins",
             disabled: true
         },
     ]

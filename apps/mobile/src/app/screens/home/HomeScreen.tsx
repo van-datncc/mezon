@@ -1,3 +1,4 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -17,7 +18,7 @@ import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import React, { useEffect } from 'react';
-import { AppState } from 'react-native';
+import { AppState, DeviceEventEmitter } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
@@ -90,8 +91,8 @@ const HomeScreen = React.memo((props: any) => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await messageLoader();
 			await reconnect();
+			await messageLoader();
 		}
 	};
 
@@ -113,17 +114,17 @@ const HomeScreen = React.memo((props: any) => {
 
 	const messageLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: '0' }));
-		store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-		store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
-		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
-		store.dispatch(
+		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
+		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+		await store.dispatch(
 			channelsActions.joinChannel({
 				clanId: currentClan?.clan_id,
 				channelId: currentChannelId,
 				noFetchMembers: false,
 			}),
 		);
+		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
 		return null;
 	};
 

@@ -1,7 +1,7 @@
-import { Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
         padding: Metrics.size.m,
         display: "flex",
@@ -10,10 +10,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         overflow: 'hidden',
         borderWidth: 1,
-        backgroundColor: Colors.darkGray,
+        backgroundColor: colors.primary,
         gap: 5,
         alignItems: "center",
-        borderColor: Colors.darkGray
+        borderColor: colors.border
     },
 
     containerSuccess: {
@@ -38,9 +38,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Colors.white,
+        color: colors.textStrong,
         fontSize: Fonts.size.h8
     }
 })
-
-export default styles;

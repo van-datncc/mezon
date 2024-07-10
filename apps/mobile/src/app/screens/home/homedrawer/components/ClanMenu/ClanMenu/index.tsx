@@ -33,7 +33,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const { dismiss } = useBottomSheetModal();
 
     const handleOpenInvite = () => {
-        inviteRef?.current.open();
+        inviteRef?.current.present();
         dismiss();
     }
 
@@ -72,7 +72,10 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
             title: t('menu.organizationMenu.createCategory'),
         },
         {
-            onPress: () => reserve(),
+            onPress: () => {
+                dismiss();
+                navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
+            },
             title: t('menu.organizationMenu.createEvent'),
         },
     ]

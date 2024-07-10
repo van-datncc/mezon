@@ -24,6 +24,7 @@ import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { AppState, StatusBar } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 // import SplashScreen from '../components/SplashScreen';
+import { STORAGE_CHANNEL_CURRENT_CACHE, remove } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -40,6 +41,7 @@ const NavigationMain = () => {
 		const timer = setTimeout(async () => {
 			await SplashScreen.hideAsync();
 			await notifee.cancelAllNotifications();
+			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		}, 200);
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
@@ -54,7 +56,7 @@ const NavigationMain = () => {
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
-	
+
 	const withTimeout = async (promise: Promise<any>, duration: number) => {
 		let timeoutId: NodeJS.Timeout;
 		const timeoutPromise = new Promise((_, reject) => {
@@ -62,12 +64,12 @@ const NavigationMain = () => {
 				reject(new Error('Operation timed out'));
 			}, duration);
 		});
-		
+
 		const result = await Promise.race([promise, timeoutPromise]);
 		clearTimeout(timeoutId);
 		return result;
 	};
-	
+
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
 			withTimeout(reconnect(), 1500)
@@ -83,7 +85,7 @@ const NavigationMain = () => {
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: false }));
+		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0', noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {
@@ -133,7 +135,9 @@ const NavigationMain = () => {
 const CustomStatusBar = () => {
 	const { themeValue, themeBasic } = useTheme();
 	// eslint-disable-next-line eqeqeq
-	return <StatusBar animated backgroundColor={themeValue.secondary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />;
+	return (
+		<StatusBar animated backgroundColor={themeValue.secondary} barStyle={themeBasic == ThemeModeBase.DARK ? 'light-content' : 'dark-content'} />
+	);
 };
 
 const RootNavigation = () => {
