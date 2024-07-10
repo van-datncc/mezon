@@ -22,7 +22,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar);
 	const usersClan = useSelector(selectAllUsesClan);
 	const { friends } = useFriends();
 	const dispatch = useAppDispatch();
@@ -40,6 +40,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemDM?.channel_label ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
+						displayName:'',
 						typeChat: 3,
 					};
 				})
@@ -72,12 +73,19 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
-						displayName: itemUserClan?.user.display_name ?? '',
 						idDM: '',
 					};
 				})
 			: [];
-		const listSearch = [...listDMSearch, ...listFriendsSearch, ...listUserClanSearch, ...listGroupSearch];
+		const friendsMap = new Map(listFriendsSearch.map(friend => [friend.id, friend]));
+		const listSearch = [ 
+			...listDMSearch.map(itemDM => {
+				const friend = friendsMap.get(itemDM.id);
+				return friend ? { ...itemDM, displayName: friend.displayName || itemDM.displayName } : itemDM;
+		  	}),
+			...listGroupSearch,
+			...listUserClanSearch
+		];
 		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
 	}, [accountId, friends, listDM, listGroup, usersClan]);
 
@@ -89,6 +97,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				subText: item?.category_name ?? '',
 				icon: '#',
 				clanId: item?.clan_id ?? '',
+				channelId: item?.channel_id ?? '',
 			};
 		});
 		return list;
@@ -273,7 +282,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 													onMouseLeave={() => setIdActive(item.id)}
 													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 												>
-													<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} />
+													<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} channelId={item.channelId}/>
 												</div>
 											);
 										})
@@ -295,11 +304,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														ref={itemRef}
 														key={item.id}
 														onClick={() => handleSelectMem(item)}
-														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} />
+														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} channelId={item.channelId}/>
 													</div>
 												);
 											})
@@ -321,11 +330,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														ref={itemRef}
 														key={item.id}
 														onClick={() => handleSelectChannel(item)}
-														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} />
+														<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} channelId={item.channelId}/>
 													</div>
 												);
 											})

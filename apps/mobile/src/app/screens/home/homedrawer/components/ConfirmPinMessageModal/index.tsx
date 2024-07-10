@@ -1,6 +1,6 @@
 import { IMessageWithUser } from "@mezon/utils";
 import { memo } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { EMessageActionType } from "../../enums";
 import Modal from "react-native-modal";
 import { styles } from "./styles";
@@ -9,7 +9,6 @@ import { ChannelStreamMode } from "mezon-js";
 import { useDispatch } from "react-redux";
 import { AppDispatch, pinMessageActions } from "@mezon/store-mobile";
 import { SeparatorWithLine } from "../../../../../components/Common";
-import { MezonButton } from "../../../../../temp-ui";
 import { Colors } from "@mezon/mobile-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
@@ -54,42 +53,34 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
         onClose()
     }
     return (
-        <View style={{flex: 1}}>
-            <Modal
-                isVisible={isVisible}
-                animationIn={'fadeIn'}
-                hasBackdrop={true}
-                coverScreen={true}
-                avoidKeyboard={false}
-                backdropColor={'rgba(0,0,0, 0.7)'}
-            >
-                <View style={styles.container}>
-                    <View>
-                        <Text style={styles.title}>{EMessageActionType.PinMessage === type ? t('pinMessage') : t('unpinMessage')}</Text>
-                        <SeparatorWithLine />
-                    </View>
-                    <Text style={styles.descriptionText}>{EMessageActionType.PinMessage === type ? t('confirmPinMessage') : t('confirmUnPinMessage')}</Text>
-                    <ScrollView>
-						            {message && <MessageItem listMentions={listMentions} message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
-					          </ScrollView>
-                    <View style={styles.buttonsWrapper}>
-                        <MezonButton
-                            onPress={() => onConfirm()}
-                            textStyle={[styles.button, {backgroundColor: Colors.bgViolet}]}
-                            viewContainerStyle={styles.borderRadius}
-                        >
-                            {t('Yes')}
-                        </MezonButton>
-                        <MezonButton
-                            onPress={() => onClose()}
-                            textStyle={styles.button}
-                            viewContainerStyle={styles.borderRadius}
-                        >
-                            {t('No')}
-                        </MezonButton>
-                    </View>
+        <Modal
+            isVisible={isVisible}
+            animationIn={'fadeIn'}
+            hasBackdrop={true}
+            coverScreen={true}
+            avoidKeyboard={false}
+            backdropColor={'rgba(0,0,0, 0.7)'}
+        >
+            <View style={styles.container}>
+                <View>
+                    <Text style={styles.title}>{EMessageActionType.PinMessage === type ? t('pinMessage') : t('unpinMessage')}</Text>
+                    <SeparatorWithLine />
                 </View>
-            </Modal>
-        </View>
+                <Text style={styles.descriptionText}>{EMessageActionType.PinMessage === type ? t('confirmPinMessage') : t('confirmUnPinMessage')}</Text>
+                <View style={styles.messageBox}>
+                    <ScrollView>
+                        {message && <MessageItem listMentions={listMentions} message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} showUserInformation preventAction />}
+                    </ScrollView>
+                </View>
+                <View style={styles.buttonsWrapper}>
+                    <TouchableOpacity onPress={() => onConfirm()} style={styles.yesButton}>
+                        <Text style={styles.buttonText}>{t('Yes')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => onClose()} style={styles.noButton}>
+                        <Text style={styles.buttonText}>{t('No')}</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
     )
 })
