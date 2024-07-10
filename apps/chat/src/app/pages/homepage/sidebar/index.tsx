@@ -45,7 +45,9 @@ const SideBar = ({ sideBarIsOpen, toggleSideBar }: SideBarProps) => {
 					style={{ borderRadius: '28px' }}
 				>
 					<Icons.HomepageDownload className="text-white w-[24px]" />
-					<div className="">Download</div>
+					<a href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer" className="">
+						Download
+					</a>
 				</div>
 			</div>
 		</div>
