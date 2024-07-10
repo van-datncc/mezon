@@ -97,6 +97,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				subText: item?.category_name ?? '',
 				icon: '#',
 				clanId: item?.clan_id ?? '',
+				channelId: item?.channel_id ?? '',
 			};
 		});
 		return list;
@@ -281,7 +282,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 													onMouseLeave={() => setIdActive(item.id)}
 													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 												>
-													<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} />
+													<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} channelId={item.channelId}/>
 												</div>
 											);
 										})
@@ -303,11 +304,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														ref={itemRef}
 														key={item.id}
 														onClick={() => handleSelectMem(item)}
-														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} />
+														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} channelId={item.channelId}/>
 													</div>
 												);
 											})
@@ -329,11 +330,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														ref={itemRef}
 														key={item.id}
 														onClick={() => handleSelectChannel(item)}
-														className={`${idActive === item.id ? 'bg-bgModifierHover' : ''} hover:bg-[#424549] w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} />
+														<SuggestItem name={item.name ?? ''} symbol={item.icon} subText={item.subText} channelId={item.channelId}/>
 													</div>
 												);
 											})
