@@ -120,7 +120,7 @@ function MessageWithUser({
 
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
-								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+								<div id={message.id} className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}
 										{!isEditing && (
