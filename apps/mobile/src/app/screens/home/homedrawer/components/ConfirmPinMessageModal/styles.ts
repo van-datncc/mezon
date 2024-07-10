@@ -15,12 +15,19 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
         gap: size.s_10
     },
-    button: {
+    noButton: {
         paddingVertical: size.s_10,
-        borderRadius: 50
+        borderRadius: 50,
+        backgroundColor: Colors.bgGrayDark
     },
-    borderRadius: {
-        borderRadius: 50
+    yesButton: {
+        paddingVertical: size.s_10,
+        borderRadius: 50,
+        backgroundColor: Colors.bgViolet
+    },
+    buttonText: {
+        color: Colors.white,
+        textAlign: 'center',
     },
     buttonsWrapper: {
         maxHeight: 90,
@@ -33,5 +40,10 @@ export const styles = StyleSheet.create({
     },
     descriptionText: {
         color: Colors.tertiary,
-    }
+    },
+    messageBox: {
+        paddingVertical: size.s_4,
+        minHeight: size.s_60,
+        maxHeight: size.s_100,
+    },
 })
