@@ -58,7 +58,7 @@
     },
     "confirm": {
         "delete": {
-            "content": "Are you sure you want to delete #{{channelName}}?. This cannot be undone",
+            "content": "Are you sure you want to delete #{{channelName}} ?. This cannot be undone",
             "confirmText": "Delete",
             "title": "Delete channel"
         },
