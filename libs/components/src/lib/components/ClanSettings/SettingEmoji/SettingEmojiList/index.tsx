@@ -1,10 +1,11 @@
 import SettingEmojiItem from "../SettingEmojiItem";
+import {ApiClanEmoji} from "mezon-js/api.gen";
 type SettingEmojiListProps = {
   title: string;
-
+  emojiList: ApiClanEmoji[]
 };
 
-const SettingEmojiList = ({ title }: SettingEmojiListProps) => {
+const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
   return (
     <div className={'flex flex-col gap-3 dark:text-textDarkTheme text-textLightTheme pb-[60px]'}>
       <h2 className="text-base font-bold">
@@ -22,10 +23,9 @@ const SettingEmojiList = ({ title }: SettingEmojiListProps) => {
         </p>
       </div>
       <div className={'flex flex-col w-full'}>
-        <SettingEmojiItem author="" emojiName=""/>
-        <SettingEmojiItem author="" emojiName=""/>
-        <SettingEmojiItem author="" emojiName=""/>
-
+        {emojiList.map(emoji => (
+          <SettingEmojiItem src={emoji.src ?? ''} emojiName={emoji.shortname ?? ''} author={''}/>
+        ))}
       </div>
     </div>
   )

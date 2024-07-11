@@ -1,11 +1,12 @@
 import { ChangeEvent, useState } from "react";
 
 type SettingEmojiItemProp = {
+  src: string,
   emojiName : string,
   author: string,
 }
 
-const SettingEmojiItem = ({ author,emojiName}: SettingEmojiItemProp) => {
+const SettingEmojiItem = ({ src, author, emojiName}: SettingEmojiItemProp) => {
   const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
@@ -20,13 +21,13 @@ const SettingEmojiItem = ({ author,emojiName}: SettingEmojiItemProp) => {
 
         <div className={'w-14 h-8'}>
           <div className={'w-8 h-8 overflow-hidden flex items-center justify-center '}>
-            <img className={'w-full h-auto object-cover'} src="https://motgame.vn/stores/news_dataimages/motgamevn/062023/30/05/hina-nu-cosplayer-noi-tieng-han-quoc-khien-bao-nguoi-me-met-nhan-lam-vo-la-ai-50-.6566.jpg" />
+            <img className={'w-full h-auto object-cover'} src={src} />
           </div>
         </div>
 
         <div className={'flex-1 relative'}>
           <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'}>
-            {nameEmoji}
+            {emojiName}
           </div>
           {
             showEdit &&

@@ -295,3 +295,13 @@ export const formatTimeToMMSS = (duration: number): string => {
   const seconds = Math.floor(duration % 60);
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
+
+export const isImageFile = (fileSrc: string) => {
+  const normalizedFileSrc = fileSrc.toLowerCase();
+  return normalizedFileSrc.endsWith('png') || fileSrc.endsWith('jpeg');
+}
+
+export const isGifFile = (fileSrc: string) => {
+  const normalizedFileSrc = fileSrc.toLowerCase();
+  return normalizedFileSrc.endsWith('gif');
+}
