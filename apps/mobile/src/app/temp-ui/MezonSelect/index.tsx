@@ -1,27 +1,21 @@
-import MezonOption from "../MezonOption";
+import MezonOption, { IMezonOptionData } from "../MezonOption";
 import { ReactNode } from "react";
 import { useState } from "react";
 import { useRef } from "react";
 import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { Icons } from "@mezon/mobile-components";
-import MezonFakeInputBox from "../MezonFakeBox";
+import MezonFakeInputBox, { IMezonFakeBoxProps } from "../MezonFakeBox";
 import { View } from "react-native";
 import MezonBottomSheet from "../MezonBottomSheet";
 import { useTheme } from "@mezon/mobile-ui";
 import { style } from "./styles";
 
-interface IMezonSelectProps {
-    title?: string;
-    icon?: ReactNode;
+type IMezonSelectProps = Omit<IMezonFakeBoxProps, "onPress" | "postfixIcon" | "value"> & {
     onChange?: (value: number) => void;
-    data: {
-        description?: string;
-        title: string;
-        value: number | string;
-    }[]
+    data: IMezonOptionData;
 }
 
-export default function MezonSelect({ data, onChange, icon, title }: IMezonSelectProps) {
+export default function MezonSelect({ data, onChange, ...props }: IMezonSelectProps) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
     const [currentValue, setCurrentValue] = useState(0);
@@ -42,13 +36,13 @@ export default function MezonSelect({ data, onChange, icon, title }: IMezonSelec
     return (
         <View>
             <MezonFakeInputBox
-                title={title}
-                value={currentContent}
+                {...props}
                 postfixIcon={<Icons.ChevronSmallRightIcon height={20} width={20} color={themeValue.text} />}
+                value={currentContent}
                 onPress={handlePress}
             />
 
-            <MezonBottomSheet ref={bottomSheetRef} heightFitContent title={title}>
+            <MezonBottomSheet ref={bottomSheetRef} heightFitContent title={props.title}>
                 <View style={styles.bsContainer}>
                     <MezonOption data={data} onChange={handleChange} value={currentValue} />
                 </View>

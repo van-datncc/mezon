@@ -13,7 +13,9 @@
         "report": "Report",
         "forward": "Forward",
         "polls": "Polls",
-        "files": "Files"
+        "files": "Files",
+        "saveImage": "Save Image",
+        "copyMediaLink": "Copy Media Link"
     },
     "chatBox": {
         "replyingTo": "Replying to",

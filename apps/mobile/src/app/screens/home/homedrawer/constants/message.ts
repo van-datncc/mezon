@@ -64,6 +64,16 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
 			title: t('message:actions.report'),
 			type: EMessageActionType.Report,
 		},
+		{
+			id: 12,
+			title: t('message:actions.saveImage'),
+			type: EMessageActionType.SaveImage,
+		},
+		{
+			id: 13,
+			title: t('message:actions.copyMediaLink'),
+			type: EMessageActionType.CopyMediaLink,
+		},
 	];
 }
 
