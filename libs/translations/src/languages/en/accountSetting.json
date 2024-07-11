@@ -1,0 +1,11 @@
+{
+    "username": "Username",
+    "displayName": "Display Name",
+    "users": "Users",
+    "accountManagement": "Account Management",
+    "blockedUsers": "Blocked Users",
+    "disableAccount": "Disable Account",
+    "deleteAccount": "Delete Account",
+    "accountInformation": "Account Information",
+    "doNotHaveBlockedUser": "You don't have any blocked users"
+}

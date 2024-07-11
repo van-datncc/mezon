@@ -1,5 +1,5 @@
 import { Checkbox, Radio } from 'flowbite-react';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 
 type ItemPanelMemberProps = {
 	children: string;

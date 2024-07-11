@@ -1,7 +1,8 @@
-import { useNotification } from '@mezon/core';
-import { selectMemberClanByUserId } from '@mezon/store';
+import { useJumpToMessage, useNotification } from '@mezon/core';
+import { selectCurrentClanId, selectMemberClanByUserId } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 export type NotifyProps = {
@@ -11,23 +12,28 @@ export type NotifyProps = {
 function NotificationItem({ notify }: NotifyProps) {
 	const { deleteNotify, setMessageNotifedId } = useNotification();
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
-
 	const userName = notify?.content?.username;
-
 	let notice = notify?.subject;
-
+	const currentClanId = useSelector(selectCurrentClanId);
 	if (userName) {
 		const userNameLenght = userName.length;
 		notice = notify?.subject?.slice(userNameLenght);
 	}
 
-	const handleClickNotification = () => {
-		setMessageNotifedId(notify.content.message_id);
-	};
+	
+
+	const messageID = useMemo(() => {
+		return notify.content.message_id;
+	}, [notify.content.message_id]);
+	const channelId = useMemo(() => {
+		return notify.content.channel_id;
+	}, [notify.content.channel_id]);
+
+	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
 
 	return (
 		<div className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton py-3 px-3 w-full cursor-pointer">
-			<div onClick={handleClickNotification} className="flex items-center gap-2">
+			<div onClick={directToMessageById} className="flex items-center gap-2">
 				<MemberProfile
 					isHideUserName={true}
 					avatar={user?.user?.avatar_url || ''}

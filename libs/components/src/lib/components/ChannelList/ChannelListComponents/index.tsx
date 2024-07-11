@@ -3,14 +3,14 @@ import { selectCurrentClanId, selectNumberEvent, selectShowNumEvent } from '@mez
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as Icons from '../../Icons';
+import * as Icons from '../../../../../../ui/src/lib/Icons';
 import EventModal from '../EventChannelModal';
 
 export const Events = () => {
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const numberEventManagement = useSelector(selectNumberEvent);
-	
+
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));

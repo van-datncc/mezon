@@ -1,20 +1,20 @@
-import { Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     box: {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.secondary,
         gap: Metrics.size.l,
         paddingHorizontal: Metrics.size.m,
-        paddingVertical: Metrics.size.m,
+        paddingVertical: Metrics.size.l,
         borderRadius: 10
     },
     textBox: {
-        color: Colors.white,
+        color: colors.textStrong,
         flex: 1,
         flexGrow: 1,
         flexBasis: 10,
@@ -22,11 +22,9 @@ const styles = StyleSheet.create({
     },
 
     sectionTitle: {
-        color: Colors.white,
+        color: colors.textStrong,
         fontSize: 11,
         fontWeight: '600',
         marginBottom: Fonts.size.s_10
     }
 })
-
-export default styles;

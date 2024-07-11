@@ -1,0 +1,11 @@
+{
+    "username": "Tên đăng nhập",
+    "displayName": "Tên hiển thị",
+    "users": "Người dùng",
+    "accountManagement": "Quản lý tài khoản",
+    "blockedUsers": "Người dùng bị chặn",
+    "disableAccount": "Vô hiệu hóa tài khoản",
+    "deleteAccount": "Xóa tài khoản",
+    "accountInformation": "Thông tin tài khoản",
+    "doNotHaveBlockedUser": "Bạn không có người dùng nào bị chặn"
+}

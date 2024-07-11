@@ -6,7 +6,7 @@ import Webhooks from './Webhooks';
 const Integrations = () => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
 	return (
-		<div>
+		<div className='sbm:mt-[60px] mt-[10px]'>
 			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
 				<div onClick={() => setIsOpenWebhooks(false)} className={`${isOpenWebhooks? "text-[#b5bac1] hover:dark:text-textDarkTheme hover:text-textLightTheme cursor-pointer":""}`}>Integrations</div>{' '}
 				{isOpenWebhooks ? (

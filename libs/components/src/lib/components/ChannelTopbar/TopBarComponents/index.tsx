@@ -3,7 +3,7 @@ import { selectChannelById, selectCloseMenu, selectCurrentChannel, selectStatusM
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../Icons';
+import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined }) => {
 	const type = Number(channel?.type);

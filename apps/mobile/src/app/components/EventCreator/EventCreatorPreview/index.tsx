@@ -4,11 +4,14 @@ import { useTranslation } from "react-i18next";
 import EventItem from "../../Event/EventItem";
 import { useAuth, useClans, useEventManagement } from "@mezon/core";
 import MezonButton from "../../../temp-ui/MezonButton2";
-import styles from "./styles";
 import { OptionEvent } from "@mezon/utils";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./styles";
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
 export default function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<CreateEventScreenType>) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const { t } = useTranslation(['eventCreator']);
     const myUser = useAuth();
     const { createEventManagement } = useEventManagement();

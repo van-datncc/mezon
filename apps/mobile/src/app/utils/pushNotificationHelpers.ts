@@ -164,12 +164,12 @@ export const navigateToNotification = async (notification: any, navigation: any,
 				() => {
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
-					store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+					// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 					store.dispatch(appActions.setLoadingMainMobile(false));
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 				},
-				isDifferentClan ? 200 : 0,
+				isDifferentClan ? 2000 : 0,
 			);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
@@ -225,7 +225,7 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
 						currentClan,
-						time: 200,
+						time: 2000,
 					});
 				}
 			});

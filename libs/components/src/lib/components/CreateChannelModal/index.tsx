@@ -6,7 +6,7 @@ import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { ChannelLableModal } from './ChannelLabel';
 import { ChannelNameModalRef, ChannelNameTextField } from './ChannelNameTextField';
 import { ChannelStatusModal } from './ChannelStatus';
@@ -111,72 +111,72 @@ export const CreateNewChannelModal = () => {
 
 	return (
 		isOpenModal && (
-				<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
-					<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
-						<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
-							<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
-								<div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
-									<div className="flex flex-col items-start gap-x-2 sm:flex-row sm:items-center w-full relative">
-										<ChannelLableModal labelProp="CREATE A NEW CHANNEL IN" />
-										<span>
-											<p className="self-stretch  text-sm font-bold leading-normal uppercase text-cyan-500">
-												{currentCategory?.category_name}
-											</p>
-										</span>
-										<div className="absolute right-1 top-[-10px]">
-											<button onClick={handleCloseModal} className="hover:text-[#ffffff]">
-												<Icons.Close />
-											</button>
-										</div>
+			<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+				<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
+					<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
+						<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
+							<div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
+								<div className="flex flex-col items-start gap-x-2 sm:flex-row sm:items-center w-full relative">
+									<ChannelLableModal labelProp="CREATE A NEW CHANNEL IN" />
+									<span>
+										<p className="self-stretch  text-sm font-bold leading-normal uppercase text-cyan-500">
+											{currentCategory?.category_name}
+										</p>
+									</span>
+									<div className="absolute right-1 top-[-10px]">
+										<button onClick={handleCloseModal} className="hover:text-[#ffffff]">
+											<Icons.Close />
+										</button>
 									</div>
+								</div>
 
-									<div className=" dark:text-zinc-400 text-colorTextLightMode text-sm">Kindly set up a channel of your choice.</div>
-								</div>
-								<div className="Frame407 self-stretch flex-col items-center gap-2 flex">
-									<ChannelLableModal labelProp="Choose channel's type:" />
-									<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex max-h-[200px] overflow-y-scroll max-xl:h-auto">
-										<ChannelTypeComponent
-											type={ChannelType.CHANNEL_TYPE_TEXT}
-											onChange={onChangeChannelType}
-											error={isErrorType}
-										/>
-										<ChannelTypeComponent
-											disable={false}
-											type={ChannelType.CHANNEL_TYPE_VOICE}
-											onChange={onChangeChannelType}
-											error={isErrorType}
-										/>
-										<ChannelTypeComponent
-											disable={true}
-											type={ChannelType.CHANNEL_TYPE_FORUM}
-											onChange={onChangeChannelType}
-											error={isErrorType}
-										/>
-										<ChannelTypeComponent
-											disable={true}
-											type={ChannelType.CHANNEL_TYPE_ANNOUNCEMENT}
-											onChange={onChangeChannelType}
-											error={isErrorType}
-										/>
-									</div>
-								</div>
-								<ChannelNameTextField
-									ref={InputRef}
-									onChange={handleChannelNameChange}
-									onCheckValidate={checkValidate}
-									type={channelType}
-									channelNameProps="What is channel's name?"
-									error={isErrorName}
-									onHandleChangeValue={handleChangeValue}
-								/>
-								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-								<CreateChannelButton onClickCancel={handleCloseModal} onClickCreate={handleSubmit} checkInputError={isInputError}/>
+								<div className=" dark:text-zinc-400 text-colorTextLightMode text-sm">Kindly set up a channel of your choice.</div>
 							</div>
+							<div className="Frame407 self-stretch flex-col items-center gap-2 flex">
+								<ChannelLableModal labelProp="Choose channel's type:" />
+								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex max-h-[200px] overflow-y-scroll max-xl:h-auto">
+									<ChannelTypeComponent
+										type={ChannelType.CHANNEL_TYPE_TEXT}
+										onChange={onChangeChannelType}
+										error={isErrorType}
+									/>
+									<ChannelTypeComponent
+										disable={false}
+										type={ChannelType.CHANNEL_TYPE_VOICE}
+										onChange={onChangeChannelType}
+										error={isErrorType}
+									/>
+									<ChannelTypeComponent
+										disable={true}
+										type={ChannelType.CHANNEL_TYPE_FORUM}
+										onChange={onChangeChannelType}
+										error={isErrorType}
+									/>
+									<ChannelTypeComponent
+										disable={true}
+										type={ChannelType.CHANNEL_TYPE_ANNOUNCEMENT}
+										onChange={onChangeChannelType}
+										error={isErrorType}
+									/>
+								</div>
+							</div>
+							<ChannelNameTextField
+								ref={InputRef}
+								onChange={handleChannelNameChange}
+								onCheckValidate={checkValidate}
+								type={channelType}
+								channelNameProps="What is channel's name?"
+								error={isErrorName}
+								onHandleChangeValue={handleChangeValue}
+							/>
+							<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+							<CreateChannelButton onClickCancel={handleCloseModal} onClickCreate={handleSubmit} checkInputError={isInputError} />
 						</div>
 					</div>
-					{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
-					{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}
 				</div>
-			)
+				{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
+				{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}
+			</div>
+		)
 	);
 };

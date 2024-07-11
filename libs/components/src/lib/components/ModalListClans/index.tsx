@@ -1,7 +1,7 @@
 import { useEscapeKey, useThreads } from '@mezon/core';
 import { IClan } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
-import { Tick } from '../Icons';
+import { Tick } from '../../../../../ui/src/lib/Icons';
 
 export type ModalListClansProps = {
 	showModal: boolean;
@@ -61,7 +61,7 @@ const ModalListClans = (props: ModalListClansProps) => {
 						<button
 							className={`w-full  flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'dark:bg-[#151C2B] bg-bgLightModeButton duration-100 dark:text-contentPrimary text-black font-bold' : 'dark:text-contentSecondary text-[#323232]'}`}
 							key={option.id}
-							onClick={() => {onChangeClan(option.id); setTurnOffThreadMessage();}}
+							onClick={() => { onChangeClan(option.id); setTurnOffThreadMessage(); }}
 						>
 							<div className="flex items-center gap-4 w-10/12">
 								{option.logo ? (

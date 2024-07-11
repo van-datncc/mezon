@@ -82,7 +82,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessageEvent) => {
 			const senderId = message.sender_id;
-
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
 
@@ -91,6 +90,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (directId === undefined) {
 				mess.isCurrentChannel = message.channel_id === channelId;
 			}
+
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
