@@ -135,7 +135,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 						</p>
 					)}
 					<span className="text-[14px] text-contentTertiary">
-						By creating a clan, you agree to Mezon’s <span className="text-contentBrandLight">Communnity Guidelines</span>.
+						By creating a clan, you agree to Mezon’s <span className="text-contentBrandLight">Community Guidelines</span>.
 					</span>
 				</div>
 			</div>
