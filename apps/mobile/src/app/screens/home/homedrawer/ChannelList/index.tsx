@@ -69,7 +69,6 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetInviteRef = useRef(null);
 	const timeoutRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
-	const [isShowBottomSheetInvite, setIsShowBottomSheetInvite] = useState<boolean>(false);
 	const filteredChannels = useMemo(() => filterMessages(categorizedChannels), [categorizedChannels]);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
@@ -168,23 +167,15 @@ const ChannelList = React.memo((props: any) => {
 						style={styles.inviteIconWrapper}
 						onPress={() => {
 							setIsUnKnownChannel(false);
-							setIsShowBottomSheetInvite(true);
-							timeoutRef.current = setTimeout(() => {
-								bottomSheetInviteRef?.current?.present?.();
-							}, 200);
+							bottomSheetInviteRef?.current?.present?.();
 						}}
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
-					{isShowBottomSheetInvite && (
-						<InviteToChannel
-							isUnknownChannel={isUnknownChannel}
-							ref={bottomSheetInviteRef}
-							onClose={() => {
-								setIsShowBottomSheetInvite(false);
-							}}
-						/>
-					)}
+					<InviteToChannel
+						isUnknownChannel={isUnknownChannel}
+						ref={bottomSheetInviteRef}
+					/>
 				</View>
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
