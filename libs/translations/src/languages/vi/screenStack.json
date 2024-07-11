@@ -3,7 +3,8 @@
         "categoryCreator": "Tạo Category",
         "channelCreator": "Tạo Channel",
         "clanSetting": "Cài đặt Clan",
-        "clanOverviewSetting": "Tổng quan"
+        "clanOverviewSetting": "Tổng quan",
+        "eventCreator": "Tạo Sự Kiện"
     },
     "menuChannelStack": {
         "channelSetting": "Cài đặt Channel"
@@ -13,6 +14,8 @@
         "appearance": "Giao diện",
         "appTheme": "Giao diện ứng dụng",
         "language": "Ngôn ngữ",
-        "profile": "Hồ sơ"
+        "profile": "Hồ sơ",
+        "account": "Tài khoản",
+        "blockedUsers": "người dùng bị chặn"
     }
 }

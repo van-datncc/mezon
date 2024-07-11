@@ -3,7 +3,11 @@ import { useLocation, useParams } from 'react-router-dom';
 
 export function useAppParams() {
 	const { clanId, channelId, directId, type } = useParams();
-	const { pathname: currentURL } = useLocation();
+	const { pathname: currentURL, search } = useLocation();
+
+	const query = useMemo(() => new URLSearchParams(search), [search]);
+
+	const messageId = query.get('messageId');
 
 	return useMemo(
 		() => ({
@@ -12,7 +16,8 @@ export function useAppParams() {
 			directId,
 			type,
 			currentURL,
+			messageId,
 		}),
-		[clanId, channelId, directId, type, currentURL],
+		[clanId, channelId, directId, type, currentURL, messageId],
 	);
 }

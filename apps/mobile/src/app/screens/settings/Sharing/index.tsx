@@ -1,14 +1,7 @@
 import { useCategory, useReference } from '@mezon/core';
 import { CloseIcon, PenIcon, SearchIcon, SendIcon, getAttachmentUnique } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	clansActions,
-	directActions,
-	getStoreAsync,
-	selectCurrentClan,
-	selectDirectsOpenlist
-} from '@mezon/store-mobile';
+import { channelsActions, clansActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -50,16 +43,16 @@ export const Sharing = ({ data, onClose }) => {
 			}
 		}
 	}, [data]);
-	
+
 	const reConnectSocket = async () => {
 		await reconnect();
 	};
-	
+
 	useEffect(() => {
 		if (searchText) {
 			handleSearchShareTo();
 		} else {
-			setDataShareTo([]);
+			setDataShareTo([...flattenedData, ...listDM]);
 		}
 	}, [searchText]);
 
@@ -99,6 +92,9 @@ export const Sharing = ({ data, onClose }) => {
 
 	const flattenedData = useMemo(() => flattenData(cloneDeep(categorizedChannels)), [categorizedChannels]);
 
+	useEffect(() => {
+		if (flattenedData || listDM) setDataShareTo([...flattenedData, ...listDM]);
+	}, [flattenedData, listDM]);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedSetSearchText = useCallback(
 		debounce((text) => setSearchText(text), 300),
@@ -135,7 +131,7 @@ export const Sharing = ({ data, onClose }) => {
 	const sendToDM = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: channelSelected?.clan_id }));
-		
+
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
 			channelSelected.id,
@@ -143,14 +139,14 @@ export const Sharing = ({ data, onClose }) => {
 			{ t: dataSend.text },
 			[],
 			getAttachmentUnique(attachmentDataRef) || [],
-			[]
+			[],
 		);
 	};
 
 	const sendToGroup = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: channelSelected.channel_id }));
-		
+
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,

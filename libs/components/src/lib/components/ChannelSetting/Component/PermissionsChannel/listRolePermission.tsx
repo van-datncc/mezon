@@ -41,7 +41,7 @@ const ListRolePermission = (props: ListRolePermissionProps) => {
             listRolesInChannel.map((role) => (
                 <div className={`flex justify-between py-2 rounded`} key={role.id}>
                     <div className="flex gap-x-2 items-center">
-                        <Icons.RoleIcon defaultSize="w-[23px] h-5" />
+                        <Icons.RoleIcon defaultSize="w-5 h-5 min-w-5" />
                         <p className="text-sm">{role.title}</p>
                     </div>
                     <div className="flex items-center gap-x-2">
@@ -54,7 +54,7 @@ const ListRolePermission = (props: ListRolePermissionProps) => {
             )) :
             <div className={`flex justify-between py-2 rounded`}>
                 <div className="flex gap-x-2 items-center">
-                    <Icons.RoleIcon defaultSize="w-[23px] h-5" />
+                    <Icons.RoleIcon defaultSize="w-5 h-5 min-w-5" />
                     <p className="text-sm text-[#AEAEAE]">No Roles</p>
                 </div>
             </div>

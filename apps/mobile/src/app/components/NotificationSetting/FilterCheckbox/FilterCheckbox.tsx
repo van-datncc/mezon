@@ -30,7 +30,7 @@ const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(({
     <TouchableOpacity onPress={handleCheckboxPress} style={styles.option}>
       <View>
         <Text style={styles.labelOption}>{label}</Text>
-        {[ENotificationType.CATEGORY_DEFAULT].includes(label as ENotificationType) && <Text style={styles.defaultNotifyName}>{defaultNotifyName}</Text>}
+        {[ENotificationType.CATEGORY_DEFAULT].includes(label as ENotificationType) && <Text style={styles.defaultNotifyName}>{defaultNotifyName?.charAt(0)?.toUpperCase() + defaultNotifyName?.slice(1)?.toLowerCase()}</Text>}
       </View>
       <BouncyCheckbox
         size={20}

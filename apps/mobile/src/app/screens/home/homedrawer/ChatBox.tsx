@@ -131,35 +131,35 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [heightInput, setHeightInput] = useState(size.s_40);
-	const [allMessages, setAllMessages] = useState<{ [key: string]: string }>({});
 	const [replyDisplayName, setReplyDisplayName] = useState('');
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked]);
 
-	async function loadMessageCache() {
-		const messages = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
-		setAllMessages(messages);
-		return messages?.[props?.channelId] || "";
+	const getAllCachedMessage = async () => {
+		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+		return allCachedMessage;
 	}
 
-	function setMessageCache(text: string) {
+	const saveMessageToCache = async (text: string) => {
+		const allCachedMessage = await getAllCachedMessage();
 		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
-			...allMessages,
+			...allCachedMessage,
 			[props?.channelId]: text,
 		});
 	}
 
-	useEffect(() => {
-		loadMessageCache()?.then((message) => {
-			setText(message);
-		});
-	}, [props?.channelId])
+	const setMessageFromCache = async () => {
+		const allCachedMessage = await getAllCachedMessage();
+		setText(allCachedMessage?.[props?.channelId] || '');
+	}
 
 	useEffect(() => {
-		setMessageCache(text);
-	}, [text])
+		if (props?.channelId) {
+			setMessageFromCache();
+		}
+	}, [props?.channelId])
 
 	//start: DM stuff
 	const {
@@ -207,7 +207,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		if (!emojiPicked) {
 			return;
 		}
-		setText(`${text.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
+		setText(`${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `);
 	};
 
 	const editMessage = useCallback(
@@ -246,8 +246,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	);
 
 	const isCanSendMessage = useMemo(() => {
-		return !!attachmentDataRef?.length || text.length > 0;
-	}, [attachmentDataRef?.length, text.length]);
+		return !!attachmentDataRef?.length || text?.length > 0;
+	}, [attachmentDataRef?.length, text?.length]);
 
 	const handleSendMessage = useCallback(() => {
 		if (!isCanSendMessage) {
@@ -419,6 +419,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			setMentionTextValue(text);
 		}
 		setIsShowAttachControl(false);
+		saveMessageToCache(text);
 		switch (props.mode) {
 			case ChannelStreamMode.STREAM_MODE_CHANNEL:
 				handleTypingDebounced();
@@ -673,7 +674,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
 			)}
 			<View style={styles.containerInput}>
-				{text.length > 0 && !isShowAttachControl ? (
+				{text?.length > 0 && !isShowAttachControl ? (
 					<TouchableOpacity
 						style={[styles.btnIcon]}
 						onPress={() => setIsShowAttachControl(!isShowAttachControl)}
@@ -712,7 +713,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						{...textInputProps}
 						style={[
 							styles.inputStyle,
-							text.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
+							text?.length > 0 && { width: isShowAttachControl ? inputWidthWhenHasInput - size.s_40 : inputWidthWhenHasInput },
 							{ height: Math.max(size.s_40, heightInput) },
 						]}
 						children={renderTextContent(text, emojiListPNG, channelsEntities)}
@@ -726,7 +727,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 				</View>
 
 				<View>
-					{text.length > 0 || !!attachmentDataRef?.length ? (
+					{text?.length > 0 || !!attachmentDataRef?.length ? (
 						<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
 							<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />
 						</View>

@@ -27,8 +27,8 @@ const ListRole = (props: ListRoleProps) => {
                         />
                         <Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
                     </div>
-                    <Icons.RoleIcon defaultSize="w-[23px] h-5" />
-                    <p className="text-sm">{role.title}</p>
+                    <Icons.RoleIcon defaultSize="w-5 h-5 min-w-5" />
+                    <p className="text-sm one-line">{role.title}</p>
                 </label>
             </div>
         ))

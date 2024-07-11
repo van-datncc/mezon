@@ -13,7 +13,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
 	wrapperChatBox: {
 		backgroundColor: colors.secondary,
-		borderTopWidth: 0.5,
+		borderTopWidth: 1,
 		borderTopColor: colors.border,
 		flexDirection: 'column',
 		justifyContent: 'space-between',

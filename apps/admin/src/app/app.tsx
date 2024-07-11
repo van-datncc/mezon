@@ -1,47 +1,105 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MezonStoreProvider, initStore } from '@mezon/store';
+import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useEffect, useMemo } from 'react';
+import 'react-toastify/dist/ReactToastify.css';
+import WebFont from 'webfontloader';
+import './app.module.scss';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Login from './pages/login';
+import AppLayout from './layouts/AppLayout';
+import ApplicationsPage from './pages/applications';
+import InitialRoutes from './routes/InititalRoutes';
+import RootLayout from './layouts/RootLayout';
+import TeamsPage from './pages/teams';
+import EmbedsPage from './pages/embeds';
+import DocsPage from './pages/docs';
+import { Routes } from './routes';
 
-import { Link, Route, Routes } from 'react-router-dom';
+const mezon: CreateMezonClientOptions = {
+	host: process.env.NX_CHAT_APP_API_HOST as string,
+	port: process.env.NX_CHAT_APP_API_PORT as string,
+	key: process.env.NX_CHAT_APP_API_KEY as string,
+	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
+};
 
 export function App() {
+	const routes = createBrowserRouter([
+		{
+			path: '',
+			element: <AppLayout />,
+			children: [
+				{
+					path: '',
+					element: <InitialRoutes />,
+				},
+				{
+					path: 'login',
+					element: <Login />,
+				},
+				{
+					path: 'admin',
+					element: <RootLayout />,
+					children: [
+						{
+							path: '',
+							element: <InitialRoutes />,
+						},
+						{
+							path: 'applications',
+							element: <ApplicationsPage />,
+						},
+						{
+							path: 'teams',
+							element: <TeamsPage />,
+						},
+						{
+							path: 'embeds',
+							element: <EmbedsPage />,
+						},
+						{
+							path: 'docs',
+							element: <DocsPage />,
+						},
+					],
+				},
+			],
+		},
+	]);
+
+	const mezon = useMezon();
+	const { store, persistor } = useMemo(() => {
+		return initStore(mezon);
+	}, [mezon]);
+
+	if (!store) {
+		return <>loading...</>;
+	}
+
 	return (
-		<div>
-			{/* START: routes */}
-			{/* These routes and navigation have been generated for you */}
-			{/* Feel free to move and update them to fit your needs */}
-			<br />
-			<hr />
-			<br />
-			<nav>
-				<ul>
-					<li>
-						<Link to="/">Home</Link>
-					</li>
-					<li>
-						<Link to="/page-2">Page 2</Link>
-					</li>
-				</ul>
-			</nav>
-			<Routes>
-				<Route
-					path="/"
-					element={
-						<div>
-							This is the generated root route. <Link to="/page-2">Click here for page 2.</Link>
-						</div>
-					}
-				/>
-				<Route
-					path="/page-2"
-					element={
-						<div>
-							<Link to="/">Click here to go back to root page.</Link>
-						</div>
-					}
-				/>
-			</Routes>
-			{/* END: routes */}
-		</div>
+		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+			<Routes />
+		</MezonStoreProvider>
 	);
 }
 
-export default App;
+function AppWrapper() {
+	useEffect(() => {
+		WebFont.load({
+			google: {
+				families: ['gg sans'],
+			},
+		});
+	}, []);
+
+	return (
+		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
+			<MezonContextProvider mezon={mezon} connect={true}>
+				<App />
+			</MezonContextProvider>
+		</GoogleOAuthProvider>
+	);
+}
+
+export default AppWrapper;
+
