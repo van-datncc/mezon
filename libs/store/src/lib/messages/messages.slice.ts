@@ -1,5 +1,5 @@
 import {
-	DIRECTION_MODE,
+	Direction_Mode,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -220,7 +220,7 @@ export const loadMoreMessage = createAsyncThunk('messages/loadMoreMessage', asyn
 				channelId: channelId,
 				noCache: false,
 				messageId: lastScrollMessageId,
-				direction: DIRECTION_MODE.BEFORE_TIMESTAMP,
+				direction: Direction_Mode.BEFORE_TIMESTAMP,
 			}),
 		);
 	} catch (e) {
@@ -243,7 +243,7 @@ export const jumpToMessage = createAsyncThunk(
 					channelId: channelId,
 					noCache: noCache,
 					messageId: messageId,
-					direction: DIRECTION_MODE.AROUND_TIMESTAMP,
+					direction: Direction_Mode.AROUND_TIMESTAMP,
 				}),
 			);
 		} catch (e) {
