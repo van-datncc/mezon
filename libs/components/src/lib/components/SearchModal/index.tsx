@@ -279,6 +279,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								? listChannelSearch
 										.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
 										.slice(0, 8)
+										.sort((a: any, b: any) => {
+											const indexA = a.name.toUpperCase().indexOf(searchText.toUpperCase());
+											const indexB = b.name.toUpperCase().indexOf(searchText.toUpperCase());
+											if (indexA === -1) return 1;
+											if (indexB === -1) return -1;
+											return indexA - indexB;
+										})
 										.map((item: any) => {
 											return (
 												<div
@@ -294,6 +301,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														symbol={item.icon}
 														subText={item.subText}
 														channelId={item.channelId}
+														valueHightLight={searchText}
 													/>
 												</div>
 											);
@@ -309,6 +317,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 									{listMemSearch.length ? (
 										listMemSearch
 											.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
+											.sort((a: any, b: any) => {
+												const indexA = a.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
+												const indexB = b.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
+												if (indexA === -1) return 1;
+												if (indexB === -1) return -1;
+												return indexA - indexB;
+											})
 											.slice(0, 25)
 											.map((item: any) => {
 												return (
@@ -320,7 +335,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														onMouseEnter={() => setIdActive(item.id)}
 														onMouseLeave={() => setIdActive(item.id)}
 													>
-														<SuggestItem name={item?.name} avatarUrl={item.avatarUser} channelId={item.channelId} />
+														<SuggestItem
+															name={item?.name}
+															avatarUrl={item.avatarUser}
+															channelId={item.channelId}
+															valueHightLight={searchText.slice(1)}
+														/>
 													</div>
 												);
 											})
@@ -336,6 +356,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 										listChannelSearch
 											.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
 											.slice(0, 25)
+											.sort((a: any, b: any) => {
+												const indexA = a.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
+												const indexB = b.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
+												if (indexA === -1) return 1;
+												if (indexB === -1) return -1;
+												return indexA - indexB;
+											})
 											.map((item: any) => {
 												return (
 													<div
@@ -351,6 +378,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 															symbol={item.icon}
 															subText={item.subText}
 															channelId={item.channelId}
+															valueHightLight={searchText.slice(1)}
 														/>
 													</div>
 												);

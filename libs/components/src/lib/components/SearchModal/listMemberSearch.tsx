@@ -17,6 +17,13 @@ const ListMemberSearch = (props: ListMemberSearchProps) => {
             ? listMemSearch
                     .filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
                     .slice(0, 7)
+                    .sort((a: any, b: any) => {
+                        const indexA = a.name.toUpperCase().indexOf(searchText.toUpperCase());
+                        const indexB = b.name.toUpperCase().indexOf(searchText.toUpperCase());
+                        if (indexA === -1) return 1;
+                        if (indexB === -1) return -1;
+                        return indexA - indexB;
+                    })
                     .map((item: any, index: number) => {
                         return (
                             <div
@@ -27,7 +34,7 @@ const ListMemberSearch = (props: ListMemberSearchProps) => {
                                 onMouseLeave={() => setIdActive(item.id)}
                                 className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
                             >
-                                <SuggestItem name={item?.name} avatarUrl={item.avatarUser} showAvatar displayName={item?.displayName}/>
+                                <SuggestItem name={item?.name} avatarUrl={item.avatarUser} showAvatar displayName={item?.displayName} valueHightLight={searchText}/>
                             </div>
                         );
                     })
