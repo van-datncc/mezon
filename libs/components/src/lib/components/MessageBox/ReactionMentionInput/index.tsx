@@ -1,5 +1,4 @@
 import {
-	useAppParams,
 	useChannelMembers,
 	useChannels,
 	useClickUpToEdit,
@@ -17,8 +16,8 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
-	selectAllUsesClan,
 	selectAllDirectChannelVoids,
+	selectAllUsesClan,
 	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -51,11 +50,11 @@ import {
 	UserMentionsOpt,
 	UsersClanEntity,
 	focusToElement,
-	regexToDetectGifLink,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -71,7 +70,6 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import { ChannelStreamMode } from 'mezon-js';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -116,7 +114,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelVoids = useSelector(selectAllDirectChannelVoids)
+	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
@@ -344,17 +342,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					username: mention.display ?? '',
 				}))
 			: [];
-		const linkGifDirect = newValue?.match(regexToDetectGifLink);
 
-		if (linkGifDirect && linkGifDirect?.length > 0) {
-			const newAttachmentDataRef = linkGifDirect
-				.filter((item) => item !== null)
-				.map((item: string) => ({
-					filetype: 'image/gif',
-					url: item,
-				}));
-			setAttachmentData(newAttachmentDataRef);
-		}
 
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue, props.isThread);
@@ -441,7 +429,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSearchHashtag = (search: any, callback: any) => {
 		setValueHightlight(search);
-		if (props.mode === ChannelStreamMode.STREAM_MODE_DM){
+		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
 			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
 		} else {
 			callback(searchMentionsHashtag(search, listChannelsMention ?? []));
@@ -564,7 +552,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								valueHightLight={valueHighlight}
 								name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 								avatarUrl={suggestion.avatarUrl ?? ''}
-								subText={suggestion.display === 'here' ? 'Notify everyone who has permission to see this channel' : suggestion.display  ?? ''}
+								subText={
+									suggestion.display === 'here'
+										? 'Notify everyone who has permission to see this channel'
+										: suggestion.display ?? ''
+								}
 								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + 'text-xs'}
 								showAvatar={suggestion.display !== 'here'}
 							/>
