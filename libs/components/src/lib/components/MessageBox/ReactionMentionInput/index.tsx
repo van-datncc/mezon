@@ -68,7 +68,7 @@ import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateTh
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
-import { widthDmGroupMemberList, widthDmUserProfile, widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
+import { defaultMaxWidth, maxWidthWithChatThread, maxWidthWithDmGroupMemberList, maxWidthWithDmUserProfile, maxWidthWithMemberList, maxWidthWithSearchMessage, widthDmGroupMemberList, widthDmUserProfile, widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -501,15 +501,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [dispatch, isFocused]);
 
 	const [mentionWidth, setMentionWidth] = useState('');
+	const [chatBoxMaxWidth, setChatBoxMaxWidth] = useState('');
 	
 	useEffect(()=>{
 		if(props.mode === ChannelStreamMode.STREAM_MODE_DM){
 			setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
+			setChatBoxMaxWidth(isShowDMUserProfile? maxWidthWithDmUserProfile : defaultMaxWidth);
 		}else if(props.mode === ChannelStreamMode.STREAM_MODE_GROUP){
 			setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
+			setChatBoxMaxWidth(isShowMemberListDM ? maxWidthWithDmGroupMemberList : defaultMaxWidth);
 		}
 		else{
 			setMentionWidth(isShowMemberList ? widthMessageViewChat : isShowCreateThread ? widthMessageViewChatThread : isSearchMessage ? widthSearchMessage : widthThumbnailAttachment);
+			setChatBoxMaxWidth(isShowMemberList ? maxWidthWithMemberList : isShowCreateThread ? maxWidthWithChatThread : isSearchMessage ? maxWidthWithSearchMessage : defaultMaxWidth);
 		}
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode])
 
@@ -548,7 +552,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			)}
 			<MentionsInput
 				onPaste={props.handlePaste}
-				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
@@ -559,6 +562,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.suggestions : darkMentionsInputStyle.suggestions),
 						width: `${mentionWidth}`,
 					},
+					control: {
+						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
+						maxWidth: `${chatBoxMaxWidth}`,
+					},
+					maxWidth: `${chatBoxMaxWidth}`,
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}

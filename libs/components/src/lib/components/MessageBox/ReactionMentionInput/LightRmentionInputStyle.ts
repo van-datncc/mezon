@@ -1,5 +1,4 @@
 export default {
-	width: "100%",
 	control: {
 		fontSize: 16,
 	},
@@ -13,7 +12,6 @@ export default {
 		},
 		highlighter: {
 			padding: 9,
-			maxWidth: 'calc(100% - 100px)',
 			border: '1px solid transparent',
 		},
 		input: {
