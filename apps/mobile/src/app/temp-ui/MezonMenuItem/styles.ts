@@ -17,7 +17,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     btnTitle: {
-        color: colors.textStrong,
+        color: colors.text,
         fontSize: Fonts.size.h85,
         fontWeight: "600"
     },

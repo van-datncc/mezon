@@ -1,21 +1,21 @@
-import { Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     title: {
-        color: Colors.white,
+        color: colors.textStrong,
         fontSize: Fonts.size.h6,
         textAlign: "center"
     },
 
     subtitle: {
-        color: Colors.gray72,
+        color: colors.text,
         fontSize: Fonts.size.h8,
         textAlign: "center"
     },
 
     bottomDescription: {
-        color: Colors.gray72,
+        color: colors.text,
         fontSize: Fonts.size.h8,
         marginVertical: Metrics.size.l
     },
@@ -25,7 +25,9 @@ const styles = StyleSheet.create({
     },
 
     container: {
-        paddingHorizontal: Metrics.size.xl
+        paddingHorizontal: Metrics.size.xl,
+        backgroundColor: colors.primary,
+        flex: 1
     },
 
     feedSection: {
@@ -41,5 +43,3 @@ const styles = StyleSheet.create({
         gap: Metrics.size.m
     }
 })
-
-export default styles;

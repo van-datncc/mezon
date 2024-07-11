@@ -11,6 +11,7 @@ import {
 	toggleIsShowFalse,
 	toggleIsShowTrue,
 } from '@mezon/store';
+import { InputField } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -66,8 +67,8 @@ const SettingPermissions = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	return (
 		<>
 			<div className="w-full flex">
-				<input
-					className="flex-grow dark:bg-black bg-white p-[7px] border rounded-lg"
+				<InputField
+					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded-lg"
 					type="text"
 					placeholder="Search Permissions"
 					value={searchTerm}

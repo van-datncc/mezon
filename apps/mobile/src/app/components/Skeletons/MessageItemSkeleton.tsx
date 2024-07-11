@@ -1,16 +1,18 @@
-import { Block, Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 
 const MessageItemSkeleton = ({ skeletonNumber }: { skeletonNumber: number }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<>
 			{Array.from({ length: skeletonNumber }).map((_, index) => (
 				<Block style={styles.wrapper} key={index}>
 					<ShimmerPlaceHolder
-						shimmerColors={[Colors.secondaryLight, Colors.darkCharcoalGray, Colors.jetBlack]}
+						shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 						shimmerStyle={styles.avatar}
 						LinearGradient={LinearGradient}
 					/>
@@ -18,20 +20,20 @@ const MessageItemSkeleton = ({ skeletonNumber }: { skeletonNumber: number }) => 
 					<Block>
 						<ShimmerPlaceHolder
 							width={100}
-							shimmerColors={[Colors.secondaryLight, Colors.darkCharcoalGray, Colors.jetBlack]}
+							shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 							shimmerStyle={styles.bigText}
 							LinearGradient={LinearGradient}
 						/>
 						<ShimmerPlaceHolder
 							width={200}
-							shimmerColors={[Colors.secondaryLight, Colors.darkCharcoalGray, Colors.jetBlack]}
+							shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 							shimmerStyle={styles.normalText}
 							LinearGradient={LinearGradient}
 						/>
 						{index % 2 ? (
 							<ShimmerPlaceHolder
 								width={300}
-								shimmerColors={[Colors.secondaryLight, Colors.darkCharcoalGray, Colors.jetBlack]}
+								shimmerColors={[themeValue.secondaryLight, themeValue.charcoal, themeValue.jet]}
 								shimmerStyle={styles.normalText}
 								LinearGradient={LinearGradient}
 							/>
@@ -44,7 +46,7 @@ const MessageItemSkeleton = ({ skeletonNumber }: { skeletonNumber: number }) => 
 };
 export default MessageItemSkeleton;
 
-const styles = StyleSheet.create({
+const style = (colors: Attributes) => StyleSheet.create({
 	wrapper: {
 		flexDirection: 'row',
 		gap: size.s_14,

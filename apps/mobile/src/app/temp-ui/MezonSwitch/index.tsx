@@ -1,21 +1,30 @@
-import React from 'react';
-import { SwitchProps, Switch } from 'react-native';
-import { Colors } from '@mezon/mobile-ui';
+import React, { useState } from 'react';
+import { SwitchProps } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { useTheme } from '@mezon/mobile-ui';
+import { style } from './styles';
+import { useEffect } from 'react';
 
-export const MezonSwitch = (props: SwitchProps) => {
-  const {
-    value,
-    onValueChange
-  } = props;
+export const MezonSwitch = ({ value, onValueChange }: SwitchProps) => {
+	const [isEnabled, setIsEnabled] = useState(value);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 
-  return (
-    <Switch
-        {...props}
-        value={value}
-        trackColor={{false: '#676b73', true: '#5a62f4'}}
-        thumbColor={Colors.white}
-        ios_backgroundColor="#3e3e3e"
-        onValueChange={onValueChange}
-    />
-  );
+	useEffect(() => {
+		if (value !== isEnabled) setIsEnabled(value);
+	}, [value]);
+
+	const toggleSwitch = () => {
+		onValueChange && onValueChange(!isEnabled);
+		setIsEnabled(previousState => !previousState);
+	}
+
+	return (
+		<TouchableOpacity
+			style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}]}
+			onPress={toggleSwitch}
+		>
+			<View style={[styles.circle, isEnabled ? styles.circleEnabled : {}]} />
+		</TouchableOpacity>
+	);
 };

@@ -2,7 +2,7 @@ import { selectCloseMenu } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { ExitSetting } from '../SettingProfile';
 import ClanSettingOverview from './ClanSettingOverview';
 import Integrations from './Integrations';
@@ -10,6 +10,7 @@ import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
 import SettingEmoji from "./SettingEmoji";
+import NotificationSoundSetting from "./NotificationSoundSetting";
 
 export type ModalSettingProps = {
 	onClose: () => void;
@@ -59,10 +60,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 
 				<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto hide-scrollbar">
 					<div className="flex flex-row flex-1 justify-start h-full">
-						<div className="w-[740px] sbm:p-[40px] p-4 pt-[60px] ">
-							<div className="relative h-full max-h-full">
+						<div className="w-[740px] sbm:px-10">
+							<div className="relative max-h-full sbm:min-h-heightRolesEdit min-h-heightRolesEditMobile">
 								{!(currentSetting.id === ItemSetting.INTEGRATIONS) ? (
-									<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme">{currentSetting.name}</h2>
+									<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">{currentSetting.name}</h2>
 								) : (
 									''
 								)}
@@ -70,6 +71,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								{currentSetting.id === ItemSetting.ROLES && <ServerSettingMainRoles />}
 								{currentSetting.id === ItemSetting.INTEGRATIONS && <Integrations />}
                 {currentSetting.id === ItemSetting.EMOJI && <SettingEmoji/>}
+                {currentSetting.id === ItemSetting.NOTIFICATION_SOUND && <NotificationSoundSetting/>}
 							</div>
 						</div>
 						{isShowDeletePopup && <DeleteClanModal onClose={() => setIsShowDeletePopup(false)} />}
