@@ -31,12 +31,12 @@ const SettingEmojiItem = ({ src, author, emojiName}: SettingEmojiItemProp) => {
           </div>
           {
             showEdit &&
-            <input className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]  dark:text-white text-black`} value={nameEmoji} onChange={(e) => handleChangeEmojiName(e)} />
+            <input className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`} value={nameEmoji} onChange={(e) => handleChangeEmojiName(e)} />
           }
         </div>
 
         <div className={'flex-1 flex gap-[6px]'}>
-          <div className={'w-6 h-6 flex rounded-[50%] overflow-hidden flex items-center justify-center'}>
+          <div className={'w-6 h-6 flex rounded-[50%] overflow-hidden items-center justify-center'}>
             <img className={'w-full h-auto object-cover'} src="https://64.media.tumblr.com/204861b8de03c6826f4b08e898256ee3/a62e949d921cdb7f-8b/s1280x1920/fa655ae1bb2bcfd1b72a4605af853aa6a7ef9c49.jpg" />
           </div>
           <p className={'text-sm h-auto leading-6'}>

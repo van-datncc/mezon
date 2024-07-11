@@ -3,7 +3,7 @@ import SettingEmojiList from "./SettingEmojiList";
 import { IUserAccount } from "@mezon/utils";
 import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useState } from "react";
+import {ChangeEvent, useCallback, useEffect, useState} from "react";
 import { AppDispatch, selectAllEmoji, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 
 const SettingEmoji = () => {
@@ -12,6 +12,10 @@ const SettingEmoji = () => {
   
   const emojiList = useSelector(selectAllEmoji);
   console.log(emojiList);
+  
+  const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log (e.target.files?.[0]);
+  }
   
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
@@ -39,7 +43,14 @@ const SettingEmoji = () => {
         </div>
         <div className="h-[38px] font-semibold rounded bg-[#3297ff] text-[#ffffff] w-28 relative flex flex-row items-center justify-center hover:bg-[#2b80d7]">
           Upload emoji
-          <input className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer" type="file" title=" " tabIndex={0} multiple accept=".jpg,.jpeg,.png,.gif" ></input>
+          <input
+            className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer"
+            type="file"
+            title=" "
+            tabIndex={0}
+            multiple accept=".jpg,.jpeg,.png,.gif"
+            onChange={handleSelectFile}
+          ></input>
         </div>
       </div>
       
