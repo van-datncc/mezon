@@ -5,6 +5,9 @@ import { useState } from "react";
 import { size, useTheme } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
 import { style } from "./styles";
+import { useEffect } from "react";
+import { validInput } from "../../utils/validate";
+import { ErrorInput } from "../../components/ErrorInput";
 
 interface IMezonInputProps {
     placeHolder?: string;
@@ -14,15 +17,21 @@ interface IMezonInputProps {
     onTextChange?: (value: string) => void;
     maxCharacter?: number,
     inputWrapperStyle?: StyleProp<ViewStyle>,
-    showBorderOnFocus?: boolean
+    showBorderOnFocus?: boolean,
+    errorMessage?: string;
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus }: IMezonInputProps) {
+export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage }: IMezonInputProps) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
-    const ref = useRef<TextInput>(null)
+    const ref = useRef<TextInput>(null);
     const [showCount, setShowCount] = useState<boolean>(false);
     const [isFocus, setFocus] = useState<boolean>(false);
+    const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
+
+    useEffect(() => {
+        setIsCheckValid(validInput(value))
+    }, [value])
 
     function handleClearBtn() {
         ref && ref.current && ref.current.clear();
@@ -82,6 +91,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                     </View>
                 }
             </View>
+            {!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
         </View>
 
     )
