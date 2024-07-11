@@ -345,8 +345,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		} else {
 			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
 		}
+		const mediaList = message.attachments.length > 0
+			? [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink]
+			: [];
 
-		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread, EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
+		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread, ...mediaList];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
 		return {
