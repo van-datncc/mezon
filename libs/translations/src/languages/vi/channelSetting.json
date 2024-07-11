@@ -57,7 +57,7 @@
     },
     "confirm": {
         "delete": {
-            "content": "Bạn có chắc muốn xóa channel #{channelName}?. Hành ddoognj này không thể khôi phục lại",
+            "content": "Bạn có chắc muốn xóa channel #{channelName} ?. Hành động này không thể khôi phục lại",
             "confirmText": "Xóa",
             "title": "Xóa channel"
         },

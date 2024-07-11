@@ -9,11 +9,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         gap: size.s_10,
-    },
-
-    menu: {
         paddingHorizontal: 20
-    }
+    },
 });
 
 export default styles;
