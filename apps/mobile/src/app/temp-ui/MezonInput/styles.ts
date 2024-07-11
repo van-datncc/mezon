@@ -1,4 +1,4 @@
-import { Attributes, Fonts, size } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -57,5 +57,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
         color: colors.text,
         fontSize: Fonts.size.h8,
         marginRight: 10
+    },
+
+    errorInput: {
+        paddingHorizontal: Metrics.size.m
     }
 })
