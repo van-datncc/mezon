@@ -3,15 +3,17 @@ import SettingEmojiList from "./SettingEmojiList";
 import { IUserAccount } from "@mezon/utils";
 import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { settingClanEmoji } from "@mezon/store";
+import {useEffect, useState} from "react";
+import {settingClanEmojiActions} from "@mezon/store";
 
 
 const SettingEmoji = () => {
   const dispatch = useDispatch();
-  useEffect(() => {
-    // dispatch(settingClanEmoji())
-  }, [])
+ 
+    // @ts-ignore
+  dispatch(settingClanEmojiActions.fetchEmojisByClanId("1810155153890742272"))
+  
+
   return (
     <>
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">

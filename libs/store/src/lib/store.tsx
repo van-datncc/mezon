@@ -44,6 +44,7 @@ import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
+import {settingClanEmojiReducer} from "./settingEmoji/settingEmoji.slice";
 
 const persistedReducer = persistReducer(
 	{
@@ -112,6 +113,7 @@ const reducer = {
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
+  settingEmoji: settingClanEmojiReducer
 };
 
 let storeInstance = configureStore({

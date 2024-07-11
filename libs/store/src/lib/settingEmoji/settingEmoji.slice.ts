@@ -1,9 +1,10 @@
 import { LoadingStatus } from '@mezon/utils';
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {PayloadAction, createAsyncThunk, createSlice, createEntityAdapter} from '@reduxjs/toolkit';
 import { ApiClanEmoji, ApiClanEmojiList } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
+import {StickersEntity} from "../giftStickerEmojiPanel/stickers.slice";
 
-export const SETTING_CLAN_EMOJI = 'settingClanEmoji';
+export const SETTING_CLAN_EMOJI = 'emojiSettingClan';
 
 export interface SettingClanEmojiState {
 	loadingStatus: LoadingStatus;
@@ -11,22 +12,23 @@ export interface SettingClanEmojiState {
 	listEmoji: Array<ApiClanEmoji>;
 }
 
+type fetchEmojiRequest = {
+  clanId: number;
+}
+
 export const initialSettingClanEmojiState: SettingClanEmojiState = {
 	loadingStatus: 'not loaded',
 	error: null,
 	listEmoji: [],
 };
-// export const stickersAdapter = createEntityAdapter<StickersEntity>();
+export const emojiAdapter = createEntityAdapter<StickersEntity>();
 
-export const settingClanEmoji = createAsyncThunk('settingClan/settingClanEmoji', async (clanId,thunkAPI) => {
+export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await mezon.client.listClanEmoji(mezon.session, '1775732550744936448');
-
-		if (response) {
-			thunkAPI.dispatch(settingClanEmojiActions.settingClanEmoji());
-		}
+		const response = await mezon.client.listClanEmoji(mezon.session, "1810155153890742272");
+    console.log ('emoji: ', response)
     return response;
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
@@ -39,14 +41,14 @@ export const settingClanEmojiSlice = createSlice({
 	reducers: {},
 	extraReducers(builder) {
 		builder
-			.addCase(settingClanEmoji.fulfilled, (state: SettingClanEmojiState, actions: PayloadAction<ApiClanEmojiList>) => {
+			.addCase(fetchEmojisByClanId.fulfilled, (state: SettingClanEmojiState, actions: PayloadAction<ApiClanEmojiList>) => {
 				state.loadingStatus = 'loaded';
 				state.listEmoji = actions.payload.emoji_list ?? [];
 			})
-			.addCase(settingClanEmoji.pending, (state: SettingClanEmojiState) => {
+			.addCase(fetchEmojisByClanId.pending, (state: SettingClanEmojiState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(settingClanEmoji.rejected, (state: SettingClanEmojiState, action) => {
+			.addCase(fetchEmojisByClanId.rejected, (state: SettingClanEmojiState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -55,7 +57,7 @@ export const settingClanEmojiSlice = createSlice({
 
 export const settingClanEmojiReducer = settingClanEmojiSlice.reducer;
 
-export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, settingClanEmoji };
+export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, fetchEmojisByClanId };
 
 // export const getSearchMessageState = (rootState: { [SEARCH_MESSAGES_FEATURE_KEY]: SearchMessageState }): SearchMessageState =>rootState[SEARCH_MESSAGES_FEATURE_KEY];
 
@@ -64,3 +66,5 @@ export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, setti
 // export const selectSearchMessagesChannel = createSelector(getSearchMessageState, (state) => state.searchMessagesChannel);
 
 // export const selectCurrentPage = createSelector(getSearchMessageState, (state) => state.currentPage);
+
+export const { selectAll, selectEntities } = emojiAdapter.getSelectors();
