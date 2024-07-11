@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../ModalValidateFile';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import { fileTypeImage } from '@mezon/utils';
 
 const SettingRightUser = ({
 	onClanProfileClick,
@@ -63,7 +64,7 @@ const SettingRightUser = ({
 			throw new Error('Client or file is not initialized');
 		}
 
-		const allowedTypes = ['image/jpeg', 'image/png'];
+		const allowedTypes = fileTypeImage;
 		if (!allowedTypes.includes(file.type)) {
 			setOpenModalType(true);
 			e.target.value = null;
