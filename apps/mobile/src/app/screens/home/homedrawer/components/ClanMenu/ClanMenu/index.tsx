@@ -17,6 +17,9 @@ import { useAuth, useClans } from "@mezon/core";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { Icons } from "@mezon/mobile-components";
 import { baseColor, useTheme } from "@mezon/mobile-ui";
+import DeleteClanModal from "../../../../../../components/DeleteClanModal";
+import { useState } from "react";
+import { useMemo } from "react";
 
 interface IServerMenuProps {
     clan: ClansEntity;
@@ -26,6 +29,7 @@ interface IServerMenuProps {
 export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
     const { themeValue } = useTheme();
+    const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
     const styles = style(themeValue);
 
     const user = useAuth();
@@ -36,6 +40,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         inviteRef?.current.present();
         dismiss();
     }
+    const isOwner = useMemo(()=>  user?.userId === clan?.creator_id, [user, clan]);
 
     const handleOpenSettings = () => {
         navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
@@ -108,13 +113,15 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         },
         {
             onPress: () => reserve(),
-            isShow: user.userId !== clan?.creator_id,
+            isShow: !isOwner,
             title: t('menu.optionsMenu.leaveServer'),
             textStyle: { color: "red" }
         },
         {
-            onPress: () => reserve(),
-            isShow: user.userId === clan?.creator_id,
+            onPress: () => {
+              setIsVisibleDeleteModal(true)
+            },
+            isShow: isOwner,
             title: t('menu.optionsMenu.deleteClan'),
             textStyle: { color: "red" }
         },
@@ -178,7 +185,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                         icon={<Icons.BellIcon color={themeValue.textStrong} />}
                         onPress={() => reserve()} />
 
-                    {user.userId === clan?.creator_id &&
+                    {isOwner &&
                         <MezonButtonIcon
                             title={t("actions.settings")}
                             icon={<Icons.SettingsIcon color={themeValue.textStrong} />}
@@ -187,11 +194,13 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                     }
 
                 </ScrollView>
-
                 <View>
                     <MezonMenu menu={menu} />
                 </View>
             </View>
+            <DeleteClanModal  isVisibleModal={isVisibleDeleteModal} visibleChange={(isVisible)=>{
+              setIsVisibleDeleteModal(isVisible)
+            }}></DeleteClanModal>
         </View>
     )
 }

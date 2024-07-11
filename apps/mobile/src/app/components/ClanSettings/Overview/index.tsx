@@ -7,12 +7,14 @@ import { useTranslation } from "react-i18next";
 import MezonToggleButton from "../../../temp-ui/MezonToggleButton";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
-import { baseColor } from "@mezon/mobile-ui";
+import DeleteClanModal from "../../DeleteClanModal";
+import { Block } from "@mezon/mobile-ui";
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
     const { currentClan, updateClan } = useClans();
     const { t } = useTranslation(['clanOverviewSetting']);
+    const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 
     const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
     const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
@@ -110,7 +112,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
         {
             title: t("menu.deleteServer.delete"),
             textStyle: { color: "red" },
-            onPress: () => reserve()
+            onPress: () =>{ setIsVisibleDeleteModal(true) }
         },
     ]
 
@@ -145,7 +147,8 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
     ]
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <Block>
+          <ScrollView contentContainerStyle={styles.container}>
             <MezonImagePicker defaultValue={banner} height={200} width={"100%"} onLoad={handleLoad} showHelpText autoUpload />
 
             <View style={{ marginVertical: 10 }}>
@@ -161,8 +164,9 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
                 title={t('fields.defaultNotification.title')}
                 bottomDescription={t('fields.defaultNotification.description')}
                 data={optionData} />
-
             <MezonMenu menu={dangerMenu} />
         </ScrollView>
+        <DeleteClanModal isVisibleModal={isVisibleDeleteModal} visibleChange={(isVisible)=>{setIsVisibleDeleteModal(isVisible)}}></DeleteClanModal>
+        </Block>
     )
 }

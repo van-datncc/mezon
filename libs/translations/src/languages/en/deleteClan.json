@@ -1,0 +1,8 @@
+{
+  "deleteClanModal": {
+    "title": "Delete clans",
+    "description": "Are you sure you want to delete {{currentClan}} ? This action cannot be undone.",
+    "confirm": "Yes",
+    "cancel": "No"
+  }
+}
