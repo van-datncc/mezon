@@ -113,11 +113,10 @@ const HomeScreen = React.memo((props: any) => {
 	};
 
 	const messageLoader = async () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.DISABLE_SKELETON_MESSAGE, { isDisabled: true });
 		const store = await getStoreAsync();
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-		// await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
 		await store.dispatch(
 			channelsActions.joinChannel({
 				clanId: currentClan?.clan_id,
@@ -126,7 +125,6 @@ const HomeScreen = React.memo((props: any) => {
 			}),
 		);
 		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
-		DeviceEventEmitter.emit(ActionEmitEvent.DISABLE_SKELETON_MESSAGE, { isDisabled: false });
 		return null;
 	};
 

@@ -1,7 +1,7 @@
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { DeleteModal } from './Component/Modal/deleteChannelModal';
 
 export type ChannelSettingItemProps = {
@@ -90,7 +90,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 			</div>
 			{showModal && (
 				<DeleteModal
-					onCloseModal = {onCloseModal}
+					onCloseModal={onCloseModal}
 					onClose={() => setShowModal(false)}
 					channelLabel={channel?.channel_label || ''}
 					channelId={channel.channel_id as string}

@@ -15,7 +15,28 @@
         "baseHref": "/",
         "main": "apps/admin/src/main.tsx",
         "tsConfig": "apps/admin/tsconfig.app.json",
-        "assets": ["apps/admin/src/favicon.ico", "apps/admin/src/assets"],
+        				"assets": [
+					{
+						"glob": "**/*",
+						"input": "apps/admin/src/assets/",
+						"output": "./assets/"
+					},
+					{
+						"glob": "**/*",
+						"input": "libs/assets/src/assets/",
+						"output": "./assets/"
+					},
+					{
+						"glob": "apps/admin/src/assets/favicon.ico",
+						"input": "./",
+						"output": "./"
+					},
+					{
+						"glob": "apps/admin/src/assets/firebase-messaging-sw.js",
+						"input": "./",
+						"output": "./"
+					}
+				],
         "styles": ["apps/admin/src/styles.scss"],
         "scripts": [],
         "webpackConfig": "apps/admin/webpack.config.js"

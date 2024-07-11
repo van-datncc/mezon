@@ -1,6 +1,7 @@
+import { useTheme } from "@mezon/mobile-ui";
 import { ReactNode } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import styles from "./styles";
+import { style } from "./styles";
 
 interface IMezonFakeBoxProps {
     title?: string;
@@ -11,6 +12,9 @@ interface IMezonFakeBoxProps {
 }
 
 export default function MezonFakeInputBox({ title, prefixIcon, postfixIcon, value, onPress }: IMezonFakeBoxProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
+    
     return (
         <View>
             {title && <Text style={styles.sectionTitle}>{title}</Text>}

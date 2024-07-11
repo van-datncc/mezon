@@ -1,6 +1,6 @@
 {
   "bottomSheet": {
-    "title": "Notification Setting",
+    "title": "Notification Settings",
     "labelOptions": {
       "reactionMessage": "Reaction Message",
       "categoryDefault": "Use Category Default",

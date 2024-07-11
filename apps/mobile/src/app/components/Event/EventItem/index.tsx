@@ -1,13 +1,14 @@
 import { EventManagementEntity, selectChannelById, selectMemberByUserId } from "@mezon/store-mobile";
 import { Pressable, Text, View } from "react-native";
-import styles from "./styles";
-import { CheckIcon, LocationIcon, MemberListIcon, ShareIcon, SpeakerIcon } from "@mezon/mobile-components";
+import { style } from "./styles";
+import { CheckIcon, Icons, MemberListIcon, ShareIcon } from "@mezon/mobile-components";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
 import { OptionEvent } from "@mezon/utils";
 import MezonButton from "../../../temp-ui/MezonButton2";
 import EventTime from "../EventTime";
 import EventLocation from "../EventLocation";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IEventItemProps {
     event: EventManagementEntity,
@@ -15,6 +16,8 @@ interface IEventItemProps {
 }
 
 export default function EventItem({ event, onPress }: IEventItemProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
     const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
     const channelVoice = useSelector(selectChannelById(event?.channel_id));
@@ -39,23 +42,21 @@ export default function EventItem({ event, onPress }: IEventItemProps) {
                             />
                         </View>
                         <View style={styles.inline}>
-                            <MemberListIcon height={10} width={10} />
+                            <Icons.GroupIcon height={10} width={10} color={themeValue.text} />
                             <Text style={styles.tinyText}>{event?.user_ids?.length}</Text>
                         </View>
                     </View>
                 </View>
 
                 <View style={styles.mainSec}>
-                    <Text style={{ color: "white" }}>{event.title}</Text>
+                    <Text style={{ color: themeValue.textStrong }}>{event.title}</Text>
                     {event.description && <Text style={styles.description}>{event.description}</Text>}
                     <EventLocation event={event} />
                 </View>
 
                 <View style={styles.inline}>
-                    {/* <MezonButton title="End event" fluid /> */}
-                    <MezonButton icon={<CheckIcon height={16} width={16} />} title="Interested" fluid border />
-                    {/* <MezonButton title="Start event" fluid type="success" /> */}
-                    <MezonButton icon={<ShareIcon height={20} width={20} />} />
+                    <MezonButton icon={<Icons.CheckmarkSmallIcon height={20} width={20} color={themeValue.text} />} title="Interested" fluid border />
+                    <MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
                 </View>
             </View>
         </Pressable>

@@ -1,5 +1,7 @@
+import { Icons } from '@mezon/components';
 import { useRoles } from '@mezon/core';
-import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { RolesClanEntity, UsersClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { InputField } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -33,7 +35,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		}
 	}, [isOpen, memberRoles]);
 
-	const [searchResults, setSearchResults] = useState<any[]>([]);
+	const [searchResults, setSearchResults] = useState<UsersClanEntity[]>([]);
 
 	useEffect(() => {
 		setSearchResults(membersNotInRoles);
@@ -66,30 +68,40 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		isOpen && (
 			<div className="fixed  inset-0 flex items-center justify-center z-50">
 				<div className="fixed inset-0 bg-black opacity-80"></div>
-				<div className="relative z-10 dark:bg-gray-900 bg-bgLightModeSecond p-6 rounded-[5px] text-center h-[400px] w-[530px] flex flex-col justify-between gap-y-2">
+				<div className="relative z-10 dark:bg-bgDisable bg-bgLightMode p-6 rounded-[5px] text-center h-[400px] w-[440px] flex flex-col justify-between gap-y-2">
 					<div>
-						<h2 className="text-[30px] font-semibold">Add members</h2>
-						<p className="text-white-600 text-[16px] mb-4">{activeRole?.title}</p>
+						<h2 className="text-2xl font-semibold">Add members</h2>
+						<p className="text-contentTertiary text-[16px] mb-4 font-light inline-flex gap-x-2 items-center">
+							<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5" />
+							{activeRole?.title}
+						</p>
 						<div className="w-full flex mb-3">
-							<input
-								className="flex-grow dark:bg-black bg-white p-[7px] pl-3 border rounded-lg"
+							<InputField
+								className="flex-grow rounded w-full dark:text-white text-black border dark:border-black border-white p-2 focus:outline-none focus:border-white-500 dark:bg-bgTertiary bg-bgLightModeThird text-base"
 								type="text"
 								placeholder="Search Permissions"
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
 							/>
 						</div>
+						<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2 text-left">Members</p>
 						<div className="overflow-y-auto">
-							<ul className="flex flex-col gap-y-[5px] max-h-[200px]">
+							<ul className="flex flex-col gap-y-[5px] max-h-[200px] font-light text-sm ">
 								{searchResults.map((permission) => (
-									<li key={permission.id} className="flex items-center justify-between">
-										<label htmlFor={permission.id} className='text-start w-full'>{permission?.user?.display_name}</label>
-										<input
-											id={permission.id}
-											type="checkbox"
-											checked={selectedUsers.includes(permission.id)}
-											onChange={() => handleUserToggle(permission.id)}
-										/>
+									<li key={permission.id} >
+										<label htmlFor={permission.id} className='w-full inline-flex justify-between items-center'>
+											<div className='inline-flex gap-x-2'>
+												<img src={permission?.user?.avatar_url} alt={permission?.user?.display_name} className='size-6 object-cover rounded-full'/>
+												<p>{permission?.user?.display_name}</p>
+												<p className='text-contentTertiary'>{permission?.user?.username}</p>
+											</div>
+											<input
+												id={permission.id}
+												type="checkbox"
+												checked={selectedUsers.includes(permission.id)}
+												onChange={() => handleUserToggle(permission.id)}
+											/>
+										</label>
 									</li>
 								))}
 							</ul>

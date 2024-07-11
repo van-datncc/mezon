@@ -26,6 +26,7 @@ import channelMenu from "./channelCreator.json";
 import channelSetting from  "./channelSetting.json";
 import appearanceSetting from "./appearanceSetting.json";
 import appThemeSetting from "./appThemeSetting.json";
+import accountSetting from "./accountSetting.json";
 
 export default {
 	inviteToChannel,
@@ -55,5 +56,6 @@ export default {
 	channelMenu,
 	channelSetting,
 	appearanceSetting,
-	appThemeSetting
+	appThemeSetting,
+	accountSetting
 };
