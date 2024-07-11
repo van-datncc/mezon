@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-import * as Icons from "../../../Icons";
 import { formatTimeToMMSS } from "@mezon/utils";
+import { Icons } from "@mezon/components";
 
 interface ISoundItemProps {
   sound: {
