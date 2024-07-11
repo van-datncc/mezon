@@ -194,18 +194,18 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionCopyMediaLink = () => {
-		const media = message.attachments;
-		if (media.length > 0) {
+		const media = message?.attachments;
+		if (media && media.length > 0) {
 			const url = media[0].url;
 			Clipboard.setString(url);
 		}
 	}
 
 	const handleActionSaveImage = async () => {
-		const media = message.attachments;
+		const media = message?.attachments;
 		bottomSheetRef?.current?.dismiss();
 		dispatch(appActions.setLoadingMainMobile(true));
-		if (media.length > 0) {
+		if (media && media.length > 0) {
 			const url = media[0].url;
 			const type = media[0].filetype.split("/");
 			const filePath = await downloadImage(url, type[1]);
@@ -345,7 +345,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		} else {
 			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
 		}
-		const mediaList = message.attachments.length > 0
+		const mediaList = message?.attachments.length > 0
 			? [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink]
 			: [];
 

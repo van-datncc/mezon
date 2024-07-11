@@ -19,39 +19,7 @@ interface IImageListModalProps {
 }
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-
 	const { visible, data, idxSelected, onClose, onImageChange, onImageChangeFooter } = props;
-	const menuBottomSheetRef = useRef<BottomSheetModal>();
-
-	const menu = useMemo(() => ([
-		{
-			items: [
-				{
-					title: "",
-					icon: <Icons.DownloadIcon color={themeValue.text} />,
-					onPress: () => reserve()
-				},
-				{
-					title: "",
-					// TODO: Nghia: Change icon
-					icon: <Icons.DownloadIcon color={themeValue.text} />,
-					onPress: () => reserve()
-				},
-				{
-					title: "",
-					icon: <Icons.WindowsMaximizeIcon color={themeValue.text} />,
-					onPress: () => reserve()
-				},
-				{
-					title: "",
-					icon: <Icons.LinkIcon color={themeValue.text} />,
-					onPress: () => reserve()
-				},
-			]
-		}
-	]) satisfies IMezonMenuSectionProps[], [])
 
 	return (
 		<ImageView
@@ -71,8 +39,5 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			onClose={onClose}
 			renderFooter={() => <RenderFooterModal data={data || []} idxSelected={idxSelected} onImageChangeFooter={onImageChangeFooter} />}
 		/>
-		//  <MezonBottomSheet ref={menuBottomSheetRef}>
-		// 	<MezonMenu menu={menu} />
-		// </MezonBottomSheet>
 	);
 });
