@@ -67,7 +67,9 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+	const timeoutRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
+	const [isShowBottomSheetInvite, setIsShowBottomSheetInvite] = useState<boolean>(false);
 	const filteredChannels = useMemo(() => filterMessages(categorizedChannels), [categorizedChannels]);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
@@ -83,6 +85,12 @@ const ChannelList = React.memo((props: any) => {
 		}
 		prevFilteredChannelsRef.current = isLogin ? filteredChannels : {};
 	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id, isLogin]);
+
+	useEffect(() => {
+		return () => {
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
@@ -160,12 +168,23 @@ const ChannelList = React.memo((props: any) => {
 						style={styles.inviteIconWrapper}
 						onPress={() => {
 							setIsUnKnownChannel(false);
-							bottomSheetInviteRef.current.present();
+							setIsShowBottomSheetInvite(true);
+							timeoutRef.current = setTimeout(() => {
+								bottomSheetInviteRef?.current?.present?.();
+							}, 200);
 						}}
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
-					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
+					{isShowBottomSheetInvite && (
+						<InviteToChannel
+							isUnknownChannel={isUnknownChannel}
+							ref={bottomSheetInviteRef}
+							onClose={() => {
+								setIsShowBottomSheetInvite(false);
+							}}
+						/>
+					)}
 				</View>
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
@@ -177,11 +196,7 @@ const ChannelList = React.memo((props: any) => {
 						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
-				{
-					isLoading === 'loading' && (
-						<ChannelListSkeleton numberSkeleton={6} />
-					)
-				}
+				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlatList
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}
