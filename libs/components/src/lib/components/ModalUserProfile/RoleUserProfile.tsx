@@ -87,7 +87,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 								<Icons.IconRemove className='text-transparent size-2'/>
 							</Tooltip>
 						</button>
-						<span className='text-xs' style={{lineHeight: '15px'}}>{role.title}</span>
+						<span className='text-xs font-medium' style={{lineHeight: '15px'}}>{role.title}</span>
 					</span>
 				))}
 				<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
@@ -101,7 +101,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						>
 							<button className='flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300'>
 								<Icons.Plus />
-								<p className='text-xs m-0'>Add Role</p>
+								<p className='text-xs m-0 font-medium'>Add Role</p>
 							</button>
 						</Tooltip>
 						<div className="absolute" style={{ top: `${positionTop}px`, left: `${positionLeft}px` }}>
@@ -121,7 +121,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 											(filteredListRoleBySearch.map((role, index) => (
 												<div
 													key={index}
-													className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center"
+													className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
 													onClick={() => addRole(role.id)}
 												>
 													<div className='size-3 dark:bg-white bg-bgLightModeButton rounded-full'></div>

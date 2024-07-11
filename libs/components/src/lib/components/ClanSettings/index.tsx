@@ -9,6 +9,7 @@ import Integrations from './Integrations';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
+import SettingEmoji from "./SettingEmoji";
 import NotificationSoundSetting from "./NotificationSoundSetting";
 
 export type ModalSettingProps = {
@@ -69,6 +70,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								{currentSetting.id === ItemSetting.OVERVIEW && <ClanSettingOverview />}
 								{currentSetting.id === ItemSetting.ROLES && <ServerSettingMainRoles />}
 								{currentSetting.id === ItemSetting.INTEGRATIONS && <Integrations />}
+                {currentSetting.id === ItemSetting.EMOJI && <SettingEmoji/>}
                 {currentSetting.id === ItemSetting.NOTIFICATION_SOUND && <NotificationSoundSetting/>}
 							</div>
 						</div>
