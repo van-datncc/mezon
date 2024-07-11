@@ -41,7 +41,7 @@ export { default as ModalNotificationSetting } from './components/notificationSe
 
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
 export { default as ForwardMessageModal } from './components/ForwardMessage';
-export * as Icons from './components/Icons';
+export { Icons } from '@mezon/ui';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';

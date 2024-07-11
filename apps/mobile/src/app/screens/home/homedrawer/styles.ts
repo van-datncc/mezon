@@ -13,7 +13,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
 	wrapperChatBox: {
 		backgroundColor: colors.secondary,
-		borderTopWidth: 0.5,
+		borderTopWidth: 1,
 		borderTopColor: colors.border,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
@@ -234,7 +234,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'space-between',
 		borderBottomWidth: 1,
 		borderBottomColor: colors.border,
-		backgroundColor: colors.primary,
+		backgroundColor: colors.secondary,
 	},
 	lineActiveClan: {
 		backgroundColor: Colors.azureBlue,
@@ -511,7 +511,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		marginVertical: size.s_30,
 	},
 	channelView: {
-		flex: 1, 
+		flex: 1,
 		backgroundColor: colors.secondary
 	},
 	iconWelcomeMessage: {

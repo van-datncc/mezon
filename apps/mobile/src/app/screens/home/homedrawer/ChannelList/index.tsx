@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
 import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	appActions,
@@ -18,7 +18,7 @@ import {
 } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel, IThread } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { isEqual } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -146,7 +146,9 @@ const ChannelList = React.memo((props: any) => {
 		bottomSheetEventRef?.current?.dismiss();
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
 	}
-
+	if (isEmpty(currentClan)) {
+		return <Block height={20} />;
+	}
 	return (
 		<ChannelListContext.Provider value={{ navigation: props.navigation }}>
 			<View style={styles.mainList}>
@@ -175,25 +177,26 @@ const ChannelList = React.memo((props: any) => {
 						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' ? (
-					<ChannelListSkeleton numberSkeleton={6} />
-				) : (
-					<FlatList
-						data={categorizedChannels || []}
-						keyExtractor={(_, index) => index.toString()}
-						renderItem={({ item, index }) => (
-							<ChannelListSection
-								data={item}
-								index={index}
-								onPressHeader={toggleCollapseChannel}
-								onLongPressCategory={(category) => handleLongPressCategory(category)}
-								onLongPressChannel={(channel) => handleLongPressChannel(channel)}
-								onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-								collapseItems={collapseChannelItems}
-							/>
-						)}
-					/>
-				)}
+				{
+					isLoading === 'loading' && (
+						<ChannelListSkeleton numberSkeleton={6} />
+					)
+				}
+				<FlatList
+					data={categorizedChannels || []}
+					keyExtractor={(_, index) => index.toString()}
+					renderItem={({ item, index }) => (
+						<ChannelListSection
+							data={item}
+							index={index}
+							onPressHeader={toggleCollapseChannel}
+							onLongPressCategory={(category) => handleLongPressCategory(category)}
+							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
+							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
+							collapseItems={collapseChannelItems}
+						/>
+					)}
+				/>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

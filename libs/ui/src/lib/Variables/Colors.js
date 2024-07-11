@@ -44,6 +44,7 @@ module.exports = {
   bgModifierHoverLight: '#DFE1E5',
   bgModalLight: 'rgba(0, 0, 0, 0.54)',
   bgTextarea: '#EBEBEB',
+  bgInputDark: '#26262B',
 
   /* text */
   channelTextarea: '#383A40',

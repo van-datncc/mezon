@@ -13,7 +13,7 @@ import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../Icons';
+import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { useAuth } from '@mezon/core';
 import ListRole from './listRoles';
 import ListMembers from './listMembers';
@@ -39,8 +39,8 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 	const [selectedUserIds, setSelectedUserIds] = useState<string[]>(selectUserIds);
 	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(selectRoleIds);
 	const { userProfile } = useAuth();
-	const rolesAddChannel = useMemo(() => rolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1),[rolesChannel]);
-	const listRolesNotAddChannel = useMemo(() => rolesClan.filter((role) => !rolesAddChannel.map((roleAddChannel) => roleAddChannel.id).includes(role.id)),[rolesClan, rolesAddChannel]);
+	const rolesAddChannel = useMemo(() => rolesChannel.filter((role) => typeof role.role_channel_active === 'number' && role.role_channel_active === 1), [rolesChannel]);
+	const listRolesNotAddChannel = useMemo(() => rolesClan.filter((role) => !rolesAddChannel.map((roleAddChannel) => roleAddChannel.id).includes(role.id)), [rolesClan, rolesAddChannel]);
 
 	const usersClan = useSelector(selectAllUsesClan);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
@@ -51,12 +51,12 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 		const memberIds = rawMembers.filter((member) => member.userChannelId !== '0').map((member) => member.user?.id || '');
 		return usersClan.filter((user) => !memberIds.some((userId) => userId === user.id));
 	}, [usersClan, rawMembers, channel.channel_private, userProfile?.user?.id]);
-	const listMembersNotInChannel = useMemo(() => listUserInvite ? listUserInvite.map((member) => member.user) : [],[listUserInvite]);
+	const listMembersNotInChannel = useMemo(() => listUserInvite ? listUserInvite.map((member) => member.user) : [], [listUserInvite]);
 
 	const initFilter: filterItemProps = useMemo(() => ({
 		listMembersNotInChannel: listMembersNotInChannel,
 		listRolesNotAddChannel: listRolesNotAddChannel,
-	}),[listRolesNotAddChannel, listMembersNotInChannel]);
+	}), [listRolesNotAddChannel, listMembersNotInChannel]);
 	const [filterItem, setFilterItem] = useState<filterItemProps>(initFilter);
 
 	const dispatch = useAppDispatch();
@@ -79,7 +79,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 
 	const handleAddMember = async () => {
 		onClose();
-		if(channel.channel_private === 1){
+		if (channel.channel_private === 1) {
 			if (selectedUserIds.length > 0) {
 				const body = {
 					channelId: channel.id,
@@ -113,10 +113,10 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 	}
 
 	const filterData = useCallback((input: string) => {
-		const inputData = input.trim().toLowerCase();
-		if(inputData.startsWith('@')){
+		const inputData = input.trim();
+		if (inputData.startsWith('@')) {
 			const searchValue = inputData.substring(1);
-      		const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.toLowerCase().includes(searchValue));
+			const filteredMembers = listMembersNotInChannel.filter(item => item?.display_name?.includes(searchValue));
 			setFilterItem({
 				listMembersNotInChannel: filteredMembers,
 				listRolesNotAddChannel: [],
@@ -129,15 +129,15 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 			listMembersNotInChannel: filteredMembers,
 			listRolesNotAddChannel: filteredRoles,
 		})
-	},[listRolesNotAddChannel, listMembersNotInChannel]);
+	}, [listRolesNotAddChannel, listMembersNotInChannel]);
 
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
 			filterData(valueSearch);
 		}, 500);
-	
+
 		return () => clearTimeout(timeoutId);
-	},[filterData, valueSearch])
+	}, [filterData, valueSearch])
 
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">
@@ -168,19 +168,19 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({ onClose, channel, onSele
 					<p className="text-xs pt-2">Add individual members by starting with @ or type a role name</p>
 				</div>
 				<div className="max-h-[270px] min-h-[270px] overflow-y-scroll hide-scrollbar">
-					{filterItem.listRolesNotAddChannel.length !==0 &&
+					{filterItem.listRolesNotAddChannel.length !== 0 &&
 						<div>
 							<p className="uppercase font-bold text-xs pb-4">Roles</p>
 							<div>
-								<ListRole listItem={filterItem.listRolesNotAddChannel} selectedRoleIds={selectedRoleIds} handleCheckboxRoleChange={handleCheckboxRoleChange}/>
+								<ListRole listItem={filterItem.listRolesNotAddChannel} selectedRoleIds={selectedRoleIds} handleCheckboxRoleChange={handleCheckboxRoleChange} />
 							</div>
 						</div>
 					}
-					{filterItem.listMembersNotInChannel.length !==0 &&
+					{filterItem.listMembersNotInChannel.length !== 0 &&
 						<div className="mt-2">
 							<p className="uppercase font-bold text-xs pb-4">Members</p>
 							<div>
-								<ListMembers listItem={filterItem.listMembersNotInChannel} selectedUserIds={selectedUserIds} handleCheckboxUserChange={handleCheckboxUserChange}/>
+								<ListMembers listItem={filterItem.listMembersNotInChannel} selectedUserIds={selectedUserIds} handleCheckboxUserChange={handleCheckboxUserChange} />
 							</div>
 						</div>
 					}

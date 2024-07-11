@@ -9,8 +9,8 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
-import * as Icons from '../Icons';
-import { AddPerson, SettingProfile } from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
+import { AddPerson, SettingProfile } from '../../../../../ui/src/lib/Icons';
 import PanelChannel from '../PanelChannel';
 
 export type ChannelLinkProps = {

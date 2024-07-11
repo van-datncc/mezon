@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev:chat": "nx run chat:serve",
+    "dev:admin": "nx run admin:serve",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format": "nx format:check",

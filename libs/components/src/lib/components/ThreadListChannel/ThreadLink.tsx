@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import PanelChannel from '../PanelChannel';
 
 type ThreadLinkProps = {

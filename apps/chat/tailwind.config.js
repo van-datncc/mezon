@@ -100,6 +100,8 @@ module.exports = {
       minHeight: {
         600: '600px',
         heightModalSearch: heightModalSearch,
+        heightRolesEdit: `calc(100% - 60px)`,
+        heightRolesEditMobile: `calc(100% - 10px)`,
       },
 
       minWidth:{

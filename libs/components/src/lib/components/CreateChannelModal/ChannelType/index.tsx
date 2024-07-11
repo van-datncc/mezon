@@ -1,6 +1,6 @@
 import { ChannelType } from 'mezon-js';
 import React from 'react';
-import * as Icons from '../../Icons';
+import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 interface ChannelTypeProps {
 	type: number;

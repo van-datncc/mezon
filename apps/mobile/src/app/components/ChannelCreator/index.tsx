@@ -3,17 +3,16 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../navigation/ScreenTypes";
 import { useState } from "react";
 import { CrossIcon, NittroIcon } from "@mezon/mobile-components";
 import { useTranslation } from "react-i18next";
-import MezonInput from "../../temp-ui/MezonInput2";
 import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
 import { useSelector } from "react-redux";
 import { createNewChannel, selectCurrentChannel, selectCurrentClanId } from "@mezon/store-mobile";
 import styles from "./styles";
-import MezonToggleButton from "../../temp-ui/MezonToggleButton";
 import { useMemo } from "react";
-import { IMezonMenuSectionProps, MezonMenu, MezonOption } from "../../temp-ui";
+import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from "../../temp-ui";
 import { ChannelType } from "mezon-js";
 import { useAppDispatch } from "@mezon/store";
 import { validInput } from "../../utils/validate";
+import Toast from "react-native-toast-message";
 
 type CreateChannelScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CHANNEL;
 export default function ChannelCreator({ navigation, route }: MenuClanScreenProps<CreateChannelScreen>) {
@@ -59,21 +58,24 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
             category_id: categoryId || currentChannel.category_id,
         };
 
-        console.log(body);
-        await dispatch(createNewChannel(body));
-        setChannelName('');
-        navigation.navigate(APP_SCREEN.HOME);
+        const newChannelCreatedId = await dispatch(createNewChannel(body));
+        // @ts-ignore
+        const error = newChannelCreatedId.error
+
+        if (newChannelCreatedId && error) {
+            Toast.show({
+                type: "info",
+                text1: error.message
+            })
+        } else {
+            setChannelName('');
+            navigation.navigate(APP_SCREEN.HOME);
+        }
     }
 
     function handleClose() {
         navigation.goBack();
     }
-
-    const ToggleBtn = () => <MezonToggleButton
-        onChange={(value: boolean) => setChannelPrivate(value)}
-        height={25}
-        width={45}
-    />
 
     const menuPrivate = useMemo(() => ([
         {
@@ -83,7 +85,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
             items: [
                 {
                     title: t('fields.channelPrivate.title'),
-                    component: <ToggleBtn />,
+                    component: <MezonSwitch />,
                     icon: <NittroIcon />
                 }
             ]
@@ -106,6 +108,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
     function handleChannelTypeChange(value: number) {
         setChannelType(value);
     }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <MezonInput
@@ -114,7 +117,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
                 label={t('fields.channelName.title')}
                 errorMessage={t('fields.channelName.errorMessage')}
                 placeHolder={t('fields.channelName.placeholder')} />
-            <View style={styles.menu}>
+            <View>
                 <MezonOption
                     title={t('fields.channelType.title')}
                     data={channelTypeList}

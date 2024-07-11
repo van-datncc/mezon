@@ -1,14 +1,17 @@
 import { Text, View } from "react-native";
 import MezonBadge from "../../../temp-ui/MezonBadge";
-import { CalendarIcon, isSameDay, timeFormat } from "@mezon/mobile-components";
+import { Icons, isSameDay, timeFormat } from "@mezon/mobile-components";
 import { EventManagementEntity } from "@mezon/store-mobile";
-import styles from "./styles";
+import { style } from "./styles";
+import { useTheme } from "@mezon/mobile-ui";
 
 interface IEventTimeProps {
     event: EventManagementEntity
 }
 
 export default function EventTime({ event }: IEventTimeProps) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     return (
         <View style={styles.inline}>
             {
@@ -16,7 +19,7 @@ export default function EventTime({ event }: IEventTimeProps) {
                 isSameDay(event.create_time as string) &&
                 <MezonBadge title="new" type="success" />
             }
-            <CalendarIcon height={20} width={20} />
+            <Icons.CalendarIcon height={20} width={20} color={themeValue.textStrong} />
             <Text style={styles.smallText}>{timeFormat(event.start_time)} </Text>
 
             {/* Coming soon */}

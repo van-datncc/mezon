@@ -66,7 +66,7 @@ export const styles = StyleSheet.create({
 	},
 	roles: {
 		flexDirection: 'row',
-		gap: size.s_20,
+		gap: size.s_10,
 	},
 	roleItem: {
 		flexDirection: 'row',

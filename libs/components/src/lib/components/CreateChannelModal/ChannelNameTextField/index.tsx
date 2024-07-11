@@ -1,6 +1,6 @@
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import * as Icons from '../../Icons';
+import * as Icons from '../../../../../../ui/src/lib/Icons';
 import { ChannelLableModal } from '../ChannelLabel';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
@@ -50,12 +50,12 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 	};
 
 	useImperativeHandle(ref, () => ({
-        checkInput: () => checkvalidate || checkNameChannel,
-    }));
+		checkInput: () => checkvalidate || checkNameChannel,
+	}));
 
 	useEffect(() => {
 		onHandleChangeValue();
-	},[checkvalidate, checkNameChannel, onHandleChangeValue]);
+	}, [checkvalidate, checkNameChannel, onHandleChangeValue]);
 
 	return (
 		<div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">

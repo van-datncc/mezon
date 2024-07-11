@@ -16,6 +16,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	input: {
 		color: colors.textStrong,
 		fontSize: Fonts.size.small,
+		height: 40,
 		flexBasis: 10,
 		flexGrow: 1,
 		paddingVertical: 0

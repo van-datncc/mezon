@@ -1,4 +1,4 @@
-import { useCategory, useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
+import { useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
 import { LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -16,9 +16,10 @@ import { EMaxUserCanInvite } from '../../enums';
 import { style } from './styles';
 import { BottomSheetModal, BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
-import { DirectEntity } from '@mezon/store-mobile';
+import { DirectEntity, selectCurrentChannelId } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import {useSelector} from "react-redux";
 
 interface IInviteToChannelProp {
    isUnknownChannel: boolean
@@ -27,6 +28,7 @@ interface IInviteToChannelProp {
 export const InviteToChannel = React.memo(
 	React.forwardRef(({ isUnknownChannel}: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
+		const currentChannelId = useSelector(selectCurrentChannelId);
 		// const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
@@ -40,16 +42,15 @@ export const InviteToChannel = React.memo(
 		const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
 		const [expiredTimeSelected, setExpiredTimeSelected] = useState<string>(ExpireLinkValue.SevenDays);
 		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
-		const { categorizedChannels } = useCategory();
-		const { listDMInvite, listUserInvite } = useDMInvite(categorizedChannels.at(0)?.channels.at(0)?.channel_id);
+		const { listDMInvite, listUserInvite } = useDMInvite(currentChannelId);
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
 		const [sentIdList, setSentIdList] = useState<string[]>([]);
 		const mezon = useMezon();
 
 		const userInviteList = useMemo(() => {
-			if (listDMInvite.length) {
-				return listDMInvite.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
+			if (listDMInvite?.length) {
+				return listDMInvite?.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
 			}
 			return listUserInvite?.filter(UserInvite => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)))
 		}, [searchUserText, listDMInvite, listUserInvite])
@@ -108,7 +109,7 @@ export const InviteToChannel = React.memo(
 				[],
 			);
 		};
-	
+
 		const directMessageWithUser = async (userId: string) => {
 			const response = await createDirectMessageWithUser(userId);
 			if (response?.channel_id) {
@@ -129,7 +130,7 @@ export const InviteToChannel = React.memo(
 				setSentIdList([...sentIdList, userId]);
 				return;
 			}
-	
+
 			if (directParamId && dmGroup) {
 				sendToDM({ text: currentInviteLink }, dmGroup);
 				setSentIdList([...sentIdList, dmGroup?.id]);
@@ -138,8 +139,7 @@ export const InviteToChannel = React.memo(
 		};
 
 		const fetchInviteLink = async () => {
-			const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
-			const response = await createLinkInviteUser(currentClanId ?? '', channelId ?? '', 10);
+			const response = await createLinkInviteUser(currentClanId ?? '', currentChannelId ?? '', 10);
 			if (!response) {
 				return;
 			}
@@ -147,10 +147,10 @@ export const InviteToChannel = React.memo(
 		}
 
 		useEffect(() => {
-			if (currentClanId) {
+			if (currentClanId && currentChannelId) {
 				fetchInviteLink();
 			}
-		}, [currentClanId]);
+		}, [currentClanId, currentChannelId]);
 
 		return (
 			<View>
@@ -223,7 +223,7 @@ export const InviteToChannel = React.memo(
 									</Pressable>
 								</View>
 							</View>
-							
+
 							<BottomSheetFlatList
 								data={userInviteList}
 								keyExtractor={(item) => item?.id}

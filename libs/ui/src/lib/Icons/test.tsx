@@ -8,7 +8,6 @@ describe('<Icons />', () => {
 	iconsIndex.map((icon) => {
 		it(`should render the ${icon} Icon correctly`, () => {
 			const { container } = render(<>{Icons[icon as keyof typeof Icons]({})}</>);
-
 			expect(container.querySelector('svg')).toBeInTheDocument();
 		});
 	});
