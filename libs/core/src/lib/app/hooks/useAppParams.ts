@@ -20,4 +20,4 @@ export function useAppParams() {
 		}),
 		[clanId, channelId, directId, type, currentURL, messageId],
 	);
-}
+} 
