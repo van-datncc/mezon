@@ -1,7 +1,7 @@
 import { selectCurrentChannelId, selectCurrentClanId, selectTheme } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { TextArea, TimePicker } from '@mezon/ui';
-import { ContenSubmitEventProps } from '@mezon/utils';
+import { ContenSubmitEventProps, fileTypeImage } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -80,7 +80,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
 		}
-		const allowedTypes = ['image/jpeg', 'image/png'];
+		const allowedTypes = fileTypeImage;
 		if (!allowedTypes.includes(file.type)) {
 			setOpenModalType(true);
 			e.target.value = null;

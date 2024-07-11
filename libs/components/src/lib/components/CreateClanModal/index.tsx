@@ -2,7 +2,7 @@ import { useAppNavigation, useClans } from '@mezon/core';
 import { selectAllAccount, selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
-import { ValidateSpecialCharacters } from '@mezon/utils';
+import { fileTypeImage, ValidateSpecialCharacters } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -55,7 +55,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
 		}
-		const allowedTypes = ['image/jpeg', 'image/png'];
+		const allowedTypes = fileTypeImage;
 		if (!allowedTypes.includes(file.type)) {
 			seOpenModalError((prev) => ({ ...prev, errorType: true }));
 			e.target.value = null;
