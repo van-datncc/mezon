@@ -5,7 +5,7 @@ import {
 	Icons,
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -25,11 +25,12 @@ import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import RNFetchBlob from 'rn-fetch-blob';
+import { useAppDispatch } from '@mezon/store';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [isSaving, setIsSaving] = useState(false);
+	const dispatch = useAppDispatch()
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -52,30 +53,46 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 	}, [mode]);
 
-	const downloadImage = async (imageUrl) => {
-		const response = await RNFetchBlob.config({
-			fileCache: true,
-		}).fetch('GET', imageUrl);
+	const downloadImage = async (imageUrl: string, type: string) => {
+		try {
+			const response = await RNFetchBlob.config({
+				fileCache: true,
+				appendExt: type,
+			}).fetch('GET', imageUrl);
 
-		if (response.ok) {
-			const filePath = response.path();
-			return filePath;
-		} else {
-			console.error('Error downloading image:', response.status);
-			return null;
+			if (response.info().status === 200) {
+				const filePath = response.path();
+				return filePath;
+			} else {
+				console.error('Error downloading image:', response.info());
+				return null;
+			}
+		} catch (error) {
+			console.error('Error downloading image:', error);
+		} finally {
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
-	const saveImageToCameraRoll = async (filePath) => {
+	const saveImageToCameraRoll = async (filePath: string, type: string) => {
 		try {
-			await CameraRoll.saveToCameraRoll(filePath, 'photo');
-			console.log('Image saved successfully!');
+			const a = await CameraRoll.save(filePath, { type: type === "video" ? "video" : "photo" });
+			console.log(a);
+
+			Toast.show({
+				text1: "Save successfully",
+				type: "info"
+			})
 		} catch (err) {
-			console.error('Error saving image to Camera Roll:', err);
+			Toast.show({
+				text1: "Error saving image",
+				type: "error"
+			})
 		} finally {
 			if (Platform.OS === 'android') {
 				await RNFetchBlob.fs.unlink(filePath);
 			}
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
@@ -186,15 +203,19 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const handleActionSaveImage = async () => {
 		const media = message.attachments;
-		setIsSaving(true);
+		bottomSheetRef?.current?.dismiss();
+		dispatch(appActions.setLoadingMainMobile(true));
 		if (media.length > 0) {
 			const url = media[0].url;
-			const filePath = await downloadImage(url);
+			const type = media[0].filetype.split("/");
+			const filePath = await downloadImage(url, type[1]);
+			console.log(filePath);
+
 			if (filePath) {
-				await saveImageToCameraRoll(filePath);
+				await saveImageToCameraRoll("file://" + filePath, type[0]);
 			}
 		}
-		setIsSaving(false);
+		dispatch(appActions.setLoadingMainMobile(false));
 	}
 
 	const handleActionReportMessage = () => {
