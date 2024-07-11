@@ -39,3 +39,4 @@ export * from './lib/errors/errors.slice';
 export * from './lib/toasts/toasts.slice';
 export * from './lib/forwardMessage/forwardMessage.slice';
 export * from './lib/channels/directChannelVoid.slice'
+export * from './lib/settingEmoji/settingEmoji.slice'

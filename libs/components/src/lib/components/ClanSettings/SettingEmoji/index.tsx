@@ -2,9 +2,16 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import SettingEmojiList from "./SettingEmojiList";
 import { IUserAccount } from "@mezon/utils";
 import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { settingClanEmoji } from "@mezon/store";
 
 
 const SettingEmoji = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // dispatch(settingClanEmoji())
+  }, [])
   return (
     <>
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
