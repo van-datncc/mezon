@@ -24,10 +24,12 @@ import { style } from './styles';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import RNFetchBlob from 'rn-fetch-blob';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const [isSaving, setIsSaving] = useState(false);
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -49,6 +51,33 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 	}, [mode]);
+
+	const downloadImage = async (imageUrl) => {
+		const response = await RNFetchBlob.config({
+			fileCache: true,
+		}).fetch('GET', imageUrl);
+
+		if (response.ok) {
+			const filePath = response.path();
+			return filePath;
+		} else {
+			console.error('Error downloading image:', response.status);
+			return null;
+		}
+	};
+
+	const saveImageToCameraRoll = async (filePath) => {
+		try {
+			await CameraRoll.saveToCameraRoll(filePath, 'photo');
+			console.log('Image saved successfully!');
+		} catch (err) {
+			console.error('Error saving image to Camera Roll:', err);
+		} finally {
+			if (Platform.OS === 'android') {
+				await RNFetchBlob.fs.unlink(filePath);
+			}
+		}
+	};
 
 	const handleActionReply = () => {
 		onClose();
@@ -155,12 +184,17 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		}
 	}
 
-	const handleActionSaveImage = () => {
+	const handleActionSaveImage = async () => {
 		const media = message.attachments;
+		setIsSaving(true);
 		if (media.length > 0) {
 			const url = media[0].url;
-			CameraRoll.save(url);
+			const filePath = await downloadImage(url);
+			if (filePath) {
+				await saveImageToCameraRoll(filePath);
+			}
 		}
+		setIsSaving(false);
 	}
 
 	const handleActionReportMessage = () => {
