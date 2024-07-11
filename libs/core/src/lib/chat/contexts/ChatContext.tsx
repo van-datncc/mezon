@@ -90,7 +90,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (directId === undefined) {
 				mess.isCurrentChannel = message.channel_id === channelId;
 			}
-			const messageIdReplied = message.references ? message?.references[0].message_ref_id : '';
 
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));

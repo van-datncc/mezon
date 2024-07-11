@@ -1,8 +1,8 @@
-import { useAuth, useChatMessages, useNotification } from '@mezon/core';
+import { useAuth, useChatMessages } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
@@ -120,7 +120,7 @@ function MessageWithUser({
 
 							<div className="w-full relative h-full">
 								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
-								<div className="justify-start items-center inline-flex w-full h-full pt-[2px] textChat">
+								<div id={message.id} className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}
 										{!isEditing && (
