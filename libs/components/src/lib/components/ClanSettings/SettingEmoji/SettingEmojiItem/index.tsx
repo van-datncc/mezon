@@ -10,7 +10,10 @@ const SettingEmojiItem = ({ author,emojiName}: SettingEmojiItemProp) => {
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
+
   }
+
+
   return (
     <div className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
       <div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
