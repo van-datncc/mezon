@@ -40,7 +40,7 @@ const SettingDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 		<div className="w-full flex flex-col text-[15px]">
 			<div className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Role name<b className='text-red-600'>*</b></div>
 			<input
-				className="dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"
+				className="dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded outline-none"
 				type="text"
 				value={nameRole}
 				onChange={handleDisplayName}
