@@ -38,6 +38,7 @@ export default function LogoClanSelector({ }: ILogoClanSelector) {
                     defaultValue={currentClan?.logo}
                     onLoad={handleLoad}
                     autoUpload={true}
+                    alt={currentClan?.clan_name}
                 />
             </View>
 

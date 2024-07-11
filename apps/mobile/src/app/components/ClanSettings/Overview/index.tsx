@@ -146,7 +146,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <MezonImagePicker defaultValue={banner} height={200} width={"100%"} onLoad={handleLoad} showHelpText autoUpload />
+            <MezonImagePicker
+                defaultValue={banner}
+                height={200}
+                width={"100%"}
+                onLoad={handleLoad}
+                showHelpText
+                autoUpload
+            />
 
             <View style={{ marginVertical: 10 }}>
                 <MezonInput

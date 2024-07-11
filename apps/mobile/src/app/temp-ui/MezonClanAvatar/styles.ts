@@ -15,6 +15,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     altText: {
-        
+        color: colors.textDisabled,
+        fontSize: 14,
+        textAlign: 'center',
+        fontWeight: "bold",
     }
 })

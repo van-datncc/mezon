@@ -11,6 +11,7 @@ import { selectCurrentChannel } from "@mezon/store-mobile";
 import { memo } from "react";
 import { openCropper } from 'react-native-image-crop-picker';
 import { useTheme } from "@mezon/mobile-ui";
+import MezonClanAvatar from "../MezonClanAvatar";
 
 export interface IFile {
     uri: string;
@@ -28,9 +29,10 @@ interface IMezonImagePickerProps {
     width?: DimensionValue;
     showHelpText?: boolean;
     autoUpload?: boolean;
+    alt?: string;
 }
 
-export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60, showHelpText, autoUpload=false }: IMezonImagePickerProps) {
+export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, height = 60, width = 60, showHelpText, autoUpload = false, alt }: IMezonImagePickerProps) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
     const [image, setImage] = useState<string>(defaultValue);
@@ -103,10 +105,9 @@ export default memo(function MezonImagePicker({ onChange, onLoad, defaultValue, 
             <View style={styles.bannerContainer}>
                 <View style={[styles.bannerWrapper, { height, width }]}>
                     {image || !showHelpText
-                        ? <FastImage
-                            source={{ uri: image }}
-                            resizeMode="cover"
-                            style={styles.image}
+                        ? <MezonClanAvatar
+                            image={image}
+                            alt={alt}
                         />
                         : <Text style={styles.textPlaceholder}>Choose an image</Text>}
                 </View>
