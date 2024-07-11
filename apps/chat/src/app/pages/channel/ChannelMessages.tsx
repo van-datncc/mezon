@@ -67,7 +67,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
 		if (idMessageRefReply !== '') setMessageIdToJump(idMessageRefReply);
 		if (idMessageToJump !== '') setMessageIdToJump(idMessageToJump);
-
 		setTimeToJump(0);
 		setPositionToJump('center');
 	}, [idMessageNotifed, idMessageRefReply, idMessageToJump]);

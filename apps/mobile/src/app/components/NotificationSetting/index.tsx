@@ -22,9 +22,9 @@ import { styles } from './NotificationSetting.styles';
 
 export const enum ENotificationType {
 	CATEGORY_DEFAULT = 'Use Category Default',
-	ALL_MESSAGE = 'ALL',
-	NOTHING_MESSAGE = 'NOTHING',
-	MENTION_MESSAGE = 'MENTION',
+	ALL_MESSAGE = 'All',
+	NOTHING_MESSAGE = 'Nothing',
+	MENTION_MESSAGE = 'Mention',
 }
 
 export default function NotificationSetting() {
@@ -119,8 +119,7 @@ export default function NotificationSetting() {
 						isChecked={isChecked}
 						size={20}
 						fillColor={Colors.bgButton}
-						iconStyle={{ borderRadius: 5 }}
-						innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white, borderRadius: 5 }}
+						innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white}}
 						textStyle={{ fontFamily: 'JosefinSans-Regular' }}
 					/>
 				</TouchableOpacity>

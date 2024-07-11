@@ -533,7 +533,7 @@ export type EmojiStorage = {
 	action: boolean;
 };
 
-export enum DIRECTION_MODE {
+export enum Direction_Mode {
 	AROUND_TIMESTAMP = 1,
 	AFTER_TIMESTAMP = 2,
 	BEFORE_TIMESTAMP = 3,

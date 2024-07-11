@@ -33,5 +33,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     textPlaceholder: {
         color: colors.textDisabled,
         fontSize: Fonts.size.h6
+    },
+    image: {
+        height: '100%',
+        width: '100%',
     }
 })

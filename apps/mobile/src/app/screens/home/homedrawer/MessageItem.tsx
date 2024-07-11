@@ -108,7 +108,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
 	const isCombine = !message.isStartedMessageGroup;
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message, user]);
+	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message?.references?.length, user]);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const swipeableRef = React.useRef(null);
@@ -151,17 +151,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	useEffect(() => {
 		if (message.references && message?.references?.length > 0) {
-			const messageReferenceId = message.references[0].message_ref_id;
-			const messageReferenceUserId = message.references[0].message_sender_id;
-			setMessageRefId(messageReferenceId ?? '');
-			setSenderId(messageReferenceUserId ?? '');
-		}
-	}, [message]);
-
-	useEffect(() => {
-		if (message.references && message?.references?.length > 0) {
-			const messageReferenceId = message.references[0].message_ref_id;
-			const messageReferenceUserId = message.references[0].message_sender_id;
+			const messageReferenceId = message?.references?.[0]?.message_ref_id;
+			const messageReferenceUserId = message?.references?.[0]?.message_sender_id;
 			setMessageRefId(messageReferenceId ?? '');
 			setSenderId(messageReferenceUserId ?? '');
 		}

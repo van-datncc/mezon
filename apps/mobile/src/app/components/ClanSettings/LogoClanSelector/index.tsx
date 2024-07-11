@@ -36,10 +36,12 @@ export default function LogoClanSelector({ }: ILogoClanSelector) {
             <View style={styles.logoContainer}>
                 <MezonImagePicker
                     defaultValue={currentClan?.logo}
-                    onLoad={handleLoad} />
+                    onLoad={handleLoad}
+                    autoUpload={true}
+                />
             </View>
 
-            <Text style={styles.clanName}>{currentClan.clan_name}</Text>
+            <Text style={styles.clanName}>{currentClan?.clan_name}</Text>
         </View>
     )
 }
