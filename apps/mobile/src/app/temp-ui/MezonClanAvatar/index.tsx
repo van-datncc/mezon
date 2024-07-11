@@ -10,6 +10,7 @@ interface IMezonClanAvatarProps {
 
 export default function MezonClanAvatar({ image, alt = "unknown" }: IMezonClanAvatarProps) {
     const styles = style(useTheme().themeValue)
+    
     return (
         <>
             {image

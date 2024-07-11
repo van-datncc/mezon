@@ -1,16 +1,18 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
-import styles from "./styles";
 import { useClans } from "@mezon/core";
-import { MezonMenu, reserve, IMezonMenuSectionProps, IMezonMenuItemProps, MezonInput, MezonImagePicker, MezonOption } from "../../../temp-ui";
+import { MezonMenu, reserve, IMezonMenuSectionProps, IMezonMenuItemProps, MezonInput, MezonImagePicker, MezonOption, MezonSwitch } from "../../../temp-ui";
 import { useTranslation } from "react-i18next";
 import MezonToggleButton from "../../../temp-ui/MezonToggleButton";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
-import { baseColor } from "@mezon/mobile-ui";
+import { useTheme } from "@mezon/mobile-ui";
+import { style } from "./styles";
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
+    const { themeValue } = useTheme();
+    const styles = style(themeValue);
     const { currentClan, updateClan } = useClans();
     const { t } = useTranslation(['clanOverviewSetting']);
 
@@ -86,22 +88,22 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
         },
         {
             title: t("menu.systemMessage.sendRandomWelcome"),
-            component: <MezonToggleButton height={24} width={40} onChange={() => { }} />,
+            component: <MezonSwitch />,
             onPress: () => reserve()
         },
         {
             title: t("menu.systemMessage.promptMembersReply"),
-            component: <MezonToggleButton height={24} width={40} onChange={() => { }} />,
+            component: <MezonSwitch />,
             onPress: () => reserve()
         },
         {
             title: t("menu.systemMessage.sendMessageBoost"),
-            component: <MezonToggleButton height={24} width={40} onChange={() => { }} />,
+            component: <MezonSwitch />,
             onPress: () => reserve()
         },
         {
             title: t("menu.systemMessage.sendHelpfulTips"),
-            component: <MezonToggleButton height={24} width={40} onChange={() => { }} />,
+            component: <MezonSwitch />,
             onPress: () => reserve()
         },
     ]

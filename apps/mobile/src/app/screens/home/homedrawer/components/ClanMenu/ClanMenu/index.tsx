@@ -1,6 +1,5 @@
 import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import FastImage from "react-native-fast-image";
 import { style } from "./styles";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
 import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps, MezonClanAvatar } from "apps/mobile/src/app/temp-ui";
