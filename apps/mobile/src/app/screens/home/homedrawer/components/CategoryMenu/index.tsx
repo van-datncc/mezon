@@ -24,7 +24,7 @@ type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
 export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps) {
     const { t } = useTranslation(['categoryMenu']);
     const {themeValue} = useTheme()
-    const styles = style(themeValue) 
+    const styles = style(themeValue)
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
 
@@ -42,7 +42,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
         {
             title: t('menu.inviteMenu.invite'),
             onPress: () => {
-                inviteRef.current.present()
+                inviteRef?.current?.present?.()
                 dismiss();
             },
             icon: <Icons.GroupPlusIcon color={themeValue.textStrong}/>

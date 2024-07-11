@@ -67,6 +67,7 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+	const timeoutRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 	const filteredChannels = useMemo(() => filterMessages(categorizedChannels), [categorizedChannels]);
 
@@ -83,6 +84,12 @@ const ChannelList = React.memo((props: any) => {
 		}
 		prevFilteredChannelsRef.current = isLogin ? filteredChannels : {};
 	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id, isLogin]);
+
+	useEffect(() => {
+		return () => {
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
@@ -160,12 +167,15 @@ const ChannelList = React.memo((props: any) => {
 						style={styles.inviteIconWrapper}
 						onPress={() => {
 							setIsUnKnownChannel(false);
-							bottomSheetInviteRef.current.present();
+							bottomSheetInviteRef?.current?.present?.();
 						}}
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
-					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
+					<InviteToChannel
+						isUnknownChannel={isUnknownChannel}
+						ref={bottomSheetInviteRef}
+					/>
 				</View>
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
@@ -177,11 +187,7 @@ const ChannelList = React.memo((props: any) => {
 						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
 					</TouchableOpacity>
 				</View>
-				{
-					isLoading === 'loading' && (
-						<ChannelListSkeleton numberSkeleton={6} />
-					)
-				}
+				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlatList
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}

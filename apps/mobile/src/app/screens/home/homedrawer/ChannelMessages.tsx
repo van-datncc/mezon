@@ -42,6 +42,7 @@ type ChannelMessagesProps = {
 };
 
 const idUserAnonymous = '1767478432163172999';
+const ITEM_HEIGHT = 100;
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
@@ -283,8 +284,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
+				removeClippedSubviews={true}
 				keyExtractor={(item) => `${item}`}
-				estimatedItemSize={200}
+				estimatedItemSize={ITEM_HEIGHT}
 				onEndReached={
 					messages?.length
 						? onLoadMore
