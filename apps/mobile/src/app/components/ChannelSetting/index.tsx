@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, View, Text } from "react-native";
-import { IMezonMenuItemProps, IMezonMenuSectionProps, IMzoneOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from "../../temp-ui";
+import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from "../../temp-ui";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./styles";
@@ -169,7 +169,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
             title: t('fields.channelHideInactivity._1Week'),
             value: 3
         },
-    ]) satisfies IMzoneOptionData, [])
+    ]) satisfies IMezonOptionData, [])
 
     const slowModeOptions = useMemo(() => ([
         {

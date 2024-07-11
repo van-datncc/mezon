@@ -1,17 +1,18 @@
-import { Pressable, Text } from "react-native";
+import { Pressable, StyleProp, Text, TextProps, TextStyle } from "react-native";
 import { style } from "./styles";
 import { useTheme } from "@mezon/mobile-ui";
 
 interface IMezonButton {
     icon?: any,
     title?: string,
+    titleStyle?: StyleProp<TextStyle>
     fluid?: boolean,
     border?: boolean,
     type?: "success" | "warning" | "danger";
     onPress?: () => void;
 }
 
-export default function MezonButton({ icon, title, fluid, border, type, onPress }: IMezonButton) {
+export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress }: IMezonButton) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
 
@@ -28,7 +29,7 @@ export default function MezonButton({ icon, title, fluid, border, type, onPress 
             onPress={onPress}
         >
             {icon}
-            {title && <Text style={styles.title}>{title}</Text>}
+            {title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
         </Pressable>
     )
 }

@@ -20,6 +20,7 @@ export const MenuClanStacks = ({}: any) => {
 			screenOptions={{
 				headerShown: true,
 				headerShadowVisible: false,
+				headerBackTitleVisible: false,
 				gestureEnabled: true,
 				gestureDirection: 'horizontal',
 				headerTitleAlign: 'center',
