@@ -3,16 +3,24 @@ import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
 import { onMessageListener, requestForToken, ToastController } from '@mezon/components';
 import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import isElectron from 'is-electron';
+import { IAppLoaderData } from '../loaders/appLoader';
 const theme = 'dark';
+
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const fcmTokenObject = JSON.parse(localStorage.getItem('fcmTokenObject') as string);
 	const navigate = useNavigate();
-
+	// TODO: login desktop
+	// const { redirectTo } = useLoaderData() as IAppLoaderData;
+	// useEffect(() => {
+	// 	if (redirectTo) {
+	// 		navigate(redirectTo);
+	// 	}
+	// }, [redirectTo, navigate]);
 	// TODO: move this to a firebase context
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
@@ -50,11 +58,13 @@ const AppLayout = () => {
 
 	// TODO: move this to a firebase context
 	useEffect(() => {
-		onMessageListener()
-			.then(handleNewMessage)
-			.catch((error: Error) => {
-				console.error('Error listening for messages:', error);
-			});
+		if (!isElectron()) {
+			onMessageListener()
+				.then(handleNewMessage)
+				.catch((error: Error) => {
+					console.error('Error listening for messages:', error);
+				});
+		}
 
 		if (fcmTokenObject?.token) {
 			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmTokenObject.token ?? '', deviceId: fcmTokenObject.deviceId ?? '', platform: "website" }));
