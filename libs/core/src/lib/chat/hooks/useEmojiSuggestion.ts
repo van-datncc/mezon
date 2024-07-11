@@ -40,8 +40,7 @@ export function useEmojiSuggestion() {
 		});
 	}
 	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
-	// const emojiRecentData = localStorage.getItem('recentEmojis');
-	const emojiRecentData = "[]"
+	const emojiRecentData = localStorage.getItem('recentEmojis');
 	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
 	const emojiFiltered = filterEmojisByUserId(emojisRecentDataParse, userId.userId ?? '');
 	const reversedEmojisRecentDataParse = emojiFiltered.reverse();
