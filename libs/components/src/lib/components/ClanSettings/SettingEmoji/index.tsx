@@ -85,7 +85,6 @@ const SettingEmoji = () => {
             type="file"
             title=" "
             tabIndex={0}
-            multiple
             accept=".jpg,.jpeg,.png,.gif"
             onChange={handleSelectFile}
           ></input>
