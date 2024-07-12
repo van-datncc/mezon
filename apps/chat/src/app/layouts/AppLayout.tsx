@@ -59,7 +59,6 @@ const AppLayout = () => {
 		onMessageListener()
 			.then(handleNewMessage)
 			.catch((error: Error) => {
-				console.log("2");
 				console.error('Error listening for messages:', error);
 			});
 
