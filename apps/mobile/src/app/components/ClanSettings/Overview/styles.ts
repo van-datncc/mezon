@@ -1,7 +1,7 @@
-import { baseColor, Colors } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Colors } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     headerActionTitle: {
         color: baseColor.blurple,
         fontWeight: "bold",
@@ -9,8 +9,7 @@ const styles = StyleSheet.create({
     },
     container: {
         paddingHorizontal: 20,
-        paddingVertical: 10
+        paddingVertical: 10,
+        backgroundColor: colors.primary
     },
 })
-
-export default styles;

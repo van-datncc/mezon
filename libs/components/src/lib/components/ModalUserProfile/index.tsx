@@ -154,7 +154,7 @@ const ModalUserProfile = ({
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
 					{isFooterProfile ? <StatusProfile userById={userById} /> : (mode !== 4) && (mode !== 3) && !hiddenRole && userById && <RoleUserProfile userID={userID} />}
 
-					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole ? (
+					{((!checkOwner(userById?.user?.google_id || '') && !hiddenRole) && !checkAnonymous)? (
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"

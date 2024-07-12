@@ -27,7 +27,7 @@ function PanelEventItem(props: PanelEventItemProps) {
                 <>
                     <ItemPanel children="Start Event" />
                     <ItemPanel children="Edit Event" />
-                    <ItemPanel children="Cancel Event" onClick={handleDeleteEvent}/>
+                    <ItemPanel children="Cancel Event" danger={true} onClick={handleDeleteEvent}/>
                 </>
             }
             <ItemPanel children="Copy Event Link" />

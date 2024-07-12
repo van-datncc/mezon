@@ -1,7 +1,7 @@
 import { useEmojiSuggestion } from '@mezon/core';
-import { ChannelsEntity, selectAllChannels } from '@mezon/store';
+import { ChannelsEntity, selectAllChannels, selectMembersVoiceChannel } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import { Icons } from '../../../components';
@@ -24,6 +24,13 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	const urlEmoji = getSrcEmoji(name, emojis);
 	const allChannels = useSelector(selectAllChannels);
 	const [specificChannel, setSpecificChannel] = useState<ChannelsEntity | null>(null);
+	const membersVoice = useSelector(selectMembersVoiceChannel);
+	const checkVoiceStatus = useMemo(() => {
+		if (channelId !== undefined && membersVoice[channelId] && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+		  return membersVoice[channelId].length >= 2;
+		}
+		return false;
+	  }, [channelId, membersVoice, specificChannel?.type]);
 
 	useEffect(()=>{
 		allChannels.map((channel) => {
@@ -61,6 +68,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 				{ specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (<Icons.SpeakerLocked defaultSize="w-5 h-5" />)}
 				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
 				<span className={`text-[15px] font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}>{highlightMatch(name, valueHightLight ?? '')}</span>
+				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorTextLightMode ">(busy)</i>}
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] ${subTextStyle}`}>{subText}</span>
 		</div>

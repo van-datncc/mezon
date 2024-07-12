@@ -37,7 +37,7 @@ const SettingEmojiItem = ({ src, author, emojiName }: SettingEmojiItemProp) => {
 
           {
             showEdit &&
-            <input className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]  dark:text-white text-black`} value={nameEmoji} onChange={(e) => handleChangeEmojiName(e)} />
+            <input className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`} value={nameEmoji} onChange={(e) => handleChangeEmojiName(e)} />
           }
         </div>
 

@@ -1,14 +1,18 @@
 import SettingEmojiList from "./SettingEmojiList";
-import { useSelector } from "react-redux";
-import { useCallback, useEffect } from "react";
-import { fetchEmojisByClanId, selectAllEmoji, selectCurrentClanId, useAppDispatch } from "@mezon/store";
+import { IUserAccount } from "@mezon/utils";
+import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
+import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { AppDispatch, selectAllEmoji, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 
 const SettingEmoji = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [openModalType, setOpenModalType] = useState(false);
   const dispatch = useAppDispatch();
   const currentClanId = useSelector(selectCurrentClanId) ?? '';
 
   const emojiList = useSelector(selectAllEmoji);
-
+  console.log(emojiList);
 
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
@@ -35,12 +39,20 @@ const SettingEmoji = () => {
         </div>
         <div className="h-[38px] font-semibold rounded bg-[#3297ff] text-[#ffffff] w-28 relative flex flex-row items-center justify-center hover:bg-[#2b80d7]">
           Upload emoji
-          <input className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer" type="file" title=" " tabIndex={0} multiple accept=".jpg,.jpeg,.png,.gif" ></input>
+          <input
+            className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer"
+            type="file"
+            title=" "
+            tabIndex={0}
+            multiple
+            accept=".jpg,.jpeg,.png,.gif"
+            onChange={handleSelectFile}
+          ></input>
         </div>
       </div>
 
-      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji} />
-      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji} />
+      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji}/>
+      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji}/>
     </>
   )
 }

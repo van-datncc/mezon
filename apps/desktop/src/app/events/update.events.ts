@@ -6,7 +6,7 @@ import { updateServerUrl } from '../constants';
 export default class UpdateEvents {
 	// initialize auto update service - most be invoked only in production
 	static initAutoUpdateService() {
-		const platform_arch = platform() === 'win32' ? platform() : platform() + '_' + arch();
+		const platform_arch = (platform() === 'win32'|| process.platform == 'linux') ? platform() : platform() + '_' + arch();
 		const version = app.getVersion();
 		const feed: Electron.FeedURLOptions = { url: `${updateServerUrl}/update/${platform_arch}/${version}` };
 
@@ -31,7 +31,7 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDa
 		type: 'info' as const,
 		buttons: ['Restart', 'Later'],
 		title: 'Application Update',
-		message: process.platform === 'win32' ? releaseNotes : releaseName,
+		message: (platform() === 'win32'|| process.platform == 'linux') ? releaseNotes : releaseName,
 		detail: 'A new version has been downloaded. Restart the application to apply the updates.',
 	};
 

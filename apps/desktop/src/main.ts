@@ -35,6 +35,13 @@ ipcMain.handle('get-device-id', async () => {
 	return await machineId();
 });
 
+ipcMain.on('navigate-to-url', async (event, url) => {
+	App.mainWindow.show();
+	if (App.mainWindow) {
+		App.mainWindow.webContents.executeJavaScript(`window.location.href = '${url}';`);
+	}
+});
+
 // handle setup events as quickly as possible
 Main.initialize();
 

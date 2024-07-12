@@ -38,7 +38,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         fontSize: size.s_14,
         fontWeight: '600',
         marginLeft: size.s_6,
-        color: colors.text,
+        color: colors.textDisabled,
     },
 
     channelListItemTitleActive: {

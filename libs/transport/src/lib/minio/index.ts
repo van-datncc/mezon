@@ -16,12 +16,15 @@ export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
 	return fetch(url, { method: 'PUT', body: stream });
 }
 
-export async function handleUploadFile(client: Client, session: Session, currentClanId: string, currentChannelId: string, filename: string, file: File, mode?: number): Promise<ApiMessageAttachment> {
+export async function handleUploadFile(client: Client, session: Session, currentClanId: string, currentChannelId: string, filename: string, file: File, mode?: number, path?: string): Promise<ApiMessageAttachment> {
 	
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
 			const ms = (new Date()).getTime();
 			let fullfilename;
+      if(mode === 3) {
+        fullfilename = path + '/' + currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g,"_")
+      } else
 			if(mode === 2){
 				fullfilename = currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g,"_");
 			}else{

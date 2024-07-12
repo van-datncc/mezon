@@ -68,6 +68,7 @@
     "react-hook-form": "^7.49.3",
     "react-i18next": "^14.1.1",
     "react-image": "^4.1.0",
+    "react-image-file-resizer": "^0.4.8",
     "react-loading-skeleton": "^3.3.1",
     "react-markdown": "^9.0.1",
     "react-mentions": "^4.4.10",
@@ -178,5 +179,6 @@
   },
   "engines": {
     "node": "18.x"
-  }
+  },
+  "author": "John Doe <john@doe.com>"
 }

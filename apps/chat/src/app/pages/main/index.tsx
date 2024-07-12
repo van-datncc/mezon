@@ -6,6 +6,8 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDirectsUnreadlist,
+	selectDmGroupCurrentId,
+	selectDmGroupCurrentType,
 	selectOpenModalAttachment,
 	selectStatusMenu,
 	selectTheme,
@@ -131,6 +133,9 @@ function MyApp() {
 		setOpenOptionMessageState(false);
 	}, []);
 
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const currentDmIType = useSelector(selectDmGroupCurrentType);
+
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
@@ -139,7 +144,7 @@ function MyApp() {
 				onClick={handleMenu}
 				id="menu"
 			>
-				<NavLink to="/chat/direct/friends" onClick={() => setMode('dm')}>
+				<NavLink to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : "/chat/direct/friends"} onClick={() => setMode('dm')}>
 					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>
 							<Image
