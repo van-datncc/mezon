@@ -18,6 +18,7 @@ export interface AppState {
 	isShowMemberListDM: boolean;
 	isUseProfileDM: boolean;
 	initialPath?: string;
+	initialParams?: Record<string, string>;
 	closeMenu: boolean;
 	statusMenu: boolean;
 	hiddenBottomTabMobile: boolean;
@@ -34,6 +35,7 @@ export const initialAppState: AppState = {
 	isShowMemberListDM: true,
 	isUseProfileDM: true,
 	initialPath: '/',
+	initialParams: {},
 	closeMenu: false,
 	statusMenu: true,
 	hiddenBottomTabMobile: true,
@@ -58,6 +60,9 @@ export const appSlice = createSlice({
 		},
 		setInitialPath: (state, action) => {
 			state.initialPath = action.payload;
+		},
+		setInitialParams: (state, action) => {
+			state.initialParams = action.payload;
 		},
 		setCloseMenu: (state, action) => {
 			state.closeMenu = action.payload;
@@ -116,6 +121,8 @@ export const selectError = createSelector(getAppState, (state: AppState) => stat
 export const selectIsShowMemberList = createSelector(getAppState, (state: AppState) => state.isShowMemberList);
 
 export const selectInitialPath = createCachedSelector(getAppState, (state: AppState) => state.initialPath);
+
+export const selectInitialParams = createCachedSelector(getAppState, (state: AppState) => state.initialParams);
 
 export const selectCloseMenu = createSelector(getAppState, (state: AppState) => state.closeMenu);
 

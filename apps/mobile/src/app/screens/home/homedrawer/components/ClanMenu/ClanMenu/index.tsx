@@ -1,9 +1,8 @@
 import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import FastImage from "react-native-fast-image";
 import { style } from "./styles";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
-import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui";
+import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps, MezonClanAvatar } from "apps/mobile/src/app/temp-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { ClansEntity } from "@mezon/store-mobile";
@@ -160,9 +159,9 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.avatarWrapper}>
-                    <FastImage
-                        source={{ uri: clan?.logo }}
-                        style={{ width: "100%", height: "100%" }}
+                    <MezonClanAvatar
+                        image={clan?.logo}
+                        alt={clan?.clan_name}
                     />
                 </View>
                 <Text style={styles.serverName}>{clan?.clan_name}</Text>
