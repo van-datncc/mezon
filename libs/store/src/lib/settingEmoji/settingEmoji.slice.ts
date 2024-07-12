@@ -1,4 +1,4 @@
-import {IEmoji, isGifFile, isImageFile, LoadingStatus} from '@mezon/utils';
+import {isGifFile, isImageFile, LoadingStatus} from '@mezon/utils';
 import {
   PayloadAction,
   createAsyncThunk,
@@ -35,13 +35,9 @@ export const initialSettingClanEmojiState: SettingClanEmojiState = {
   },
 };
 
-export interface EmojiEntity extends IEmoji {
-  id: string;
-}
-
 // export interface IEmojiState extends EntityState<any, any>
 
-export const emojiAdapter = createEntityAdapter<EmojiEntity>();
+export const emojiAdapter = createEntityAdapter<StickersEntity>();
 
 export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji/fetchClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
 	try {

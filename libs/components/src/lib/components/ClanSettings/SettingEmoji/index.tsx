@@ -53,7 +53,7 @@ const SettingEmoji = () => {
         };
         await dispatch(createEmoji(request));
       })
-     }else {
+    }else {
       return;
     }
     
