@@ -1,31 +1,27 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import SettingEmojiList from "./SettingEmojiList";
-import { IUserAccount } from "@mezon/utils";
-import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
-import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useState } from "react";
-import { AppDispatch, selectAllEmoji, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { useSelector } from "react-redux";
+import { useCallback, useEffect } from "react";
+import { fetchEmojisByClanId, selectAllEmoji, selectCurrentClanId, useAppDispatch } from "@mezon/store";
 
 const SettingEmoji = () => {
   const dispatch = useAppDispatch();
   const currentClanId = useSelector(selectCurrentClanId) ?? '';
-  
+
   const emojiList = useSelector(selectAllEmoji);
-  console.log(emojiList);
-  
+
+
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
-      await dispatch(settingClanEmojiActions.fetchEmojisByClanId({ clanId: currentClanId }));
+      await dispatch(fetchEmojisByClanId(currentClanId));
     }
   }, [dispatch, currentClanId]);
-  
+
   useEffect(() => {
     fetchEmojis();
   }, [fetchEmojis]);
-  
+
   return (
     <>
-      
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
         <div className={'dark:text-textSecondary flex flex-col gap-2 text-textSecondary800'}>
           <p className={''}>Add up to 250 custom emoji that anyone can use in this server. Animated GIF emoji may be used by members with Mezon Nitro</p>
@@ -42,9 +38,9 @@ const SettingEmoji = () => {
           <input className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer" type="file" title=" " tabIndex={0} multiple accept=".jpg,.jpeg,.png,.gif" ></input>
         </div>
       </div>
-      
-      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji}/>
-      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji}/>
+
+      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji} />
+      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji} />
     </>
   )
 }

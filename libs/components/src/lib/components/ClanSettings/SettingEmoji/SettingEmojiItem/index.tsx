@@ -1,19 +1,22 @@
+
 import { ChangeEvent, useState } from "react";
+import { useSelector } from "react-redux";
+import { selectMemberClanByUserId } from "@mezon/store";
 
 type SettingEmojiItemProp = {
   src: string,
-  emojiName : string,
+  emojiName: string,
   author: string,
 }
 
-const SettingEmojiItem = ({ src, author, emojiName}: SettingEmojiItemProp) => {
+const SettingEmojiItem = ({ src, author, emojiName }: SettingEmojiItemProp) => {
   const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
 
   }
-
+  const dataAuthor = useSelector(selectMemberClanByUserId("1809069169707061248"));
 
   return (
     <div className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
@@ -27,8 +30,11 @@ const SettingEmojiItem = ({ src, author, emojiName}: SettingEmojiItemProp) => {
 
         <div className={'flex-1 relative'}>
           <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'}>
-            {emojiName}
+            <p className={`max-w-[172px] truncate overflow-hidden inline-block`}>
+              {emojiName}
+            </p>
           </div>
+
           {
             showEdit &&
             <input className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]  dark:text-white text-black`} value={nameEmoji} onChange={(e) => handleChangeEmojiName(e)} />
@@ -37,10 +43,10 @@ const SettingEmojiItem = ({ src, author, emojiName}: SettingEmojiItemProp) => {
 
         <div className={'flex-1 flex gap-[6px]'}>
           <div className={'w-6 h-6 flex rounded-[50%] overflow-hidden flex items-center justify-center'}>
-            <img className={'w-full h-auto object-cover'} src="https://64.media.tumblr.com/204861b8de03c6826f4b08e898256ee3/a62e949d921cdb7f-8b/s1280x1920/fa655ae1bb2bcfd1b72a4605af853aa6a7ef9c49.jpg" />
+            <img className={'w-full h-auto object-cover'} src={dataAuthor?.user?.avatar_url} />
           </div>
           <p className={'text-sm h-auto leading-6'}>
-            {author}
+            {dataAuthor?.user?.username}
           </p>
         </div>
 

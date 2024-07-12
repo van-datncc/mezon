@@ -39,7 +39,7 @@ export const initialSettingClanEmojiState: SettingClanEmojiState = {
 
 export const emojiAdapter = createEntityAdapter<StickersEntity>();
 
-export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
+export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji', async (clanId: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
@@ -54,7 +54,7 @@ export const settingClanEmojiSlice = createSlice({
 	name: SETTING_CLAN_EMOJI,
 	initialState: initialSettingClanEmojiState,
 	reducers: {
-  
+
   },
 	extraReducers(builder) {
 		builder
