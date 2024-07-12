@@ -34,11 +34,10 @@ initializeFirebase();
 export const requestForToken = async () => {
   let currentToken = '';
   try {
-    if (!isMessagingAvailable(messaging)) {
-      throw new Error('Platform is not supported');
+    if (isMessagingAvailable(messaging)) {
+      currentToken = await getToken(messaging, { vapidKey: process.env.NX_CHAT_APP_FCM_VAPID_KEY as string });
     }
 
-    currentToken = await getToken(messaging, { vapidKey: process.env.NX_CHAT_APP_FCM_VAPID_KEY as string });
   } catch (error) {
     return '';
   }
@@ -48,13 +47,12 @@ export const requestForToken = async () => {
 export const onMessageListener = () => {
   return new Promise((resolve, reject) => {
     try {
-      if (!isMessagingAvailable(messaging)) {
-        throw new Error('Platform is not supported');
+      if (isMessagingAvailable(messaging)) {
+        onMessage(messaging, (payload) => {
+          resolve(payload);
+        });
       }
 
-      onMessage(messaging, (payload) => {
-        resolve(payload);
-      });
     } catch (e) {
       reject(e);
     }
