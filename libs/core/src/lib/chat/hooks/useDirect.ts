@@ -9,11 +9,11 @@ type UseDirectParams = {
 	autoFetch: boolean, 
 }
 
-export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : false}) {
+export function useDirect({autoFetch = false}:UseDirectParams = {autoFetch : false}) {
 	const dispatch = useAppDispatch();
 	const isLoadDM = useSelector(selectIsLoadDMData);
 	const createDirectMessageWithUser = useCallback(
-		async (userId: string) => {
+		async (userId: string, noFetchAgainMember?: boolean) => {
 			const bodyCreateDm: ApiCreateChannelDescRequest = {
 				type: ChannelType.CHANNEL_TYPE_DM,
 				channel_private: 1,
@@ -28,6 +28,7 @@ export function useDirect({autoFetch = false }:UseDirectParams = {autoFetch : fa
 						directMessageId: resPayload.channel_id,
 						channelName: resPayload.channel_label,
 						type: Number(resPayload.type),
+						noFetchAgainMember,
 					}),
 				);
 			}

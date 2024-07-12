@@ -146,6 +146,7 @@ interface JoinDirectMessagePayload {
 	directMessageId: string;
 	channelName?: string;
 	type?: number;
+	noFetchAgainMember?: boolean;
 	noCache?: boolean;
 }
 interface members {
@@ -159,19 +160,20 @@ interface members {
 
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>(
 	'direct/joinDirectMessage',
-	async ({ directMessageId, channelName, type, noCache = false }, thunkAPI) => {
+	async ({ directMessageId, channelName, type, noFetchAgainMember = false, noCache = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType((type)?.toString() || ''));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache }));
-			
-			const fetchChannelMembersResult = await thunkAPI.dispatch(
-				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
-			);
-			const members = fetchChannelMembersResult.payload as members[];
-			const userIds = members.map((member: any) => member.user.id);
-			if (type === ChannelType.CHANNEL_TYPE_DM) {
-				thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({userIds:userIds, directId: directMessageId}))
+			if(!noFetchAgainMember){
+				const fetchChannelMembersResult = await thunkAPI.dispatch(
+					channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+				);
+				const members = fetchChannelMembersResult.payload as members[];
+				const userIds = members.map((member: any) => member.user.id);
+				if (type === ChannelType.CHANNEL_TYPE_DM) {
+					thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({userIds:userIds, directId: directMessageId}))
+				}
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));

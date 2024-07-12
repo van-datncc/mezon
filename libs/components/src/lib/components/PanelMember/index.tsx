@@ -10,6 +10,7 @@ import { directMessageValueProps } from '../DmList/DMListItem';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
 import PanelGroupDM from './PanelGroupDm';
+import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 
 type PanelMemberProps = {
 	coords: Coords;
@@ -19,9 +20,10 @@ type PanelMemberProps = {
 	directMessageValue?: directMessageValueProps;
 	name?: string;
 	isMemberDMGroup: boolean;
+	dataMemberCreate?: DataMemberCreate;
 };
 
-const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup }: PanelMemberProps) => {
+const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, dataMemberCreate }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +51,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.dmID ?? ''));
 
 	useEffect(()=>{
-		if(userProfile?.user?.id === currentDmGroup.creator_id){
+		if(userProfile?.user?.id === currentDmGroup?.creator_id){
 			setIsDmGroupOwner(true);
 		}
 	}, [currentDmGroup, userProfile]);
@@ -59,8 +61,8 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 			ref={panelRef}
 			onMouseDown={(e) => e.stopPropagation()}
 			style={{
-				right: coords.mouseX > 330 ? '30px' : 'auto',
-				left: coords.mouseX > 330 ? 'auto' : coords.mouseX,
+				right: isMemberDMGroup ? '30px' : 'auto',
+				left: isMemberDMGroup? 'auto' : coords.mouseX,
 				bottom: positionTop ? '12px' : 'auto',
 				top: positionTop ? 'auto' : coords.mouseY,
 				boxShadow: "rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px"
@@ -95,7 +97,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 					}
 					{directMessageValue && <ItemPanelMember children="Close DM" /> }
 				</GroupPanelMember>
-			{(isMemberDMGroup && !checkUser) &&
+			{(isMemberDMGroup && !checkUser && dataMemberCreate?.createId === userProfile?.user?.id) &&
 				<GroupPanelMember>
 					<ItemPanelMember children="Remove From Group" danger/>
 					<ItemPanelMember children="Make Group Owner" danger/>

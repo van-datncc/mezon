@@ -56,7 +56,7 @@ const ModalUserProfile = ({
 	const [openModal, setOpenModal] = useState<OpenModalProps>(initOpenModal);
 
 	const sendMessage = async (userId: string) => {
-		const response = await createDirectMessageWithUser(userId);
+		const response = await createDirectMessageWithUser(userId, true);
 		if (response.channel_id) {
 			await dispatch(clansActions.joinClan({ clanId: response.clan_id as string }));
 			var channelMode = 0

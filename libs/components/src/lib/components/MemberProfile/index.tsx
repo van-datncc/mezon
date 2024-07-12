@@ -197,7 +197,7 @@ function MemberProfile({
 				</div>
 			</div>
 			{(isShowPanelMember && !isHiddenPanel) && (
-				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} />
+				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} dataMemberCreate={dataMemberCreate}/>
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div
