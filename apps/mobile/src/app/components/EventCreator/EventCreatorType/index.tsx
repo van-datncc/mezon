@@ -1,16 +1,17 @@
 import { Text, View } from "react-native";
 import { MenuClanScreenProps, APP_SCREEN } from "../../../navigation/ScreenTypes";
-import { MezonInput, MezonOption, MezonSelect } from "../../../temp-ui";
+import { IMezonSlideOptionsData, IMezonOptionData, MezonInput, MezonOption, MezonSelect } from "../../../temp-ui";
 import { useTranslation } from "react-i18next";
-import { SpeakerIcon } from "@mezon/mobile-components";
+import { Icons, SpeakerIcon } from "@mezon/mobile-components";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectVoiceChannelAll } from "@mezon/store-mobile";
 import MezonButton from "../../../temp-ui/MezonButton2";
 import { OptionEvent } from "@mezon/utils";
 import Toast from "react-native-toast-message";
-import { useTheme } from "@mezon/mobile-ui";
+import { Fonts, useTheme } from "@mezon/mobile-ui";
 import { style } from "./styles";
+import { useMemo } from "react";
 
 
 type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
@@ -22,25 +23,36 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
     const voicesChannel = useSelector(selectVoiceChannelAll);
 
     navigation.setOptions({
-        headerTitle: t('screens.eventType.headerTitle')
+        headerTitle: t('screens.eventType.headerTitle'),
+        headerTitleStyle: {
+            fontSize: Fonts.size.h7,
+            color: themeValue.textDisabled
+        }
     })
 
-    const options = [
+    const options = useMemo(() => ([
         {
             title: t('fields.channelType.voiceChannel.title'),
             description: t('fields.channelType.voiceChannel.description'),
-            value: OptionEvent.OPTION_SPEAKER
+            value: OptionEvent.OPTION_SPEAKER,
+            textStyle: {
+                fontWeight: "bold"
+            }
         },
         {
             title: t('fields.channelType.somewhere.title'),
             description: t('fields.channelType.somewhere.description'),
-            value: OptionEvent.OPTION_LOCATION
+            value: OptionEvent.OPTION_LOCATION,
+            textStyle: {
+                fontWeight: "bold"
+            }
         }
-    ]
+    ]) satisfies IMezonOptionData, []);
 
     const channels = voicesChannel.map(item => ({
         title: item.channel_label,
-        value: item.channel_id
+        value: item.channel_id,
+        icon: <SpeakerIcon height={20} width={20} color={themeValue.text} />
     }))
 
     const [eventType, setEventType] = useState<OptionEvent>(OptionEvent.OPTION_SPEAKER);
@@ -88,9 +100,11 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
             {
                 eventType === OptionEvent.OPTION_SPEAKER
                     ? <MezonSelect
+                        prefixIcon={<Icons.VoiceNormalIcon height={20} width={20} color={themeValue.textStrong} />}
                         title={t('fields.channel.title')}
+                        titleStyle={{fontSize: Fonts.size.h7, textTransform: "uppercase"}}
                         onChange={handleChannelIDChange}
-                        data={channels} icon={<SpeakerIcon height={20} width={20} />}
+                        data={channels} 
                     />
 
                     : <MezonInput
@@ -105,6 +119,7 @@ export default function EventCreatorType({ navigation }: MenuClanScreenProps<Cre
 
             <MezonButton
                 title={t('actions.next')}
+                titleStyle={{fontSize: Fonts.size.h7}}
                 type="success"
                 onPress={handlePressNext}
             />

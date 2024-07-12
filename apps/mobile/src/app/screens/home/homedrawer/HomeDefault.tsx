@@ -7,7 +7,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
@@ -26,6 +25,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	const timeoutRef = useRef<any>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 
 	const dispatch = useAppDispatch();
@@ -49,8 +49,10 @@ const HomeDefault = React.memo((props: any) => {
 
 	const openBottomSheet = () => {
 		Keyboard.dismiss();
-		bottomSheetRef.current?.snapToIndex(1);
 		setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet);
+		timeoutRef.current = setTimeout(() => {
+			bottomSheetRef.current?.snapToIndex(1);
+		}, 200)
 	};
 
 	const closeBottomSheet = () => {
@@ -77,6 +79,7 @@ const HomeDefault = React.memo((props: any) => {
 
 		return () => {
 			appStateSubscription.remove();
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
 		};
 	}, []);
 
@@ -106,12 +109,6 @@ const HomeDefault = React.memo((props: any) => {
 		Keyboard.dismiss();
 	};
 
-	const handleGesture = (event: { nativeEvent: { translationX: number; state: number } }) => {
-		if (event.nativeEvent.translationX >= 5 && event.nativeEvent.state === State.CANCELLED) {
-			onOpenDrawer();
-		}
-	};
-
 	return (
 		<View style={[styles.homeDefault]}>
 			<HomeDefaultHeader
@@ -122,15 +119,11 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
-					<PanGestureHandler onGestureEvent={handleGesture} onHandlerStateChange={handleGesture} activeOffsetX={[-10, 10]}>
-						<View style={{ flex: 1 }}>
-							<ChannelMessages
-								channelId={currentChannel.channel_id}
-								channelLabel={currentChannel?.channel_label}
-								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-							/>
-						</View>
-					</PanGestureHandler>
+					<ChannelMessages
+						channelId={currentChannel.channel_id}
+						channelLabel={currentChannel?.channel_label}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
 						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
 							<TouchableOpacity style={{ flex: 1 }} onPress={() => onShowKeyboardBottomSheet(false, 0, 'text')}></TouchableOpacity>
@@ -169,16 +162,21 @@ const HomeDefault = React.memo((props: any) => {
 					)}
 				</View>
 			)}
-			<BottomSheet
-				ref={bottomSheetRef}
-				enablePanDownToClose={true}
-				backdropComponent={renderBackdrop}
-				index={-1}
-				snapPoints={snapPoints}
-				backgroundStyle={{ backgroundColor: themeValue.secondary }}
-			>
-				<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
-			</BottomSheet>
+			{
+				isShowSettingNotifyBottomSheet && (
+					<BottomSheet
+						ref={bottomSheetRef}
+						animateOnMount
+						enablePanDownToClose={true}
+						backdropComponent={renderBackdrop}
+						index={-1}
+						snapPoints={snapPoints}
+						backgroundStyle={{ backgroundColor: themeValue.secondary }}
+					>
+						<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
+					</BottomSheet>
+				)
+			}
 		</View>
 	);
 });

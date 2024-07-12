@@ -8,7 +8,7 @@ import { useState } from "react";
 import { getNearTime } from "@mezon/mobile-components";
 import { OptionEvent } from "@mezon/utils";
 import Toast from "react-native-toast-message";
-import { useTheme } from "@mezon/mobile-ui";
+import { Fonts, useTheme } from "@mezon/mobile-ui";
 
 type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS;
 export default function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<CreateEventScreenDetails>) {
@@ -155,6 +155,7 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 
             <MezonButton
                 title={t('actions.next')}
+                titleStyle={{fontSize: Fonts.size.h7}}
                 type="success"
                 onPress={handlePressNext}
             />
