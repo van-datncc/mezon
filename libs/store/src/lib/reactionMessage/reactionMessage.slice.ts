@@ -71,6 +71,7 @@ export const updateReactionMessage = createAsyncThunk(
 
 export type WriteMessageReactionArgs = {
 	id: string;
+	clanId: string;
 	channelId: string;
 	mode: number;
 	messageId: string;
@@ -82,7 +83,7 @@ export type WriteMessageReactionArgs = {
 
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
-	async ({ id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
+	async ({ id, clanId, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const session = mezon.sessionRef.current;
@@ -93,7 +94,7 @@ export const writeMessageReaction = createAsyncThunk(
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeMessageReaction(id, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete);
+			await socket.writeMessageReaction(id, clanId, channelId, mode, messageId, emoji, count, messageSenderId, actionDelete);
 		} catch (e) {
 			return thunkAPI.rejectWithValue('Error while writing message reaction');
 		}
