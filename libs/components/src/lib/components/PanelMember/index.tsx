@@ -1,5 +1,5 @@
-import { useAuth, useFriends } from '@mezon/core';
-import { selectCurrentChannel, selectFriendStatus } from '@mezon/store';
+import { useAppParams, useAuth, useFriends } from '@mezon/core';
+import { selectCurrentChannel, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -44,6 +44,15 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const checkDm = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM, [directMessageValue?.type]);
 	const checkDmGroup = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP, [directMessageValue?.type]);
 	const { deleteFriend, addFriend } = useFriends();
+	const [isDmGroupOwner, setIsDmGroupOwner] = useState(false);
+
+	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.dmID ?? ''));
+
+	useEffect(()=>{
+		if(userProfile?.user?.id === currentDmGroup.creator_id){
+			setIsDmGroupOwner(true);
+		}
+	}, [currentDmGroup, userProfile]);
 
 	return (
 		<div
@@ -54,15 +63,16 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 				left: coords.mouseX > 330 ? 'auto' : coords.mouseX,
 				bottom: positionTop ? '12px' : 'auto',
 				top: positionTop ? 'auto' : coords.mouseY,
+				boxShadow: "rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px"
 			}}
-			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary shadow z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-slate-700 rounded"
+			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-none rounded"
 			onClick={(e) => {
 				e.stopPropagation();
 				onClose();
 			}}
 		>
 			{(directMessageValue && checkDmGroup) ? 
-				<PanelGroupDM /> :	
+				<PanelGroupDM isDmGroupOwner={isDmGroupOwner}/> :	
 			<>
 				<GroupPanelMember>
 					<ItemPanelMember children="Profile" />

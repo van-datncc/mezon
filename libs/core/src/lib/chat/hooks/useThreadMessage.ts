@@ -46,7 +46,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 
 	const sendMessageTyping = React.useCallback(async () => {
 		if (channelId) {
-			dispatch(messagesActions.sendTypingUser({ channelId, mode }));
+			dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
 		}
 	}, [channelId, dispatch, mode]);
 
@@ -62,7 +62,7 @@ export function useThreadMessage({ channelId, channelLabel, mode }: UseThreadMes
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(channelId, mode, messageId, editMessage);
+			await socket.updateChatMessage(currentClanId, channelId, mode, messageId, editMessage);
 		},
 		[sessionRef, clientRef, socketRef, currentClanId, mode, channelId],
 	);
