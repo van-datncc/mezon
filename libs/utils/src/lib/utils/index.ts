@@ -298,7 +298,7 @@ export const formatTimeToMMSS = (duration: number): string => {
 
 export const isImageFile = (fileSrc: string) => {
   const normalizedFileSrc = fileSrc.toLowerCase();
-  return normalizedFileSrc.endsWith('png') || fileSrc.endsWith('jpeg');
+  return normalizedFileSrc.endsWith('png') || normalizedFileSrc.endsWith('jpeg') || normalizedFileSrc.endsWith('jpg');
 }
 
 export const isGifFile = (fileSrc: string) => {

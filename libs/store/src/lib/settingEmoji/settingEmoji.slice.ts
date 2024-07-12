@@ -7,7 +7,7 @@ import {
   EntityState,
   createSelector
 } from '@reduxjs/toolkit';
-import { ApiClanEmoji, ApiClanEmojiList } from 'mezon-js/api.gen';
+import {ApiClanEmoji, ApiClanEmojiCreateRequest, ApiClanEmojiList} from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 import {StickersEntity} from "../giftStickerEmojiPanel/stickers.slice";
 
@@ -50,16 +50,26 @@ export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoj
 	}
 });
 
+export const createEmoji = createAsyncThunk('settingClan/settingClanEmoji', async (request: ApiClanEmojiCreateRequest, thunkAPI) => {
+  try {
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const res = await mezon.client.createClanEmoji(mezon.session, request);
+    return res;
+  } catch (error) {
+    return thunkAPI.rejectWithValue({})
+  }
+})
+
 export const settingClanEmojiSlice = createSlice({
 	name: SETTING_CLAN_EMOJI,
 	initialState: initialSettingClanEmojiState,
 	reducers: {
-  
   },
 	extraReducers(builder) {
 		builder
 			.addCase(fetchEmojisByClanId.fulfilled, (state: SettingClanEmojiState, actions: PayloadAction<ApiClanEmojiList>) => {
 				state.loadingStatus = 'loaded';
+        console.log (actions.payload.emoji_list)
 				state.listEmoji.staticEmoji = actions.payload.emoji_list?.filter(emoji => isImageFile(emoji.src ?? '')) ?? [];
         state.listEmoji.animatedEmoji = actions.payload.emoji_list?.filter(emoji => isGifFile(emoji.src ?? '')) ?? [];
 			})
@@ -70,7 +80,7 @@ export const settingClanEmojiSlice = createSlice({
 			.addCase(fetchEmojisByClanId.rejected, (state: SettingClanEmojiState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			});
+			})
 	},
 });
 
@@ -81,5 +91,5 @@ export const selectAllEmoji = createSelector(getEmojiSettingState, (state) => st
 
 export const settingClanEmojiReducer = settingClanEmojiSlice.reducer;
 
-export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, fetchEmojisByClanId };
+export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, fetchEmojisByClanId, createEmoji };
 

@@ -1,31 +1,74 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import SettingEmojiList from "./SettingEmojiList";
-import { IUserAccount } from "@mezon/utils";
-import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {ChangeEvent, useCallback, useEffect, useState} from "react";
-import { AppDispatch, selectAllEmoji, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import {
+  createEmoji,
+  selectAllEmoji,
+  selectCurrentChannelId,
+  selectCurrentClanId,
+  settingClanEmojiActions,
+  useAppDispatch
+} from "@mezon/store";
+import {handleUploadFile, useMezon} from "@mezon/transport";
+import {ApiClanEmojiCreateRequest, ApiMessageAttachment} from "mezon-js/api.gen";
+import {ModalErrorTypeUpload, ModalOverData} from "@mezon/components";
 
 const SettingEmoji = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [openModalType, setOpenModalType] = useState(false);
   const dispatch = useAppDispatch();
-  const currentClanId = useSelector(selectCurrentClanId) ?? '';
-  
+  const currentChannelId = useSelector(selectCurrentChannelId) || '';
+  const currentClanId = useSelector(selectCurrentClanId) || '';
+  const { sessionRef, clientRef } = useMezon()
   const emojiList = useSelector(selectAllEmoji);
-  console.log(emojiList);
   
   const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log (e.target.files?.[0]);
+    if(e.target.files) {
+      console.log (e.target.files[0]);
+      const file = e.target.files[0];
+      const imageSize = file?.size;
+      const fileName = file?.name;
+      const session = sessionRef.current;
+      const client = clientRef.current;
+      const category = 'Custom';
+      const path = 'emojis/' + category;
+      if(!client || !session) {
+        throw new Error('Client or file is not initialized')
+      }
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file?.type)) {
+        setOpenModalType(true);
+        return;
+      }
+      
+      if (imageSize > 1000000) {
+        setOpenModal(true);
+        return;
+      }
+      handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, 3, path).then(async (attachment: ApiMessageAttachment) => {
+        const request: ApiClanEmojiCreateRequest = {
+          category: category,
+          clan_id: currentClanId,
+          shortname: ':' + fileName + ':',
+          source: attachment.url,
+        };
+        await dispatch(createEmoji(request));
+      })
+     }else {
+      return;
+    }
+    
   }
   
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
       await dispatch(settingClanEmojiActions.fetchEmojisByClanId({ clanId: currentClanId }));
     }
-  }, [dispatch, currentClanId]);
+  }, [dispatch]);
   
   useEffect(() => {
     fetchEmojis();
-  }, [fetchEmojis]);
+  }, [fetchEmojis, emojiList.staticEmoji.length, emojiList.animatedEmoji.length]);
   
   return (
     <>
@@ -48,7 +91,8 @@ const SettingEmoji = () => {
             type="file"
             title=" "
             tabIndex={0}
-            multiple accept=".jpg,.jpeg,.png,.gif"
+            multiple
+            accept=".jpg,.jpeg,.png,.gif"
             onChange={handleSelectFile}
           ></input>
         </div>
@@ -56,6 +100,10 @@ const SettingEmoji = () => {
       
       <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji}/>
       <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji}/>
+      
+      <ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
+      
+      <ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
     </>
   )
 }
