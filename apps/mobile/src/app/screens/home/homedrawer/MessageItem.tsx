@@ -107,7 +107,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
-	const isCombine = !message.isStartedMessageGroup;
+	const isCombine = !message?.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message?.references?.length, user]);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
@@ -380,12 +380,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		<Swipeable
-			renderRightActions={renderRightActions}
-			ref={swipeableRef}
-			overshootRight={false}
-			onSwipeableOpen={handleSwipeableOpen}
-		>
+		// <Swipeable
+		// 	renderRightActions={renderRightActions}
+		// 	ref={swipeableRef}
+		// 	overshootRight={false}
+		// 	onSwipeableOpen={handleSwipeableOpen}
+		// 	hitSlop={{ left: -10 }}
+		// >
 			<View
 				style={[
 					styles.messageWrapper,
@@ -528,7 +529,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					</Pressable>
 				</View>
 			</View>
-		</Swipeable>
+		// </Swipeable>
 	);
 }, arePropsEqual);
 

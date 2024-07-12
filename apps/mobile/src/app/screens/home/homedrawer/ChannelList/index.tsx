@@ -1,14 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
 import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
-import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
+import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
-	appActions,
 	categoriesActions,
 	channelsActions,
 	getStoreAsync,
-	messagesActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
@@ -122,7 +120,6 @@ const ChannelList = React.memo((props: any) => {
 		const store = await getStoreAsync();
 		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		store.dispatch(appActions.setLoadingMainMobile(false));
 	};
 
 	function handlePress() {
@@ -172,10 +169,7 @@ const ChannelList = React.memo((props: any) => {
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
-					<InviteToChannel
-						isUnknownChannel={isUnknownChannel}
-						ref={bottomSheetInviteRef}
-					/>
+					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
@@ -184,11 +178,9 @@ const ChannelList = React.memo((props: any) => {
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
 						<Icons.CalendarIcon height={20} width={20} color={themeValue.text} />
-						<Text style={{ color: themeValue.textStrong }}>{
-							allEventManagement?.length > 0
-								? `${allEventManagement?.length} Events`
-								: 'Events'
-						}</Text>
+						<Text style={{ color: themeValue.textStrong }}>
+							{allEventManagement?.length > 0 ? `${allEventManagement?.length} Events` : 'Events'}
+						</Text>
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
@@ -228,7 +220,7 @@ const ChannelList = React.memo((props: any) => {
 				headerRight={
 					currentClan?.creator_id === user?.userId && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
-							<Text style={{ color: baseColor.blurple, fontWeight: "bold" }}>Create</Text>
+							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
 						</TouchableOpacity>
 					)
 				}
