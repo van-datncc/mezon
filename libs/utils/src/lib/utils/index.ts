@@ -1,4 +1,3 @@
-import { useEmojiSuggestion } from '@mezon/core';
 import Resizer from "react-image-file-resizer";
 import {
 	differenceInDays,
