@@ -1,12 +1,13 @@
 import { useClans } from '@mezon/core';
-import { useTheme } from '@mezon/mobile-ui';
+import { Block, useTheme } from '@mezon/mobile-ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../../temp-ui';
 import { style } from "./styles";
+import DeleteClanModal from '../../DeleteClanModal';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../../temp-ui';
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
@@ -14,7 +15,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
 	const { t } = useTranslation(['clanOverviewSetting']);
-
+  const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
@@ -107,13 +108,13 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
         },
     ]
 
-	const deleteMenu: IMezonMenuItemProps[] = [
-		{
-			title: t('menu.deleteServer.delete'),
-			textStyle: { color: 'red' },
-			onPress: () => reserve(),
-		},
-	];
+    const deleteMenu: IMezonMenuItemProps[] = [
+        {
+            title: t("menu.deleteServer.delete"),
+            textStyle: { color: "red" },
+            onPress: () =>{ setIsVisibleDeleteModal(true) }
+        },
+    ]
 
 	const generalMenu: IMezonMenuSectionProps[] = [
 		{
@@ -145,9 +146,10 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		},
 	];
 
-	return (
-		<ScrollView contentContainerStyle={styles.container}>
-			<MezonImagePicker defaultValue={banner} height={200} width={'100%'} onLoad={handleLoad} showHelpText autoUpload />
+    return (
+        <Block>
+          <ScrollView contentContainerStyle={styles.container}>
+            <MezonImagePicker defaultValue={banner} height={200} width={"100%"} onLoad={handleLoad} showHelpText autoUpload />
 
 			<View style={{ marginVertical: 10 }}>
 				<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} />
@@ -155,13 +157,13 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 			<MezonMenu menu={generalMenu} />
 
-			<MezonOption
-				title={t('fields.defaultNotification.title')}
-				bottomDescription={t('fields.defaultNotification.description')}
-				data={optionData}
-			/>
-
-			<MezonMenu menu={dangerMenu} />
-		</ScrollView>
-	);
+            <MezonOption
+                title={t('fields.defaultNotification.title')}
+                bottomDescription={t('fields.defaultNotification.description')}
+                data={optionData} />
+            <MezonMenu menu={dangerMenu} />
+        </ScrollView>
+        <DeleteClanModal isVisibleModal={isVisibleDeleteModal} visibleChange={(isVisible)=>{setIsVisibleDeleteModal(isVisible)}}></DeleteClanModal>
+        </Block>
+    )
 }
