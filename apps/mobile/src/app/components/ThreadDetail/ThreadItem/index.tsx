@@ -23,7 +23,6 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		navigation.navigate(APP_SCREEN.HOME as never);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
-		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 	const timeMessage = useMemo(() => {
@@ -32,6 +31,13 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 			return lastTime;
 		}
 	}, [thread]);
+  let lastSentMessage = '';
+  try {
+    const lastSentMessageContent = thread?.last_sent_message?.content ? JSON.parse(thread?.last_sent_message?.content): {};
+    lastSentMessage = lastSentMessageContent?.t || '';
+  } catch (error) {
+    console.error('JSON parse error:', error);
+  }
 
 	return (
 		<Pressable
@@ -45,7 +51,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 				<View style={styles.threadContent}>
 					<Text style={styles.textThreadCreateBy}>{username}</Text>
 					<Text numberOfLines={1} ellipsizeMode="tail" style={styles.messageContent}>
-						{!!JSON.parse(thread?.last_sent_message?.content)?.['t'] ? JSON.parse(thread?.last_sent_message?.content)?.['t'] : ''}
+						{lastSentMessage}
 					</Text>
 					<Text style={styles.bullet}>•</Text>
 					<Text style={styles.createTime}>{timeMessage}</Text>
