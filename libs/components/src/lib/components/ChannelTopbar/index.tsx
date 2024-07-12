@@ -7,8 +7,6 @@ import {
 	selectDefaultNotificationClan,
 	selectIsShowMemberList,
 	selectNewNotificationStatus,
-	// selectNewNotificationStatus,
-	// selectNotiUnread,
 	selectStatusMenu,
 	selectTheme,
 	selectnotificatonSelected,
@@ -212,8 +210,9 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
 
 	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
-	const notiUnreadList = useMemo(()=>{ return localStorage.getItem('notiUnread')},[newNotificationStatus]) ;
-
+	const notiUnreadList = useMemo(() => {
+		return localStorage.getItem('notiUnread');
+	}, [newNotificationStatus]);
 
 	useEffect(() => {
 		const updateNotiUnread = () => {
@@ -231,7 +230,6 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 			window.removeEventListener('storage', handleStorageChange);
 		};
 	}, [newNotificationStatus]);
-
 
 	const handleShowInbox = () => {
 		setIsShowInbox(!isShowInbox);

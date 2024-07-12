@@ -82,7 +82,6 @@ export const notificationSlice = createSlice({
 		},
 
 		setReadNotiStatus(state, action) {
-			console.log('id remove', action.payload);
 			let storedIds = localStorage.getItem('notiUnread');
 			let ids = storedIds ? JSON.parse(storedIds) : [];
 			
