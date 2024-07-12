@@ -592,7 +592,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		const inputValue = currentTextInput?.current;
 		if (!mentionMessage?.display) return;
 		const textMentions = `@${mentionMessage?.display} `;
-		const textArray = inputValue.split('');
+		const textArray = inputValue?.split?.('');
 		textArray.splice(cursorPosition, 0, textMentions);
 		const textConverted = textArray.join('');
 		setText(textConverted);
