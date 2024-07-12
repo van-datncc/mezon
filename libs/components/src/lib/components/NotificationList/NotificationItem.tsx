@@ -20,7 +20,6 @@ function NotificationItem({ notify }: NotifyProps) {
 		notice = notify?.subject?.slice(userNameLenght);
 	}
 
-	
 
 	const messageID = useMemo(() => {
 		return notify.content.message_id;

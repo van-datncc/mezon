@@ -1,9 +1,22 @@
-import { useApp, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectCloseMenu, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectStatusMenu, selectTheme, selectnotificatonSelected } from '@mezon/store';
+import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import {
+	appActions,
+	searchMessagesActions,
+	selectCloseMenu,
+	selectDefaultNotificationCategory,
+	selectDefaultNotificationClan,
+	selectIsShowMemberList,
+	selectNewNotificationStatus,
+	// selectNewNotificationStatus,
+	// selectNotiUnread,
+	selectStatusMenu,
+	selectTheme,
+	selectnotificatonSelected,
+} from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -119,26 +132,25 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
-	const [isMuteBell, setIsMuteBell] = useState<boolean>(false)
+	const [isMuteBell, setIsMuteBell] = useState<boolean>(false);
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
-			setIsMuteBell(true)
-		}
-		else if (getNotificationChannelSelected?.id === "0") {
+			setIsMuteBell(true);
+		} else if (getNotificationChannelSelected?.id === '0') {
 			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === 'NOTHING') {
-				setIsMuteBell(true)
+				setIsMuteBell(true);
 			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === 'NOTHING') {
-				setIsMuteBell(true)
+				setIsMuteBell(true);
 			} else {
-				setIsMuteBell(false)
+				setIsMuteBell(false);
 			}
 		} else {
-			setIsMuteBell(false)
+			setIsMuteBell(false);
 		}
-	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
+	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -158,8 +170,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{isMuteBell ? (<Icons.MuteBell />) : (
-						<Icons.UnMuteBell />)}
+					{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell />}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}
@@ -198,6 +209,29 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
+	const newNotificationStatus = useSelector(selectNewNotificationStatus);
+
+	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
+	const notiUnreadList = useMemo(()=>{ return localStorage.getItem('notiUnread')},[newNotificationStatus]) ;
+
+
+	useEffect(() => {
+		const updateNotiUnread = () => {
+			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
+		};
+		updateNotiUnread(); // Initial check
+		const handleStorageChange = (event: StorageEvent) => {
+			if (event.key === 'notiUnread') {
+				updateNotiUnread();
+			}
+		};
+		window.addEventListener('storage', handleStorageChange);
+
+		return () => {
+			window.removeEventListener('storage', handleStorageChange);
+		};
+	}, [newNotificationStatus]);
+
 
 	const handleShowInbox = () => {
 		setIsShowInbox(!isShowInbox);
@@ -209,12 +243,23 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content="Inboxs" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none relative" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox />
+					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>
 			{isShowInbox && <NotificationList />}
 		</div>
+	);
+}
+
+function RedDot() {
+	return (
+		<div
+			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]
+		 w-[12px] h-[12px] rounded-full bg-colorDanger 
+		  font-bold text-[11px] flex items-center justify-center -bottom-0.5 -right-0.5"
+		></div>
 	);
 }
 
