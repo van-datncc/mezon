@@ -1,4 +1,4 @@
-import { useCategory, useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
+import { useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
 import { LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -24,10 +24,11 @@ import { SeparatorWithLine } from '../../../../../components/Common';
 
 interface IInviteToChannelProp {
    isUnknownChannel: boolean
+	 onClose?: () => void;
 }
 
 export const InviteToChannel = React.memo(
-	React.forwardRef(({ isUnknownChannel}: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
+	React.forwardRef(({ isUnknownChannel, onClose }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const currentChannelId = useSelector(selectCurrentChannelId);
 		// const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -43,7 +44,6 @@ export const InviteToChannel = React.memo(
 		const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
 		const [expiredTimeSelected, setExpiredTimeSelected] = useState<string>(ExpireLinkValue.SevenDays);
 		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
-		const { categorizedChannels } = useCategory();
 		const { listDMInvite, listUserInvite } = useDMInvite(currentChannelId);
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
@@ -53,7 +53,7 @@ export const InviteToChannel = React.memo(
 
 		const userInviteList = useMemo(() => {
 			if (listDMInvite?.length) {
-				return listDMInvite.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
+				return listDMInvite?.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
 			}
 			return listUserInvite?.filter(UserInvite => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)))
 		}, [searchUserText, listDMInvite, listUserInvite])
@@ -112,7 +112,7 @@ export const InviteToChannel = React.memo(
 				[],
 			);
 		};
-	
+
 		const directMessageWithUser = async (userId: string) => {
 			const response = await createDirectMessageWithUser(userId);
 			if (response?.channel_id) {
@@ -133,7 +133,7 @@ export const InviteToChannel = React.memo(
 				setSentIdList([...sentIdList, userId]);
 				return;
 			}
-	
+
 			if (directParamId && dmGroup) {
 				sendToDM({ text: currentInviteLink }, dmGroup);
 				setSentIdList([...sentIdList, dmGroup?.id]);
@@ -192,6 +192,7 @@ export const InviteToChannel = React.memo(
             		animateOnMount
 					backdropComponent={Backdrop}
 					onDismiss={() => {
+						onClose?.();
 						resetSearch();
 					}}
 					handleComponent={() => null}
@@ -257,7 +258,7 @@ export const InviteToChannel = React.memo(
 									</Pressable>
 								</View>
 							</View>
-							
+
 							<BottomSheetFlatList
 								data={userInviteList}
 								keyExtractor={(item) => item?.id}

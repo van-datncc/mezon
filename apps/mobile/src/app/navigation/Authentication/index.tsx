@@ -3,7 +3,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuth, useReference } from '@mezon/core';
 import { getAppInfo } from '@mezon/mobile-components';
-import { fcmActions, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrentId, selectLoadingMainMobile } from '@mezon/store-mobile';
+import {
+	appActions,
+	fcmActions,
+	getStoreAsync,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDmGroupCurrentId,
+	selectLoadingMainMobile
+} from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -81,8 +89,10 @@ export const Authentication = () => {
 					text2: remoteMessage.notification?.body,
 					onPress: async () => {
 						Toast.hide();
-						navigation.navigate(APP_SCREEN.HOME);
-						await navigateToNotification(remoteMessage, navigation, null);
+						const store = await getStoreAsync();
+						store.dispatch(appActions.setLoadingMainMobile(true));
+						store.dispatch(appActions.setIsFromFCMMobile(true));
+						await navigateToNotification(store, remoteMessage, navigation, null);
 						navigation.dispatch(DrawerActions.closeDrawer());
 					},
 				});

@@ -1,12 +1,12 @@
 import { useApp, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectCloseMenu, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectStatusMenu, selectTheme, selectnotificatonSelected } from '@mezon/store';
+import { appActions, searchMessagesActions, selectCloseMenu, selectCurrentChannelId, selectDefaultNotificationCategory, selectDefaultNotificationClan, selectIsShowMemberList, selectLastPinMessageByChannelId, selectLastSeenPinMessageChannel, selectStatusMenu, selectTheme, selectnotificatonSelected } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -123,7 +123,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-	useEffect(()=>{
+	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
 			setIsMuteBell(true)
 		}
@@ -138,7 +138,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 		} else {
 			setIsMuteBell(false)
 		}
-	},[getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
+	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan])
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -158,8 +158,8 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{ isMuteBell ? (<Icons.MuteBell />):(
-					<Icons.UnMuteBell />)}
+					{isMuteBell ? (<Icons.MuteBell />) : (
+						<Icons.UnMuteBell />)}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}
@@ -170,11 +170,12 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
 	const threadRef = useRef<HTMLDivElement | null>(null);
-
 	const handleShowPinMessage = () => {
 		setIsShowPinMessage(!isShowPinMessage);
 	};
-
+	const currentChannelId = useSelector(selectCurrentChannelId)
+	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannel)
+	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId))
 	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
 	useEscapeKey(() => setIsShowPinMessage(false));
 	return (
@@ -186,8 +187,9 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 				animation="duration-500"
 				style={isLightMode ? 'light' : 'dark'}
 			>
-				<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
+					{(lastPinMessage && lastSeenPinMessageChannel && lastPinMessage !== lastSeenPinMessageChannel) ? (<span className='w-[8px] h-[8px] rounded-full bg-[#DA373C] absolute bottom-0 right-0'></span>) : (<></>)}
 				</button>
 			</Tooltip>
 			{isShowPinMessage && <PinnedMessages />}

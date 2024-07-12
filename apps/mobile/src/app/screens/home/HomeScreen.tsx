@@ -1,4 +1,4 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { load, STORAGE_IS_FROM_FCM } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -17,8 +17,9 @@ import {
 import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
+import { delay } from 'lodash';
 import React, { useEffect } from 'react';
-import { AppState, DeviceEventEmitter } from 'react-native';
+import { AppState } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
@@ -26,14 +27,21 @@ import HomeDefault from './homedrawer/HomeDefault';
 
 const Drawer = createDrawerNavigator();
 
+type Sessionlike = {
+	token: string;
+	refresh_token: string;
+	created: boolean;
+};
+
 const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 	const dispatch = useDispatch();
 	return (
 		<Drawer.Navigator
 			screenOptions={{
 				drawerPosition: 'left',
-				drawerType: 'back',
+				drawerType: 'slide',
 				swipeEdgeWidth: Metrics.screenWidth,
+				swipeMinDistance: 5,
 				drawerStyle: {
 					width: '100%',
 				},
@@ -53,6 +61,10 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 				name="HomeDefault"
 				component={HomeDefault}
 				options={{
+					drawerType: 'slide',
+					swipeEdgeWidth: Metrics.screenWidth,
+					keyboardDismissMode: 'none',
+					swipeMinDistance: 5,
 					headerShown: false,
 				}}
 			/>
@@ -66,7 +78,7 @@ const HomeScreen = React.memo((props: any) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isLogin = useSelector(selectIsLogin);
 
-	const { reconnect } = useMezon();
+	const { reconnect, refreshSession } = useMezon();
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
@@ -76,7 +88,9 @@ const HomeScreen = React.memo((props: any) => {
 	}, [clans, currentClan]);
 
 	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+		const appStateSubscription = AppState.addEventListener('change', (state) => {
+			delay(handleAppStateChange, 200, state);
+		});
 
 		return () => {
 			appStateSubscription.remove();
@@ -90,10 +104,11 @@ const HomeScreen = React.memo((props: any) => {
 	}, [isLogin]);
 
 	const handleAppStateChange = async (state: string) => {
-		if (state === 'active') {
-			await reconnect();
+		const isFromFCM = await load(STORAGE_IS_FROM_FCM);
+		if (state === 'active' && isFromFCM?.toString() !== 'true') {
 			await messageLoader();
 		}
+		await reconnect();
 	};
 
 	const mainLoader = async () => {
@@ -114,6 +129,9 @@ const HomeScreen = React.memo((props: any) => {
 
 	const messageLoader = async () => {
 		const store = await getStoreAsync();
+		// const resSession = await store.dispatch(authActions.refreshSession());
+		// const refreshToken = resSession?.payload as Sessionlike;
+		// await refreshSession(refreshToken);
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
@@ -121,7 +139,7 @@ const HomeScreen = React.memo((props: any) => {
 			channelsActions.joinChannel({
 				clanId: currentClan?.clan_id,
 				channelId: currentChannelId,
-				noFetchMembers: false,
+				noFetchMembers: true,
 			}),
 		);
 		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));

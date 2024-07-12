@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
     sectionWrapper: {
+        marginTop: Metrics.size.xl,
         marginBottom: Metrics.size.xl,
     },
 

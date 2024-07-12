@@ -1,6 +1,9 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { machineId } from 'node-machine-id';
+import { join } from 'path';
+import { format } from 'url';
 import App from './app/app';
+import { rendererAppName } from './app/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
@@ -33,6 +36,24 @@ ipcMain.handle('sender-id', () => {
 
 ipcMain.handle('get-device-id', async () => {
 	return await machineId();
+});
+
+ipcMain.on('navigate-to-url', async (event, url) => {
+	if (App.mainWindow) {
+		const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
+		App.mainWindow.loadURL(
+			format({
+				pathname: baseUrl,
+				protocol: 'file:',
+				slashes: true,
+				query: { notificationUrl: url },
+			}),
+		);
+		if (!App.mainWindow.isVisible()) {
+			App.mainWindow.show();
+		}
+		App.mainWindow.focus();
+	}
 });
 
 // handle setup events as quickly as possible

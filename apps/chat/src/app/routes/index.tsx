@@ -81,6 +81,7 @@ export const Routes = () => {
 						},
 						{
 							path: '/',
+							loader: loaderWithStore(loginLoader),
 							element: <Homepage />,
 						},
 						{

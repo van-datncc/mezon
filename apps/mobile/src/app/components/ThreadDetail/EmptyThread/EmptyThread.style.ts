@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 	},
 	emptyThreadContent: {
 		position: 'absolute',
-		top: '50%',
+		top: '30%',
 		left: 10,
 		right: 10,
 		flexDirection: 'column',

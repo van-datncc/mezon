@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ForwardMessageModal from '../ForwardMessage';
-import * as Icons from '../Icons';
-import { IconFriends } from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
+import { IconFriends } from '../../../../../ui/src/lib/Icons';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
 import { Tooltip } from 'flowbite-react';
 import ListDMChannel from './listDMChannel';
@@ -37,7 +37,7 @@ function DirectMessageList() {
 		});
 	};
 	const navigate = useNavigate();
-	
+
 	useEffect(() => {
 		const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
 		const sortedData = sortDMItem(filteredDataDM);
@@ -84,18 +84,18 @@ function DirectMessageList() {
 						onClick={onClickOpenModal}
 						className="cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
 					>
-						<Tooltip content='Create DM' trigger="hover" animation="duration-500" style={appearanceTheme==='light' ? 'light' : 'dark'}>
+						<Tooltip content='Create DM' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 							<Icons.Plus />
 						</Tooltip>
 					</button>
 				</div>
 			</div>
-			{openPopupForward && <ForwardMessageModal  openModal={openPopupForward} onClose={handleCloseModalForward} />}
+			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
-					<ListDMChannel listDM={sortedFilteredDataDM}/>
+					<ListDMChannel listDM={sortedFilteredDataDM} />
 				</div>
 			</div>
 		</>

@@ -51,6 +51,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	currentVoiceChannelId: string;
 	valueTextInput: Record<string, string>;
 	idChannelSelected: Record<string, string>;
+	membersVoiceChannel: Record<string, string[]>;
 	mode: 'clan' | 'dm';
 }
 
@@ -225,6 +226,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	currentVoiceChannelId: '',
 	valueTextInput: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	membersVoiceChannel: {},
 	mode: 'dm',
 });
 
@@ -322,6 +324,13 @@ export const channelsSlice = createSlice({
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+		},
+		setMembersVoiceChannel: (state, action: PayloadAction<{ channelId: string; member: string }>) => {
+			const { channelId, member } = action.payload;
+			if (!state.membersVoiceChannel[channelId]) {
+				state.membersVoiceChannel[channelId] = [];
+			}
+			state.membersVoiceChannel[channelId].push(member);
 		},
 	},
 	extraReducers: (builder) => {
@@ -441,10 +450,16 @@ export const selectEntitiesChannel = createSelector(getChannelsState, (state) =>
 
 export const selectMode = createSelector(getChannelsState, (state) => state.mode);
 
+export const selectMembersVoiceChannel = createSelector(getChannelsState, (state) => state.membersVoiceChannel);
+
 export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
 export const selectCurrentChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
 	clanId ? clansEntities[clanId] : null,
+);
+
+export const selectLastSeenPinMessageChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
+	clanId ? clansEntities[clanId].last_pin_message : '',
 );
 
 export const selectClanId = () => createSelector(selectCurrentChannel, (channel) => channel?.clan_id);

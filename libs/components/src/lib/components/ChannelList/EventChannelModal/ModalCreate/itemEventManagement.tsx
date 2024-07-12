@@ -5,7 +5,7 @@ import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../../../ChannelLink';
-import * as Icons from '../../../Icons';
+import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
 import PanelEventItem from './panelEventItem';
 import ModalDelEvent from './modalDelEvent';
@@ -68,7 +68,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const panelRef = useRef(null);
 	useOnClickOutside(panelRef, () => setOpenPanel(false));
 
-	const checkTimeVoice = useMemo(() => differenceTime(end || '') + 30 < 0,[end]);
+	const checkTimeVoice = useMemo(() => differenceTime(end || '') + 30 < 0, [end]);
 	const checkTimeLocation = useMemo(() => differenceTime(end || '') < 0, [end]);
 	useEffect(() => {
 		if (checkTimeVoice && checkOptionVoice) {
@@ -85,11 +85,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			onClick={
 				setOpenModalDetail && event
 					? () => {
-							setOpenModalDetail(true);
-							setChooseEvent(event);
-						}
+						setOpenModalDetail(true);
+						setChooseEvent(event);
+					}
 					: // eslint-disable-next-line @typescript-eslint/no-empty-function
-						() => {}
+					() => { }
 			}
 			ref={panelRef}
 		>
@@ -172,7 +172,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}
-			{openModalDelEvent && <ModalDelEvent event={event} onClose={() => setOpenPanel(false)} setOpenModalDelEvent={setOpenModalDelEvent} onHandle={handleStopPropagation}/>}
+			{openModalDelEvent && <ModalDelEvent event={event} onClose={() => setOpenPanel(false)} setOpenModalDelEvent={setOpenModalDelEvent} onHandle={handleStopPropagation} />}
 		</div>
 	);
 };

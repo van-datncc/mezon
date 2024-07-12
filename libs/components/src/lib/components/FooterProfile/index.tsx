@@ -13,7 +13,7 @@ import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { HeadPhoneICon, MicIcon, SettingProfile } from '../Icons';
+import { HeadPhoneICon, MicIcon, SettingProfile } from '../../../../../ui/src/lib/Icons';
 import MemberProfile from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalFooterProfile from './ModalFooterProfile';

@@ -37,10 +37,10 @@ const SettingDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
-		<div className="w-full flex flex-col gap-y-5 text-[15px]">
-			<div className="tracking-wide font-normal">Role name<b className='text-red-600'>*</b></div>
+		<div className="w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800">
+			<div className="text-xs font-bold uppercase mb-2">Role name<b className='text-red-600'>*</b></div>
 			<input
-				className="dark:bg-black bg-white text-[15px] w-full p-[7px] font-normal border rounded-lg "
+				className="dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded outline-none"
 				type="text"
 				value={nameRole}
 				onChange={handleDisplayName}

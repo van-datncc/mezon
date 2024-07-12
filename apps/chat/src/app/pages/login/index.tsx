@@ -1,7 +1,6 @@
 import { GoogleButtonLogin, LoginForm, QRSection, TitleSection } from '@mezon/components';
 import { useAppNavigation } from '@mezon/core';
-import { authActions, selectIsLogin, useAppDispatch } from '@mezon/store';
-import isElectron from 'is-electron';
+import { selectIsLogin } from '@mezon/store';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useLoaderData } from 'react-router-dom';
@@ -9,17 +8,8 @@ import { ILoginLoaderData } from '../../loaders/loginLoader';
 
 function Login() {
 	const { navigate } = useAppNavigation();
-	const dispatch = useAppDispatch();
 	const isLogin = useSelector(selectIsLogin);
 	const { redirectTo } = useLoaderData() as ILoginLoaderData;
-	const deepLinkUrl = JSON.parse(localStorage.getItem('deepLinkUrl') as string);
-	useEffect(() => {
-		if (deepLinkUrl && isElectron()) {
-			const data = JSON.parse(decodeURIComponent(deepLinkUrl));
-			dispatch(authActions.setSession(data));
-			localStorage.removeItem('deepLinkUrl');
-		}
-	}, [deepLinkUrl, dispatch]);
 
 	useEffect(() => {
 		if (isLogin) {

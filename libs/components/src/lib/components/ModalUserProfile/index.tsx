@@ -154,7 +154,7 @@ const ModalUserProfile = ({
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
 					{isFooterProfile ? <StatusProfile userById={userById} /> : (mode !== 4) && (mode !== 3) && !hiddenRole && userById && <RoleUserProfile userID={userID} />}
 
-					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole ? (
+					{((!checkOwner(userById?.user?.google_id || '') && !hiddenRole) && !checkAnonymous)? (
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
@@ -172,7 +172,7 @@ const ModalUserProfile = ({
 					) : null}
 					{showNote && (
 						<>
-							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center p-2"></div>
+							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 p-2"></div>
 							<NoteUserProfile />
 						</>
 					)}

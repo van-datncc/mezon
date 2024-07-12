@@ -1,5 +1,5 @@
 import { Colors } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
+import { ChannelsEntity } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import React from 'react';
 import { Text } from 'react-native';
@@ -19,7 +19,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channel
 	};
 
 	const renderChannelMention = (id: string) => {
-		const channelId = id.match(channelIdRegex)[1];
+		const channelId = id?.match(channelIdRegex)[1];
 		const channel = getChannelById(channelId);
 
 		return (
@@ -32,7 +32,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channel
 		);
 	};
 
-  const renderUserMention = (id: string) => {
+	const renderUserMention = (id: string) => {
 		return (
 			<Text>
 				<Text style={styles.contentMessageMention}>{id}</Text>
@@ -46,18 +46,19 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channel
 
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
-			.split(mentionRegexSplit)
-			.filter(Boolean)
-			.filter((i) => i !== '@' && i !== '#');
-
+			?.split(mentionRegexSplit)
+			?.filter(Boolean)
+			?.filter((i) => i !== '@' && i !== '#');
 		return parts?.map?.((part, index) => (
 			<Text key={`${index}-${part}-renderTextWithMention'}`}>
 				{!part ? (
 					<Text />
 				) : matchesMention.includes(part) ? (
 					renderMention(part)
-				) : (
+				) : highlightEmojiRegex.test(part) ? (
 					<Text style={styles.contentMessageBox}>{renderTextWithEmoji(part)}</Text>
+				) : (
+					<Text>{part}</Text>
 				)}
 			</Text>
 		));
@@ -75,7 +76,7 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channel
 		});
 	};
 
-	const matchesMention = text.match(mentionRegex);
+	const matchesMention = text?.match(mentionRegex);
 	if (matchesMention?.length) {
 		return <Text>{renderTextWithMention(text, matchesMention)}</Text>;
 	} else {

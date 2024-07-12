@@ -11,7 +11,7 @@ function AddVoiceFriend({ channelId }: AddVoiceFriendProps) {
 	));
 	return (
 		<div className="bg-black rounded-[10px] w-full m-auto flex justify-center items-center min-h-full overflow-hidden wrapperBtnAddFriend">
-			<button className="bg-[#26262B] rounded p-2 text-lg btnAddFriend" onClick={openInviteChannelModal}>
+			<button className="bg-bgInputDark rounded p-2 text-lg btnAddFriend" onClick={openInviteChannelModal}>
 				Invites Friend
 			</button>
 		</div>

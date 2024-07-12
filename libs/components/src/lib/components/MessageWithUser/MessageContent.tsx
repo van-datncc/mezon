@@ -17,7 +17,7 @@ const MessageText = ({ message, lines, isEdited, mode }: { message: IMessageWith
 		{' '}
 		{lines.length > 0 ? (
 			<div className="flex w-full">
-				<div id={message.id} className="w-full">
+				<div className="w-full">
 					<MessageLine line={lines} messageId={message.id} mode={mode} />
 				</div>
 				{isEdited && (

@@ -16,6 +16,7 @@ export function useSeenMessagePool() {
 		seenMessagePool.registerSeenMessageWorker((action) => {
 			dispatch(
 				messagesActions.updateLastSeenMessage({
+					clanId: action.clanId,
 					channelId: action.channelId,
 					messageId: action.messageId,
 				}),
@@ -34,6 +35,7 @@ export function useSeenMessagePool() {
 		}
 		
 		seenMessagePool.addSeenMessage({
+			clanId: message.clan_id || '',
 			channelId: message.channel_id || '',
 			channelLabel: message.channel_label,
 			messageId: message.id || '',

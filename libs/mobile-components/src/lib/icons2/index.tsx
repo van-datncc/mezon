@@ -1225,7 +1225,7 @@ export const PencilSparkleIcon = ({ width = 24, height = 24, color = "white", ..
 )
 // TODO: Need reviewing
 export const MessagePlusIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
-    <Svg viewBox="0 0 80 80" fill="none" width={width} height={height} {...props}>
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
         <Path
             d="M63.333 46.666A3.333 3.333 0 0166.667 50v10h10a3.333 3.333 0 110 6.666h-10v10a3.333 3.333 0 11-6.667 0v-10H50A3.333 3.333 0 1150 60h10V50a3.333 3.333 0 013.333-3.334z"
             fill={color}
@@ -1323,3 +1323,48 @@ export const CheckmarkLargeIcon = ({ width = 24, height = 24, color = "white", .
         <Path d="M26.61 56.9c-1.45-.07-2.33-1.1-3.26-2C18.13 49.58 12.93 44.27 7.67 39c-1.53-1.54-2.76-3.27-1-5.15 2-2.14 3.76-.85 5.42.86 3.9 4 8 7.89 11.76 12.05 2.12 2.34 3.42 2.56 5.77.1 9.24-9.67 18.72-19.11 28.13-28.62a21.577 21.577 0 012.92-2.66 2.56 2.56 0 013.56.4 2.72 2.72 0 01.4 3.62A11.383 11.383 0 0163 21.51a30671.058 30671.058 0 01-32.71 33.16c-1.04 1.05-2 2.26-3.68 2.23z" />
     </Svg>
 )
+
+export const FlagIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M9 2.01a3 3 0 013 3v2.46l26.01-4.35A6 6 0 0145 9.06v4.41l17.01-2.85A6.001 6.001 0 0169 16.56v21.9a6 6 0 01-5.01 5.94l-27 4.5a5.999 5.999 0 01-5.34-1.8c-.6-.63-.24-1.62.54-2.04a15.03 15.03 0 005.82-5.82c.54-.96-.3-1.98-1.38-1.8L12 41.55v20.46a3 3 0 01-6 0v-57a3 3 0 013-3z" />
+    </Svg>
+)
+
+export const WindowsMaximizeIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M45 6a3 3 0 013-3h18a3 3 0 013 3v18a3 3 0 11-6 0V13.23l-12.9 12.9a2.999 2.999 0 11-4.2-4.26L58.74 9H48a3 3 0 01-3-3z" />
+        <Path d="M15 6a9 9 0 00-9 9v42a9 9 0 009 9h42a9 9 0 009-9V39a3 3 0 00-6 0v18a3 3 0 01-3 3H15a3 3 0 01-3-3V15a3 3 0 013-3h18a3 3 0 000-6H15z" />
+    </Svg>
+)
+
+export const WindowsSmallerIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M24 18a6 6 0 01-6 6H9a3 3 0 000 6h9a12 12 0 0012-12V9a3 3 0 00-6 0v9zm0 36a6 6 0 00-6-6H9a3 3 0 010-6h9a12 12 0 0112 12v9a3 3 0 01-6 0v-9zm30-30a6 6 0 01-6-6V9a3 3 0 00-6 0v9a12 12 0 0012 12h9a3 3 0 000-6h-9zm-6 30c0-3.3 2.7-6 6-6h9a3 3 0 000-6h-9a12 12 0 00-12 12v9a3 3 0 006 0v-9z" />
+    </Svg>
+)
+
+export const WindowsMinimizeIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M30 63a3 3 0 01-3 3H9a3 3 0 01-3-3V45a3 3 0 116 0v10.77l12.9-12.9a3 3 0 114.2 4.26L16.26 60H27a3 3 0 013 3z" />
+        <Path d="M60 63a9 9 0 009-9V12a9 9 0 00-9-9H18a9 9 0 00-9 9v18a3 3 0 106 0V12a3 3 0 013-3h42a3 3 0 013 3v42a3 3 0 01-3 3H42a3 3 0 000 6h18z" />
+    </Svg>
+)
+
+export const WindowsBiggerIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M12 18c0-3.3 2.7-6 6-6h9a3 3 0 000-6h-9A12 12 0 006 18v9a3 3 0 006 0v-9zm0 36c0 3.3 2.7 6 6 6h9a3 3 0 010 6h-9A12 12 0 016 54v-9a3 3 0 116 0v9zm42-42a6 6 0 016 6v9a3 3 0 006 0v-9A12 12 0 0054 6h-9a3 3 0 100 6h9zm6 42a6 6 0 01-6 6h-9a3 3 0 000 6h9a12 12 0 0012-12v-9a3 3 0 00-6 0v9z" />
+    </Svg>
+)
+
+export const UploadIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M39 48V16.23l9.9 9.9a3 3 0 104.2-4.26l-15-15a3 3 0 00-4.2 0l-15 15a3 3 0 004.2 4.26L33 16.2V48a3 3 0 006 0zM9 60a3 3 0 000 6h54a3 3 0 000-6H9z" />
+    </Svg>
+)
+
+export const DownloadIcon = ({ width = 24, height = 24, color = "white", ...props }: SvgProps) => (
+    <Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+        <Path d="M36 6a3 3 0 013 3v31.77l9.9-9.9a3 3 0 114.2 4.26l-15 15a3 3 0 01-4.2 0l-15-15a3 3 0 114.2-4.26l9.9 9.9V9a3 3 0 013-3zM9 60a3 3 0 000 6h54a3 3 0 000-6H9z" />
+    </Svg>
+)
+

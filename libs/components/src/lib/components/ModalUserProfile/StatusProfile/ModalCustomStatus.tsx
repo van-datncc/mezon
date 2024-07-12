@@ -30,7 +30,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 						</div>
 						<input
 							type="text"
-							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-[#26262B] bg-bgLightModeThird text-base rounded placeholder:text-sm"
+							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
 							placeholder="Support has arrived!"
 						/>
 					</div>
@@ -42,7 +42,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 dark:bg-[#26262B] bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
+								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 dark:bg-bgInputDark bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
 									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] list-none select-none">Today</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
@@ -66,7 +66,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm h-9 dark:bg-[#26262B] bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
+								<div className="flex items-center justify-between rounded-sm h-9 dark:bg-bgInputDark bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
 									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] cursor-pointer list-none select-none">Online</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
@@ -113,7 +113,7 @@ const ItemSelect = ({ children, dropdown, startIcon, onClick }: ItemSelectProps)
 	return (
 		<div
 			onClick={onClick}
-			className="flex items-center justify-between h-11 rounded-sm dark:bg-[#26262B] bg-bgLightModeThird cursor-pointer  dark:hover:bg-zinc-700 hover:bg-bgLightMode dark:hover:[&>li]:text-[#fff] hover:[&>li]:text-[#000] px-3"
+			className="flex items-center justify-between h-11 rounded-sm dark:bg-bgInputDark bg-bgLightModeThird cursor-pointer  dark:hover:bg-zinc-700 hover:bg-bgLightMode dark:hover:[&>li]:text-[#fff] hover:[&>li]:text-[#000] px-3"
 		>
 			{startIcon && <div className="flex items-center justify-center h-[18px] w-[18px] mr-2">{startIcon}</div>}
 			<li className="text-[14px] dark:text-[#B5BAC1] text-[#777777] w-full list-none leading-[44px]">{children}</li>

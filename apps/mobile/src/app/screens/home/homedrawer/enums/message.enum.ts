@@ -16,4 +16,6 @@ export enum EMessageActionType {
 	CopyMessageLink,
 	Report,
 	UnPinMessage,
+	SaveImage,
+	CopyMediaLink
 }

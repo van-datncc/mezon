@@ -28,7 +28,8 @@ import appearanceSetting from "./appearanceSetting.json";
 import appThemeSetting from "./appThemeSetting.json";
 import accountSetting from "./accountSetting.json";
 import clanRoles from "./clanRoles.json";
- 
+import deleteClan from "./deleteClan.json";
+
 export default {
 	inviteToChannel,
 	notification,
@@ -59,5 +60,6 @@ export default {
 	appearanceSetting,
 	appThemeSetting,
 	accountSetting,
-	clanRoles
+	clanRoles,
+  	deleteClan
 };

@@ -1,5 +1,4 @@
 import {
-	useAppParams,
 	useChannelMembers,
 	useChannels,
 	useClickUpToEdit,
@@ -17,8 +16,8 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
-	selectAllUsesClan,
 	selectAllDirectChannelVoids,
+	selectAllUsesClan,
 	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -28,6 +27,8 @@ import {
 	selectIdMessageRefReply,
 	selectIsFocused,
 	selectIsShowMemberList,
+	selectIsShowMemberListDM,
+	selectIsUseProfileDM,
 	selectLassSendMessageEntityBySenderId,
 	selectMessageByMessageId,
 	selectOpenEditMessageState,
@@ -51,27 +52,40 @@ import {
 	UserMentionsOpt,
 	UsersClanEntity,
 	focusToElement,
-	regexToDetectGifLink,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
 } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
-import { widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
+import {
+	defaultMaxWidth,
+	maxWidthWithChatThread,
+	maxWidthWithDmGroupMemberList,
+	maxWidthWithDmUserProfile,
+	maxWidthWithMemberList,
+	maxWidthWithSearchMessage,
+	widthDmGroupMemberList,
+	widthDmUserProfile,
+	widthMessageViewChat,
+	widthMessageViewChatThread,
+	widthSearchMessage,
+	widthThumbnailAttachment,
+} from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import { ChannelStreamMode } from 'mezon-js';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -116,7 +130,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelVoids = useSelector(selectAllDirectChannelVoids)
+	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
@@ -133,11 +147,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const { isSearchMessage } = useSearchMessages();
+	const { directId } = useParams();
 
 	const userProfile = useSelector(selectAllAccount);
 	const lastMessageByUserId = useSelector((state) =>
-		selectLassSendMessageEntityBySenderId(state, currentChannel?.channel_id, userProfile?.user?.id),
+		selectLassSendMessageEntityBySenderId(state, currentChannel?.channel_id ?? directId, userProfile?.user?.id),
 	);
 
 	const { valueTextInput, setValueTextInput } = useMessageValue(
@@ -344,17 +361,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					username: mention.display ?? '',
 				}))
 			: [];
-		const linkGifDirect = newValue?.match(regexToDetectGifLink);
-
-		if (linkGifDirect && linkGifDirect?.length > 0) {
-			const newAttachmentDataRef = linkGifDirect
-				.filter((item) => item !== null)
-				.map((item: string) => ({
-					filetype: 'image/gif',
-					url: item,
-				}));
-			setAttachmentData(newAttachmentDataRef);
-		}
 
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue, props.isThread);
@@ -441,7 +447,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSearchHashtag = (search: any, callback: any) => {
 		setValueHightlight(search);
-		if (props.mode === ChannelStreamMode.STREAM_MODE_DM){
+		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
 			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
 		} else {
 			callback(searchMentionsHashtag(search, listChannelsMention ?? []));
@@ -496,6 +502,38 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	}, [dispatch, isFocused]);
 
+	const [mentionWidth, setMentionWidth] = useState('');
+	const [chatBoxMaxWidth, setChatBoxMaxWidth] = useState('');
+
+	useEffect(() => {
+		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
+			setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
+			setChatBoxMaxWidth(isShowDMUserProfile ? maxWidthWithDmUserProfile : defaultMaxWidth);
+		} else if (props.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
+			setChatBoxMaxWidth(isShowMemberListDM ? maxWidthWithDmGroupMemberList : defaultMaxWidth);
+		} else {
+			setMentionWidth(
+				isShowMemberList
+					? widthMessageViewChat
+					: isShowCreateThread
+						? widthMessageViewChatThread
+						: isSearchMessage
+							? widthSearchMessage
+							: widthThumbnailAttachment,
+			);
+			setChatBoxMaxWidth(
+				isShowMemberList
+					? maxWidthWithMemberList
+					: isShowCreateThread
+						? maxWidthWithChatThread
+						: isSearchMessage
+							? maxWidthWithSearchMessage
+							: defaultMaxWidth,
+			);
+		}
+	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
+
 	return (
 		<div className="relative">
 			{props.isThread && !threadCurrentChannel && (
@@ -504,7 +542,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
-							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-[#26262B] bg-bgLightModeButton rounded-full pointer-events-none">
+							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-bgInputDark bg-bgLightModeButton rounded-full pointer-events-none">
 								<Icons.ThreadIcon defaultSize="w-7 h-7" />
 								{isPrivate === 1 && (
 									<div className="absolute right-4 bottom-4">
@@ -531,7 +569,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			)}
 			<MentionsInput
 				onPaste={props.handlePaste}
-				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
@@ -540,8 +577,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					...(appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle),
 					suggestions: {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.suggestions : darkMentionsInputStyle.suggestions),
-						width: `${isShowMemberList ? widthMessageViewChat : isShowCreateThread ? widthMessageViewChatThread : isSearchMessage ? widthSearchMessage : widthThumbnailAttachment}`,
+						width: `${mentionWidth}`,
 					},
+					control: {
+						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
+						maxWidth: `${chatBoxMaxWidth}`,
+					},
+					maxWidth: `${chatBoxMaxWidth}`,
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
@@ -564,8 +606,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								valueHightLight={valueHighlight}
 								name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 								avatarUrl={suggestion.avatarUrl ?? ''}
-								subText={suggestion.display === 'here' ? 'Notify everyone who has permission to see this channel' : suggestion.display  ?? ''}
-								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + 'text-xs'}
+								subText={
+									suggestion.display === 'here'
+										? 'Notify everyone who has permission to see this channel'
+										: suggestion.display ?? ''
+								}
+								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== 'here'}
 							/>
 						);
