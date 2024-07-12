@@ -12,10 +12,10 @@ const firebaseConfig = {
   measurementId: process.env.NX_CHAT_APP_FCM_MEASUREMENT_ID as string,
 };
 
-let messaging: Messaging| null = null;
+let messaging: Messaging | null = null;
 
-function isPlatformSupported() {
-  return isSupported();
+async function isPlatformSupported() {
+  return await isSupported();
 }
 
 function isMessagingAvailable(messaging: Messaging | null): messaging is Messaging {
@@ -29,6 +29,7 @@ async function initializeFirebase() {
   }
 }
 
+initializeFirebase();
 
 export const requestForToken = async () => {
   let currentToken = '';
@@ -37,14 +38,12 @@ export const requestForToken = async () => {
       throw new Error('Platform is not supported');
     }
 
-    currentToken = await getToken(messaging, { vapidKey: process.env.NX_CHAT_APP_FCM_VAPID_KEY as string});
+    currentToken = await getToken(messaging, { vapidKey: process.env.NX_CHAT_APP_FCM_VAPID_KEY as string });
   } catch (error) {
     return '';
   }
   return currentToken;
 };
-
-initializeFirebase();
 
 export const onMessageListener = () => {
   return new Promise((resolve, reject) => {
@@ -60,4 +59,4 @@ export const onMessageListener = () => {
       reject(e);
     }
   });
-}
+};
