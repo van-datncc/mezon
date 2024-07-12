@@ -323,7 +323,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.Report:
 				return <Icons.FlagIcon color={baseColor.red} height={20} width={20} />;
 			default:
-				return <View />;
+				return <View />;	
 		}
 	};
 
