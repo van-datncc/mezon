@@ -1,5 +1,5 @@
 import { useApp } from '@mezon/core';
-import { RolesClanEntity, getIsShow, getSelectedRoleId, selectTheme, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
+import { RolesClanEntity, getIsShow, getNewNameRole, getSelectedRoleId, selectTheme, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
@@ -14,7 +14,7 @@ const SettingListRole = (props: closeEditRole) => {
 
 	const clickRole = useSelector(getSelectedRoleId);
 	const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
-	const [nameRoleNew] = useState('New role');
+	const nameRoleNew = useSelector(getNewNameRole);
 
 	const dispatch = useDispatch();
 	const handleRoleClick = (roleId: string) => {
@@ -47,9 +47,9 @@ const SettingListRole = (props: closeEditRole) => {
 			<div className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
 				{clickedRole === 'New Role' ? (
 					<div>
-						<button className="w-full py-1.5 px-[10px] text-[15px] dark:bg-[#4e5058] bg-bgModifierHoverLight text-white font-bold inline-flex gap-x-2 items-center rounded">
+						<button className="w-full py-1.5 px-[10px] text-[15px] dark:bg-[#4e5058] bg-bgModifierHoverLight dark:text-textDarkTheme text-textSecondary800 font-medium inline-flex gap-x-2 items-center rounded">
 							<div className='size-3 bg-contentTertiary rounded-full min-w-3'></div>
-							<span className='one-line'>{nameRoleNew}</span>
+							<span className='one-line'>{nameRoleNew ?? 'New Role'}</span>
 						</button>
 					</div>
 				) : (

@@ -1,17 +1,15 @@
 import { useMemo } from "react";
-import { IMezonMenuSectionProps, MezonMenu, MezonRadioButton } from "../../temp-ui";
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonRadioButton } from "../../temp-ui";
 import { View } from "react-native";
 import { useState } from "react";
 
-export type IMzoneOptionData = {
-    description ?: string;
-    title: string;
+export type IMezonOptionData = (Omit<IMezonMenuItemProps, "onPress"> & {
     value: number | string;
-}[]
+})[]
 
 interface IMezonOptionProps extends Omit<IMezonMenuSectionProps, "items"> {
     onChange?: (value: number | string) => void;
-    data: IMzoneOptionData
+    data: IMezonOptionData
     value?: number | string;
 }
 
@@ -25,16 +23,16 @@ export default function MezonOption({ data, onChange, value, ...menuProps }: IMe
 
     const menu = useMemo(() => ([
         {
-            items: data.map((item) => ({
-                ...item,
+            items: data.map(({ value, ...props }) => ({
+                ...props,
                 component: (
                     <MezonRadioButton
-                        checked={item.value === currentValue}
-                        onChange={() => handleChange(item.value)}
+                        checked={value === currentValue}
+                        onChange={() => handleChange(value)}
                         noSwitchFalse
                     />
                 ),
-                onPress: () => handleChange(item.value)
+                onPress: () => handleChange(value)
             })),
             ...menuProps
         }

@@ -12,7 +12,9 @@
         "report": "Báo cáo",
         "forward": "Chuyển tiếp",
         "polls": "Polls",
-        "files": "Files"
+        "files": "Files",
+        "saveImage": "Lưu ảnh",
+        "copyMediaLink": "Sao chép đường dẫn media"
     },
     "chatBox": {
         "replyingTo": "Đang phản hổi",

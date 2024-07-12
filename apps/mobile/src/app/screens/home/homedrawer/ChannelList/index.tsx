@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
 import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	appActions,
@@ -184,7 +184,11 @@ const ChannelList = React.memo((props: any) => {
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
 						<Icons.CalendarIcon height={20} width={20} color={themeValue.text} />
-						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
+						<Text style={{ color: themeValue.textStrong }}>{
+							allEventManagement?.length > 0
+								? `${allEventManagement?.length} Events`
+								: 'Events'
+						}</Text>
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
@@ -220,10 +224,11 @@ const ChannelList = React.memo((props: any) => {
 			<MezonBottomSheet
 				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}
+				heightFitContent={allEventManagement?.length === 0}
 				headerRight={
 					currentClan?.creator_id === user?.userId && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
-							<Text style={{ color: 'white' }}>Create</Text>
+							<Text style={{ color: baseColor.blurple, fontWeight: "bold" }}>Create</Text>
 						</TouchableOpacity>
 					)
 				}
