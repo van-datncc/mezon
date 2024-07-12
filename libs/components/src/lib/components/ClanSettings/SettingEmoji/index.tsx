@@ -1,9 +1,7 @@
-import SettingEmojiList from "./SettingEmojiList";
-import { IUserAccount } from "@mezon/utils";
-import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
-import { useDispatch, useSelector } from "react-redux";
+import SettingEmojiList from "./SettingEmojiList"
+import {  useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
-import { AppDispatch, selectAllEmoji, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { fetchEmojisByClanId, selectAllEmoji, selectCurrentClanId, useAppDispatch } from "@mezon/store";
 
 const SettingEmoji = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -12,7 +10,6 @@ const SettingEmoji = () => {
   const currentClanId = useSelector(selectCurrentClanId) ?? '';
 
   const emojiList = useSelector(selectAllEmoji);
-  console.log(emojiList);
 
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
