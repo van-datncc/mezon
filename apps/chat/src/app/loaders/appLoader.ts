@@ -1,8 +1,9 @@
-import { AppDispatch, appActions } from '@mezon/store';
+import { AppDispatch, appActions, authActions } from '@mezon/store';
 import { LoaderFunctionArgs } from 'react-router-dom';
 
 export interface IAppLoaderData {
 	pathname: string;
+	redirectTo?: string;
 }
 
 type DataFunctionValue = Response | NonNullable<unknown> | null;
@@ -23,11 +24,21 @@ export type CustomLoaderFunction<Context = any> = {
 
 export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const { pathname } = window.location;
-
+	let redirectTo = ""
+	const paramString = window.location.href.split("?")[1];
+	const params = new URLSearchParams(paramString);
+	const result = Object.fromEntries(params.entries());
+	const {deepLinkUrl}= result
+	if (deepLinkUrl) {
+		redirectTo = "/guess/login?deepLinkUrl="+deepLinkUrl
+		const data = JSON.parse(decodeURIComponent(deepLinkUrl));
+		await dispatch(authActions.setSession(data));
+	}
 	dispatch(appActions.setInitialPath(pathname));
-
+	dispatch(appActions.setInitialParams(params));
 	return {
 		pathname,
+		redirectTo,
 	} as IAppLoaderData;
 };
 

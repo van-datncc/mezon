@@ -1,9 +1,8 @@
 import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import FastImage from "react-native-fast-image";
 import { style } from "./styles";
 import MezonButtonIcon from "apps/mobile/src/app/temp-ui/MezonButtonIcon";
-import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps } from "apps/mobile/src/app/temp-ui";
+import { reserve, MezonMenu, IMezonMenuSectionProps, IMezonMenuItemProps, MezonClanAvatar } from "apps/mobile/src/app/temp-ui";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { ClansEntity } from "@mezon/store-mobile";
@@ -17,6 +16,9 @@ import { useAuth, useClans } from "@mezon/core";
 import { useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { Icons } from "@mezon/mobile-components";
 import { baseColor, useTheme } from "@mezon/mobile-ui";
+import DeleteClanModal from "../../../../../../components/DeleteClanModal";
+import { useState } from "react";
+import { useMemo } from "react";
 
 interface IServerMenuProps {
     clan: ClansEntity;
@@ -26,6 +28,7 @@ interface IServerMenuProps {
 export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
     const { t } = useTranslation(['clanMenu']);
     const { themeValue } = useTheme();
+    const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
     const styles = style(themeValue);
 
     const user = useAuth();
@@ -36,6 +39,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         inviteRef?.current.present();
         dismiss();
     }
+    const isOwner = useMemo(()=>  user?.userId === clan?.creator_id, [user, clan]);
 
     const handleOpenSettings = () => {
         navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
@@ -108,13 +112,15 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         },
         {
             onPress: () => reserve(),
-            isShow: user.userId !== clan?.creator_id,
+            isShow: !isOwner,
             title: t('menu.optionsMenu.leaveServer'),
             textStyle: { color: "red" }
         },
         {
-            onPress: () => reserve(),
-            isShow: user.userId === clan?.creator_id,
+            onPress: () => {
+              setIsVisibleDeleteModal(true)
+            },
+            isShow: isOwner,
             title: t('menu.optionsMenu.deleteClan'),
             textStyle: { color: "red" }
         },
@@ -153,9 +159,9 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.avatarWrapper}>
-                    <FastImage
-                        source={{ uri: clan?.logo }}
-                        style={{ width: "100%", height: "100%" }}
+                    <MezonClanAvatar
+                        image={clan?.logo}
+                        alt={clan?.clan_name}
                     />
                 </View>
                 <Text style={styles.serverName}>{clan?.clan_name}</Text>
@@ -178,7 +184,7 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                         icon={<Icons.BellIcon color={themeValue.textStrong} />}
                         onPress={() => reserve()} />
 
-                    {user.userId === clan?.creator_id &&
+                    {isOwner &&
                         <MezonButtonIcon
                             title={t("actions.settings")}
                             icon={<Icons.SettingsIcon color={themeValue.textStrong} />}
@@ -187,11 +193,13 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
                     }
 
                 </ScrollView>
-
                 <View>
                     <MezonMenu menu={menu} />
                 </View>
             </View>
+            <DeleteClanModal  isVisibleModal={isVisibleDeleteModal} visibleChange={(isVisible)=>{
+              setIsVisibleDeleteModal(isVisible)
+            }}></DeleteClanModal>
         </View>
     )
 }
