@@ -1,25 +1,45 @@
 
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectMemberClanByUserId } from "@mezon/store";
+import {selectCurrentClanId, selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch} from "@mezon/store";
+import {MezonUpdateClanEmojiByIdBody} from "mezon-js/api.gen";
 
 type SettingEmojiItemProp = {
   src: string,
   emojiName: string,
   author: string,
+  category: string,
 }
 
-const SettingEmojiItem = ({ src, author, emojiName }: SettingEmojiItemProp) => {
+const SettingEmojiItem = ({ src, author, emojiName, category }: SettingEmojiItemProp) => {
   const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
   const [showEdit, setShowEdit] = useState<boolean>(false);
+  const dispatch = useAppDispatch()
+  
+  const dataAuthor = useSelector(selectMemberClanByUserId("1809069169707061248"));
+  const currentClanId = useSelector(selectCurrentClanId) || '';
+  
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
-
+    console.log (e.target.value);
   }
-  const dataAuthor = useSelector(selectMemberClanByUserId("1809069169707061248"));
+  
+  const handleUpdateEmoji = () => {
+    console.log ('update')
+    const request: MezonUpdateClanEmojiByIdBody = {
+      source: src,
+      shortname: nameEmoji,
+      category: category,
+    }
+    dispatch(settingClanEmojiActions.updateEmoji({request, currentClanId}))
+  }
 
   return (
-    <div className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
+    <div
+      className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
+      onMouseEnter={() => setShowEdit(true)}
+      onMouseLeave={() => setShowEdit(false)}
+    >
       <div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
 
         <div className={'w-14 h-8'}>
@@ -37,7 +57,12 @@ const SettingEmojiItem = ({ src, author, emojiName }: SettingEmojiItemProp) => {
 
           {
             showEdit &&
-            <input className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`} value={nameEmoji} onChange={(e) => handleChangeEmojiName(e)} />
+            <input
+              className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
+              value={nameEmoji}
+              onChange={(e) => handleChangeEmojiName(e)}
+              onKeyDown={(e) => {e.key === 'Enter' && handleUpdateEmoji()}}
+            />
           }
         </div>
 

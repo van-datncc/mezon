@@ -7,7 +7,12 @@ import {
   EntityState,
   createSelector
 } from '@reduxjs/toolkit';
-import {ApiClanEmoji, ApiClanEmojiCreateRequest, ApiClanEmojiList} from 'mezon-js/api.gen';
+import {
+  ApiClanEmoji,
+  ApiClanEmojiCreateRequest,
+  ApiClanEmojiList,
+  MezonUpdateClanEmojiByIdBody
+} from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 import {StickersEntity} from "../giftStickerEmojiPanel/stickers.slice";
 
@@ -26,6 +31,11 @@ type fetchEmojiRequest = {
   clanId: string;
 }
 
+type updateEmojiRequest = {
+  request: MezonUpdateClanEmojiByIdBody,
+  currentClanId: string
+}
+
 export const initialSettingClanEmojiState: SettingClanEmojiState = {
 	loadingStatus: 'not loaded',
 	error: null,
@@ -35,11 +45,9 @@ export const initialSettingClanEmojiState: SettingClanEmojiState = {
   },
 };
 
-// export interface IEmojiState extends EntityState<any, any>
-
 export const emojiAdapter = createEntityAdapter<StickersEntity>();
 
-export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji/fetchClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
+export const fetchEmojisByClanId = createAsyncThunk('settingClanEmoji/fetchClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
@@ -50,7 +58,7 @@ export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoj
 	}
 });
 
-export const createEmoji = createAsyncThunk('settingClan/settingClanEmoji/createEmoji', async (request: ApiClanEmojiCreateRequest, thunkAPI) => {
+export const createEmoji = createAsyncThunk('settingClanEmoji/createEmoji', async (request: ApiClanEmojiCreateRequest, thunkAPI) => {
   try {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const res = await mezon.client.createClanEmoji(mezon.session, request);
@@ -63,6 +71,20 @@ export const createEmoji = createAsyncThunk('settingClan/settingClanEmoji/create
       return newEmoji;
     }
   } catch (error) {
+    return thunkAPI.rejectWithValue({})
+  }
+});
+
+export const updateEmoji = createAsyncThunk('settingClanEmoji/updateEmoji', async ({request, currentClanId}: updateEmojiRequest, thunkAPI) => {
+  try {
+    console.log (request, currentClanId);
+    const mezon = await ensureSession(getMezonCtx(thunkAPI));
+    const res = await mezon.client.updateClanEmojiById(mezon.session, currentClanId, request);
+    if(res) {
+      console.log (res);
+    }
+  } catch (error) {
+    console.log (request, currentClanId);
     return thunkAPI.rejectWithValue({})
   }
 })
@@ -95,6 +117,9 @@ export const settingClanEmojiSlice = createSlice({
           }
         }
       })
+      .addCase(updateEmoji.fulfilled, (state: SettingClanEmojiState, action) => {
+        console.log (action.payload)
+      })
 	},
 });
 
@@ -105,5 +130,5 @@ export const selectAllEmoji = createSelector(getEmojiSettingState, (state) => st
 
 export const settingClanEmojiReducer = settingClanEmojiSlice.reducer;
 
-export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, fetchEmojisByClanId, createEmoji };
+export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, fetchEmojisByClanId, createEmoji, updateEmoji };
 
