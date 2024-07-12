@@ -1,4 +1,4 @@
-import {isGifFile, isImageFile, LoadingStatus} from '@mezon/utils';
+import {IEmoji, isGifFile, isImageFile, LoadingStatus} from '@mezon/utils';
 import {
   PayloadAction,
   createAsyncThunk,
@@ -35,11 +35,15 @@ export const initialSettingClanEmojiState: SettingClanEmojiState = {
   },
 };
 
+export interface EmojiEntity extends IEmoji {
+  id: string;
+}
+
 // export interface IEmojiState extends EntityState<any, any>
 
-export const emojiAdapter = createEntityAdapter<StickersEntity>();
+export const emojiAdapter = createEntityAdapter<EmojiEntity>();
 
-export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
+export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoji/fetchClanEmoji', async ({clanId}: fetchEmojiRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
@@ -50,11 +54,18 @@ export const fetchEmojisByClanId = createAsyncThunk('settingClan/settingClanEmoj
 	}
 });
 
-export const createEmoji = createAsyncThunk('settingClan/settingClanEmoji', async (request: ApiClanEmojiCreateRequest, thunkAPI) => {
+export const createEmoji = createAsyncThunk('settingClan/settingClanEmoji/createEmoji', async (request: ApiClanEmojiCreateRequest, thunkAPI) => {
   try {
     const mezon = await ensureSession(getMezonCtx(thunkAPI));
     const res = await mezon.client.createClanEmoji(mezon.session, request);
-    return res;
+    if(res) {
+      const newEmoji: ApiClanEmoji = {
+        src: request.source,
+        category: request.category,
+        shortname: request.shortname,
+      }
+      return newEmoji;
+    }
   } catch (error) {
     return thunkAPI.rejectWithValue({})
   }
@@ -69,18 +80,25 @@ export const settingClanEmojiSlice = createSlice({
 		builder
 			.addCase(fetchEmojisByClanId.fulfilled, (state: SettingClanEmojiState, actions: PayloadAction<ApiClanEmojiList>) => {
 				state.loadingStatus = 'loaded';
-        console.log (actions.payload.emoji_list)
 				state.listEmoji.staticEmoji = actions.payload.emoji_list?.filter(emoji => isImageFile(emoji.src ?? '')) ?? [];
         state.listEmoji.animatedEmoji = actions.payload.emoji_list?.filter(emoji => isGifFile(emoji.src ?? '')) ?? [];
 			})
 			.addCase(fetchEmojisByClanId.pending, (state: SettingClanEmojiState) => {
 				state.loadingStatus = 'loading';
-        console.log ('loading')
 			})
 			.addCase(fetchEmojisByClanId.rejected, (state: SettingClanEmojiState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
+      .addCase(createEmoji.fulfilled, (state: SettingClanEmojiState, action) => {
+        if(action.payload) {
+          if(isImageFile(action.payload.src ?? '')) {
+            state.listEmoji.staticEmoji.unshift(action.payload);
+          } else if(isGifFile(action.payload.src ?? '')) {
+            state.listEmoji.animatedEmoji.unshift(action.payload);
+          }
+        }
+      })
 	},
 });
 

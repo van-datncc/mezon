@@ -24,10 +24,9 @@ const SettingEmoji = () => {
   
   const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
     if(e.target.files) {
-      console.log (e.target.files[0]);
       const file = e.target.files[0];
       const imageSize = file?.size;
-      const fileName = file?.name;
+      const fileName = file?.name.slice(62);
       const session = sessionRef.current;
       const client = clientRef.current;
       const category = 'Custom';
@@ -68,7 +67,7 @@ const SettingEmoji = () => {
   
   useEffect(() => {
     fetchEmojis();
-  }, [fetchEmojis, emojiList.staticEmoji.length, emojiList.animatedEmoji.length]);
+  }, [fetchEmojis]);
   
   return (
     <>
