@@ -22,7 +22,7 @@ export const ActionRow = React.memo(() => {
 	const actionList = [
 		{
 			title: 'Search',
-			action: () => {},
+			action: () => { },
 			icon: <SearchIcon width={22} height={22} />,
 			hidden: true,
 		},
@@ -44,7 +44,14 @@ export const ActionRow = React.memo(() => {
 		},
 		{
 			title: 'Settings',
-			action: () => {},
+			action: () => {
+				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
+					params: {
+						channelId: currentChannel?.channel_id
+					}
+				});
+			},
 			icon: <SettingIcon width={22} height={22} />,
 			hidden: true,
 		},
