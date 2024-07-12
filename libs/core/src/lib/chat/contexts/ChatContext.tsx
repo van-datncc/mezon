@@ -129,7 +129,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[currentChannel?.channel_id, dispatch],
 	);
 	const ondisconnect = useCallback(() => {
-		console.log("sadfd");
 		
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
