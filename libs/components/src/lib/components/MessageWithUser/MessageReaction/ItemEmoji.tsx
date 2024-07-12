@@ -49,6 +49,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			message.clan_id || '',
 			message.channel_id,
 			messageId ?? '',
 			emoji ?? '',

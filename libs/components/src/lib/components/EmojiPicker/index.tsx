@@ -77,6 +77,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+				currentChannel?.clan_id || '',
 				channelID ?? '',
 				props.messageEmojiId ?? '',
 				emojiPicked.trim(),
