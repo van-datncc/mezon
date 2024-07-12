@@ -77,7 +77,7 @@ export default class App {
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
-				if (process.platform == 'win32') {
+				if (process.platform == 'win32' || process.platform == 'linux') {
 					deeplinkingUrl = argv.slice(1);
 
 					const url = argv.pop().slice(1);
@@ -87,8 +87,7 @@ export default class App {
 						const dataString = url.substring(index + 1);
 
 						if (dataString) {
-							App.mainWindow.webContents.send('send-data-to-renderer', dataString);
-							App.loadMainWindow();
+							App.loadMainWindow({ deepLinkUrl: dataString });
 						}
 					}
 				}
@@ -119,7 +118,7 @@ export default class App {
 		App.mainWindow.once('ready-to-show', () => {
 			App.mainWindow.show();
 		});
-
+		App.mainWindow.webContents.openDevTools()
 		// handle all external redirects in a new browser window
 		App.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 			shell.openExternal(url);
@@ -129,27 +128,44 @@ export default class App {
 		// Emitted when the window is closed.
 		App.mainWindow.on('close', (event) => this.onClose(event));
 	}
-
-	private static loadMainWindow() {
-		// load the index.html of the app.
-		if (!App.application.isPackaged) {
-			App.mainWindow.loadURL(`http://localhost:${rendererAppPort}`);
-		} else {
-			App.mainWindow.loadURL(
-				format({
-					pathname: join(__dirname, '..', rendererAppName, 'index.html'),
-					protocol: 'file:',
-					slashes: true,
-				}),
-			);
-		}
-
-		if (process.platform == 'win32') {
-			// Keep only command line / deep linked arguments
-			deeplinkingUrl = process.argv.slice(1);
-			App.application.setAppUserModelId('Mezon');
-		}
+	private static generateQueryString(params: Record<string, string>): string {
+		return Object.keys(params).map((key) => {
+			return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+		}).join('&');
 	}
+
+	private static generateFullUrl(base: string, params: Record<string, string>): string {
+		if (params) {
+			const queryString = App.generateQueryString(params);
+			return queryString ? `${base}?${queryString}` : base;
+		}
+		return base
+	}
+
+	private static loadMainWindow(params?: Record<string, string>) {
+        // load the index.html of the app.
+        if (!App.application.isPackaged) {
+            const baseUrl = `http://localhost:${rendererAppPort}`;
+            const fullUrl =  this.generateFullUrl(baseUrl, params);
+            App.mainWindow.loadURL(fullUrl);
+        } else {
+            const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
+            App.mainWindow.loadURL(
+                format({
+                    pathname: baseUrl,
+                    protocol: 'file:',
+                    slashes: true,
+					query: params
+                }),
+            );
+        }
+    
+        if (process.platform == 'win32'|| process.platform == 'linux') {
+            // Keep only command line / deep linked arguments
+            deeplinkingUrl = process.argv.slice(1);
+            App.application.setAppUserModelId('Mezon');
+        }
+    }
 	private static handleTray() {
 		let mezonTray = null;
 		App.application.whenReady().then(() => {
