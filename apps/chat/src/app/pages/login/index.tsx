@@ -12,14 +12,6 @@ function Login() {
 	const dispatch = useAppDispatch();
 	const isLogin = useSelector(selectIsLogin);
 	const { redirectTo } = useLoaderData() as ILoginLoaderData;
-	const deepLinkUrl = JSON.parse(localStorage.getItem('deepLinkUrl') as string);
-	useEffect(() => {
-		if (deepLinkUrl && isElectron()) {
-			const data = JSON.parse(decodeURIComponent(deepLinkUrl));
-			dispatch(authActions.setSession(data));
-			localStorage.removeItem('deepLinkUrl');
-		}
-	}, [deepLinkUrl, dispatch]);
 
 	useEffect(() => {
 		if (isLogin) {

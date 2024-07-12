@@ -1,0 +1,8 @@
+{
+  "deleteClanModal": {
+    "title": "Xóa clan",
+    "description": "Bạn có chắc chắn muốn xóa {{currentClan}} không? Hành động này không thể hoàn tác.",
+    "confirm": "Có",
+    "cancel": "Không"
+  }
+}

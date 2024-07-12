@@ -1,6 +1,7 @@
 import {
 	directActions,
 	messagesActions,
+	selectCurrentClanId,
 	selectDirectById,
 	useAppDispatch,
 } from '@mezon/store';
@@ -23,6 +24,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
 	const channel = useSelector(selectDirectById(channelId));
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const sendDirectMessage = React.useCallback(
 		async (content: IMessageSendPayload,
@@ -52,7 +54,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId: channelId, mode: mode}));
+		dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId: channelId, mode: mode}));
 	}, [channelId, dispatch, mode]);
 
 	return useMemo(

@@ -27,7 +27,8 @@ import channelSetting from "./channelSetting.json";
 import appearanceSetting from "./appearanceSetting.json";
 import appThemeSetting from "./appThemeSetting.json";
 import accountSetting from "./accountSetting.json";
- 
+import deleteClan from "./deleteClan.json";
+
 export default {
 	inviteToChannel,
 	notification,
@@ -57,5 +58,6 @@ export default {
 	channelSetting,
 	appearanceSetting,
 	appThemeSetting,
-	accountSetting
+	accountSetting,
+  deleteClan
 };

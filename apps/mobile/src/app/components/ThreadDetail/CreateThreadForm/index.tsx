@@ -1,12 +1,12 @@
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
-import { ActionEmitEvent, ThreadIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, STORAGE_KEY_CLAN_CURRENT_CACHE, ThreadIcon, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	RootState,
 	channelsActions,
+	clansActions,
 	createNewChannel,
 	getStoreAsync,
-	messagesActions,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -16,12 +16,12 @@ import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, TextInput, View } from 'react-native';
-import { Text } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import UseMentionList from '../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChatBox from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
@@ -30,7 +30,6 @@ import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { validInput } from '../../../utils/validate';
 import { ErrorInput } from '../../ErrorInput';
 import { styles } from './CreateThreadForm.style';
-import UseMentionList from '../../../hooks/useUserMentionList';
 
 export default function CreateThreadForm() {
 	const dispatch = useAppDispatch();
@@ -43,8 +42,8 @@ export default function CreateThreadForm() {
 	const navigation = useNavigation();
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
-	const { valueThread , threadCurrentChannel} = useThreads();
-  const listMentions = UseMentionList(currentChannelId || '');
+	const { valueThread, threadCurrentChannel } = useThreads();
+	const listMentions = UseMentionList(currentChannelId || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
@@ -81,6 +80,7 @@ export default function CreateThreadForm() {
 					Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
 				} else {
 					handleRouteData(newThreadResponse.payload as IChannel);
+					return newThreadResponse?.payload;
 				}
 			} catch (error) {
 				Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
@@ -99,14 +99,17 @@ export default function CreateThreadForm() {
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
-					await createThread(value);
+					const thread = await createThread(value);
+					if (thread) {
+						await dispatch(clansActions.joinClan({ clanId: currentClanId as string }));
+						await sendMessageThread(content, mentions, attachments, references, thread as ApiChannelDescription);
+					}
 				}
-				await sendMessageThread(content, mentions, [], []);
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, sendMessageThread, sessionUser],
+		[createThread, sendMessageThread, sessionUser, currentClanId, dispatch],
 	);
 
 	useEffect(() => {
@@ -129,7 +132,8 @@ export default function CreateThreadForm() {
 		navigation.navigate(APP_SCREEN.HOME as never);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
-		// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 
@@ -159,7 +163,7 @@ export default function CreateThreadForm() {
 									placeholderTextColor="#7e848c"
 									placeholder="New Thread"
 									style={styles.inputThreadName}
-                  maxLength={64}
+									maxLength={64}
 								/>
 								{!isCheckValid && <ErrorInput style={styles.errorMessage} errorMessage={t('errorMessage')} />}
 							</SafeAreaView>
@@ -183,11 +187,11 @@ export default function CreateThreadForm() {
 							{valueThread && openThreadMessageState && (
 								<View style={styles.messageBox}>
 									<MessageItem
-                    listMentions={listMentions}
+										listMentions={listMentions}
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}
-                    					isNumberOfLine={true}
+										isNumberOfLine={true}
 										preventAction
 									/>
 								</View>

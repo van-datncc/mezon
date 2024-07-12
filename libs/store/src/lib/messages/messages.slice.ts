@@ -195,6 +195,7 @@ export const fetchMessages = createAsyncThunk(
 
 			if (lastMessage) {
 				seenMessagePool.updateKnownSeenMessage({
+					clanId: lastMessage.clan_id || '',
 					channelId: lastMessage.channel_id || '',
 					channelLabel: lastMessage.channel_label,
 					messageId: lastMessage.id,
@@ -254,17 +255,18 @@ export const jumpToMessage = createAsyncThunk(
 );
 
 type UpdateMessageArgs = {
+	clanId: string;
 	channelId: string;
 	messageId: string;
 };
 
 export const updateLastSeenMessage = createAsyncThunk(
 	'messages/updateLastSeenMessage',
-	async ({ channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
+			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
 		} catch (e) {
 			console.error('Error updating last seen message', e);
 		}
@@ -387,13 +389,14 @@ export const updateTypingUsers = createAsyncThunk(
 );
 
 export type SendMessageArgs = {
+	clanId: string;
 	channelId: string;
 	mode: number;
 };
 
-export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ channelId, mode }: SendMessageArgs, thunkAPI) => {
+export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ clanId, channelId, mode }: SendMessageArgs, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const ack = mezon.socketRef.current?.writeMessageTyping(channelId, mode);
+	const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode);
 	return ack;
 });
 
