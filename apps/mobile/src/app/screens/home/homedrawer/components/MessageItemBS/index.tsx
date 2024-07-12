@@ -323,7 +323,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.Report:
 				return <Icons.FlagIcon color={baseColor.red} height={20} width={20} />;
 			default:
-				return <View />;
+				return <View />;	
 		}
 	};
 
@@ -360,11 +360,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
+		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
 	};
 
 	const handleReact = async (mode, messageId, emoji: string, senderId) => {
-		await reactionMessageDispatch('', mode, message.channel_id ?? '', messageId ?? '', emoji?.trim(), 1, senderId ?? '', false);
+		await reactionMessageDispatch('', mode, message?.clan_id, message.channel_id ?? '', messageId ?? '', emoji?.trim(), 1, senderId ?? '', false);
 		onClose();
 	};
 
