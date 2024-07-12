@@ -1,8 +1,8 @@
-import { Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 const width = Dimensions.get('window').width;
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	wrapperFooterImagesModal: {
 		flex: 1,
 		alignSelf: 'center',

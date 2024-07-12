@@ -131,11 +131,11 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					/>
 					{checkvalidate && (
 						<p className="text-[#e44141] text-xs italic font-thin">
-							Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
+							Please enter a valid clan name (max 64 characters, only words, numbers, _ or -).
 						</p>
 					)}
 					<span className="text-[14px] text-contentTertiary">
-						By creating a clan, you agree to Mezon’s <span className="text-contentBrandLight">Communnity Guidelines</span>.
+						By creating a clan, you agree to Mezon’s <span className="text-contentBrandLight">Community Guidelines</span>.
 					</span>
 				</div>
 			</div>

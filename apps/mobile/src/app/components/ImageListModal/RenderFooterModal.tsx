@@ -1,4 +1,4 @@
-import { Block, size, Text } from '@mezon/mobile-ui';
+import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
 import { selectMemberByUserId } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { clearTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { FlatList, Image, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
-import { styles } from './styles';
+import { style } from './styles';
 
 interface IRenderFooterModalProps {
 	ref?: any;
@@ -16,6 +16,8 @@ interface IRenderFooterModalProps {
 }
 
 export const RenderFooterModal = React.memo((props: IRenderFooterModalProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { idxSelected, data, onImageChangeFooter } = props;
 	const itemActive = useMemo(() => {
 		return data?.[idxSelected] || {};
