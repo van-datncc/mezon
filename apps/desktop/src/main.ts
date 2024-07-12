@@ -49,7 +49,6 @@ ipcMain.on('navigate-to-url', async (event, url) => {
 				query: { notificationUrl: url },
 			}),
 		);
-		console.log('App.mainWindow.isVisible()', App.mainWindow.isVisible());
 		if (!App.mainWindow.isVisible()) {
 			App.mainWindow.show();
 		}
