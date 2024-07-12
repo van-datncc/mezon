@@ -1,21 +1,61 @@
-import SettingEmojiList from "./SettingEmojiList"
-import {  useSelector } from "react-redux";
+import SettingEmojiList from "./SettingEmojiList";
+import { IUserAccount } from "@mezon/utils";
+import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
+import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
-import { fetchEmojisByClanId, selectAllEmoji, selectCurrentClanId, useAppDispatch } from "@mezon/store";
+import { AppDispatch, selectAllEmoji, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 
 const SettingEmoji = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openModalType, setOpenModalType] = useState(false);
   const dispatch = useAppDispatch();
-  const currentClanId = useSelector(selectCurrentClanId) ?? '';
-
+  const currentChannelId = useSelector(selectCurrentChannelId) || '';
+  const currentClanId = useSelector(selectCurrentClanId) || '';
+  const { sessionRef, clientRef } = useMezon()
   const emojiList = useSelector(selectAllEmoji);
+
+  const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if(e.target.files) {
+      const file = e.target.files[0];
+      const imageSize = file?.size;
+      const fileName = file?.name.slice(62);
+      const session = sessionRef.current;
+      const client = clientRef.current;
+      const category = 'Custom';
+      const path = 'emojis/' + category;
+      if(!client || !session) {
+        throw new Error('Client or file is not initialized')
+      }
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file?.type)) {
+        setOpenModalType(true);
+        return;
+      }
+
+      if (imageSize > 1000000) {
+        setOpenModal(true);
+        return;
+      }
+      handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, 3, path).then(async (attachment: ApiMessageAttachment) => {
+        const request: ApiClanEmojiCreateRequest = {
+          category: category,
+          clan_id: currentClanId,
+          shortname: ':' + fileName + ':',
+          source: attachment.url,
+        };
+        await dispatch(createEmoji(request));
+      })
+    }else {
+      return;
+    }
+
+  }
 
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
-      await dispatch(fetchEmojisByClanId(currentClanId));
+      await dispatch(settingClanEmojiActions.fetchEmojisByClanId({ clanId: currentClanId }));
     }
-  }, [dispatch, currentClanId]);
+  }, [dispatch]);
 
   useEffect(() => {
     fetchEmojis();
@@ -23,6 +63,7 @@ const SettingEmoji = () => {
 
   return (
     <>
+
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
         <div className={'dark:text-textSecondary flex flex-col gap-2 text-textSecondary800'}>
           <p className={''}>Add up to 250 custom emoji that anyone can use in this server. Animated GIF emoji may be used by members with Mezon Nitro</p>
@@ -50,6 +91,10 @@ const SettingEmoji = () => {
 
       <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji}/>
       <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji}/>
+
+      <ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
+
+      <ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
     </>
   )
 }
