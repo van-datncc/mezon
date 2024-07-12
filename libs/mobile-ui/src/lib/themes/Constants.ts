@@ -21,6 +21,8 @@ export type Attributes = {
     bgInputPrimary: HexColor,
     charcoal: HexColor,
     jet: HexColor,
+    channelUnread: HexColor,
+    channelNormal: HexColor,
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -57,7 +59,9 @@ export const themeColors: ThemeColor = {
         black: '#000000',
         bgInputPrimary: '#2a2e31',
         charcoal: '#2b2b2e',
-        jet: "#29292b"
+        jet: "#29292b",
+        channelUnread: "#ffffff",
+        channelNormal: "#aeaeae"
     },
     light: {
         primary: "#f2f3f5",
@@ -77,6 +81,8 @@ export const themeColors: ThemeColor = {
         black: '#FFFFFF',
         bgInputPrimary: '#a0a1a6',
         charcoal: "#f2f3f5",
-        jet: "#ecedef"
+        jet: "#ecedef",
+        channelUnread: "#000000",
+        channelNormal: "#535353"
     }
 }
