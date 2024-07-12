@@ -232,7 +232,7 @@ export const renderRulesCustom = {
 
 		//Note: Handle lost text when ```
 		if (sourceInfo) {
-			const textContent = sourceInfo.split(' ');
+			const textContent = sourceInfo?.split?.(' ');
 			if (textContent[textContent.length - 1].includes(EDITED_FLAG)) {
 				textContent.pop();
 			}
@@ -257,7 +257,7 @@ export const renderRulesCustom = {
  */
 export const formatUrls = (text: string) => {
 	const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
-	const parts = modifiedString.split('\0').filter(Boolean);
+	const parts = modifiedString?.split?.('\0')?.filter?.(Boolean);
 
 	return parts
 		?.map((part) => {
@@ -279,7 +279,7 @@ export const formatUrls = (text: string) => {
 
 export const formatEmoji = (text: string, emojiImages: IEmoji[] = [], isMessageReply: boolean) => {
 	const modifiedString = text.replace(splitBlockCodeRegex, (match) => `\0${match}\0`);
-	const parts = modifiedString.split('\0').filter(Boolean);
+	const parts = modifiedString?.split?.('\0')?.filter?.(Boolean);
 	return parts
 		?.map((part) => {
 			if (codeBlockRegex.test(part)) {
@@ -440,7 +440,7 @@ const formatMention = (
 	currentClan?: ClansEntity,
 	listMentions?: MentionDataProps[],
 ) => {
-	const parts = text.split(splitBlockCodeRegex);
+	const parts = text?.split?.(splitBlockCodeRegex);
 	return parts
 		?.map((part) => {
 			if (codeBlockRegex.test(part)) {

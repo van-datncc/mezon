@@ -207,7 +207,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		dispatch(appActions.setLoadingMainMobile(true));
 		if (media && media.length > 0) {
 			const url = media[0].url;
-			const type = media[0].filetype.split("/");
+			const type = media?.[0]?.filetype?.split?.("/");
 			const filePath = await downloadImage(url, type[1]);
 			console.log(filePath);
 
@@ -323,7 +323,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.Report:
 				return <Icons.FlagIcon color={baseColor.red} height={20} width={20} />;
 			default:
-				return <View />;	
+				return <View />;
 		}
 	};
 
