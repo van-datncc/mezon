@@ -31,6 +31,7 @@ export type MemberProfileProps = {
 	positionType?: MemberProfileType;
 	countMember?: number;
 	dataMemberCreate?: DataMemberCreate;
+	isHiddenPanel?: boolean;
 };
 
 function MemberProfile({
@@ -53,6 +54,7 @@ function MemberProfile({
 	positionType,
 	countMember,
 	dataMemberCreate,
+	isHiddenPanel,
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanelMember, setIsShowPanelMember] = useState<boolean>(false);
@@ -194,7 +196,7 @@ function MemberProfile({
 					)}
 				</div>
 			</div>
-			{isShowPanelMember && (
+			{(isShowPanelMember && !isHiddenPanel) && (
 				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} />
 			)}
 			{isShowUserProfile && listProfile ? (

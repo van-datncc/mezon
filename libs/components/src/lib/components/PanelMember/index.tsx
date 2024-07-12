@@ -15,7 +15,7 @@ type PanelMemberProps = {
 	coords: Coords;
 	member?: ChannelMembersEntity;
 	onClose: () => void;
-	onRemoveMember: () => void;
+	onRemoveMember?: () => void;
 	directMessageValue?: directMessageValueProps;
 	name?: string;
 	isMemberDMGroup: boolean;
@@ -35,7 +35,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	}, [coords.distanceToBottom]);
 
 	const handleRemoveMember = () => {
-		onRemoveMember();
+		onRemoveMember?.();
 	};
 
 	const checkAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
@@ -123,8 +123,17 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 								<ItemPanelMember children="Clan 3" />
 							</Dropdown>
 							{checkAddFriend.friend ? 
-								<ItemPanelMember children="Remove Friend" onClick={() => {deleteFriend(directMessageValue? name || '' : member?.user?.username || '', directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '');}}/> : 
-								<ItemPanelMember children="Add Friend" onClick={() => addFriend({ usernames: [directMessageValue ? name || '' : member?.user?.username || ''], ids:[]})}/>
+								<ItemPanelMember 
+									children="Remove Friend" 
+									onClick={() => {deleteFriend(directMessageValue? name || '' : member?.user?.username || '', directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '');}}
+								/> : 
+								<ItemPanelMember 
+									children="Add Friend" 
+									onClick={() => {
+										console.log(1);
+										addFriend({ usernames: [directMessageValue ? name || '' : member?.user?.username || ''], ids:[]});
+									}}
+								/>
 							}
 							<ItemPanelMember children="Block" />
 						</>
