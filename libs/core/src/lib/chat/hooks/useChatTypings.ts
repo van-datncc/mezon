@@ -1,4 +1,4 @@
-import { messagesActions, selectChannelMemberByUserIds, selectTypingUserIdsByChannelId, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectChannelMemberByUserIds, selectCurrentClanId, selectTypingUserIdsByChannelId, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -10,12 +10,13 @@ interface UseChatTypingsOptions {
 export function useChatTypings({ channelId, mode }: UseChatTypingsOptions) {
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
+	const currentClanId = useSelector(selectCurrentClanId)
 
 	const dispatch = useAppDispatch();
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId, mode }));
-	}, [channelId, dispatch, mode]);
+		dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
+	}, [channelId, currentClanId, dispatch, mode]);
 
 	return useMemo(
 		() => ({

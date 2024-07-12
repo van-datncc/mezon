@@ -1,14 +1,19 @@
 import { Dropdown } from 'flowbite-react';
 import ItemPanelMember from './ItemPanelMember';
 
-const PanelGroupDM = () => {
+interface PanelGroupDMPProps{
+	isDmGroupOwner: boolean,
+}
+
+const PanelGroupDM = ({isDmGroupOwner} : PanelGroupDMPProps) => {
+	
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
 				<ItemPanelMember children="Mark as read" />
 			</div>
 			<div className="border-b dark:border-[#2e2f34]">
-				<ItemPanelMember children="Invites" />
+				{isDmGroupOwner && (<ItemPanelMember children="Invites" />)}
 				<ItemPanelMember children="Change icon" />
 			</div>
 			<div className="border-b dark:border-[#2e2f34]">
