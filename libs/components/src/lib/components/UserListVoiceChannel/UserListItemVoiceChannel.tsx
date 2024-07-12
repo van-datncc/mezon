@@ -1,11 +1,18 @@
-import { selectChannelById, selectMemberByDisplayName, selectMembersByChannelId } from '@mezon/store';
+import { selectMemberByDisplayName } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { IChannelMember } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import { Icons } from '../../components';
+import { useEffect } from 'react';
+import { useMembersVoiceChannel } from '@mezon/core';
 
 function UserListItem({user, channelID}: {user: IChannelMember, channelID: string}){
     const member = useSelector(selectMemberByDisplayName(user.participant ||''));
+    const {setMembersVoiceChannel} = useMembersVoiceChannel();
+
+    useEffect(() => {
+        setMembersVoiceChannel(channelID, user.id);
+    },[setMembersVoiceChannel, channelID, user.id]);
 
     return(
         <div className="dark:hover:bg-[#36373D] hover:bg-bgLightModeButton w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">
