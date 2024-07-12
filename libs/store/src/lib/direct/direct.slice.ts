@@ -31,6 +31,7 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	socketStatus: LoadingStatus;
 	error?: string | null;
 	currentDirectMessageId?: string | null;
+	currentDirectMessageType?: string | null;
 	dmMetadata: EntityState<DMMeta, string>;
 }
 
@@ -161,6 +162,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	async ({ directMessageId, channelName, type, noCache = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentType((type)?.toString() || ''));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache }));
 			
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
@@ -197,6 +199,9 @@ export const directSlice = createSlice({
 		remove: directAdapter.removeOne,
 		setDmGroupCurrentId: (state, action: PayloadAction<string>) => {
 			state.currentDirectMessageId = action.payload;
+		},
+		setDmGroupCurrentType: (state, action: PayloadAction<string>) => {
+			state.currentDirectMessageType = action.payload;
 		},
 		updateDMSocket: (state, action: PayloadAction<ChannelMessageEvent>) => {
 			const payload = action.payload;
@@ -304,6 +309,8 @@ export const selectDirectMessageEntities = createSelector(getDirectState, select
 
 export const selectAllDirectMessages = createSelector(getDirectState, selectAll);
 export const selectDmGroupCurrentId = createSelector(getDirectState, (state) => state.currentDirectMessageId);
+
+export const selectDmGroupCurrentType = createSelector(getDirectState, (state) => state.currentDirectMessageType);
 
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 

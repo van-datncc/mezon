@@ -68,7 +68,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 							</button>
 							<Dropdown
 								label=""
-								className="dark:bg-[#242529] bg-bgLightMode border dark:border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px]"
+								className="dark:bg-[#242529] bg-bgLightMode border dark:border-borderDefault text-contentSecondary p-2 w-[150px] text-[14px] font-medium"
 								dismissOnClick={true}
 								placement="right-start"
 								renderTrigger={() => (
@@ -76,24 +76,25 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 										<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 									</button>
 								)}
+								style={{boxShadow: "rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px"}}
 							>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex font-semibold',
+										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-[#6a6b72] p-2 rounded-[5px] w-full flex',
 									}}
 								>
 									Start Video Call
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme p-2 rounded-[5px] w-full flex font-semibold',
+										base: 'dark:hover:bg-hoverPrimary hover:bg-bgLightModeThird dark:text-textDarkTheme text-[#6a6b72] p-2 rounded-[5px] w-full flex',
 									}}
 								>
 									Start Voice Call
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex font-semibold',
+										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex',
 									}}
 									onClick={() => handleDeleteFriend(friend?.user?.username as string, friend.user?.id as string)}
 								>
@@ -101,7 +102,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 								</Dropdown.Item>
 								<Dropdown.Item
 									theme={{
-										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex font-semibold',
+										base: 'dark:hover:bg-colorDanger dark:hover:text-contentSecondary hover:bg-bgLightModeThird p-2 rounded-[5px] w-full text-colorDanger flex',
 									}}
 									onClick={() => handleBlockFriend(friend?.user?.username as string, friend.user?.id as string)}
 								>

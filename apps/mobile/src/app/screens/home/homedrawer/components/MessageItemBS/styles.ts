@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	bottomSheetWrapper: {
 		flex: 1,
 		width: '100%',
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	messageActionGroup: {
-		backgroundColor: Colors.bgDarkSlate,
+		backgroundColor: colors.secondary,
 		marginHorizontal: size.s_10,
 		borderRadius: size.s_10,
 		overflow: 'hidden',
@@ -33,22 +33,20 @@ export const styles = StyleSheet.create({
 		gap: 20,
 		paddingHorizontal: size.s_16,
 		paddingVertical: size.s_12,
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.secondary,
 	},
 	icon: {
 		width: size.s_20,
 		height: size.s_20,
 	},
 	warningIcon: {
-		width: size.s_30,
-		height: size.s_30,
 		padding: size.s_6,
-		backgroundColor: Colors.bgReply,
+		backgroundColor: colors.tertiary,
 		borderRadius: 50,
 
 	},
 	favouriteIconItem: {
-		backgroundColor: Colors.bgDarkSlate,
+		backgroundColor: colors.secondary,
 		padding: size.s_10,
 		borderRadius: 50
 	},
@@ -57,7 +55,7 @@ export const styles = StyleSheet.create({
 		color: Colors.white,
 	},
 	actionText: {
-		color: Colors.white,
+		color: colors.text,
 	},
 	warningActionText: {
 		color: Colors.textRed,
@@ -69,7 +67,7 @@ export const styles = StyleSheet.create({
 		width: size.s_30,
 		height: size.s_4,
 		borderRadius: 20,
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.textStrong,
 	},
 	bottomSheetBarWrapper: {
 		height: 20,

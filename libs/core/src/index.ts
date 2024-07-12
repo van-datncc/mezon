@@ -49,4 +49,5 @@ export * from './lib/chat/hooks/useThreads';
 export * from './lib/chat/hooks/useVoice';
 export * from './lib/chat/hooks/useSettingFooter';
 export * from './lib/chat/hooks/useSeenMessagePool';
+export * from './lib/chat/hooks/useMembersVoiceChannel';
 export * from './lib/policy';
