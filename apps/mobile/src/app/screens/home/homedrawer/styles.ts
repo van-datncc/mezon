@@ -414,7 +414,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		marginTop: size.s_4
 	},
 	wrapperMessageBoxCombine: {
-		marginBottom: size.s_4,
+		// marginBottom: size.s_10,
 	},
 	rowMessageBox: {
 		marginLeft: 15,
