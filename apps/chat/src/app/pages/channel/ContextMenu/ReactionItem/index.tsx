@@ -35,6 +35,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, mes
 		await reactionMessageDispatch(
 			'',
 			activeMode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel?.clan_id || '',
 			channelID && channelID,
 			messageId,
 			emojiShortCode,
@@ -42,7 +43,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, activeMode, mes
 			userId.userId ?? '',
 			false,
 		);
-	}, [emojiShortCode, activeMode, messageId, channelID]);
+	}, [emojiShortCode, activeMode, messageId, channelID, currentChannel]);
 
 	return (
 		<div

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { reactionActions, useAppDispatch } from '@mezon/store';
 
+
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
@@ -12,6 +13,7 @@ export function useChatReaction() {
 		async (
 			id: string,
 			mode: number,
+			clanId: string,
 			channelId: string,
 			messageId: string,
 			emoji: string,
@@ -22,6 +24,7 @@ export function useChatReaction() {
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
+					clanId,
 					channelId,
 					mode,
 					messageId,

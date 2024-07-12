@@ -4,7 +4,6 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ChannelStreamMode } from 'mezon-js';
 import { useAppParams } from '../../app/hooks/useAppParams';
 
 export type UseChatSendingOptions = {
@@ -26,7 +25,7 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 	const direct = useSelector(selectDirectById(directMessageId || directId || ""));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
-	var channelID = channelId
+	let channelID = channelId
 	if (direct) {
 		channelID = direct.id
 	}
@@ -56,8 +55,8 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ channelId, mode }));
-	}, [channelId, dispatch, mode]);
+		dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
+	}, [channelId, currentClanId, dispatch, mode]);
 
 	// TODO: why "Edit" not "edit"?
 	// Move this function to to a new action of messages slice
@@ -74,9 +73,9 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 				throw new Error('Client is not initialized');
 			}
 			
-			await socket.updateChatMessage(channelId, mode, messageId, editMessage);
+			await socket.updateChatMessage(currentClanId || '', channelId, mode, messageId, editMessage);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, mode, channelId],
+		[sessionRef, clientRef, socketRef, channel, direct, currentClanId, channelId, mode],
 	);
 
 	return useMemo(
