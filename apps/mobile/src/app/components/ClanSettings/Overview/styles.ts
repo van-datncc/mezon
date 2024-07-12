@@ -1,4 +1,4 @@
-import {Attributes, baseColor, Colors} from "@mezon/mobile-ui";
+import { Attributes, baseColor, Colors } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -13,5 +13,3 @@ export const style = (colors: Attributes) => StyleSheet.create({
         backgroundColor: colors.primary
     },
 })
-
-export default style;

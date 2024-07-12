@@ -14,6 +14,17 @@
         "target": "nsis",
         "appId": "Mezon"
       },
+      "linux": {
+        "category": "Utility",
+        "target": "deb",
+        "mimeTypes": [
+          "x-scheme-handler/mezonapp"
+        ],
+        "desktop": {
+          "exec": "mezonapp %U"
+        },
+        "appId": "Mezon"
+      },
       "options": {
         "outputPath": "dist/apps/desktop",
         "main": "apps/desktop/src/main.ts",
@@ -78,6 +89,17 @@
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
           "appId": "Mezon"
+        },
+        "linux": {
+          "category": "Utility",
+          "target": "deb",
+          "mimeTypes": [
+            "x-scheme-handler/mezonapp"
+          ],
+          "desktop": {
+            "exec": "mezonapp %U"
+          },
+          "appId": "Mezon"
         }
       }
     },
@@ -91,6 +113,17 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
+          "appId": "Mezon"
+        },
+        "linux": {
+          "category": "Utility",
+          "target": "deb",
+          "mimeTypes": [
+            "x-scheme-handler/mezonapp"
+          ],
+          "desktop": {
+            "exec": "mezonapp %U"
+          },
           "appId": "Mezon"
         }
       }

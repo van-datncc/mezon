@@ -18,7 +18,7 @@ window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
 });
 
 window.electron?.onDeepLinkUrl((deepLinkUrl) => {
-  localStorage.removeItem('deepLinkUrl');
+  window.location.href = "/guess/login?deepLinkUrl="+deepLinkUrl;
   localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
 });
 

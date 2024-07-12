@@ -5,12 +5,12 @@ import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { memo, useEffect, useRef, useState } from 'react';
 import { DimensionValue, Platform, Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
+import MezonClanAvatar from "../MezonClanAvatar";
 
 export interface IFile {
 	uri: string;
@@ -28,6 +28,7 @@ interface IMezonImagePickerProps {
 	width?: DimensionValue;
 	showHelpText?: boolean;
 	autoUpload?: boolean;
+	alt?: string;
 }
 
 export default memo(function MezonImagePicker({
@@ -38,6 +39,7 @@ export default memo(function MezonImagePicker({
 	width = 60,
 	showHelpText,
 	autoUpload = false,
+	alt
 }: IMezonImagePickerProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -122,11 +124,15 @@ export default memo(function MezonImagePicker({
 		<TouchableOpacity onPress={() => handleImage()}>
 			<View style={styles.bannerContainer}>
 				<View style={[styles.bannerWrapper, { height, width }]}>
-					{image || !showHelpText ? (
-						<FastImage source={{ uri: image }} resizeMode="cover" style={styles.image} />
-					) : (
-						<Text style={styles.textPlaceholder}>Choose an image</Text>
-					)}
+					{image || !showHelpText
+						? (
+							<MezonClanAvatar
+								image={image}
+								alt={alt}
+							/>
+						) : (
+							<Text style={styles.textPlaceholder}>Choose an image</Text>
+						)}
 				</View>
 
 				<View style={styles.btnWrapper}>
