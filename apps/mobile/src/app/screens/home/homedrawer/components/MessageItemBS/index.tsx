@@ -364,7 +364,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleReact = async (mode, messageId, emoji: string, senderId) => {
-		await reactionMessageDispatch('', mode, message.channel_id ?? '', messageId ?? '', emoji?.trim(), 1, senderId ?? '', false);
+		await reactionMessageDispatch('', mode, message?.clan_id, message.channel_id ?? '', messageId ?? '', emoji?.trim(), 1, senderId ?? '', false);
 		onClose();
 	};
 

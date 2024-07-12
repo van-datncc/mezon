@@ -165,7 +165,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = (videoItem?: any) => {
+	const renderVideos = useCallback((videoItem?: any) => {
 		return (
 			<View
 				style={{
@@ -183,7 +183,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				)}
 			</View>
 		);
-	};
+	}, [videos]);
 
 	const imageItem = useCallback(({ image, index, checkImage }) => {
 		return (
