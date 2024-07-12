@@ -227,7 +227,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 		const updateNotiUnread = () => {
 			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
 		};
-		updateNotiUnread(); // Initial check
+		updateNotiUnread(); 
 		const handleStorageChange = (event: StorageEvent) => {
 			if (event.key === 'notiUnread') {
 				updateNotiUnread();
