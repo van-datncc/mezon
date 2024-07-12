@@ -4,7 +4,7 @@ import { Colors, useTheme } from '@mezon/mobile-ui';
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
@@ -20,6 +20,7 @@ import { DirectEntity, selectCurrentChannelId } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import {useSelector} from "react-redux";
+import { SeparatorWithLine } from '../../../../../components/Common';
 
 interface IInviteToChannelProp {
    isUnknownChannel: boolean
@@ -47,6 +48,7 @@ export const InviteToChannel = React.memo(
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
 		const [sentIdList, setSentIdList] = useState<string[]>([]);
+		const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 		const mezon = useMezon();
 
 		const userInviteList = useMemo(() => {
@@ -153,12 +155,39 @@ export const InviteToChannel = React.memo(
 			}
 		}, [currentClanId, currentChannelId]);
 
+		useEffect(() => {
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+				() => {
+					setIsKeyboardVisible(true);
+				}
+			);
+			const keyboardDidHideListener = Keyboard.addListener(
+				'keyboardDidHide',
+				() => {
+					setIsKeyboardVisible(false);
+				}
+			);
+	
+			return () => {
+			  keyboardDidShowListener.remove();
+			  keyboardDidHideListener.remove();
+			};
+		}, []);
+
+		const snapPoints = useMemo(() => {
+			if (isKeyboardVisible) {
+				return ['90%'];
+			}
+			return ['80%']
+		}, [isKeyboardVisible])
+
 		return (
 			<View>
 				<BottomSheetModal
 					ref={refRBSheet}
 					enableDynamicSizing={false}
-					snapPoints={['80%']}
+					snapPoints={snapPoints}
 					index={0}
             		animateOnMount
 					backdropComponent={Backdrop}
@@ -168,44 +197,48 @@ export const InviteToChannel = React.memo(
 					handleComponent={() => null}
 				>
 					<View style={styles.bottomSheetWrapper}>
-						<View style={styles.inviteHeader}>
-							<Text style={styles.inviteHeaderText}>{t('title')}</Text>
-						</View>
+						{!isKeyboardVisible ? (
+							<View style={styles.inviteHeader}>
+								<Text style={styles.inviteHeaderText}>{t('title')}</Text>
+							</View>
+						): null}
 					{
 						isUnknownChannel ? <Text style={styles.textUnknown}>{t('unknownChannel')}</Text> : (
 						<>
-							<View style={styles.iconAreaWrapper}>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
-								</Pressable>
-							</View>
+							{!isKeyboardVisible ? (
+								<View style={styles.iconAreaWrapper}>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
+									</Pressable>
+								</View>
+							): null}
 
 							<View style={styles.searchInviteFriendWrapper}>
 								<View style={styles.searchFriendToInviteWrapper}>
@@ -228,6 +261,10 @@ export const InviteToChannel = React.memo(
 							<BottomSheetFlatList
 								data={userInviteList}
 								keyExtractor={(item) => item?.id}
+								ItemSeparatorComponent={() => {
+									return <SeparatorWithLine style={{backgroundColor: themeValue.border}} />
+								}}
+								style={styles.inviteList}
 								renderItem={({ item }) => {
 									return <FriendListItem
 										key={item?.id}

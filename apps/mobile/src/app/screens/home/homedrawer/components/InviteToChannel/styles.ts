@@ -23,7 +23,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		backgroundColor: colors.tertiary,
 		padding: 19,
 		width: '100%',
-		
+	},
+	inviteList: {
+		backgroundColor: colors.secondary,
+		borderRadius: size.s_10,
+		marginHorizontal: size.s_16
 	},
 	inviteHeaderText: {
 		color: colors.white,

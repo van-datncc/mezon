@@ -1,0 +1,198 @@
+import { Block, Colors, Text, size, useTheme } from "@mezon/mobile-ui";
+import { Alert, FlatList, TouchableOpacity } from "react-native"
+import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { rolesClanActions, selectAllRolesClan, useAppDispatch } from "@mezon/store-mobile";
+import { CheckIcon, Icons } from "@mezon/mobile-components";
+import { useMemo, useState } from "react";
+import { MezonInput } from "../../../temp-ui";
+import { SeparatorWithLine } from "../../../components/Common";
+import Toast from "react-native-toast-message";
+import { useEffect } from "react";
+import { isEqual } from "lodash";
+import { useRoles } from "@mezon/core";
+
+enum EActionType {
+    permissions,
+    members
+}
+
+type RoleDetailScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_DETAIL;
+export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetailScreen>) => {
+    const roleId = route.params?.roleId;
+    const { t } = useTranslation('clanRoles');
+    const RolesClan = useSelector(selectAllRolesClan);
+    const [originRoleName, setOriginRoleName] = useState('');
+    const [currentRoleName, setCurrentRoleName] = useState('');
+    const { themeValue } = useTheme();
+    const dispatch = useAppDispatch();
+    const { updateRole } = useRoles();
+
+    const clanRole = useMemo(() => {
+        return RolesClan.find(role => role?.id === roleId)
+    }, [roleId, RolesClan])
+
+    const isNotChange = useMemo(() => {
+        return isEqual(originRoleName, currentRoleName);
+    }, [originRoleName, currentRoleName])
+
+    navigation.setOptions({
+        headerTitle: () => (
+            <Block>
+                <Text center bold h3 color={themeValue?.white}>{clanRole?.title}</Text>
+                <Text center color={themeValue?.text}>{t('roleDetail.role')}</Text>
+            </Block>
+        ),
+        headerRight: () => {
+            if (isNotChange) return null;
+            return (
+                <TouchableOpacity onPress={async () => {
+                    const selectedPermissions = clanRole?.permission_list?.permissions.filter(it => it?.active).map(it => it?.id);
+                    const selectedMembers = clanRole?.role_user_list?.role_users?.map(it => it?.id);
+                    await updateRole(clanRole.clan_id, clanRole.id, currentRoleName, selectedMembers, selectedPermissions, [], []);
+                    Toast.show({
+                        type: 'success',
+                        props: {
+                            text2: t('roleDetail.changesSaved'),
+                            leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                        }
+                    });
+                    navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
+                }}>
+                    <Block marginRight={size.s_14}>
+                        <Text h4 color={Colors.textViolet}>{t('roleDetail.save')}</Text>
+                    </Block>
+                </TouchableOpacity>
+            )
+        }
+    });
+
+    const deleteRole = () => {
+        Alert.alert(
+			'Delete Role',
+			'Are you sure you want to delete this role?',
+			[
+				{
+					text: 'No',
+					style: 'cancel',
+				},
+				{
+					text: 'Yes',
+					onPress: async () => {
+                        await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id }));
+                        Toast.show({
+                            type: 'success',
+                            props: {
+                                text2: t('roleDetail.deleteRoleSuccessfully', { roleName: clanRole?.title }),
+                                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                            }
+                        });
+                        navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)
+                    }
+				},
+			],
+		);
+    }
+
+    useEffect(() => {
+        if (clanRole?.title) {
+            setOriginRoleName(clanRole.title);
+            setCurrentRoleName(clanRole.title);
+        }
+    }, [clanRole?.title])
+
+    const handleAction = (type: EActionType) => {
+        switch (type) {
+            case EActionType.permissions:
+                navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS, { roleId })
+                break;
+            case EActionType.members:
+                navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS, { roleId })
+                break;
+            default:
+                break;
+        }
+    }
+
+    const actionList = useMemo(() => {
+        return [
+            {
+                id: 1,
+                actionTitle: t('roleDetail.permissions'),
+                type: EActionType.permissions,
+            },
+            {
+                id: 2,
+                actionTitle: t('roleDetail.members'),
+                type: EActionType.members,
+            }
+        ]
+    }, [t])
+    return (
+        <Block
+            backgroundColor={themeValue.primary}
+            flex={1}
+            paddingHorizontal={size.s_14}
+        >
+            <Block marginTop={size.s_14}>
+                <MezonInput
+                    value={currentRoleName}
+                    onTextChange={setCurrentRoleName}
+                    placeHolder={t('roleDetail.roleName')}
+                    label={t('roleDetail.roleName')}
+                />
+            </Block>
+
+            <Block marginVertical={size.s_10} flex={1}>
+                <Block borderRadius={size.s_10} overflow="hidden">
+                    <FlatList
+                        data={actionList}
+                        scrollEnabled
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={(item) => item.id.toString()}
+                        ItemSeparatorComponent={SeparatorWithLine}
+                        renderItem={({item}) => {
+                            return (
+                                <TouchableOpacity onPress={() => handleAction(item.type)}>
+                                    <Block
+                                        flexDirection="row"
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                        backgroundColor={themeValue.secondary}
+                                        padding={size.s_12}
+                                        gap={size.s_10}
+                                    >
+                                        <Block flex={1}>
+                                            <Text color={themeValue.white}>{item.actionTitle}</Text>
+                                        </Block>
+                                        <Icons.ChevronSmallRightIcon color={themeValue.text}/>
+                                    </Block>
+                                </TouchableOpacity>
+                            )
+                        }}
+                    />
+                </Block>
+
+                <Block marginVertical={size.s_10}>
+                    <TouchableOpacity onPress={() => deleteRole()}>
+                        <Block
+                            flexDirection="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            backgroundColor={themeValue.secondary}
+                            paddingVertical={size.s_14}
+                            paddingHorizontal={size.s_12}
+                            gap={size.s_10}
+                            borderRadius={size.s_10}
+                        >
+                            <Block flex={1}>
+                                <Text color={Colors.textRed}>{t('roleDetail.deleteRole')}</Text>
+                            </Block>
+                        </Block>
+                    </TouchableOpacity>
+                </Block>
+            </Block>
+        </Block>
+    )
+}

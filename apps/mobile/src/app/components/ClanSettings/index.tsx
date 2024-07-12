@@ -105,7 +105,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
         },
         {
             title: t('menu.userManagement.role'),
-            onPress: () => reserve(),
+            onPress: () => {
+                navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)
+            },
             expandable: true,
             icon: <Icons.ShieldUserIcon color={themeValue.text} />
         },

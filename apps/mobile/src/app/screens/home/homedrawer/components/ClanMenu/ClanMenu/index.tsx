@@ -82,7 +82,10 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 
     const optionsMenu: IMezonMenuItemProps[] = [
         {
-            onPress: () => reserve(),
+            onPress: () => {
+                dismiss();
+                navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.PROFILE });
+            },
             title: t('menu.optionsMenu.editServerProfile'),
         },
         {
