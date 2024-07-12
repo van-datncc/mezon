@@ -14,13 +14,12 @@ const AppLayout = () => {
 	const { userProfile } = useAuth();
 	const fcmTokenObject = JSON.parse(localStorage.getItem('fcmTokenObject') as string);
 	const navigate = useNavigate();
-	// TODO: login desktop
-	// const { redirectTo } = useLoaderData() as IAppLoaderData;
-	// useEffect(() => {
-	// 	if (redirectTo) {
-	// 		navigate(redirectTo);
-	// 	}
-	// }, [redirectTo, navigate]);
+	const { redirectTo } = useLoaderData() as IAppLoaderData;
+	useEffect(() => {
+		if (redirectTo) {
+			navigate(redirectTo);
+		}
+	}, [redirectTo, navigate]);
 	// TODO: move this to a firebase context
 	const handleNewMessage = (payload: any) => {
 		if (typeof payload === 'object' && payload !== null) {
