@@ -4,7 +4,7 @@ import {
 	CopyIcon,
 	Icons,
 } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -305,7 +305,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyText:
 				return <Icons.CopyIcon color={themeValue.text} />;
 			case EMessageActionType.DeleteMessage:
-				return <Icons.TrashIcon color={themeValue.text} />;
+				return <Icons.TrashIcon color={baseColor.red} height={20} width={20}/>;
 			case EMessageActionType.PinMessage:
 				return <Icons.PinIcon color={themeValue.text} />;
 			case EMessageActionType.UnPinMessage:
@@ -321,9 +321,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyMessageLink:
 				return <Icons.LinkIcon color={themeValue.text} />;
 			case EMessageActionType.Report:
-				return <Icons.FlagIcon color={themeValue.text} />;
+				return <Icons.FlagIcon color={baseColor.red} height={20} width={20} />;
 			default:
-				return <View />;
+				return <View />;	
 		}
 	};
 
@@ -346,15 +346,15 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
 		}
 		const mediaList = message?.attachments.length > 0
-			? [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink]
-			: [];
+			? []
+			: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
-		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread, ...mediaList];
+		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
 		return {
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
-			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList].includes(action.type)),
+			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		}
 	}, [t, userProfile, message, listPinMessages, isDM]);
