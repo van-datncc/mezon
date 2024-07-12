@@ -1,8 +1,10 @@
-import { STORAGE_KEY_CLAN_CURRENT_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
+import { STORAGE_IS_FROM_FCM, STORAGE_KEY_CLAN_CURRENT_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+import { DrawerActions } from '@react-navigation/native';
+import { delay } from 'lodash';
 import { Alert, Linking, Platform } from 'react-native';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
@@ -141,36 +143,40 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 	return true;
 };
 
-export const navigateToNotification = async (notification: any, navigation: any, currentClan: any) => {
+const jumpChannelOnNotification = async (store: any, channelId: string, clanId: string) => {
+	const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+	save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+	// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
+	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+	store.dispatch(appActions.setLoadingMainMobile(false));
+};
+
+export const navigateToNotification = async (store: any, notification: any, navigation: any, currentClan: any) => {
 	const link = notification?.data?.link;
 	if (link) {
-		const store = await getStoreAsync();
-		store.dispatch(appActions.setLoadingMainMobile(true));
-		store.dispatch(appActions.setIsFromFCMMobile(true));
-
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
 		// IF is notification to channel
 		if (linkMatch) {
-			store.dispatch(appActions.setLoadingMainMobile(true));
+			if (navigation) {
+				navigation.navigate(APP_SCREEN.HOME as never);
+				navigation.dispatch(DrawerActions.closeDrawer());
+			}
+
 			const clanId = linkMatch[1];
 			const isDifferentClan = currentClan?.clan_id !== clanId;
 			const channelId = linkMatch[2];
 			if (isDifferentClan) {
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
 				store.dispatch(clansActions.joinClan({ clanId: clanId }));
 				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 			}
-			setTimeout(
-				() => {
-					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-					save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
-					// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
-					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-					store.dispatch(appActions.setLoadingMainMobile(false));
-					store.dispatch(appActions.setIsFromFCMMobile(false));
-				},
-				isDifferentClan ? 2000 : 0,
-			);
+			delay(jumpChannelOnNotification, isDifferentClan ? 2000 : 500, store, channelId, clanId);
+			delay(() => {
+				store.dispatch(appActions.setIsFromFCMMobile(false));
+				save(STORAGE_IS_FROM_FCM, false);
+			}, 4000);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
 
@@ -180,7 +186,10 @@ export const navigateToNotification = async (notification: any, navigation: any,
 				const type = linkDirectMessageMatch[2];
 
 				store.dispatch(appActions.setLoadingMainMobile(false));
-				store.dispatch(appActions.setIsFromFCMMobile(false));
+				delay(() => {
+					store.dispatch(appActions.setIsFromFCMMobile(false));
+					save(STORAGE_IS_FROM_FCM, false);
+				}, 4000);
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
@@ -188,22 +197,35 @@ export const navigateToNotification = async (notification: any, navigation: any,
 					});
 				}
 			} else {
-				store.dispatch(appActions.setIsFromFCMMobile(false));
+				store.dispatch(appActions.setLoadingMainMobile(false));
+				delay(() => {
+					store.dispatch(appActions.setIsFromFCMMobile(false));
+					save(STORAGE_IS_FROM_FCM, false);
+				}, 4000);
 			}
 		}
 
 		// TODO: handle navigation
 		// handleRemoteNotificationNavigation(notification.data.action, notification);
+	} else {
+		store.dispatch(appActions.setLoadingMainMobile(false));
+		delay(() => {
+			store.dispatch(appActions.setIsFromFCMMobile(false));
+			save(STORAGE_IS_FROM_FCM, false);
+		}, 4000);
 	}
 };
 
-const processNotification = ({ notification, navigation, currentClan, time = 0 }) => {
+const processNotification = async ({ notification, navigation, currentClan, time = 0 }) => {
+	const store = await getStoreAsync();
+	store.dispatch(appActions.setLoadingMainMobile(true));
+	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
-			navigateToNotification(notification, navigation, currentClan);
+			navigateToNotification(store, notification, navigation, currentClan);
 		}, time);
 	} else {
-		navigateToNotification(notification, navigation, currentClan);
+		navigateToNotification(store, notification, navigation, currentClan);
 	}
 };
 
@@ -231,8 +253,8 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 			});
 	}
 
-	messaging().onNotificationOpenedApp((remoteMessage) => {
-		console.log('Notification caused app to open from background state:');
+	messaging().onNotificationOpenedApp(async (remoteMessage) => {
+		save(STORAGE_IS_FROM_FCM, true);
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,

@@ -46,9 +46,9 @@ export const renderTextContent = (text: string, emojiListPNG?: IEmoji[], channel
 
 	const renderTextWithMention = (text: string, matchesMention: RegExpMatchArray) => {
 		const parts = text
-			.split(mentionRegexSplit)
-			.filter(Boolean)
-			.filter((i) => i !== '@' && i !== '#');
+			?.split(mentionRegexSplit)
+			?.filter(Boolean)
+			?.filter((i) => i !== '@' && i !== '#');
 		return parts?.map?.((part, index) => (
 			<Text key={`${index}-${part}-renderTextWithMention'}`}>
 				{!part ? (
