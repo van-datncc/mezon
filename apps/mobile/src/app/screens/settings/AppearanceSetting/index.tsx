@@ -3,7 +3,7 @@ import { APP_SCREEN, SettingScreenProps } from "../../../navigation/ScreenTypes"
 import { style } from "./styles";
 import { useTheme } from "@mezon/mobile-ui";
 import { useMemo } from "react";
-import { IMezonMenuSectionProps, IMzoneOptionData, MezonMenu, MezonOption } from "../../../temp-ui";
+import { IMezonMenuSectionProps, IMezonOptionData, MezonMenu, MezonOption } from "../../../temp-ui";
 import { useTranslation } from "react-i18next";
 
 type AppearanceSettingScreen = typeof APP_SCREEN.SETTINGS.APPEARANCE;
@@ -59,7 +59,7 @@ export default function AppearanceSetting({ navigation }: SettingScreenProps<App
             title: t('fields.DMMessagePreview.None'),
             value: 2
         },
-    ]) as IMzoneOptionData, [])
+    ]) as IMezonOptionData, [])
 
     return (
         <View style={styles.container}>

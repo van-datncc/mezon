@@ -18,7 +18,7 @@ window.electron?.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
 });
 
 window.electron?.onDeepLinkUrl((deepLinkUrl) => {
-  localStorage.removeItem('deepLinkUrl');
+  window.location.href = "/guess/login?deepLinkUrl="+deepLinkUrl;
   localStorage.setItem('deepLinkUrl', JSON.stringify(deepLinkUrl));
 });
 
@@ -34,18 +34,19 @@ window.electron?.on(TOKEN_UPDATED, (_, token) => {
 window.electron?.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
   if (serverNotificationPayload.notification.body) {
 
-    const notifi = new Notification(serverNotificationPayload.notification.title, {
+    const notification = new Notification(serverNotificationPayload.notification.title, {
       body: serverNotificationPayload.notification.body,
       icon: serverNotificationPayload.notification.image,
       data: {
-        link: serverNotificationPayload.data.link 
+        link: serverNotificationPayload.data.link
       }
     })
-    notifi.onclick = () => {
-      if (notifi.data && notifi.data.link) {
-            window.location.href = notifi.data.link ;
-          }
-    } 
+    notification.onclick = () => {
+      const link = serverNotificationPayload.data.link
+      if (link) {
+        window.electron?.send('navigate-to-url', link);
+      }
+    }
   } else {
     console.log('do something with the key/value pairs in the data', serverNotificationPayload.data);
   }

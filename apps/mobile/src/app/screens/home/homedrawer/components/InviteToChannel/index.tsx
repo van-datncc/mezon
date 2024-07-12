@@ -23,10 +23,11 @@ import {useSelector} from "react-redux";
 
 interface IInviteToChannelProp {
    isUnknownChannel: boolean
+	 onClose?: () => void;
 }
 
 export const InviteToChannel = React.memo(
-	React.forwardRef(({ isUnknownChannel}: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
+	React.forwardRef(({ isUnknownChannel, onClose }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const currentChannelId = useSelector(selectCurrentChannelId);
 		// const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -162,6 +163,7 @@ export const InviteToChannel = React.memo(
             		animateOnMount
 					backdropComponent={Backdrop}
 					onDismiss={() => {
+						onClose?.();
 						resetSearch();
 					}}
 					handleComponent={() => null}

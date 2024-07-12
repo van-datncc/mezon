@@ -1,4 +1,5 @@
 import { useEmojiSuggestion } from '@mezon/core';
+import Resizer from "react-image-file-resizer";
 import {
 	differenceInDays,
 	differenceInHours,
@@ -269,7 +270,7 @@ export function searchMentionsHashtag(searchValue: any, list: any[]) {
 }
 
 export const ValidateSpecialCharacters = () => {
-	return /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]{1,64}$/u;
+	return /^(?![_\-\s])(?:(?!')[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]){1,64}$/u;
 };
 
 export const checkSameDayByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
@@ -296,12 +297,20 @@ export const formatTimeToMMSS = (duration: number): string => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-export const isImageFile = (fileSrc: string) => {
-  const normalizedFileSrc = fileSrc.toLowerCase();
-  return normalizedFileSrc.endsWith('png') || normalizedFileSrc.endsWith('jpeg') || normalizedFileSrc.endsWith('jpg');
-}
-
-export const isGifFile = (fileSrc: string) => {
-  const normalizedFileSrc = fileSrc.toLowerCase();
-  return normalizedFileSrc.endsWith('gif');
-}
+export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number, type:string, minWidth?:number, minHeight?: number) =>
+	new Promise((resolve) => {
+		Resizer.imageFileResizer(
+			file,
+			maxWidth,
+			maxHeight,
+			'JPEG',
+			100,
+			0,
+			(uri) => {
+				resolve(uri);
+			},
+			type,
+			minWidth,
+			minHeight
+		);
+	});

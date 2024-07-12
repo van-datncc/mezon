@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
 import { Icons, STORAGE_KEY_CLAN_CURRENT_CACHE, getInfoChannelByClanId, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	appActions,
@@ -67,6 +67,7 @@ const ChannelList = React.memo((props: any) => {
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+	const timeoutRef = useRef(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 	const filteredChannels = useMemo(() => filterMessages(categorizedChannels), [categorizedChannels]);
 
@@ -83,6 +84,12 @@ const ChannelList = React.memo((props: any) => {
 		}
 		prevFilteredChannelsRef.current = isLogin ? filteredChannels : {};
 	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id, isLogin]);
+
+	useEffect(() => {
+		return () => {
+			timeoutRef?.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
@@ -160,12 +167,15 @@ const ChannelList = React.memo((props: any) => {
 						style={styles.inviteIconWrapper}
 						onPress={() => {
 							setIsUnKnownChannel(false);
-							bottomSheetInviteRef.current.present();
+							bottomSheetInviteRef?.current?.present?.();
 						}}
 					>
 						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
-					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
+					<InviteToChannel
+						isUnknownChannel={isUnknownChannel}
+						ref={bottomSheetInviteRef}
+					/>
 				</View>
 
 				<View style={{ paddingHorizontal: size.s_12, marginBottom: size.s_18 }}>
@@ -174,14 +184,14 @@ const ChannelList = React.memo((props: any) => {
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
 						<Icons.CalendarIcon height={20} width={20} color={themeValue.text} />
-						<Text style={{ color: themeValue.textStrong }}>{`${allEventManagement?.length} Events`}</Text>
+						<Text style={{ color: themeValue.textStrong }}>{
+							allEventManagement?.length > 0
+								? `${allEventManagement?.length} Events`
+								: 'Events'
+						}</Text>
 					</TouchableOpacity>
 				</View>
-				{
-					isLoading === 'loading' && (
-						<ChannelListSkeleton numberSkeleton={6} />
-					)
-				}
+				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlatList
 					data={categorizedChannels || []}
 					keyExtractor={(_, index) => index.toString()}
@@ -214,10 +224,11 @@ const ChannelList = React.memo((props: any) => {
 			<MezonBottomSheet
 				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}
+				heightFitContent={allEventManagement?.length === 0}
 				headerRight={
 					currentClan?.creator_id === user?.userId && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
-							<Text style={{ color: 'white' }}>Create</Text>
+							<Text style={{ color: baseColor.blurple, fontWeight: "bold" }}>Create</Text>
 						</TouchableOpacity>
 					)
 				}

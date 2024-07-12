@@ -2,6 +2,7 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
+	authActions,
 	channelsActions,
 	clansActions,
 	directActions,
@@ -26,14 +27,21 @@ import HomeDefault from './homedrawer/HomeDefault';
 
 const Drawer = createDrawerNavigator();
 
+type Sessionlike = {
+	token: string;
+	refresh_token: string;
+	created: boolean;
+};
+
 const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 	const dispatch = useDispatch();
 	return (
 		<Drawer.Navigator
 			screenOptions={{
 				drawerPosition: 'left',
-				drawerType: 'back',
+				drawerType: 'slide',
 				swipeEdgeWidth: Metrics.screenWidth,
+				swipeMinDistance: 5,
 				drawerStyle: {
 					width: '100%',
 				},
@@ -53,6 +61,10 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 				name="HomeDefault"
 				component={HomeDefault}
 				options={{
+					drawerType: 'slide',
+					swipeEdgeWidth: Metrics.screenWidth,
+					keyboardDismissMode: 'none',
+					swipeMinDistance: 5,
 					headerShown: false,
 				}}
 			/>
@@ -66,7 +78,7 @@ const HomeScreen = React.memo((props: any) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isLogin = useSelector(selectIsLogin);
 
-	const { reconnect } = useMezon();
+	const { reconnect, refreshSession } = useMezon();
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
@@ -91,8 +103,8 @@ const HomeScreen = React.memo((props: any) => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await reconnect();
 			await messageLoader();
+			await reconnect();
 		}
 	};
 
@@ -114,6 +126,9 @@ const HomeScreen = React.memo((props: any) => {
 
 	const messageLoader = async () => {
 		const store = await getStoreAsync();
+		const resSession = await store.dispatch(authActions.refreshSession());
+		const refreshToken = resSession?.payload as Sessionlike;
+		await refreshSession(refreshToken);
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
@@ -121,7 +136,7 @@ const HomeScreen = React.memo((props: any) => {
 			channelsActions.joinChannel({
 				clanId: currentClan?.clan_id,
 				channelId: currentChannelId,
-				noFetchMembers: false,
+				noFetchMembers: true,
 			}),
 		);
 		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
