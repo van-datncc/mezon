@@ -98,16 +98,16 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{isUnRead && <View style={styles.dotIsNew} />}
 
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceLockIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
+						<Icons.VoiceLockIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextLockIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
+						<Icons.TextLockIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
 					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceNormalIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
+						<Icons.VoiceNormalIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
 					{props?.data?.channel_private === undefined && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextIcon width={16} height={16} color={isUnRead ? themeValue.textStrong : themeValue.text} />
+						<Icons.TextIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
 
 					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
