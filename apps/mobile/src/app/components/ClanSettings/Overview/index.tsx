@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, reserve } from '../../../temp-ui';
-import MezonToggleButton from '../../../temp-ui/MezonToggleButton';
-import style from "./styles";
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../../temp-ui';
+import { style } from "./styles";
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
@@ -79,34 +78,34 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		},
 	];
 
-	const systemMessageMenu: IMezonMenuItemProps[] = [
-		{
-			title: t('menu.systemMessage.channel'),
-			expandable: true,
-			component: <Text style={{ color: 'white', fontSize: 11 }}>general</Text>,
-			onPress: () => reserve(),
-		},
-		{
-			title: t('menu.systemMessage.sendRandomWelcome'),
-			component: <MezonToggleButton height={24} width={40} onChange={() => {}} />,
-			onPress: () => reserve(),
-		},
-		{
-			title: t('menu.systemMessage.promptMembersReply'),
-			component: <MezonToggleButton height={24} width={40} onChange={() => {}} />,
-			onPress: () => reserve(),
-		},
-		{
-			title: t('menu.systemMessage.sendMessageBoost'),
-			component: <MezonToggleButton height={24} width={40} onChange={() => {}} />,
-			onPress: () => reserve(),
-		},
-		{
-			title: t('menu.systemMessage.sendHelpfulTips'),
-			component: <MezonToggleButton height={24} width={40} onChange={() => {}} />,
-			onPress: () => reserve(),
-		},
-	];
+    const systemMessageMenu: IMezonMenuItemProps[] = [
+        {
+            title: t("menu.systemMessage.channel"),
+            expandable: true,
+            component: <Text style={{ color: "white", fontSize: 11 }}>general</Text>,
+            onPress: () => reserve()
+        },
+        {
+            title: t("menu.systemMessage.sendRandomWelcome"),
+            component: <MezonSwitch />,
+            onPress: () => reserve()
+        },
+        {
+            title: t("menu.systemMessage.promptMembersReply"),
+            component: <MezonSwitch />,
+            onPress: () => reserve()
+        },
+        {
+            title: t("menu.systemMessage.sendMessageBoost"),
+            component: <MezonSwitch />,
+            onPress: () => reserve()
+        },
+        {
+            title: t("menu.systemMessage.sendHelpfulTips"),
+            component: <MezonSwitch />,
+            onPress: () => reserve()
+        },
+    ]
 
 	const deleteMenu: IMezonMenuItemProps[] = [
 		{
