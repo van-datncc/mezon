@@ -19,7 +19,7 @@ const DeleteClanModal: React.FC<DeleteClanModalProps> = ({ onClose }) => {
 		e.preventDefault();
 		if(inputValue === currentClan?.clan_name){
 			await deleteClan({clanId: currentClanId || ""});
-			navigate("/");
+			navigate("/mezon");
 		}else{
 			setInputValueIsMatchClanName(false);
 		}
