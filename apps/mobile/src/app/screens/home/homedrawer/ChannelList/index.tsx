@@ -81,7 +81,7 @@ const ChannelList = React.memo((props: any) => {
 			setDefaultChannelLoader();
 		}
 		prevFilteredChannelsRef.current = isLogin ? filteredChannels : {};
-	}, [filteredChannels, isFromFCMMobile, currentClan?.clan_id, isLogin]);
+	}, [filteredChannels, isFromFCMMobile, isLogin]);
 
 	useEffect(() => {
 		return () => {

@@ -1,6 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, ArrowLeftIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, ArrowLeftIcon, save, STORAGE_CLAN_ID, UserGroupIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import {
 	channelMembersActions,
@@ -81,6 +81,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: currentDmGroup?.clan_id }));
+		save(STORAGE_CLAN_ID, currentDmGroup?.clan_id);
 		store.dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: currentDmGroup.id,
