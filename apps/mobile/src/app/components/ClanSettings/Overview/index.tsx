@@ -31,7 +31,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	async function handleSave() {
 		setLoading(true);
-		const name = clanName.trim();
+		const name = clanName?.trim();
 		setClanName(name);
 
 		if (name?.length === 0) {
