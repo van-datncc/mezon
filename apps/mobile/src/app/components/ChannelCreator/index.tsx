@@ -53,7 +53,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
         const body: ApiCreateChannelDescRequest = {
             clan_id: currentClanId?.toString(),
             type: channelType,
-            channel_label: channelName.trim(),
+            channel_label: channelName?.trim(),
             channel_private: isChannelPrivate ? 1 : 0,
             category_id: categoryId || currentChannel.category_id,
         };
