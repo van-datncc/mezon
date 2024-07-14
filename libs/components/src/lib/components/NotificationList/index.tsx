@@ -50,7 +50,7 @@ function NotificationList({ unReadList }: NotificationProps) {
 
 	const unreadListRemain = useMemo(() => {
 		return notifyMentionItem.filter((item) => !readList?.includes(item));
-	}, [readList, notifyMentionItem]);
+	}, [readList, notifyMentionItem, localStorage.getItem('notiUnread')]);
 
 	const handleMarkAllAsRead = useCallback(() => {
 		localStorage.setItem('notiUnread', JSON.stringify([]));
