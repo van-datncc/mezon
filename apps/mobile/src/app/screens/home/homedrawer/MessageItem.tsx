@@ -5,7 +5,7 @@ import {
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
@@ -324,7 +324,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				await Linking.openURL(urlVoice);
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		} catch (error) {

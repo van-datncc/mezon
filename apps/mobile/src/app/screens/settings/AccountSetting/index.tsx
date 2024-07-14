@@ -5,7 +5,12 @@ import { style } from "./styles";
 import { useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@mezon/core";
-import { ChevronIcon } from "@mezon/mobile-components";
+import {
+  ChevronIcon,
+  remove,
+  STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID,
+  STORAGE_DATA_CLAN_CHANNEL_CACHE, STORAGE_KEY_TEMPORARY_INPUT_MESSAGES
+} from "@mezon/mobile-components";
 import { SeparatorWithLine } from "../../../components/Common";
 import Toast from "react-native-toast-message";
 import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from "@mezon/store-mobile";
@@ -32,11 +37,15 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
     const { t } = useTranslation('accountSetting');
     const dispatch = useAppDispatch();
 
-	const logout = () => {
+	const logout = async () => {
 		dispatch(authActions.logOut());
 		dispatch(channelsActions.removeAll());
 		dispatch(messagesActions.removeAll());
 		dispatch(clansActions.removeAll());
+    await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
+    await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+    await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+    await remove(STORAGE_CLAN_ID);
 	};
 
     //TODO: delete
