@@ -3,7 +3,7 @@ import Modal from 'react-native-modal';
 import { styles } from './DeleteClanModal.styles';
 import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { useSelector } from 'react-redux';
-import { remove, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
+import { remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { useNavigation } from '@react-navigation/native';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -24,7 +24,8 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange,  }: { isVisibleModal: 
     visibleChange(false);
     await dispatch(clansActions.deleteClan({clanId: currentClan?.clan_id || ""}));
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-		store.dispatch(clansActions.joinClan({ clanId: clans[0]?.clan_id }));
+		store.dispatch(clansActions.joinClan({ clanId: clans?.[0]?.clan_id }));
+	  save(STORAGE_CLAN_ID, clans?.[0]?.clan_id);
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clans[0]?.clan_id }));
   };
 

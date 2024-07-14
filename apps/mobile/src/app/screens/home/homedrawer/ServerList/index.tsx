@@ -1,5 +1,5 @@
 import { useFriends } from '@mezon/core';
-import { Icons, STORAGE_CHANNEL_CURRENT_CACHE, remove } from '@mezon/mobile-components';
+import { Icons, STORAGE_CHANNEL_CURRENT_CACHE, remove, save, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
@@ -30,6 +30,7 @@ const ServerList = React.memo((props: any) => {
 		const store = await getStoreAsync();
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		store.dispatch(clansActions.joinClan({ clanId: clanId }));
+		save(STORAGE_CLAN_ID, clanId);
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
 	};
 
