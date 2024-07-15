@@ -1,4 +1,5 @@
 import { AvatarUser } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectMemberByDisplayName } from '@mezon/store-mobile';
 import { IChannelMember } from '@mezon/utils';
 import React from 'react';
@@ -6,7 +7,6 @@ import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../../../../temp-ui/MezonAvatar';
 import { style } from './styles';
-import { useTheme } from '@mezon/mobile-ui';
 
 interface IUserVoiceProps {
 	userVoice: IChannelMember;

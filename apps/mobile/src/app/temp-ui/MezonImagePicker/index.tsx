@@ -9,8 +9,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
+import MezonClanAvatar from '../MezonClanAvatar';
 import { style } from './styles';
-import MezonClanAvatar from "../MezonClanAvatar";
 
 export interface IFile {
 	uri: string;
@@ -39,7 +39,7 @@ export default memo(function MezonImagePicker({
 	width = 60,
 	showHelpText,
 	autoUpload = false,
-	alt
+	alt,
 }: IMezonImagePickerProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -98,7 +98,7 @@ export default memo(function MezonImagePicker({
 						path: file.uri,
 						mediaType: 'photo',
 						includeBase64: true,
-						compressImageQuality: 1
+						compressImageQuality: 1,
 					});
 					setImage(croppedFile.path);
 					onChange && onChange(croppedFile);
@@ -125,15 +125,11 @@ export default memo(function MezonImagePicker({
 		<TouchableOpacity onPress={() => handleImage()}>
 			<View style={styles.bannerContainer}>
 				<View style={[styles.bannerWrapper, { height, width }]}>
-					{image || !showHelpText
-						? (
-							<MezonClanAvatar
-								image={image}
-								alt={alt}
-							/>
-						) : (
-							<Text style={styles.textPlaceholder}>Choose an image</Text>
-						)}
+					{image || !showHelpText ? (
+						<MezonClanAvatar image={image} alt={alt} />
+					) : (
+						<Text style={styles.textPlaceholder}>Choose an image</Text>
+					)}
 				</View>
 
 				<View style={styles.btnWrapper}>

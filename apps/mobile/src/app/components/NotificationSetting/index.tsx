@@ -12,8 +12,7 @@ import {
 } from '@mezon/store-mobile';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
@@ -119,7 +118,7 @@ export default function NotificationSetting() {
 						isChecked={isChecked}
 						size={20}
 						fillColor={Colors.bgButton}
-						innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white}}
+						innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white }}
 						textStyle={{ fontFamily: 'JosefinSans-Regular' }}
 					/>
 				</TouchableOpacity>

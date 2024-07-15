@@ -5,9 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { style } from "./styles";
+import {
+	IMezonMenuItemProps,
+	IMezonMenuSectionProps,
+	MezonImagePicker,
+	MezonInput,
+	MezonMenu,
+	MezonOption,
+	MezonSwitch,
+	reserve,
+} from '../../../temp-ui';
 import DeleteClanModal from '../../DeleteClanModal';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../../temp-ui';
+import { style } from './styles';
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING;
 export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
@@ -15,7 +24,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
 	const { t } = useTranslation(['clanOverviewSetting']);
-  const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
+	const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
@@ -79,42 +88,44 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		},
 	];
 
-    const systemMessageMenu: IMezonMenuItemProps[] = [
-        {
-            title: t("menu.systemMessage.channel"),
-            expandable: true,
-            component: <Text style={{ color: "white", fontSize: 11 }}>general</Text>,
-            onPress: () => reserve()
-        },
-        {
-            title: t("menu.systemMessage.sendRandomWelcome"),
-            component: <MezonSwitch />,
-            onPress: () => reserve()
-        },
-        {
-            title: t("menu.systemMessage.promptMembersReply"),
-            component: <MezonSwitch />,
-            onPress: () => reserve()
-        },
-        {
-            title: t("menu.systemMessage.sendMessageBoost"),
-            component: <MezonSwitch />,
-            onPress: () => reserve()
-        },
-        {
-            title: t("menu.systemMessage.sendHelpfulTips"),
-            component: <MezonSwitch />,
-            onPress: () => reserve()
-        },
-    ]
+	const systemMessageMenu: IMezonMenuItemProps[] = [
+		{
+			title: t('menu.systemMessage.channel'),
+			expandable: true,
+			component: <Text style={{ color: 'white', fontSize: 11 }}>general</Text>,
+			onPress: () => reserve(),
+		},
+		{
+			title: t('menu.systemMessage.sendRandomWelcome'),
+			component: <MezonSwitch />,
+			onPress: () => reserve(),
+		},
+		{
+			title: t('menu.systemMessage.promptMembersReply'),
+			component: <MezonSwitch />,
+			onPress: () => reserve(),
+		},
+		{
+			title: t('menu.systemMessage.sendMessageBoost'),
+			component: <MezonSwitch />,
+			onPress: () => reserve(),
+		},
+		{
+			title: t('menu.systemMessage.sendHelpfulTips'),
+			component: <MezonSwitch />,
+			onPress: () => reserve(),
+		},
+	];
 
-    const deleteMenu: IMezonMenuItemProps[] = [
-        {
-            title: t("menu.deleteServer.delete"),
-            textStyle: { color: "red" },
-            onPress: () =>{ setIsVisibleDeleteModal(true) }
-        },
-    ]
+	const deleteMenu: IMezonMenuItemProps[] = [
+		{
+			title: t('menu.deleteServer.delete'),
+			textStyle: { color: 'red' },
+			onPress: () => {
+				setIsVisibleDeleteModal(true);
+			},
+		},
+	];
 
 	const generalMenu: IMezonMenuSectionProps[] = [
 		{
@@ -146,24 +157,30 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		},
 	];
 
-    return (
-        <Block>
-          <ScrollView contentContainerStyle={styles.container}>
-            <MezonImagePicker defaultValue={banner} height={200} width={"100%"} onLoad={handleLoad} showHelpText autoUpload />
+	return (
+		<Block>
+			<ScrollView contentContainerStyle={styles.container}>
+				<MezonImagePicker defaultValue={banner} height={200} width={'100%'} onLoad={handleLoad} showHelpText autoUpload />
 
-			<View style={{ marginVertical: 10 }}>
-				<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} />
-			</View>
+				<View style={{ marginVertical: 10 }}>
+					<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} />
+				</View>
 
-			<MezonMenu menu={generalMenu} />
+				<MezonMenu menu={generalMenu} />
 
-            <MezonOption
-                title={t('fields.defaultNotification.title')}
-                bottomDescription={t('fields.defaultNotification.description')}
-                data={optionData} />
-            <MezonMenu menu={dangerMenu} />
-        </ScrollView>
-        <DeleteClanModal isVisibleModal={isVisibleDeleteModal} visibleChange={(isVisible)=>{setIsVisibleDeleteModal(isVisible)}}></DeleteClanModal>
-        </Block>
-    )
+				<MezonOption
+					title={t('fields.defaultNotification.title')}
+					bottomDescription={t('fields.defaultNotification.description')}
+					data={optionData}
+				/>
+				<MezonMenu menu={dangerMenu} />
+			</ScrollView>
+			<DeleteClanModal
+				isVisibleModal={isVisibleDeleteModal}
+				visibleChange={(isVisible) => {
+					setIsVisibleDeleteModal(isVisible);
+				}}
+			></DeleteClanModal>
+		</Block>
+	);
 }

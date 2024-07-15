@@ -1,7 +1,6 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { createCachedSelector } from '../messages/messages.slice';
-import { boolean } from 'yup';
 
 export const APP_FEATURE_KEY = 'app';
 

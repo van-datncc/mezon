@@ -151,19 +151,22 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 	}
 });
 
-export const removeMemberChannel = createAsyncThunk('channelMembers/removeChannelUser', async ({ channelId, userIds }: RemoveChannelUsers, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.removeChannelUsers(mezon.session, channelId, userIds);
-		if (response) {
-			await thunkAPI.dispatch(
-				fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
-			);
+export const removeMemberChannel = createAsyncThunk(
+	'channelMembers/removeChannelUser',
+	async ({ channelId, userIds }: RemoveChannelUsers, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.removeChannelUsers(mezon.session, channelId, userIds);
+			if (response) {
+				await thunkAPI.dispatch(
+					fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+				);
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
 		}
-	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
-	}
-});
+	},
+);
 
 export const initialChannelMembersState: ChannelMembersState = channelMembersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -301,10 +304,10 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
 
-export const selectMemberByDisplayName = (displayName: string) =>
-    createSelector(selectAllChannelMembers, (members) => {
-        return members.find((member) => member.user?.display_name === displayName);
-    });
+export const selectMemberByGoogleId = (googleId: string) =>
+	createSelector(selectAllChannelMembers, (members) => {
+		return members.find((member) => member.user?.google_id === googleId);
+	});
 
 export const selectMembersMap = (channelId?: string | null) =>
 	createSelector(selectChannelMembesEntities, (entities) => {
@@ -345,4 +348,3 @@ export const selectMemberByUserId = (userId: string) =>
 	createSelector(selectAllChannelMembers, (entities) => {
 		return entities.find((ent) => ent?.user?.id === userId) || null;
 	});
-

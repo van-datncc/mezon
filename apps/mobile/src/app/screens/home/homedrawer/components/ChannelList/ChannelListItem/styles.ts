@@ -1,4 +1,4 @@
-import { Attributes, Colors, Fonts, Metrics, baseColor, size } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics, baseColor, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({

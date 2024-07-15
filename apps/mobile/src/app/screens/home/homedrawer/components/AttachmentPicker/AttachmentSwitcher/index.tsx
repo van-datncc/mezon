@@ -1,8 +1,8 @@
 import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import React, { useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity } from 'react-native';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
-import { useTheme } from '@mezon/mobile-ui';
 
 export type AttachmentPickerProps = {
 	mode: IModeKeyboardPicker;

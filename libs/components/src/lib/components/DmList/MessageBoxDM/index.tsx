@@ -74,7 +74,6 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 		}
 	}, [subPanelActive]);
 
-
 	return (
 		<div className="mx-2 relative " role="button" aria-hidden>
 			{isEmojiOnChat && (
@@ -92,7 +91,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				onSend={handleSend}
 				currentChannelId={directParamId}
 				onTyping={handleTypingDebounced}
-				listMentions={UserMentionList({channelID: directParamId, channelMode: mode})}
+				listMentions={UserMentionList({ channelID: directParamId, channelMode: mode })}
 				mode={mode}
 			/>
 			{isEmojiOnChat && ( // responsive mobile

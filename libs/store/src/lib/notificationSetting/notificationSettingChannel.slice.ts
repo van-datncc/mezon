@@ -1,9 +1,9 @@
 import { INotificationSetting, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import memoize from 'memoizee';
 import { ApiNotificationUserChannel } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { defaultNotificationCategoryActions } from './notificationSettingCategory.slice';
-import memoize from 'memoizee';
 
 export const NOTIFICATION_SETTING_FEATURE_KEY = 'notificationsetting';
 

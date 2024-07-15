@@ -10,7 +10,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrentId,
-	selectLoadingMainMobile
+	selectLoadingMainMobile,
 } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
@@ -24,21 +24,21 @@ import { Sharing } from '../../screens/settings/Sharing';
 import {
 	checkNotificationPermission,
 	createLocalNotification,
-	isShowNotification,
 	handleFCMToken,
+	isShowNotification,
 	navigateToNotification,
 	setupNotificationListeners,
 } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigator from './BottomNavigator';
 import { FriendStacks } from './stacks/FriendStacks';
+import { MenuChannelStacks } from './stacks/MenuChannelStack';
 import { MenuClanStacks } from './stacks/MenuSererStack';
 import { MenuThreadDetailStacks } from './stacks/MenuThreadDetailStacks';
 import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
-import { MenuChannelStacks } from './stacks/MenuChannelStack';
 const RootStack = createNativeStackNavigator();
 
 export const Authentication = () => {
@@ -71,18 +71,11 @@ export const Authentication = () => {
 		currentChannelRef.current = currentChannel;
 	}, [currentChannel]);
 
-
 	useEffect(() => {
 		checkNotificationPermission();
 
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
-			if (
-				isShowNotification(
-					currentChannelRef.current?.id,
-					currentDmGroupIdRef.current,
-					remoteMessage
-				)
-			) {
+			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 				Toast.show({
 					type: 'info',
 					text1: remoteMessage.notification?.title,
@@ -154,50 +147,22 @@ export const Authentication = () => {
 				screenOptions={{
 					headerShown: false,
 					gestureEnabled: true,
-					gestureDirection: 'horizontal'
-				}}>
+					gestureDirection: 'horizontal',
+				}}
+			>
+				<RootStack.Screen name={APP_SCREEN.BOTTOM_BAR} component={BottomNavigator} options={{ gestureEnabled: false }} />
+				<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />
+				<RootStack.Screen name={APP_SCREEN.MESSAGES.STACK} children={(props) => <MessagesStacks {...props} />} />
+				<RootStack.Screen name={APP_SCREEN.NOTIFICATION.STACK} children={(props) => <NotificationStacks {...props} />} />
+				<RootStack.Screen name={APP_SCREEN.MENU_CHANNEL.STACK} children={(props) => <MenuChannelStacks {...props} />} />
 
-				<RootStack.Screen
-					name={APP_SCREEN.BOTTOM_BAR}
-					component={BottomNavigator}
-					options={{ gestureEnabled: false }}
-				/>
-				<RootStack.Screen
-					name={APP_SCREEN.SERVERS.STACK}
-					children={(props) => <ServersStacks {...props} />}
-				/>
-				<RootStack.Screen
-					name={APP_SCREEN.MESSAGES.STACK}
-					children={(props) => <MessagesStacks {...props} />}
-				/>
-				<RootStack.Screen
-					name={APP_SCREEN.NOTIFICATION.STACK}
-					children={(props) => <NotificationStacks {...props} />}
-				/>
-				<RootStack.Screen
-					name={APP_SCREEN.MENU_CHANNEL.STACK}
-					children={(props) => <MenuChannelStacks {...props} />}
-				/>
+				<RootStack.Screen name={APP_SCREEN.MENU_THREAD.STACK} children={(props) => <MenuThreadDetailStacks {...props} />} />
 
-				<RootStack.Screen
-					name={APP_SCREEN.MENU_THREAD.STACK}
-					children={(props) => <MenuThreadDetailStacks {...props} />}
-				/>
+				<RootStack.Screen name={APP_SCREEN.MENU_CLAN.STACK} children={(props) => <MenuClanStacks {...props} />} />
 
-				<RootStack.Screen
-					name={APP_SCREEN.MENU_CLAN.STACK}
-					children={(props) => <MenuClanStacks {...props} />}
-				/>
+				<RootStack.Screen name={APP_SCREEN.SETTINGS.STACK} children={(props) => <SettingStacks {...props} />} />
 
-				<RootStack.Screen
-					name={APP_SCREEN.SETTINGS.STACK}
-					children={(props) => <SettingStacks {...props} />}
-				/>
-
-				<RootStack.Screen
-					name={APP_SCREEN.FRIENDS.STACK}
-					children={(props) => <FriendStacks {...props} />}
-				/>
+				<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
 			</RootStack.Navigator>
 			<LoadingModal isVisible={isLoadingMain} />
 			{!!fileShared && !isLoadingMain && <Sharing data={fileShared} onClose={onCloseFileShare} />}

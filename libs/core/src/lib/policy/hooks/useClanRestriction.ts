@@ -1,9 +1,9 @@
+import { selectCurrentClan } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
-import { useUserRestriction } from './useUserRestriction';
-import { useAuth } from '../../auth/hooks/useAuth';
 import { useSelector } from 'react-redux';
-import { selectCurrentClan } from '@mezon/store';
+import { useAuth } from '../../auth/hooks/useAuth';
+import { useUserRestriction } from './useUserRestriction';
 
 export type ClanRestrictionReturnType = [boolean, { isClanCreator: boolean }];
 

@@ -1,23 +1,16 @@
-import { colors as Colors, lightThemeColor, darkThemeColor } from "./Colors";
+import { colors as Colors, darkThemeColor, lightThemeColor } from "./Colors";
 import Fonts, { size } from "./Fonts";
 
 import {
-	Metrics,
-	horizontalScale,
-	moderateScale,
-	verticalScale,
+    Metrics,
+    horizontalScale,
+    moderateScale,
+    verticalScale,
 } from "./Metrics";
 
 export {
-	Colors,
-	lightThemeColor,
-	darkThemeColor,
-	Metrics,
-	Fonts,
-	horizontalScale,
-	moderateScale,
-	verticalScale,
-	size
+    Colors, Fonts, Metrics, darkThemeColor, horizontalScale, lightThemeColor, moderateScale, size, verticalScale
 };
 
-export * from "./Constants";
+    export * from "./Constants";
+

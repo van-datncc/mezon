@@ -1,6 +1,6 @@
-import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 

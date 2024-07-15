@@ -108,7 +108,6 @@ export const CreateNewChannelModal = () => {
 		setIsInputError(isValid ?? false);
 	}, []);
 
-
 	return (
 		isOpenModal && (
 			<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
@@ -135,11 +134,7 @@ export const CreateNewChannelModal = () => {
 							<div className="Frame407 self-stretch flex-col items-center gap-2 flex">
 								<ChannelLableModal labelProp="Choose channel's type:" />
 								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex max-h-[200px] overflow-y-scroll max-xl:h-auto">
-									<ChannelTypeComponent
-										type={ChannelType.CHANNEL_TYPE_TEXT}
-										onChange={onChangeChannelType}
-										error={isErrorType}
-									/>
+									<ChannelTypeComponent type={ChannelType.CHANNEL_TYPE_TEXT} onChange={onChangeChannelType} error={isErrorType} />
 									<ChannelTypeComponent
 										disable={false}
 										type={ChannelType.CHANNEL_TYPE_VOICE}

@@ -2,8 +2,8 @@ import React from 'react';
 /**
  * ? Local Imports
  */
-import { Fonts, verticalScale } from '../themes/index';
 import { StyleSheet, TextProps, Text as TextRN, TextStyle } from 'react-native';
+import { Fonts, verticalScale } from '../themes/index';
 
 interface ITextWrapperProps extends TextProps {
 	fontFamily?: string;
@@ -126,5 +126,5 @@ const styles = StyleSheet.create({
 	},
 	styleDefault: {
 		fontFamily: 'OpenSans-Bold',
-	}
+	},
 });

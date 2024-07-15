@@ -5,12 +5,12 @@ import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
-import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
+import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
-import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -130,7 +130,7 @@ function MemberProfile({
 	useOnClickOutside(panelRef, handleClickOutSide);
 
 	return (
-		<div className="relative group" >
+		<div className="relative group">
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
@@ -183,11 +183,12 @@ function MemberProfile({
 							>
 								{name}
 							</p>
-							{((dataMemberCreate?.createId || currentClan?.creator_id) && (dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id) && (
-								<button className="w-[14px] h-[14px] ml-1">
-									<Icons.OwnerIcon />
-								</button>
-							)}
+							{(dataMemberCreate?.createId || currentClan?.creator_id) &&
+								(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id && (
+									<button className="w-[14px] h-[14px] ml-1">
+										<Icons.OwnerIcon />
+									</button>
+								)}
 						</div>
 					)}
 
@@ -196,8 +197,17 @@ function MemberProfile({
 					)}
 				</div>
 			</div>
-			{(isShowPanel && !isHiddenAvatarPanel) && (
-				<PanelMember coords={coords} onClose={handleClosePannelMember} member={user} onRemoveMember={handleClickRemoveMember} directMessageValue={directMessageValue} name={name} isMemberDMGroup={dataMemberCreate ? true : false} dataMemberCreate={dataMemberCreate}/>
+			{isShowPanel && !isHiddenAvatarPanel && (
+				<PanelMember
+					coords={coords}
+					onClose={handleClosePannelMember}
+					member={user}
+					onRemoveMember={handleClickRemoveMember}
+					directMessageValue={directMessageValue}
+					name={name}
+					isMemberDMGroup={dataMemberCreate ? true : false}
+					dataMemberCreate={dataMemberCreate}
+				/>
 			)}
 			{isShowUserProfile && listProfile ? (
 				<div

@@ -1,12 +1,12 @@
+import { useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, UsersClanEntity } from '@mezon/store-mobile';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { DirectEntity, UsersClanEntity } from '@mezon/store-mobile';
 import Images from '../../../../assets/Images';
 import { MezonButton } from '../../../temp-ui';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
 import { style } from './styles';
-import { useTheme } from '@mezon/mobile-ui';
 
 export const ChannelListContext = React.createContext({} as any);
 export interface IFriendListItemProps {

@@ -28,7 +28,7 @@ const NotificationSetting = () => {
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
 	const notificationTypes = Object.values(NotificationType);
 	useEffect(() => {
-		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.active === undefined) {	
+		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.active === undefined) {
 			setNameChildren('Mute Channel');
 			setmutedUntil('');
 		} else {

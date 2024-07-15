@@ -1,9 +1,9 @@
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import React, { useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { ErrorInput } from '../../components/ErrorInput';
-import { style } from './styles';
 import { validInput } from '../../utils/validate';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { style } from './styles';
 
 interface IMezonInput2 {
 	placeHolder?: string;
@@ -18,12 +18,19 @@ export default function MezonInput({ label, placeHolder, value, onTextChange, er
 	const styles = style(themeValue);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	useEffect(() => {
-		setIsCheckValid(validInput(value))
-	}, [value])
+		setIsCheckValid(validInput(value));
+	}, [value]);
 	return (
 		<View>
 			<Text style={styles.label}>{label}</Text>
-			<TextInput placeholderTextColor={Colors.textGray} placeholder={placeHolder} style={styles.input} value={value} onChangeText={onTextChange} maxLength={64} />
+			<TextInput
+				placeholderTextColor={Colors.textGray}
+				placeholder={placeHolder}
+				style={styles.input}
+				value={value}
+				onChangeText={onTextChange}
+				maxLength={64}
+			/>
 			{!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
 		</View>
 	);
