@@ -8,6 +8,7 @@ export interface IReplyBottomSheet {
 	type: EMessageBSToShow | null;
 	onConfirmAction: (payload: IConfirmActionPayload) => void;
 	mode?: number;
+	clanId?: string;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
   	checkAnonymous?: boolean;

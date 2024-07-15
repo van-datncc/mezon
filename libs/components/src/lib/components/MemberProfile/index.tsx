@@ -181,7 +181,7 @@ function MemberProfile({
 							>
 								{name}
 							</p>
-							{((dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id) && (
+							{((dataMemberCreate?.createId || currentClan?.creator_id) && (dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id) && (
 								<button className="w-[14px] h-[14px] ml-1">
 									<Icons.OwnerIcon />
 								</button>

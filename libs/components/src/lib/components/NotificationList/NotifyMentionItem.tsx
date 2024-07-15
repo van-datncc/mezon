@@ -1,5 +1,5 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import { INotification, referencesActions, selectChannelById, selectCurrentClan, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
+import { INotification, notificationActions, referencesActions, selectChannelById, selectCurrentClan, selectMemberByUserId, selectMessageByMessageId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -61,6 +61,10 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 		return notify.content.channel_id;
 	}, [notify.content.channel_id]);
 
+	const notiId = useMemo(() => {
+		return notify.id;
+	}, [notify.id]);
+
 	const message = useSelector(selectMessageByMessageId(messageID));
 	data.content = JSON.parse(data.content);
 	data.update_time = data.create_time;
@@ -69,6 +73,8 @@ function NotifyMentionItem({ notify }: NotifyMentionProps) {
 	const handleClickJump = useCallback(() => {
 		dispatch(referencesActions.setIdMessageToJump(messageID));
 		directToMessageById();
+		dispatch(notificationActions.setReadNotiStatus(notiId))
+		dispatch(notificationActions.setStatusNoti())
 	}, []);
 
 	return (

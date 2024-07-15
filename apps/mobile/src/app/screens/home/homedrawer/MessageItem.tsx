@@ -30,7 +30,7 @@ import {
   selectAllUsesClan,
 } from '@mezon/store-mobile';
 import { IMessageWithUser, MentionDataProps, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -101,11 +101,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous, [message?.sender_id]);
 	const { t } = useTranslation('message');
-  const userProfile = useSelector(selectAllAccount);
+	const userProfile = useSelector(selectAllAccount);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
-	const isCombine = !message.isStartedMessageGroup;
+	const isCombine = !message?.isStartedMessageGroup;
 	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message?.references?.length, user]);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
@@ -162,7 +162,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = (videoItem?: any) => {
+	const renderVideos = useCallback((videoItem?: any) => {
 		return (
 			<View
 				style={{
@@ -180,7 +180,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				)}
 			</View>
 		);
-	};
+	}, [videos]);
 
 	const imageItem = useCallback(({ image, index, checkImage }) => {
 		return (
@@ -284,6 +284,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
 				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
+
 				if (!mentionedUser || tagName === "here") return;
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,
@@ -377,12 +378,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	};
 
 	return (
-		<Swipeable
-			renderRightActions={renderRightActions}
-			ref={swipeableRef}
-			overshootRight={false}
-			onSwipeableOpen={handleSwipeableOpen}
-		>
+		// <Swipeable
+		// 	renderRightActions={renderRightActions}
+		// 	ref={swipeableRef}
+		// 	overshootRight={false}
+		// 	onSwipeableOpen={handleSwipeableOpen}
+		// 	hitSlop={{ left: -10 }}
+		// >
 			<View
 				style={[
 					styles.messageWrapper,
@@ -498,9 +500,24 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								onPress={() => {
 									if (preventAction) return;
 									setIsOnlyEmojiPicker(false);
+
+									const userForDisplay: ApiUser = user
+										? user?.user
+										: checkAnonymous
+											? {
+												username: message?.username,
+												display_name: message?.name,
+												id: ""
+											}
+											: {
+												username: message?.user?.username,
+												display_name: message?.user?.name,
+												id: message?.user?.id
+											}
+
 									onMessageAction({
 										type: EMessageBSToShow.UserInformation,
-										user: user?.user
+										user: userForDisplay
 									})
 								}}
 								style={styles.messageBoxTop}
@@ -545,11 +562,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									})
 								}}
 							/>
-						): null}
+						) : null}
 					</Pressable>
 				</View>
 			</View>
-		</Swipeable>
+		// </Swipeable>
 	);
 }, arePropsEqual);
 

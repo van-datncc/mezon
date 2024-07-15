@@ -10,7 +10,7 @@ interface IProps {
 }
 
 const AttachmentFilePreview = ({ attachment }: IProps) => {
-	const splitFiletype = attachment.filetype.split('/');
+	const splitFiletype = attachment?.filetype?.split?.('/');
 	const type = splitFiletype?.[splitFiletype?.length - 1];
 	return (
 		<View style={styles.fileViewer}>
