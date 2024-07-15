@@ -5,6 +5,7 @@
     "members": "Members",
     "noRole": "There are currently no roles",
     "skipStep": "Skip this step",
+    "failed": "failed",
     "createNewRole": {
         "title": "Step 1 of 3",
         "createANewRole": "Create a new role",
@@ -12,7 +13,8 @@
         "create": "Create",
         "newRole": "new role",
         "roleName": "ROLE NAME",
-        "createSuccess": "Created {{roleName}} role successfully"
+        "createSuccess": "Created {{roleName}} role successfully",
+        "cannotCreate": "Cannot create {{roleName}}"
     },
     "setupPermission": {
         "title": "Step 2 of 3",

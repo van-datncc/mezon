@@ -4,7 +4,7 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectCurrentClanId } from "@mezon/store-mobile";
-import { CheckIcon, Icons } from "@mezon/mobile-components";
+import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import { MezonInput } from "../../../temp-ui";
 import { useState } from "react";
 import { useRoles } from "@mezon/core";
@@ -32,15 +32,26 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
     }
 
     const createNewRole = async () => {
-        await createRole(currentClanId, currentClanId, roleName, [], []);
-        navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS);
-        Toast.show({
-            type: 'success',
-            props: {
-                text2: t('createNewRole.createSuccess', { roleName }),
-                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-            }
-        });
+        const response = await createRole(currentClanId, currentClanId, roleName, [], []) as any;
+        if (response?.id) {
+            navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS);
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('createNewRole.createSuccess', { roleName }),
+                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                }
+            });
+        } else {
+            navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('failed'),
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                }
+            });
+        }
     }
     return (
         <Block
@@ -69,11 +80,11 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
             </Block>
             <Block marginBottom={size.s_16}>
                 <TouchableOpacity onPress={() => {
-                    if (roleName.trim().length === 0) return;
+                    if (roleName?.trim()?.length === 0) return;
                     createNewRole()
                 }}>
                     <Block
-                        backgroundColor={roleName.trim().length === 0 ? Colors.bgGrayDark : Colors.bgViolet}
+                        backgroundColor={roleName?.trim()?.length === 0 ? Colors.bgGrayDark : Colors.bgViolet}
                         paddingVertical={size.s_14}
                         borderRadius={size.s_8}
                     >

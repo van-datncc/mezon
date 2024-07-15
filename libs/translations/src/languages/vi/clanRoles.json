@@ -5,6 +5,7 @@
     "members": "Thành viên",
     "noRole": "Hiện tại không có vai trò nào",
     "skipStep": "Bỏ qua bước này",
+    "failed": "Thất bại",
     "createNewRole": {
         "title": "Bước 1 của 3",
         "createANewRole": "Tạo một vai trò mới",
@@ -12,7 +13,8 @@
         "create": "Tạo",
         "newRole": "vai trò mới",
         "roleName": "TÊN VAI TRÒ",
-        "createSuccess": "Tạo vai trò {{roleName}} thành công"
+        "createSuccess": "Tạo vai trò {{roleName}} thành công",
+        "cannotCreate": "Không thể tạo {{roleName}}"
     },
     "setupPermission": {
         "title": "Bước 2 của 3",

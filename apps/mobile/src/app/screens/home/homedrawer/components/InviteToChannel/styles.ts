@@ -46,7 +46,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		alignSelf: 'center',
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: colors.textNormal,
+		backgroundColor: colors.secondary,
 		overflow: 'hidden',
 	},
 	shareToInviteIcon: {

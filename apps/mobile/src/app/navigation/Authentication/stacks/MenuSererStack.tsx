@@ -92,14 +92,6 @@ export const MenuClanStacks = ({}: any) => {
 			/>
 
             <Stack.Screen
-                name={APP_SCREEN.MENU_CLAN.SETTINGS}
-                component={ClanSetting}
-                options={{
-                    headerTitle: t('menuClanStack.clanSetting'),
-                }}
-            />
-
-            <Stack.Screen
                 name={APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING}
                 component={ClanOverviewSetting}
                 options={{
@@ -118,30 +110,34 @@ export const MenuClanStacks = ({}: any) => {
             <Stack.Screen
                 name={APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE}
                 component={CreateNewRole}
+				options={{
+					headerLeftLabelVisible: false
+				}}
             />
 
             <Stack.Screen
                 name={APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS}
                 component={SetupPermissions}
+				options={{
+					headerLeftLabelVisible: false
+				}}
             />
 
             <Stack.Screen
                 name={APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS}
                 component={SetupMembers}
+				options={{
+					headerLeftLabelVisible: false
+				}}
             />
 
             <Stack.Screen
                 name={APP_SCREEN.MENU_CLAN.ROLE_DETAIL}
                 component={RoleDetail}
-            />
-
-            <Stack.Screen
-				name={APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING}
-				component={ClanOverviewSetting}
 				options={{
-					headerTitle: t('menuClanStack.clanOverviewSetting'),
+					headerLeftLabelVisible: false
 				}}
-			/>
+            />
         </Stack.Navigator>
     );
 }

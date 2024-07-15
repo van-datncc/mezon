@@ -4,7 +4,7 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectAllRolesClan } from "@mezon/store-mobile";
-import { CheckIcon, Icons } from "@mezon/mobile-components";
+import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import { MezonInput, MezonSwitch } from "../../../temp-ui";
 import { useMemo, useState } from "react";
 import { useEffect } from "react";
@@ -50,15 +50,25 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
     const handleEditPermissions = async () => {
         const selectedMembers = clanRole?.role_user_list?.role_users?.map(it => it?.id);
         const removePermissionList = permissionList.filter(permission => !selectedPermissions.includes(permission?.id)).map(it => it?.id);
-        await updateRole(clanRole.clan_id, clanRole.id, clanRole?.title, selectedMembers, selectedPermissions, [], removePermissionList);
-        Toast.show({
-            type: 'success',
-            props: {
-                text2: t('roleDetail.changesSaved'),
-                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-            }
-        });
-        navigation.goBack();
+        const response = await updateRole(clanRole.clan_id, clanRole.id, clanRole?.title, selectedMembers, selectedPermissions, [], removePermissionList);
+        if (response) {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('roleDetail.changesSaved'),
+                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                }
+            });
+            navigation.goBack();
+        } else {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('failed'),
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                }
+            });
+        }
     }
 
     navigation.setOptions({
@@ -108,15 +118,25 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
     }
 
     const handleNextStep = async () => {
-        updateRole(newRole.clan_id, newRole.id, newRole.title, [], selectedPermissions, [], []);
-        navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS);
-        Toast.show({
-            type: 'success',
-            props: {
-                text2: t('setupPermission.setupPermissionSuccessfully'),
-                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-            }
-        });
+        const response = updateRole(newRole.clan_id, newRole.id, newRole.title, [], selectedPermissions, [], []);
+        if (response) {
+            navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS);
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('setupPermission.setupPermissionSuccessfully'),
+                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                }
+            });
+        } else {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('failed'),
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                }
+            });
+        }
     }
 
     //Note: edit role case

@@ -4,7 +4,7 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { rolesClanActions, selectAllRolesClan, useAppDispatch } from "@mezon/store-mobile";
-import { CheckIcon, Icons } from "@mezon/mobile-components";
+import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import { useMemo, useState } from "react";
 import { MezonInput } from "../../../temp-ui";
 import { SeparatorWithLine } from "../../../components/Common";
@@ -50,15 +50,25 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
                 <TouchableOpacity onPress={async () => {
                     const selectedPermissions = clanRole?.permission_list?.permissions.filter(it => it?.active).map(it => it?.id);
                     const selectedMembers = clanRole?.role_user_list?.role_users?.map(it => it?.id);
-                    await updateRole(clanRole.clan_id, clanRole.id, currentRoleName, selectedMembers, selectedPermissions, [], []);
-                    Toast.show({
-                        type: 'success',
-                        props: {
-                            text2: t('roleDetail.changesSaved'),
-                            leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-                        }
-                    });
-                    navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
+                    const response = await updateRole(clanRole.clan_id, clanRole.id, currentRoleName, selectedMembers, selectedPermissions, [], []);
+                    if (response) {
+                        Toast.show({
+                            type: 'success',
+                            props: {
+                                text2: t('roleDetail.changesSaved'),
+                                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                            }
+                        });
+                        navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
+                    } else {
+                        Toast.show({
+                            type: 'success',
+                            props: {
+                                text2: t('failed'),
+                                leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                            }
+                        });
+                    }
                 }}>
                     <Block marginRight={size.s_14}>
                         <Text h4 color={Colors.textViolet}>{t('roleDetail.save')}</Text>
@@ -80,15 +90,25 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				{
 					text: 'Yes',
 					onPress: async () => {
-                        await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id }));
-                        Toast.show({
-                            type: 'success',
-                            props: {
-                                text2: t('roleDetail.deleteRoleSuccessfully', { roleName: clanRole?.title }),
-                                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-                            }
-                        });
-                        navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)
+                        const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id }));
+                        if (response?.payload) {
+                            Toast.show({
+                                type: 'success',
+                                props: {
+                                    text2: t('roleDetail.deleteRoleSuccessfully', { roleName: clanRole?.title }),
+                                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                                }
+                            });
+                            navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)
+                        } else {
+                            Toast.show({
+                                type: 'success',
+                                props: {
+                                    text2: t('failed'),
+                                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                                }
+                            });
+                        }
                     }
 				},
 			],

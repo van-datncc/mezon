@@ -4,7 +4,7 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectAllRolesClan, selectAllUsesClan } from "@mezon/store-mobile";
-import { CheckIcon, Icons } from "@mezon/mobile-components";
+import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import Toast from "react-native-toast-message";
 import { SeparatorWithLine } from "../../../components/Common";
 import BouncyCheckbox from "react-native-bouncy-checkbox/build/dist/BouncyCheckbox";
@@ -48,15 +48,25 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
     const handleEditMember = async () => {
         const selectedPermissions = clanRole?.permission_list?.permissions?.filter(it => it?.active).map(it => it?.id);
         const removeMemberList = clanRole?.role_user_list?.role_users?.filter(member => !selectedMembers.includes(member?.id)).map(it => it?.id) || [];
-        await updateRole(clanRole.clan_id, clanRole.id, clanRole?.title, selectedMembers, selectedPermissions, removeMemberList, []);
-        Toast.show({
-            type: 'success',
-            props: {
-                text2: t('roleDetail.changesSaved'),
-                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-            }
-        });
-        navigation.goBack();
+        const response = await updateRole(clanRole.clan_id, clanRole.id, clanRole?.title, selectedMembers, selectedPermissions, removeMemberList, []);
+        if (response) {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('roleDetail.changesSaved'),
+                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                }
+            });
+            navigation.goBack();
+        } else {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('failed'),
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                }
+            });
+        }
     }
 
     navigation.setOptions({
@@ -106,15 +116,25 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 
     const updateMemberToRole = async () => {
         const selectedPermissions = newRole?.permission_list?.permissions.filter(it => it?.active).map(it => it?.id);
-        await updateRole(newRole.clan_id, newRole.id, newRole.title, selectedMembers, selectedPermissions, [], []);
-        navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
-        Toast.show({
-            type: 'success',
-            props: {
-                text2: t('setupMember.addedMember', { memberCount: selectedMembers.length }),
-                leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
-            }
-        });
+        const response = await updateRole(newRole.clan_id, newRole.id, newRole.title, selectedMembers, selectedPermissions, [], []);
+        if (response) {
+            navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('setupMember.addedMember', { memberCount: selectedMembers.length }),
+                    leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+                }
+            });
+        } else {
+            Toast.show({
+                type: 'success',
+                props: {
+                    text2: t('failed'),
+                    leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+                }
+            });
+        }
     }
 
     const filteredMemberList = useMemo(() => {
