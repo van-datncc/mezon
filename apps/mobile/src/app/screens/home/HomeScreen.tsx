@@ -5,18 +5,12 @@ import {
 	authActions,
 	channelsActions,
 	clansActions,
-	directActions,
-	friendsActions,
 	getStoreAsync,
 	messagesActions,
-	notificationActions,
-	selectAllClans,
 	selectCurrentChannelId,
 	selectCurrentClan,
-	selectIsLogin,
 } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
 import React, { useEffect } from 'react';
 import { AppState } from 'react-native';
@@ -97,6 +91,10 @@ const HomeScreen = React.memo((props: any) => {
 	};
 
 	const messageLoader = async () => {
+		if (!currentClan?.clan_id) {
+			dispatch(appActions.setLoadingMainMobile(false));
+			return null;
+		}
 		const store = await getStoreAsync();
 		await store.dispatch(authActions.refreshSession());
 		dispatch(appActions.setLoadingMainMobile(false));

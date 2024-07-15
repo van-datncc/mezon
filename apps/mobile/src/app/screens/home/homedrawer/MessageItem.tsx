@@ -108,7 +108,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
 	const isCombine = !message?.isStartedMessageGroup;
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message?.references?.length, user]);
+	const isShowInfoUser = !isCombine || (message?.references?.length && !!user);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const swipeableRef = React.useRef(null);
@@ -301,6 +301,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
+		alert('jumpToChannel Message item')
 		const store = await getStoreAsync();
 
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));

@@ -93,7 +93,7 @@ const ChannelList = React.memo((props: any) => {
 	}, []);
 
 	useEffect(() => {
-		if (!isEqual(filteredChannels, prevFilteredChannelsRef.current) && filteredChannels && !isFromFCMMobile && mainLoaderCompleted) {
+		if (!isEqual(filteredChannels, prevFilteredChannelsRef.current) && !isEmpty(prevFilteredChannelsRef.current) && prevFilteredChannelsRef.current && filteredChannels?.length && !isFromFCMMobile && mainLoaderCompleted) {
 			setDefaultChannelLoader();
 		}
 		prevFilteredChannelsRef.current = filteredChannels;
@@ -124,7 +124,7 @@ const ChannelList = React.memo((props: any) => {
 		await store.dispatch(gifsActions.fetchGifCategories());
 		await store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-		if (currentClan) {
+		if (currentClan && currentClan?.clan_id) {
 			save(STORAGE_CLAN_ID, currentClan?.clan_id);
 			await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
 			await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
@@ -155,9 +155,9 @@ const ChannelList = React.memo((props: any) => {
 			await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
 		} else {
 			const firstChannel = filteredChannels?.[0]?.channels?.[0];
-			if (firstChannel) {
+			if (firstChannel?.channel_id && currentClan?.clan_id) {
 				const channelId = firstChannel?.channel_id;
-				const clanId = currentClan?.clan_id;
+				const clanId = firstChannel?.clan_id;
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
