@@ -1,8 +1,8 @@
 
-import { ChangeEvent, useState } from "react";
-import { useSelector } from "react-redux";
 import { selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
+import { ChangeEvent, useState } from "react";
+import { useSelector } from "react-redux";
 
 type SettingEmojiItemProp = {
   emoji: ApiClanEmojiListResponse,
@@ -20,25 +20,32 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   }
 
   const handleUpdateEmoji = async () => {
-    console.log('update')
-    const request: MezonUpdateClanEmojiByIdBody = {
-      source: emoji.src,
-      shortname: nameEmoji,
-      category: emoji.category,
+    if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
+      console.log('update')
+      const request: MezonUpdateClanEmojiByIdBody = {
+        source: emoji.src,
+        shortname: nameEmoji,
+        category: emoji.category,
+      }
+      await dispatch(settingClanEmojiActions.updateEmoji({ request: request, emojiId: emoji.id || '' }))
+    } else {
+      setNameEmoji(emoji.shortname ?? '');
     }
-    await dispatch(settingClanEmojiActions.updateEmoji({ request: request, emojiId: emoji.id || '' }))
   }
 
   const handleDelete = () => {
     console.log('delete')
     dispatch(settingClanEmojiActions.deleteEmoji(emoji.id || ''));
   }
-
+  const handleOnMouseLeave = () => {
+    setNameEmoji(emoji.shortname ?? '');
+    setShowEdit(false);
+  }
   return (
     <div
       className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
       onMouseEnter={() => setShowEdit(true)}
-      onMouseLeave={() => setShowEdit(false)}
+      onMouseLeave={handleOnMouseLeave}
     >
       <div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
 
@@ -51,7 +58,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
         <div className={'flex-1 relative'}>
           <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'}>
             <p className={`max-w-[172px] truncate overflow-hidden inline-block`}>
-              {emoji.shortname}
+              {nameEmoji}
             </p>
           </div>
 

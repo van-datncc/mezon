@@ -1,5 +1,5 @@
-import SettingEmojiItem from "../SettingEmojiItem";
 import { ApiClanEmojiListResponse } from "mezon-js/api.gen";
+import SettingEmojiItem from "../SettingEmojiItem";
 
 type SettingEmojiListProps = {
   title: string;
