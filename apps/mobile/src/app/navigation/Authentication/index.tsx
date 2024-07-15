@@ -60,8 +60,8 @@ export const Authentication = () => {
 	}, [userProfile?.email]);
 
 	useEffect(() => {
-		setupNotificationListeners(navigation, currentClan);
-	}, [navigation, currentClan]);
+		setupNotificationListeners(navigation);
+	}, [navigation]);
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
@@ -92,7 +92,7 @@ export const Authentication = () => {
 						const store = await getStoreAsync();
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
-						await navigateToNotification(store, remoteMessage, navigation, null);
+						await navigateToNotification(store, remoteMessage, navigation);
 						navigation.dispatch(DrawerActions.closeDrawer());
 					},
 				});

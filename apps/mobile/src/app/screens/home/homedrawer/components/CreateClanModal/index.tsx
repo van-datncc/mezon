@@ -1,5 +1,5 @@
 import { useClans } from '@mezon/core';
-import { AddIcon, UploadImage } from '@mezon/mobile-components';
+import { AddIcon, save, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -34,6 +34,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 		createClans(nameClan?.trim?.(), urlImage).then((res) => {
 			if (res && res?.clan_id) {
 				store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
+				save(STORAGE_CLAN_ID, res?.clan_id);
 				store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
 				setVisible(false);
 			}

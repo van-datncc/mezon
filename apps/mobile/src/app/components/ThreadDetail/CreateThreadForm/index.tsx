@@ -1,5 +1,12 @@
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
-import { ActionEmitEvent, STORAGE_KEY_CLAN_CURRENT_CACHE, ThreadIcon, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	ThreadIcon,
+	getUpdateOrAddClanChannelCache,
+	save,
+	STORAGE_CLAN_ID
+} from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -102,6 +109,7 @@ export default function CreateThreadForm() {
 					const thread = await createThread(value);
 					if (thread) {
 						await dispatch(clansActions.joinClan({ clanId: currentClanId as string }));
+						save(STORAGE_CLAN_ID, currentClanId);
 						await sendMessageThread(content, mentions, attachments, references, thread as ApiChannelDescription);
 					}
 				}
@@ -133,7 +141,7 @@ export default function CreateThreadForm() {
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 
@@ -187,7 +195,6 @@ export default function CreateThreadForm() {
 							{valueThread && openThreadMessageState && (
 								<View style={styles.messageBox}>
 									<MessageItem
-										listMentions={listMentions}
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel.channel_id}

@@ -27,6 +27,7 @@ import channelSetting from "./channelSetting.json";
 import appearanceSetting from "./appearanceSetting.json";
 import appThemeSetting from "./appThemeSetting.json";
 import accountSetting from "./accountSetting.json";
+import clanRoles from "./clanRoles.json";
 import deleteClan from "./deleteClan.json";
 
 export default {
@@ -59,5 +60,6 @@ export default {
 	appearanceSetting,
 	appThemeSetting,
 	accountSetting,
-  deleteClan
+	clanRoles,
+  	deleteClan
 };

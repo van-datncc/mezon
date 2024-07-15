@@ -1,4 +1,4 @@
-import { STORAGE_KEY_CLAN_CURRENT_CACHE } from '../../constant';
+import { STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
 import { load } from '../storage';
 
 type ClanChannelPair = {
@@ -7,7 +7,7 @@ type ClanChannelPair = {
 };
 
 export function getUpdateOrAddClanChannelCache(clanId: string, channelId: string) {
-	const data = load(STORAGE_KEY_CLAN_CURRENT_CACHE) || [];
+	const data = load(STORAGE_DATA_CLAN_CHANNEL_CACHE) || [];
 	const result = [...data];
 	const pairIndex = data.findIndex((pair: ClanChannelPair) => pair.clanId === clanId);
 

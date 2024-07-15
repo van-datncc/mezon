@@ -1,41 +1,52 @@
-import { useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
-import { LinkIcon } from '@mezon/mobile-components';
+import { useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
+import { Icons, LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useReducedMotion } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
+import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
 import { normalizeString } from '../../../../../utils/helpers';
 import { FriendListItem } from '../../Reusables';
 import { ExpireLinkValue, LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import { EMaxUserCanInvite } from '../../enums';
 import { style } from './styles';
 import { BottomSheetModal, BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
-import { DirectEntity, selectCurrentChannelId } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import {useSelector} from "react-redux";
+import { SeparatorWithLine } from '../../../../../components/Common';
+import { useCallback } from 'react';
 
 interface IInviteToChannelProp {
-   isUnknownChannel: boolean
-	 onClose?: () => void;
+	isUnknownChannel: boolean;
+	onClose?: () => void;
+}
+
+interface IInviteToChannelIconProp {
+	icon: React.JSX.Element;
+	title: string;
+	onPress?: () => void;
 }
 
 export const InviteToChannel = React.memo(
 	React.forwardRef(({ isUnknownChannel, onClose }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const currentChannelId = useSelector(selectCurrentChannelId);
-		// const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+		const reducedMotion = useReducedMotion();
+
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
-		const { currentClanId, currentClan } = useClans();
+		const currentClanId = useSelector(selectCurrentClanId);
+		const currentClan = useSelector(selectCurrentClan);
 		const { createLinkInviteUser } = useInvite();
 		const { t } = useTranslation(['inviteToChannel']);
 		const timeoutRef = useRef(null);
@@ -47,14 +58,15 @@ export const InviteToChannel = React.memo(
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
 		const [sentIdList, setSentIdList] = useState<string[]>([]);
+		const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 		const mezon = useMezon();
 
 		const userInviteList = useMemo(() => {
 			if (listDMInvite?.length) {
-				return listDMInvite?.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
+				return listDMInvite?.filter((dm) => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)));
 			}
-			return listUserInvite?.filter(UserInvite => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)))
-		}, [searchUserText, listDMInvite, listUserInvite])
+			return listUserInvite?.filter((UserInvite) => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)));
+		}, [searchUserText, listDMInvite, listUserInvite]);
 
 		const openEditLinkModal = () => {
 			//@ts-ignore
@@ -81,7 +93,7 @@ export const InviteToChannel = React.memo(
 			backToInviteModal();
 		};
 
-		const addInviteLinkToClipboard = () => {
+		const addInviteLinkToClipboard = useCallback(() => {
 			Clipboard.setString(currentInviteLink);
 			Toast.show({
 				type: 'success',
@@ -90,7 +102,7 @@ export const InviteToChannel = React.memo(
 					leadingIcon: <LinkIcon color={Colors.textLink} />,
 				},
 			});
-		};
+		}, [currentInviteLink, t]);
 
 		const resetSearch = () => {
 			if (isVisibleEditLinkModal) {
@@ -114,12 +126,12 @@ export const InviteToChannel = React.memo(
 		const directMessageWithUser = async (userId: string) => {
 			const response = await createDirectMessageWithUser(userId);
 			if (response?.channel_id) {
-				let channelMode = 0
+				let channelMode = 0;
 				if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
-					channelMode = ChannelStreamMode.STREAM_MODE_DM
+					channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				}
 				if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
-					channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+					channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
 				}
 				sendInviteMessage(currentInviteLink, response.channel_id, channelMode);
 			}
@@ -145,7 +157,7 @@ export const InviteToChannel = React.memo(
 				return;
 			}
 			setCurrentInviteLink(`https://mezon.vn/invite/${response.invite_link}`);
-		}
+		};
 
 		useEffect(() => {
 			if (currentClanId && currentChannelId) {
@@ -153,14 +165,92 @@ export const InviteToChannel = React.memo(
 			}
 		}, [currentClanId, currentChannelId]);
 
+		useEffect(() => {
+			const keyboardDidShowListener = Keyboard.addListener(
+				'keyboardDidShow',
+				() => {
+					setIsKeyboardVisible(true);
+				}
+			);
+			const keyboardDidHideListener = Keyboard.addListener(
+				'keyboardDidHide',
+				() => {
+					setIsKeyboardVisible(false);
+				}
+			);
+	
+			return () => {
+			  keyboardDidShowListener.remove();
+			  keyboardDidHideListener.remove();
+			};
+		}, []);
+
+		//TODO: delete
+		const showUpdating = () => {
+			Toast.show({
+				type: 'info',
+				text1: 'Coming soon'
+			});
+		} 
+
+		const inviteToChannelIconList = useMemo(() => {
+			const iconList: IInviteToChannelIconProp[] = [
+				{
+					title: t('iconTitle.shareInvite'),
+					icon: <Icons.ShareIcon color={themeValue.text} />,
+					onPress: () => showUpdating()
+				},
+				{
+					title: t('iconTitle.copyLink'),
+					icon: <Icons.LinkIcon color={themeValue.text} />,
+					onPress: () => addInviteLinkToClipboard()
+				},
+				{
+					title: t('iconTitle.youtube'),
+					icon: <Icons.BrandYoutubeIcon color={themeValue.text} />,
+					onPress: () => showUpdating()
+				},
+				{
+					title: t('iconTitle.facebook'),
+					icon: <Icons.BrandFacebookIcon color={themeValue.text} />,
+					onPress: () => showUpdating()
+				},
+				{
+					title: t('iconTitle.twitter'),
+					icon: <Icons.BrandTwitterIcon color={themeValue.text} />,
+					onPress: () => showUpdating()
+				}
+			] 
+			return iconList;
+		}, [t, addInviteLinkToClipboard, themeValue])
+
+		const getInviteToChannelIcon = ({ icon, title, onPress }: IInviteToChannelIconProp) => {
+			return (
+				<Pressable style={styles.inviteIconWrapper} onPress={() => onPress()}>
+					<View style={styles.shareToInviteIconWrapper}>
+						{icon}
+					</View>
+					<Text style={styles.inviteIconText}>{title}</Text>
+				</Pressable>
+			)
+		}
+
+		const snapPoints = useMemo(() => {
+			if (isKeyboardVisible) {
+				return ['90%'];
+			}
+			return ['80%']
+		}, [isKeyboardVisible])
+
 		return (
 			<View>
 				<BottomSheetModal
 					ref={refRBSheet}
 					enableDynamicSizing={false}
-					snapPoints={['80%']}
+					snapPoints={snapPoints}
+					animateOnMount={!reducedMotion}
 					index={0}
-            		animateOnMount
+					enablePanDownToClose
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
@@ -169,59 +259,42 @@ export const InviteToChannel = React.memo(
 					handleComponent={() => null}
 				>
 					<View style={styles.bottomSheetWrapper}>
-						<View style={styles.inviteHeader}>
-							<Text style={styles.inviteHeaderText}>{t('title')}</Text>
-						</View>
+						{!isKeyboardVisible && (
+							<View style={styles.inviteHeader}>
+								<Text style={styles.inviteHeaderText}>{t('title')}</Text>
+							</View>
+						)}
 					{
 						isUnknownChannel ? <Text style={styles.textUnknown}>{t('unknownChannel')}</Text> : (
 						<>
-							<View style={styles.iconAreaWrapper}>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
-								</Pressable>
-							</View>
+							{!isKeyboardVisible && (
+								<View style={styles.iconAreaWrapper}>
+									{inviteToChannelIconList.map((icon, index) => {
+										return (
+											<View key={index}>
+												{getInviteToChannelIcon(icon)}
+											</View>
+										);
+									})}
+								</View>
+							)}
 
 							<View style={styles.searchInviteFriendWrapper}>
 								<View style={styles.searchFriendToInviteWrapper}>
 									<TextInput
-									placeholder={'Invite friend to channel'}
-									placeholderTextColor={themeValue.text}
-									style={styles.searchFriendToInviteInput}
-									onChangeText={setSearchUserText}
+										placeholder={'Invite friend to channel'}
+										placeholderTextColor={themeValue.text}
+										style={styles.searchFriendToInviteInput}
+										onChangeText={setSearchUserText}
 									/>
 									<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 								</View>
 								<View style={styles.editInviteLinkWrapper}>
-									<Text style={styles.defaultText}>{t('yourLinkInvite')} {expiredTimeSelected} </Text>
+									<Text style={styles.defaultText}>
+										{t('yourLinkInvite')} {expiredTimeSelected}{' '}
+									</Text>
 									<Pressable onPress={() => openEditLinkModal()}>
-									<Text style={styles.linkText}>{t('editInviteLink')}</Text>
+										<Text style={styles.linkText}>{t('editInviteLink')}</Text>
 									</Pressable>
 								</View>
 							</View>
@@ -229,6 +302,10 @@ export const InviteToChannel = React.memo(
 							<BottomSheetFlatList
 								data={userInviteList}
 								keyExtractor={(item) => item?.id}
+								ItemSeparatorComponent={() => {
+									return <SeparatorWithLine style={{backgroundColor: themeValue.border}} />
+								}}
+								style={styles.inviteList}
 								renderItem={({ item }) => {
 									return <FriendListItem
 										key={item?.id}
@@ -275,7 +352,10 @@ export const InviteToChannel = React.memo(
 										>
 											<Text
 												style={[
-													{ color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray, textAlign: 'center' },
+													{
+														color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray,
+														textAlign: 'center',
+													},
 												]}
 											>
 												{option.label}
@@ -298,7 +378,10 @@ export const InviteToChannel = React.memo(
 										>
 											<Text
 												style={[
-													{ color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray, textAlign: 'center' },
+													{
+														color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray,
+														textAlign: 'center',
+													},
 												]}
 											>
 												{option}
@@ -312,13 +395,11 @@ export const InviteToChannel = React.memo(
 								<MezonSwitch value={isTemporaryMembership} onValueChange={setIsTemporaryMembership} />
 							</View>
 							<View style={{ flexDirection: 'row' }}>
-								<Text style={{ color: Colors.textGray }}>
-									{t('memberAutoKick')}
-								</Text>
+								<Text style={{ color: Colors.textGray }}>{t('memberAutoKick')}</Text>
 							</View>
 						</View>
 					</MezonModal>
-				): null}
+				) : null}
 			</View>
 		);
 	}),

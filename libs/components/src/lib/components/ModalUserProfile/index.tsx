@@ -1,4 +1,4 @@
-import { useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAppNavigation, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { clansActions, selectAllAccount, selectFriendStatus, selectMemberByUserId, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,6 +12,7 @@ import StatusProfile from './StatusProfile';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
 import PendingFriend from './pendingFriend';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -46,7 +47,7 @@ const ModalUserProfile = ({
 	const { sendInviteMessage } = useSendInviteMessage();
 
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-	// console.log("userById: ", userById);
+
 	const [content, setContent] = useState<string>('');
 
 	const initOpenModal = {
@@ -55,11 +56,12 @@ const ModalUserProfile = ({
 	};
 	const [openModal, setOpenModal] = useState<OpenModalProps>(initOpenModal);
 
+	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
+
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			await dispatch(clansActions.joinClan({ clanId: response.clan_id as string }));
-			var channelMode = 0
+			let channelMode = 0;
 			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
 				channelMode = ChannelStreamMode.STREAM_MODE_DM
 			}
@@ -68,6 +70,8 @@ const ModalUserProfile = ({
 			}
 			sendInviteMessage(content, response.channel_id, channelMode);
 			setContent('');
+			const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
+			navigate('/'+directChat);
 		}
 	};
 	const handleContent = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,17 +87,17 @@ const ModalUserProfile = ({
 	};
 	const [color, setColor] = useState<string>('#323232');
 
-	const getColor = async () => {
-		if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
-			const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
-			const colorImg = await getColorAverageFromURL(url || '');
-			if (colorImg) setColor(colorImg);
-		}
-	};
-
 	useEffect(() => {
+		const getColor = async () => {
+			if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
+				const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
+				const colorImg = await getColorAverageFromURL(url || '');
+				if (colorImg) setColor(colorImg);
+			}
+		};
+	
 		getColor();
-	}, [userID, []]);
+	}, [userProfile?.user?.avatar_url, userById?.user?.avatar_url, isFooterProfile, userID]);
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);

@@ -61,7 +61,10 @@ export function useDMInvite(channelID?: string) {
 	}, [usersClan, rawMembers, isChannelPrivate]);
 
 	useEffect(() => {
-		dispatch(channelMembersActions.fetchChannelMembers({ clanId: '', channelId: channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT }));
+		if (channelID)
+			dispatch(
+				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: channelID || '', channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+			);
 	}, [channelID]);
 
 	return useMemo(

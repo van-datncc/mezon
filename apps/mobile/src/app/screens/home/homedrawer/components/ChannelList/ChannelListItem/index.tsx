@@ -1,7 +1,7 @@
 import {
 	Icons,
 	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	load,
 	save,
@@ -76,7 +76,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			timeoutRef.current = setTimeout(() => {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 				if (!channelsCache?.includes(channelId)) {

@@ -1,5 +1,13 @@
 import { useCategory, useReference } from '@mezon/core';
-import { CloseIcon, PenIcon, SearchIcon, SendIcon, getAttachmentUnique } from '@mezon/mobile-components';
+import {
+	CloseIcon,
+	PenIcon,
+	SearchIcon,
+	SendIcon,
+	getAttachmentUnique,
+	save,
+	STORAGE_CLAN_ID
+} from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -131,6 +139,7 @@ export const Sharing = ({ data, onClose }) => {
 	const sendToDM = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: channelSelected?.clan_id }));
+		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
 			'DM',
@@ -145,7 +154,8 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToGroup = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: channelSelected.channel_id }));
+		store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
+		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,

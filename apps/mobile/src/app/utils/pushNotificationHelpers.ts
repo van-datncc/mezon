@@ -1,4 +1,11 @@
-import { STORAGE_IS_FROM_FCM, STORAGE_KEY_CLAN_CURRENT_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import {
+	STORAGE_CLAN_ID,
+	STORAGE_IS_FROM_FCM,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save,
+} from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
@@ -145,13 +152,13 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 
 const jumpChannelOnNotification = async (store: any, channelId: string, clanId: string) => {
 	const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-	save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+	save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 	// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	store.dispatch(appActions.setLoadingMainMobile(false));
 };
 
-export const navigateToNotification = async (store: any, notification: any, navigation: any, currentClan: any) => {
+export const navigateToNotification = async (store: any, notification: any, navigation: any) => {
 	const link = notification?.data?.link;
 	if (link) {
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
@@ -162,15 +169,16 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				navigation.navigate(APP_SCREEN.HOME as never);
 				navigation.dispatch(DrawerActions.closeDrawer());
 			}
-
+			const clanIdCache = load(STORAGE_CLAN_ID);
 			const clanId = linkMatch[1];
-			const isDifferentClan = currentClan?.clan_id !== clanId;
+			const isDifferentClan = clanIdCache !== clanId;
 			const channelId = linkMatch[2];
 			if (isDifferentClan) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				save(STORAGE_CLAN_ID, clanId);
 				store.dispatch(clansActions.joinClan({ clanId: clanId }));
-				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
 			}
 			delay(jumpChannelOnNotification, isDifferentClan ? 2000 : 500, store, channelId, clanId);
 			delay(() => {
@@ -216,20 +224,21 @@ export const navigateToNotification = async (store: any, notification: any, navi
 	}
 };
 
-const processNotification = async ({ notification, navigation, currentClan, time = 0 }) => {
+const processNotification = async ({ notification, navigation, time = 0 }) => {
 	const store = await getStoreAsync();
+	save(STORAGE_IS_FROM_FCM, true);
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
-			navigateToNotification(store, notification, navigation, currentClan);
+			navigateToNotification(store, notification, navigation);
 		}, time);
 	} else {
-		navigateToNotification(store, notification, navigation, currentClan);
+		navigateToNotification(store, notification, navigation);
 	}
 };
 
-export const setupNotificationListeners = async (navigation, currentClan) => {
+export const setupNotificationListeners = async (navigation) => {
 	await notifee.createChannel({
 		id: 'default',
 		name: 'mezon',
@@ -246,7 +255,6 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 					processNotification({
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
-						currentClan,
 						time: 2000,
 					});
 				}
@@ -254,11 +262,9 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 	}
 
 	messaging().onNotificationOpenedApp(async (remoteMessage) => {
-		save(STORAGE_IS_FROM_FCM, true);
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,
-			currentClan,
 			time: 0,
 		});
 	});
@@ -277,7 +283,6 @@ export const setupNotificationListeners = async (navigation, currentClan) => {
 				processNotification({
 					notification: detail.notification,
 					navigation,
-					currentClan,
 				});
 				console.log('User pressed notification', detail.notification);
 
