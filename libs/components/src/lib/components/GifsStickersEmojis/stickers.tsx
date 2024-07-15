@@ -5,12 +5,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
-	channelLabel: string;
 	mode: number;
 };
 
-function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
+function ImageSquare({ channelId, mode }: ChannelMessageBoxProps) {
+	const { sendMessage } = useChatSending({ channelId, mode });
 
 	const handleSend = useCallback(
 		(
