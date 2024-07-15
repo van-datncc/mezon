@@ -32,5 +32,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     input: {
         backgroundColor: colors.secondary
+    },
+
+    feedSection: {
+        flexBasis: 10,
+        flexGrow: 1
+    },
+
+    btnWrapper: {
+        paddingVertical: Metrics.size.xl,
+        backgroundColor: colors.primary
     }
 })

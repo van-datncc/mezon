@@ -26,5 +26,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
         fontSize: 11,
         fontWeight: '600',
         marginBottom: Fonts.size.s_10
+    },
+
+    titleUppercase: {
+        fontSize: Fonts.size.h7,
+        textTransform: "uppercase"
     }
 })

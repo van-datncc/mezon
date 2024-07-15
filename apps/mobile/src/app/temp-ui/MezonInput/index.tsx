@@ -1,4 +1,4 @@
-import { StyleProp, Text, TextInput, View, ViewStyle } from "react-native";
+import { StyleProp, Text, TextInput, TextStyle, View, ViewStyle } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRef } from "react";
 import { useState } from "react";
@@ -12,6 +12,8 @@ import { ErrorInput } from "../../components/ErrorInput";
 interface IMezonInputProps {
     placeHolder?: string;
     label?: string;
+    titleStyle?: StyleProp<TextStyle>,
+    titleUppercase?: boolean
     textarea?: boolean;
     value: string;
     onTextChange?: (value: string) => void;
@@ -21,7 +23,7 @@ interface IMezonInputProps {
     errorMessage?: string;
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage }: IMezonInputProps) {
+export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle }: IMezonInputProps) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
     const ref = useRef<TextInput>(null);
@@ -58,7 +60,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>
             <View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
                 <View style={styles.inputBox}>
                     <TextInput
