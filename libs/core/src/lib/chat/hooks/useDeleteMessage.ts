@@ -1,5 +1,6 @@
 import { messagesActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppParams } from '../../app/hooks/useAppParams';
@@ -37,8 +38,12 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 					messageId,
 				}),
 			);
-
-			await socket.removeChatMessage(currentClanId || '', channelIdDelete, mode, messageId);
+			await socket.removeChatMessage(
+				mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : currentClanId ?? '',
+				channelIdDelete,
+				mode,
+				messageId,
+			);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode],
 	);

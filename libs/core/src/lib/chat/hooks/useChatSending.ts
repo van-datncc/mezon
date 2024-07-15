@@ -1,6 +1,7 @@
 import { messagesActions, selectChannelById, selectCurrentClanId, selectCurrentUserId, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -22,12 +23,12 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
 	// If not, using 2 hooks for direct and channel
-	const direct = useSelector(selectDirectById(directMessageId || directId || ""));
+	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
-	let channelID = channelId
+	let channelID = channelId;
 	if (direct) {
-		channelID = direct.id
+		channelID = direct.id;
 	}
 	const sendMessage = React.useCallback(
 		async (
@@ -38,18 +39,20 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 			anonymous?: boolean,
 			mentionEveryone?: boolean,
 		) => {
-			return dispatch(messagesActions.sendMessage({
-				channelId: channelID,
-				clanId: currentClanId ?? '',
-				mode,
-				content,
-				mentions,
-				attachments,
-				references,
-				anonymous,
-				mentionEveryone,
-				senderId: currentUserId,
-			}))
+			return dispatch(
+				messagesActions.sendMessage({
+					channelId: channelID,
+					clanId: mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : currentClanId ?? '',
+					mode,
+					content,
+					mentions,
+					attachments,
+					references,
+					anonymous,
+					mentionEveryone,
+					senderId: currentUserId,
+				}),
+			);
 		},
 		[dispatch, channelID, currentClanId, mode, currentUserId],
 	);
@@ -72,7 +75,7 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-			
+
 			await socket.updateChatMessage(currentClanId || '', channelId, mode, messageId, editMessage);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, currentClanId, channelId, mode],
