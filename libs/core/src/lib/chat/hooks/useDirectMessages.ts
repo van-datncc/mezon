@@ -24,7 +24,6 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
 	const channel = useSelector(selectDirectById(channelId));
-	const currentClanId = useSelector(selectCurrentClanId);
 
 	const sendDirectMessage = React.useCallback(
 		async (content: IMessageSendPayload,
@@ -39,7 +38,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				console.log(client, session, socket, channel);
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeChatMessage('DM', channel.id, mode, content, mentions, attachments, references);
+			await socket.writeChatMessage('0', channel.id, mode, content, mentions, attachments, references);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {
@@ -54,7 +53,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId: channelId, mode: mode}));
+		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode}));
 	}, [channelId, dispatch, mode]);
 
 	return useMemo(

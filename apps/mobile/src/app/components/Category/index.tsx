@@ -56,7 +56,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 
         const body: ApiCreateCategoryDescRequest = {
             clan_id: currentClanId?.toString(),
-            category_name: categoryName.trim(),
+            category_name: categoryName?.trim(),
         };
         await dispatch(categoriesActions.createNewCategory(body));
         setCategoryName('');

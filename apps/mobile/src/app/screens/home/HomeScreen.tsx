@@ -1,4 +1,4 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { load, save, STORAGE_CLAN_ID, STORAGE_IS_FROM_FCM } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -15,23 +15,17 @@ import {
 	selectCurrentClan,
 	selectIsLogin,
 } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
+import { delay } from 'lodash';
 import React, { useEffect } from 'react';
-import { AppState, DeviceEventEmitter } from 'react-native';
+import { AppState } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 
 const Drawer = createDrawerNavigator();
-
-type Sessionlike = {
-	token: string;
-	refresh_token: string;
-	created: boolean;
-};
 
 const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 	const dispatch = useDispatch();
@@ -77,8 +71,8 @@ const HomeScreen = React.memo((props: any) => {
 	const clans = useSelector(selectAllClans);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isLogin = useSelector(selectIsLogin);
+	const dispatch = useDispatch();
 
-	const { reconnect, refreshSession } = useMezon();
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
@@ -88,7 +82,12 @@ const HomeScreen = React.memo((props: any) => {
 	}, [clans, currentClan]);
 
 	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+		const appStateSubscription = AppState.addEventListener('change', (state) => {
+			if (state === 'active') {
+				dispatch(appActions.setLoadingMainMobile(true));
+			}
+			delay(handleAppStateChange, 800, state);
+		});
 
 		return () => {
 			appStateSubscription.remove();
@@ -102,9 +101,12 @@ const HomeScreen = React.memo((props: any) => {
 	}, [isLogin]);
 
 	const handleAppStateChange = async (state: string) => {
-		if (state === 'active') {
+		const isFromFCM = await load(STORAGE_IS_FROM_FCM);
+		if (isFromFCM?.toString() === 'true') {
+			dispatch(appActions.setLoadingMainMobile(false));
+		}
+		if (state === 'active' && isFromFCM?.toString() !== 'true') {
 			await messageLoader();
-			await reconnect();
 		}
 	};
 
@@ -112,25 +114,27 @@ const HomeScreen = React.memo((props: any) => {
 		const store = await getStoreAsync();
 		store.dispatch(notificationActions.fetchListNotification());
 		store.dispatch(friendsActions.fetchListFriends({}));
-		store.dispatch(directActions.fetchDirectMessage({}));
 		store.dispatch(clansActions.fetchClans());
 		store.dispatch(gifsActions.fetchGifCategories());
 		store.dispatch(gifsActions.fetchGifCategoryFeatured());
+		store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		if (currentClan) {
-			store.dispatch(clansActions.joinClan({ clanId: '0' }));
 			store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id }));
+			save(STORAGE_CLAN_ID, currentClan?.clan_id);
+			store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+		} else {
+			store.dispatch(directActions.fetchDirectMessage({}));
 		}
 		return null;
 	};
 
 	const messageLoader = async () => {
 		const store = await getStoreAsync();
-		const resSession = await store.dispatch(authActions.refreshSession());
-		const refreshToken = resSession?.payload as Sessionlike;
-		await refreshSession(refreshToken);
+		await store.dispatch(authActions.refreshSession());
+		dispatch(appActions.setLoadingMainMobile(false));
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+		save(STORAGE_CLAN_ID, currentClan?.clan_id);
 		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
 		await store.dispatch(
 			channelsActions.joinChannel({
@@ -149,6 +153,7 @@ const HomeScreen = React.memo((props: any) => {
 		if (lastClanId) {
 			store.dispatch(clansActions.joinClan({ clanId: '0' }));
 			store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
+			save(STORAGE_CLAN_ID, lastClanId);
 			store.dispatch(clansActions.changeCurrentClan({ clanId: lastClanId }));
 		}
 		return null;
