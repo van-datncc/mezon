@@ -27,8 +27,10 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 				throw new Error('Client is not initialized');
 			}
 			let channelIdDelete = channelId;
+			let clanId = currentClanId;
 			if (direct) {
 				channelIdDelete = direct.id || '';
+				clanId = '0';
 			}
 
 			dispatch(
@@ -38,7 +40,7 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 				}),
 			);
 
-			await socket.removeChatMessage(currentClanId || '', channelIdDelete, mode, messageId);
+			await socket.removeChatMessage(clanId || '', channelIdDelete, mode, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode],
 	);

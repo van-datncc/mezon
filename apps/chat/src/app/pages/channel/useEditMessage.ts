@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
   const dispatch = useDispatch();
-  const { EditSendMessage } = useChatSending({ channelId: channelId || '', channelLabel: channelLabel || '', mode });
+  const { EditSendMessage } = useChatSending({ channelId: channelId || '', mode });
 
   const openEditMessageState = useSelector(selectOpenEditMessageState);
   const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
