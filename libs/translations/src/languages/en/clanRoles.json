@@ -1,0 +1,44 @@
+{
+    "roleDescription": "Use roles to group your server members and assign permissions",
+    "defaultRole": "Default permission for all server members",
+    "roles": "Roles",
+    "members": "Members",
+    "noRole": "There are currently no roles",
+    "skipStep": "Skip this step",
+    "failed": "failed",
+    "createNewRole": {
+        "title": "Step 1 of 3",
+        "createANewRole": "Create a new role",
+        "description": "Give this role a unique name and color. You can always change this later.",
+        "create": "Create",
+        "newRole": "new role",
+        "roleName": "ROLE NAME",
+        "createSuccess": "Created {{roleName}} role successfully",
+        "cannotCreate": "Cannot create {{roleName}}"
+    },
+    "setupPermission": {
+        "title": "Step 2 of 3",
+        "setupPermissionTitle": "Set up permissions",
+        "setupPermissionSuccessfully": "Setup Permission Successfully",
+        "next": "Next",
+        "searchPermission": "Search Permissions"
+    },
+    "setupMember": {
+        "title": "Step 3 of 3",
+        "addMember": "Add members",
+        "description": "Assign this role to your members. Members can have more than one role.",
+        "finish": "Finish",
+        "addedMember": "You have added {{memberCount}} member to this role.",
+        "searchMembers": "Search Members"
+    },
+    "roleDetail": {
+        "permissions": "Permissions",
+        "members": "Members",
+        "role": "Role",
+        "roleName": "Role Name",
+        "deleteRole": "Delete Role",
+        "deleteRoleSuccessfully": "Deleted {{roleName}} Role Successfully",
+        "changesSaved": "Changes Saved",
+        "save": "Save"
+    }
+}

@@ -1,11 +1,11 @@
 {
   "title": "Mời bạn bè",
   "iconTitle": {
-      "twitter": "Twitter",
-      "faceBook": "Facebook",
-      "youtube": "Youtube",
-      "copyLink": "Sao chép liên kết",
-      "email": "Email"
+    "shareInvite": "Chia sẻ ời",
+    "copyLink": "Sao chép liên kết",
+    "facebook": "Facebook",
+    "youtube": "Youtube",
+    "twitter": "Twitter"
   },
   "copyLink": "Đã sao chép liên kết!",
   "unknownChannel": "CHANNEL KHÔNG XÁC ĐỊNH",
