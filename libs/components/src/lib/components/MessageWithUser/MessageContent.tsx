@@ -1,4 +1,5 @@
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { useMemo } from 'react';
 import MessageLine from './MessageLine';
 import { useMessageParser } from './useMessageParser';
 
@@ -15,7 +16,7 @@ type IMessageContentProps = {
 const MessageText = ({ message, lines, isEdited, mode }: { message: IMessageWithUser; lines: string; isEdited?: boolean; mode?: number }) => (
 	<>
 		{' '}
-		{lines.length > 0 ? (
+		{lines?.length > 0 ? (
 			<div className="flex w-full">
 				<div className="w-full">
 					<MessageLine line={lines} messageId={message.id} mode={mode} />
@@ -32,7 +33,14 @@ const MessageText = ({ message, lines, isEdited, mode }: { message: IMessageWith
 
 const MessageContent = ({ message, mode }: IMessageContentProps) => {
 	const { attachments, lines, hasAttachments, isEdited } = useMessageParser(message);
-	return <MessageText message={message} lines={lines as string} isEdited={isEdited} mode={mode} />;
+	const lineValue = useMemo(() => {
+		if (lines === undefined) {
+			return JSON.parse(message.content).t;
+		} else {
+			return lines;
+		}
+	}, [lines]);
+	return <MessageText message={message} lines={lineValue as string} isEdited={isEdited} mode={mode} />;
 };
 
 export default MessageContent;

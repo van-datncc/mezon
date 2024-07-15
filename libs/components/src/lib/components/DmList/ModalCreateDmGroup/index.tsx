@@ -88,7 +88,7 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 							aria-labelledby="dropdownSearchButton"
 						>
 							{filteredFriends.map((friend, index) => (
-								<li key={friend.id} className='dark:hover:bg-gray-700 rounded hover:bg-bgLightModeButton'>
+								<li key={friend.id} className="dark:hover:bg-gray-700 rounded hover:bg-bgLightModeButton">
 									<div className="flex text-black dark:text-white items-center py-2 my-2 rounded w-full">
 										<input
 											id={`checkbox-item-${index}`}
@@ -101,9 +101,15 @@ export function ModalCreateDM({ onClose, isOpen }: ModalCreateDMProps) {
 											htmlFor={`checkbox-item-${index}`}
 											className="w-full ms-2 text-sm font-medium cursor-pointer text-black dark:text-white rounded flex gap-2"
 										>
-											<img src={friend.user?.avatar_url} alt={friend.user?.avatar_url} className='size-5 rounded-full object-cover'/>
+											<img
+												src={friend.user?.avatar_url}
+												alt={friend.user?.avatar_url}
+												className="size-5 rounded-full object-cover"
+											/>
 											{friend.user?.display_name}
-											<span className='dark:text-colorNeutral text-colorTextLightMode font-medium'>{friend.user?.username}</span>
+											<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">
+												{friend.user?.username}
+											</span>
 										</label>
 									</div>
 								</li>

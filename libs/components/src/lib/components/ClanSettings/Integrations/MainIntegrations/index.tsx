@@ -1,10 +1,10 @@
-import { Icons } from "libs/components/src/lib/components";
+import { Icons } from 'libs/components/src/lib/components';
 
-interface IIntegrationProps{
-    setIsOpenWebhooks(): void;
+interface IIntegrationProps {
+	setIsOpenWebhooks(): void;
 }
 
-const MainIntegrations = ({setIsOpenWebhooks} : IIntegrationProps) => {
+const MainIntegrations = ({ setIsOpenWebhooks }: IIntegrationProps) => {
 	return (
 		<>
 			<div className="dark:text-[#b5bac1] text-textLightTheme text-sm pt-5">

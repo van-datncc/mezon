@@ -1,12 +1,12 @@
 import { useRoles } from '@mezon/core';
 import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { InputField } from '@mezon/ui';
+import { UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddMembersModal } from '../AddMembersModal';
-import { UsersClanEntity } from '@mezon/utils';
-import { InputField } from '@mezon/ui';
 
-const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
+const SettingManageMembers = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
 	const { updateRole } = useRoles();
 	const dispatchRole = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
@@ -67,14 +67,18 @@ const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 				<ul className="flex flex-col gap-y-[5px]">
 					{searchResults.map((member: UsersClanEntity) => (
 						<li key={member?.user?.id} className="flex justify-between items-center group">
-							<div className='flex gap-x-2'>
-								<img src={member?.user?.avatar_url} alt={member?.user?.display_name} className='size-6 rounded-full' />
-								<span className='dark:text-white text-black'>{member?.user?.display_name}</span>
-								<span className='dark:text-colorNeutral text-colorTextLightMode font-medium'>{member?.user?.username}</span>
+							<div className="flex gap-x-2">
+								<img src={member?.user?.avatar_url} alt={member?.user?.display_name} className="size-6 rounded-full" />
+								<span className="dark:text-white text-black">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{member?.user?.username}</span>
 							</div>
 							{clickRole !== 'New Role' ? (
 								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
-									<span onClick={() => handleRemoveMember(member?.user?.id || '')} className="text-white cursor-pointer" role="button">
+									<span
+										onClick={() => handleRemoveMember(member?.user?.id || '')}
+										className="text-white cursor-pointer"
+										role="button"
+									>
 										x
 									</span>
 								</div>
@@ -83,7 +87,7 @@ const SettingManageMembers = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 					))}
 				</ul>
 			</div>
-			<AddMembersModal isOpen={openModal} onClose={handleCloseModal} RolesClan={RolesClan}/>
+			<AddMembersModal isOpen={openModal} onClose={handleCloseModal} RolesClan={RolesClan} />
 		</>
 	);
 };

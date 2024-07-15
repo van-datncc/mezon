@@ -1,13 +1,13 @@
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import {
-	gifsActions,
-	selectAllgifCategory,
-	selectButtonArrowBackStatus,
-	selectCategoriesStatus,
-	selectDataGifsFeatured,
-	selectGifsDataSearch,
-	selectLoadingStatusGifs,
-	selectTrendingClickingStatus,
+    gifsActions,
+    selectAllgifCategory,
+    selectButtonArrowBackStatus,
+    selectCategoriesStatus,
+    selectDataGifsFeatured,
+    selectGifsDataSearch,
+    selectLoadingStatusGifs,
+    selectTrendingClickingStatus,
 } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

@@ -1,11 +1,11 @@
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
+	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	ThreadIcon,
 	getUpdateOrAddClanChannelCache,
 	save,
-	STORAGE_CLAN_ID
 } from '@mezon/mobile-components';
 import { Colors, useAnimatedState } from '@mezon/mobile-ui';
 import {

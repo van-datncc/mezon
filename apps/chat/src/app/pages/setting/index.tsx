@@ -14,15 +14,15 @@ const Setting = () => {
 	const handleMenuBtn = () => {
 		setMenuIsOpen(!menuIsOpen);
 	};
-	const {setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab} = useSettingFooter();
+	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const closeSetting = () => {
 		setIsShowSettingFooterStatus(false);
 		setIsShowSettingFooterInitTab('Account');
-	}
+	};
 
 	useEffect(() => {
 		setCurrentSetting(isShowSettingFooter?.initTab || 'Account');
-	},[isShowSettingFooter?.initTab]);
+	}, [isShowSettingFooter?.initTab]);
 	return (
 		<div>
 			{isShowSettingFooter?.status ? (
@@ -37,9 +37,15 @@ const Setting = () => {
 						<ExitSetting onClose={closeSetting} />
 
 						{menuIsOpen ? (
-							<Icons.ArrowLeftCircleActive className='flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400' onClick={handleMenuBtn}/>
+							<Icons.ArrowLeftCircleActive
+								className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400"
+								onClick={handleMenuBtn}
+							/>
 						) : (
-							<Icons.ArrowLeftCircle className='flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400' onClick={handleMenuBtn}/>
+							<Icons.ArrowLeftCircle
+								className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400"
+								onClick={handleMenuBtn}
+							/>
 						)}
 
 						<div className="flex sbm:hidden absolute right-4 top-4" onClick={closeSetting}>

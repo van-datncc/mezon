@@ -1,8 +1,8 @@
 import { INotifiReactMessage, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import memoize from 'memoizee';
 import { ApiNotifiReactMessage } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import memoize from 'memoizee';
 export const NOTIFI_REACT_MESSAGE_FEATURE_KEY = 'notifireactmessage';
 
 export interface NotifiReactMessageState {

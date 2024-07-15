@@ -1,46 +1,42 @@
-import { View } from "react-native";
-import { Text } from 'react-native';
-import BouncyCheckbox from "react-native-bouncy-checkbox/build/dist/BouncyCheckbox";
-import { styles } from "../NotificationSetting.styles";
-import { Colors } from "@mezon/mobile-ui";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { ENotificationType } from "../../NotificationSetting";
+import { Colors } from '@mezon/mobile-ui';
 import React from 'react';
-
+import { Text, View } from 'react-native';
+import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ENotificationType } from '../../NotificationSetting';
+import { styles } from '../NotificationSetting.styles';
 
 interface FilterCheckboxProps {
-  id: number;
-  isChecked: boolean;
-  label: string;
-  defaultNotifyName: string,
-  onCheckboxPress: (checked: boolean, id: number) => void;
+	id: number;
+	isChecked: boolean;
+	label: string;
+	defaultNotifyName: string;
+	onCheckboxPress: (checked: boolean, id: number) => void;
 }
 
-const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(({
-  id,
-  isChecked,
-  label,
-  defaultNotifyName,
-  onCheckboxPress,
-}) => {
-  const handleCheckboxPress = () => {
-    onCheckboxPress(!isChecked, id);
-  };
-  return (
-    <TouchableOpacity onPress={handleCheckboxPress} style={styles.option}>
-      <View>
-        <Text style={styles.labelOption}>{label}</Text>
-        {[ENotificationType.CATEGORY_DEFAULT].includes(label as ENotificationType) && <Text style={styles.defaultNotifyName}>{defaultNotifyName?.charAt(0)?.toUpperCase() + defaultNotifyName?.slice(1)?.toLowerCase()}</Text>}
-      </View>
-      <BouncyCheckbox
-        size={20}
-        fillColor={Colors.bgButton}
-        isChecked={isChecked}
-        innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white }}
-        textStyle={{ fontFamily: "JosefinSans-Regular",  textDecorationLine: "none", }}
-      />
-    </TouchableOpacity>
-  );
+const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(({ id, isChecked, label, defaultNotifyName, onCheckboxPress }) => {
+	const handleCheckboxPress = () => {
+		onCheckboxPress(!isChecked, id);
+	};
+	return (
+		<TouchableOpacity onPress={handleCheckboxPress} style={styles.option}>
+			<View>
+				<Text style={styles.labelOption}>{label}</Text>
+				{[ENotificationType.CATEGORY_DEFAULT].includes(label as ENotificationType) && (
+					<Text style={styles.defaultNotifyName}>
+						{defaultNotifyName?.charAt(0)?.toUpperCase() + defaultNotifyName?.slice(1)?.toLowerCase()}
+					</Text>
+				)}
+			</View>
+			<BouncyCheckbox
+				size={20}
+				fillColor={Colors.bgButton}
+				isChecked={isChecked}
+				innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white }}
+				textStyle={{ fontFamily: 'JosefinSans-Regular', textDecorationLine: 'none' }}
+			/>
+		</TouchableOpacity>
+	);
 });
 
 export default FilterCheckbox;

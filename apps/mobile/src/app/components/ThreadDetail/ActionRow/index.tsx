@@ -1,15 +1,13 @@
-import React, { useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import React, { useContext } from 'react';
 
 import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon, UnMuteIcon } from '@mezon/mobile-components';
-import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
-import { Text } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import styles from './style';
-import { useMemo } from 'react';
 import { threadDetailContext } from '../MenuThreadDetail';
+import styles from './style';
 
 export const ActionRow = React.memo(() => {
 	const currentChannel = useContext(threadDetailContext);
@@ -22,7 +20,7 @@ export const ActionRow = React.memo(() => {
 	const actionList = [
 		{
 			title: 'Search',
-			action: () => { },
+			action: () => {},
 			icon: <SearchIcon width={22} height={22} />,
 			hidden: true,
 		},
@@ -48,8 +46,8 @@ export const ActionRow = React.memo(() => {
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
 					params: {
-						channelId: currentChannel?.channel_id
-					}
+						channelId: currentChannel?.channel_id,
+					},
 				});
 			},
 			icon: <SettingIcon width={22} height={22} />,
@@ -58,11 +56,11 @@ export const ActionRow = React.memo(() => {
 	];
 
 	const filteredActionList = useMemo(() => {
-		if (currentChannel?.clan_id === "0") {
-			return actionList.filter((item) => ['Mute', 'Search'].includes(item.title))
+		if (currentChannel?.clan_id === '0') {
+			return actionList.filter((item) => ['Mute', 'Search'].includes(item.title));
 		}
 		return actionList;
-	}, [currentChannel, isChannel])
+	}, [currentChannel, isChannel]);
 	return (
 		<View style={styles.container}>
 			{filteredActionList.map((action, index) =>
@@ -77,5 +75,4 @@ export const ActionRow = React.memo(() => {
 			)}
 		</View>
 	);
-}
-)
+});

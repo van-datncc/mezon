@@ -11,10 +11,10 @@ import { IChannel, MouseButton } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import PanelChannel from '../PanelChannel';
 
 type ThreadLinkProps = {

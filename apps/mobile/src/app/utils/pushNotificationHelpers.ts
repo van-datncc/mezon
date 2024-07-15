@@ -1,10 +1,10 @@
 import {
-	STORAGE_CLAN_ID,
-	STORAGE_IS_FROM_FCM,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save,
+    STORAGE_CLAN_ID,
+    STORAGE_DATA_CLAN_CHANNEL_CACHE,
+    STORAGE_IS_FROM_FCM,
+    getUpdateOrAddClanChannelCache,
+    load,
+    save,
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';

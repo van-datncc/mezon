@@ -1,7 +1,7 @@
+import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import * as Icons from '../../../../../ui/src/lib/Icons';
-import { useReference } from '@mezon/core';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -24,11 +24,13 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 		const promises = Array.from(files).map((file) => {
 			return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
-		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => onFinishUpload(attachment));
-		}).then(() => {
-			setStatusLoadingAttachment(false);
-		});
+		Promise.all(promises)
+			.then((attachments) => {
+				attachments.forEach((attachment) => onFinishUpload(attachment));
+			})
+			.then(() => {
+				setStatusLoadingAttachment(false);
+			});
 	};
 
 	return (

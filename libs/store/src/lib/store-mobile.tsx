@@ -1,8 +1,8 @@
+import { reduxPersistStorage as storage } from '@mezon/mobile-components';
 import { MezonContextValue } from '@mezon/transport';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
-import { reduxPersistStorage as storage } from '@mezon/mobile-components';
 
 import { accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';

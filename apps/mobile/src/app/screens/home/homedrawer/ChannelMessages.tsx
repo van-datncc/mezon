@@ -272,100 +272,100 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	}, [channelId]);
 
 	return (
-		<View style={{flex: 1}}>
-		<View style={styles.wrapperChannelMessage}>
-			{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
-			{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && <MessageItemSkeleton skeletonNumber={15} />}
-			<FlashList
-				ref={flatListRef}
-				inverted
-				data={dataReverse || []}
-				onScroll={handleScroll}
-				keyboardShouldPersistTaps={'handled'}
-				contentContainerStyle={styles.listChannels}
-				renderItem={renderItem}
-				removeClippedSubviews={true}
-				keyExtractor={(item) => `${item}`}
-				estimatedItemSize={ITEM_HEIGHT}
-				onEndReached={
-					messages?.length
-						? onLoadMore
-						: () => {
-								// 	empty
-							}
-				}
-				onEndReachedThreshold={0.1}
-				showsVerticalScrollIndicator={false}
-				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
-			/>
-
-			{showScrollToBottomButton && (
-				<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>
-					<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />
-				</TouchableOpacity>
-			)}
-
-			{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
-		</View>
-
-		<View>
-		{visibleImageModalOverlay && (
-				<View style={styles.overlay}>
-					<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
-				</View>
-			)}
-
-			{visibleImageModal ? (
-				<ImageListModal
-					data={formatAttachments}
-					visible={visibleImageModal}
-					idxSelected={idxSelectedImageModal}
-					onImageChange={onImageModalChange}
-					onClose={() => setVisibleImageModal(false)}
-					onImageChangeFooter={onImageFooterChange}
+		<View style={{ flex: 1 }}>
+			<View style={styles.wrapperChannelMessage}>
+				{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
+				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && <MessageItemSkeleton skeletonNumber={15} />}
+				<FlashList
+					ref={flatListRef}
+					inverted
+					data={dataReverse || []}
+					onScroll={handleScroll}
+					keyboardShouldPersistTaps={'handled'}
+					contentContainerStyle={styles.listChannels}
+					renderItem={renderItem}
+					removeClippedSubviews={true}
+					keyExtractor={(item) => `${item}`}
+					estimatedItemSize={ITEM_HEIGHT}
+					onEndReached={
+						messages?.length
+							? onLoadMore
+							: () => {
+									// 	empty
+								}
+					}
+					onEndReachedThreshold={0.1}
+					showsVerticalScrollIndicator={false}
+					ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 				/>
-			) : null}
 
-			<MessageItemBS
-				mode={mode}
-				clanId={currentClan.clan_id}
-				message={messageSelected}
-				onConfirmAction={onConfirmAction}
-				type={openBottomSheet}
-				isOnlyEmojiPicker={isOnlyEmojiPicker}
-				onClose={() => {
-					setOpenBottomSheet(null);
-				}}
-				user={userSelected}
-				checkAnonymous={checkAnonymous}
-				senderDisplayName={senderDisplayName}
-			/>
+				{showScrollToBottomButton && (
+					<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>
+						<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />
+					</TouchableOpacity>
+				)}
 
-			{currentMessageActionType === EMessageActionType.ForwardMessage && (
-				<ForwardMessageModal
-					show={currentMessageActionType === EMessageActionType.ForwardMessage}
-					onClose={() => setCurrentMessageActionType(null)}
+				{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
+			</View>
+
+			<View>
+				{visibleImageModalOverlay && (
+					<View style={styles.overlay}>
+						<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
+					</View>
+				)}
+
+				{visibleImageModal ? (
+					<ImageListModal
+						data={formatAttachments}
+						visible={visibleImageModal}
+						idxSelected={idxSelectedImageModal}
+						onImageChange={onImageModalChange}
+						onClose={() => setVisibleImageModal(false)}
+						onImageChangeFooter={onImageFooterChange}
+					/>
+				) : null}
+
+				<MessageItemBS
+					mode={mode}
+					clanId={currentClan.clan_id}
 					message={messageSelected}
+					onConfirmAction={onConfirmAction}
+					type={openBottomSheet}
+					isOnlyEmojiPicker={isOnlyEmojiPicker}
+					onClose={() => {
+						setOpenBottomSheet(null);
+					}}
+					user={userSelected}
+					checkAnonymous={checkAnonymous}
+					senderDisplayName={senderDisplayName}
 				/>
-			)}
 
-			{currentMessageActionType === EMessageActionType.Report && (
-				<ReportMessageModal
-					isVisible={currentMessageActionType === EMessageActionType.Report}
-					onClose={() => setCurrentMessageActionType(null)}
-					message={messageSelected}
-				/>
-			)}
+				{currentMessageActionType === EMessageActionType.ForwardMessage && (
+					<ForwardMessageModal
+						show={currentMessageActionType === EMessageActionType.ForwardMessage}
+						onClose={() => setCurrentMessageActionType(null)}
+						message={messageSelected}
+					/>
+				)}
 
-			{[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType) && (
-				<ConfirmPinMessageModal
-					isVisible={[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType)}
-					onClose={() => setCurrentMessageActionType(null)}
-					message={messageSelected}
-					type={currentMessageActionType}
-				/>
-			)}
-		</View>
+				{currentMessageActionType === EMessageActionType.Report && (
+					<ReportMessageModal
+						isVisible={currentMessageActionType === EMessageActionType.Report}
+						onClose={() => setCurrentMessageActionType(null)}
+						message={messageSelected}
+					/>
+				)}
+
+				{[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType) && (
+					<ConfirmPinMessageModal
+						isVisible={[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType)}
+						onClose={() => setCurrentMessageActionType(null)}
+						message={messageSelected}
+						type={currentMessageActionType}
+					/>
+				)}
+			</View>
 		</View>
 	);
 });

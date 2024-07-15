@@ -1,35 +1,32 @@
-import { Pressable, StyleProp, Text, TextProps, TextStyle } from "react-native";
-import { style } from "./styles";
-import { useTheme } from "@mezon/mobile-ui";
+import { useTheme } from '@mezon/mobile-ui';
+import { Pressable, StyleProp, Text, TextStyle } from 'react-native';
+import { style } from './styles';
 
 interface IMezonButton {
-    icon?: any,
-    title?: string,
-    titleStyle?: StyleProp<TextStyle>
-    fluid?: boolean,
-    border?: boolean,
-    type?: "success" | "warning" | "danger";
-    onPress?: () => void;
+	icon?: any;
+	title?: string;
+	titleStyle?: StyleProp<TextStyle>;
+	fluid?: boolean;
+	border?: boolean;
+	type?: 'success' | 'warning' | 'danger';
+	onPress?: () => void;
 }
 
 export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress }: IMezonButton) {
-    const { themeValue } = useTheme();
-    const styles = style(themeValue);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 
-    function renderContainerStyle() {
-        if (type === "success") return styles.containerSuccess;
-        if (type === "warning") return styles.containerWarning;
-        if (type === "danger") return styles.containerDanger;
-        return {};
-    }
+	function renderContainerStyle() {
+		if (type === 'success') return styles.containerSuccess;
+		if (type === 'warning') return styles.containerWarning;
+		if (type === 'danger') return styles.containerDanger;
+		return {};
+	}
 
-    return (
-        <Pressable
-            style={[styles.container, fluid && styles.fluid, border && styles.border, renderContainerStyle()]}
-            onPress={onPress}
-        >
-            {icon}
-            {title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
-        </Pressable>
-    )
+	return (
+		<Pressable style={[styles.container, fluid && styles.fluid, border && styles.border, renderContainerStyle()]} onPress={onPress}>
+			{icon}
+			{title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
+		</Pressable>
+	);
 }

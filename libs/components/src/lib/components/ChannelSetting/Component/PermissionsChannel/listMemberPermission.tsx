@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { channelUsersActions, selectAllAccount, selectMembersByChannelId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { useCallback, useLayoutEffect, useState, useMemo } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 type ListMemberPermissionProps = {
 	channel: IChannel;
@@ -29,10 +29,8 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 
 	const listMembersInChannel = () => {
 		if (channel.channel_private === 0 || channel.channel_private === undefined) {
-			const filteredMembers = rawMembers.filter((member) => 
-            member.user && member.user.id && props.selectedUserIds.includes(member.user.id)
-        );
-		return filteredMembers.map((member) => member.user);
+			const filteredMembers = rawMembers.filter((member) => member.user && member.user.id && props.selectedUserIds.includes(member.user.id));
+			return filteredMembers.map((member) => member.user);
 		}
 		const filteredMembers = rawMembers.filter((member) => member.userChannelId !== '0');
 		return filteredMembers.map((member) => member.user);
