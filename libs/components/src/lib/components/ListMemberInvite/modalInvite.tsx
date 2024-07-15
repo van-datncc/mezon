@@ -1,5 +1,6 @@
 import { useEscapeKey, useInvite } from '@mezon/core';
 import { selectChannelById, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ListMemberInvite from '.';
@@ -32,7 +33,7 @@ const ModalInvite = (props: ModalParam) => {
 	const handleOpenInvite = () => {
 		createLinkInviteUser(currentClanId ?? '', props.channelID ?? '', 10).then((res) => {
 			if (res && res?.invite_link) {
-				setUrlInvite(window.location.origin + '/invite/' + res.invite_link);
+				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
 			}
 		});
 	};
