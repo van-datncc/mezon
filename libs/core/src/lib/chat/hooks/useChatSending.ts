@@ -1,7 +1,6 @@
 import { messagesActions, selectChannelById, selectCurrentClanId, selectCurrentUserId, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -9,13 +8,12 @@ import { useAppParams } from '../../app/hooks/useAppParams';
 
 export type UseChatSendingOptions = {
 	channelId: string;
-	channelLabel: string;
 	mode: number;
 	directMessageId?: string;
 };
 
 // TODO: separate this hook into 2 hooks for send and edit message
-export function useChatSending({ channelId, channelLabel, mode, directMessageId }: UseChatSendingOptions) {
+export function useChatSending({ channelId, mode, directMessageId }: UseChatSendingOptions) {
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
@@ -27,8 +25,10 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
 	let channelID = channelId;
+	let clanID = currentClanId;
 	if (direct) {
 		channelID = direct.id;
+		clanID = '0';
 	}
 	const sendMessage = React.useCallback(
 		async (
@@ -42,7 +42,7 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 			return dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
-					clanId: mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : currentClanId ?? '',
+					clanId: clanID || '',
 					mode,
 					content,
 					mentions,
@@ -54,12 +54,12 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 				}),
 			);
 		},
-		[dispatch, channelID, currentClanId, mode, currentUserId],
+		[dispatch, channelID, clanID, mode, currentUserId],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
-	}, [channelId, currentClanId, dispatch, mode]);
+		dispatch(messagesActions.sendTypingUser({ clanId: clanID || '', channelId, mode }));
+	}, [channelId, clanID, dispatch, mode]);
 
 	// TODO: why "Edit" not "edit"?
 	// Move this function to to a new action of messages slice
@@ -76,9 +76,9 @@ export function useChatSending({ channelId, channelLabel, mode, directMessageId 
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(currentClanId || '', channelId, mode, messageId, editMessage);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, editMessage);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, currentClanId, channelId, mode],
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
 
 	return useMemo(
