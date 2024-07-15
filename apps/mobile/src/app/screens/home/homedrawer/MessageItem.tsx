@@ -487,7 +487,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							alt={user?.user?.username || message?.username}
 							image={user?.user?.avatar_url}
 							defaultColor={baseColor.gray}
-							textStyle={{ fontWeight: "normal" }}
+							textStyle={{ fontWeight: "normal", fontSize: 22 }}
 						/>
 					</Pressable>
 				) : (
