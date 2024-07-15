@@ -282,8 +282,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingVertical: 12,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		borderBottomWidth: 1,
-		borderBottomColor: Colors.borderPrimary,
 	},
 	friendItemWrapperInvited: {
 		opacity: 0.6
