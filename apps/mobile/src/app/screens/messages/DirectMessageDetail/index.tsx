@@ -1,6 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, ArrowLeftIcon, save, STORAGE_CLAN_ID, UserGroupIcon } from '@mezon/mobile-components';
+import { ActionEmitEvent, ArrowLeftIcon, STORAGE_CLAN_ID, UserGroupIcon, save } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import {
 	channelMembersActions,

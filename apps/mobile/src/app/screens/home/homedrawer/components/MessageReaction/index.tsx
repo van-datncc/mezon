@@ -2,12 +2,7 @@ import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { selectAllAccount, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
-import {
-	EmojiDataOptionals,
-	SenderInfoOptionals,
-	calculateTotalCount,
-	getSrcEmoji,
-} from '@mezon/utils';
+import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -103,9 +98,8 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 								1,
 								userId ?? '',
 								false,
-							)
-						}
-						}
+							);
+						}}
 						key={index + emojiItemData.id}
 						style={[styles.reactItem, isMyReaction ? styles.myReaction : styles.otherReaction]}
 					>

@@ -1,16 +1,16 @@
 import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessageEvent, ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
+import { fetchChannelsCached } from '../channels/channels.slice';
+import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 import { clansActions } from '../clans/clans.slice';
 import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
-import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 

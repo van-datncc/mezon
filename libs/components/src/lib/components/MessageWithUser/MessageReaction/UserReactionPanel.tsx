@@ -1,6 +1,6 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { emojiSuggestionActions, reactionActions, selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { Fragment, useCallback, useEffect, useState } from 'react';
@@ -28,7 +28,17 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		}
 	}, [message]);
 	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
-		await reactionMessageDispatch(id, mode, message.clan_id || '', message.channel_id ?? '', messageId, emoji, countRemoved, message_sender_id, true);
+		await reactionMessageDispatch(
+			id,
+			mode,
+			message.clan_id || '',
+			message.channel_id ?? '',
+			messageId,
+			emoji,
+			countRemoved,
+			message_sender_id,
+			true,
+		);
 	};
 
 	const [senderList, setSenderList] = useState<SenderInfoOptionals[]>(emojiShowPanel.senders);

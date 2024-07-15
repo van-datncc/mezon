@@ -1,7 +1,7 @@
 import { authActions, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useEffect, useState } from 'react';
-const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName: string) => void, initSetting: string }) => {
+const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName: string) => void; initSetting: string }) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>(initSetting);
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
@@ -21,7 +21,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 
 	useEffect(() => {
 		setSelectedButton(initSetting);
-	}, [initSetting])
+	}, [initSetting]);
 
 	return (
 		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-[#F0F0F0] flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
@@ -132,9 +132,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				>
 					Log Out
 				</button>
-				{ openModal &&
-					<LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />
-				}
+				{openModal && <LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />}
 				<div className="h-9"></div>
 			</div>
 		</div>

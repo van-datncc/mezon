@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useChatReaction, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
 import { useCallback } from 'react';

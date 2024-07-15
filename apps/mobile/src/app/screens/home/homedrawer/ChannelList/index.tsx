@@ -23,16 +23,15 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
 	selectIsFromFCMMobile,
-	selectIsLogin,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ICategoryChannel, IChannel, IThread } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { isEmpty, isEqual } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -93,7 +92,14 @@ const ChannelList = React.memo((props: any) => {
 	}, []);
 
 	useEffect(() => {
-		if (!isEqual(filteredChannels, prevFilteredChannelsRef.current) && !isEmpty(prevFilteredChannelsRef.current) && prevFilteredChannelsRef.current && filteredChannels?.length && !isFromFCMMobile && mainLoaderCompleted) {
+		if (
+			!isEqual(filteredChannels, prevFilteredChannelsRef.current) &&
+			!isEmpty(prevFilteredChannelsRef.current) &&
+			prevFilteredChannelsRef.current &&
+			filteredChannels?.length &&
+			!isFromFCMMobile &&
+			mainLoaderCompleted
+		) {
 			setDefaultChannelLoader();
 		}
 		prevFilteredChannelsRef.current = filteredChannels;

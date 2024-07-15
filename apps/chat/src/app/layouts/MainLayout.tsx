@@ -1,4 +1,4 @@
-import { ChatContextProvider, useChatReaction, useGifsStickersEmoji } from '@mezon/core';
+import { ChatContextProvider, useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions } from '@mezon/store';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName } from '@mezon/utils';
@@ -13,7 +13,6 @@ const MainLayout = () => {
 	const handleClickingOutside = () => {
 		setSubPanelActive(SubPanelName.NONE);
 		dispatch(reactionActions.setUserReactionPanelState(false));
-
 	};
 	return (
 		<div

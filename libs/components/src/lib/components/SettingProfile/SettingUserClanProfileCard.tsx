@@ -16,19 +16,19 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 	const [color, setColor] = useState<string>('#323232');
 
 	const getColor = async () => {
-		if(!checkUrl){
+		if (!checkUrl) {
 			const colorImg = await getColorAverageFromURL(profiles.urlImage);
-			if(colorImg) setColor(colorImg);
-		}		
-	}
+			if (colorImg) setColor(colorImg);
+		}
+	};
 
-	useEffect(()=>{
+	useEffect(() => {
 		getColor();
-	},[profiles.urlImage]);
+	}, [profiles.urlImage]);
 
 	return (
 		<div className="dark:bg-bgSecondary600 bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative">
-			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px]"  style={{backgroundColor: color}}></div>
+			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px]" style={{ backgroundColor: color }}></div>
 			<div className="text-black ml-[50px]">
 				{checkUrl ? (
 					<div className="w-[90px] h-[90px] dark:bg-bgDisable bg-gray-100 rounded-full flex justify-center items-center text-contentSecondary text-[50px] mt-[-50px] ml-[-25px]">

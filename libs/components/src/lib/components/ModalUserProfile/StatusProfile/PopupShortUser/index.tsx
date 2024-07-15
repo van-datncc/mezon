@@ -24,8 +24,8 @@ export const PopupOption = ({ showPopupLeft }: { showPopupLeft?: boolean }) => {
 			className={`absolute top-0 dark:bg-bgProfileBody bg-gray-100 rounded-sm shadow w-[165px] p-2 z-[1] ${showPopupLeft ? 'right-9' : 'sbm:left-9 right-9'}`}
 		>
 			{!showPopupLeft && <ItemPanel children="View Full Profile" />}
-			<ItemPanel children="Block" danger/>
-			<ItemPanel children="Report User Profile" danger/>
+			<ItemPanel children="Block" danger />
+			<ItemPanel children="Report User Profile" danger />
 		</div>
 	);
 };

@@ -1,20 +1,20 @@
-import { MezonStoreProvider, initStore } from '@mezon/store';
+import { initStore, MezonStoreProvider } from '@mezon/store';
 import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useEffect, useMemo } from 'react';
+import { createBrowserRouter } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
 import './app.module.scss';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Login from './pages/login';
 import AppLayout from './layouts/AppLayout';
-import ApplicationsPage from './pages/applications';
-import InitialRoutes from './routes/InititalRoutes';
 import RootLayout from './layouts/RootLayout';
-import TeamsPage from './pages/teams';
-import EmbedsPage from './pages/embeds';
+import ApplicationsPage from './pages/applications';
 import DocsPage from './pages/docs';
+import EmbedsPage from './pages/embeds';
+import Login from './pages/login';
+import TeamsPage from './pages/teams';
 import { Routes } from './routes';
+import InitialRoutes from './routes/InititalRoutes';
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
@@ -102,4 +102,3 @@ function AppWrapper() {
 }
 
 export default AppWrapper;
-

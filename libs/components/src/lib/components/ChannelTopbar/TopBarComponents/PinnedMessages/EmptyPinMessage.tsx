@@ -1,9 +1,16 @@
-import { PinMessageEntity, pinMessageActions, selectCurrentChannelId, selectCurrentClanId, selectPinMessageByChannelId, useAppDispatch } from '@mezon/store';
+import { useAppParams } from '@mezon/core';
+import {
+	PinMessageEntity,
+	pinMessageActions,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectPinMessageByChannelId,
+	useAppDispatch,
+} from '@mezon/store';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
 import MessageLine from '../../../MessageWithUser/MessageLine';
-import { useAppParams } from '@mezon/core';
-import { useEffect } from 'react';
 
 type EmptyPinMessageProps = {
 	onClick?: () => void;
@@ -13,7 +20,7 @@ const EmptyPinMessage = ({ onClick }: EmptyPinMessageProps) => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentClanId = useSelector(selectCurrentClanId)
+	const currentClanId = useSelector(selectCurrentClanId);
 	const dmChannelId = useSelector(selectPinMessageByChannelId(directId));
 	const clanChannelId = useSelector(selectPinMessageByChannelId(currentChannelId));
 	let listPinMessages: PinMessageEntity[] = [];
@@ -31,7 +38,13 @@ const EmptyPinMessage = ({ onClick }: EmptyPinMessageProps) => {
 
 	useEffect(() => {
 		if (listPinMessages.length) {
-			dispatch(pinMessageActions.updateLastSeenPin({ clanId: currentClanId ?? '', channelId: currentChannelId ?? '', messageId: listPinMessages[listPinMessages.length - 1]?.message_id ?? '' }))
+			dispatch(
+				pinMessageActions.updateLastSeenPin({
+					clanId: currentClanId ?? '',
+					channelId: currentChannelId ?? '',
+					messageId: listPinMessages[listPinMessages.length - 1]?.message_id ?? '',
+				}),
+			);
 		}
 	}, []);
 

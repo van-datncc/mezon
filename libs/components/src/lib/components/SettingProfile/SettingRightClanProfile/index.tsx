@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import SettingRightClanEdit from './settingUserClanProfileEdit';
-import { useSelector } from 'react-redux';
 import { selectAllClans, selectCurrentClan } from '@mezon/store';
-const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileClick?: () => void; menuIsOpen: boolean; }) => {
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import SettingRightClanEdit from './settingUserClanProfileEdit';
+const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileClick?: () => void; menuIsOpen: boolean }) => {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
 	const [flagOption, setFlagOption] = useState(false);
@@ -17,7 +17,9 @@ const SettingRightClan = ({ onUserProfileClick, menuIsOpen }: { onUserProfileCli
 	};
 
 	return (
-		<div className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? "min-w-[700px]" : ""} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}>
+		<div
+			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar`}
+		>
 			<div className="dark:text-white text-black">
 				<h1 className="text-xl font-semibold tracking-wider mb-8">Profiles</h1>
 				<button className="pt-1 text-[#AEAEAE] font-bold text-base tracking-wider" onClick={handleUserProfileButtonClick}>

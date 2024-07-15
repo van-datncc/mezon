@@ -1,11 +1,10 @@
 import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
-import { FC, useMemo } from 'react';
+import { FC, memo, useMemo } from 'react';
 import { Pressable } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import SuggestItem from './SuggestItem';
-import { memo } from 'react';
 
 export interface MentionSuggestionsProps {
 	suggestions: MentionDataProps[];

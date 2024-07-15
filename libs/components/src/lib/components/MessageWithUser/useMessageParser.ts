@@ -1,5 +1,5 @@
 import { IMessageWithUser, convertDateString, convertTimeHour, convertTimeString } from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
 	const attachments = useMemo(() => {

@@ -4,11 +4,11 @@ import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Coords } from '../../../ChannelLink';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
+import { Coords } from '../../../ChannelLink';
 import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
-import PanelEventItem from './panelEventItem';
 import ModalDelEvent from './modalDelEvent';
+import PanelEventItem from './panelEventItem';
 
 export type ItemEventManagementProps = {
 	option: string;
@@ -85,11 +85,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			onClick={
 				setOpenModalDetail && event
 					? () => {
-						setOpenModalDetail(true);
-						setChooseEvent(event);
-					}
+							setOpenModalDetail(true);
+							setChooseEvent(event);
+						}
 					: // eslint-disable-next-line @typescript-eslint/no-empty-function
-					() => { }
+						() => {}
 			}
 			ref={panelRef}
 		>
@@ -172,7 +172,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}
-			{openModalDelEvent && <ModalDelEvent event={event} onClose={() => setOpenPanel(false)} setOpenModalDelEvent={setOpenModalDelEvent} onHandle={handleStopPropagation} />}
+			{openModalDelEvent && (
+				<ModalDelEvent
+					event={event}
+					onClose={() => setOpenPanel(false)}
+					setOpenModalDelEvent={setOpenModalDelEvent}
+					onHandle={handleStopPropagation}
+				/>
+			)}
 		</div>
 	);
 };

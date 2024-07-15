@@ -1,8 +1,8 @@
-import {IDefaultNotification, IDefaultNotificationClan, LoadingStatus } from '@mezon/utils';
-import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
-import { ApiNotificationSetting } from 'mezon-js/api.gen';
+import { IDefaultNotification, IDefaultNotificationClan, LoadingStatus } from '@mezon/utils';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
+import { ApiNotificationSetting } from 'mezon-js/api.gen';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 export const DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY = 'defaultnotificationclan';
 
 export interface DefaultNotificationClanState {

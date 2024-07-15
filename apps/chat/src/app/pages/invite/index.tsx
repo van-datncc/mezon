@@ -1,35 +1,34 @@
 import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { selectInviteById } from '@mezon/store';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectInviteById } from '@mezon/store';
 import { toast } from 'react-toastify';
 
 export default function InvitePage() {
 	const { inviteId: inviteIdParam } = useParams();
-	const selectInvite  = useSelector(selectInviteById(inviteIdParam || ''));
+	const selectInvite = useSelector(selectInviteById(inviteIdParam || ''));
 	const navigate = useNavigate();
 	const { inviteUser } = useInvite();
 
 	const clanName = useMemo(() => {
-		return selectInvite?.clan_name || '' 
+		return selectInvite?.clan_name || '';
 	}, [selectInvite]);
 	const channelName = useMemo(() => {
-		return selectInvite?.channel_label || ''
+		return selectInvite?.channel_label || '';
 	}, [selectInvite]);
 	const clanId = useMemo(() => {
-		return selectInvite?.clan_id || ''
+		return selectInvite?.clan_id || '';
 	}, [selectInvite]);
 	const channeId = useMemo(() => {
-		return selectInvite?.channel_id || ''
+		return selectInvite?.channel_id || '';
 	}, [selectInvite]);
 	const userJoined = useMemo(() => {
-		return selectInvite?.user_joined
+		return selectInvite?.user_joined;
 	}, [selectInvite]);
-	
-	
+
 	const joinChannel = async () => {
 		if (inviteIdParam) {
 			inviteUser(inviteIdParam).then((res) => {
@@ -47,11 +46,11 @@ export default function InvitePage() {
 	const handleCancelJoin = () => {
 		navigate(`/chat/direct`);
 	};
-	
+
 	useEffect(() => {
 		if (userJoined) {
 			navigate(`/chat/clans/${clanId}/channels/${channeId}`);
-			toast.info("You are already a member!")
+			toast.info('You are already a member!');
 		}
 	}, []);
 
@@ -67,9 +66,7 @@ export default function InvitePage() {
 						</div>
 						<p className="text-base text-gray-400 dark:text-gray-400 text-[18px] mt-3 ">You've been invite to join</p>
 						<p className="text-4xl text-white font-semibold mt-4">{clanName}</p>
-						{channelName && (
-							<p className="text-4xl text-white text-[18px]">#{channelName}</p>
-						)}
+						{channelName && <p className="text-4xl text-white text-[18px]">#{channelName}</p>}
 					</div>
 				</Modal.Body>
 				{/* <Modal.Footer> */}

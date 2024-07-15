@@ -1,44 +1,61 @@
-import { StyleProp, Text, TextStyle, TouchableOpacity, View } from "react-native";
-import { ReactNode } from "react";
-import { ChevronSmallRightIcon }
-    // @ts-ignore
-    from "libs/mobile-components/src/lib/icons2";
-import { style } from "./styles";
-import { useTheme } from "@mezon/mobile-ui";
+import { useTheme } from '@mezon/mobile-ui';
+import {
+	ChevronSmallRightIcon,
+	// @ts-ignore
+} from 'libs/mobile-components/src/lib/icons2';
+import { ReactNode } from 'react';
+import { StyleProp, Text, TextStyle, TouchableOpacity, View } from 'react-native';
+import { style } from './styles';
 
 export interface IMezonMenuItemProps {
-    isShow?: boolean;
-    title: string,
-    icon?: any,
-    onPress?: () => void,
-    expandable?: boolean,
-    isLast?: boolean,
-    component?: ReactNode,
-    textStyle?: StyleProp<TextStyle>,
-    disabled?: boolean,
-    description?: string,
-    previewValue?: string,
+	isShow?: boolean;
+	title: string;
+	icon?: any;
+	onPress?: () => void;
+	expandable?: boolean;
+	isLast?: boolean;
+	component?: ReactNode;
+	textStyle?: StyleProp<TextStyle>;
+	disabled?: boolean;
+	description?: string;
+	previewValue?: string;
 }
-export default function MezonMenuItem({ isLast, title, expandable, icon, onPress, component, textStyle, disabled, description, isShow = true, previewValue }: IMezonMenuItemProps) {
-    const { themeValue } = useTheme();
-    const styles = style(themeValue);
+export default function MezonMenuItem({
+	isLast,
+	title,
+	expandable,
+	icon,
+	onPress,
+	component,
+	textStyle,
+	disabled,
+	description,
+	isShow = true,
+	previewValue,
+}: IMezonMenuItemProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 
-    return (
-        isShow &&
-        <TouchableOpacity
-            disabled={disabled}
-            onPress={() => { onPress && onPress() }}
-            style={styles.btn}>
-            {icon}
-            <View style={[styles.btnTitleWrapper, disabled && styles.disable, !isLast && styles.borderBottom]}>
-                <View style={styles.btnTextWrapper}>
-                    <Text style={[styles.btnTitle, textStyle]}>{title}</Text>
-                    {description && <Text style={[styles.btnDescription]}>{description}</Text>}
-                </View>
-                {component}
-                {previewValue && <Text style={styles.previewValue}>{previewValue}</Text>}
-                {expandable && <ChevronSmallRightIcon height={18} width={18} color={themeValue.text} />}
-            </View>
-        </TouchableOpacity>
-    )
+	return (
+		isShow && (
+			<TouchableOpacity
+				disabled={disabled}
+				onPress={() => {
+					onPress && onPress();
+				}}
+				style={styles.btn}
+			>
+				{icon}
+				<View style={[styles.btnTitleWrapper, disabled && styles.disable, !isLast && styles.borderBottom]}>
+					<View style={styles.btnTextWrapper}>
+						<Text style={[styles.btnTitle, textStyle]}>{title}</Text>
+						{description && <Text style={[styles.btnDescription]}>{description}</Text>}
+					</View>
+					{component}
+					{previewValue && <Text style={styles.previewValue}>{previewValue}</Text>}
+					{expandable && <ChevronSmallRightIcon height={18} width={18} color={themeValue.text} />}
+				</View>
+			</TouchableOpacity>
+		)
+	);
 }

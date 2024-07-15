@@ -1,4 +1,4 @@
-import { createListenerMiddleware, Action } from '@reduxjs/toolkit';
+import { Action, createListenerMiddleware } from '@reduxjs/toolkit';
 import { toastActions } from './toasts.slice';
 
 // Define the type for actions that include a toast in their meta

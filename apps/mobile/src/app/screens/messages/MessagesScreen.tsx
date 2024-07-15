@@ -1,27 +1,25 @@
-import moment from 'moment';
-import React, { useState, useMemo } from 'react';
-import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Icons, MessageIcon, PaperclipIcon, } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { style } from './styles';
-import { useTranslation } from 'react-i18next';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { useMemberStatus } from '@mezon/core';
-import { emojiRegex, normalizeString } from '../../utils/helpers';
-import { useThrottledCallback } from 'use-debounce';
-import { useSelector } from 'react-redux';
-import { DirectEntity, selectDirectsOpenlist, selectAllEmojiSuggestion } from '@mezon/store-mobile';
-import { removeBlockCode } from '../home/homedrawer/constants';
-import FastImage from 'react-native-fast-image';
+import { Icons, PaperclipIcon } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, selectAllEmojiSuggestion, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
+import moment from 'moment';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { useSelector } from 'react-redux';
+import { useThrottledCallback } from 'use-debounce';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { emojiRegex, normalizeString } from '../../utils/helpers';
+import { removeBlockCode } from '../home/homedrawer/constants';
+import { style } from './styles';
 
 const SeparatorListFriend = () => {
-	return (
-		<View style={{ height: size.s_8 }} />
-	)
-}
+	return <View style={{ height: size.s_8 }} />;
+};
 
-const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation: any }) => {
+const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation } = props;
@@ -29,8 +27,11 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const redirectToMessageDetail = () => {
-		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL, params: { directMessageId: directMessage?.id } })
-	}
+		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+			params: { directMessageId: directMessage?.id },
+		});
+	};
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
@@ -38,12 +39,12 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 
 		return usernameList.map((username, index) => ({
 			userId: userIdList[index],
-			username: username
-		}))
-	}, [directMessage])
+			username: username,
+		}));
+	}, [directMessage]);
 
 	const getLastMessageContent = (content) => {
-		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t
+		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 		const lastMessageSender = otherMemberList.find((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 
 		if (!text) {
@@ -54,32 +55,38 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 					{'attachment '}
 					<PaperclipIcon width={13} height={13} color={Colors.textGray} />
 				</Text>
-			)
+			);
 		}
 
 		const parts = removeBlockCode?.(text?.trim())?.split(/(:[^:]+:)/);
 		return (
 			<View style={{ flex: 1, maxHeight: size.s_18, flexDirection: 'row', flexWrap: 'nowrap', overflow: 'hidden' }}>
-				<Text style={[styles.defaultText, styles.lastMessage]}>{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}</Text>
+				<Text style={[styles.defaultText, styles.lastMessage]}>
+					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
+				</Text>
 				{parts?.map?.((part, index) => {
-					if (!part) return null
+					if (!part) return null;
 					if (part.match(emojiRegex)) {
 						const srcEmoji = getSrcEmoji(part, emojiListPNG);
-						return <FastImage key={index} source={{ uri: srcEmoji }} style={{ width: 18, height: 18 }} />
+						return <FastImage key={index} source={{ uri: srcEmoji }} style={{ width: 18, height: 18 }} />;
 					}
-					return <Text style={[styles.defaultText, styles.lastMessage]} key={index}>{part} </Text>
+					return (
+						<Text style={[styles.defaultText, styles.lastMessage]} key={index}>
+							{part}{' '}
+						</Text>
+					);
 				})}
 			</View>
-		)
+		);
 	};
 
 	const lastMessageTime = useMemo(() => {
 		if (directMessage?.last_sent_message?.content) {
 			const timestamp = Number(directMessage?.last_sent_message?.timestamp);
-			return moment.unix(timestamp).format('DD/MM/YYYY HH:mm')
+			return moment.unix(timestamp).format('DD/MM/YYYY HH:mm');
 		}
 		return null;
-	}, [directMessage])
+	}, [directMessage]);
 
 	return (
 		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()}>
@@ -96,24 +103,17 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity, navigation:
 
 			<View style={{ flex: 1 }}>
 				<View style={styles.messageContent}>
-					<Text
-						numberOfLines={1}
-						style={[styles.defaultText, styles.channelLabel]}
-					>
+					<Text numberOfLines={1} style={[styles.defaultText, styles.channelLabel]}>
 						{directMessage?.channel_label}
 					</Text>
-					{lastMessageTime ? (
-						<Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text>
-					) : null}
+					{lastMessageTime ? <Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text> : null}
 				</View>
 
-				{lastMessageTime ? (
-					getLastMessageContent(directMessage?.last_sent_message?.content)
-				) : null}
+				{lastMessageTime ? getLastMessageContent(directMessage?.last_sent_message?.content) : null}
 			</View>
 		</TouchableOpacity>
-	)
-})
+	);
+});
 
 const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
@@ -130,26 +130,30 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const filterDmGroupsByChannelLabel = (data: DirectEntity[]) => {
 		const uniqueLabels = new Set();
-		return data?.filter((obj: DirectEntity) => {
-			const isUnique = !uniqueLabels.has(obj.channel_label);
-			uniqueLabels.add(obj.channel_label);
-			return isUnique;
-		}).sort(sortDM);
+		return data
+			?.filter((obj: DirectEntity) => {
+				const isUnique = !uniqueLabels.has(obj.channel_label);
+				uniqueLabels.add(obj.channel_label);
+				return isUnique;
+			})
+			.sort(sortDM);
 	};
 
 	const filteredDataDM = useMemo(() => {
-		return filterDmGroupsByChannelLabel(dmGroupChatList)?.filter?.(dm => normalizeString(dm.channel_label)?.includes(normalizeString(searchText)));
+		return filterDmGroupsByChannelLabel(dmGroupChatList)?.filter?.((dm) =>
+			normalizeString(dm.channel_label)?.includes(normalizeString(searchText)),
+		);
 	}, [dmGroupChatList, searchText]);
 
 	const navigateToAddFriendScreen = () => {
 		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.ADD_FRIEND });
-	}
+	};
 
 	const navigateToNewMessageScreen = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.NEW_MESSAGE });
-	}
+	};
 
-	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500)
+	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 
 	return (
 		<View style={styles.container}>

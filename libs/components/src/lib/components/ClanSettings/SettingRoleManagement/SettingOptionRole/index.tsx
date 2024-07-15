@@ -5,10 +5,10 @@ import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
 
-const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
+const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>('Display');
 	const clickRole = useSelector(getSelectedRoleId);
-	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole),[RolesClan, clickRole]);
+	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole), [RolesClan, clickRole]);
 	const dispatch = useDispatch();
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
@@ -26,7 +26,9 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 					}}
 				>
 					Display
-					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Display' ? 'bg-blue-400' : ''}`} />
+					<div
+						className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Display' ? 'bg-blue-400' : ''}`}
+					/>
 				</button>
 
 				<button
@@ -37,7 +39,9 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 					}}
 				>
 					Permissions
-					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Permissions' ? 'bg-blue-400' : ''}`} />
+					<div
+						className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Permissions' ? 'bg-blue-400' : ''}`}
+					/>
 				</button>
 				<button
 					className="py-[5px] dark:text-white text-black text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group"
@@ -47,12 +51,14 @@ const SettingValueDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => 
 					}}
 				>
 					Manage Members ({roleUsersCount > 0 ? roleUsersCount : 0})
-					<div className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Manage Members' ? 'bg-blue-400' : ''}`} />
+					<div
+						className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${selectedButton === 'Manage Members' ? 'bg-blue-400' : ''}`}
+					/>
 				</button>
 			</div>
-			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan}/>}
-			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan}/>}
-			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan}/>}
+			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan} />}
+			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan} />}
+			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan} />}
 		</>
 	);
 };
