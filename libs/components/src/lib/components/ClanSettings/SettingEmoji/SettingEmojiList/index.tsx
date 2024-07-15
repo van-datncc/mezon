@@ -15,7 +15,7 @@ const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
         {title} - {250 - emojiList.length} slots available
       </h2>
       <div className={'flex items-center flex-row w-full dark:text-textSecondary text-textSecondary800'}>
-        <p className={'w-14   text-xs font-bold '}>
+        <p className={'w-14 text-xs font-bold '}>
           IMAGE
         </p>
         <p className={'flex-1 text-xs font-bold'}>
@@ -27,7 +27,7 @@ const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
       </div>
       <div className={'flex flex-col w-full'}>
         {emojiList.map(emoji => (
-          <SettingEmojiItem src={emoji.src ?? ''} emojiName={emoji.shortname ?? ''} author={''} />
+          <SettingEmojiItem key={emoji.src} src={emoji.src ?? ''} emojiName={emoji.shortname ?? ''} authorId={'1809069169707061248'} />
         ))}
       </div>
     </div>

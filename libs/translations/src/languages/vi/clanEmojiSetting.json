@@ -1,0 +1,24 @@
+{
+  "title":"TILE",
+  "header": {
+      "description": "Add up to 250 custom emoji that anyone can use in this server. Animated GIF emoji may be used by members with Mezon Nitro",
+      "upload_requirements" : "UPLOAD REQUIREMENTS",
+      "rule":{
+        "one" : "File type: JPEG, PNG, GIF",
+        "two" : "Recommended file size: 256 KB (We'll compress for you)",
+        "three" : "Recommended dimensions: 128x128",
+        "four" : "Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores"
+      }
+  },
+  "body":{
+    "title":{
+      "emoji" : "emoji",
+      "emoji_animated" : "emoji animated",
+      "slot_available" :"slots available",
+      "image" : "image",
+      "name" : "name",
+      "uploaded_by" : "uploaded by"
+    }
+  }
+
+}

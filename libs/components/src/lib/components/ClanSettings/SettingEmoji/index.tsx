@@ -7,6 +7,9 @@ import { AppDispatch, createEmoji, selectAllEmoji, selectCurrentChannelId, selec
 import { handleUploadFile, useMezon } from "@mezon/transport";
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from "mezon-js/api.gen";
 import { ModalErrorTypeUpload, ModalOverData } from "../../ModalError";
+import { useTranslation } from 'react-i18next';
+
+
 
 const SettingEmoji = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -16,20 +19,21 @@ const SettingEmoji = () => {
   const currentClanId = useSelector(selectCurrentClanId) || '';
   const { sessionRef, clientRef } = useMezon()
   const emojiList = useSelector(selectAllEmoji);
-
+  // const { t } = useTranslation(["clanEmojiSetting"]);
+  const { t, i18n } = useTranslation('en');
   const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
-    if(e.target.files) {
+    if (e.target.files) {
       const file = e.target.files[0];
       const imageSize = file?.size;
-      const fileName = file?.name.slice(62);
+      const fileName = file?.name.slice(0.62);
       const session = sessionRef.current;
       const client = clientRef.current;
       const category = 'Custom';
       const path = 'emojis/' + category;
-      if(!client || !session) {
+      if (!client || !session) {
         throw new Error('Client or file is not initialized')
       }
-      const allowedTypes = ['image/jpeg', 'image/png'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file?.type)) {
         setOpenModalType(true);
         return;
@@ -48,7 +52,7 @@ const SettingEmoji = () => {
         };
         await dispatch(createEmoji(request));
       })
-    }else {
+    } else {
       return;
     }
 
@@ -67,12 +71,13 @@ const SettingEmoji = () => {
   return (
     <>
 
+
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
         <div className={'dark:text-textSecondary flex flex-col gap-2 text-textSecondary800'}>
-          <p className={''}>Add up to 250 custom emoji that anyone can use in this server. Animated GIF emoji may be used by members with Mezon Nitro</p>
-          <p className={'uppercase text-xs'}>Upload requirements</p>
+          <p className={''}>{t('description')}</p>
+          <p className={'uppercase text-xs'}>{t('header.description')}</p>
           <ul className={"list-disc ml-[16px]"}>
-            <li>File type: JPEG, PNG, GIF</li>
+            <li>{t('title')}</li>
             <li>Recommended file size: 256 KB (We'll compress for you)</li>
             <li>Recommended dimensions: 128x128</li>
             <li>Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores</li>
@@ -91,12 +96,13 @@ const SettingEmoji = () => {
         </div>
       </div>
 
-      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji}/>
-      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji}/>
+      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji} />
+      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji} />
 
-      <ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)}/>
+      <ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 
-      <ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)}/>
+      <ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
+
     </>
   )
 }

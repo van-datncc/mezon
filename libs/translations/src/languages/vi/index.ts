@@ -28,7 +28,7 @@ import appearanceSetting from "./appearanceSetting.json";
 import appThemeSetting from "./appThemeSetting.json";
 import accountSetting from "./accountSetting.json";
 import deleteClan from "./deleteClan.json";
-
+import clanEmojiSetting from "./clanEmojiSetting.json"
 export default {
 	inviteToChannel,
 	notification,
@@ -59,5 +59,6 @@ export default {
 	appearanceSetting,
 	appThemeSetting,
 	accountSetting,
-  deleteClan
+  deleteClan,
+  clanEmojiSetting
 };

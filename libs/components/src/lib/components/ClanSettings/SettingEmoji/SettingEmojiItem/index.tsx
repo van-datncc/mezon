@@ -6,17 +6,16 @@ import { selectMemberClanByUserId } from "@mezon/store";
 type SettingEmojiItemProp = {
   src: string,
   emojiName: string,
-  author: string,
+  authorId: string,
 }
 
-const SettingEmojiItem = ({ src, author, emojiName }: SettingEmojiItemProp) => {
+const SettingEmojiItem = ({ src, authorId, emojiName }: SettingEmojiItemProp) => {
   const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
-
   }
-  const dataAuthor = useSelector(selectMemberClanByUserId("1809069169707061248"));
+  const dataAuthor = useSelector(selectMemberClanByUserId(authorId));
 
   return (
     <div className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
@@ -31,7 +30,7 @@ const SettingEmojiItem = ({ src, author, emojiName }: SettingEmojiItemProp) => {
         <div className={'flex-1 relative'}>
           <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'}>
             <p className={`max-w-[172px] truncate overflow-hidden inline-block`}>
-              {emojiName}
+              {nameEmoji}
             </p>
           </div>
 
