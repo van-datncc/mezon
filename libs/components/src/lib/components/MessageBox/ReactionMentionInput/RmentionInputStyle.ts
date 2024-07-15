@@ -37,7 +37,6 @@ export default {
 	},
 
 	suggestions: {
-		left: '-40px',
 		top: '20px',
 		list: {
 			overflowY: 'auto',

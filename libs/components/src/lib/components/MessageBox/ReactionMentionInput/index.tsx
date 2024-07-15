@@ -569,7 +569,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			)}
 			<MentionsInput
 				onPaste={props.handlePaste}
-				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."
 				value={valueTextInput ?? ''}
@@ -578,8 +577,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					...(appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle),
 					suggestions: {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.suggestions : darkMentionsInputStyle.suggestions),
-						width: `${mentionWidth}`,
+						width: `${!closeMenu ? mentionWidth : "90vw"}`,
+						left: `${!closeMenu ? "-40px" : "-30px"}`
 					},
+					control: {
+						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
+						maxWidth: `${!closeMenu ? chatBoxMaxWidth : "75vw"}`,
+					},
+					maxWidth: `${!closeMenu ? chatBoxMaxWidth : "75vw"}`,
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
